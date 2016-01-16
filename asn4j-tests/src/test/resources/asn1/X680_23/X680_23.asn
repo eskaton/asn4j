@@ -1,0 +1,6 @@
+X680-23 DEFINITIONS ::=
+BEGIN
+
+TestOctetString ::= OCTET STRING
+
+END

@@ -1,0 +1,10 @@
+X680-18 DEFINITIONS ::=
+BEGIN
+
+TestBoolean ::= BOOLEAN
+
+testBooleanValueT BOOLEAN ::= TRUE
+
+testBooleanValueF BOOLEAN ::= FALSE
+
+END

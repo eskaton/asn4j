@@ -1,0 +1,22 @@
+X680-19 DEFINITIONS ::=
+BEGIN
+
+TestInteger ::= INTEGER
+
+TestNamedInteger ::= INTEGER {
+	value1(minusOne), value3(3), value5(five)	
+}
+
+TestNamedInteger5 ::= INTEGER {
+	five(5)
+}
+
+TestNamedInteger3 ::= INTEGER {
+	three(3)
+}
+
+minusOne INTEGER ::= -1
+
+five TestNamedInteger5 ::= five
+
+END

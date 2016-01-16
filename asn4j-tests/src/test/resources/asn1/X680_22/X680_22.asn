@@ -1,0 +1,20 @@
+X680-22 DEFINITIONS ::=
+BEGIN
+
+TestBitString1 ::= BIT STRING {
+  test-a(0), 
+  test-b(one), 
+  test-c(two)
+}
+
+TestBitString2 ::= BIT STRING
+
+TestNamedInteger2 ::= INTEGER {
+	two(2)
+}
+
+one INTEGER ::= 1
+
+two TestNamedInteger2 ::= two
+
+END
