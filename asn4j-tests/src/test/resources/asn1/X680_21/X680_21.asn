@@ -1,0 +1,24 @@
+X680-21 DEFINITIONS ::=
+BEGIN
+
+testRealValueA REAL ::= PLUS-INFINITY
+
+testRealValueB REAL ::= MINUS-INFINITY
+
+testRealValueC REAL ::= NOT-A-NUMBER
+
+testRealValueD REAL ::= 0
+
+testRealValueE REAL ::= 5
+
+testRealValueF REAL ::= 12.78
+
+testRealValueG REAL ::= 12.78e-5
+
+testRealValueH REAL ::= 12.78e+45
+
+testRealValueI REAL ::= { mantissa 5, base 2, exponent 3}
+
+testRealValueJ REAL ::= { mantissa -3, base 10, exponent 12}
+
+END

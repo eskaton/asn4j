@@ -1,0 +1,10 @@
+X680-20 DEFINITIONS ::=
+BEGIN
+
+TestEnumeration ::= ENUMERATED {
+	m(testInt), a, b, c(0), ..., d, e(5), f, g(9), h
+}
+
+testInt INTEGER ::= -3
+
+END

@@ -1,0 +1,6 @@
+X680-24 DEFINITIONS ::=
+BEGIN
+
+TestNull ::= NULL
+
+END

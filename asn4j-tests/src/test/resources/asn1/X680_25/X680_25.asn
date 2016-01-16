@@ -1,0 +1,47 @@
+X680-25 DEFINITIONS ::=
+BEGIN
+
+TestSequence1 ::= SEQUENCE {
+	a INTEGER,
+	b BOOLEAN,
+	c OCTET STRING 
+}
+
+TestSequence2 ::= SEQUENCE {
+	a INTEGER,
+	b BOOLEAN OPTIONAL,
+	c OCTET STRING 
+}
+
+TestSequence3 ::= SEQUENCE {
+	a INTEGER,
+	b BOOLEAN,
+	c OCTET STRING DEFAULT "test"
+}
+
+intValue INTEGER ::= 4711
+
+TestSequence4 ::= SEQUENCE {
+	a INTEGER DEFAULT intValue,
+	b BOOLEAN,
+	c OCTET STRING
+}
+
+TestSequence5 ::= SEQUENCE {
+	a INTEGER DEFAULT 23,
+	...,
+	z INTEGER
+}
+
+TestSequence6 ::= SEQUENCE {
+	COMPONENTS OF TestSequence5,
+	b BOOLEAN
+}
+
+TestSequence7 ::= SEQUENCE {
+	a INTEGER,
+	...,
+	b INTEGER
+}
+
+END
