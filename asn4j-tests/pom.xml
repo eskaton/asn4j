@@ -34,12 +34,12 @@
 			<version>2.4</version>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
-	
+
 		<plugins>
-		
- 			<plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>
@@ -47,216 +47,12 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>ch.eskaton</groupId>
 				<artifactId>asn4j-maven-plugin</artifactId>
 				<version>1.0.0-SNAPSHOT</version>
 				<executions>
-					<!-- <execution>
-						<id>example</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>PersonnelRecord</module>
-							<pkg>ch.eskaton.asn4jtest.example</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/example</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test1</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test1</module>
-							<pkg>ch.eskaton.asn4jtest.test1</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test1</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test2</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test2</module>
-							<pkg>ch.eskaton.asn4jtest.test2</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test2</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>test6</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test6</module>
-							<pkg>ch.eskaton.asn4jtest.test6</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test6</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test7</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test7</module>
-							<pkg>ch.eskaton.asn4jtest.test7</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test7</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test8</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test8</module>
-							<pkg>ch.eskaton.asn4jtest.test8</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test8</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test9</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test9</module>
-							<pkg>ch.eskaton.asn4jtest.test9</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test9</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test10</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test10</module>
-							<pkg>ch.eskaton.asn4jtest.test10</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test10</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test11</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test11</module>
-							<pkg>ch.eskaton.asn4jtest.test11</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test11</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test12</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test12</module>
-							<pkg>ch.eskaton.asn4jtest.test12</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test12</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test13</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test13</module>
-							<pkg>ch.eskaton.asn4jtest.test13</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test13</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-<					<execution>
-						<id>test14</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test14</module>
-							<pkg>ch.eskaton.asn4jtest.test14</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test14</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test15</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test15</module>
-							<pkg>ch.eskaton.asn4jtest.test15</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test15</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution>
-						<id>test16</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>Test16</module>
-							<pkg>ch.eskaton.asn4jtest.test16</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/test16</includePath>
-							</includePaths>
-						</configuration>
-					</execution>
-					<execution> <id>test17</id> <phase>generate-sources</phase> <goals> 
-						<goal>asn4j</goal> </goals> <configuration> <module>Test17</module> <pkg>ch.eskaton.asn4jtest.test17</pkg> 
-						<includePaths> <includePath>src/test/resources/asn1/test17</includePath> 
-						</includePaths> </configuration> </execution>
-						
-						-->
-						
 					<execution>
 						<id>X680_18</id>
 						<phase>generate-sources</phase>
@@ -270,8 +66,8 @@
 								<includePath>src/test/resources/asn1/X680_18</includePath>
 							</includePaths>
 						</configuration>
-					</execution>	
-						
+					</execution>
+
 					<execution>
 						<id>X680_19</id>
 						<phase>generate-sources</phase>
@@ -286,7 +82,7 @@
 							</includePaths>
 						</configuration>
 					</execution>
-					
+
 					<execution>
 						<id>X680_20</id>
 						<phase>generate-sources</phase>
@@ -301,7 +97,7 @@
 							</includePaths>
 						</configuration>
 					</execution>
-					
+
 
 					<execution>
 						<id>X680_21</id>
@@ -317,7 +113,7 @@
 							</includePaths>
 						</configuration>
 					</execution>
-					
+
 					<execution>
 						<id>X680_22</id>
 						<phase>generate-sources</phase>
@@ -332,7 +128,7 @@
 							</includePaths>
 						</configuration>
 					</execution>
-					
+
 					<execution>
 						<id>X680_23</id>
 						<phase>generate-sources</phase>
@@ -347,7 +143,7 @@
 							</includePaths>
 						</configuration>
 					</execution>
-					
+
 					<execution>
 						<id>X680_24</id>
 						<phase>generate-sources</phase>
@@ -362,7 +158,7 @@
 							</includePaths>
 						</configuration>
 					</execution>
-					
+
 					<execution>
 						<id>X680_25</id>
 						<phase>generate-sources</phase>
@@ -377,53 +173,39 @@
 							</includePaths>
 						</configuration>
 					</execution>
-					
-					<!--
+
 					<execution>
-						<id>X680_50_1</id>
+						<id>X680_26</id>
 						<phase>generate-sources</phase>
 						<goals>
 							<goal>asn4j</goal>
 						</goals>
 						<configuration>
-							<module>X680_50_1</module>
-							<pkg>ch.eskaton.asn4jtest.x680_50_1</pkg>
+							<module>X680_26</module>
+							<pkg>ch.eskaton.asn4jtest.x680_26</pkg>
 							<includePaths>
-								<includePath>src/test/resources/asn1/X680_50_1</includePath>
+								<includePath>src/test/resources/asn1/X680_26</includePath>
 							</includePaths>
 						</configuration>
 					</execution>
+
 					<execution>
-						<id>X680_51_2</id>
+						<id>X680_27</id>
 						<phase>generate-sources</phase>
 						<goals>
 							<goal>asn4j</goal>
 						</goals>
 						<configuration>
-							<module>X680_51_2</module>
-							<pkg>ch.eskaton.asn4jtest.x680_51_2</pkg>
+							<module>X680_27</module>
+							<pkg>ch.eskaton.asn4jtest.x680_27</pkg>
 							<includePaths>
-								<includePath>src/test/resources/asn1/X680_51_2</includePath>
+								<includePath>src/test/resources/asn1/X680_27</includePath>
 							</includePaths>
 						</configuration>
 					</execution>
-					<execution>
-						<id>X680_51_4</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>asn4j</goal>
-						</goals>
-						<configuration>
-							<module>X680_51_4</module>
-							<pkg>ch.eskaton.asn4jtest.x680_51_4</pkg>
-							<includePaths>
-								<includePath>src/test/resources/asn1/X680_51_4</includePath>
-							</includePaths>
-						</configuration>
-					</execution> -->
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -443,9 +225,9 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 		</plugins>
-		
+
 		<pluginManagement>
 			<plugins>
 				<!--This plugin's configuration is used to store Eclipse m2e settings 
@@ -484,7 +266,7 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
-		
+
 	</build>
-	
+
 </project>

@@ -27,10 +27,14 @@
 
 package ch.eskaton.asn4j.test.x680_20;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
 
 import org.junit.Test;
 
+import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
@@ -39,6 +43,14 @@ import ch.eskaton.asn4j.runtime.EncodingException;
 import ch.eskaton.asn4jtest.x680_20.TestEnumeration;
 
 public class TestX680_20 {
+
+	@Test
+	public void testEncoding() throws ASN1RuntimeException, IOException {
+		BEREncoder encoder = new BEREncoder();
+
+		assertArrayEquals(new byte[] { 0x0a, 0x01, 0x02 },
+				encoder.encode(TestEnumeration.B));
+	}
 
 	@Test
 	public void test1() throws DecodingException, EncodingException,

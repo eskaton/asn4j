@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.test.x680_22;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -44,6 +45,24 @@ import ch.eskaton.asn4jtest.x680_22.TestBitString1;
 import ch.eskaton.asn4jtest.x680_22.TestBitString2;
 
 public class TestX680_22 {
+
+	@Test
+	public void testEncoding() throws ASN1RuntimeException, IOException {
+		BEREncoder encoder = new BEREncoder();
+		TestBitString1 a = new TestBitString1();
+
+		assertArrayEquals(new byte[] { 0x03, 0x01, 0x00 }, encoder.encode(a));
+
+		a.setBit(1);
+
+		assertArrayEquals(new byte[] { 0x03, 0x02, 0x07, (byte) 0x80 },
+				encoder.encode(a));
+
+		a.setBit(8);
+
+		assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, (byte) 0x81 },
+				encoder.encode(a));
+	}
 
 	@Test
 	public void test1() throws ASN1RuntimeException, IOException {
