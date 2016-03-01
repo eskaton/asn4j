@@ -27,20 +27,34 @@
 
 package ch.eskaton.asn4j.test.x680_18;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 import org.junit.Test;
 
+import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 import ch.eskaton.asn4jtest.x680_18.TestBoolean;
-import ch.eskaton.commons.HexDump;
 
 public class TestX680_18 {
+
+	@Test
+	public void testEncoding() throws ASN1RuntimeException, IOException {
+		BEREncoder encoder = new BEREncoder();
+		TestBoolean a = new TestBoolean();
+
+		a.setValue(true);
+
+		assertArrayEquals(new byte[] { 0x01, 0x01, (byte) 0xff },
+				encoder.encode(a));
+
+		a.setValue(false);
+
+		assertArrayEquals(new byte[] { 0x01, 0x01, 0x00 }, encoder.encode(a));
+	}
 
 	@Test
 	public void test1() throws ASN1RuntimeException, IOException {

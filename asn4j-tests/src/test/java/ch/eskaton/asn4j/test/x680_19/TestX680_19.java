@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.test.x680_19;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -35,15 +36,30 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
+import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 import ch.eskaton.asn4jtest.x680_19.TestInteger;
 import ch.eskaton.asn4jtest.x680_19.TestNamedInteger;
 import ch.eskaton.asn4jtest.x680_19.TestNamedInteger3;
 import ch.eskaton.asn4jtest.x680_19.TestNamedInteger5;
 
 public class TestX680_19 {
+
+	@Test
+	public void testEncoding() throws ASN1RuntimeException, IOException {
+		BEREncoder encoder = new BEREncoder();
+		TestInteger a = new TestInteger();
+
+		a.setValue(BigInteger.valueOf(127));
+
+		assertArrayEquals(new byte[] { 0x02, 0x01, 0x7f }, encoder.encode(a));
+
+		a.setValue(BigInteger.valueOf(255));
+
+		assertArrayEquals(new byte[] { 0x02, 0x02, 0x00, (byte) 0xff },
+				encoder.encode(a));
+	}
 
 	@Test
 	public void test1() throws ASN1RuntimeException, IOException {
