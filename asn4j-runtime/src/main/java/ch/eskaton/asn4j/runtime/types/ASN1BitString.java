@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1BitString implements ASN1Type {
 
-	protected byte[] value = new byte[1];
+	protected byte[] value = new byte[0];
 
 	private int usedBits;
 
@@ -59,7 +59,7 @@ public class ASN1BitString implements ASN1Type {
 	}
 
 	public void setBit(int bit) {
-		int length = bit / 8;
+		int length = (bit - 1) / 8;
 
 		if (length >= value.length) {
 			byte[] tmpValue = new byte[length + 1];
@@ -118,7 +118,7 @@ public class ASN1BitString implements ASN1Type {
 	}
 
 	private int getBit(int bit) {
-		return 1 << (7 - (bit % 8));
+		return 1 << ((8 - bit) % 8);
 	}
 
 	private void calcUsedBits(int pos) {
