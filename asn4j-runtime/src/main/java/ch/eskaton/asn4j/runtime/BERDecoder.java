@@ -27,16 +27,10 @@
 
 package ch.eskaton.asn4j.runtime;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import ch.eskaton.commons.utils.ReflectionUtils;
 import ch.eskaton.commons.utils.StringUtils;
-import com.sun.deploy.util.ReflectionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,12 +110,12 @@ public class BERDecoder implements Decoder {
         MultipleTagsMatcher matcher = new MultipleTagsMatcher(tags.keySet());
         DecoderState state = consumeMultipleTags(states, matcher);
 
-        matcher.getLastMatch();
+        ASN1Tag tag = matcher.getLastMatch();
 
-        // decodeState(Class<T> type, states,
-        // state);
-        // TODO implement
-        return null;
+        // TODO: use a list of tags instead of a single ones
+        Class<? extends ASN1Type> type = tags.remove(Arrays.asList(tag));
+
+        return decodeState(type, states, state);
     }
 
     public <T extends ASN1Type> T decode(Class<T> type, DecoderStates states,
