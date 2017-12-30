@@ -31,9 +31,9 @@ import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.EncodingException;
 import ch.eskaton.asn4j.runtime.TLVUtils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 

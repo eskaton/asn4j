@@ -29,8 +29,8 @@ package ch.eskaton.asn4j.runtime.types;
 
 import java.math.BigInteger;
 
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 2, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1Integer implements ASN1Type {
@@ -54,6 +54,7 @@ public class ASN1Integer implements ASN1Type {
 			throw new ConstraintViolatedException(String.format(
 					"%d doesn't satisfy a constraint", value));
 		}
+		
 		this.value = value;
 	}
 

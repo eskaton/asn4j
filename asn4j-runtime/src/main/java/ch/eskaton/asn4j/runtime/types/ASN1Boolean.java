@@ -27,8 +27,8 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 1, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1Boolean implements ASN1Type {

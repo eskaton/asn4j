@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Stack;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 public class TLVUtils {

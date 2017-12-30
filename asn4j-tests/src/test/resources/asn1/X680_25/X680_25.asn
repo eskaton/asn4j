@@ -1,6 +1,10 @@
 X680-25 DEFINITIONS ::=
 BEGIN
 
+TestSequence0 ::= SEQUENCE {
+	a BOOLEAN
+}
+
 TestSequence1 ::= SEQUENCE {
 	a INTEGER,
 	b BOOLEAN,

@@ -31,70 +31,68 @@ import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import ch.eskaton.asn4j.runtime.Utils;
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.EncodingException;
-import ch.eskaton.asn4j.runtime.TLVUtils;
+import ch.eskaton.asn4j.runtime.Utils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.commons.utils.ReflectionUtils;
 
 public abstract class CollectionEncoder<T extends ASN1Type> implements
-		TypeEncoder<T> {
+        TypeEncoder<T> {
 
-	private Utils berUtils = new Utils();
+    private Utils berUtils = new Utils();
 
-	public byte[] encode(Encoder encoder, T obj) throws EncodingException {
-		ByteArrayOutputStream content = new ByteArrayOutputStream();
+    public byte[] encode(Encoder encoder, T obj) throws EncodingException {
+        ByteArrayOutputStream content = new ByteArrayOutputStream();
 
-		List<Field> compFields = berUtils.getComponents(obj);
+        List<Field> compFields = berUtils.getComponents(obj);
 
-		if (compFields.size() > 0) {
-			for (Field compField : compFields) {
-				ASN1Component annotation = compField
-						.getAnnotation(ASN1Component.class);
-				if (annotation != null) {
-					compField.setAccessible(true);
+        if (compFields.size() > 0) {
+            for (Field compField : compFields) {
+                ASN1Component annotation = compField
+                        .getAnnotation(ASN1Component.class);
+                if (annotation != null) {
+                    compField.setAccessible(true);
 
-					ASN1Tag tag = compField.getAnnotation(ASN1Tag.class);
+                    ASN1Tag tag = ReflectionUtils.getAnnotation(compField,
+                            ASN1Tag.class);
 
-					try {
-						Object value = compField.get(obj);
+                    try {
+                        Object value = compField.get(obj);
 
-						if (value != null) {
-							if (tag != null) {
-								ByteArrayOutputStream fieldContent = new ByteArrayOutputStream();
-								fieldContent.write(encoder.encode(
-										(ASN1Type) value,
-										tag.mode() == ASN1Tag.Mode.Implicit));
-								content.write(TLVUtils.getTag(tag));
-								content.write(TLVUtils.getLength(fieldContent
-										.size()));
-								content.write(fieldContent.toByteArray());
-							} else {
-								content.write(encoder.encode((ASN1Type) value));
-							}
-						} else if (!(annotation.optional() || annotation
-								.hasDefault())) {
-							throw new EncodingException("Value for "
-									+ obj.getClass().getSimpleName() + "."
-									+ compField.getName() + " missing");
+                        if (value != null) {
+                            if (tag != null) {
+                                ByteArrayOutputStream fieldContent = new ByteArrayOutputStream();
+                                fieldContent.write(encoder.encode(
+                                        (ASN1Type) value,
+                                        tag.mode() == ASN1Tag.Mode.Implicit));
+                                content.write(fieldContent.toByteArray());
+                            } else {
+                                content.write(encoder.encode((ASN1Type) value));
+                            }
+                        } else if (!(annotation.optional() || annotation
+                                .hasDefault())) {
+                            throw new EncodingException("Value for "
+                                    + obj.getClass().getSimpleName() + "."
+                                    + compField.getName() + " missing");
 
-						}
-					} catch (Throwable e) {
-						if (e instanceof EncodingException) {
-							throw (EncodingException) e;
-						}
+                        }
+                    } catch (Throwable e) {
+                        if (e instanceof EncodingException) {
+                            throw (EncodingException) e;
+                        }
 
-						throw new EncodingException(e);
-					}
-				}
-			}
+                        throw new EncodingException(e);
+                    }
+                }
+            }
 
-			return content.toByteArray();
-		} else {
-			return new byte[0];
-		}
-	}
+            return content.toByteArray();
+        } else {
+            return new byte[0];
+        }
+    }
 
 }

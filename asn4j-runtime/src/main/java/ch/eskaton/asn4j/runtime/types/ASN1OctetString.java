@@ -31,55 +31,55 @@ import java.util.Arrays;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 4, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1OctetString implements ASN1Type {
 
-	private byte[] value;
+    private byte[] value;
 
-	public ASN1OctetString() {
-	}
+    public ASN1OctetString() {
+    }
 
-	private ASN1OctetString(byte[] value) {
-		this.value = value;
-	}
+    private ASN1OctetString(byte[] value) {
+        this.value = value;
+    }
 
-	public static ASN1OctetString valueOf(String value) {
-		return new ASN1OctetString(value.getBytes());
-	}
+    public static ASN1OctetString valueOf(String value) {
+        return new ASN1OctetString(value.getBytes());
+    }
 
-	public byte[] getValue() {
-		return value;
-	}
+    public byte[] getValue() {
+        return value;
+    }
 
-	public void setValue(byte[] value) {
-		this.value = value;
-	}
+    public void setValue(byte[] value) {
+        this.value = value;
+    }
 
-	@Override
-	public String toString() {
-		return new String(value);
-	}
+    @Override
+    public String toString() {
+        return new String(value);
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + Arrays.hashCode(value);
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(value);
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ASN1OctetString other = (ASN1OctetString) obj;
-		if (!Arrays.equals(value, other.value))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ASN1OctetString other = (ASN1OctetString) obj;
+        if (!Arrays.equals(value, other.value))
+            return false;
+        return true;
+    }
 
 }

@@ -28,14 +28,14 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.EncodingException;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
 public class IntegerEncoder implements TypeEncoder<ASN1Integer> {
 
-	public byte[] encode(Encoder encoder, ASN1Integer obj)
-			throws EncodingException {
-		return ((ASN1Integer) obj).getValue().toByteArray();
-	}
-
+    public byte[] encode(Encoder encoder, ASN1Integer obj)
+            throws EncodingException {
+        return obj.getValue().toByteArray();
+    }
+    
 }

@@ -32,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 6, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1ObjectIdentifier implements ASN1Type {

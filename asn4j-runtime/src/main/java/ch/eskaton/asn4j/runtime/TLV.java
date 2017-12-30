@@ -113,4 +113,11 @@ public class TLV {
 		return tlv;
 	}
 
+	@Override
+	public String toString() {
+		return "TLV [pos=" + pos + ", clazz=" + clazz + ", constructed="
+				+ constructed + ", tag=" + tag + ", length=" + length
+				+ ", nextTlv=" + nextTlv + "]";
+	}
+
 }

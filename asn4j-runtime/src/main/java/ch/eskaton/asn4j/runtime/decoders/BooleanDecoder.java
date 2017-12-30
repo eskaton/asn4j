@@ -25,14 +25,17 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime;
+package ch.eskaton.asn4j.runtime.decoders;
 
-public class ConstraintViolatedException extends RuntimeException {
+import ch.eskaton.asn4j.runtime.DecoderState;
+import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 
-	private static final long serialVersionUID = 1L;
+public class BooleanDecoder {
 
-	public ConstraintViolatedException(String message) {
-		super(message);
+	public void decode(DecoderStates states, DecoderState state, ASN1Boolean obj) {
+		obj.setValue(states.buf[state.pos] == 0x00 ? false
+				: true);
 	}
 
 }

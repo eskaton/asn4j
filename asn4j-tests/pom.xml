@@ -203,6 +203,21 @@
 							</includePaths>
 						</configuration>
 					</execution>
+					
+					<execution>
+						<id>X690_8</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>asn4j</goal>
+						</goals>
+						<configuration>
+							<module>X690_8</module>
+							<pkg>ch.eskaton.asn4jtest.X690_8</pkg>
+							<includePaths>
+								<includePath>src/test/resources/asn1/X690_8</includePath>
+							</includePaths>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 

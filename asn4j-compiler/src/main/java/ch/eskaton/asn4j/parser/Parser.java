@@ -597,8 +597,7 @@ public class Parser {
 
 		private TokenType[] types;
 
-		ChoiceParser(
-				@SuppressWarnings("unchecked") RuleParser<? extends T>... objects) {
+		ChoiceParser(RuleParser<? extends T>... objects) {
 			this.choices = objects;
 		}
 
@@ -1049,12 +1048,12 @@ public class Parser {
 
 			if (rule != null) {
 				switch (((Token) rule.get(0)).getType()) {
-					case EXPLICIT_KW:
-						return ModuleNode.TagMode.Explicit;
-					case IMPLICIT_KW:
-						return ModuleNode.TagMode.Implicit;
-					case AUTOMATIC_KW:
-						return ModuleNode.TagMode.Automatic;
+				case EXPLICIT_KW:
+					return ModuleNode.TagMode.Explicit;
+				case IMPLICIT_KW:
+					return ModuleNode.TagMode.Implicit;
+				case AUTOMATIC_KW:
+					return ModuleNode.TagMode.Automatic;
 				}
 			}
 
@@ -1827,193 +1826,187 @@ public class Parser {
 
 			switch (token.getType()) {
 
-				case BOOLEAN_KW:
-					type = new BooleanType();
-					break;
+			case BOOLEAN_KW:
+				type = new BooleanType();
+				break;
 
-				case DATE_KW:
-					type = new DateType();
-					break;
+			case DATE_KW:
+				type = new DateType();
+				break;
 
-				case DATE_TIME_KW:
-					type = new DateTime();
-					break;
+			case DATE_TIME_KW:
+				type = new DateTime();
+				break;
 
-				case DURATION_KW:
-					type = new Duration();
-					break;
+			case DURATION_KW:
+				type = new Duration();
+				break;
 
-				case EMBEDDED_KW:
-					if (expect(TokenType.PDV_KW) != null) {
-						type = new EmbeddedPDV();
+			case EMBEDDED_KW:
+				if (expect(TokenType.PDV_KW) != null) {
+					type = new EmbeddedPDV();
+				} else {
+					resetToMark();
+					return null;
+				}
+				break;
+
+			case BIT_KW:
+				List<Object> bitRule = new SequenceParser(new boolean[] { true,
+						false }, TokenType.STRING_KW,
+						new ValueExtractor<List<NamedBitNode>>(1,
+								new SequenceParser(TokenType.LBrace,
+										namedBitListParser, TokenType.RBrace)))
+						.parse();
+
+				if (bitRule != null) {
+					if (bitRule.get(1) != null) {
+						type = new BitString(
+								(List<NamedBitNode>) bitRule.get(1));
 					} else {
-						resetToMark();
-						return null;
+						type = new BitString();
 					}
-					break;
+				}
+				break;
 
-				case BIT_KW:
-					List<Object> bitRule = new SequenceParser(new boolean[] {
-							true, false }, TokenType.STRING_KW,
-							new ValueExtractor<List<NamedBitNode>>(1,
-									new SequenceParser(TokenType.LBrace,
-											namedBitListParser,
-											TokenType.RBrace))).parse();
+			case NULL_KW:
+				type = new Null();
+				break;
 
-					if (bitRule != null) {
-						if (bitRule.get(1) != null) {
-							type = new BitString(
-									(List<NamedBitNode>) bitRule.get(1));
+			case REAL_KW:
+				type = new Real();
+				break;
+
+			case INTEGER_KW:
+				List<NamedNumber> intRule = new ValueExtractor<List<NamedNumber>>(
+						1, new SequenceParser(TokenType.LBrace,
+								namedNumberListParser, TokenType.RBrace))
+						.parse();
+
+				if (intRule != null) {
+					type = new IntegerType(intRule);
+				} else {
+					type = new IntegerType();
+				}
+
+				break;
+
+			case RELATIVE_OID_KW:
+				type = new RelativeOID();
+				break;
+
+			case OID_IRI_KW:
+				type = new IRI();
+				break;
+
+			case RELATIVE_OID_IRI_KW:
+				type = new RelativeIRI();
+				break;
+
+			case OBJECT_KW:
+				if (expect(TokenType.IDENTIFIER_KW) != null) {
+					type = new ObjectIdentifier();
+				} else {
+					resetToMark();
+					return null;
+				}
+				break;
+
+			case OCTET_KW:
+				if (expect(TokenType.STRING_KW) != null) {
+					type = new OctetString();
+				} else {
+					resetToMark();
+					return null;
+				}
+				break;
+
+			case EXTERNAL_KW:
+				type = new External();
+				break;
+
+			case CHOICE_KW:
+				List<Object> choiceRule = new SequenceParser(TokenType.LBrace,
+						alternativeTypeListsParser, TokenType.RBrace).parse();
+
+				if (choiceRule != null) {
+					type = new Choice((AlternativeTypeLists) choiceRule.get(1));
+				}
+				break;
+
+			case ENUMERATED_KW:
+				List<Object> enumRule = new SequenceParser(TokenType.LBrace,
+						enumerationsParser, TokenType.RBrace).parse();
+
+				if (enumRule != null) {
+					type = (EnumeratedType) enumRule.get(1);
+				}
+				break;
+
+			case TIME_KW:
+				type = new Time();
+				break;
+
+			case TIME_OF_DAY_KW:
+				type = new TimeOfDay();
+				break;
+
+			case INSTANCE_KW:
+				List<Object> instRule = new SequenceParser(TokenType.OF_KW,
+						definedObjectClassParser).parse();
+
+				if (instRule != null) {
+					type = new InstanceOfType(
+							(ObjectClassReferenceNode) instRule.get(1));
+				}
+				break;
+
+			case SEQUENCE_KW:
+			case SET_KW:
+				if (expect(TokenType.OF_KW) != null) {
+					Type rule = typeOrNamedTypeParser.parse();
+
+					if (rule != null) {
+						type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceOfType(
+								rule) : new SetOfType(rule);
+					}
+				} else {
+					List<Object> rule = new SequenceParser(new boolean[] {
+							true, false, true }, TokenType.LBrace,
+							new ChoiceParser<List<Object>>(new SequenceParser(
+									componentTypeListsParser),
+									new SequenceParser(new boolean[] { true,
+											false },
+											extensionAndExceptionParser,
+											optionalExtensionMarkerParser)),
+							TokenType.RBrace).parse();
+
+					if (rule != null) {
+						if (rule.get(1) == null) {
+							type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceType()
+									: new SetType();
 						} else {
-							type = new BitString();
-						}
-					}
-					break;
-
-				case NULL_KW:
-					type = new Null();
-					break;
-
-				case REAL_KW:
-					type = new Real();
-					break;
-
-				case INTEGER_KW:
-					List<NamedNumber> intRule = new ValueExtractor<List<NamedNumber>>(
-							1, new SequenceParser(TokenType.LBrace,
-									namedNumberListParser, TokenType.RBrace))
-							.parse();
-
-					if (intRule != null) {
-						type = new IntegerType(intRule);
-					} else {
-						type = new IntegerType();
-					}
-
-					break;
-
-				case RELATIVE_OID_KW:
-					type = new RelativeOID();
-					break;
-
-				case OID_IRI_KW:
-					type = new IRI();
-					break;
-
-				case RELATIVE_OID_IRI_KW:
-					type = new RelativeIRI();
-					break;
-
-				case OBJECT_KW:
-					if (expect(TokenType.IDENTIFIER_KW) != null) {
-						type = new ObjectIdentifier();
-					} else {
-						resetToMark();
-						return null;
-					}
-					break;
-
-				case OCTET_KW:
-					if (expect(TokenType.STRING_KW) != null) {
-						type = new OctetString();
-					} else {
-						resetToMark();
-						return null;
-					}
-					break;
-
-				case EXTERNAL_KW:
-					type = new External();
-					break;
-
-				case CHOICE_KW:
-					List<Object> choiceRule = new SequenceParser(
-							TokenType.LBrace, alternativeTypeListsParser,
-							TokenType.RBrace).parse();
-
-					if (choiceRule != null) {
-						type = new Choice(
-								(AlternativeTypeLists) choiceRule.get(1));
-					}
-					break;
-
-				case ENUMERATED_KW:
-					List<Object> enumRule = new SequenceParser(
-							TokenType.LBrace, enumerationsParser,
-							TokenType.RBrace).parse();
-
-					if (enumRule != null) {
-						type = (EnumeratedType) enumRule.get(1);
-					}
-					break;
-
-				case TIME_KW:
-					type = new Time();
-					break;
-
-				case TIME_OF_DAY_KW:
-					type = new TimeOfDay();
-					break;
-
-				case INSTANCE_KW:
-					List<Object> instRule = new SequenceParser(TokenType.OF_KW,
-							definedObjectClassParser).parse();
-
-					if (instRule != null) {
-						type = new InstanceOfType(
-								(ObjectClassReferenceNode) instRule.get(1));
-					}
-					break;
-
-				case SEQUENCE_KW:
-				case SET_KW:
-					if (expect(TokenType.OF_KW) != null) {
-						Type rule = typeOrNamedTypeParser.parse();
-
-						if (rule != null) {
-							type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceOfType(
-									rule) : new SetOfType(rule);
-						}
-					} else {
-						List<Object> rule = new SequenceParser(
-								new boolean[] { true, false, true },
-								TokenType.LBrace,
-								new ChoiceParser<List<Object>>(
-										new SequenceParser(
-												componentTypeListsParser),
-										new SequenceParser(new boolean[] {
-												true, false },
-												extensionAndExceptionParser,
-												optionalExtensionMarkerParser)),
-								TokenType.RBrace).parse();
-
-						if (rule != null) {
-							if (rule.get(1) == null) {
-								type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceType()
-										: new SetType();
+							List<Object> ruleList = (List<Object>) rule.get(1);
+							if (ruleList.size() == 1) {
+								type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceType(
+										(ComponentTypeListsNode) ruleList
+												.get(0)) : new SetType(
+										(ComponentTypeListsNode) ruleList
+												.get(0));
 							} else {
-								List<Object> ruleList = (List<Object>) rule
-										.get(1);
-								if (ruleList.size() == 1) {
-									type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceType(
-											(ComponentTypeListsNode) ruleList
-													.get(0)) : new SetType(
-											(ComponentTypeListsNode) ruleList
-													.get(0));
-								} else {
-									type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceType(
-											ruleList.get(0), ruleList.get(1))
-											: new SetType(ruleList.get(0),
-													ruleList.get(1));
-								}
+								type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceType(
+										ruleList.get(0), ruleList.get(1))
+										: new SetType(ruleList.get(0),
+												ruleList.get(1));
 							}
 						}
 					}
-					break;
+				}
+				break;
 
-				default:
-					resetToMark();
-					return null;
+			default:
+				resetToMark();
+				return null;
 
 			}
 
@@ -2409,25 +2402,22 @@ public class Parser {
 
 			if (rule != null) {
 				switch (rule.size()) {
-					case 1:
+				case 1:
+					return new ComponentType(ComponentType.CompType.NamedType,
+							(NamedType) rule.get(0));
+				case 2:
+					return new ComponentType(
+							ComponentType.CompType.NamedTypeOpt,
+							(NamedType) rule.get(0));
+				case 3:
+					if (rule.get(0) instanceof Token) {
+						return new ComponentType(ComponentType.CompType.Type,
+								(Type) rule.get(2));
+					} else {
 						return new ComponentType(
-								ComponentType.CompType.NamedType,
-								(NamedType) rule.get(0));
-					case 2:
-						return new ComponentType(
-								ComponentType.CompType.NamedTypeOpt,
-								(NamedType) rule.get(0));
-					case 3:
-						if (rule.get(0) instanceof Token) {
-							return new ComponentType(
-									ComponentType.CompType.Type,
-									(Type) rule.get(2));
-						} else {
-							return new ComponentType(
-									ComponentType.CompType.NamedTypeDef,
-									(NamedType) rule.get(0),
-									(Value) rule.get(2));
-						}
+								ComponentType.CompType.NamedTypeDef,
+								(NamedType) rule.get(0), (Value) rule.get(2));
+					}
 				}
 			}
 
@@ -2614,12 +2604,12 @@ public class Parser {
 
 			if (token != null) {
 				switch (token.getType()) {
-					case UNIVERSAL_KW:
-						return ClassType.UNIVERSAL;
-					case APPLICATION_KW:
-						return ClassType.APPLICATION;
-					case PRIVATE_KW:
-						return ClassType.PRIVATE;
+				case UNIVERSAL_KW:
+					return ClassType.UNIVERSAL;
+				case APPLICATION_KW:
+					return ClassType.APPLICATION;
+				case PRIVATE_KW:
+					return ClassType.PRIVATE;
 				}
 			}
 
@@ -3576,12 +3566,12 @@ public class Parser {
 
 			if (token != null) {
 				switch (token.getType()) {
-					case PLUS_INFINITY_KW:
-						return new RealValue(RealValue.Type.PositiveInf);
-					case MINUS_INFINITY_KW:
-						return new RealValue(RealValue.Type.NegativeInf);
-					case NOT_A_NUMBER_KW:
-						return new RealValue(RealValue.Type.NaN);
+				case PLUS_INFINITY_KW:
+					return new RealValue(RealValue.Type.PositiveInf);
+				case MINUS_INFINITY_KW:
+					return new RealValue(RealValue.Type.NegativeInf);
+				case NOT_A_NUMBER_KW:
+					return new RealValue(RealValue.Type.NaN);
 				}
 			}
 
@@ -3880,12 +3870,12 @@ public class Parser {
 						tmp.substring(0, tmp.length() - 3));
 
 				switch (type.getType()) {
-					case UTCTime_KW:
-						return new UTCTime(typeName);
-					case GeneralizedTime_KW:
-						return new GeneralizedTime(typeName);
-					case ObjectDescriptor_KW:
-						return new ObjectDescriptor(typeName);
+				case UTCTime_KW:
+					return new UTCTime(typeName);
+				case GeneralizedTime_KW:
+					return new GeneralizedTime(typeName);
+				case ObjectDescriptor_KW:
+					return new ObjectDescriptor(typeName);
 				}
 			}
 
@@ -3937,14 +3927,14 @@ public class Parser {
 				Type type;
 
 				switch (((Token) rule.get(0)).getType()) {
-					case SET_KW:
-						type = new SetOfType((Type) rule.get(3));
-						break;
-					case SEQUENCE_KW:
-						type = new SequenceOfType((Type) rule.get(3));
-						break;
-					default:
-						throw new ParserException("Implementation error");
+				case SET_KW:
+					type = new SetOfType((Type) rule.get(3));
+					break;
+				case SEQUENCE_KW:
+					type = new SequenceOfType((Type) rule.get(3));
+					break;
+				default:
+					throw new ParserException("Implementation error");
 				}
 
 				type.setConstraints(Arrays.asList((Constraint) rule.get(1)));
@@ -4125,19 +4115,18 @@ public class Parser {
 				if (rule instanceof List) {
 					List<Object> ruleList = (List<Object>) rule;
 					switch (ruleList.size()) {
-						case 3:
-							if (ruleList.get(2) instanceof Token) {
-								return new SetSpecsNode(
-										(ElementSet) ruleList.get(0), true);
-							} else {
-								return new SetSpecsNode(null, true,
-										(ElementSet) ruleList.get(2));
-							}
-
-						case 5:
+					case 3:
+						if (ruleList.get(2) instanceof Token) {
 							return new SetSpecsNode(
-									(ElementSet) ruleList.get(0), true,
-									(ElementSet) ruleList.get(4));
+									(ElementSet) ruleList.get(0), true);
+						} else {
+							return new SetSpecsNode(null, true,
+									(ElementSet) ruleList.get(2));
+						}
+
+					case 5:
+						return new SetSpecsNode((ElementSet) ruleList.get(0),
+								true, (ElementSet) ruleList.get(4));
 					}
 
 				} else {
@@ -4662,15 +4651,15 @@ public class Parser {
 
 			if (rule != null) {
 				switch (rule.type) {
-					case PRESENT_KW:
-						return new PresenceConstraint(
-								PresenceConstraint.Type.Present);
-					case ABSENT_KW:
-						return new PresenceConstraint(
-								PresenceConstraint.Type.Absent);
-					case OPTIONAL_KW:
-						return new PresenceConstraint(
-								PresenceConstraint.Type.Optional);
+				case PRESENT_KW:
+					return new PresenceConstraint(
+							PresenceConstraint.Type.Present);
+				case ABSENT_KW:
+					return new PresenceConstraint(
+							PresenceConstraint.Type.Absent);
+				case OPTIONAL_KW:
+					return new PresenceConstraint(
+							PresenceConstraint.Type.Optional);
 				}
 			}
 
@@ -5036,12 +5025,12 @@ public class Parser {
 
 			if (rule != null) {
 				switch (rule.getType()) {
-					case TypeFieldReference:
-						return new PrimitiveFieldNameNode(rule.getText()
-								.substring(1), TokenType.TypeFieldReference);
-					case ValueFieldReference:
-						return new PrimitiveFieldNameNode(rule.getText()
-								.substring(1), TokenType.ValueFieldReference);
+				case TypeFieldReference:
+					return new PrimitiveFieldNameNode(rule.getText().substring(
+							1), TokenType.TypeFieldReference);
+				case ValueFieldReference:
+					return new PrimitiveFieldNameNode(rule.getText().substring(
+							1), TokenType.ValueFieldReference);
 				}
 			}
 
@@ -6057,15 +6046,15 @@ public class Parser {
 
 			if (rule != null) {
 				switch (rule.size()) {
-					case 2:
-						return new ContentsConstraint((Type) rule.get(1));
+				case 2:
+					return new ContentsConstraint((Type) rule.get(1));
 
-					case 3:
-						return new ContentsConstraint((Value) rule.get(2));
+				case 3:
+					return new ContentsConstraint((Value) rule.get(2));
 
-					case 5:
-						return new ContentsConstraint((Type) rule.get(1),
-								(Value) rule.get(4));
+				case 5:
+					return new ContentsConstraint((Type) rule.get(1),
+							(Value) rule.get(4));
 				}
 			}
 

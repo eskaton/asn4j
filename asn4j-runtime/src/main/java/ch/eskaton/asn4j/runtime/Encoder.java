@@ -27,14 +27,16 @@
 
 package ch.eskaton.asn4j.runtime;
 
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 public interface Encoder {
 
-	byte[] encode(ASN1Type obj) throws EncodingException,
-			ConstraintViolatedException;
+    byte[] encode(ASN1Type obj) throws EncodingException,
+            ConstraintViolatedException;
 
-	byte[] encode(ASN1Type obj, boolean implicit) throws EncodingException,
-			ConstraintViolatedException;
+    byte[] encode(ASN1Type obj, boolean implicit) throws EncodingException,
+            ConstraintViolatedException;
 
 }

@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.EncodingException;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 
 public class ObjectIdentifierEncoder implements

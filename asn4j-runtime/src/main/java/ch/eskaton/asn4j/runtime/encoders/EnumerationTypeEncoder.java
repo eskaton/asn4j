@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.runtime.encoders;
 import java.math.BigInteger;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.EncodingException;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 
 public class EnumerationTypeEncoder implements TypeEncoder<ASN1EnumeratedType> {

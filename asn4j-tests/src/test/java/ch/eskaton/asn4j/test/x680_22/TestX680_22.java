@@ -35,12 +35,12 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.DecodingException;
-import ch.eskaton.asn4j.runtime.EncodingException;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4jtest.x680_22.TestBitString1;
 import ch.eskaton.asn4jtest.x680_22.TestBitString2;
 
@@ -50,15 +50,16 @@ public class TestX680_22 {
 	public void testEncoding() throws ASN1RuntimeException, IOException {
 		BEREncoder encoder = new BEREncoder();
 		TestBitString1 a = new TestBitString1();
+		a.setValue(new byte[] { 0x00 });
 
-		assertArrayEquals(new byte[] { 0x03, 0x01, 0x00 }, encoder.encode(a));
+		assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, 0x00 }, encoder.encode(a));
 
-		a.setBit(1);
+		a.setBit(0);
 
-		assertArrayEquals(new byte[] { 0x03, 0x02, 0x07, (byte) 0x80 },
+		assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, (byte) 0x80 },
 				encoder.encode(a));
 
-		a.setBit(8);
+		a.setBit(7);
 
 		assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, (byte) 0x81 },
 				encoder.encode(a));
@@ -82,6 +83,7 @@ public class TestX680_22 {
 	@Test
 	public void test4() throws ASN1RuntimeException, IOException {
 		TestBitString2 a = new TestBitString2();
+		a.setValue(new byte[] { 0x00 });
 
 		a.setBit(5);
 
@@ -100,6 +102,7 @@ public class TestX680_22 {
 			throws ASN1RuntimeException, DecodingException, EncodingException,
 			ConstraintViolatedException {
 		TestBitString1 a = new TestBitString1();
+		a.setValue(new byte[] { 0x00 });
 
 		a.setBit(namedValue);
 
