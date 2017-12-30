@@ -27,96 +27,84 @@
 
 package ch.eskaton.asn4j.test.x680_20;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
 
 import org.junit.Test;
 
-import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.DecodingException;
-import ch.eskaton.asn4j.runtime.EncodingException;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4jtest.x680_20.TestEnumeration;
 
 public class TestX680_20 {
 
-	@Test
-	public void testEncoding() throws ASN1RuntimeException, IOException {
-		BEREncoder encoder = new BEREncoder();
+    @Test
+    public void test1() throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        testEnumeration(TestEnumeration.M, -3);
+    }
 
-		assertArrayEquals(new byte[] { 0x0a, 0x01, 0x02 },
-				encoder.encode(TestEnumeration.B));
-	}
+    @Test
+    public void test2() throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        testEnumeration(TestEnumeration.A, 1);
+    }
 
-	@Test
-	public void test1() throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		testEnumeration(TestEnumeration.M, -3);
-	}
+    @Test
+    public void test3() throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        testEnumeration(TestEnumeration.B, 2);
+    }
 
-	@Test
-	public void test2() throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		testEnumeration(TestEnumeration.A, 1);
-	}
+    @Test
+    public void test4() throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        testEnumeration(TestEnumeration.C, 0);
+    }
 
-	@Test
-	public void test3() throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		testEnumeration(TestEnumeration.B, 2);
-	}
+    @Test
+    public void test5() throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        testEnumeration(TestEnumeration.D, 3);
+    }
 
-	@Test
-	public void test4() throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		testEnumeration(TestEnumeration.C, 0);
-	}
+    @Test
+    public void test6() throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        testEnumeration(TestEnumeration.E, 5);
+    }
 
-	@Test
-	public void test5() throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		testEnumeration(TestEnumeration.D, 3);
-	}
+    @Test
+    public void test7() throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        testEnumeration(TestEnumeration.F, 6);
+    }
 
-	@Test
-	public void test6() throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		testEnumeration(TestEnumeration.E, 5);
-	}
+    @Test
+    public void test8() throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        testEnumeration(TestEnumeration.G, 9);
+    }
 
-	@Test
-	public void test7() throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		testEnumeration(TestEnumeration.F, 6);
-	}
+    @Test
+    public void test9() throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        testEnumeration(TestEnumeration.H, 10);
+    }
 
-	@Test
-	public void test8() throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		testEnumeration(TestEnumeration.G, 9);
-	}
+    private void testEnumeration(TestEnumeration a, int value)
+            throws DecodingException, EncodingException,
+            ConstraintViolatedException {
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-	@Test
-	public void test9() throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		testEnumeration(TestEnumeration.H, 10);
-	}
+        TestEnumeration b = decoder.decode(TestEnumeration.class,
+                encoder.encode(a));
 
-	private void testEnumeration(TestEnumeration a, int value)
-			throws DecodingException, EncodingException,
-			ConstraintViolatedException {
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
-
-		TestEnumeration b = decoder.decode(TestEnumeration.class,
-				encoder.encode(a));
-
-		assertEquals(a, b);
-		assertEquals(value, b.getValue());
-	}
+        assertEquals(a, b);
+        assertEquals(value, b.getValue());
+    }
 
 }

@@ -47,7 +47,7 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 public class BooleanConstraintCompiler extends
 		AbstractConstraintCompiler<Boolean> {

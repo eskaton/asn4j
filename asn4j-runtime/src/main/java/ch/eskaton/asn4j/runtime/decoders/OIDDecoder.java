@@ -64,7 +64,7 @@ public class OIDDecoder {
 			}
 		}
 
-		((ASN1ObjectIdentifier) obj).setValue(components);
+		obj.setValue(components);
 	}
 
 }

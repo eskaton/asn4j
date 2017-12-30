@@ -27,9 +27,9 @@
 
 package ch.eskaton.asn4j.runtime.decoders;
 
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 
 public class OctetStringDecoder {

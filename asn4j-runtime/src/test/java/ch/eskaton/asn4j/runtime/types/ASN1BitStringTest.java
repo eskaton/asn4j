@@ -31,9 +31,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import org.junit.Test;
-
-import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 
 public class ASN1BitStringTest {
 
@@ -44,72 +43,71 @@ public class ASN1BitStringTest {
 		bs.setValue(new byte[] { 0x01 });
 
 		assertEquals(0, bs.getUnusedBits());
+		assertArrayEquals(new byte[] { 0x01 }, bs.getValue());
 
-		bs.setValue(new byte[] { 0x04 });
+		bs.setValue(new byte[] { 0x04 }, 2);
 
 		assertEquals(2, bs.getUnusedBits());
+        assertArrayEquals(new byte[] { 0x04 }, bs.getValue());
 
-		bs.setValue(new byte[] { (byte) 0x80 });
+		bs.setValue(new byte[] { (byte) 0x80 }, 7);
 
 		assertEquals(7, bs.getUnusedBits());
+        assertArrayEquals(new byte[] { (byte) 0x80 }, bs.getValue());
 
 		bs.setValue(new byte[] {});
 
 		assertEquals(0, bs.getUnusedBits());
+        assertArrayEquals(new byte[] {}, bs.getValue());
 	}
 
 	@Test
-	public void testSetBit0() {
-		ASN1BitString bs = new ASN1BitString();
+	public void testSetBit0() throws ASN1RuntimeException {
+		ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00 });
 		bs.setBit(0);
 		assertArrayEquals(new byte[] { (byte) 0x80 }, bs.getValue());
-		assertEquals(7, bs.getUnusedBits());
 	}
 
 	@Test
-	public void testSetBit7() {
-		ASN1BitString bs = new ASN1BitString();
+	public void testSetBit7() throws ASN1RuntimeException {
+		ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00 });
 		bs.setBit(7);
 		assertArrayEquals(new byte[] { (byte) 0x01 }, bs.getValue());
-		assertEquals(0, bs.getUnusedBits());
 	}
 
 	@Test
-	public void testSetBit15() {
-		ASN1BitString bs = new ASN1BitString();
+	public void testSetBit15() throws ASN1RuntimeException {
+		ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00, 0x00 });
 		bs.setBit(15);
 		assertArrayEquals(new byte[] { (byte) 0x00, (byte) 0x01 },
 				bs.getValue());
-		assertEquals(0, bs.getUnusedBits());
 	}
 
 	@Test
 	public void testTestBit15() throws ASN1RuntimeException {
-		ASN1BitString bs = new ASN1BitString();
+		ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00, 0x00 });
 		bs.setBit(15);
 		assertTrue(bs.testBit(15));
 	}
 
 	@Test
 	public void testClearBit() throws ASN1RuntimeException {
-		ASN1BitString bs = new ASN1BitString();
+		ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00, 0x00 });
 		bs.setBit(1);
 
-		assertEquals(6, bs.getUnusedBits());
+        assertArrayEquals(new byte[] { (byte)0x40, 0x00 }, bs.getValue());
 
 		bs.setBit(14);
 
-		assertEquals(1, bs.getUnusedBits());
+        assertArrayEquals(new byte[] { (byte)0x40, 0x02 }, bs.getValue());
 
 		bs.clearBit(14);
 
-		assertEquals(6, bs.getUnusedBits());
-
-		assertArrayEquals(new byte[] { 0x40 }, bs.getValue());
+		assertArrayEquals(new byte[] { (byte)0x40, 0x00 }, bs.getValue());
 
 		bs.clearBit(1);
 
-		assertArrayEquals(new byte[] {}, bs.getValue());
+		assertArrayEquals(new byte[] { (byte)0x00, 0x00 }, bs.getValue());
 	}
 
 }

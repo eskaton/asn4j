@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.compiler.java.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
 public class IntegerDefaultCompiler implements DefaultCompiler {

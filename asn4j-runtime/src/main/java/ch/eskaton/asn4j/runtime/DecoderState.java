@@ -35,4 +35,10 @@ public class DecoderState {
 
 	public TLV tlv;
 
+	@Override
+	public String toString() {
+		return "DecoderState [pos=" + pos + ", length=" + length + ", tlv="
+				+ tlv + "]";
+	}
+
 }

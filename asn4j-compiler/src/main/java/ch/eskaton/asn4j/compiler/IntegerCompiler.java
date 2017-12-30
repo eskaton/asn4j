@@ -40,7 +40,7 @@ import ch.eskaton.asn4j.compiler.java.JavaStaticInitializer;
 import ch.eskaton.asn4j.compiler.java.JavaVisibility;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.StringUtils;
 
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {

@@ -27,155 +27,124 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.commons.utils.HexDump;
 
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1BitString implements ASN1Type {
 
-	protected byte[] value = new byte[0];
+    protected byte[] value = new byte[0];
 
-	private int usedBits;
+    private int unusedBits;
 
-	public byte[] getValue() {
-		return value;
-	}
+    public static ASN1BitString of(byte[] value) {
+        return of(value, 0);
+    }
 
-	public void setValue(byte[] value) {
-		int usedBytes = 0;
+    public static ASN1BitString of(byte[] value, int unusedBits) {
+        return new ASN1BitString().value(value, unusedBits);
+    }
 
-		for (int i = 0; i < value.length; i++) {
-			if (value[i] != 0) {
-				usedBytes = i + 1;
-			}
-		}
+    public byte[] getValue() {
+        return value;
+    }
 
-		this.value = new byte[usedBytes];
-		System.arraycopy(value, 0, this.value, 0, usedBytes);
+    public void setValue(byte[] value) {
+        setValue(value, 0);
+    }
 
-		usedBits = 0;
+    public void setValue(byte[] value, int unusedBits) {
+        this.unusedBits = unusedBits;
+        this.value = new byte[value.length];
+        System.arraycopy(value, 0, this.value, 0, value.length);
+    }
 
-		calcUsedBits(this.value.length - 1);
-	}
+    public ASN1BitString value(byte[] value) {
+        setValue(value);
+        return this;
+    }
 
-	public void setBit(int bit) {
-		int length = (bit - 1) / 8;
+    public ASN1BitString value(byte[] value, int unusedBits) {
+        setValue(value, unusedBits);
+        return this;
+    }
 
-		if (length >= value.length) {
-			byte[] tmpValue = new byte[length + 1];
-			System.arraycopy(value, 0, tmpValue, 0, value.length);
-			value = tmpValue;
-		}
+    public void setBit(int bit) throws ASN1RuntimeException {
+        int pos = getPos(bit);
 
-		value[length] = value[length] |= getBit(bit);
+        value[pos] = value[pos] |= getBit(bit);
+    }
 
-		if (length >= usedBits / 8) {
-			calcUsedBits(length);
-		}
-	}
+    public void clearBit(int bit) throws ASN1RuntimeException {
+        int pos = getPos(bit);
 
-	public boolean testBit(int bit) throws ASN1RuntimeException {
-		int pos = bit / 8;
+        value[pos] = (byte) (value[pos] & ~getBit(bit));
+    }
 
-		if (pos > value.length) {
-			throw new RuntimeException("Bit position out of range");
-		}
+    public boolean testBit(int bit) throws ASN1RuntimeException {
+        int pos = getPos(bit);
 
-		return (value[pos] & getBit(bit)) != 0;
-	}
+        return (value[pos] & getBit(bit)) != 0;
+    }
 
-	public void clearBit(int bit) throws ASN1RuntimeException {
-		int pos = bit / 8;
+    private int getPos(int bit) throws ASN1RuntimeException {
+        int pos = bit / 8;
 
-		if (pos > value.length) {
-			throw new ASN1RuntimeException("Bit position out of range");
-		}
+        if (pos >= value.length) {
+            throw new ASN1RuntimeException("Bit position out of range");
+        }
 
-		value[pos] = (byte) (value[pos] & ~getBit(bit));
+        return pos;
+    }
 
-		if (pos == value.length - 1) {
-			while (value[pos] == 0) {
-				if (pos == 0) {
-					value = new byte[] {};
-					usedBits = 0;
-					return;
-				}
-				pos--;
-			}
+    public int getUnusedBits() {
+        return unusedBits;
+    }
 
-			if (pos != value.length - 1) {
-				byte[] tmpValue = new byte[pos + 1];
-				System.arraycopy(value, 0, tmpValue, 0, pos + 1);
-				value = tmpValue;
-				calcUsedBits(pos);
-			}
-		}
+    private int getBit(int bit) {
+        return 1 << 7 - (bit % 8);
+    }
 
-	}
+    @Override
+    public int hashCode() {
+        return 31 + ((value == null) ? 0 : value.hashCode());
+    }
 
-	public int getUnusedBits() {
-		return (8 - usedBits % 8) % 8;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
 
-	private int getBit(int bit) {
-		return 1 << ((8 - bit) % 8);
-	}
+        if (obj == null)
+            return false;
 
-	private void calcUsedBits(int pos) {
-		for (int i = pos; i >= 0; i--) {
-			if (value[i] != 0) {
-				byte b = value[i];
-				int bit = 0;
+        if (getClass() != obj.getClass())
+            return false;
 
-				while (bit < 7) {
-					if (!((b & 0x01) == 1)) {
-						bit++;
-						b >>= 1;
-					} else {
-						break;
-					}
-				}
+        ASN1BitString other = (ASN1BitString) obj;
 
-				usedBits = (i + 1) * 8 - bit;
-				break;
-			}
-		}
-	}
+        if (value == null) {
+            if (other.value != null)
+                return false;
+        } else {
+            if (value.length != other.value.length) {
+                return false;
+            }
 
-	@Override
-	public int hashCode() {
-		return 31 + ((value == null) ? 0 : value.hashCode());
-	}
+            for (int i = 0; i < value.length; i++) {
+                if ((value[i] != other.value[i])) {
+                    return false;
+                }
+            }
+        }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
+        return true;
+    }
 
-		if (obj == null)
-			return false;
-
-		if (getClass() != obj.getClass())
-			return false;
-
-		ASN1BitString other = (ASN1BitString) obj;
-
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else {
-			if (value.length != other.value.length) {
-				return false;
-			}
-
-			for (int i = 0; i < value.length; i++) {
-				if ((value[i] != other.value[i])) {
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
+    @Override
+    public String toString() {
+        return "ASN1BitString[value=0x" + HexDump.toHexString(value) + ", unusedBits=" + unusedBits + "]";
+    }
 
 }

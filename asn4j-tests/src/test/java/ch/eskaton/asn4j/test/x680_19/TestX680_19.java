@@ -27,7 +27,6 @@
 
 package ch.eskaton.asn4j.test.x680_19;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -36,9 +35,9 @@ import java.math.BigInteger;
 
 import org.junit.Test;
 
-import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4jtest.x680_19.TestInteger;
 import ch.eskaton.asn4jtest.x680_19.TestNamedInteger;
 import ch.eskaton.asn4jtest.x680_19.TestNamedInteger3;
@@ -46,74 +45,59 @@ import ch.eskaton.asn4jtest.x680_19.TestNamedInteger5;
 
 public class TestX680_19 {
 
-	@Test
-	public void testEncoding() throws ASN1RuntimeException, IOException {
-		BEREncoder encoder = new BEREncoder();
-		TestInteger a = new TestInteger();
+    @Test
+    public void test1() throws ASN1RuntimeException, IOException {
+        TestInteger a = new TestInteger();
 
-		a.setValue(BigInteger.valueOf(127));
+        a.setValue(BigInteger.valueOf(17));
 
-		assertArrayEquals(new byte[] { 0x02, 0x01, 0x7f }, encoder.encode(a));
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-		a.setValue(BigInteger.valueOf(255));
+        TestInteger b = decoder.decode(TestInteger.class, encoder.encode(a));
 
-		assertArrayEquals(new byte[] { 0x02, 0x02, 0x00, (byte) 0xff },
-				encoder.encode(a));
-	}
+        assertEquals(a, b);
+    }
 
-	@Test
-	public void test1() throws ASN1RuntimeException, IOException {
-		TestInteger a = new TestInteger();
+    @Test
+    public void test2() throws ASN1RuntimeException, IOException {
+        TestNamedInteger a = TestNamedInteger.VALUE3;
 
-		a.setValue(BigInteger.valueOf(17));
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+        TestNamedInteger b = decoder.decode(TestNamedInteger.class,
+                encoder.encode(a));
 
-		TestInteger b = decoder.decode(TestInteger.class, encoder.encode(a));
+        assertEquals(a, b);
+    }
 
-		assertEquals(a, b);
-	}
+    @Test
+    public void test3() throws ASN1RuntimeException, IOException {
+        TestNamedInteger a = new TestNamedInteger();
+        a.setValue(BigInteger.valueOf(13));
 
-	@Test
-	public void test2() throws ASN1RuntimeException, IOException {
-		TestNamedInteger a = TestNamedInteger.VALUE3;
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+        TestNamedInteger b = decoder.decode(TestNamedInteger.class,
+                encoder.encode(a));
 
-		TestNamedInteger b = decoder.decode(TestNamedInteger.class,
-				encoder.encode(a));
+        assertEquals(a, b);
+    }
 
-		assertEquals(a, b);
-	}
+    @Test
+    public void testEquality() throws ASN1RuntimeException, IOException {
+        TestNamedInteger3 a = new TestNamedInteger3();
+        TestNamedInteger3 b = new TestNamedInteger3();
+        assertEquals(a, b);
+    }
 
-	@Test
-	public void test3() throws ASN1RuntimeException, IOException {
-		TestNamedInteger a = new TestNamedInteger();
-		a.setValue(BigInteger.valueOf(13));
-
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
-
-		TestNamedInteger b = decoder.decode(TestNamedInteger.class,
-				encoder.encode(a));
-
-		assertEquals(a, b);
-	}
-
-	@Test
-	public void testEquality() throws ASN1RuntimeException, IOException {
-		TestNamedInteger3 a = new TestNamedInteger3();
-		TestNamedInteger3 b = new TestNamedInteger3();
-		assertEquals(a, b);
-	}
-
-	@Test
-	public void testInequality() throws ASN1RuntimeException, IOException {
-		TestNamedInteger3 a = new TestNamedInteger3();
-		TestNamedInteger5 b = new TestNamedInteger5();
-		assertNotEquals(a, b);
-	}
+    @Test
+    public void testInequality() throws ASN1RuntimeException, IOException {
+        TestNamedInteger3 a = new TestNamedInteger3();
+        TestNamedInteger5 b = new TestNamedInteger5();
+        assertNotEquals(a, b);
+    }
 
 }

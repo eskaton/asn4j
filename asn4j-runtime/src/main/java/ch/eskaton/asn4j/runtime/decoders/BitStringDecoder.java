@@ -27,18 +27,35 @@
 
 package ch.eskaton.asn4j.runtime.decoders;
 
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.exceptions.PrematureEndOfInputException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
+import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
 
 public class BitStringDecoder {
 
-	public void decode(DecoderStates states, DecoderState state,
-			ASN1BitString obj) throws ConstraintViolatedException {
-		byte[] value = new byte[state.length - 1];
-		System.arraycopy(states.buf, state.pos + 1, value, 0, state.length - 1);
-		((ASN1BitString) obj).setValue(value);
-	}
+    public void decode(DecoderStates states, DecoderState state,
+                       ASN1BitString obj) throws ConstraintViolatedException {
+        byte unusedBits = states.buf[2];
+
+        if (state.length == 1) {
+            if (states.buf[2] != 0) {
+                throw new DecodingException("Unused bits must be 0 if content is empty");
+            }
+        } else {
+            if (states.buf.length - state.pos < state.length) {
+                throw new PrematureEndOfInputException();
+            }
+
+            byte[] value = new byte[state.length - 1];
+
+            System.arraycopy(states.buf, state.pos + 1, value, 0, state.length - 1);
+            obj.setValue(value, unusedBits);
+        }
+    }
 
 }

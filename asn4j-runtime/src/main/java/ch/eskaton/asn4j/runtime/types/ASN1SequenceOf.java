@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
+import java.util.Arrays;
 import java.util.List;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
@@ -42,6 +43,10 @@ public class ASN1SequenceOf<T extends ASN1Type> implements ASN1Type {
 
 	public void setValues(List<T> values) {
 		this.values = values;
+	}
+
+	public void setValues(T... values) {
+		this.values = Arrays.asList(values);
 	}
 
 	@Override

@@ -35,10 +35,11 @@ import org.junit.Test;
 
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4jtest.x680_25.TestSequence0;
 import ch.eskaton.asn4jtest.x680_25.TestSequence1;
 import ch.eskaton.asn4jtest.x680_25.TestSequence2;
 import ch.eskaton.asn4jtest.x680_25.TestSequence3;
@@ -47,98 +48,112 @@ import ch.eskaton.asn4jtest.x680_25.TestSequence6;
 
 public class TestX680_25 {
 
-	@Test
-	public void testSequence() throws ASN1RuntimeException, IOException {
-		TestSequence1 a = new TestSequence1();
-		a.setA(ASN1Integer.valueOf(4711));
-		a.setB(ASN1Boolean.TRUE);
-		a.setC(ASN1OctetString.valueOf("test"));
+    @Test
+    public void testSequence0() throws ASN1RuntimeException, IOException {
+        TestSequence0 a = new TestSequence0();
+        a.setA(ASN1Boolean.TRUE);
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-		TestSequence1 b = decoder
-				.decode(TestSequence1.class, encoder.encode(a));
+        TestSequence0 b = decoder
+                .decode(TestSequence0.class, encoder.encode(a));
 
-		assertEquals(a, b);
-	}
+        assertEquals(a, b);
+    }
 
-	@Test
-	public void testOptional() throws ASN1RuntimeException, IOException {
-		TestSequence2 a = new TestSequence2();
-		a.setA(ASN1Integer.valueOf(4711));
-		a.setC(ASN1OctetString.valueOf("test"));
+    @Test
+    public void testSequence1() throws ASN1RuntimeException, IOException {
+        TestSequence1 a = new TestSequence1();
+        a.setA(ASN1Integer.valueOf(4711));
+        a.setB(ASN1Boolean.TRUE);
+        a.setC(ASN1OctetString.valueOf("test"));
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-		TestSequence2 b = decoder
-				.decode(TestSequence2.class, encoder.encode(a));
+        TestSequence1 b = decoder
+                .decode(TestSequence1.class, encoder.encode(a));
 
-		assertEquals(a, b);
-	}
+        assertEquals(a, b);
+    }
 
-	@Test
-	public void testDefaultAtEnd() throws ASN1RuntimeException, IOException {
-		TestSequence3 a = new TestSequence3();
-		a.setA(ASN1Integer.valueOf(4711));
-		a.setB(ASN1Boolean.TRUE);
+    @Test
+    public void testOptional() throws ASN1RuntimeException, IOException {
+        TestSequence2 a = new TestSequence2();
+        a.setA(ASN1Integer.valueOf(4711));
+        a.setC(ASN1OctetString.valueOf("test"));
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-		TestSequence3 b = decoder
-				.decode(TestSequence3.class, encoder.encode(a));
+        TestSequence2 b = decoder
+                .decode(TestSequence2.class, encoder.encode(a));
 
-		assertEquals(a, b);
-		assert (ASN1OctetString.valueOf("test").equals(b.getC()));
-	}
+        assertEquals(a, b);
+    }
 
-	@Test
-	public void testDefaultAtStart() throws ASN1RuntimeException, IOException {
-		TestSequence4 a = new TestSequence4();
-		a.setB(ASN1Boolean.TRUE);
-		a.setC(ASN1OctetString.valueOf("test"));
+    @Test
+    public void testDefaultAtEnd() throws ASN1RuntimeException, IOException {
+        TestSequence3 a = new TestSequence3();
+        a.setA(ASN1Integer.valueOf(4711));
+        a.setB(ASN1Boolean.TRUE);
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-		TestSequence4 b = decoder
-				.decode(TestSequence4.class, encoder.encode(a));
+        TestSequence3 b = decoder
+                .decode(TestSequence3.class, encoder.encode(a));
 
-		assertEquals(a, b);
-		assert (ASN1Integer.valueOf(4711).equals(b.getC()));
-	}
+        assertEquals(a, b);
+        assert (ASN1OctetString.valueOf("test").equals(b.getC()));
+    }
 
-	@Test
-	public void testComponentsOf() throws ASN1RuntimeException, IOException {
-		TestSequence6 a = new TestSequence6();
-		a.setA(ASN1Integer.valueOf(4711));
-		a.setB(ASN1Boolean.TRUE);
+    @Test
+    public void testDefaultAtStart() throws ASN1RuntimeException, IOException {
+        TestSequence4 a = new TestSequence4();
+        a.setB(ASN1Boolean.TRUE);
+        a.setC(ASN1OctetString.valueOf("test"));
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-		TestSequence6 b = decoder
-				.decode(TestSequence6.class, encoder.encode(a));
+        TestSequence4 b = decoder
+                .decode(TestSequence4.class, encoder.encode(a));
 
-		assertEquals(a, b);
-	}
+        assertEquals(a, b);
+        assert (ASN1Integer.valueOf(4711).equals(b.getC()));
+    }
 
-	@Test
-	public void testComponentsOfDefault() throws ASN1RuntimeException,
-			IOException {
-		TestSequence6 a = new TestSequence6();
-		a.setB(ASN1Boolean.TRUE);
+    @Test
+    public void testComponentsOf() throws ASN1RuntimeException, IOException {
+        TestSequence6 a = new TestSequence6();
+        a.setA(ASN1Integer.valueOf(4711));
+        a.setB(ASN1Boolean.TRUE);
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-		TestSequence6 b = decoder
-				.decode(TestSequence6.class, encoder.encode(a));
+        TestSequence6 b = decoder
+                .decode(TestSequence6.class, encoder.encode(a));
 
-		assertEquals(a, b);
-		assert (ASN1Integer.valueOf(23).equals(a.getA()));
-	}
+        assertEquals(a, b);
+    }
+
+    @Test
+    public void testComponentsOfDefault() throws ASN1RuntimeException,
+            IOException {
+        TestSequence6 a = new TestSequence6();
+        a.setB(ASN1Boolean.TRUE);
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        TestSequence6 b = decoder
+                .decode(TestSequence6.class, encoder.encode(a));
+
+        assertEquals(a, b);
+        assert (ASN1Integer.valueOf(23).equals(a.getA()));
+    }
 
 }

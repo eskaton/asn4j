@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import java.math.BigInteger;
 
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
 public class IntegerDecoder {
@@ -42,4 +42,5 @@ public class IntegerDecoder {
 		System.arraycopy(states.buf, state.tlv.pos, buf, 0, state.tlv.length);
 		obj.setValue(new BigInteger(buf));
 	}
+
 }

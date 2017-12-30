@@ -29,11 +29,13 @@ package ch.eskaton.asn4j.runtime;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.commons.Reflection;
+import ch.eskaton.commons.utils.ReflectionUtils;
 
 public class Utils {
 
@@ -63,6 +65,29 @@ public class Utils {
 		return tags;
 	}
 
+	public <T extends ASN1Type> List<ASN1Tag> getTags(Class<T> type, ASN1Tag tag) {
+		List<ASN1Tag> tags;
+
+		if (tag != null) {
+			if (tag.mode() == ASN1Tag.Mode.Implicit) {
+				tags = new LinkedList<ASN1Tag>();
+				tags.add(0, tag);
+			} else {
+				tags = getTags(type);
+				tags.add(0, tag);
+			}
+		} else {
+			tags = getTags(type);
+		}
+
+		if (tags.isEmpty()) {
+			throw new DecodingException("Invalid type provided: "
+					+ type.getClass().getSimpleName()
+					+ ". No ASN1Tag annotation found");
+		}
+		return tags;
+	}
+
 	public List<Field> getComponents(ASN1Type type) {
 		List<Field> compFields = new ArrayList<Field>(20);
 		Class<?> clazz = type.getClass();
@@ -76,7 +101,7 @@ public class Utils {
 
 			clazz = clazz.getSuperclass();
 		} while (clazz != null
-				&& Reflection.implementsInterface(clazz, ASN1Type.class));
+				&& ReflectionUtils.implementsInterface(clazz, ASN1Type.class));
 
 		return compFields;
 	}

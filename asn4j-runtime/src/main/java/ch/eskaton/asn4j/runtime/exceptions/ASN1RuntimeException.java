@@ -25,16 +25,16 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime;
+package ch.eskaton.asn4j.runtime.exceptions;
 
 @SuppressWarnings("serial")
-public class DecodingException extends RuntimeException {
+public class ASN1RuntimeException extends Exception {
 
-	public DecodingException(String message) {
+	public ASN1RuntimeException(String message) {
 		super(message);
 	}
 
-	public DecodingException(Throwable e) {
+	public ASN1RuntimeException(Throwable e) {
 		super(e);
 	}
 
