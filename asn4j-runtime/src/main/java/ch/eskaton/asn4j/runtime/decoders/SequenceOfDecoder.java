@@ -33,7 +33,7 @@ import java.util.List;
 
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.DecodingException;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
@@ -49,16 +49,17 @@ public class SequenceOfDecoder implements CollectionDecoder<ASN1SequenceOf> {
 				.getActualTypeArguments()[0];
 		List<ASN1Type> elements = new LinkedList<ASN1Type>();
 
-		ASN1Type element = null;
+		ASN1Type element;
 
 		do {
-			element = decoder.decode(typeParam, states);
+			element = decoder.decode(typeParam, states, null, true);
+
 			if (element != null) {
 				elements.add(element);
 			}
 		} while (element != null);
 
-		((ASN1SequenceOf) obj).setValues(elements);
+		obj.setValues(elements);
 	}
 
 }

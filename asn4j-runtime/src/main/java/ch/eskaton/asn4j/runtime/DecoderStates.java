@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.runtime;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 public class DecoderStates {
@@ -34,5 +35,11 @@ public class DecoderStates {
 	public byte[] buf;
 
 	public Stack<DecoderState> states = new Stack<DecoderState>();
+
+	@Override
+	public String toString() {
+		return "DecoderStates [buf=" + Arrays.toString(buf) + ", states="
+				+ states + "]";
+	}
 
 }

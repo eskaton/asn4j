@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.EncodingException;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 
 public class BooleanEncoder implements TypeEncoder<ASN1Boolean> {

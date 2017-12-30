@@ -42,72 +42,72 @@ import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
-import ch.eskaton.asn4j.runtime.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 public class ConstraintCompiler {
 
-	private Map<Class<? extends Type>, AbstractConstraintCompiler<?>> compilers;
+    private Map<Class<? extends Type>, AbstractConstraintCompiler<?>> compilers;
 
-	private TypeResolver typeResolver;
+    private TypeResolver typeResolver;
 
-	@SuppressWarnings("serial")
-	public ConstraintCompiler(final TypeResolver typeResolver) {
-		this.typeResolver = typeResolver;
-		compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler<?>>() {
-			{
-				put(IntegerType.class, new IntegerConstraintCompiler(
-						ConstraintCompiler.this, typeResolver));
-				put(BooleanType.class, new BooleanConstraintCompiler(
-						ConstraintCompiler.this, typeResolver));
-				put(BitString.class, new BitStringConstraintCompiler(
-						ConstraintCompiler.this, typeResolver));
-				put(VisibleString.class, new VisibleStringConstraintCompiler(
-						ConstraintCompiler.this, typeResolver));
-				put(OctetString.class, new OctetStringConstraintCompiler(
-						ConstraintCompiler.this, typeResolver));
-				put(Null.class, new NullConstraintCompiler(
-						ConstraintCompiler.this, typeResolver));
-			}
-		};
-	}
+    @SuppressWarnings("serial")
+    public ConstraintCompiler(final TypeResolver typeResolver) {
+        this.typeResolver = typeResolver;
+        compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler<?>>() {
+            {
+                put(IntegerType.class, new IntegerConstraintCompiler(
+                        ConstraintCompiler.this, typeResolver));
+                put(BooleanType.class, new BooleanConstraintCompiler(
+                        ConstraintCompiler.this, typeResolver));
+                put(BitString.class, new BitStringConstraintCompiler(
+                        ConstraintCompiler.this, typeResolver));
+                put(VisibleString.class, new VisibleStringConstraintCompiler(
+                        ConstraintCompiler.this, typeResolver));
+                put(OctetString.class, new OctetStringConstraintCompiler(
+                        ConstraintCompiler.this, typeResolver));
+                put(Null.class, new NullConstraintCompiler(
+                        ConstraintCompiler.this, typeResolver));
+            }
+        };
+    }
 
-	public void compileConstraint(JavaClass clazz, String name, Type node)
-			throws CompilerException {
-		Type base = null;
+    public void compileConstraint(JavaClass clazz, String name, Type node)
+            throws CompilerException {
+        Type base = null;
 
-		if (node instanceof TypeReference) {
-			base = typeResolver.getBase(((TypeReference) node).getType());
-		} else {
-			base = node;
-		}
+        if (node instanceof TypeReference) {
+            base = typeResolver.getBase(((TypeReference) node).getType());
+        } else {
+            base = node;
+        }
 
-		if (!compilers.containsKey(base.getClass())) {
-			throw new CompilerException("Constraints for type "
-					+ base.getClass().getSimpleName() + " not yet supported");
-		}
+        if (!compilers.containsKey(base.getClass())) {
+            throw new CompilerException("Constraints for type "
+                    + base.getClass().getSimpleName() + " not yet supported");
+        }
 
-		AbstractConstraintCompiler<?> compiler = compilers.get(base.getClass());
+        AbstractConstraintCompiler<?> compiler = compilers.get(base.getClass());
 
-		Collection<?> cons;
+        Collection<?> cons;
 
-		try {
-			cons = compiler.compileConstraints(node, base);
-		} catch (CompilerException e) {
-			throw new CompilerException("Error in constraints for type " + name
-					+ ": " + e.getMessage(), e);
-		}
+        try {
+            cons = compiler.compileConstraints(node, base);
+        } catch (CompilerException e) {
+            throw new CompilerException("Error in constraints for type " + name
+                    + ": " + e.getMessage(), e);
+        }
 
-		if (cons != null) {
-			if (cons.isEmpty()) {
-				throw new CompilerException("Constraints for type " + name
-						+ " excludes all values");
-			}
-			compiler.addConstraint(clazz, cons);
-		}
+        if (cons != null) {
+            if (cons.isEmpty()) {
+                throw new CompilerException("Constraints for type " + name
+                        + " excludes all values");
+            }
+            compiler.addConstraint(clazz, cons);
+        }
 
-		clazz.addImport(ConstraintViolatedException.class);
+        clazz.addImport(ConstraintViolatedException.class);
 
-		return;
-	}
+        return;
+    }
 
 }

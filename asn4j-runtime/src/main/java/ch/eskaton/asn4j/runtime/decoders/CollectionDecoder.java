@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.DecodingException;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 
 public interface CollectionDecoder<T> {
 

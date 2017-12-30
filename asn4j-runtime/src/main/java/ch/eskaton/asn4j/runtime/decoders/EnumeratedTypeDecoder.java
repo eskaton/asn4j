@@ -33,9 +33,9 @@ import java.math.BigInteger;
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.DecodingException;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
-import ch.eskaton.commons.Reflection;
+import ch.eskaton.commons.utils.ReflectionUtils;
 
 public class EnumeratedTypeDecoder {
 
@@ -47,7 +47,7 @@ public class EnumeratedTypeDecoder {
 		System.arraycopy(states.buf, state.tlv.pos, buf, 0, state.tlv.length);
 
 		try {
-			return (T) Reflection.invokeStaticMethod(type, "valueOf",
+			return (T) ReflectionUtils.invokeStaticMethod(type, "valueOf",
 					new Object[] { new BigInteger(buf).intValue() },
 					new Class<?>[] { int.class });
 		} catch (IllegalAccessException e) {

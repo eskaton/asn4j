@@ -1,0 +1,8 @@
+X690-8 DEFINITIONS ::=
+BEGIN
+
+TestEnumeration ::= ENUMERATED {
+	a(0), b(1), c(128)
+}
+
+END

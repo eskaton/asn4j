@@ -25,17 +25,42 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime;
+package ch.eskaton.asn4j.test.x690_8;
 
-@SuppressWarnings("serial")
-public class ASN1RuntimeException extends Exception {
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
-	public ASN1RuntimeException(String message) {
-		super(message);
-	}
+import java.io.IOException;
 
-	public ASN1RuntimeException(Throwable e) {
-		super(e);
-	}
+import org.junit.Test;
+
+import ch.eskaton.asn4j.runtime.BERDecoder;
+import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+
+public class TestX690_8_7 {
+
+    @Test
+    public void testEncode() throws ASN1RuntimeException, IOException {
+        BEREncoder encoder = new BEREncoder();
+
+        assertArrayEquals(new byte[] { 0x04, 0x00 },
+                encoder.encode(ASN1OctetString.valueOf("")));
+        assertArrayEquals(new byte[] { 0x04, 0x03, 0x31, 0x32, 0x33 },
+                encoder.encode(ASN1OctetString.valueOf("123")));
+    }
+
+    @Test
+    public void testDecode() throws ASN1RuntimeException, IOException {
+        BERDecoder decoder = new BERDecoder();
+
+        assertEquals(ASN1OctetString.valueOf(""), decoder.decode(
+                ASN1OctetString.class, new byte[] { 0x04, 0x00 }));
+        assertEquals(
+                ASN1OctetString.valueOf("123"),
+                decoder.decode(ASN1OctetString.class, new byte[] { 0x04, 0x03,
+                        0x31, 0x32, 0x33 }));
+    }
 
 }
