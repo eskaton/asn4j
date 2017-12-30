@@ -122,7 +122,7 @@ public class TestX680_25 {
                 .decode(TestSequence4.class, encoder.encode(a));
 
         assertEquals(a, b);
-        assert (ASN1Integer.valueOf(4711).equals(b.getC()));
+        assert (ASN1Integer.valueOf(4711).equals(b.getA()));
     }
 
     @Test

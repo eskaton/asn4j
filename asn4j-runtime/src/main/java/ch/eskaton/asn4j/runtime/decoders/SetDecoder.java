@@ -110,7 +110,7 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
 
         do {
             comp = decoder.decode(states, tags);
-        } while (comp != null);
+        } while (comp != null && !tags.isEmpty());
 
         // if (comp != null) {
         // compField.setAccessible(true);
