@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.eskaton.asn4j.parser.ast.constraints.AbstractConstraint;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class UserDefinedConstraintNode extends AbstractConstraint {
 

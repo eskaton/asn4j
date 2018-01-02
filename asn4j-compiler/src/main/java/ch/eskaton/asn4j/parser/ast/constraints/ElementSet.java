@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.parser.ast.constraints;
 import java.util.Arrays;
 import java.util.List;
 
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class ElementSet implements Elements {
 

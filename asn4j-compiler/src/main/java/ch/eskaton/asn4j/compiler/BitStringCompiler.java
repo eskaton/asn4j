@@ -35,7 +35,7 @@ import ch.eskaton.asn4j.compiler.java.JavaLiteralField;
 import ch.eskaton.asn4j.compiler.java.JavaLiteralMethod;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 

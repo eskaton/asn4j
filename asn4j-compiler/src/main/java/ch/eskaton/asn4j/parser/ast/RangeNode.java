@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.ast.constraints.AbstractConstraint;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class RangeNode extends AbstractConstraint {
 
