@@ -31,7 +31,7 @@ import java.util.List;
 
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class SimpleDefinedType extends AbstractType implements
 		ParameterizedNode {

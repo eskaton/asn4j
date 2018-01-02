@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.ast.ExternalObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class ExternalValueReference extends SimpleDefinedValue {
 
