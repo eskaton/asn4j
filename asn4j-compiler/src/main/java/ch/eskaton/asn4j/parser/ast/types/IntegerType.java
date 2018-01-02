@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.List;
 
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class IntegerType extends AbstractType {
 

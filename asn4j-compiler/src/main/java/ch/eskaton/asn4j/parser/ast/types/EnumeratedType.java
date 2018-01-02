@@ -31,7 +31,7 @@ import java.util.List;
 
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class EnumeratedType extends AbstractType {
 

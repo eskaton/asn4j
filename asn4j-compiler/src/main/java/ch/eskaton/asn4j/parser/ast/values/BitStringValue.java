@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.parser.ast.values;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class BitStringValue implements Value {
 

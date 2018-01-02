@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.ast.types.ExtensionAdditionAlternativesGroup;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class ExtensionAdditionAlternativeNode implements Node {
 

@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class ComponentType extends AbstractType {
 

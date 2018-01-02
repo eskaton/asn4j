@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.compiler.java;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaTypedSetter extends JavaMethod {
 
