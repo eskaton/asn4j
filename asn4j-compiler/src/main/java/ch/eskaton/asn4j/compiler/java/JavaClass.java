@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Set;
 
 import ch.eskaton.asn4j.parser.ast.values.Tag;
-import ch.eskaton.commons.CollectionUtils;
-import ch.eskaton.commons.CollectionUtils.Mapper;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.CollectionUtils;
+import ch.eskaton.commons.utils.CollectionUtils.Mapper;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaClass implements JavaStructure {
 

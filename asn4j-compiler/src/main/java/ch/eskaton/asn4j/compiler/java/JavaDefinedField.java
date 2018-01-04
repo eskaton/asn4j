@@ -32,7 +32,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaDefinedField implements JavaField {
 

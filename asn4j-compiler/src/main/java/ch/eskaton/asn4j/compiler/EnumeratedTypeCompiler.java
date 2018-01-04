@@ -44,7 +44,7 @@ import ch.eskaton.asn4j.compiler.java.JavaVisibility;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
 
