@@ -40,16 +40,14 @@ public class TLVUtils {
 
 	private static final double LOG10_2_DIV_8 = Math.log10(2) / 8;
 
-	private static Utils berUtils = new Utils();
-
 	@SuppressWarnings("unchecked")
 	static byte[] getTagLength(ASN1Type obj, int contentLen)
 			throws EncodingException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		Stack<byte[]> bufs = new Stack<byte[]>();
+		Stack<byte[]> bufs = new Stack<>();
 		Class<ASN1Type> clazz = (Class<ASN1Type>) obj.getClass();
-		List<ASN1Tag> tags = berUtils.getTags(clazz);
+		List<ASN1Tag> tags = Utils.getTags(clazz);
 		ASN1Tag tag;
 
 		for (int i = tags.size() - 1; i >= 0; i--) {

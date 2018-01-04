@@ -42,12 +42,10 @@ import ch.eskaton.commons.utils.ReflectionUtils;
 public abstract class CollectionEncoder<T extends ASN1Type> implements
         TypeEncoder<T> {
 
-    private Utils berUtils = new Utils();
-
     public byte[] encode(Encoder encoder, T obj) throws EncodingException {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
-        List<Field> compFields = berUtils.getComponents(obj);
+        List<Field> compFields = Utils.getComponents(obj);
 
         if (compFields.size() > 0) {
             for (Field compField : compFields) {
