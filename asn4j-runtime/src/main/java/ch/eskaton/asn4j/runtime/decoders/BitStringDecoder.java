@@ -29,12 +29,10 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.exceptions.PrematureEndOfInputException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
-import com.sun.xml.internal.ws.api.message.ExceptionHasMessage;
 
 public class BitStringDecoder {
 
