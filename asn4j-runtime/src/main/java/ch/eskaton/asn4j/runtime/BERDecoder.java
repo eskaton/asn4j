@@ -304,11 +304,15 @@ public class BERDecoder implements Decoder {
 
     }
 
-    private static class SingleTagsMatcher implements TagsMatcher {
+    static class SingleTagsMatcher implements TagsMatcher {
 
         private Iterator<ASN1Tag> tags;
 
         public SingleTagsMatcher(List<ASN1Tag> tags) {
+            if(tags == null || tags.size() == 0) {
+                throw new IllegalArgumentException("tags must not be null or empty");
+            }
+
             this.tags = tags.iterator();
         }
 
@@ -328,7 +332,7 @@ public class BERDecoder implements Decoder {
 
     }
 
-    private static class MultipleTagsMatcher implements TagsMatcher {
+    static class MultipleTagsMatcher implements TagsMatcher {
 
         private TagNode tree;
 
