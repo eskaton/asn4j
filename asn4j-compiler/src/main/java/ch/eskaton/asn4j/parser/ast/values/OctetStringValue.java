@@ -27,7 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class OctetStringValue implements Value {
 

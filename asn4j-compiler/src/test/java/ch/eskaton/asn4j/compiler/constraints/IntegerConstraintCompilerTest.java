@@ -39,7 +39,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.commons.Reflection;
+import ch.eskaton.commons.utils.ReflectionUtils;
 import org.junit.Test;
 
 public class IntegerConstraintCompilerTest {
@@ -47,37 +47,37 @@ public class IntegerConstraintCompilerTest {
 	@Test
 	public void testCompareCanonicalEndpoint() throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		assertTrue(-1 == (Integer) Reflection.invokeStaticPrivateMethod(
+		assertTrue(-1 == (Integer) ReflectionUtils.invokeStaticPrivateMethod(
 				IntegerConstraintCompiler.class, "compareCanonicalEndpoint",
 				new EndpointNode[] {
 						new EndpointNode(new IntegerValue(-2), true),
 						new EndpointNode(new IntegerValue(-1), true) }));
 
-		assertTrue(-2 == (Integer) Reflection.invokeStaticPrivateMethod(
+		assertTrue(-2 == (Integer) ReflectionUtils.invokeStaticPrivateMethod(
 				IntegerConstraintCompiler.class, "compareCanonicalEndpoint",
 				new EndpointNode[] {
 						new EndpointNode(new IntegerValue(-5), true),
 						new EndpointNode(new IntegerValue(-1), true) }));
 
-		assertEquals(0, Reflection.invokeStaticPrivateMethod(
+		assertEquals(0, ReflectionUtils.invokeStaticPrivateMethod(
 				IntegerConstraintCompiler.class, "compareCanonicalEndpoint",
 				new EndpointNode[] {
 						new EndpointNode(new IntegerValue(5), true),
 						new EndpointNode(new IntegerValue(5), true) }));
 
-		assertTrue(1 == (Integer) Reflection.invokeStaticPrivateMethod(
+		assertTrue(1 == (Integer) ReflectionUtils.invokeStaticPrivateMethod(
 				IntegerConstraintCompiler.class, "compareCanonicalEndpoint",
 				new EndpointNode[] {
 						new EndpointNode(new IntegerValue(5), true),
 						new EndpointNode(new IntegerValue(4), true) }));
 
-		assertTrue(2 == (Integer) Reflection.invokeStaticPrivateMethod(
+		assertTrue(2 == (Integer) ReflectionUtils.invokeStaticPrivateMethod(
 				IntegerConstraintCompiler.class, "compareCanonicalEndpoint",
 				new EndpointNode[] {
 						new EndpointNode(new IntegerValue(5), true),
 						new EndpointNode(new IntegerValue(-5), true) }));
 
-		assertTrue(2 == (Integer) Reflection
+		assertTrue(2 == (Integer) ReflectionUtils
 				.invokeStaticPrivateMethod(IntegerConstraintCompiler.class,
 						"compareCanonicalEndpoint", new EndpointNode[] {
 								new EndpointNode(new IntegerValue(
@@ -85,7 +85,7 @@ public class IntegerConstraintCompilerTest {
 								new EndpointNode(new IntegerValue(
 										Long.MIN_VALUE), true) }));
 
-		assertTrue(-2 == (Integer) Reflection
+		assertTrue(-2 == (Integer) ReflectionUtils
 				.invokeStaticPrivateMethod(IntegerConstraintCompiler.class,
 						"compareCanonicalEndpoint", new EndpointNode[] {
 								new EndpointNode(new IntegerValue(
@@ -93,7 +93,7 @@ public class IntegerConstraintCompilerTest {
 								new EndpointNode(new IntegerValue(
 										Long.MAX_VALUE), true) }));
 
-		assertTrue(-1 == (Integer) Reflection
+		assertTrue(-1 == (Integer) ReflectionUtils
 				.invokeStaticPrivateMethod(IntegerConstraintCompiler.class,
 						"compareCanonicalEndpoint", new EndpointNode[] {
 								new EndpointNode(new IntegerValue(
@@ -105,14 +105,14 @@ public class IntegerConstraintCompilerTest {
 	@Test
 	public void testCompareCanonicalRange() throws IllegalArgumentException,
 			IllegalAccessException, InvocationTargetException {
-		assertTrue(-1 >= (Integer) Reflection
+		assertTrue(-1 >= (Integer) ReflectionUtils
 				.invokeStaticPrivateMethod(
 						IntegerConstraintCompiler.class,
 						"compareCanonicalRange",
 						new RangeNode[] { createRange(-2L, -1L),
 								createRange(-1L, 0L) }));
 
-		assertTrue(-1 >= (Integer) Reflection
+		assertTrue(-1 >= (Integer) ReflectionUtils
 				.invokeStaticPrivateMethod(
 						IntegerConstraintCompiler.class,
 						"compareCanonicalRange",
@@ -120,17 +120,17 @@ public class IntegerConstraintCompilerTest {
 								createRange(-2L, 0L) }));
 
 		assertEquals(0,
-				Reflection.invokeStaticPrivateMethod(
+				ReflectionUtils.invokeStaticPrivateMethod(
 						IntegerConstraintCompiler.class,
 						"compareCanonicalRange",
 						new RangeNode[] { createRange(-2L, -1L),
 								createRange(-2L, -1L) }));
 
-		assertTrue(1 <= (Integer) Reflection.invokeStaticPrivateMethod(
+		assertTrue(1 <= (Integer) ReflectionUtils.invokeStaticPrivateMethod(
 				IntegerConstraintCompiler.class, "compareCanonicalRange",
 				new RangeNode[] { createRange(0L, 5L), createRange(-5L, 5L) }));
 
-		assertTrue(1 <= (Integer) Reflection.invokeStaticPrivateMethod(
+		assertTrue(1 <= (Integer) ReflectionUtils.invokeStaticPrivateMethod(
 				IntegerConstraintCompiler.class, "compareCanonicalRange",
 				new RangeNode[] { createRange(0L, 5L), createRange(0L, 4L) }));
 	}
@@ -142,66 +142,66 @@ public class IntegerConstraintCompilerTest {
 				null, null);
 
 		assertEquals(new ArrayList<RangeNode>(),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { new ArrayList<RangeNode>() }));
 
 		// 2 ranges
 		assertEquals(Arrays.asList(createRange(0L, 5L), createRange(7L, 10L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 5L),
 								createRange(7L, 10L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 10L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 5L),
 								createRange(6L, 10L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 10L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 5L),
 								createRange(5L, 10L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 10L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 5L),
 								createRange(3L, 10L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 5L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 5L),
 								createRange(3L, 5L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 5L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 5L),
 								createRange(3L, 5L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 5L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 5L),
 								createRange(3L, 4L)) }));
 
 		// 3 ranges
 		assertEquals(Arrays.asList(createRange(0L, 5L), createRange(7L, 10L),
-				createRange(15L, 20L)), Reflection.invokePrivateMethod(
+				createRange(15L, 20L)), ReflectionUtils.invokePrivateMethod(
 				compiler,
 				"canonicalizeRanges",
 				new Object[] { Arrays.asList(createRange(0L, 5L),
 						createRange(7L, 10L), createRange(15L, 20L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 5L), createRange(7L, 20L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 5L),
 								createRange(7L, 16L), createRange(15L, 20L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 20L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 6L),
 								createRange(7L, 16L), createRange(15L, 20L)) }));
 
 		assertEquals(
 				Arrays.asList(createRange(0L, 13L), createRange(15L, 20L)),
-				Reflection.invokePrivateMethod(compiler, "canonicalizeRanges",
+				ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
 						new Object[] { Arrays.asList(createRange(0L, 6L),
 								createRange(7L, 13L), createRange(15L, 20L)) }));
 	}
@@ -213,7 +213,7 @@ public class IntegerConstraintCompilerTest {
 				null, null);
 
 		try {
-			Reflection.invokePrivateMethod(
+			ReflectionUtils.invokePrivateMethod(
 					compiler,
 					"calculateExclude",
 					new Object[] { Arrays.asList(createRange(5L, 10L)),
@@ -224,7 +224,7 @@ public class IntegerConstraintCompilerTest {
 		}
 
 		try {
-			Reflection.invokePrivateMethod(
+			ReflectionUtils.invokePrivateMethod(
 					compiler,
 					"calculateExclude",
 					new Object[] { Arrays.asList(createRange(5L, 10L)),
@@ -235,7 +235,7 @@ public class IntegerConstraintCompilerTest {
 		}
 
 		try {
-			Reflection.invokePrivateMethod(
+			ReflectionUtils.invokePrivateMethod(
 					compiler,
 					"calculateExclude",
 					new Object[] { Arrays.asList(createRange(5L, 10L)),
@@ -246,7 +246,7 @@ public class IntegerConstraintCompilerTest {
 		}
 
 		try {
-			Reflection.invokePrivateMethod(
+			ReflectionUtils.invokePrivateMethod(
 					compiler,
 					"calculateExclude",
 					new Object[] { Arrays.asList(createRange(5L, 10L)),
@@ -256,29 +256,29 @@ public class IntegerConstraintCompilerTest {
 			assertTrue(e.getCause() instanceof CompilerException);
 		}
 
-		assertEquals(Arrays.asList(), Reflection.invokePrivateMethod(
+		assertEquals(Arrays.asList(), ReflectionUtils.invokePrivateMethod(
 				compiler,
 				"calculateExclude",
 				new Object[] { Arrays.asList(createRange(0L, 10L)),
 						Arrays.asList(createRange(0L, 10L)) }));
 
 		assertEquals(Arrays.asList(createRange(6L, 10L)),
-				Reflection.invokePrivateMethod(compiler, "calculateExclude",
+				ReflectionUtils.invokePrivateMethod(compiler, "calculateExclude",
 						new Object[] { Arrays.asList(createRange(0L, 10L)),
 								Arrays.asList(createRange(0L, 5L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 2L), createRange(9L, 10L)),
-				Reflection.invokePrivateMethod(compiler, "calculateExclude",
+				ReflectionUtils.invokePrivateMethod(compiler, "calculateExclude",
 						new Object[] { Arrays.asList(createRange(0L, 10L)),
 								Arrays.asList(createRange(3L, 8L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 5L)),
-				Reflection.invokePrivateMethod(compiler, "calculateExclude",
+				ReflectionUtils.invokePrivateMethod(compiler, "calculateExclude",
 						new Object[] { Arrays.asList(createRange(0L, 10L)),
 								Arrays.asList(createRange(6L, 10L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 5L), createRange(7L, 10L),
-				createRange(20L, 30L)), Reflection.invokePrivateMethod(
+				createRange(20L, 30L)), ReflectionUtils.invokePrivateMethod(
 				compiler,
 				"calculateExclude",
 				new Object[] {
@@ -287,7 +287,7 @@ public class IntegerConstraintCompilerTest {
 						Arrays.asList(createRange(6L, 6L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 10L), createRange(20L, 21L),
-				createRange(23L, 30L)), Reflection.invokePrivateMethod(
+				createRange(23L, 30L)), ReflectionUtils.invokePrivateMethod(
 				compiler,
 				"calculateExclude",
 				new Object[] {
@@ -296,7 +296,7 @@ public class IntegerConstraintCompilerTest {
 						Arrays.asList(createRange(22L, 22L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 10L), createRange(40L, 50L),
-				createRange(80L, 90L)), Reflection.invokePrivateMethod(
+				createRange(80L, 90L)), ReflectionUtils.invokePrivateMethod(
 				compiler,
 				"calculateExclude",
 				new Object[] {
@@ -315,12 +315,12 @@ public class IntegerConstraintCompilerTest {
 
 		assertEquals(Arrays.asList(createRange(Long.MIN_VALUE, 4L),
 				createRange(6L, Long.MAX_VALUE)),
-				Reflection.invokePrivateMethod(compiler, "calculateInversion",
+				ReflectionUtils.invokePrivateMethod(compiler, "calculateInversion",
 						new Object[] { Arrays.asList(createRange(5L, 5L)) }));
 
 		assertEquals(Arrays.asList(createRange(Long.MIN_VALUE, 4L),
 				createRange(6L, 9L), createRange(21L, Long.MAX_VALUE)),
-				Reflection.invokePrivateMethod(compiler, "calculateInversion",
+				ReflectionUtils.invokePrivateMethod(compiler, "calculateInversion",
 						new Object[] { Arrays.asList(createRange(5L, 5L),
 								createRange(10L, 20L)) }));
 	}
@@ -331,54 +331,54 @@ public class IntegerConstraintCompilerTest {
 		IntegerConstraintCompiler compiler = new IntegerConstraintCompiler(
 				null, null);
 
-		assertEquals(Arrays.asList(), Reflection.invokePrivateMethod(compiler,
+		assertEquals(Arrays.asList(), ReflectionUtils.invokePrivateMethod(compiler,
 				"calculateIntersection",
 				new Object[] { Arrays.asList(), Arrays.asList() }));
 
-		assertEquals(Arrays.asList(), Reflection.invokePrivateMethod(
+		assertEquals(Arrays.asList(), ReflectionUtils.invokePrivateMethod(
 				compiler,
 				"calculateIntersection",
 				new Object[] { Arrays.asList(createRange(1L, 1L)),
 						Arrays.asList() }));
 
-		assertEquals(Arrays.asList(), Reflection.invokePrivateMethod(
+		assertEquals(Arrays.asList(), ReflectionUtils.invokePrivateMethod(
 				compiler,
 				"calculateIntersection",
 				new Object[] { Arrays.asList(),
 						Arrays.asList(createRange(1L, 1L)) }));
 
-		assertEquals(Arrays.asList(), Reflection.invokePrivateMethod(
+		assertEquals(Arrays.asList(), ReflectionUtils.invokePrivateMethod(
 				compiler,
 				"calculateIntersection",
 				new Object[] { Arrays.asList(createRange(0L, 10L)),
 						Arrays.asList(createRange(11L, 20L)) }));
 
 		assertEquals(Arrays.asList(createRange(0L, 10L)),
-				Reflection.invokePrivateMethod(compiler,
+				ReflectionUtils.invokePrivateMethod(compiler,
 						"calculateIntersection",
 						new Object[] { Arrays.asList(createRange(0L, 10L)),
 								Arrays.asList(createRange(0L, 10L)) }));
 
 		assertEquals(Arrays.asList(createRange(3L, 7L)),
-				Reflection.invokePrivateMethod(compiler,
+				ReflectionUtils.invokePrivateMethod(compiler,
 						"calculateIntersection",
 						new Object[] { Arrays.asList(createRange(0L, 10L)),
 								Arrays.asList(createRange(3L, 7L)) }));
 
 		assertEquals(Arrays.asList(createRange(3L, 7L)),
-				Reflection.invokePrivateMethod(compiler,
+				ReflectionUtils.invokePrivateMethod(compiler,
 						"calculateIntersection",
 						new Object[] { Arrays.asList(createRange(3L, 7L)),
 								Arrays.asList(createRange(0L, 10L)) }));
 
 		assertEquals(Arrays.asList(createRange(3L, 5L)),
-				Reflection.invokePrivateMethod(compiler,
+				ReflectionUtils.invokePrivateMethod(compiler,
 						"calculateIntersection",
 						new Object[] { Arrays.asList(createRange(3L, 7L)),
 								Arrays.asList(createRange(0L, 5L)) }));
 
 		assertEquals(Arrays.asList(createRange(3L, 5L)),
-				Reflection.invokePrivateMethod(compiler,
+				ReflectionUtils.invokePrivateMethod(compiler,
 						"calculateIntersection",
 						new Object[] { Arrays.asList(createRange(0L, 5L)),
 								Arrays.asList(createRange(3L, 7L)) }));
@@ -386,7 +386,7 @@ public class IntegerConstraintCompilerTest {
 		assertEquals(Arrays.asList(createRange(5L, 10L), createRange(20L, 25L),
 				createRange(40L, 40L), createRange(45L, 50L),
 				createRange(60L, 70L)),
-				Reflection.invokePrivateMethod(
+				ReflectionUtils.invokePrivateMethod(
 						compiler,
 						"calculateIntersection",
 						new Object[] {

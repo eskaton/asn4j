@@ -31,7 +31,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaEquals extends JavaMethod {
 

@@ -85,7 +85,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class CompilerContext {
 

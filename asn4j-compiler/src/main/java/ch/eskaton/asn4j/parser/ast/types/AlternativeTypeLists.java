@@ -32,7 +32,7 @@ import java.util.List;
 import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
 import ch.eskaton.asn4j.parser.ast.Node;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class AlternativeTypeLists implements Node {
 

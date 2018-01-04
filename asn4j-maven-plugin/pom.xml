@@ -6,21 +6,9 @@
 		<artifactId>asn4j</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
+
 	<artifactId>asn4j-maven-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 	<dependencies>
 		<dependency>
@@ -36,7 +24,7 @@
 		<dependency>
 			<groupId>ch.eskaton</groupId>
 			<artifactId>asn4j-compiler</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

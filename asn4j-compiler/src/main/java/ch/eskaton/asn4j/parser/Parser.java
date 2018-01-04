@@ -236,7 +236,7 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.ValueFromObject;
 import ch.eskaton.asn4j.runtime.TaggingMode;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class Parser {
 

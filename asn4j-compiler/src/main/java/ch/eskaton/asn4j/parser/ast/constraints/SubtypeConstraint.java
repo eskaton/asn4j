@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.constraints;
 
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class SubtypeConstraint extends AbstractConstraint {
 

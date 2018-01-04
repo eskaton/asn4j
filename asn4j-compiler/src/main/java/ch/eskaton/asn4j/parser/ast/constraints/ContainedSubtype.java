@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.constraints;
 
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.commons.StringUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class ContainedSubtype extends AbstractConstraint implements Constraint {
 
