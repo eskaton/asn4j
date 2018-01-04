@@ -39,8 +39,10 @@ import ch.eskaton.commons.utils.ReflectionUtils;
 
 public class Utils {
 
-	@SuppressWarnings("unchecked")
-	public List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
+	private Utils() {
+	}
+
+	public static List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
 		List<ASN1Tag> tags = new ArrayList<>(10);
 		ASN1Tag tag;
 
@@ -65,12 +67,12 @@ public class Utils {
 		return tags;
 	}
 
-	public <T extends ASN1Type> List<ASN1Tag> getTags(Class<T> type, ASN1Tag tag) {
+	public static <T extends ASN1Type> List<ASN1Tag> getTags(Class<T> type, ASN1Tag tag) {
 		List<ASN1Tag> tags;
 
 		if (tag != null) {
 			if (tag.mode() == ASN1Tag.Mode.Implicit) {
-				tags = new LinkedList<ASN1Tag>();
+				tags = new LinkedList<>();
 				tags.add(0, tag);
 			} else {
 				tags = getTags(type);
@@ -85,11 +87,12 @@ public class Utils {
 					+ type.getClass().getSimpleName()
 					+ ". No ASN1Tag annotation found");
 		}
+
 		return tags;
 	}
 
-	public List<Field> getComponents(ASN1Type type) {
-		List<Field> compFields = new ArrayList<Field>(20);
+	public static List<Field> getComponents(ASN1Type type) {
+		List<Field> compFields = new ArrayList<>(20);
 		Class<?> clazz = type.getClass();
 
 		do {

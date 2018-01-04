@@ -43,12 +43,10 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 public class SetDecoder implements CollectionDecoder<ASN1Set> {
 
-    private Utils berUtils = new Utils();
-
     @SuppressWarnings("unchecked")
     public void decode(Decoder decoder, DecoderStates states, ASN1Set obj)
             throws DecodingException {
-        List<Field> compFields = berUtils.getComponents(obj);
+        List<Field> compFields = Utils.getComponents(obj);
         //
         // do {
         // ASN1Type comp = null;
@@ -101,7 +99,7 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
                 Class<? extends ASN1Type> type = (Class<? extends ASN1Type>) compField
                         .getType();
                 tags.put(
-                        berUtils.getTags(type,
+                        Utils.getTags(type,
                                 compField.getAnnotation(ASN1Tag.class)), type);
             }
         }
