@@ -41,7 +41,7 @@ public class Utils {
 
 	@SuppressWarnings("unchecked")
 	public List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
-		List<ASN1Tag> tags = new ArrayList<ASN1Tag>(10);
+		List<ASN1Tag> tags = new ArrayList<>(10);
 		ASN1Tag tag;
 
 		while (true) {

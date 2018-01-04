@@ -45,7 +45,7 @@ public class TLV {
 
 	public int nextTlv;
 
-	private TLV() {
+	TLV() {
 	}
 
 	public static TLV getTLV(byte[] buf, int pos, int length)

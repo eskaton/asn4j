@@ -35,11 +35,11 @@ public @interface ASN1Tag {
 
 	enum Clazz {
 		Universal, Application, ContextSpecific, Private
-	};
+	}
 
 	enum Mode {
 		Implicit, Explicit
-	};
+	}
 
 	Clazz clazz();
 
