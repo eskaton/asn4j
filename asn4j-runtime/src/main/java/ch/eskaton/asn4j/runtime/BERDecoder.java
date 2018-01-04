@@ -86,8 +86,6 @@ public class BERDecoder implements Decoder {
     private SetDecoder setDecoder = new SetDecoder();
     private VisibleStringDecoder visibleStringDecoder = new VisibleStringDecoder();
 
-    private Utils berUtils = new Utils();
-
     public <T extends ASN1Type> T decode(Class<T> type, byte[] buf)
             throws DecodingException {
         DecoderStates states = new DecoderStates();
@@ -126,17 +124,13 @@ public class BERDecoder implements Decoder {
             return choiceDecoder.decode(this, type, states);
         }
 
-        tags = berUtils.getTags(type, tag);
+        tags = Utils.getTags(type, tag);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(StringUtils.concat("Expecting: javatype=", type
                     .getSimpleName(), ", tags=(", StringUtils.join(
-                    CollectionUtils.map(tags, new CollectionUtils.Mapper<ASN1Tag, String>() {
-                        public String map(ASN1Tag value) {
-                            return StringUtils.concat("tag=", value.tag(),
-                                    ", class=", value.clazz());
-                        }
-                    }), ", "), ")"));
+                    CollectionUtils.map(tags, value -> StringUtils.concat("tag=", value.tag(),
+                            ", class=", value.clazz())), ", "), ")"));
         }
 
         return decodeState(type, states, consumeTags(states, tags, optional));
@@ -336,7 +330,7 @@ public class BERDecoder implements Decoder {
 
         private TagNode tree;
 
-        private Set<TLV> matches = new HashSet<TLV>();
+        private Set<TLV> matches = new HashSet<>();
 
         private ASN1Tag lastMatch;
 

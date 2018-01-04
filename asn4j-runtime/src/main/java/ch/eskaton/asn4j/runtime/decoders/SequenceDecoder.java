@@ -42,11 +42,9 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class SequenceDecoder implements CollectionDecoder<ASN1Sequence> {
 
-	private Utils berUtils = new Utils();
-
 	public void decode(Decoder decoder, DecoderStates states, ASN1Sequence obj)
 			throws DecodingException {
-		List<Field> compFields = berUtils.getComponents(obj);
+		List<Field> compFields = Utils.getComponents(obj);
 
 		for (Field compField : compFields) {
 			ASN1Component annotation = compField

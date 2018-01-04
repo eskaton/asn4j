@@ -33,11 +33,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import ch.eskaton.asn4j.runtime.Decoder;
-import ch.eskaton.asn4j.runtime.DecoderState;
-import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.TLV;
-import ch.eskaton.asn4j.runtime.Utils;
+import ch.eskaton.asn4j.runtime.*;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
@@ -45,8 +41,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class ChoiceDecoder {
-
-	private Utils berUtils = new Utils();
 
 	public <T extends ASN1Type> T decode(Decoder decoder, Class<T> type,
 			DecoderStates states) throws DecodingException {
@@ -59,7 +53,7 @@ public class ChoiceDecoder {
 
 			T obj = type.newInstance();
 
-			List<Field> altFields = berUtils.getComponents(obj);
+			List<Field> altFields = Utils.getComponents(obj);
 
 			for (Field altField : altFields) {
 				ASN1Alternative annotation = altField
@@ -74,7 +68,7 @@ public class ChoiceDecoder {
 						}
 					} else {
 						@SuppressWarnings("unchecked")
-						List<ASN1Tag> tags = berUtils
+						List<ASN1Tag> tags = Utils
 								.getTags((Class<? extends ASN1Type>) altField
 										.getType());
 						// TODO: Multiple tags? explicit encoding?
