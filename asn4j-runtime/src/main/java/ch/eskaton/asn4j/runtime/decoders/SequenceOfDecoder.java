@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,39 +27,36 @@
 
 package ch.eskaton.asn4j.runtime.decoders;
 
-import java.lang.reflect.ParameterizedType;
-import java.util.LinkedList;
-import java.util.List;
-
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.LinkedList;
+import java.util.List;
+
 @SuppressWarnings("rawtypes")
 public class SequenceOfDecoder implements CollectionDecoder<ASN1SequenceOf> {
 
-	@SuppressWarnings("unchecked")
-	public void decode(Decoder decoder, DecoderStates states, ASN1SequenceOf obj)
-			throws DecodingException {
-		ParameterizedType pt = (ParameterizedType) obj.getClass()
-				.getGenericSuperclass();
-		Class<ASN1Type> typeParam = (Class<ASN1Type>) pt
-				.getActualTypeArguments()[0];
-		List<ASN1Type> elements = new LinkedList<ASN1Type>();
+    @SuppressWarnings("unchecked")
+    public void decode(Decoder decoder, DecoderStates states, ASN1SequenceOf obj) throws DecodingException {
+        ParameterizedType pt = (ParameterizedType) obj.getClass().getGenericSuperclass();
+        Class<ASN1Type> typeParam = (Class<ASN1Type>) pt.getActualTypeArguments()[0];
+        List<ASN1Type> elements = new LinkedList<>();
 
-		ASN1Type element;
+        ASN1Type element;
 
-		do {
-			element = decoder.decode(typeParam, states, null, true);
+        do {
+            element = decoder.decode(typeParam, states, null, true);
 
-			if (element != null) {
-				elements.add(element);
-			}
-		} while (element != null);
+            if (element != null) {
+                elements.add(element);
+            }
+        } while (element != null);
 
-		obj.setValues(elements);
-	}
+        obj.setValues(elements);
+    }
 
 }

@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,59 +27,58 @@
 
 package ch.eskaton.asn4j.runtime.encoders;
 
-import java.io.ByteArrayOutputStream;
-import java.util.LinkedList;
-import java.util.List;
-
 import ch.eskaton.asn4j.runtime.Encoder;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 
-public class ObjectIdentifierEncoder implements
-		TypeEncoder<ASN1ObjectIdentifier> {
+import java.io.ByteArrayOutputStream;
+import java.util.LinkedList;
+import java.util.List;
 
-	public byte[] encode(Encoder encoder, ASN1ObjectIdentifier obj)
-			throws EncodingException {
-		List<Integer> components = obj.getValue();
-		ByteArrayOutputStream value = new ByteArrayOutputStream();
-		int component = 0;
+public class ObjectIdentifierEncoder implements TypeEncoder<ASN1ObjectIdentifier> {
 
-		if (components == null || components.size() < 2) {
-			throw new EncodingException("Invalid OID: " + obj);
-		}
+    public byte[] encode(Encoder encoder, ASN1ObjectIdentifier obj)
+            throws EncodingException {
+        List<Integer> components = obj.getValue();
+        ByteArrayOutputStream value = new ByteArrayOutputStream();
+        int component = 0;
 
-		for (int i = 0; i < components.size(); i++) {
-			if (i == 0) {
-				component = 40 * components.get(i);
-			} else if (i == 1) {
-				component += components.get(i);
-			} else {
-				component = components.get(i);
-			}
+        if (components == null || components.size() < 2) {
+            throw new EncodingException("Invalid OID: " + obj);
+        }
 
-			if (i != 0 || components.size() == 1) {
-				LinkedList<Integer> list = new LinkedList<Integer>();
+        for (int i = 0; i < components.size(); i++) {
+            if (i == 0) {
+                component = 40 * components.get(i);
+            } else if (i == 1) {
+                component += components.get(i);
+            } else {
+                component = components.get(i);
+            }
 
-				while (component > 127) {
-					list.push(component & 0x7F);
-					component >>= 7;
-				}
+            if (i != 0 || components.size() == 1) {
+                LinkedList<Integer> list = new LinkedList<Integer>();
 
-				list.push(component);
+                while (component > 127) {
+                    list.push(component & 0x7F);
+                    component >>= 7;
+                }
 
-				int listSize = list.size();
+                list.push(component);
 
-				for (int j = 0; j < listSize; j++) {
-					if (j == listSize - 1) {
-						value.write(list.get(j));
-					} else {
-						value.write(list.get(j) | 0x80);
-					}
-				}
-			}
-		}
+                int listSize = list.size();
 
-		return value.toByteArray();
-	}
+                for (int j = 0; j < listSize; j++) {
+                    if (j == listSize - 1) {
+                        value.write(list.get(j));
+                    } else {
+                        value.write(list.get(j) | 0x80);
+                    }
+                }
+            }
+        }
+
+        return value.toByteArray();
+    }
 
 }

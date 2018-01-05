@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.runtime.decoders;
 
-import java.math.BigDecimal;
-
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -36,11 +34,13 @@ import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1Real.Type;
 
+import java.math.BigDecimal;
+
 public class RealDecoder {
 
-    public void decode(DecoderStates states, DecoderState state, ASN1Real obj)
-            throws ConstraintViolatedException {
-        outer: switch (state.tlv.length) {
+    public void decode(DecoderStates states, DecoderState state, ASN1Real obj) throws ConstraintViolatedException {
+        outer:
+        switch (state.tlv.length) {
             case 0:
                 obj.setValue(BigDecimal.ZERO);
                 break;
@@ -66,11 +66,10 @@ public class RealDecoder {
 
             default:
                 if ((states.buf[state.tlv.pos] >> 6) == 0x00) {
-                    int offset = 1 + (states.buf[state.tlv.pos + 1] == 0x20 ? 1
-                            : 0);
+                    int offset = 1 + (states.buf[state.tlv.pos + 1] == 0x20 ? 1 : 0);
                     byte[] buf = new byte[state.tlv.length - offset];
-                    System.arraycopy(states.buf, state.tlv.pos + offset, buf,
-                            0, state.tlv.length - offset);
+                    System.arraycopy(states.buf, state.tlv.pos + offset, buf, 0,
+                                     state.tlv.length - offset);
                     obj.setValue(new BigDecimal(new String(buf)));
                 } else {
                     throw new DecodingException("Binary encoding not yet supported");

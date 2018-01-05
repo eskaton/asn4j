@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,52 +27,42 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-import java.util.Arrays;
-import java.util.List;
-
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 16, mode = ASN1Tag.Mode.Explicit, constructed = true)
-public class ASN1SequenceOf<T extends ASN1Type> implements ASN1Type {
+public class ASN1SequenceOf<T extends ASN1Type> extends ASN1CollectionOf<T> {
 
-	private List<T> values;
+    @Override
+    public int hashCode() {
+        return 31 + ((values == null) ? 0 : values.hashCode());
+    }
 
-	public List<T> getValues() {
-		return values;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
 
-	public void setValues(List<T> values) {
-		this.values = values;
-	}
+        if (obj == null) {
+            return false;
+        }
 
-	public void setValues(T... values) {
-		this.values = Arrays.asList(values);
-	}
+        if (!(obj instanceof ASN1SequenceOf)) {
+            return false;
+        }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((values == null) ? 0 : values.hashCode());
-		return result;
-	}
+        @SuppressWarnings("rawtypes")
+        ASN1SequenceOf other = (ASN1SequenceOf<?>) obj;
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof ASN1SequenceOf))
-			return false;
-		@SuppressWarnings("rawtypes")
-		ASN1SequenceOf other = (ASN1SequenceOf<?>) obj;
-		if (values == null) {
-			if (other.values != null)
-				return false;
-		} else if (!values.equals(other.values))
-			return false;
-		return true;
-	}
+        if (values == null) {
+            if (other.values != null) {
+                return false;
+            }
+        } else if (!values.equals(other.values)) {
+            return false;
+        }
+
+        return true;
+    }
 
 }

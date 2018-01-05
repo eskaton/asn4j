@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,35 +27,9 @@
 
 package ch.eskaton.asn4j.runtime.encoders;
 
-import java.io.ByteArrayOutputStream;
-import java.util.List;
-
-import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
-@SuppressWarnings("rawtypes")
-public class SequenceOfEncoder implements TypeEncoder<ASN1SequenceOf> {
 
-	@SuppressWarnings("unchecked")
-	public byte[] encode(Encoder encoder, ASN1SequenceOf obj)
-			throws EncodingException {
-		ByteArrayOutputStream content = new ByteArrayOutputStream();
-
-		List<ASN1Type> values = obj.getValues();
-
-		if (values != null) {
-			for (ASN1Type value : values) {
-				try {
-					content.write(encoder.encode(value));
-				} catch (Throwable e) {
-					throw new EncodingException(e);
-				}
-			}
-		}
-
-		return content.toByteArray();
-	}
-
+public class SequenceOfEncoder<T extends ASN1Type> extends CollectionOfEncoder<ASN1SequenceOf<T>, T> {
 }

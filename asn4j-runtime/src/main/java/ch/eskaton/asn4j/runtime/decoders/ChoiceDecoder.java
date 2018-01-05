@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,12 +27,6 @@
 
 package ch.eskaton.asn4j.runtime.decoders;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-
 import ch.eskaton.asn4j.runtime.*;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
@@ -40,86 +34,74 @@ import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.utils.StringUtils;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+
 public class ChoiceDecoder {
 
-	public <T extends ASN1Type> T decode(Decoder decoder, Class<T> type,
-			DecoderStates states) throws DecodingException {
-		DecoderState lastState = states.states.peek();
-		int pos = lastState.pos;
-		int length = lastState.length;
+    public <T extends ASN1Type> T decode(Decoder decoder, Class<T> type,
+                                         DecoderStates states) throws DecodingException {
+        DecoderState lastState = states.states.peek();
+        int pos = lastState.pos;
+        int length = lastState.length;
 
-		try {
-			TLV tlv = TLV.getTLV(states.buf, pos, length);
+        try {
+            TLV tlv = TLV.getTLV(states.buf, pos, length);
 
-			T obj = type.newInstance();
+            T obj = type.newInstance();
 
-			List<Field> altFields = Utils.getComponents(obj);
+            List<Field> altFields = Utils.getComponents(obj);
 
-			for (Field altField : altFields) {
-				ASN1Alternative annotation = altField
-						.getAnnotation(ASN1Alternative.class);
-				if (annotation != null) {
-					ASN1Tag tag = altField.getAnnotation(ASN1Tag.class);
+            for (Field altField : altFields) {
+                ASN1Alternative annotation = altField.getAnnotation(ASN1Alternative.class);
 
-					if (tag != null) {
-						if (!tag.clazz().equals(tlv.clazz)
-								|| tag.tag() != tlv.tag) {
-							continue;
-						}
-					} else {
-						@SuppressWarnings("unchecked")
-						List<ASN1Tag> tags = Utils
-								.getTags((Class<? extends ASN1Type>) altField
-										.getType());
-						// TODO: Multiple tags? explicit encoding?
+                if (annotation != null) {
+                    ASN1Tag tag = altField.getAnnotation(ASN1Tag.class);
 
-						if (tags.isEmpty()) {
-							continue;
-						} else {
-							// ASN1Tag firstTag = tags.peek();
-							ASN1Tag firstTag = tags.get(tags.size() - 1);
+                    if (tag != null) {
+                        if (!tag.clazz().equals(tlv.clazz)
+                                || tag.tag() != tlv.tag) {
+                            continue;
+                        }
+                    } else {
+                        @SuppressWarnings("unchecked")
+                        List<ASN1Tag> tags = Utils.getTags((Class<? extends ASN1Type>) altField.getType());
+                        // TODO: Multiple tags? explicit encoding?
 
-							if (firstTag.clazz().equals(tlv.clazz)
-									|| firstTag.tag() != tlv.tag) {
-								continue;
-							}
-						}
-					}
+                        if (tags.isEmpty()) {
+                            continue;
+                        } else {
+                            ASN1Tag firstTag = tags.get(tags.size() - 1);
 
-					@SuppressWarnings("unchecked")
-					ASN1Type value = decoder.decode(
-							(Class<? extends ASN1Type>) altField.getType(),
-							states, tag, false);
+                            if (firstTag.clazz().equals(tlv.clazz)
+                                    || firstTag.tag() != tlv.tag) {
+                                continue;
+                            }
+                        }
+                    }
 
-					try {
-						Method m = obj.getClass()
-								.getMethod(
-										StringUtils.concat("set", StringUtils
-												.initCap(altField.getName())),
-										new Class<?>[] { value.getClass() });
-						m.invoke(obj, value);
-						return obj;
-					} catch (SecurityException e) {
-						throw new DecodingException(e);
-					} catch (NoSuchMethodException e) {
-						throw new DecodingException(e);
-					} catch (IllegalArgumentException e) {
-						throw new DecodingException(e);
-					} catch (InvocationTargetException e) {
-						throw new DecodingException(e);
-					}
-				}
-			}
+                    @SuppressWarnings("unchecked")
+                    ASN1Type value = decoder.decode(
+                            (Class<? extends ASN1Type>) altField.getType(),
+                            states, tag, false);
 
-		} catch (IOException e) {
-			throw new DecodingException(e);
-		} catch (InstantiationException e) {
-			throw new DecodingException(e);
-		} catch (IllegalAccessException e) {
-			throw new DecodingException(e);
-		}
 
-		return null;
-	}
+                    Method m = obj.getClass()
+                            .getMethod(StringUtils.concat("set", StringUtils.initCap(altField.getName())),
+                                       value.getClass());
+                    m.invoke(obj, value);
+                    return obj;
+                }
+            }
+        } catch (IOException | IllegalAccessException | InstantiationException | SecurityException |
+                InvocationTargetException | IllegalArgumentException | NoSuchMethodException e) {
+            throw new DecodingException(e);
+        }
+
+        return null;
+    }
 
 }
