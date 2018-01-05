@@ -110,10 +110,9 @@ public class BERDecoder implements Decoder {
         MultipleTagsMatcher matcher = new MultipleTagsMatcher(tags.keySet());
         DecoderState state = consumeMultipleTags(states, matcher);
 
-        List<ASN1Tag> tag = matcher.getMatch();
+        List<ASN1Tag> match = matcher.getMatch();
 
-        // TODO: use a list of tags instead of a single ones
-        Class<? extends ASN1Type> type = tags.remove(Arrays.asList(tag));
+        Class<? extends ASN1Type> type = tags.remove(match);
 
         return decodeState(type, states, state);
     }
@@ -226,9 +225,6 @@ public class BERDecoder implements Decoder {
 
     private DecoderState consumeTags(DecoderStates states, List<ASN1Tag> tags,
                                      boolean optional) throws DecodingException {
-        // Set<List<ASN1Tag>> tagsSet = new HashSet<List<ASN1Tag>>();
-        // tagsSet.add(tags);
-        // TagsMatcher matcher = new MultipleTagsMatcher(tagsSet);
         TagsMatcher matcher = new SingleTagsMatcher(tags);
         DecoderState state = consumeTags(states, matcher);
 

@@ -34,8 +34,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 public class BooleanDecoder {
 
 	public void decode(DecoderStates states, DecoderState state, ASN1Boolean obj) {
-		obj.setValue(states.buf[state.pos] == 0x00 ? false
-				: true);
+		obj.setValue(states.buf[state.pos] != 0x00);
 	}
 
 }

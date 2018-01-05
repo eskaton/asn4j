@@ -44,7 +44,7 @@ import ch.eskaton.asn4jtest.x680_27.TestSet2;
 public class TestX680_27 {
 
 	@Test
-	public void testSet1() throws ASN1RuntimeException, IOException {
+	public void testSet1() {
 		TestSet1 a = new TestSet1();
 		a.setA(ASN1Integer.valueOf(4711));
 		a.setB(ASN1OctetString.valueOf("test"));
@@ -58,7 +58,7 @@ public class TestX680_27 {
 	}
 
 	@Test
-	public void testSet2() throws ASN1RuntimeException, IOException {
+	public void testSet2() {
 		TestSet2 a = new TestSet2();
 		a.setA(ASN1Integer.valueOf(4711));
 
