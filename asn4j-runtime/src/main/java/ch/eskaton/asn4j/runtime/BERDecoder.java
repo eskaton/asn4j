@@ -67,6 +67,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.utils.CollectionUtils;
 
+import static ch.eskaton.asn4j.runtime.Assert.notEmpty;
+import static ch.eskaton.asn4j.runtime.Assert.notEmptyCollection;
 
 public class BERDecoder implements Decoder {
 
@@ -103,12 +105,12 @@ public class BERDecoder implements Decoder {
     }
 
     public ASN1Type decode(DecoderStates states,
-            Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags)
+                           Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags)
             throws DecodingException {
         MultipleTagsMatcher matcher = new MultipleTagsMatcher(tags.keySet());
         DecoderState state = consumeMultipleTags(states, matcher);
 
-        ASN1Tag tag = matcher.getLastMatch();
+        List<ASN1Tag> tag = matcher.getMatch();
 
         // TODO: use a list of tags instead of a single ones
         Class<? extends ASN1Type> type = tags.remove(Arrays.asList(tag));
@@ -117,7 +119,7 @@ public class BERDecoder implements Decoder {
     }
 
     public <T extends ASN1Type> T decode(Class<T> type, DecoderStates states,
-            ASN1Tag tag, boolean optional) throws DecodingException {
+                                         ASN1Tag tag, boolean optional) throws DecodingException {
         List<ASN1Tag> tags;
 
         if (ReflectionUtils.extendsClazz(type, ASN1Choice.class)) {
@@ -136,9 +138,9 @@ public class BERDecoder implements Decoder {
         return decodeState(type, states, consumeTags(states, tags, optional));
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private <T> T decodeState(Class<T> type, DecoderStates states,
-            DecoderState state) {
+                              DecoderState state) {
         if (state == null) {
             return null;
         }
@@ -167,7 +169,7 @@ public class BERDecoder implements Decoder {
                             .decode(this, states, (ASN1SequenceOf) obj);
                 } else if (obj instanceof ASN1Integer
                         || ReflectionUtils
-                                .extendsClazz(type, ASN1NamedInteger.class)) {
+                        .extendsClazz(type, ASN1NamedInteger.class)) {
                     integerDecoder.decode(states, state, (ASN1Integer) obj);
                 } else if (obj instanceof ASN1Real) {
                     realDecoder.decode(states, state, (ASN1Real) obj);
@@ -206,7 +208,7 @@ public class BERDecoder implements Decoder {
     }
 
     private DecoderState consumeMultipleTags(DecoderStates states,
-            MultipleTagsMatcher matcher) throws DecodingException {
+                                             MultipleTagsMatcher matcher) throws DecodingException {
         DecoderState state = consumeTags(states, matcher);
 
         if (state == null) {
@@ -223,7 +225,7 @@ public class BERDecoder implements Decoder {
     }
 
     private DecoderState consumeTags(DecoderStates states, List<ASN1Tag> tags,
-            boolean optional) throws DecodingException {
+                                     boolean optional) throws DecodingException {
         // Set<List<ASN1Tag>> tagsSet = new HashSet<List<ASN1Tag>>();
         // tagsSet.add(tags);
         // TagsMatcher matcher = new MultipleTagsMatcher(tagsSet);
@@ -303,9 +305,7 @@ public class BERDecoder implements Decoder {
         private Iterator<ASN1Tag> tags;
 
         public SingleTagsMatcher(List<ASN1Tag> tags) {
-            if(tags == null || tags.size() == 0) {
-                throw new IllegalArgumentException("tags must not be null or empty");
-            }
+            notEmpty(tags, "tags");
 
             this.tags = tags.iterator();
         }
@@ -330,11 +330,11 @@ public class BERDecoder implements Decoder {
 
         private TagNode tree;
 
-        private Set<TLV> matches = new HashSet<>();
-
-        private ASN1Tag lastMatch;
+        private List<ASN1Tag> match = new ArrayList<>();
 
         public MultipleTagsMatcher(Collection<List<ASN1Tag>> tags) {
+            notEmptyCollection(tags, "tags");
+
             tree = new TagTree();
 
             for (List<ASN1Tag> list : tags) {
@@ -343,27 +343,23 @@ public class BERDecoder implements Decoder {
         }
 
         public boolean hasNext() {
-            return tree.hasChilds();
+            return tree != null && tree.hasChilds();
         }
 
         public boolean accept(TLV tlv) {
-            if (matches.contains(tlv)) {
-                return false;
-            }
-
             tree = tree.accept(tlv);
 
             if (tree != null) {
-                matches.add(tlv);
-                lastMatch = tree.getTag();
+                match.add(tree.getTag());
                 return true;
             }
 
+            match.clear();
             return false;
         }
 
-        public ASN1Tag getLastMatch() {
-            return lastMatch;
+        public List<ASN1Tag> getMatch() {
+            return hasNext() || match.isEmpty() ? null : match;
         }
 
     }
@@ -442,7 +438,6 @@ public class BERDecoder implements Decoder {
                 if (tag.clazz().equals(tlv.clazz) && tag.tag() == tlv.tag) {
                     return child;
                 }
-
             }
 
             return null;
@@ -458,10 +453,7 @@ public class BERDecoder implements Decoder {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((tag == null) ? 0 : tag.hashCode());
-            return result;
+            return 31  + ((tag == null) ? 0 : tag.hashCode());
         }
 
         @Override
@@ -469,13 +461,17 @@ public class BERDecoder implements Decoder {
             if (this == obj) {
                 return true;
             }
+
             if (obj == null) {
                 return false;
             }
+
             if (!(obj instanceof TagNodeImpl)) {
                 return false;
             }
+
             TagNodeImpl other = (TagNodeImpl) obj;
+
             if (tag == null) {
                 if (other.tag != null) {
                     return false;
@@ -483,6 +479,7 @@ public class BERDecoder implements Decoder {
             } else if (!tag.equals(other.tag)) {
                 return false;
             }
+
             return true;
         }
 

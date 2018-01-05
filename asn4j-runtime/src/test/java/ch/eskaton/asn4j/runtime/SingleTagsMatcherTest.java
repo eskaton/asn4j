@@ -32,12 +32,11 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class SingleTagsMatcherTest {
+public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyTags() {
@@ -53,7 +52,6 @@ public class SingleTagsMatcherTest {
         TLV tlv = getTlv(ASN1Tag.Clazz.Universal, 1, false);
 
         assertTrue(matcher.accept(tlv));
-
         assertFalse(matcher.hasNext());
     }
 
@@ -66,7 +64,6 @@ public class SingleTagsMatcherTest {
         TLV tlv = getTlv(ASN1Tag.Clazz.Universal, 7, false);
 
         assertFalse(matcher.accept(tlv));
-
         assertFalse(matcher.hasNext());
     }
 
@@ -83,9 +80,7 @@ public class SingleTagsMatcherTest {
         tlv = getTlv(ASN1Tag.Clazz.Universal, 1, false);
 
         assertTrue(matcher.hasNext());
-
         assertTrue(matcher.accept(tlv));
-
         assertFalse(matcher.hasNext());
     }
 
@@ -98,23 +93,7 @@ public class SingleTagsMatcherTest {
         TLV tlv = getTlv(ASN1Tag.Clazz.Universal, 7, false);
 
         assertFalse(matcher.accept(tlv));
-
         assertTrue(matcher.hasNext());
-    }
-
-    private List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
-        Utils utils = new Utils();
-        return utils.getTags(clazz);
-    }
-
-    private TLV getTlv(ASN1Tag.Clazz clazz, int tag, boolean constructed) {
-        TLV tlv = new TLV();
-
-        tlv.clazz = clazz;
-        tlv.tag = tag;
-        tlv.constructed = constructed;
-
-        return tlv;
     }
 
     @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 1, mode = ASN1Tag.Mode.Explicit, constructed = false)
