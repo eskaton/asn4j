@@ -1,10 +1,15 @@
-X680-27 DEFINITIONS IMPLICIT TAGS ::=
+X680-27 DEFINITIONS ::=
 BEGIN
 
-TestSetImplicit ::= SET {
+TestSet1 ::= SET {
 	a [0] INTEGER,
 	b [1] OCTET STRING,
 	c INTEGER
+}
+
+TestSet2 ::= SET {
+	a [0] INTEGER,
+	b [1] INTEGER OPTIONAL
 }
 
 END
