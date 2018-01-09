@@ -29,19 +29,15 @@ package ch.eskaton.asn4j.test.x680_27;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-
 import org.junit.Test;
 
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
-import ch.eskaton.asn4jtest.x680_27.TestSet1;
-import ch.eskaton.asn4jtest.x680_27.TestSet2;
+import ch.eskaton.asn4jtest.x680_27_implicit.TestSet1;
 
-public class TestX680_27 {
+public class TestX680_27_implicit {
 
 	@Test
 	public void testSet1() {
@@ -53,19 +49,6 @@ public class TestX680_27 {
 		BERDecoder decoder = new BERDecoder();
 
 		TestSet1 b = decoder.decode(TestSet1.class, encoder.encode(a));
-
-		assertEquals(a, b);
-	}
-
-	@Test
-	public void testSet2() {
-		TestSet2 a = new TestSet2();
-		a.setA(ASN1Integer.valueOf(4711));
-
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
-
-		TestSet2 b = decoder.decode(TestSet2.class, encoder.encode(a));
 
 		assertEquals(a, b);
 	}
