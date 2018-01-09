@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.test.x680_27;
 
 import static org.junit.Assert.assertEquals;
 
+import ch.eskaton.asn4jtest.x680_27_implicit.TestSet2;
 import org.junit.Test;
 
 import ch.eskaton.asn4j.runtime.BERDecoder;
@@ -37,20 +38,34 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4jtest.x680_27_implicit.TestSet1;
 
-public class TestX680_27_implicit {
+public class TestX680_27 {
 
-	@Test
-	public void testSet1() {
-		TestSet1 a = new TestSet1();
-		a.setA(ASN1Integer.valueOf(4711));
-		a.setB(ASN1OctetString.valueOf("test"));
+    @Test
+    public void testSet1() {
+    	TestSet1 a = new TestSet1();
+    	a.setA(ASN1Integer.valueOf(4711));
+    	a.setB(ASN1OctetString.valueOf("test"));
+        a.setC(ASN1Integer.valueOf(23));
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+    	BEREncoder encoder = new BEREncoder();
+    	BERDecoder decoder = new BERDecoder();
 
-		TestSet1 b = decoder.decode(TestSet1.class, encoder.encode(a));
+    	TestSet1 b = decoder.decode(TestSet1.class, encoder.encode(a));
 
-		assertEquals(a, b);
-	}
+    	assertEquals(a, b);
+    }
+
+    @Test
+    public void testSet2() {
+        TestSet2 a = new TestSet2();
+        a.setA(ASN1Integer.valueOf(4711));
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        TestSet2 b = decoder.decode(TestSet2.class, encoder.encode(a));
+
+        assertEquals(a, b);
+    }
 
 }
