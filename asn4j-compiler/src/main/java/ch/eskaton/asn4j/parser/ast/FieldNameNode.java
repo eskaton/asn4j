@@ -49,14 +49,9 @@ public class FieldNameNode implements Node {
     public String toString() {
     	return StringUtils.concat("FieldName[", CollectionUtils.foldr(
     			fieldNames, new StringBuilder(),
-    			new Folder<PrimitiveFieldNameNode, StringBuilder>() {
-    				public StringBuilder fold(StringBuilder accumulator,
-    						PrimitiveFieldNameNode value) {
-    					return (accumulator.length() != 0 ? accumulator
-    							.append(".") : accumulator).append("&").append(
-    							value.getReference());
-    				}
-    			}), "]");
+                (accumulator, value) -> (accumulator.length() != 0 ? accumulator
+                        .append(".") : accumulator).append("&").append(
+                        value.getReference())), "]");
     }
 
 }
