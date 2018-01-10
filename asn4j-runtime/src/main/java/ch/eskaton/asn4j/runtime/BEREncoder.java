@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,7 +94,7 @@ public class BEREncoder implements Encoder {
 
     public byte[] encode(ASN1Type obj) throws EncodingException,
             ConstraintViolatedException {
-        byte[] encoded = encode(obj, false);
+        byte[] encoded = encode(obj, null);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Encoded value of type "
@@ -118,7 +119,7 @@ public class BEREncoder implements Encoder {
     }
 
     @SuppressWarnings("rawtypes")
-    public byte[] encode(ASN1Type obj, boolean implicit)
+    public byte[] encode(ASN1Type obj, ASN1Tag tag)
             throws EncodingException, ConstraintViolatedException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf;
@@ -173,7 +174,7 @@ public class BEREncoder implements Encoder {
         }
 
         try {
-            if (!implicit) {
+            if (tag == null || tag.mode() != ASN1Tag.Mode.Implicit) {
                 baos.write(TLVUtils.getTagLength(obj, buf.length));
             }
 

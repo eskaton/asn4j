@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.commons.utils.StringUtils;
@@ -60,7 +61,27 @@ public class IntegerType extends AbstractType {
 		return null;
 	}
 
-	@Override
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        IntegerType that = (IntegerType) o;
+
+        return Objects.equals(namedNumbers, that.namedNumbers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(namedNumbers);
+    }
+
+    @Override
 	public String toString() {
 		return StringUtils.concat(
 				"Integer",

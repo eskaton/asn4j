@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,14 +27,10 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
+import ch.eskaton.asn4j.parser.ast.ModuleNode.TagMode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
@@ -48,116 +44,119 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
-	public void compile(CompilerContext ctx, ComponentType node)
-			throws CompilerException {
-		switch (node.getCompType()) {
-			case NamedTypeOpt:
-				// fall through
-			case NamedTypeDef:
-				// fall through
-			case NamedType:
-				compileComponentNamedType(ctx, node, node.getNamedType());
-				break;
-			case Type:
-				try {
-					compileComponentType(ctx, node.getType());
-				} catch (IOException e) {
-					throw new CompilerException(e);
-				}
-				return;
-			default:
-				throw new CompilerException("Unsupported ComponentType: "
-						+ node.getCompType());
-		}
-	}
+    public void compile(CompilerContext ctx, ComponentType node)
+            throws CompilerException {
 
-	private void compileComponentNamedType(CompilerContext ctx,
-			ComponentType component, NamedType namedType)
-			throws CompilerException {
-		JavaClass javaClass = ctx.getCurrentClass();
-		Type type = namedType.getType();
-		Tag tag = type.getTag();
-		TaggingMode taggingMode = type.getTaggingMode();
+        TagMode mode = ctx.getModule().getTagMode();
 
-		JavaDefinedField field = new JavaDefinedField(ctx.getType(javaClass,
-				namedType), CompilerUtils.formatName(namedType.getName()));
-		JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
+        switch (node.getCompType()) {
+            case NamedTypeOpt:
+                // fall through
+            case NamedTypeDef:
+                // fall through
+            case NamedType:
+                compileComponentNamedType(ctx, node, node.getNamedType());
+                break;
+            case Type:
+                compileComponentType(ctx, mode, node.getType());
+                return;
+            default:
+                throw new CompilerException("Unsupported ComponentType: "
+                                                    + node.getCompType());
+        }
+    }
 
-		if (component.getCompType() == CompType.NamedTypeOpt) {
-			compAnnotation.addParameter("optional", "true");
-		} else if (component.getCompType() == CompType.NamedTypeDef) {
-			compAnnotation.addParameter("hasDefault", "true");
-			ctx.compileDefault(javaClass, field.getName(), component);
-		}
+    private void compileComponentNamedType(CompilerContext ctx,
+            ComponentType component, NamedType namedType)
+            throws CompilerException {
+        JavaClass javaClass = ctx.getCurrentClass();
+        Type type = namedType.getType();
+        Tag tag = type.getTag();
+        TaggingMode taggingMode = type.getTaggingMode();
 
-		field.addAnnotation(compAnnotation);
+        JavaDefinedField field = new JavaDefinedField(ctx.getType(namedType), CompilerUtils
+                .formatName(namedType.getName()));
+        JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
 
-		if (tag != null) {
-			field.addAnnotation(CompilerUtils.getTagAnnotation(ctx.getModule(),
-					tag, taggingMode));
-		}
+        if (component.getCompType() == CompType.NamedTypeOpt) {
+            compAnnotation.addParameter("optional", "true");
+        } else if (component.getCompType() == CompType.NamedTypeDef) {
+            compAnnotation.addParameter("hasDefault", "true");
+            ctx.compileDefault(javaClass, field.getName(), component);
+        }
 
-		javaClass.addField(field);
-	}
+        field.addAnnotation(compAnnotation);
 
-	private Collection<String> compileComponentType(CompilerContext ctx,
-			Type type) throws CompilerException, IOException {
-		TypeAssignmentNode assignment = null;
+        if (tag != null) {
+            field.addAnnotation(CompilerUtils.getTagAnnotation(ctx.getModule(),
+                                                               tag, taggingMode));
+        }
 
-		if (type instanceof TypeReference) {
-			TypeReference typeRef = (TypeReference) type;
-			String refTypeName = typeRef.getType();
+        javaClass.addField(field);
+    }
 
-			assignment = ctx.getTypeAssignment(refTypeName, null);
+    private Collection<String> compileComponentType(CompilerContext ctx, TagMode mode,
+            Type type) throws CompilerException {
+        TypeAssignmentNode assignment;
 
-			if (assignment == null) {
-				throw new CompilerException("Type " + refTypeName
-						+ " referenced but not defined");
-			}
+        if (type instanceof TypeReference) {
+            TypeReference typeRef = (TypeReference) type;
+            String refTypeName = typeRef.getType();
 
-			ctx.duplicateModule();
-		} else if (type instanceof ExternalTypeReference) {
-			ExternalTypeReference typeRef = (ExternalTypeReference) type;
-			String refTypeName = typeRef.getType();
-			String refModuleName = typeRef.getModule();
+            assignment = ctx.getTypeAssignment(refTypeName, null);
 
-			assignment = ctx.getTypeAssignment(refTypeName, refModuleName);
+            if (assignment == null) {
+                throw new CompilerException("Type " + refTypeName
+                                                    + " referenced but not defined");
+            }
 
-			if (assignment == null) {
-				throw new CompilerException("Type " + refTypeName
-						+ " from Module " + refModuleName
-						+ " referenced but not defined or not exported");
-			}
+            ctx.duplicateModule();
+        } else if (type instanceof ExternalTypeReference) {
+            ExternalTypeReference typeRef = (ExternalTypeReference) type;
+            String refTypeName = typeRef.getType();
+            String refModuleName = typeRef.getModule();
 
-			ctx.pushModule(refModuleName);
-		} else {
-			throw new CompilerException("Unimplemented type " + type);
-		}
+            assignment = ctx.getTypeAssignment(refTypeName, refModuleName);
 
-		Type referencedType = assignment.getType();
-		List<ComponentType> componentTypes;
+            if (assignment == null) {
+                throw new CompilerException("Type " + refTypeName
+                                                    + " from Module " + refModuleName
+                                                    + " referenced but not defined or not exported");
+            }
 
-		if (referencedType instanceof SetType) {
-			componentTypes = ((SetType) referencedType).getAllComponents();
-		} else if (referencedType instanceof SequenceType) {
-			componentTypes = ((SequenceType) referencedType).getAllComponents();
-		} else {
-			throw new CompilerException("Components of type " + referencedType
-					+ " not supported");
-		}
+            ctx.pushModule(refModuleName);
+        } else {
+            throw new CompilerException("Unimplemented type " + type);
+        }
 
-		List<String> fieldNames = new ArrayList<String>();
+        Type referencedType = assignment.getType();
+        List<ComponentType> componentTypes;
 
-		for (ComponentType referencedComponent : componentTypes) {
-			ctx.<ComponentType, ComponentTypeCompiler> getCompiler(
-					ComponentType.class).compile(ctx, referencedComponent);
-		}
+        if (referencedType instanceof SetType) {
+            componentTypes = ((SetType) referencedType).getAllComponents();
+        } else if (referencedType instanceof SequenceType) {
+            componentTypes = ((SequenceType) referencedType).getAllComponents();
+        } else {
+            throw new CompilerException("Components of type " + referencedType
+                                                + " not supported");
+        }
 
-		ctx.popModule();
+        List<String> fieldNames = new ArrayList<>();
 
-		return fieldNames;
-	}
+        for (ComponentType referencedComponent : componentTypes) {
+            ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
+                    .compile(ctx, referencedComponent);
+        }
+
+        ctx.popModule();
+
+        return fieldNames;
+    }
 
 }
