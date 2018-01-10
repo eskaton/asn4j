@@ -32,11 +32,11 @@ import java.util.List;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class ParameterizedTypeAssignmentNode extends
-		ParameterizedTypeOrObjectClassAssignmentNode<Type> {
+    	ParameterizedTypeOrObjectClassAssignmentNode<Type> {
 
-	public ParameterizedTypeAssignmentNode(String reference,
-			List<ParameterNode> parameters, Type type) {
-		super(reference, parameters, type);
-	}
+    public ParameterizedTypeAssignmentNode(String reference,
+    		List<ParameterNode> parameters, Type type) {
+    	super(reference, parameters, type);
+    }
 
 }

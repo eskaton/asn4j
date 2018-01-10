@@ -39,74 +39,74 @@ import ch.eskaton.commons.utils.ReflectionUtils;
 
 public class Utils {
 
-	private Utils() {
-	}
+    private Utils() {
+    }
 
-	public static List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
-		List<ASN1Tag> tags = new ArrayList<>(10);
-		ASN1Tag tag;
+    public static List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
+    	List<ASN1Tag> tags = new ArrayList<>(10);
+    	ASN1Tag tag;
 
-		while (true) {
-			tag = clazz.getAnnotation(ASN1Tag.class);
+    	while (true) {
+    		tag = clazz.getAnnotation(ASN1Tag.class);
 
-			while (tag == null) {
-				clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
-				tag = clazz.getAnnotation(ASN1Tag.class);
-			}
+    		while (tag == null) {
+    			clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
+    			tag = clazz.getAnnotation(ASN1Tag.class);
+    		}
 
-			tags.add(tag);
+    		tags.add(tag);
 
-			if (tag.mode() != ASN1Tag.Mode.Explicit
-					|| tag.clazz() == ASN1Tag.Clazz.Universal) {
-				break;
-			}
+    		if (tag.mode() != ASN1Tag.Mode.Explicit
+    				|| tag.clazz() == ASN1Tag.Clazz.Universal) {
+    			break;
+    		}
 
-			clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
-		}
+    		clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
+    	}
 
-		return tags;
-	}
+    	return tags;
+    }
 
-	public static <T extends ASN1Type> List<ASN1Tag> getTags(Class<T> type, ASN1Tag tag) {
-		List<ASN1Tag> tags;
+    public static <T extends ASN1Type> List<ASN1Tag> getTags(Class<T> type, ASN1Tag tag) {
+    	List<ASN1Tag> tags;
 
-		if (tag != null) {
-			if (tag.mode() == ASN1Tag.Mode.Implicit) {
-				tags = new LinkedList<>();
-				tags.add(0, tag);
-			} else {
-				tags = getTags(type);
-				tags.add(0, tag);
-			}
-		} else {
-			tags = getTags(type);
-		}
+    	if (tag != null) {
+    		if (tag.mode() == ASN1Tag.Mode.Implicit) {
+    			tags = new LinkedList<>();
+    			tags.add(0, tag);
+    		} else {
+    			tags = getTags(type);
+    			tags.add(0, tag);
+    		}
+    	} else {
+    		tags = getTags(type);
+    	}
 
-		if (tags.isEmpty()) {
-			throw new DecodingException("Invalid type provided: "
-					+ type.getClass().getSimpleName()
-					+ ". No ASN1Tag annotation found");
-		}
+    	if (tags.isEmpty()) {
+    		throw new DecodingException("Invalid type provided: "
+    				+ type.getClass().getSimpleName()
+    				+ ". No ASN1Tag annotation found");
+    	}
 
-		return tags;
-	}
+    	return tags;
+    }
 
-	public static List<Field> getComponents(ASN1Type type) {
-		List<Field> compFields = new ArrayList<>(20);
-		Class<?> clazz = type.getClass();
+    public static List<Field> getComponents(ASN1Type type) {
+    	List<Field> compFields = new ArrayList<>(20);
+    	Class<?> clazz = type.getClass();
 
-		do {
-			Field[] fields = clazz.getDeclaredFields();
+    	do {
+    		Field[] fields = clazz.getDeclaredFields();
 
-			for (Field field : fields) {
-				compFields.add(field);
-			}
+    		for (Field field : fields) {
+    			compFields.add(field);
+    		}
 
-			clazz = clazz.getSuperclass();
-		} while (clazz != null
-				&& ReflectionUtils.implementsInterface(clazz, ASN1Type.class));
+    		clazz = clazz.getSuperclass();
+    	} while (clazz != null
+    			&& ReflectionUtils.implementsInterface(clazz, ASN1Type.class));
 
-		return compFields;
-	}
+    	return compFields;
+    }
 
 }

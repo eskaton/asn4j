@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class CharacterString extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "CharacterString";
-	}
+    @Override
+    public String toString() {
+    	return "CharacterString";
+    }
 
 }

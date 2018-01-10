@@ -36,57 +36,57 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class AlternativeTypeLists implements Node {
 
-	private List<NamedType> rootTypeList;
+    private List<NamedType> rootTypeList;
 
-	private ExtensionAndExceptionNode extensionAndException;
+    private ExtensionAndExceptionNode extensionAndException;
 
-	private List<ExtensionAdditionAlternativeNode> extAddAlts;
+    private List<ExtensionAdditionAlternativeNode> extAddAlts;
 
-	private boolean optExtMarker;
+    private boolean optExtMarker;
 
-	public AlternativeTypeLists(List<NamedType> rootTypeList) {
-		this.rootTypeList = rootTypeList;
-	}
+    public AlternativeTypeLists(List<NamedType> rootTypeList) {
+    	this.rootTypeList = rootTypeList;
+    }
 
-	public AlternativeTypeLists(List<NamedType> rootTypeList,
-			ExtensionAndExceptionNode extensionAndException,
-			List<ExtensionAdditionAlternativeNode> extAddAlts,
-			boolean optExtMarker) {
-		this.rootTypeList = rootTypeList;
-		this.extensionAndException = extensionAndException;
-		this.extAddAlts = extAddAlts;
-		this.optExtMarker = optExtMarker;
-	}
+    public AlternativeTypeLists(List<NamedType> rootTypeList,
+    		ExtensionAndExceptionNode extensionAndException,
+    		List<ExtensionAdditionAlternativeNode> extAddAlts,
+    		boolean optExtMarker) {
+    	this.rootTypeList = rootTypeList;
+    	this.extensionAndException = extensionAndException;
+    	this.extAddAlts = extAddAlts;
+    	this.optExtMarker = optExtMarker;
+    }
 
-	public List<NamedType> getRootTypeList() {
-		return rootTypeList;
-	}
+    public List<NamedType> getRootTypeList() {
+    	return rootTypeList;
+    }
 
-	public ExtensionAndExceptionNode getExtensionAndException() {
-		return extensionAndException;
-	}
+    public ExtensionAndExceptionNode getExtensionAndException() {
+    	return extensionAndException;
+    }
 
-	public List<ExtensionAdditionAlternativeNode> getExtAddAlts() {
-		return extAddAlts;
-	}
+    public List<ExtensionAdditionAlternativeNode> getExtAddAlts() {
+    	return extAddAlts;
+    }
 
-	public boolean hasOptExtMarker() {
-		return optExtMarker;
-	}
+    public boolean hasOptExtMarker() {
+    	return optExtMarker;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils
-				.concat("AlternativeTypeLists[ext=",
-						(extensionAndException != null ? "true" : "false"),
-						", optExtMarker=",
-						optExtMarker,
-						(extensionAndException != null
-								&& extensionAndException.getExceptionId() != null ? ", exceptionId="
-								+ extensionAndException.getExceptionId()
-								: ""), ", root=(", StringUtils.join(
-								rootTypeList, ","), "), extAlts=(",
-						extAddAlts != null ? StringUtils.join(extAddAlts, ",")
-								: "", ")", "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils
+    			.concat("AlternativeTypeLists[ext=",
+    					(extensionAndException != null ? "true" : "false"),
+    					", optExtMarker=",
+    					optExtMarker,
+    					(extensionAndException != null
+    							&& extensionAndException.getExceptionId() != null ? ", exceptionId="
+    							+ extensionAndException.getExceptionId()
+    							: ""), ", root=(", StringUtils.join(
+    							rootTypeList, ","), "), extAlts=(",
+    					extAddAlts != null ? StringUtils.join(extAddAlts, ",")
+    							: "", ")", "]");
+    }
 }

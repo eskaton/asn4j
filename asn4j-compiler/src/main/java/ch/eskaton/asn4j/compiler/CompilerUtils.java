@@ -38,103 +38,103 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class CompilerUtils {
 
-	static String formatTypeName(String name) {
-		return StringUtils.initCap(formatName(name));
-	}
+    static String formatTypeName(String name) {
+    	return StringUtils.initCap(formatName(name));
+    }
 
-	static String formatName(String name) {
-		StringBuilder sb = new StringBuilder();
-		boolean cap = false;
+    static String formatName(String name) {
+    	StringBuilder sb = new StringBuilder();
+    	boolean cap = false;
 
-		for (char c : name.toCharArray()) {
-			if (c == '-') {
-				cap = true;
-			} else if (cap == true) {
-				cap = false;
-				if ('a' <= c && c <= 'z') {
-					sb.append((char) (c & ~0x20));
-				} else {
-					sb.append(c);
-				}
-			} else {
-				sb.append(c);
-			}
-		}
+    	for (char c : name.toCharArray()) {
+    		if (c == '-') {
+    			cap = true;
+    		} else if (cap == true) {
+    			cap = false;
+    			if ('a' <= c && c <= 'z') {
+    				sb.append((char) (c & ~0x20));
+    			} else {
+    				sb.append(c);
+    			}
+    		} else {
+    			sb.append(c);
+    		}
+    	}
 
-		return sb.toString();
-	}
+    	return sb.toString();
+    }
 
-	static String formatConstant(String name) {
-		StringBuilder sb = new StringBuilder();
+    static String formatConstant(String name) {
+    	StringBuilder sb = new StringBuilder();
 
-		for (char c : name.toCharArray()) {
-			if (c == '-') {
-				sb.append('_');
-			} else {
-				if ('a' <= c && c <= 'z') {
-					sb.append((char) (c & ~0x20));
-				} else {
-					sb.append(c);
-				}
-			}
-		}
+    	for (char c : name.toCharArray()) {
+    		if (c == '-') {
+    			sb.append('_');
+    		} else {
+    			if ('a' <= c && c <= 'z') {
+    				sb.append((char) (c & ~0x20));
+    			} else {
+    				sb.append(c);
+    			}
+    		}
+    	}
 
-		return sb.toString();
-	}
+    	return sb.toString();
+    }
 
-	static Mode getTaggingMode(ModuleNode module, Type type)
-			throws CompilerException {
-		TaggingMode taggingMode = type.getTaggingMode();
+    static Mode getTaggingMode(ModuleNode module, Type type)
+    		throws CompilerException {
+    	TaggingMode taggingMode = type.getTaggingMode();
 
-		if (taggingMode != null) {
-			switch (taggingMode) {
-				case Explicit:
-					return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Explicit;
-				case Implicit:
-					return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Implicit;
-			}
-		}
+    	if (taggingMode != null) {
+    		switch (taggingMode) {
+    			case Explicit:
+    				return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Explicit;
+    			case Implicit:
+    				return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Implicit;
+    		}
+    	}
 
-		switch (module.getTagMode()) {
-			case Explicit:
-				return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Explicit;
-			case Implicit:
-				return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Implicit;
-			default:
-				throw new CompilerException("Automatic tagging not supported");
+    	switch (module.getTagMode()) {
+    		case Explicit:
+    			return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Explicit;
+    		case Implicit:
+    			return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Implicit;
+    		default:
+    			throw new CompilerException("Automatic tagging not supported");
 
-		}
+    	}
 
-	}
+    }
 
-	static JavaAnnotation getTagAnnotation(ModuleNode module, Tag tag,
-			TaggingMode taggingMode) {
-		JavaAnnotation tagAnnotation = new JavaAnnotation(
-				ch.eskaton.asn4j.runtime.annotations.ASN1Tag.class);
+    static JavaAnnotation getTagAnnotation(ModuleNode module, Tag tag,
+    		TaggingMode taggingMode) {
+    	JavaAnnotation tagAnnotation = new JavaAnnotation(
+    			ch.eskaton.asn4j.runtime.annotations.ASN1Tag.class);
 
-		tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz()
-				.toString());
-		tagAnnotation
-				.addParameter(
-						"clazz",
-						ASN1Tag.class.getSimpleName()
-								+ ".Clazz."
-								+ (tag.getClazz() != null ? StringUtils
-										.initCap(tag.getClazz().toString()
-												.toLowerCase())
-										: ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Clazz.ContextSpecific
-												.toString()));
-		// TODO: dynamic
-		tagAnnotation.addParameter("constructed", "false");
+    	tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz()
+    			.toString());
+    	tagAnnotation
+    			.addParameter(
+    					"clazz",
+    					ASN1Tag.class.getSimpleName()
+    							+ ".Clazz."
+    							+ (tag.getClazz() != null ? StringUtils
+    									.initCap(tag.getClazz().toString()
+    											.toLowerCase())
+    									: ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Clazz.ContextSpecific
+    											.toString()));
+    	// TODO: dynamic
+    	tagAnnotation.addParameter("constructed", "false");
 
-		if (taggingMode != null) {
-			tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName()
-					+ ".Mode." + taggingMode.toString());
-		} else {
-			tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName()
-					+ ".Mode." + module.getTagMode().toString());
-		}
-		return tagAnnotation;
-	}
+    	if (taggingMode != null) {
+    		tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName()
+    				+ ".Mode." + taggingMode.toString());
+    	} else {
+    		tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName()
+    				+ ".Mode." + module.getTagMode().toString());
+    	}
+    	return tagAnnotation;
+    }
 
 }

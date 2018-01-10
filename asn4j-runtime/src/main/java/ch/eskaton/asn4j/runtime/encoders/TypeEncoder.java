@@ -33,6 +33,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 public interface TypeEncoder<T extends ASN1Type> {
 
-	byte[] encode(Encoder encoder, T obj) throws EncodingException;
+    byte[] encode(Encoder encoder, T obj) throws EncodingException;
 
 }

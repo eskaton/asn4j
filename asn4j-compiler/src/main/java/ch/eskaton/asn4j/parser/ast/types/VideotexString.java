@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class VideotexString extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "VideotexString";
-	}
+    @Override
+    public String toString() {
+    	return "VideotexString";
+    }
 
 }

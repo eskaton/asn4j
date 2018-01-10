@@ -36,108 +36,108 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaConstructor extends JavaMethod {
 
-	private JavaVisibility visibility;
+    private JavaVisibility visibility;
 
-	private String clazz;
+    private String clazz;
 
-	private List<JavaParameter> parameters;
+    private List<JavaParameter> parameters;
 
-	private String body;
+    private String body;
 
-	private List<String> exceptions;
+    private List<String> exceptions;
 
-	public JavaConstructor(JavaVisibility visibility, String clazz,
-			List<JavaParameter> parameters, String body) {
-		this(visibility, clazz, parameters, body, new ArrayList<String>());
-	}
+    public JavaConstructor(JavaVisibility visibility, String clazz,
+    		List<JavaParameter> parameters, String body) {
+    	this(visibility, clazz, parameters, body, new ArrayList<String>());
+    }
 
-	public JavaConstructor(JavaVisibility visibility, String clazz,
-			List<JavaParameter> parameters, String body, List<String> exceptions) {
-		this.visibility = visibility;
-		this.clazz = clazz;
-		this.parameters = parameters;
-		this.body = body;
-		this.exceptions = exceptions;
-	}
+    public JavaConstructor(JavaVisibility visibility, String clazz,
+    		List<JavaParameter> parameters, String body, List<String> exceptions) {
+    	this.visibility = visibility;
+    	this.clazz = clazz;
+    	this.parameters = parameters;
+    	this.body = body;
+    	this.exceptions = exceptions;
+    }
 
-	public JavaVisibility getVisibility() {
-		return visibility;
-	}
+    public JavaVisibility getVisibility() {
+    	return visibility;
+    }
 
-	public String getClazz() {
-		return clazz;
-	}
+    public String getClazz() {
+    	return clazz;
+    }
 
-	public List<JavaParameter> getParameters() {
-		return parameters;
-	}
+    public List<JavaParameter> getParameters() {
+    	return parameters;
+    }
 
-	public String getBody() {
-		return body;
-	}
+    public String getBody() {
+    	return body;
+    }
 
-	public void setBody(String body) {
-		this.body = body;
-	}
+    public void setBody(String body) {
+    	this.body = body;
+    }
 
-	public void write(BufferedWriter writer, String prefix) throws IOException {
-		int paramCount = 0;
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+    	int paramCount = 0;
 
-		writer.write(StringUtils.concat(prefix, "\t",
-				(visibility == JavaVisibility.Default ? "" : visibility
-						.toString().toLowerCase()), " ", clazz, "("));
+    	writer.write(StringUtils.concat(prefix, "\t",
+    			(visibility == JavaVisibility.Default ? "" : visibility
+    					.toString().toLowerCase()), " ", clazz, "("));
 
-		for (JavaParameter parameter : parameters) {
-			if (paramCount != 0) {
-				writer.write(", ");
-			}
-			parameter.write(writer, "");
-		}
+    	for (JavaParameter parameter : parameters) {
+    		if (paramCount != 0) {
+    			writer.write(", ");
+    		}
+    		parameter.write(writer, "");
+    	}
 
-		writer.write(prefix);
-		writer.write(") ");
+    	writer.write(prefix);
+    	writer.write(") ");
 
-		if (!exceptions.isEmpty()) {
-			writer.write(" throws " + StringUtils.join(exceptions, ", "));
-		}
+    	if (!exceptions.isEmpty()) {
+    		writer.write(" throws " + StringUtils.join(exceptions, ", "));
+    	}
 
-		writer.write(" {\n");
-		writer.write(StringUtils.inject(body, "\n", prefix));
-		writer.write("\n");
-		writer.write(prefix);
-		writer.write("\t}\n\n");
-	}
+    	writer.write(" {\n");
+    	writer.write(StringUtils.inject(body, "\n", prefix));
+    	writer.write("\n");
+    	writer.write(prefix);
+    	writer.write("\t}\n\n");
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
-		result = prime * result
-				+ ((parameters == null) ? 0 : parameters.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+    	final int prime = 31;
+    	int result = 1;
+    	result = prime * result + ((clazz == null) ? 0 : clazz.hashCode());
+    	result = prime * result
+    			+ ((parameters == null) ? 0 : parameters.hashCode());
+    	return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		JavaConstructor other = (JavaConstructor) obj;
-		if (clazz == null) {
-			if (other.clazz != null)
-				return false;
-		} else if (!clazz.equals(other.clazz))
-			return false;
-		if (parameters == null) {
-			if (other.parameters != null)
-				return false;
-		} else if (!parameters.equals(other.parameters))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj)
+    		return true;
+    	if (obj == null)
+    		return false;
+    	if (getClass() != obj.getClass())
+    		return false;
+    	JavaConstructor other = (JavaConstructor) obj;
+    	if (clazz == null) {
+    		if (other.clazz != null)
+    			return false;
+    	} else if (!clazz.equals(other.clazz))
+    		return false;
+    	if (parameters == null) {
+    		if (other.parameters != null)
+    			return false;
+    	} else if (!parameters.equals(other.parameters))
+    		return false;
+    	return true;
+    }
 
 }

@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class GeneralString extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "GeneralString";
-	}
+    @Override
+    public String toString() {
+    	return "GeneralString";
+    }
 
 }

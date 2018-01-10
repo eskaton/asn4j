@@ -29,10 +29,10 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 public interface Constraint<C extends Constraint<C>> {
 
-	void union(C c);
+    void union(C c);
 
-	void intersect(C c);
+    void intersect(C c);
 
-	void minus(C c);
+    void minus(C c);
 
 }

@@ -31,10 +31,10 @@ import ch.eskaton.asn4j.parser.ast.Node;
 
 public interface Value extends Node {
 
-	Value MIN = new Value() {
-	};
+    Value MIN = new Value() {
+    };
 
-	Value MAX = new Value() {
-	};
+    Value MAX = new Value() {
+    };
 
 }

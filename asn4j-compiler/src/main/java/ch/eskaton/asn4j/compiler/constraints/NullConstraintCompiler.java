@@ -37,30 +37,30 @@ import ch.eskaton.asn4j.parser.ast.types.Null;
 
 public class NullConstraintCompiler extends AbstractConstraintCompiler<Null> {
 
-	public NullConstraintCompiler(ConstraintCompiler constraintCompiler,
-			TypeResolver typeResolver) {
-		super(constraintCompiler, typeResolver);
-	}
+    public NullConstraintCompiler(ConstraintCompiler constraintCompiler,
+    		TypeResolver typeResolver) {
+    	super(constraintCompiler, typeResolver);
+    }
 
-	@Override
-	protected Collection<Null> compileConstraint(ElementSet set)
-			throws CompilerException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected Collection<Null> compileConstraint(ElementSet set)
+    		throws CompilerException {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
-	@Override
-	protected Collection<Null> calculateIntersection(Collection<?> op1,
-			Collection<?> op2) throws CompilerException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected Collection<Null> calculateIntersection(Collection<?> op1,
+    		Collection<?> op2) throws CompilerException {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
-	@Override
-	protected void addConstraint(JavaClass clazz, Collection<?> values)
-			throws CompilerException {
-		// TODO Auto-generated method stub
+    @Override
+    protected void addConstraint(JavaClass clazz, Collection<?> values)
+    		throws CompilerException {
+    	// TODO Auto-generated method stub
 
-	}
+    }
 
 }

@@ -34,35 +34,35 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class Tag implements Node {
 
-	private String encodingRef;
+    private String encodingRef;
 
-	private ClassType clazz;
+    private ClassType clazz;
 
-	private ClassNumber classNumber;
+    private ClassNumber classNumber;
 
-	public Tag(String encodingRef, ClassType clazz, ClassNumber classNumber) {
-		this.encodingRef = encodingRef;
-		this.clazz = clazz;
-		this.classNumber = classNumber;
-	}
+    public Tag(String encodingRef, ClassType clazz, ClassNumber classNumber) {
+    	this.encodingRef = encodingRef;
+    	this.clazz = clazz;
+    	this.classNumber = classNumber;
+    }
 
-	public String getEncodingRef() {
-		return encodingRef;
-	}
+    public String getEncodingRef() {
+    	return encodingRef;
+    }
 
-	public ClassType getClazz() {
-		return clazz;
-	}
+    public ClassType getClazz() {
+    	return clazz;
+    }
 
-	public ClassNumber getClassNumber() {
-		return classNumber;
-	}
+    public ClassNumber getClassNumber() {
+    	return classNumber;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("Tag[", (encodingRef != null ? encodingRef
-				+ " " : ""), (clazz != null ? clazz + " " : ""), classNumber,
-				"]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("Tag[", (encodingRef != null ? encodingRef
+    			+ " " : ""), (clazz != null ? clazz + " " : ""), classNumber,
+    			"]");
+    }
 
 }

@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public interface DefaultCompiler {
 
-	void compileDefault(CompilerContext ctx, JavaClass clazz, String field,
-			Value value) throws CompilerException;
+    void compileDefault(CompilerContext ctx, JavaClass clazz, String field,
+    		Value value) throws CompilerException;
 
 }

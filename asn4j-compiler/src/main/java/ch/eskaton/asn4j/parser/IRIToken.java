@@ -29,37 +29,37 @@ package ch.eskaton.asn4j.parser;
 
 public class IRIToken {
 
-	public enum Type {
-		Solidus, IntegerUnicodeLabel, NonIntegerUnicodeLabel
-	}
+    public enum Type {
+    	Solidus, IntegerUnicodeLabel, NonIntegerUnicodeLabel
+    }
 
-	private Type type;
+    private Type type;
 
-	private int pos;
+    private int pos;
 
-	private String text;
+    private String text;
 
-	public IRIToken(Type type, int pos) {
-		this.type = type;
-		this.pos = pos;
-	}
+    public IRIToken(Type type, int pos) {
+    	this.type = type;
+    	this.pos = pos;
+    }
 
-	public IRIToken(Type type, int pos, String text) {
-		this.type = type;
-		this.pos = pos;
-		this.text = text;
-	}
+    public IRIToken(Type type, int pos, String text) {
+    	this.type = type;
+    	this.pos = pos;
+    	this.text = text;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	public int getPos() {
-		return pos;
-	}
+    public int getPos() {
+    	return pos;
+    }
 
-	public String getText() {
-		return text;
-	}
+    public String getText() {
+    	return text;
+    }
 
 }

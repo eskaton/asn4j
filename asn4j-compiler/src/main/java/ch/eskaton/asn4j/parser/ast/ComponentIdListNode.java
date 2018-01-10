@@ -35,24 +35,24 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ComponentIdListNode implements Node {
 
-	private List<String> identifiers;
+    private List<String> identifiers;
 
-	public ComponentIdListNode(List<Token> tokens) {
-		identifiers = new ArrayList<String>(tokens.size());
+    public ComponentIdListNode(List<Token> tokens) {
+    	identifiers = new ArrayList<String>(tokens.size());
 
-		for (Token token : tokens) {
-			identifiers.add(token.getText());
-		}
-	}
+    	for (Token token : tokens) {
+    		identifiers.add(token.getText());
+    	}
+    }
 
-	public List<String> getIdentifiers() {
-		return identifiers;
-	}
+    public List<String> getIdentifiers() {
+    	return identifiers;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ComponentIdList[",
-				StringUtils.join(identifiers, "."), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ComponentIdList[",
+    			StringUtils.join(identifiers, "."), "]");
+    }
 
 }

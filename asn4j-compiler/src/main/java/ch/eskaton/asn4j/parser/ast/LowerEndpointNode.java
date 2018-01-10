@@ -31,12 +31,12 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class LowerEndpointNode extends EndpointNode {
 
-	public LowerEndpointNode(Value value) {
-		super(value, true);
-	}
+    public LowerEndpointNode(Value value) {
+    	super(value, true);
+    }
 
-	public LowerEndpointNode(Value value, boolean inclusive) {
-		super(value, inclusive);
-	}
+    public LowerEndpointNode(Value value, boolean inclusive) {
+    	super(value, inclusive);
+    }
 
 }

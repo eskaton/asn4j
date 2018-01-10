@@ -33,64 +33,64 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 1, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1Boolean implements ASN1Type {
 
-	public static ASN1Boolean TRUE = new ASN1Boolean(true);
+    public static ASN1Boolean TRUE = new ASN1Boolean(true);
 
-	public static ASN1Boolean FALSE = new ASN1Boolean(false);
+    public static ASN1Boolean FALSE = new ASN1Boolean(false);
 
-	protected Boolean value;
+    protected Boolean value;
 
-	public ASN1Boolean() {
-	}
+    public ASN1Boolean() {
+    }
 
-	private ASN1Boolean(boolean value) {
-		this.value = value;
-	}
+    private ASN1Boolean(boolean value) {
+    	this.value = value;
+    }
 
-	public Boolean getValue() {
-		return value;
-	}
+    public Boolean getValue() {
+    	return value;
+    }
 
-	public void setValue(Boolean value) throws ConstraintViolatedException {
-		if (!checkConstraint(value)) {
-			throw new ConstraintViolatedException(String.format(
-					"%b doesn't satisfy a constraint", value));
-		}
-		this.value = value;
-	}
+    public void setValue(Boolean value) throws ConstraintViolatedException {
+    	if (!checkConstraint(value)) {
+    		throw new ConstraintViolatedException(String.format(
+    				"%b doesn't satisfy a constraint", value));
+    	}
+    	this.value = value;
+    }
 
-	protected boolean checkConstraint(Boolean value)
-			throws ConstraintViolatedException {
-		return true;
-	}
+    protected boolean checkConstraint(Boolean value)
+    		throws ConstraintViolatedException {
+    	return true;
+    }
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
-	}
+    @Override
+    public String toString() {
+    	return String.valueOf(value);
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+    	final int prime = 31;
+    	int result = 1;
+    	result = prime * result + ((value == null) ? 0 : value.hashCode());
+    	return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ASN1Boolean other = (ASN1Boolean) obj;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj)
+    		return true;
+    	if (obj == null)
+    		return false;
+    	if (getClass() != obj.getClass())
+    		return false;
+    	ASN1Boolean other = (ASN1Boolean) obj;
+    	if (value == null) {
+    		if (other.value != null)
+    			return false;
+    	} else if (!value.equals(other.value))
+    		return false;
+    	return true;
+    }
 
 }

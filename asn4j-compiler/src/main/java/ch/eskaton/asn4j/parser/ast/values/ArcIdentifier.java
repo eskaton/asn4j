@@ -29,14 +29,14 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 public class ArcIdentifier implements Value {
 
-	private String identifier;
+    private String identifier;
 
-	public ArcIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
+    public ArcIdentifier(String identifier) {
+    	this.identifier = identifier;
+    }
 
-	public String getIdentifier() {
-		return identifier;
-	}
+    public String getIdentifier() {
+    	return identifier;
+    }
 
 }

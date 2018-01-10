@@ -32,14 +32,14 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 10, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1EnumeratedType implements ASN1Type {
 
-	private int value;
+    private int value;
 
-	public int getValue() {
-		return value;
-	}
+    public int getValue() {
+    	return value;
+    }
 
-	protected void setValue(int value) {
-		this.value = value;
-	}
+    protected void setValue(int value) {
+    	this.value = value;
+    }
 
 }

@@ -31,13 +31,13 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class TypeReference extends SimpleDefinedType {
 
-	public TypeReference(String type) {
-		super(type);
-	}
+    public TypeReference(String type) {
+    	super(type);
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("TypeReference[", getType(), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("TypeReference[", getType(), "]");
+    }
 
 }

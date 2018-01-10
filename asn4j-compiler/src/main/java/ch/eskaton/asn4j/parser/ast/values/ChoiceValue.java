@@ -29,21 +29,21 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 public class ChoiceValue implements Value {
 
-	private String id;
+    private String id;
 
-	private Value value;
+    private Value value;
 
-	public ChoiceValue(String id, Value value) {
-		this.id = id;
-		this.value = value;
-	}
+    public ChoiceValue(String id, Value value) {
+    	this.id = id;
+    	this.value = value;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+    	return id;
+    }
 
-	public Value getValue() {
-		return value;
-	}
+    public Value getValue() {
+    	return value;
+    }
 
 }

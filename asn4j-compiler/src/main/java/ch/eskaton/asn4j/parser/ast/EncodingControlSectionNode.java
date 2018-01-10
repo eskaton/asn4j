@@ -33,22 +33,22 @@ import ch.eskaton.asn4j.parser.Token;
 
 public class EncodingControlSectionNode implements Node {
 
-	private String encodingReference;
+    private String encodingReference;
 
-	private List<Token> encodingInstruction;
+    private List<Token> encodingInstruction;
 
-	public EncodingControlSectionNode(String encodingReference,
-			List<Token> encodingInstruction) {
-		this.encodingReference = encodingReference;
-		this.encodingInstruction = encodingInstruction;
-	}
+    public EncodingControlSectionNode(String encodingReference,
+    		List<Token> encodingInstruction) {
+    	this.encodingReference = encodingReference;
+    	this.encodingInstruction = encodingInstruction;
+    }
 
-	public String getEncodingReference() {
-		return encodingReference;
-	}
+    public String getEncodingReference() {
+    	return encodingReference;
+    }
 
-	public List<Token> getEncodingInstruction() {
-		return encodingInstruction;
-	}
+    public List<Token> getEncodingInstruction() {
+    	return encodingInstruction;
+    }
 
 }

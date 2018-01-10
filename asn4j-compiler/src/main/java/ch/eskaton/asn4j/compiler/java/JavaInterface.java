@@ -37,44 +37,44 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaInterface implements JavaStructure {
 
-	private String pkg;
+    private String pkg;
 
-	private String name;
+    private String name;
 
-	public JavaInterface(String pkg, String name) {
-		this.pkg = pkg;
-		this.name = name;
-	}
+    public JavaInterface(String pkg, String name) {
+    	this.pkg = pkg;
+    	this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
-	public void save(String dir) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
-				new FileOutputStream(dir + File.separator
-						+ pkg.replace('.', File.separatorChar) + File.separator
-						+ name + ".java")));
-		write(writer, "");
-	}
+    public void save(String dir) throws IOException {
+    	BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
+    			new FileOutputStream(dir + File.separator
+    					+ pkg.replace('.', File.separatorChar) + File.separator
+    					+ name + ".java")));
+    	write(writer, "");
+    }
 
-	public void write(BufferedWriter writer, String prefix) throws IOException {
-		writeInterfaceHeader(writer);
-		writeInterfaceFooter(writer);
-	}
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+    	writeInterfaceHeader(writer);
+    	writeInterfaceFooter(writer);
+    }
 
-	private void writeInterfaceHeader(BufferedWriter writer) throws IOException {
-		writer.write("/* AUTOMATICALLY GENERATED - DO NOT EDIT */\n");
-		writer.write(StringUtils.concat("package ", pkg, ";\n"));
-		writer.newLine();
+    private void writeInterfaceHeader(BufferedWriter writer) throws IOException {
+    	writer.write("/* AUTOMATICALLY GENERATED - DO NOT EDIT */\n");
+    	writer.write(StringUtils.concat("package ", pkg, ";\n"));
+    	writer.newLine();
 
-		writer.write(StringUtils.concat("public interface ", name, " {\n\n"));
-	}
+    	writer.write(StringUtils.concat("public interface ", name, " {\n\n"));
+    }
 
-	private void writeInterfaceFooter(BufferedWriter writer) throws IOException {
-		writer.write("}");
-		writer.newLine();
-		writer.close();
-	}
+    private void writeInterfaceFooter(BufferedWriter writer) throws IOException {
+    	writer.write("}");
+    	writer.newLine();
+    	writer.close();
+    }
 
 }

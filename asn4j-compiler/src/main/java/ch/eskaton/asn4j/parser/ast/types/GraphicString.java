@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class GraphicString extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "GraphicString";
-	}
+    @Override
+    public String toString() {
+    	return "GraphicString";
+    }
 
 }

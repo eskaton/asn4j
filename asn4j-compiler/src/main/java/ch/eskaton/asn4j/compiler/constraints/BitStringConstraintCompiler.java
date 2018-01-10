@@ -37,32 +37,32 @@ import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 
 public class BitStringConstraintCompiler extends
-		AbstractConstraintCompiler<List<NamedBitNode>> {
+    	AbstractConstraintCompiler<List<NamedBitNode>> {
 
-	public BitStringConstraintCompiler(ConstraintCompiler constraintCompiler,
-			TypeResolver typeResolver) {
-		super(constraintCompiler, typeResolver);
-	}
+    public BitStringConstraintCompiler(ConstraintCompiler constraintCompiler,
+    		TypeResolver typeResolver) {
+    	super(constraintCompiler, typeResolver);
+    }
 
-	@Override
-	protected Collection<List<NamedBitNode>> compileConstraint(ElementSet set)
-			throws CompilerException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected Collection<List<NamedBitNode>> compileConstraint(ElementSet set)
+    		throws CompilerException {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
-	@Override
-	protected Collection<List<NamedBitNode>> calculateIntersection(
-			Collection<?> op1, Collection<?> op2) throws CompilerException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected Collection<List<NamedBitNode>> calculateIntersection(
+    		Collection<?> op1, Collection<?> op2) throws CompilerException {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
-	@Override
-	protected void addConstraint(JavaClass clazz, Collection<?> values)
-			throws CompilerException {
-		// TODO Auto-generated method stub
+    @Override
+    protected void addConstraint(JavaClass clazz, Collection<?> values)
+    		throws CompilerException {
+    	// TODO Auto-generated method stub
 
-	}
+    }
 
 }

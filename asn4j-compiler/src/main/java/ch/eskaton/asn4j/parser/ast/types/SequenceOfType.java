@@ -31,19 +31,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class SequenceOfType extends AbstractType {
 
-	private Type type;
+    private Type type;
 
-	public SequenceOfType(Type type) {
-		this.type = type;
-	}
+    public SequenceOfType(Type type) {
+    	this.type = type;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("SequenceOf[", type, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("SequenceOf[", type, "]");
+    }
 
 }

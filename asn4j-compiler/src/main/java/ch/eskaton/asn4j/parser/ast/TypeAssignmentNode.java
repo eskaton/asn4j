@@ -31,13 +31,13 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class TypeAssignmentNode extends TypeOrObjectClassAssignmentNode<Type> {
 
-	public TypeAssignmentNode(String reference, Type type) {
-		super(reference, type);
-	}
+    public TypeAssignmentNode(String reference, Type type) {
+    	super(reference, type);
+    }
 
-	@Override
-	public String toString() {
-		return "TypeAssignment[" + getReference() + " = " + getType() + "]";
-	}
+    @Override
+    public String toString() {
+    	return "TypeAssignment[" + getReference() + " = " + getType() + "]";
+    }
 
 }

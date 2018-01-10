@@ -31,9 +31,9 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class EmptyValue implements Value {
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("EmptyValue[]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("EmptyValue[]");
+    }
 
 }

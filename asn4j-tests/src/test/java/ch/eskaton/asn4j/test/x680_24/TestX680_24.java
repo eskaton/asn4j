@@ -40,16 +40,16 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 
 public class TestX680_24 {
 
-	@Test
-	public void test1() throws ASN1RuntimeException, IOException {
-		ASN1Null a = new ASN1Null();
+    @Test
+    public void test1() throws ASN1RuntimeException, IOException {
+    	ASN1Null a = new ASN1Null();
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+    	BEREncoder encoder = new BEREncoder();
+    	BERDecoder decoder = new BERDecoder();
 
-		ASN1Null b = decoder.decode(ASN1Null.class, encoder.encode(a));
+    	ASN1Null b = decoder.decode(ASN1Null.class, encoder.encode(a));
 
-		assertEquals(a, b);
-	}
+    	assertEquals(a, b);
+    }
 
 }

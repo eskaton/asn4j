@@ -31,14 +31,14 @@ import java.util.List;
 
 public class Group implements TokenOrGroup {
 
-	private List<TokenOrGroup> group;
+    private List<TokenOrGroup> group;
 
-	public Group(List<TokenOrGroup> group) {
-		this.group = group;
-	}
+    public Group(List<TokenOrGroup> group) {
+    	this.group = group;
+    }
 
-	public List<TokenOrGroup> getGroup() {
-		return group;
-	}
+    public List<TokenOrGroup> getGroup() {
+    	return group;
+    }
 
 }

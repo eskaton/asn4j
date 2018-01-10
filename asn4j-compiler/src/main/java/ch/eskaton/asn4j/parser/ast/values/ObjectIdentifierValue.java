@@ -33,30 +33,30 @@ import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 
 public class ObjectIdentifierValue implements Value {
 
-	private List<OIDComponentNode> oidValues;
+    private List<OIDComponentNode> oidValues;
 
-	private DefinedValue reference;
+    private DefinedValue reference;
 
-	public ObjectIdentifierValue(List<OIDComponentNode> oidValues) {
-		this.oidValues = oidValues;
-	}
+    public ObjectIdentifierValue(List<OIDComponentNode> oidValues) {
+    	this.oidValues = oidValues;
+    }
 
-	public ObjectIdentifierValue(DefinedValue reference) {
-		this.reference = reference;
-	}
+    public ObjectIdentifierValue(DefinedValue reference) {
+    	this.reference = reference;
+    }
 
-	public List<OIDComponentNode> getOidValues() {
-		return oidValues;
-	}
+    public List<OIDComponentNode> getOidValues() {
+    	return oidValues;
+    }
 
-	public DefinedValue getReference() {
-		return reference;
-	}
+    public DefinedValue getReference() {
+    	return reference;
+    }
 
-	// @Override
-	// public String toString() {
-	// return StringUtils.concat("ObjectIdentifierValue[", oid,
-	// (definedValue != null ? ", " + definedValue : ""), "]");
-	// }
+    // @Override
+    // public String toString() {
+    // return StringUtils.concat("ObjectIdentifierValue[", oid,
+    // (definedValue != null ? ", " + definedValue : ""), "]");
+    // }
 
 }

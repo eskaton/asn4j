@@ -36,38 +36,38 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class SimpleDefinedValue extends DefinedValue implements
-		ParameterizedNode {
+    	ParameterizedNode {
 
-	private String value;
+    private String value;
 
-	private List<Node> parameters;
+    private List<Node> parameters;
 
-	public SimpleDefinedValue(String value) {
-		this.value = value;
-	}
+    public SimpleDefinedValue(String value) {
+    	this.value = value;
+    }
 
-	public String getValue() {
-		return value;
-	}
+    public String getValue() {
+    	return value;
+    }
 
-	public void setParameters(List<Node> parameters) {
-		this.parameters = parameters;
-	}
+    public void setParameters(List<Node> parameters) {
+    	this.parameters = parameters;
+    }
 
-	public List<Node> getParameters() {
-		return parameters;
-	}
+    public List<Node> getParameters() {
+    	return parameters;
+    }
 
-	@Override
-	public ObjectNode toObjectValue() {
-		ObjectReferenceNode ref = new ObjectReferenceNode(value);
-		ref.setParameters(parameters);
-		return ref;
-	}
+    @Override
+    public ObjectNode toObjectValue() {
+    	ObjectReferenceNode ref = new ObjectReferenceNode(value);
+    	ref.setParameters(parameters);
+    	return ref;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("SimpleDefinedValue[", value, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("SimpleDefinedValue[", value, "]");
+    }
 
 }

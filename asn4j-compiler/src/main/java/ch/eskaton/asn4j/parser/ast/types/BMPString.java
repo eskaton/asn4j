@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class BMPString extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "BMPString";
-	}
+    @Override
+    public String toString() {
+    	return "BMPString";
+    }
 
 }

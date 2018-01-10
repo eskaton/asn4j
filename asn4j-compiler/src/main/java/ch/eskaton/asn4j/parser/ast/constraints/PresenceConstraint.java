@@ -31,23 +31,23 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class PresenceConstraint extends AbstractConstraint {
 
-	public enum Type {
-		Present, Absent, Optional
-	}
+    public enum Type {
+    	Present, Absent, Optional
+    }
 
-	private Type type;
+    private Type type;
 
-	public PresenceConstraint(Type type) {
-		this.type = type;
-	}
+    public PresenceConstraint(Type type) {
+    	this.type = type;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("PresenceConstraint[", type, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("PresenceConstraint[", type, "]");
+    }
 
 }

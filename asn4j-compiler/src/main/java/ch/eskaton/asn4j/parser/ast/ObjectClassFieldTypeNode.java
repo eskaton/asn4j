@@ -31,22 +31,22 @@ import ch.eskaton.asn4j.parser.ast.types.AbstractType;
 
 public class ObjectClassFieldTypeNode extends AbstractType {
 
-	private ObjectClassReferenceNode objectclass;
+    private ObjectClassReferenceNode objectclass;
 
-	private FieldNameNode field;
+    private FieldNameNode field;
 
-	public ObjectClassFieldTypeNode(ObjectClassReferenceNode objectClass,
-			FieldNameNode field) {
-		this.objectclass = objectClass;
-		this.field = field;
-	}
+    public ObjectClassFieldTypeNode(ObjectClassReferenceNode objectClass,
+    		FieldNameNode field) {
+    	this.objectclass = objectClass;
+    	this.field = field;
+    }
 
-	public ObjectClassReferenceNode getObjectclass() {
-		return objectclass;
-	}
+    public ObjectClassReferenceNode getObjectclass() {
+    	return objectclass;
+    }
 
-	public FieldNameNode getField() {
-		return field;
-	}
+    public FieldNameNode getField() {
+    	return field;
+    }
 
 }

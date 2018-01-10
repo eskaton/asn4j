@@ -31,30 +31,30 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class OctetStringValue implements Value {
 
-	private char[] stringValue;
+    private char[] stringValue;
 
-	private Value value;
+    private Value value;
 
-	public OctetStringValue(char[] stringValue) {
-		this.stringValue = stringValue;
-	}
+    public OctetStringValue(char[] stringValue) {
+    	this.stringValue = stringValue;
+    }
 
-	public OctetStringValue(Value value) {
-		this.value = value;
-	}
+    public OctetStringValue(Value value) {
+    	this.value = value;
+    }
 
-	public char[] getStringValue() {
-		return stringValue;
-	}
+    public char[] getStringValue() {
+    	return stringValue;
+    }
 
-	public Value getValue() {
-		return value;
-	}
+    public Value getValue() {
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("OctetStringValue[",
-				stringValue != null ? new String(stringValue) : value, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("OctetStringValue[",
+    			stringValue != null ? new String(stringValue) : value, "]");
+    }
 
 }

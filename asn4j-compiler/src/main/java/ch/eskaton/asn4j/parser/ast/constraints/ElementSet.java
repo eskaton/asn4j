@@ -34,35 +34,35 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ElementSet implements Elements {
 
-	public enum OpType {
-		All, Exclude, Union, Intersection
-	}
+    public enum OpType {
+    	All, Exclude, Union, Intersection
+    }
 
-	private OpType operation;
+    private OpType operation;
 
-	private List<Elements> operands;
+    private List<Elements> operands;
 
-	public ElementSet(OpType operation, Elements... operands) {
-		this(operation, Arrays.asList(operands));
-	}
+    public ElementSet(OpType operation, Elements... operands) {
+    	this(operation, Arrays.asList(operands));
+    }
 
-	public ElementSet(OpType operation, List<Elements> operands) {
-		this.operation = operation;
-		this.operands = operands;
-	}
+    public ElementSet(OpType operation, List<Elements> operands) {
+    	this.operation = operation;
+    	this.operands = operands;
+    }
 
-	public OpType getOperation() {
-		return operation;
-	}
+    public OpType getOperation() {
+    	return operation;
+    }
 
-	public List<Elements> getOperands() {
-		return operands;
-	}
+    public List<Elements> getOperands() {
+    	return operands;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ElementSet[op=", operation.toString(),
-				", operands={", StringUtils.join(operands, ","), "}]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ElementSet[op=", operation.toString(),
+    			", operands={", StringUtils.join(operands, ","), "}]");
+    }
 
 }

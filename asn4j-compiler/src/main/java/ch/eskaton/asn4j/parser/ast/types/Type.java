@@ -37,22 +37,22 @@ import ch.eskaton.asn4j.runtime.TaggingMode;
 
 public interface Type extends Node {
 
-	Tag getTag();
+    Tag getTag();
 
-	void setTag(Tag tag);
+    void setTag(Tag tag);
 
-	TaggingMode getTaggingMode();
+    TaggingMode getTaggingMode();
 
-	void setTaggingMode(TaggingMode mode);
+    void setTaggingMode(TaggingMode mode);
 
-	void setConstraints(List<Constraint> constraints);
+    void setConstraints(List<Constraint> constraints);
 
-	List<Constraint> getConstraints();
+    List<Constraint> getConstraints();
 
-	boolean hasConstraint();
+    boolean hasConstraint();
 
-	void setEncodingPrefix(EncodingPrefixNode encodingPrefix);
+    void setEncodingPrefix(EncodingPrefixNode encodingPrefix);
 
-	EncodingPrefixNode getEncodingPrefix();
+    EncodingPrefixNode getEncodingPrefix();
 
 }

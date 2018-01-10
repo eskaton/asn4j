@@ -31,19 +31,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class BooleanValue implements Value {
 
-	private boolean value;
+    private boolean value;
 
-	public BooleanValue(boolean value) {
-		this.value = value;
-	}
+    public BooleanValue(boolean value) {
+    	this.value = value;
+    }
 
-	public boolean getValue() {
-		return value;
-	}
+    public boolean getValue() {
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("BooleanValue[", value, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("BooleanValue[", value, "]");
+    }
 
 }

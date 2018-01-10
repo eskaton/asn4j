@@ -32,6 +32,6 @@ import java.io.IOException;
 
 public interface JavaObject {
 
-	void write(BufferedWriter writer, String prefix) throws IOException;
+    void write(BufferedWriter writer, String prefix) throws IOException;
 
 }

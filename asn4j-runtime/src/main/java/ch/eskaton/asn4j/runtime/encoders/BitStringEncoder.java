@@ -33,14 +33,14 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 
 public class BitStringEncoder implements TypeEncoder<ASN1BitString> {
 
-	public byte[] encode(Encoder encoder, ASN1BitString obj)
-			throws EncodingException {
-		byte[] value = obj.getValue();
-		int unusedBits = obj.getUnusedBits();
-		byte[] buf = new byte[value.length + 1];
-		buf[0] = (byte) (unusedBits & 0x07);
-		System.arraycopy(value, 0, buf, 1, value.length);
-		return buf;
-	}
+    public byte[] encode(Encoder encoder, ASN1BitString obj)
+    		throws EncodingException {
+    	byte[] value = obj.getValue();
+    	int unusedBits = obj.getUnusedBits();
+    	byte[] buf = new byte[value.length + 1];
+    	buf[0] = (byte) (unusedBits & 0x07);
+    	System.arraycopy(value, 0, buf, 1, value.length);
+    	return buf;
+    }
 
 }

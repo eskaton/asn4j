@@ -31,37 +31,37 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 
 public class NamedBitNode implements Node {
 
-	private String id;
+    private String id;
 
-	private int num;
+    private int num;
 
-	private DefinedValue ref;
+    private DefinedValue ref;
 
-	public NamedBitNode(String id, int num) {
-		this.id = id;
-		this.num = num;
-	}
+    public NamedBitNode(String id, int num) {
+    	this.id = id;
+    	this.num = num;
+    }
 
-	public NamedBitNode(String id, DefinedValue ref) {
-		this.id = id;
-		this.ref = ref;
-	}
+    public NamedBitNode(String id, DefinedValue ref) {
+    	this.id = id;
+    	this.ref = ref;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+    	return id;
+    }
 
-	public int getNum() {
-		return num;
-	}
+    public int getNum() {
+    	return num;
+    }
 
-	public DefinedValue getRef() {
-		return ref;
-	}
+    public DefinedValue getRef() {
+    	return ref;
+    }
 
-	@Override
-	public String toString() {
-		return id + "(" + (ref == null ? String.valueOf(num) : ref) + ")";
-	}
+    @Override
+    public String toString() {
+    	return id + "(" + (ref == null ? String.valueOf(num) : ref) + ")";
+    }
 
 }

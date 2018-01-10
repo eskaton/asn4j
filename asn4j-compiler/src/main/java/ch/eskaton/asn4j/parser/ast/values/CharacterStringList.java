@@ -31,14 +31,14 @@ import java.util.List;
 
 public class CharacterStringList implements Value {
 
-	private List<Value> values;
+    private List<Value> values;
 
-	public CharacterStringList(List<Value> values) {
-		this.values = values;
-	}
+    public CharacterStringList(List<Value> values) {
+    	this.values = values;
+    }
 
-	public List<Value> getValues() {
-		return values;
-	}
+    public List<Value> getValues() {
+    	return values;
+    }
 
 }

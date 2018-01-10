@@ -31,13 +31,13 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class UsefulType extends TypeReference {
 
-	public UsefulType(String type) {
-		super(type);
-	}
+    public UsefulType(String type) {
+    	super(type);
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("UsefulType[", getType(), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("UsefulType[", getType(), "]");
+    }
 
 }

@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class ISO646String extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "ISO646String";
-	}
+    @Override
+    public String toString() {
+    	return "ISO646String";
+    }
 
 }

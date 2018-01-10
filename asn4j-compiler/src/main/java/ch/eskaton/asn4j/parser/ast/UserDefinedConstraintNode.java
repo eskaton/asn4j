@@ -35,21 +35,21 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class UserDefinedConstraintNode extends AbstractConstraint {
 
-	private List<UserDefinedConstraintParamNode> params;
+    private List<UserDefinedConstraintParamNode> params;
 
-	public UserDefinedConstraintNode(List<UserDefinedConstraintParamNode> params) {
-		this.params = params != null ? params
-				: new ArrayList<UserDefinedConstraintParamNode>();
-	}
+    public UserDefinedConstraintNode(List<UserDefinedConstraintParamNode> params) {
+    	this.params = params != null ? params
+    			: new ArrayList<UserDefinedConstraintParamNode>();
+    }
 
-	public List<UserDefinedConstraintParamNode> getParams() {
-		return params;
-	}
+    public List<UserDefinedConstraintParamNode> getParams() {
+    	return params;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("UserDefinedConstraint[(",
-				StringUtils.join(params, ","), ")]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("UserDefinedConstraint[(",
+    			StringUtils.join(params, ","), ")]");
+    }
 
 }

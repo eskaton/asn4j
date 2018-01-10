@@ -32,16 +32,16 @@ import java.util.List;
 import ch.eskaton.asn4j.parser.ast.PropertyAndSettingNode;
 
 public class PropertySettingsConstraint extends AbstractConstraint implements
-		Constraint {
+    	Constraint {
 
-	private List<PropertyAndSettingNode> settings;
+    private List<PropertyAndSettingNode> settings;
 
-	public PropertySettingsConstraint(List<PropertyAndSettingNode> settings) {
-		this.settings = settings;
-	}
+    public PropertySettingsConstraint(List<PropertyAndSettingNode> settings) {
+    	this.settings = settings;
+    }
 
-	public List<PropertyAndSettingNode> getSettings() {
-		return settings;
-	}
+    public List<PropertyAndSettingNode> getSettings() {
+    	return settings;
+    }
 
 }

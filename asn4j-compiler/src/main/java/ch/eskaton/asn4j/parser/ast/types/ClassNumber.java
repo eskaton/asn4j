@@ -33,30 +33,30 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ClassNumber implements Node {
 
-	private Integer clazz;
+    private Integer clazz;
 
-	private DefinedValue ref;
+    private DefinedValue ref;
 
-	public ClassNumber(int clazz) {
-		this.clazz = clazz;
-	}
+    public ClassNumber(int clazz) {
+    	this.clazz = clazz;
+    }
 
-	public ClassNumber(DefinedValue ref) {
-		this.ref = ref;
-	}
+    public ClassNumber(DefinedValue ref) {
+    	this.ref = ref;
+    }
 
-	public Integer getClazz() {
-		return clazz;
-	}
+    public Integer getClazz() {
+    	return clazz;
+    }
 
-	public DefinedValue getRef() {
-		return ref;
-	}
+    public DefinedValue getRef() {
+    	return ref;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ClassNumber[",
-				(clazz != null ? clazz : ref), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ClassNumber[",
+    			(clazz != null ? clazz : ref), "]");
+    }
 
 }

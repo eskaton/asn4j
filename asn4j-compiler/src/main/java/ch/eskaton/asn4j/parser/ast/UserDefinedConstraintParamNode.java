@@ -32,31 +32,31 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class UserDefinedConstraintParamNode {
 
-	private Governor governor;
+    private Governor governor;
 
-	private Node value;
+    private Node value;
 
-	public UserDefinedConstraintParamNode(Governor governor, Node value) {
-		this.governor = governor;
-		this.value = value;
-	}
+    public UserDefinedConstraintParamNode(Governor governor, Node value) {
+    	this.governor = governor;
+    	this.value = value;
+    }
 
-	public UserDefinedConstraintParamNode(Node value) {
-		this(null, value);
-	}
+    public UserDefinedConstraintParamNode(Node value) {
+    	this(null, value);
+    }
 
-	public Governor getGovernor() {
-		return governor;
-	}
+    public Governor getGovernor() {
+    	return governor;
+    }
 
-	public Node getValue() {
-		return value;
-	}
+    public Node getValue() {
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("UserDefinedConstraintParam[governor=",
-				governor, (value != null ? ",value=" + value : ""), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("UserDefinedConstraintParam[governor=",
+    			governor, (value != null ? ",value=" + value : ""), "]");
+    }
 
 }

@@ -29,25 +29,25 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class ParameterNode implements Node {
 
-	private ParamGovernorNode governor;
+    private ParamGovernorNode governor;
 
-	private ReferenceNode reference;
+    private ReferenceNode reference;
 
-	public ParameterNode(ReferenceNode reference) {
-		this.reference = reference;
-	}
+    public ParameterNode(ReferenceNode reference) {
+    	this.reference = reference;
+    }
 
-	public ParameterNode(ParamGovernorNode governor, ReferenceNode reference) {
-		this.governor = governor;
-		this.reference = reference;
-	}
+    public ParameterNode(ParamGovernorNode governor, ReferenceNode reference) {
+    	this.governor = governor;
+    	this.reference = reference;
+    }
 
-	public ParamGovernorNode getGovernor() {
-		return governor;
-	}
+    public ParamGovernorNode getGovernor() {
+    	return governor;
+    }
 
-	public ReferenceNode getReference() {
-		return reference;
-	}
+    public ReferenceNode getReference() {
+    	return reference;
+    }
 
 }

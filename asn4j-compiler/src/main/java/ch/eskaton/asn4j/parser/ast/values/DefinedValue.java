@@ -31,6 +31,6 @@ import ch.eskaton.asn4j.parser.ast.ObjectNode;
 
 public abstract class DefinedValue implements Value {
 
-	public abstract ObjectNode toObjectValue();
+    public abstract ObjectNode toObjectValue();
 
 }

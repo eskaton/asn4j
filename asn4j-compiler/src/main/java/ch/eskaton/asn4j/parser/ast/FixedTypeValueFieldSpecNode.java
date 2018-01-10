@@ -31,23 +31,23 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class FixedTypeValueFieldSpecNode extends AbstractASN1FieldSpecNode {
 
-	private Type type;
+    private Type type;
 
-	private boolean unique;
+    private boolean unique;
 
-	public FixedTypeValueFieldSpecNode(String valueReference, Type type,
-			boolean unique, OptionalitySpecNode optionalitySpec) {
-		super(valueReference, optionalitySpec);
-		this.type = type;
-		this.unique = unique;
-	}
+    public FixedTypeValueFieldSpecNode(String valueReference, Type type,
+    		boolean unique, OptionalitySpecNode optionalitySpec) {
+    	super(valueReference, optionalitySpec);
+    	this.type = type;
+    	this.unique = unique;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	public boolean isUnique() {
-		return unique;
-	}
+    public boolean isUnique() {
+    	return unique;
+    }
 
 }

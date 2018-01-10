@@ -32,15 +32,15 @@ import java.io.IOException;
 
 public class JavaLiteralField implements JavaField {
 
-	private String fieldDef;
+    private String fieldDef;
 
-	public JavaLiteralField(String fieldDef) {
-		this.fieldDef = fieldDef;
-	}
+    public JavaLiteralField(String fieldDef) {
+    	this.fieldDef = fieldDef;
+    }
 
-	public void write(BufferedWriter writer, String prefix) throws IOException {
-		writer.write(prefix);
-		writer.write(fieldDef);
-	}
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+    	writer.write(prefix);
+    	writer.write(fieldDef);
+    }
 
 }

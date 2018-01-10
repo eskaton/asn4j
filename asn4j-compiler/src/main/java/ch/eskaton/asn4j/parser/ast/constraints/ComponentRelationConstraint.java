@@ -34,22 +34,22 @@ import ch.eskaton.asn4j.parser.ast.ObjectSetReferenceNode;
 
 public class ComponentRelationConstraint extends TableConstraint {
 
-	private ObjectSetReferenceNode reference;
+    private ObjectSetReferenceNode reference;
 
-	private List<AtNotationNode> components;
+    private List<AtNotationNode> components;
 
-	public ComponentRelationConstraint(ObjectSetReferenceNode reference,
-			List<AtNotationNode> components) {
-		this.reference = reference;
-		this.components = components;
-	}
+    public ComponentRelationConstraint(ObjectSetReferenceNode reference,
+    		List<AtNotationNode> components) {
+    	this.reference = reference;
+    	this.components = components;
+    }
 
-	public ObjectSetReferenceNode getReference() {
-		return reference;
-	}
+    public ObjectSetReferenceNode getReference() {
+    	return reference;
+    }
 
-	public List<AtNotationNode> getComponents() {
-		return components;
-	}
+    public List<AtNotationNode> getComponents() {
+    	return components;
+    }
 
 }

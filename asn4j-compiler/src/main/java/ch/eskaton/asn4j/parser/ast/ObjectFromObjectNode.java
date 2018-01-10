@@ -31,14 +31,14 @@ import ch.eskaton.asn4j.parser.ast.types.InformationFromObjects;
 
 public class ObjectFromObjectNode implements ObjectNode {
 
-	private InformationFromObjects object;
+    private InformationFromObjects object;
 
-	public ObjectFromObjectNode(InformationFromObjects object) {
-		this.object = object;
-	}
+    public ObjectFromObjectNode(InformationFromObjects object) {
+    	this.object = object;
+    }
 
-	public InformationFromObjects getObject() {
-		return object;
-	}
+    public InformationFromObjects getObject() {
+    	return object;
+    }
 
 }

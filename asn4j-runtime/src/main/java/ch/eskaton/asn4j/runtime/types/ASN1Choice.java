@@ -29,6 +29,6 @@ package ch.eskaton.asn4j.runtime.types;
 
 public abstract class ASN1Choice implements ASN1Type {
 
-	public abstract ASN1Type getValue();
+    public abstract ASN1Type getValue();
 
 }

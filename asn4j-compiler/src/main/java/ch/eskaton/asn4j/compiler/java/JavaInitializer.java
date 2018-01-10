@@ -29,15 +29,15 @@ package ch.eskaton.asn4j.compiler.java;
 
 public class JavaInitializer {
 
-	private String body;
+    private String body;
 
-	public JavaInitializer(String body) {
-		this.body = body;
-	}
+    public JavaInitializer(String body) {
+    	this.body = body;
+    }
 
-	@Override
-	public String toString() {
-		return body;
-	}
+    @Override
+    public String toString() {
+    	return body;
+    }
 
 }

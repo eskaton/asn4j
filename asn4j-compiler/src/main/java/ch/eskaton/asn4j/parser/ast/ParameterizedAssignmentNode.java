@@ -31,17 +31,17 @@ import java.util.List;
 
 public class ParameterizedAssignmentNode extends AssignmentNode {
 
-	private List<ParameterNode> parameters;
+    private List<ParameterNode> parameters;
 
-	public ParameterizedAssignmentNode(String reference,
-			List<ParameterNode> parameters) {
-		super(reference);
-		this.parameters = parameters;
+    public ParameterizedAssignmentNode(String reference,
+    		List<ParameterNode> parameters) {
+    	super(reference);
+    	this.parameters = parameters;
 
-	}
+    }
 
-	public List<ParameterNode> getParameters() {
-		return parameters;
-	}
+    public List<ParameterNode> getParameters() {
+    	return parameters;
+    }
 
 }

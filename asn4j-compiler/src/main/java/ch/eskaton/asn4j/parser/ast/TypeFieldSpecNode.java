@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class TypeFieldSpecNode extends AbstractASN1FieldSpecNode {
 
-	public TypeFieldSpecNode(String typeReference,
-			OptionalitySpecNode optionalitySpec) {
-		super(typeReference, optionalitySpec);
-	}
+    public TypeFieldSpecNode(String typeReference,
+    		OptionalitySpecNode optionalitySpec) {
+    	super(typeReference, optionalitySpec);
+    }
 
 }

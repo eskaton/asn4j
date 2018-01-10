@@ -31,17 +31,17 @@ import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public abstract class BuiltinTypeCompiler<T extends Type> implements
-		NamedCompiler<T> {
+    	NamedCompiler<T> {
 
-	public void compile(CompilerContext ctx, String name, T node)
-			throws CompilerException {
-		JavaClass javaClass = ctx.createClass(name, node, false);
+    public void compile(CompilerContext ctx, String name, T node)
+    		throws CompilerException {
+    	JavaClass javaClass = ctx.createClass(name, node, false);
 
-		if (node.hasConstraint()) {
-			ctx.compileConstraint(javaClass, name, node);
-		}
+    	if (node.hasConstraint()) {
+    		ctx.compileConstraint(javaClass, name, node);
+    	}
 
-		ctx.finishClass();
-	}
+    	ctx.finishClass();
+    }
 
 }

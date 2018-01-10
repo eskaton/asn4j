@@ -28,10 +28,10 @@
 package ch.eskaton.asn4j.parser.ast;
 
 public class DefaultValueSetSpecNode extends
-		DefaultOptionalitySpecNode<ElementSetSpecsNode> {
+    	DefaultOptionalitySpecNode<ElementSetSpecsNode> {
 
-	public DefaultValueSetSpecNode(ElementSetSpecsNode setSpecs) {
-		super(setSpecs);
-	}
+    public DefaultValueSetSpecNode(ElementSetSpecsNode setSpecs) {
+    	super(setSpecs);
+    }
 
 }

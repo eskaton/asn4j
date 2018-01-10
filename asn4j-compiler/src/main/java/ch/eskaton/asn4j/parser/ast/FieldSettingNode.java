@@ -29,21 +29,21 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class FieldSettingNode implements Node {
 
-	private PrimitiveFieldNameNode fieldName;
+    private PrimitiveFieldNameNode fieldName;
 
-	private Node setting;
+    private Node setting;
 
-	public FieldSettingNode(PrimitiveFieldNameNode fieldName, Node setting) {
-		this.fieldName = fieldName;
-		this.setting = setting;
-	}
+    public FieldSettingNode(PrimitiveFieldNameNode fieldName, Node setting) {
+    	this.fieldName = fieldName;
+    	this.setting = setting;
+    }
 
-	public PrimitiveFieldNameNode getFieldName() {
-		return fieldName;
-	}
+    public PrimitiveFieldNameNode getFieldName() {
+    	return fieldName;
+    }
 
-	public Node getSetting() {
-		return setting;
-	}
+    public Node getSetting() {
+    	return setting;
+    }
 
 }

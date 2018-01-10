@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class PrintableString extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "PrintableString";
-	}
+    @Override
+    public String toString() {
+    	return "PrintableString";
+    }
 
 }

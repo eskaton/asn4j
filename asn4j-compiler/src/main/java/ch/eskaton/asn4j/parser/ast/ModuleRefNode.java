@@ -32,31 +32,31 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ModuleRefNode implements Node {
 
-	private String name;
+    private String name;
 
-	private ObjectIdentifierValue value;
+    private ObjectIdentifierValue value;
 
-	public ModuleRefNode(String name) {
-		this.name = name;
-	}
+    public ModuleRefNode(String name) {
+    	this.name = name;
+    }
 
-	public ModuleRefNode(String name, ObjectIdentifierValue value) {
-		this.name = name;
-		this.value = value;
-	}
+    public ModuleRefNode(String name, ObjectIdentifierValue value) {
+    	this.name = name;
+    	this.value = value;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
-	public ObjectIdentifierValue getValue() {
-		return value;
-	}
+    public ObjectIdentifierValue getValue() {
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ModuleRef[", name, value != null ? "{"
-				+ value + "}" : "", "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ModuleRef[", name, value != null ? "{"
+    			+ value + "}" : "", "]");
+    }
 
 }

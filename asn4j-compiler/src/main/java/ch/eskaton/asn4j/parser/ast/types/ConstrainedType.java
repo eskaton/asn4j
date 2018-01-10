@@ -34,22 +34,22 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ConstrainedType extends AbstractType {
 
-	private Type type;
+    private Type type;
 
-	private List<Constraint> constraints;
+    private List<Constraint> constraints;
 
-	public ConstrainedType(Type type, List<Constraint> constraints) {
-		this.type = type;
-		this.constraints = constraints;
-	}
+    public ConstrainedType(Type type, List<Constraint> constraints) {
+    	this.type = type;
+    	this.constraints = constraints;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat(
-				"ConstrainedType[type=",
-				type,
-				(constraints != null ? ",constraints=("
-						+ StringUtils.join(constraints, ",") + ")" : ""), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat(
+    			"ConstrainedType[type=",
+    			type,
+    			(constraints != null ? ",constraints=("
+    					+ StringUtils.join(constraints, ",") + ")" : ""), "]");
+    }
 
 }

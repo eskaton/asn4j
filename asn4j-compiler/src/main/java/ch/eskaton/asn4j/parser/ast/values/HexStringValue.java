@@ -29,33 +29,33 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 public class HexStringValue implements Value {
 
-	private String value;
+    private String value;
 
-	public HexStringValue(String value) {
-		this.value = value;
-	}
+    public HexStringValue(String value) {
+    	this.value = value;
+    }
 
-	public BitStringValue toBitString() {
-		return new BitStringValue(Integer.parseInt(value, 16));
-	}
+    public BitStringValue toBitString() {
+    	return new BitStringValue(Integer.parseInt(value, 16));
+    }
 
-	public OctetStringValue toOctetString() {
-		int trailor = value.length() & 0x1;
+    public OctetStringValue toOctetString() {
+    	int trailor = value.length() & 0x1;
 
-		String paddedValue = value;
+    	String paddedValue = value;
 
-		if (trailor != 0) {
-			paddedValue += "0";
-		}
+    	if (trailor != 0) {
+    		paddedValue += "0";
+    	}
 
-		char[] buf = new char[paddedValue.length() / 2];
+    	char[] buf = new char[paddedValue.length() / 2];
 
-		for (int i = 0, pos = 0; pos < paddedValue.length(); i++, pos += 2) {
-			buf[i] = (char) Short.parseShort(
-					paddedValue.substring(pos, pos + 2), 16);
-		}
+    	for (int i = 0, pos = 0; pos < paddedValue.length(); i++, pos += 2) {
+    		buf[i] = (char) Short.parseShort(
+    				paddedValue.substring(pos, pos + 2), 16);
+    	}
 
-		return new OctetStringValue(buf);
-	}
+    	return new OctetStringValue(buf);
+    }
 
 }

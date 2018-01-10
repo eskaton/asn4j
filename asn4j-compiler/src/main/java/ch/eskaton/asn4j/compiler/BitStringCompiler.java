@@ -39,57 +39,57 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
-	@Override
-	public void compile(CompilerContext ctx, String name, BitString node)
-			throws CompilerException {
-		JavaClass javaClass = ctx.createClass(name, node, false);
-		Collection<NamedBitNode> namedBits = node.getNamedBits();
-		IdentifierUniquenessChecker<Long> iuc = new IdentifierUniquenessChecker<Long>(
-				name);
+    @Override
+    public void compile(CompilerContext ctx, String name, BitString node)
+    		throws CompilerException {
+    	JavaClass javaClass = ctx.createClass(name, node, false);
+    	Collection<NamedBitNode> namedBits = node.getNamedBits();
+    	IdentifierUniquenessChecker<Long> iuc = new IdentifierUniquenessChecker<Long>(
+    			name);
 
-		javaClass
-				.setParent(ch.eskaton.asn4j.runtime.types.ASN1NamedBitString.class
-						.getSimpleName());
-		long msb = 0;
+    	javaClass
+    			.setParent(ch.eskaton.asn4j.runtime.types.ASN1NamedBitString.class
+    					.getSimpleName());
+    	long msb = 0;
 
-		if (namedBits != null && !namedBits.isEmpty()) {
-			for (NamedBitNode namedBit : namedBits) {
-				String fieldName = CompilerUtils.formatConstant(namedBit
-						.getId());
-				long value;
+    	if (namedBits != null && !namedBits.isEmpty()) {
+    		for (NamedBitNode namedBit : namedBits) {
+    			String fieldName = CompilerUtils.formatConstant(namedBit
+    					.getId());
+    			long value;
 
-				if (namedBit.getRef() != null) {
-					BigInteger bigValue = ctx.resolveIntegerValue(namedBit
-							.getRef());
+    			if (namedBit.getRef() != null) {
+    				BigInteger bigValue = ctx.resolveIntegerValue(namedBit
+    						.getRef());
 
-					if (bigValue.bitLength() > 63) {
-						throw new CompilerException("Named bit '" + fieldName
-								+ "' too long: " + bigValue.toString());
-					}
+    				if (bigValue.bitLength() > 63) {
+    					throw new CompilerException("Named bit '" + fieldName
+    							+ "' too long: " + bigValue.toString());
+    				}
 
-					value = bigValue.longValue();
-				} else {
-					value = namedBit.getNum();
-				}
+    				value = bigValue.longValue();
+    			} else {
+    				value = namedBit.getNum();
+    			}
 
-				iuc.add(namedBit.getId(), value);
+    			iuc.add(namedBit.getId(), value);
 
-				msb = value > msb ? value : msb;
+    			msb = value > msb ? value : msb;
 
-				javaClass.addField(new JavaLiteralField(StringUtils.concat(
-						"\tpublic static final int ", fieldName, " = ", value,
-						";\n\n")));
-			}
-		}
+    			javaClass.addField(new JavaLiteralField(StringUtils.concat(
+    					"\tpublic static final int ", fieldName, " = ", value,
+    					";\n\n")));
+    		}
+    	}
 
-		javaClass.addMethod(new JavaLiteralMethod(StringUtils.concat(
-				"\tpublic ", name, "() {\n", "\t\tsuper();", "\n\t}\n")));
+    	javaClass.addMethod(new JavaLiteralMethod(StringUtils.concat(
+    			"\tpublic ", name, "() {\n", "\t\tsuper();", "\n\t}\n")));
 
-		if (node.hasConstraint()) {
-			ctx.compileConstraint(javaClass, name, node);
-		}
+    	if (node.hasConstraint()) {
+    		ctx.compileConstraint(javaClass, name, node);
+    	}
 
-		ctx.finishClass(false);
-	}
+    	ctx.finishClass(false);
+    }
 
 }

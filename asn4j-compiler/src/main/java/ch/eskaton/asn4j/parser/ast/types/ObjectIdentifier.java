@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class ObjectIdentifier extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "ObjectIdentifier";
-	}
+    @Override
+    public String toString() {
+    	return "ObjectIdentifier";
+    }
 
 }

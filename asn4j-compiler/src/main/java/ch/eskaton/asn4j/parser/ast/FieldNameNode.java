@@ -35,28 +35,28 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class FieldNameNode implements Node {
 
-	private List<PrimitiveFieldNameNode> fieldNames;
+    private List<PrimitiveFieldNameNode> fieldNames;
 
-	public FieldNameNode(List<PrimitiveFieldNameNode> fieldNames) {
-		this.fieldNames = fieldNames;
-	}
+    public FieldNameNode(List<PrimitiveFieldNameNode> fieldNames) {
+    	this.fieldNames = fieldNames;
+    }
 
-	public List<PrimitiveFieldNameNode> getPrimitiveFieldNames() {
-		return fieldNames;
-	}
+    public List<PrimitiveFieldNameNode> getPrimitiveFieldNames() {
+    	return fieldNames;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("FieldName[", CollectionUtils.foldr(
-				fieldNames, new StringBuilder(),
-				new Folder<PrimitiveFieldNameNode, StringBuilder>() {
-					public StringBuilder fold(StringBuilder accumulator,
-							PrimitiveFieldNameNode value) {
-						return (accumulator.length() != 0 ? accumulator
-								.append(".") : accumulator).append("&").append(
-								value.getReference());
-					}
-				}), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("FieldName[", CollectionUtils.foldr(
+    			fieldNames, new StringBuilder(),
+    			new Folder<PrimitiveFieldNameNode, StringBuilder>() {
+    				public StringBuilder fold(StringBuilder accumulator,
+    						PrimitiveFieldNameNode value) {
+    					return (accumulator.length() != 0 ? accumulator
+    							.append(".") : accumulator).append("&").append(
+    							value.getReference());
+    				}
+    			}), "]");
+    }
 
 }

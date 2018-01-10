@@ -45,124 +45,124 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
 public abstract class AbstractConstraintCompiler<T> {
 
-	// protected ConstraintCompiler constraintCompiler;
+    // protected ConstraintCompiler constraintCompiler;
 
-	protected TypeResolver typeResolver;
+    protected TypeResolver typeResolver;
 
-	public AbstractConstraintCompiler(ConstraintCompiler constraintCompiler,
-			TypeResolver typeResolver) {
-		// this.constraintCompiler = constraintCompiler;
-		this.typeResolver = typeResolver;
-	}
+    public AbstractConstraintCompiler(ConstraintCompiler constraintCompiler,
+    		TypeResolver typeResolver) {
+    	// this.constraintCompiler = constraintCompiler;
+    	this.typeResolver = typeResolver;
+    }
 
-	public Collection<T> compileConstraint(SetSpecsNode setSpecs,
-			boolean includeAddition) throws CompilerException {
-		Collection<T> root = compileConstraint(setSpecs.getRootElements());
+    public Collection<T> compileConstraint(SetSpecsNode setSpecs,
+    		boolean includeAddition) throws CompilerException {
+    	Collection<T> root = compileConstraint(setSpecs.getRootElements());
 
-		if (includeAddition) {
-			ElementSet additionalElements = setSpecs.getAdditionalElements();
+    	if (includeAddition) {
+    		ElementSet additionalElements = setSpecs.getAdditionalElements();
 
-			if (additionalElements != null) {
-				Collection<T> extension = compileConstraint(additionalElements);
-				root.addAll(extension);
-			}
-		}
+    		if (additionalElements != null) {
+    			Collection<T> extension = compileConstraint(additionalElements);
+    			root.addAll(extension);
+    		}
+    	}
 
-		return root;
-	}
+    	return root;
+    }
 
-	Collection<T> compileConstraints(Type node, Type base)
-			throws CompilerException {
-		Stack<Collection<T>> cons = new Stack<Collection<T>>();
+    Collection<T> compileConstraints(Type node, Type base)
+    		throws CompilerException {
+    	Stack<Collection<T>> cons = new Stack<Collection<T>>();
 
-		boolean includeAdditions = true;
+    	boolean includeAdditions = true;
 
-		while (true) {
-			if (node.hasConstraint()) {
-				cons.push(compileConstraints(node.getConstraints(),
-						includeAdditions));
-			}
+    	while (true) {
+    		if (node.hasConstraint()) {
+    			cons.push(compileConstraints(node.getConstraints(),
+    					includeAdditions));
+    		}
 
-			includeAdditions = false;
+    		includeAdditions = false;
 
-			if (base.equals(node)) {
-				break;
-			}
+    		if (base.equals(node)) {
+    			break;
+    		}
 
-			if (node instanceof UsefulType) {
-				break;
-			} else if (node instanceof TypeReference) {
-				TypeAssignmentNode type = typeResolver
-						.getType(((TypeReference) node).getType());
-				if (type == null) {
-					throw new CompilerException("Referenced type "
-							+ ((TypeReference) node).getType() + " not found");
-				}
-				node = type.getType();
-			} else {
-				throw new CompilerException("not yet supported");
-			}
+    		if (node instanceof UsefulType) {
+    			break;
+    		} else if (node instanceof TypeReference) {
+    			TypeAssignmentNode type = typeResolver
+    					.getType(((TypeReference) node).getType());
+    			if (type == null) {
+    				throw new CompilerException("Referenced type "
+    						+ ((TypeReference) node).getType() + " not found");
+    			}
+    			node = type.getType();
+    		} else {
+    			throw new CompilerException("not yet supported");
+    		}
 
-		}
+    	}
 
-		if (cons.size() == 1) {
-			return cons.pop();
-		} else if (cons.size() > 1) {
-			Collection<T> op1 = cons.pop();
-			Collection<T> op2 = cons.pop();
+    	if (cons.size() == 1) {
+    		return cons.pop();
+    	} else if (cons.size() > 1) {
+    		Collection<T> op1 = cons.pop();
+    		Collection<T> op2 = cons.pop();
 
-			do {
-				op1 = calculateIntersection(op1, op2);
+    		do {
+    			op1 = calculateIntersection(op1, op2);
 
-				if (cons.isEmpty()) {
-					break;
-				}
+    			if (cons.isEmpty()) {
+    				break;
+    			}
 
-				op2 = cons.pop();
-			} while (true);
+    			op2 = cons.pop();
+    		} while (true);
 
-			return op1;
-		}
+    		return op1;
+    	}
 
-		return null;
-	}
+    	return null;
+    }
 
-	Collection<T> compileConstraints(List<Constraint> constraints,
-			boolean includeAdditions) throws CompilerException {
-		Collection<T> intersection = null;
+    Collection<T> compileConstraints(List<Constraint> constraints,
+    		boolean includeAdditions) throws CompilerException {
+    	Collection<T> intersection = null;
 
-		for (Constraint constraint : constraints) {
-			SetSpecsNode setSpecs = ((SubtypeConstraint) constraint)
-					.getElementSetSpecs();
+    	for (Constraint constraint : constraints) {
+    		SetSpecsNode setSpecs = ((SubtypeConstraint) constraint)
+    				.getElementSetSpecs();
 
-			if (constraint instanceof SubtypeConstraint) {
-				if (intersection == null) {
-					intersection = compileConstraint(setSpecs, includeAdditions);
-					includeAdditions = false;
-				} else {
-					intersection.retainAll(compileConstraint(setSpecs,
-							includeAdditions));
-					if (intersection.isEmpty()) {
-						return intersection;
-					}
-				}
-			} else {
-				throw new CompilerException("Constraints of type "
-						+ constraint.getClass().getName()
-						+ " not yet supported");
-			}
-		}
+    		if (constraint instanceof SubtypeConstraint) {
+    			if (intersection == null) {
+    				intersection = compileConstraint(setSpecs, includeAdditions);
+    				includeAdditions = false;
+    			} else {
+    				intersection.retainAll(compileConstraint(setSpecs,
+    						includeAdditions));
+    				if (intersection.isEmpty()) {
+    					return intersection;
+    				}
+    			}
+    		} else {
+    			throw new CompilerException("Constraints of type "
+    					+ constraint.getClass().getName()
+    					+ " not yet supported");
+    		}
+    	}
 
-		return intersection;
-	}
+    	return intersection;
+    }
 
-	protected abstract Collection<T> compileConstraint(ElementSet set)
-			throws CompilerException;
+    protected abstract Collection<T> compileConstraint(ElementSet set)
+    		throws CompilerException;
 
-	protected abstract Collection<T> calculateIntersection(Collection<?> op1,
-			Collection<?> op2) throws CompilerException;
+    protected abstract Collection<T> calculateIntersection(Collection<?> op1,
+    		Collection<?> op2) throws CompilerException;
 
-	protected abstract void addConstraint(JavaClass clazz, Collection<?> values)
-			throws CompilerException;
+    protected abstract void addConstraint(JavaClass clazz, Collection<?> values)
+    		throws CompilerException;
 
 }

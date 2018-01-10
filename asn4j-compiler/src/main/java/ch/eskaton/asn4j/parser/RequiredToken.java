@@ -31,14 +31,14 @@ import ch.eskaton.asn4j.parser.ast.Node;
 
 public class RequiredToken implements TokenOrGroup {
 
-	private Node token;
+    private Node token;
 
-	public RequiredToken(Node token) {
-		this.token = token;
-	}
+    public RequiredToken(Node token) {
+    	this.token = token;
+    }
 
-	public Node getToken() {
-		return token;
-	}
+    public Node getToken() {
+    	return token;
+    }
 
 }

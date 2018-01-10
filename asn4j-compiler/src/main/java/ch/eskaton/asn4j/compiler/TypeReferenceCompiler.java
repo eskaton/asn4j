@@ -33,21 +33,21 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
 public class TypeReferenceCompiler implements NamedCompiler<TypeReference> {
 
-	public void compile(CompilerContext ctx, String name, TypeReference node)
-			throws CompilerException {
-		JavaClass javaClass = ctx.createClass(name, node, false);
-		ctx.compileConstraint(javaClass, name, node);
-		ctx.finishClass();
+    public void compile(CompilerContext ctx, String name, TypeReference node)
+    		throws CompilerException {
+    	JavaClass javaClass = ctx.createClass(name, node, false);
+    	ctx.compileConstraint(javaClass, name, node);
+    	ctx.finishClass();
 
-		if (node instanceof UsefulType) {
-			// no-op
-		} else if (node.getParameters() != null) {
-			throw new CompilerException(
-					"ParameterizedTypeReference not yet supported");
-		} else {
-			ctx.addReferencedType(node.getType());
-		}
+    	if (node instanceof UsefulType) {
+    		// no-op
+    	} else if (node.getParameters() != null) {
+    		throw new CompilerException(
+    				"ParameterizedTypeReference not yet supported");
+    	} else {
+    		ctx.addReferencedType(node.getType());
+    	}
 
-	}
+    }
 
 }

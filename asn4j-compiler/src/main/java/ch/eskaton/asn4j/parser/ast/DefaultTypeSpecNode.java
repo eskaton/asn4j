@@ -31,8 +31,8 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class DefaultTypeSpecNode extends DefaultOptionalitySpecNode<Type> {
 
-	public DefaultTypeSpecNode(Type type) {
-		super(type);
-	}
+    public DefaultTypeSpecNode(Type type) {
+    	super(type);
+    }
 
 }
