@@ -153,14 +153,14 @@ public class JavaClass implements JavaStructure {
 
     public void addStaticInitializer(JavaStaticInitializer staticInitializer) {
     	if (this.staticInitializers == null) {
-    		this.staticInitializers = new ArrayList<JavaStaticInitializer>();
+    		this.staticInitializers = new ArrayList<>();
     	}
     	this.staticInitializers.add(staticInitializer);
     }
 
     public void addInitializer(JavaInitializer initializer) {
     	if (this.initializers == null) {
-    		this.initializers = new ArrayList<JavaInitializer>();
+    		this.initializers = new ArrayList<>();
     	}
     	this.initializers.add(initializer);
     }
@@ -276,11 +276,7 @@ public class JavaClass implements JavaStructure {
     			prefix,
     			"public ",
     			StringUtils.join(CollectionUtils.map(modifiers,
-    					new Mapper<JavaModifier, String>() {
-    						public String map(JavaModifier value) {
-    							return value.toString().toLowerCase();
-    						}
-    					}), " "),
+                        value -> value.toString().toLowerCase()), " "),
     			" class ",
     			name,
     			(parent != null ? " extends " + parent

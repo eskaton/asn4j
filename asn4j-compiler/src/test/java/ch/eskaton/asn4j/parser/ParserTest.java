@@ -456,8 +456,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testModuleDefinitionParser() throws IOException,
-    		ParserException {
+    public void testModuleDefinitionParser() {
     	// TODO: implement
     }
 
@@ -3261,7 +3260,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExternalValueParser() throws IOException, ParserException {
+    public void testExternalValueParser() {
     	// TODO: Test sequence content
     }
 
@@ -4658,13 +4657,12 @@ public class ParserTest {
     }
 
     @Test
-    public void testTimePointRangeParser() throws IOException, ParserException {
+    public void testTimePointRangeParser() {
     	// TODO: implement
     }
 
     @Test
-    public void testReccurrenceRangeParser() throws IOException,
-    		ParserException {
+    public void testReccurrenceRangeParser() {
     	// TODO: implement
     }
 
@@ -4986,8 +4984,8 @@ public class ParserTest {
 
     	assertNotNull(result);
     	assertTrue(result instanceof TypeFieldSpecNode);
-    	assertNotNull(((TypeFieldSpecNode) result).getOptionalitySpec());
-    	assertTrue(((TypeFieldSpecNode) result).getOptionalitySpec() instanceof OptionalSpecNode);
+    	assertNotNull(result.getOptionalitySpec());
+    	assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
     	// FixedTypeValueFieldSpec
     	parser = new Parser(new ByteArrayInputStream(

@@ -27,15 +27,15 @@
 
 package ch.eskaton.asn4j.parser;
 
+import ch.eskaton.asn4j.parser.Token.TokenType;
+import ch.eskaton.asn4j.parser.ast.ModuleNode;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
-import ch.eskaton.asn4j.parser.Token.TokenType;
-import ch.eskaton.asn4j.parser.ast.ModuleNode;
 
 public class Lexer {
 
@@ -531,24 +531,19 @@ public class Lexer {
 
     private Token parseFieldReference(Context parseCtx, TokenType expected,
     		TokenType actual) throws IOException {
-    	Token token = null;
+        Token token = parseOther(parseCtx);
 
-    	try {
-    		token = parseOther(parseCtx);
+        if (token != null) {
+            token.offset--;
+            token.pos--;
+            token.text = "&" + token.text;
 
-    		if (token != null) {
-    			token.offset--;
-    			token.pos--;
-    			token.text = "&" + token.text;
+            if (token.type == expected) {
+                token.type = actual;
+            }
+        }
 
-    			if (token.type == expected) {
-    				token.type = actual;
-    			}
-    		}
-    	} catch (ParserException e) {
-    	}
-
-    	return token;
+        return token;
     }
 
     private Token parseCharString(Context ctx) throws IOException {
@@ -786,7 +781,7 @@ public class Lexer {
     	return null;
     }
 
-    private Token parseOther(Context ctx) throws IOException, ParserException {
+    private Token parseOther(Context ctx) throws IOException {
     	StringBuilder sb = new StringBuilder();
     	TokenType type;
     	int beginOffset = is.getPos();

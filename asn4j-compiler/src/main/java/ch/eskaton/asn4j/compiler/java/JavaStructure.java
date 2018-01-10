@@ -31,6 +31,6 @@ import java.io.IOException;
 
 public interface JavaStructure extends JavaObject {
 
-    public void save(String dir) throws IOException;
+    void save(String dir) throws IOException;
 
 }

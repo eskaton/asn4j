@@ -89,7 +89,7 @@ public class IntegerConstraintCompiler extends
     			return calculateUnion(operands);
     	}
 
-    	return new ArrayList<RangeNode>();
+    	return new ArrayList<>();
     }
 
     private List<RangeNode> calculateElements(Elements elements)
@@ -253,7 +253,7 @@ public class IntegerConstraintCompiler extends
     		return ranges;
     	}
 
-    	ranges = new ArrayList<RangeNode>(ranges);
+    	ranges = new ArrayList<>(ranges);
 
     	Collections.sort(ranges, new ASN1RangeComparator());
 

@@ -40,7 +40,7 @@ public class JavaDefinedField implements JavaField {
 
     private String name;
 
-    private Set<JavaAnnotation> annotations = new HashSet<JavaAnnotation>();
+    private Set<JavaAnnotation> annotations = new HashSet<>();
 
     public JavaDefinedField(String typeName, String name, String params) {
     	this.typeName = typeName;

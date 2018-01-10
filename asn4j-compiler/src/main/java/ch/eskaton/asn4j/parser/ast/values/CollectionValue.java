@@ -33,9 +33,6 @@ public class CollectionValue implements Value {
 
     private List<Value> values;
 
-    public CollectionValue() {
-    }
-
     public CollectionValue(List<Value> values) {
     	this.values = values;
     }

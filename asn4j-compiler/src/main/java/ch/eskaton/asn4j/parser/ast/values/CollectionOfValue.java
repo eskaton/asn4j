@@ -46,9 +46,6 @@ public class CollectionOfValue extends CollectionValue {
 
     private Boolean isQuadruple = null;
 
-    public CollectionOfValue() {
-    }
-
     public CollectionOfValue(List<Value> values) {
     	super(values);
     }

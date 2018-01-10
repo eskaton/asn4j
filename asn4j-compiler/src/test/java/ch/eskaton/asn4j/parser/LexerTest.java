@@ -263,7 +263,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testInvalidRealNumber() throws IOException, ParserException {
+    public void testInvalidRealNumber() throws IOException {
     	Lexer lexer = new Lexer(new ByteArrayInputStream("5e".getBytes()));
 
     	try {
@@ -378,7 +378,7 @@ public class LexerTest {
     }
 
     private static String getCString(Token token) {
-    	return new StringValue(((StringToken) token).getText(),
+    	return new StringValue(token.getText(),
     			((StringToken) token).getFlags()).getCString();
     }
 
@@ -405,7 +405,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testInvalidSimpleString() throws IOException, ParserException {
+    public void testInvalidSimpleString() throws IOException {
     	Lexer lexer = new Lexer(new ByteArrayInputStream("\"\"".getBytes()));
     	Token token;
 
@@ -439,7 +439,7 @@ public class LexerTest {
     }
 
     private static String getSimpleString(Token token) throws ParserException {
-    	return new StringValue(((StringToken) token).getText(),
+    	return new StringValue(token.getText(),
     			((StringToken) token).getFlags()).getSimpleString();
     }
 
@@ -463,7 +463,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testInvalidTString() throws IOException, ParserException {
+    public void testInvalidTString() throws IOException {
     	Lexer lexer = new Lexer(new ByteArrayInputStream("\"\"".getBytes()));
     	Token token;
 
@@ -497,7 +497,7 @@ public class LexerTest {
     }
 
     private static TimeValue getTimeValue(Token token) throws ParserException {
-    	return new StringValue(((StringToken) token).getText(),
+    	return new StringValue(token.getText(),
     			((StringToken) token).getFlags()).getTimeValue();
     }
 
@@ -649,8 +649,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testInvalidEncodingReference() throws IOException,
-    		ParserException {
+    public void testInvalidEncodingReference() throws IOException {
     	Lexer lexer = new Lexer(new ByteArrayInputStream("ABC".getBytes()));
 
     	try {

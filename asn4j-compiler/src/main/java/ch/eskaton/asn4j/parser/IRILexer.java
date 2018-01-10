@@ -39,7 +39,7 @@ public class IRILexer {
 
     private boolean eof = false;
 
-    public IRILexer(String s) throws ParserException {
+    public IRILexer(String s) {
     	is = new LexerInputStream(s.toCharArray());
     }
 
@@ -91,7 +91,6 @@ public class IRILexer {
     									throw new ParserException(
     											"A non-integerUnicodeLabel must not contain two hyphens in the third and fourth position");
     								}
-
     							}
 
     						case '.':
