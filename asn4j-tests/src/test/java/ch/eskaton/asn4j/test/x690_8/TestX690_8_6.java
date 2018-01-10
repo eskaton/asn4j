@@ -44,7 +44,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 public class TestX690_8_6 {
 
     @Test
-    public void testEncode() throws ASN1RuntimeException, IOException {
+    public void testEncode() {
         BEREncoder encoder = new BEREncoder();
 
         assertArrayEquals(new byte[]{0x03, 0x01, 0x00},
@@ -56,7 +56,7 @@ public class TestX690_8_6 {
     }
 
     @Test
-    public void testDecode() throws ASN1RuntimeException, IOException {
+    public void testDecode() {
         BERDecoder decoder = new BERDecoder();
 
         assertEquals(
@@ -74,13 +74,13 @@ public class TestX690_8_6 {
     }
 
     @Test(expected = DecodingException.class)
-    public void testDecodeUnusedBitsFailure() throws ASN1RuntimeException, IOException {
+    public void testDecodeUnusedBitsFailure() {
         new BERDecoder().decode(ASN1BitString.class, new byte[]{0x03, 0x01,
                 0x01});
     }
 
     @Test(expected = PrematureEndOfInputException.class)
-    public void testDecodeLengthFailure() throws ASN1RuntimeException, IOException {
+    public void testDecodeLengthFailure() {
         new BERDecoder().decode(ASN1BitString.class, new byte[]{0x03, 0x02,
                 0x00});
     }

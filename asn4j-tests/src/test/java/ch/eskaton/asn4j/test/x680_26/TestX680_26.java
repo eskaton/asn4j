@@ -42,7 +42,7 @@ import ch.eskaton.asn4jtest.x680_26.TestSequenceOf1;
 public class TestX680_26 {
 
     @Test
-    public void testSequenceOf() throws ASN1RuntimeException, IOException {
+    public void testSequenceOf() {
     	TestSequenceOf1 a = new TestSequenceOf1();
     	a.setValues(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23));
 

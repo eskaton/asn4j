@@ -81,7 +81,7 @@ public class TestX680_22 {
     }
 
     @Test
-    public void test4() throws ASN1RuntimeException, IOException {
+    public void test4() throws ASN1RuntimeException {
     	TestBitString2 a = new TestBitString2();
     	a.setValue(new byte[] { 0x00 });
 
