@@ -46,7 +46,7 @@ import ch.eskaton.asn4jtest.x680_19.TestNamedInteger5;
 public class TestX680_19 {
 
     @Test
-    public void test1() throws ASN1RuntimeException, IOException {
+    public void test1() {
         TestInteger a = new TestInteger();
 
         a.setValue(BigInteger.valueOf(17));
@@ -60,7 +60,7 @@ public class TestX680_19 {
     }
 
     @Test
-    public void test2() throws ASN1RuntimeException, IOException {
+    public void test2() {
         TestNamedInteger a = TestNamedInteger.VALUE3;
 
         BEREncoder encoder = new BEREncoder();
@@ -73,7 +73,7 @@ public class TestX680_19 {
     }
 
     @Test
-    public void test3() throws ASN1RuntimeException, IOException {
+    public void test3() {
         TestNamedInteger a = new TestNamedInteger();
         a.setValue(BigInteger.valueOf(13));
 
@@ -87,14 +87,14 @@ public class TestX680_19 {
     }
 
     @Test
-    public void testEquality() throws ASN1RuntimeException, IOException {
+    public void testEquality() {
         TestNamedInteger3 a = new TestNamedInteger3();
         TestNamedInteger3 b = new TestNamedInteger3();
         assertEquals(a, b);
     }
 
     @Test
-    public void testInequality() throws ASN1RuntimeException, IOException {
+    public void testInequality() {
         TestNamedInteger3 a = new TestNamedInteger3();
         TestNamedInteger5 b = new TestNamedInteger5();
         assertNotEquals(a, b);
