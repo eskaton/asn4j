@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,16 +27,8 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
-import ch.eskaton.asn4j.compiler.java.JavaEnum;
-import ch.eskaton.asn4j.compiler.java.JavaGetter;
-import ch.eskaton.asn4j.compiler.java.JavaLiteralMethod;
-import ch.eskaton.asn4j.compiler.java.JavaTypedSetter;
+import ch.eskaton.asn4j.compiler.java.*;
+import ch.eskaton.asn4j.parser.ast.ModuleNode.TagMode;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
@@ -44,74 +36,77 @@ import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChoiceCompiler implements NamedCompiler<Choice> {
 
-	private static final String CHOICE_TYPE_ENUM = "Type";
+    private static final String CHOICE_TYPE_ENUM = "Type";
 
-	private static final String CHOICE_TYPE_FIELD = "type";
+    private static final String CHOICE_TYPE_FIELD = "type";
 
-	public void compile(CompilerContext ctx, String name, Choice node)
-			throws CompilerException {
+    public void compile(CompilerContext ctx, String name, Choice node)
+            throws CompilerException {
 
-		JavaClass javaClass = ctx.createClass(name, node, true);
+        JavaClass javaClass = ctx.createClass(name, node, true);
 
-		List<String> fieldNames = new ArrayList<String>();
-		JavaEnum typeEnum = new JavaEnum(CHOICE_TYPE_ENUM);
+        List<String> fieldNames = new ArrayList<String>();
+        JavaEnum typeEnum = new JavaEnum(CHOICE_TYPE_ENUM);
 
-		StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-		sb.append("\t@Override\n\tpublic ")
-				.append(ASN1Type.class.getSimpleName())
-				.append(" getValue() {\n\t\tswitch(type) {\n");
+        sb.append("\t@Override\n\tpublic ")
+                .append(ASN1Type.class.getSimpleName())
+                .append(" getValue() {\n\t\tswitch(type) {\n");
 
-		for (NamedType type : node.getRootTypeList()) {
-			String typeConstant = CompilerUtils.formatConstant(type.getName());
-			String fieldName = compileChoiceNamedType(ctx, javaClass, type,
-					CHOICE_TYPE_ENUM + "." + typeConstant);
-			typeEnum.addEnumConstant(typeConstant);
-			fieldNames.add(fieldName);
-			sb.append("\t\t\tcase ").append(typeConstant)
-					.append(":\n\t\t\t\treturn ").append(fieldName)
-					.append(";\n");
-		}
+        for (NamedType type : node.getRootTypeList()) {
+            String typeConstant = CompilerUtils.formatConstant(type.getName());
+            String fieldName = compileChoiceNamedType(ctx, javaClass, type,
+                                                      CHOICE_TYPE_ENUM + "." + typeConstant);
+            typeEnum.addEnumConstant(typeConstant);
+            fieldNames.add(fieldName);
+            sb.append("\t\t\tcase ").append(typeConstant)
+                    .append(":\n\t\t\t\treturn ").append(fieldName)
+                    .append(";\n");
+        }
 
-		sb.append("\t\t}\n\n\t\treturn null;\n\t}\n\n");
+        sb.append("\t\t}\n\n\t\treturn null;\n\t}\n\n");
 
-		javaClass.addEnum(typeEnum);
-		javaClass.addField(new JavaDefinedField(CHOICE_TYPE_ENUM,
-				CHOICE_TYPE_FIELD));
-		javaClass
-				.addMethod(new JavaGetter(CHOICE_TYPE_ENUM, CHOICE_TYPE_FIELD));
+        javaClass.addEnum(typeEnum);
+        javaClass.addField(new JavaDefinedField(CHOICE_TYPE_ENUM,
+                                                CHOICE_TYPE_FIELD));
+        javaClass
+                .addMethod(new JavaGetter(CHOICE_TYPE_ENUM, CHOICE_TYPE_FIELD));
 
-		javaClass.createEqualsAndHashCode();
-		javaClass.addMethod(new JavaLiteralMethod(sb.toString()));
+        javaClass.createEqualsAndHashCode();
+        javaClass.addMethod(new JavaLiteralMethod(sb.toString()));
 
-		ctx.finishClass();
-	}
+        ctx.finishClass();
+    }
 
-	private String compileChoiceNamedType(CompilerContext ctx,
-			JavaClass javaClass, NamedType namedType, String typeConstant)
-			throws CompilerException {
-		String name;
-		String typeName = ctx.getType(javaClass, namedType);
-		name = CompilerUtils.formatName(namedType.getName());
-		Tag tag = namedType.getType().getTag();
-		TaggingMode taggingMode = namedType.getType().getTaggingMode();
+    private String compileChoiceNamedType(CompilerContext ctx,
+            JavaClass javaClass, NamedType namedType, String typeConstant)
+            throws CompilerException {
+        String name;
+        String typeName = ctx.getType(namedType);
+        name = CompilerUtils.formatName(namedType.getName());
+        Tag tag = namedType.getType().getTag();
+        TaggingMode taggingMode = namedType.getType().getTaggingMode();
 
-		JavaDefinedField field = new JavaDefinedField(typeName, name);
+        JavaDefinedField field = new JavaDefinedField(typeName, name);
 
-		field.addAnnotation(new JavaAnnotation(ASN1Alternative.class));
+        field.addAnnotation(new JavaAnnotation(ASN1Alternative.class));
 
-		if (tag != null) {
-			JavaAnnotation tagAnnotation = CompilerUtils.getTagAnnotation(
-					ctx.getModule(), tag, taggingMode);
-			field.addAnnotation(tagAnnotation);
-		}
+        if (tag != null) {
+            JavaAnnotation tagAnnotation = CompilerUtils.getTagAnnotation(
+                    ctx.getModule(), tag, taggingMode);
+            field.addAnnotation(tagAnnotation);
+        }
 
-		javaClass.addField(field);
-		javaClass.addMethod(new JavaTypedSetter(typeName, name,
-				CHOICE_TYPE_FIELD, typeConstant));
-		return name;
-	}
+        javaClass.addField(field);
+        javaClass.addMethod(new JavaTypedSetter(typeName, name,
+                                                CHOICE_TYPE_FIELD, typeConstant));
+        return name;
+    }
 
 }

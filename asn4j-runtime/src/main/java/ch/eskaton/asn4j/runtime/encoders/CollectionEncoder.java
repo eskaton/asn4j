@@ -61,8 +61,7 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements
                         if (value != null) {
                             if (tag != null) {
                                 ByteArrayOutputStream fieldContent = new ByteArrayOutputStream();
-                                fieldContent.write(encoder.encode((ASN1Type) value,
-                                        tag.mode() == ASN1Tag.Mode.Implicit));
+                                fieldContent.write(encoder.encode((ASN1Type) value, tag));
                                 content.write(fieldContent.toByteArray());
                             } else {
                                 content.write(encoder.encode((ASN1Type) value));

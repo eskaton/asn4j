@@ -58,7 +58,7 @@ public class ChoiceEncoder implements TypeEncoder<ASN1Choice> {
         try {
             if (tag != null) {
                 ByteArrayOutputStream fieldContent = new ByteArrayOutputStream();
-                fieldContent.write(encoder.encode(value, tag.mode() == ASN1Tag.Mode.Implicit));
+                fieldContent.write(encoder.encode(value, tag));
                 content.write(TLVUtils.getTag(tag));
                 content.write(TLVUtils.getLength(fieldContent.size()));
                 content.write(fieldContent.toByteArray());
