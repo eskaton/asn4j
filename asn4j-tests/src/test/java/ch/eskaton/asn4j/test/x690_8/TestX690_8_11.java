@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
-import ch.eskaton.asn4jtest.x680_27_implicit.TestSet1;
+import ch.eskaton.asn4jtest.x680_27.TestSet1;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
