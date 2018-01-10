@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
-import ch.eskaton.asn4jtest.x680_27.TestSet1;
+import ch.eskaton.asn4jtest.x680_27_implicit.TestSet1;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -46,6 +46,7 @@ public class TestX690_8_11 {
         TestSet1 a = new TestSet1();
         a.setA(ASN1Integer.valueOf(4711));
         a.setB(ASN1OctetString.valueOf("test"));
+        a.setC(ASN1Integer.valueOf(23));
 
         assertArrayEquals(new byte[] { 0x31, 0x0a, 0x02, 0x02, 0x12, 0x67,
                 0x04, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(a));
