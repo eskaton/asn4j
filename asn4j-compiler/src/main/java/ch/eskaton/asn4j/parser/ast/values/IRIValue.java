@@ -33,8 +33,8 @@ import ch.eskaton.asn4j.parser.IRIToken;
 
 public class IRIValue extends RelativeIRIValue {
 
-	public IRIValue(List<IRIToken> arcIdentifiers) {
-		super(arcIdentifiers);
-	}
+    public IRIValue(List<IRIToken> arcIdentifiers) {
+    	super(arcIdentifiers);
+    }
 
 }

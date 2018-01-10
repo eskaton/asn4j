@@ -39,90 +39,90 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 
 public class JavaWriter {
 
-	public void write(Map<String, JavaStructure> structs, String outputDir)
-			throws CompilerException {
-		Set<JavaStructure> processed = new HashSet<JavaStructure>();
+    public void write(Map<String, JavaStructure> structs, String outputDir)
+    		throws CompilerException {
+    	Set<JavaStructure> processed = new HashSet<JavaStructure>();
 
-		for (JavaStructure struct : structs.values()) {
-			if (processed.contains(struct)) {
-				continue;
-			}
+    	for (JavaStructure struct : structs.values()) {
+    		if (processed.contains(struct)) {
+    			continue;
+    		}
 
-			if (struct instanceof JavaClass) {
-				JavaClass clazz = (JavaClass) struct;
-				String parent = clazz.getParent();
-				Stack<JavaClass> clazzHierarchy = new Stack<JavaClass>();
-				clazzHierarchy.push(clazz);
+    		if (struct instanceof JavaClass) {
+    			JavaClass clazz = (JavaClass) struct;
+    			String parent = clazz.getParent();
+    			Stack<JavaClass> clazzHierarchy = new Stack<JavaClass>();
+    			clazzHierarchy.push(clazz);
 
-				while (parent != null && !parent.startsWith("ASN1")) {
-					JavaStructure parentStruct = structs.get(parent);
+    			while (parent != null && !parent.startsWith("ASN1")) {
+    				JavaStructure parentStruct = structs.get(parent);
 
-					if (parentStruct instanceof JavaClass) {
-						clazz = (JavaClass) parentStruct;
-						if (clazz != null) {
-							clazzHierarchy.push(clazz);
-							parent = clazz.getParent();
-						}
-					} else if (parentStruct instanceof JavaInterface) {
-						clazz.setParent(null);
-						clazz.setInterfaze(parent);
-						parent = null;
-					} else {
-						parent = null;
-					}
-				}
+    				if (parentStruct instanceof JavaClass) {
+    					clazz = (JavaClass) parentStruct;
+    					if (clazz != null) {
+    						clazzHierarchy.push(clazz);
+    						parent = clazz.getParent();
+    					}
+    				} else if (parentStruct instanceof JavaInterface) {
+    					clazz.setParent(null);
+    					clazz.setInterfaze(parent);
+    					parent = null;
+    				} else {
+    					parent = null;
+    				}
+    			}
 
-				List<JavaConstructor> constructors = new ArrayList<JavaConstructor>();
+    			List<JavaConstructor> constructors = new ArrayList<JavaConstructor>();
 
-				while (!clazzHierarchy.empty()) {
-					clazz = clazzHierarchy.pop();
-					if (!constructors.isEmpty()) {
-						List<JavaConstructor> availableConstructors = clazz
-								.getConstructors();
-						for (JavaConstructor constructor : constructors) {
-							JavaConstructor childConstructor = new JavaConstructor(
-									constructor.getVisibility(),
-									clazz.getName(),
-									constructor.getParameters(), null);
-							if (!availableConstructors
-									.contains(childConstructor)) {
-								StringBuilder body = new StringBuilder();
-								body.append("\t\tsuper(");
+    			while (!clazzHierarchy.empty()) {
+    				clazz = clazzHierarchy.pop();
+    				if (!constructors.isEmpty()) {
+    					List<JavaConstructor> availableConstructors = clazz
+    							.getConstructors();
+    					for (JavaConstructor constructor : constructors) {
+    						JavaConstructor childConstructor = new JavaConstructor(
+    								constructor.getVisibility(),
+    								clazz.getName(),
+    								constructor.getParameters(), null);
+    						if (!availableConstructors
+    								.contains(childConstructor)) {
+    							StringBuilder body = new StringBuilder();
+    							body.append("\t\tsuper(");
 
-								int paramCount = 0;
+    							int paramCount = 0;
 
-								for (JavaParameter parameter : childConstructor
-										.getParameters()) {
-									if (paramCount > 0) {
-										body.append(", ");
-									}
-									body.append(parameter.getName());
-									paramCount++;
-								}
+    							for (JavaParameter parameter : childConstructor
+    									.getParameters()) {
+    								if (paramCount > 0) {
+    									body.append(", ");
+    								}
+    								body.append(parameter.getName());
+    								paramCount++;
+    							}
 
-								body.append(");\n");
-								childConstructor.setBody(body.toString());
-								clazz.addMethod(childConstructor);
-							}
-						}
-					}
-					constructors.clear();
-					constructors.addAll(clazz.getConstructors());
-					processed.add(clazz);
-				}
-			}
+    							body.append(");\n");
+    							childConstructor.setBody(body.toString());
+    							clazz.addMethod(childConstructor);
+    						}
+    					}
+    				}
+    				constructors.clear();
+    				constructors.addAll(clazz.getConstructors());
+    				processed.add(clazz);
+    			}
+    		}
 
-		}
+    	}
 
-		// write classes
-		for (JavaStructure struct : structs.values()) {
-			try {
-				struct.save(outputDir);
-			} catch (IOException e) {
-				throw new CompilerException(e);
-			}
-		}
+    	// write classes
+    	for (JavaStructure struct : structs.values()) {
+    		try {
+    			struct.save(outputDir);
+    		} catch (IOException e) {
+    			throw new CompilerException(e);
+    		}
+    	}
 
-	}
+    }
 
 }

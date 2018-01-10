@@ -35,106 +35,106 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public abstract class Collection extends AbstractType {
 
-	private List<ComponentType> rootComponents;
+    private List<ComponentType> rootComponents;
 
-	private List<ComponentType> extRootComponents;
+    private List<ComponentType> extRootComponents;
 
-	private Object extAndEx;
+    private Object extAndEx;
 
-	private Object optExtMarker;
+    private Object optExtMarker;
 
-	private Object extAdditions;
+    private Object extAdditions;
 
-	public Collection() {
-	}
+    public Collection() {
+    }
 
-	public Collection(ComponentTypeListsNode compTypes) {
-		this.rootComponents = compTypes.getRootComponents();
-		this.extAndEx = compTypes.getExtAndEx();
-		this.extAdditions = compTypes.getExtAdditions();
-		this.optExtMarker = compTypes.getExtEndMarker();
-		this.extRootComponents = compTypes.getExtRootComponents();
-	}
+    public Collection(ComponentTypeListsNode compTypes) {
+    	this.rootComponents = compTypes.getRootComponents();
+    	this.extAndEx = compTypes.getExtAndEx();
+    	this.extAdditions = compTypes.getExtAdditions();
+    	this.optExtMarker = compTypes.getExtEndMarker();
+    	this.extRootComponents = compTypes.getExtRootComponents();
+    }
 
-	public Collection(Object extAndEx, Object optExtMarker) {
-		this.extAndEx = extAndEx;
-		this.optExtMarker = optExtMarker;
-	}
+    public Collection(Object extAndEx, Object optExtMarker) {
+    	this.extAndEx = extAndEx;
+    	this.optExtMarker = optExtMarker;
+    }
 
-	public List<ComponentType> getAllComponents() {
-		List<ComponentType> components = new ArrayList<ComponentType>(2);
-		if (rootComponents != null) {
-			components.addAll(rootComponents);
-		}
+    public List<ComponentType> getAllComponents() {
+    	List<ComponentType> components = new ArrayList<ComponentType>(2);
+    	if (rootComponents != null) {
+    		components.addAll(rootComponents);
+    	}
 
-		if (extRootComponents != null) {
-			components.addAll(extRootComponents);
-		}
+    	if (extRootComponents != null) {
+    		components.addAll(extRootComponents);
+    	}
 
-		return components;
-	}
+    	return components;
+    }
 
-	public List<ComponentType> getRootComponents() {
-		return rootComponents;
-	}
+    public List<ComponentType> getRootComponents() {
+    	return rootComponents;
+    }
 
-	public List<ComponentType> getExtRootComponents() {
-		return extRootComponents;
-	}
+    public List<ComponentType> getExtRootComponents() {
+    	return extRootComponents;
+    }
 
-	public Object getExtAndEx() {
-		return extAndEx;
-	}
+    public Object getExtAndEx() {
+    	return extAndEx;
+    }
 
-	public Object getOptExtMarker() {
-		return optExtMarker;
-	}
+    public Object getOptExtMarker() {
+    	return optExtMarker;
+    }
 
-	public Object getExtAdditions() {
-		return extAdditions;
-	}
+    public Object getExtAdditions() {
+    	return extAdditions;
+    }
 
-	protected abstract String getType();
+    protected abstract String getType();
 
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder();
+    @Override
+    public String toString() {
+    	StringBuilder sb = new StringBuilder();
 
-		if (rootComponents != null) {
-			sb.append("(").append(StringUtils.join(rootComponents, ","))
-					.append(")");
-		}
+    	if (rootComponents != null) {
+    		sb.append("(").append(StringUtils.join(rootComponents, ","))
+    				.append(")");
+    	}
 
-		if (extAndEx != null) {
-			if (sb.length() > 0) {
-				sb.append(", ");
-			}
-			sb.append(extAndEx);
-		}
+    	if (extAndEx != null) {
+    		if (sb.length() > 0) {
+    			sb.append(", ");
+    		}
+    		sb.append(extAndEx);
+    	}
 
-		if (extAdditions != null) {
-			if (sb.length() > 0) {
-				sb.append(", ");
-			}
-			sb.append(extAdditions);
-		}
+    	if (extAdditions != null) {
+    		if (sb.length() > 0) {
+    			sb.append(", ");
+    		}
+    		sb.append(extAdditions);
+    	}
 
-		if (optExtMarker != null) {
-			if (sb.length() > 0) {
-				sb.append(", ");
-			}
-			sb.append(optExtMarker);
-		}
+    	if (optExtMarker != null) {
+    		if (sb.length() > 0) {
+    			sb.append(", ");
+    		}
+    		sb.append(optExtMarker);
+    	}
 
-		if (extRootComponents != null) {
-			if (sb.length() > 0) {
-				sb.append(", ");
-			}
-			sb.append("(").append(StringUtils.join(extRootComponents, ","))
-					.append(")");
-		}
+    	if (extRootComponents != null) {
+    		if (sb.length() > 0) {
+    			sb.append(", ");
+    		}
+    		sb.append("(").append(StringUtils.join(extRootComponents, ","))
+    				.append(")");
+    	}
 
-		return StringUtils.concat(getType() + "[", sb.toString(), "]");
-	}
+    	return StringUtils.concat(getType() + "[", sb.toString(), "]");
+    }
 
 }

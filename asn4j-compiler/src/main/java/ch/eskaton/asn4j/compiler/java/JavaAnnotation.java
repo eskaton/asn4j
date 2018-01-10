@@ -36,22 +36,22 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaAnnotation implements JavaObject {
 
-	private Class<?> annotation;
+    private Class<?> annotation;
 
-	private Map<String, String> params = new HashMap<String, String>();
+    private Map<String, String> params = new HashMap<String, String>();
 
-	public JavaAnnotation(Class<?> annotation) {
-		this.annotation = annotation;
-	}
+    public JavaAnnotation(Class<?> annotation) {
+    	this.annotation = annotation;
+    }
 
-	public void addParameter(String name, String value) {
-		params.put(name, value);
-	}
+    public void addParameter(String name, String value) {
+    	params.put(name, value);
+    }
 
-	public void write(BufferedWriter writer, String prefix) throws IOException {
-		writer.write(StringUtils.concat(prefix, "\t@",
-				annotation.getSimpleName(), "(",
-				StringUtils.join(params, "=", ","), ")\n"));
-	}
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+    	writer.write(StringUtils.concat(prefix, "\t@",
+    			annotation.getSimpleName(), "(",
+    			StringUtils.join(params, "=", ","), ")\n"));
+    }
 
 }

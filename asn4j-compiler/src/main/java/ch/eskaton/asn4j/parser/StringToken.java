@@ -31,30 +31,30 @@ import ch.eskaton.asn4j.parser.Lexer.Context;
 
 public class StringToken extends Token {
 
-	public static final int CSTRING = 0x01;
+    public static final int CSTRING = 0x01;
 
-	public static final int SIMPLE_STRING = 0x02;
+    public static final int SIMPLE_STRING = 0x02;
 
-	public static final int TSTRING = 0x04;
+    public static final int TSTRING = 0x04;
 
-	private int flags;
+    private int flags;
 
-	public StringToken(Context context, TokenType type, int offset, int line,
-			int pos, String text, int flags) {
-		super(context, type, offset, line, pos);
-		this.flags = flags;
-		this.text = text;
-	}
+    public StringToken(Context context, TokenType type, int offset, int line,
+    		int pos, String text, int flags) {
+    	super(context, type, offset, line, pos);
+    	this.flags = flags;
+    	this.text = text;
+    }
 
-	public int getFlags() {
-		return flags;
-	}
+    public int getFlags() {
+    	return flags;
+    }
 
-	@Override
-	public String toString() {
-		return "StringToken[" + type + ", line=" + line + ", pos=" + pos
-				+ (text != null ? ", text=" + text : "") + ", flags=0x"
-				+ Integer.toHexString(flags) + "]";
-	}
+    @Override
+    public String toString() {
+    	return "StringToken[" + type + ", line=" + line + ", pos=" + pos
+    			+ (text != null ? ", text=" + text : "") + ", flags=0x"
+    			+ Integer.toHexString(flags) + "]";
+    }
 
 }

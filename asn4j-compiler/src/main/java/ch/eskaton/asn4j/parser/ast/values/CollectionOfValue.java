@@ -35,102 +35,102 @@ import ch.eskaton.asn4j.parser.ast.TupleNode;
 
 public class CollectionOfValue extends CollectionValue {
 
-	private static final BigInteger[] MAX_TUPLE_VALUES = {
-			BigInteger.valueOf(7), BigInteger.valueOf(15) };
+    private static final BigInteger[] MAX_TUPLE_VALUES = {
+    		BigInteger.valueOf(7), BigInteger.valueOf(15) };
 
-	private static final BigInteger[] MAX_QUADRUPLE_VALUES = {
-			BigInteger.valueOf(127), BigInteger.valueOf(255),
-			BigInteger.valueOf(255), BigInteger.valueOf(255) };
+    private static final BigInteger[] MAX_QUADRUPLE_VALUES = {
+    		BigInteger.valueOf(127), BigInteger.valueOf(255),
+    		BigInteger.valueOf(255), BigInteger.valueOf(255) };
 
-	private Boolean isTuple = null;
+    private Boolean isTuple = null;
 
-	private Boolean isQuadruple = null;
+    private Boolean isQuadruple = null;
 
-	public CollectionOfValue() {
-	}
+    public CollectionOfValue() {
+    }
 
-	public CollectionOfValue(List<Value> values) {
-		super(values);
-	}
+    public CollectionOfValue(List<Value> values) {
+    	super(values);
+    }
 
-	public boolean isTuple() {
-		if (isTuple != null) {
-			return isTuple;
-		}
+    public boolean isTuple() {
+    	if (isTuple != null) {
+    		return isTuple;
+    	}
 
-		List<Value> values = getValues();
+    	List<Value> values = getValues();
 
-		if (values.size() != 2) {
-			return isTuple = false;
-		}
+    	if (values.size() != 2) {
+    		return isTuple = false;
+    	}
 
-		int pos = 0;
+    	int pos = 0;
 
-		for (Value value : values) {
-			if (!(value instanceof IntegerValue)
-					|| ((IntegerValue) value).isReference()
-					|| ((IntegerValue) value).getValue().compareTo(
-							BigInteger.ZERO) < 0
-					|| ((IntegerValue) value).getValue().compareTo(
-							MAX_TUPLE_VALUES[pos++]) > 0) {
-				return isTuple = false;
-			}
-		}
+    	for (Value value : values) {
+    		if (!(value instanceof IntegerValue)
+    				|| ((IntegerValue) value).isReference()
+    				|| ((IntegerValue) value).getValue().compareTo(
+    						BigInteger.ZERO) < 0
+    				|| ((IntegerValue) value).getValue().compareTo(
+    						MAX_TUPLE_VALUES[pos++]) > 0) {
+    			return isTuple = false;
+    		}
+    	}
 
-		return isTuple = true;
-	}
+    	return isTuple = true;
+    }
 
-	public TupleNode toTuple() {
-		List<Value> values = getValues();
+    public TupleNode toTuple() {
+    	List<Value> values = getValues();
 
-		if (!isTuple()) {
-			return null;
-		}
+    	if (!isTuple()) {
+    		return null;
+    	}
 
-		return new TupleNode(((IntegerValue) values.get(0)).getValue()
-				.shortValue(), ((IntegerValue) values.get(1)).getValue()
-				.shortValue());
-	}
+    	return new TupleNode(((IntegerValue) values.get(0)).getValue()
+    			.shortValue(), ((IntegerValue) values.get(1)).getValue()
+    			.shortValue());
+    }
 
-	public boolean isQuadruple() {
-		if (isQuadruple != null) {
-			return isQuadruple;
-		}
+    public boolean isQuadruple() {
+    	if (isQuadruple != null) {
+    		return isQuadruple;
+    	}
 
-		List<Value> values = getValues();
+    	List<Value> values = getValues();
 
-		if (values.size() != 4) {
-			return isQuadruple = false;
-		}
+    	if (values.size() != 4) {
+    		return isQuadruple = false;
+    	}
 
-		int pos = 0;
+    	int pos = 0;
 
-		for (Value value : values) {
-			if (!(value instanceof IntegerValue)
-					|| ((IntegerValue) value).isReference()
-					|| ((IntegerValue) value).getValue().compareTo(
-							BigInteger.ZERO) < 0
-					|| ((IntegerValue) value).getValue().compareTo(
-							MAX_QUADRUPLE_VALUES[pos++]) > 0) {
-				return isQuadruple = false;
-			}
-		}
+    	for (Value value : values) {
+    		if (!(value instanceof IntegerValue)
+    				|| ((IntegerValue) value).isReference()
+    				|| ((IntegerValue) value).getValue().compareTo(
+    						BigInteger.ZERO) < 0
+    				|| ((IntegerValue) value).getValue().compareTo(
+    						MAX_QUADRUPLE_VALUES[pos++]) > 0) {
+    			return isQuadruple = false;
+    		}
+    	}
 
-		return isQuadruple = true;
-	}
+    	return isQuadruple = true;
+    }
 
-	public QuadrupleNode toQuadruple() {
-		List<Value> values = getValues();
+    public QuadrupleNode toQuadruple() {
+    	List<Value> values = getValues();
 
-		if (!isQuadruple()) {
-			return null;
-		}
+    	if (!isQuadruple()) {
+    		return null;
+    	}
 
-		return new QuadrupleNode(((IntegerValue) values.get(0)).getValue()
-				.shortValue(), ((IntegerValue) values.get(1)).getValue()
-				.shortValue(), ((IntegerValue) values.get(2)).getValue()
-				.shortValue(), ((IntegerValue) values.get(3)).getValue()
-				.shortValue());
-	}
+    	return new QuadrupleNode(((IntegerValue) values.get(0)).getValue()
+    			.shortValue(), ((IntegerValue) values.get(1)).getValue()
+    			.shortValue(), ((IntegerValue) values.get(2)).getValue()
+    			.shortValue(), ((IntegerValue) values.get(3)).getValue()
+    			.shortValue());
+    }
 
 }

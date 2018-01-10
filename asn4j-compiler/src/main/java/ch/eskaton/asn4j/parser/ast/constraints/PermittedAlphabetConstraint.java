@@ -30,22 +30,22 @@ package ch.eskaton.asn4j.parser.ast.constraints;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class PermittedAlphabetConstraint extends AbstractConstraint implements
-		Constraint {
+    	Constraint {
 
-	private Constraint constraint;
+    private Constraint constraint;
 
-	public PermittedAlphabetConstraint(Constraint constraint) {
-		this.constraint = constraint;
-	}
+    public PermittedAlphabetConstraint(Constraint constraint) {
+    	this.constraint = constraint;
+    }
 
-	public Constraint getConstraint() {
-		return constraint;
-	}
+    public Constraint getConstraint() {
+    	return constraint;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("PermittedAlphabetConstraint[", constraint,
-				"]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("PermittedAlphabetConstraint[", constraint,
+    			"]");
+    }
 
 }

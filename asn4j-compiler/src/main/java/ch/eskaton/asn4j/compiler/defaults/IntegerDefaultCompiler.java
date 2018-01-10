@@ -39,39 +39,39 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
 public class IntegerDefaultCompiler implements DefaultCompiler {
 
-	public void compileDefault(CompilerContext ctx, JavaClass clazz,
-			String field, Value value) throws CompilerException {
-		long intValue;
+    public void compileDefault(CompilerContext ctx, JavaClass clazz,
+    		String field, Value value) throws CompilerException {
+    	long intValue;
 
-		if (value instanceof IntegerValue) {
-			intValue = ((IntegerValue) value).getValue().longValue();
+    	if (value instanceof IntegerValue) {
+    		intValue = ((IntegerValue) value).getValue().longValue();
 
-			try {
-				ASN1Integer.valueOf(intValue);
-			} catch (ConstraintViolatedException e) {
-				throw new CompilerException(
-						"Default value doesn't satisfy constraints", e);
-			}
-		} else if (value instanceof SimpleDefinedValue) {
-			intValue = ctx.resolveIntegerValue(((SimpleDefinedValue) value))
-					.longValue();
-		} else {
-			throw new CompilerException("Invalid default value");
-		}
+    		try {
+    			ASN1Integer.valueOf(intValue);
+    		} catch (ConstraintViolatedException e) {
+    			throw new CompilerException(
+    					"Default value doesn't satisfy constraints", e);
+    		}
+    	} else if (value instanceof SimpleDefinedValue) {
+    		intValue = ctx.resolveIntegerValue(((SimpleDefinedValue) value))
+    				.longValue();
+    	} else {
+    		throw new CompilerException("Invalid default value");
+    	}
 
-		StringBuilder body = new StringBuilder();
+    	StringBuilder body = new StringBuilder();
 
-		body.append("\t\ttry {\n");
-		body.append("\t\t\t").append(field).append(" = ")
-				.append(ASN1Integer.class.getSimpleName()).append(".valueOf(")
-				.append(intValue).append(");\n");
-		body.append("\t\t} catch(")
-				.append(ConstraintViolatedException.class.getSimpleName())
-				.append(" e) {\n");
-		body.append("\t\t}");
+    	body.append("\t\ttry {\n");
+    	body.append("\t\t\t").append(field).append(" = ")
+    			.append(ASN1Integer.class.getSimpleName()).append(".valueOf(")
+    			.append(intValue).append(");\n");
+    	body.append("\t\t} catch(")
+    			.append(ConstraintViolatedException.class.getSimpleName())
+    			.append(" e) {\n");
+    	body.append("\t\t}");
 
-		clazz.addInitializer(new JavaInitializer(body.toString()));
-		clazz.addImport(ConstraintViolatedException.class);
-	}
+    	clazz.addInitializer(new JavaInitializer(body.toString()));
+    	clazz.addImport(ConstraintViolatedException.class);
+    }
 
 }

@@ -29,14 +29,14 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class DefaultOptionalitySpecNode<T> extends OptionalitySpecNode {
 
-	private T spec;
+    private T spec;
 
-	public DefaultOptionalitySpecNode(T spec) {
-		this.spec = spec;
-	}
+    public DefaultOptionalitySpecNode(T spec) {
+    	this.spec = spec;
+    }
 
-	public T getSpec() {
-		return spec;
-	}
+    public T getSpec() {
+    	return spec;
+    }
 
 }

@@ -34,31 +34,31 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class SimpleDefinedType extends AbstractType implements
-		ParameterizedNode {
+    	ParameterizedNode {
 
-	private String type;
+    private String type;
 
-	private List<Node> parameters;
+    private List<Node> parameters;
 
-	public SimpleDefinedType(String type) {
-		this.type = type;
-	}
+    public SimpleDefinedType(String type) {
+    	this.type = type;
+    }
 
-	public String getType() {
-		return type;
-	}
+    public String getType() {
+    	return type;
+    }
 
-	public void setParameters(List<Node> parameters) {
-		this.parameters = parameters;
-	}
+    public void setParameters(List<Node> parameters) {
+    	this.parameters = parameters;
+    }
 
-	public List<Node> getParameters() {
-		return parameters;
-	}
+    public List<Node> getParameters() {
+    	return parameters;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("SimpleDefinedType[", getType(), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("SimpleDefinedType[", getType(), "]");
+    }
 
 }

@@ -36,30 +36,30 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class IntegerType extends AbstractType {
 
-	private List<NamedNumber> namedNumbers;
+    private List<NamedNumber> namedNumbers;
 
-	public IntegerType() {
-	}
+    public IntegerType() {
+    }
 
-	public IntegerType(List<NamedNumber> namedNumbers) {
-		this.namedNumbers = namedNumbers;
-	}
+    public IntegerType(List<NamedNumber> namedNumbers) {
+    	this.namedNumbers = namedNumbers;
+    }
 
-	public Collection<NamedNumber> getNamedNumbers() {
-		return namedNumbers;
-	}
+    public Collection<NamedNumber> getNamedNumbers() {
+    	return namedNumbers;
+    }
 
-	public NamedNumber getNamedNumber(String name) {
-		if (namedNumbers != null) {
-			for (NamedNumber namedNumber : namedNumbers) {
-				if (namedNumber.getId().equals(name)) {
-					return namedNumber;
-				}
-			}
-		}
+    public NamedNumber getNamedNumber(String name) {
+    	if (namedNumbers != null) {
+    		for (NamedNumber namedNumber : namedNumbers) {
+    			if (namedNumber.getId().equals(name)) {
+    				return namedNumber;
+    			}
+    		}
+    	}
 
-		return null;
-	}
+    	return null;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -82,11 +82,11 @@ public class IntegerType extends AbstractType {
     }
 
     @Override
-	public String toString() {
-		return StringUtils.concat(
-				"Integer",
-				namedNumbers != null ? StringUtils.concat("[",
-						StringUtils.join(namedNumbers, ", "), "]") : "");
-	}
+    public String toString() {
+    	return StringUtils.concat(
+    			"Integer",
+    			namedNumbers != null ? StringUtils.concat("[",
+    					StringUtils.join(namedNumbers, ", "), "]") : "");
+    }
 
 }

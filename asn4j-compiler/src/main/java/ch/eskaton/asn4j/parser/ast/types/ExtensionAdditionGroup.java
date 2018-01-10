@@ -34,29 +34,29 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ExtensionAdditionGroup implements Node {
 
-	private Integer version;
+    private Integer version;
 
-	private List<ComponentType> components;
+    private List<ComponentType> components;
 
-	public ExtensionAdditionGroup(Integer version,
-			List<ComponentType> components) {
-		this.version = version;
-		this.components = components;
-	}
+    public ExtensionAdditionGroup(Integer version,
+    		List<ComponentType> components) {
+    	this.version = version;
+    	this.components = components;
+    }
 
-	public Integer getVersion() {
-		return version;
-	}
+    public Integer getVersion() {
+    	return version;
+    }
 
-	public List<ComponentType> getComponents() {
-		return components;
-	}
+    public List<ComponentType> getComponents() {
+    	return components;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ExtensionAdditionGroup[",
-				version != null ? version : "", "(",
-				StringUtils.join(components, ", "), ")]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ExtensionAdditionGroup[",
+    			version != null ? version : "", "(",
+    			StringUtils.join(components, ", "), ")]");
+    }
 
 }

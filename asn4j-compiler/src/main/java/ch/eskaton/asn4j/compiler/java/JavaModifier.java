@@ -28,5 +28,5 @@
 package ch.eskaton.asn4j.compiler.java;
 
 public enum JavaModifier {
-	Static, Final
+    Static, Final
 }

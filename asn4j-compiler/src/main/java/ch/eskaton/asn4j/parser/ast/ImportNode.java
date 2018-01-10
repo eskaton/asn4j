@@ -33,27 +33,27 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ImportNode implements Node {
 
-	private List<ReferenceNode> symbols;
+    private List<ReferenceNode> symbols;
 
-	private ModuleRefNode reference;
+    private ModuleRefNode reference;
 
-	public ImportNode(List<ReferenceNode> symbols, ModuleRefNode reference) {
-		this.symbols = symbols;
-		this.reference = reference;
-	}
+    public ImportNode(List<ReferenceNode> symbols, ModuleRefNode reference) {
+    	this.symbols = symbols;
+    	this.reference = reference;
+    }
 
-	public List<ReferenceNode> getSymbols() {
-		return symbols;
-	}
+    public List<ReferenceNode> getSymbols() {
+    	return symbols;
+    }
 
-	public ModuleRefNode getReference() {
-		return reference;
-	}
+    public ModuleRefNode getReference() {
+    	return reference;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("Import[", reference, " (",
-				StringUtils.join(symbols, ", "), ")", "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("Import[", reference, " (",
+    			StringUtils.join(symbols, ", "), ")", "]");
+    }
 
 }

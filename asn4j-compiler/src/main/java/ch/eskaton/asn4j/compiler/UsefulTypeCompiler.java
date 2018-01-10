@@ -32,11 +32,11 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
 public class UsefulTypeCompiler implements NamedCompiler<UsefulType> {
 
-	public void compile(CompilerContext ctx, String name, UsefulType node)
-			throws CompilerException {
-		JavaClass javaClass = ctx.createClass(name, node, false);
-		ctx.compileConstraint(javaClass, name, node);
-		ctx.finishClass();
-	}
+    public void compile(CompilerContext ctx, String name, UsefulType node)
+    		throws CompilerException {
+    	JavaClass javaClass = ctx.createClass(name, node, false);
+    	ctx.compileConstraint(javaClass, name, node);
+    	ctx.finishClass();
+    }
 
 }

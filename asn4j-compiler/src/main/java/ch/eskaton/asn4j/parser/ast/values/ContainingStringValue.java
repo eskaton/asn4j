@@ -29,14 +29,14 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 public class ContainingStringValue implements Value {
 
-	private Value value;
+    private Value value;
 
-	public ContainingStringValue(Value value) {
-		this.value = value;
-	}
+    public ContainingStringValue(Value value) {
+    	this.value = value;
+    }
 
-	public Value getValue() {
-		return value;
-	}
+    public Value getValue() {
+    	return value;
+    }
 
 }

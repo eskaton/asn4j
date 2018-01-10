@@ -32,14 +32,14 @@ import java.util.List;
 
 public class DefinedSyntaxNode implements ObjectSyntaxNode {
 
-	private List<Node> nodes;
+    private List<Node> nodes;
 
-	public DefinedSyntaxNode(List<Node> nodes) {
-		this.nodes = nodes != null ? nodes : new ArrayList<Node>();
-	}
+    public DefinedSyntaxNode(List<Node> nodes) {
+    	this.nodes = nodes != null ? nodes : new ArrayList<Node>();
+    }
 
-	public List<Node> getNodes() {
-		return nodes;
-	}
+    public List<Node> getNodes() {
+    	return nodes;
+    }
 
 }

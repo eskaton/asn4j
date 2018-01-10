@@ -29,8 +29,8 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class ObjectDescriptor extends UsefulType {
 
-	public ObjectDescriptor(String type) {
-		super(type);
-	}
+    public ObjectDescriptor(String type) {
+    	super(type);
+    }
 
 }

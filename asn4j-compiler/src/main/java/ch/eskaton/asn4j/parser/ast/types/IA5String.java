@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class IA5String extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "IA5String";
-	}
+    @Override
+    public String toString() {
+    	return "IA5String";
+    }
 
 }

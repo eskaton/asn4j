@@ -30,16 +30,16 @@ package ch.eskaton.asn4j.parser;
 @SuppressWarnings("serial")
 public class ParserException extends Exception {
 
-	public ParserException(Exception e) {
-		super(e);
-	}
+    public ParserException(Exception e) {
+    	super(e);
+    }
 
-	public ParserException(String message) {
-		super(message);
-	}
+    public ParserException(String message) {
+    	super(message);
+    }
 
-	public ParserException(String message, Exception e) {
-		super(message, e);
-	}
+    public ParserException(String message, Exception e) {
+    	super(message, e);
+    }
 
 }

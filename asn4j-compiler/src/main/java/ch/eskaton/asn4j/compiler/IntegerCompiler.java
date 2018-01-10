@@ -45,74 +45,74 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
-	@Override
-	public void compile(CompilerContext ctx, String name, IntegerType node)
-			throws CompilerException {
-		JavaClass javaClass = ctx.createClass(name, node, false);
-		Collection<NamedNumber> namedNumbers = node.getNamedNumbers();
-		IdentifierUniquenessChecker<BigInteger> iuc = new IdentifierUniquenessChecker<BigInteger>(
-				name);
+    @Override
+    public void compile(CompilerContext ctx, String name, IntegerType node)
+    		throws CompilerException {
+    	JavaClass javaClass = ctx.createClass(name, node, false);
+    	Collection<NamedNumber> namedNumbers = node.getNamedNumbers();
+    	IdentifierUniquenessChecker<BigInteger> iuc = new IdentifierUniquenessChecker<BigInteger>(
+    			name);
 
-		if (namedNumbers != null && !namedNumbers.isEmpty()) {
-			StringBuilder staticBody = new StringBuilder();
-			staticBody.append("\t\ttry {\n");
+    	if (namedNumbers != null && !namedNumbers.isEmpty()) {
+    		StringBuilder staticBody = new StringBuilder();
+    		staticBody.append("\t\ttry {\n");
 
-			for (NamedNumber namedNumber : namedNumbers) {
-				String fieldName = CompilerUtils.formatConstant(namedNumber
-						.getId());
-				BigInteger bigValue;
-				long value;
+    		for (NamedNumber namedNumber : namedNumbers) {
+    			String fieldName = CompilerUtils.formatConstant(namedNumber
+    					.getId());
+    			BigInteger bigValue;
+    			long value;
 
-				if (namedNumber.getRef() != null) {
-					bigValue = ctx.resolveIntegerValue(namedNumber.getRef());
-				} else {
-					bigValue = namedNumber.getValue().getNumber();
-				}
+    			if (namedNumber.getRef() != null) {
+    				bigValue = ctx.resolveIntegerValue(namedNumber.getRef());
+    			} else {
+    				bigValue = namedNumber.getValue().getNumber();
+    			}
 
-				if (bigValue.bitLength() > 63) {
-					throw new CompilerException("Named number '" + fieldName
-							+ "' too long: " + bigValue.toString());
-				}
+    			if (bigValue.bitLength() > 63) {
+    				throw new CompilerException("Named number '" + fieldName
+    						+ "' too long: " + bigValue.toString());
+    			}
 
-				iuc.add(namedNumber.getId(), bigValue);
+    			iuc.add(namedNumber.getId(), bigValue);
 
-				value = bigValue.longValue();
+    			value = bigValue.longValue();
 
-				javaClass.addField(new JavaLiteralField(StringUtils
-						.concat("\tpublic static final ", name, " ", fieldName,
-								";\n\n")));
+    			javaClass.addField(new JavaLiteralField(StringUtils
+    					.concat("\tpublic static final ", name, " ", fieldName,
+    							";\n\n")));
 
-				staticBody.append(StringUtils.concat("\t\t\t", fieldName,
-						" = ", "new ", name, "(", value, ");\n"));
-			}
+    			staticBody.append(StringUtils.concat("\t\t\t", fieldName,
+    					" = ", "new ", name, "(", value, ");\n"));
+    		}
 
-			staticBody.append("\t\t} catch (")
-					.append(ConstraintViolatedException.class.getSimpleName())
-					.append(" e){\n");
-			staticBody.append("\t\t\tthrow new RuntimeException(e);\n");
-			staticBody.append("\t\t}");
+    		staticBody.append("\t\t} catch (")
+    				.append(ConstraintViolatedException.class.getSimpleName())
+    				.append(" e){\n");
+    		staticBody.append("\t\t\tthrow new RuntimeException(e);\n");
+    		staticBody.append("\t\t}");
 
-			javaClass.addStaticInitializer(new JavaStaticInitializer(staticBody
-					.toString()));
-		}
+    		javaClass.addStaticInitializer(new JavaStaticInitializer(staticBody
+    				.toString()));
+    	}
 
-		javaClass.addImport(BigInteger.class);
-		javaClass.addImport(ConstraintViolatedException.class);
+    	javaClass.addImport(BigInteger.class);
+    	javaClass.addImport(ConstraintViolatedException.class);
 
-		javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, name,
-				Collections.<JavaParameter> emptyList(), "\t\tsuper();",
-				Collections.<String> emptyList()));
+    	javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, name,
+    			Collections.<JavaParameter> emptyList(), "\t\tsuper();",
+    			Collections.<String> emptyList()));
 
-		javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, name,
-				Arrays.asList(new JavaParameter("long", "value")),
-				"\t\tsuper.setValue(BigInteger.valueOf(value));", Arrays
-						.asList(ConstraintViolatedException.class.getName())));
+    	javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, name,
+    			Arrays.asList(new JavaParameter("long", "value")),
+    			"\t\tsuper.setValue(BigInteger.valueOf(value));", Arrays
+    					.asList(ConstraintViolatedException.class.getName())));
 
-		if (node.hasConstraint()) {
-			ctx.compileConstraint(javaClass, name, node);
-		}
+    	if (node.hasConstraint()) {
+    		ctx.compileConstraint(javaClass, name, node);
+    	}
 
-		ctx.finishClass();
-	}
+    	ctx.finishClass();
+    }
 
 }

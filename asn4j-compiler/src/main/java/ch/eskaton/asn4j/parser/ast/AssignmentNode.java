@@ -29,14 +29,14 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class AssignmentNode implements Node {
 
-	private String reference;
+    private String reference;
 
-	public AssignmentNode(String reference) {
-		this.reference = reference;
-	}
+    public AssignmentNode(String reference) {
+    	this.reference = reference;
+    }
 
-	public String getReference() {
-		return reference;
-	}
+    public String getReference() {
+    	return reference;
+    }
 
 }

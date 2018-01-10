@@ -32,19 +32,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class TypeConstraint extends AbstractConstraint implements Constraint {
 
-	private Type type;
+    private Type type;
 
-	public TypeConstraint(Type type) {
-		this.type = type;
-	}
+    public TypeConstraint(Type type) {
+    	this.type = type;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("TypeConstraint[", type, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("TypeConstraint[", type, "]");
+    }
 
 }

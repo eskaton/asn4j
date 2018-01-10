@@ -34,16 +34,16 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaLiteralMethod extends JavaMethod {
 
-	private String body;
+    private String body;
 
-	public JavaLiteralMethod(String body) {
-		this.body = body;
-	}
+    public JavaLiteralMethod(String body) {
+    	this.body = body;
+    }
 
-	public void write(BufferedWriter writer, String prefix) throws IOException {
-		writer.write(StringUtils.inject(body, "\n", prefix));
-		writer.write(prefix);
-		writer.write("\n");
-	}
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+    	writer.write(StringUtils.inject(body, "\n", prefix));
+    	writer.write(prefix);
+    	writer.write("\n");
+    }
 
 }

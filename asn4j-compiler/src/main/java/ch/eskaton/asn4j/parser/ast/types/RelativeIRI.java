@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class RelativeIRI extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "RelativeIRI";
-	}
+    @Override
+    public String toString() {
+    	return "RelativeIRI";
+    }
 
 }

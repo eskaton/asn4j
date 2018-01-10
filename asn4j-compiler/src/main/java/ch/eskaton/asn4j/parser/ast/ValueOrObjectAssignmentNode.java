@@ -28,30 +28,30 @@
 package ch.eskaton.asn4j.parser.ast;
 
 public class ValueOrObjectAssignmentNode<T extends Node, V extends Node>
-		extends AssignmentNode {
+    	extends AssignmentNode {
 
-	private T type;
+    private T type;
 
-	private V value;
+    private V value;
 
-	public ValueOrObjectAssignmentNode(String reference, T type, V value) {
-		super(reference);
-		this.type = type;
-		this.value = value;
-	}
+    public ValueOrObjectAssignmentNode(String reference, T type, V value) {
+    	super(reference);
+    	this.type = type;
+    	this.value = value;
+    }
 
-	public T getType() {
-		return type;
-	}
+    public T getType() {
+    	return type;
+    }
 
-	public V getValue() {
-		return value;
-	}
+    public V getValue() {
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		return "ValueOrObjectAssignment[" + getReference() + "(" + type
-				+ ") = " + value + "]";
-	}
+    @Override
+    public String toString() {
+    	return "ValueOrObjectAssignment[" + getReference() + "(" + type
+    			+ ") = " + value + "]";
+    }
 
 }

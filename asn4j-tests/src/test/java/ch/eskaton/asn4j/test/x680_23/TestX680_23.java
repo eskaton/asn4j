@@ -40,19 +40,19 @@ import ch.eskaton.asn4jtest.x680_23.TestOctetString;
 
 public class TestX680_23 {
 
-	@Test
-	public void test1() throws ASN1RuntimeException, IOException {
-		TestOctetString a = new TestOctetString();
+    @Test
+    public void test1() throws ASN1RuntimeException, IOException {
+    	TestOctetString a = new TestOctetString();
 
-		a.setValue("test".getBytes());
+    	a.setValue("test".getBytes());
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+    	BEREncoder encoder = new BEREncoder();
+    	BERDecoder decoder = new BERDecoder();
 
-		TestOctetString b = decoder.decode(TestOctetString.class,
-				encoder.encode(a));
+    	TestOctetString b = decoder.decode(TestOctetString.class,
+    			encoder.encode(a));
 
-		assertEquals(a, b);
-	}
+    	assertEquals(a, b);
+    }
 
 }

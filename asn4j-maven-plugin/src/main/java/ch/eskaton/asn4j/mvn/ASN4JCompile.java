@@ -45,79 +45,79 @@ import ch.eskaton.asn4j.compiler.CompilerImpl;
  */
 public class ASN4JCompile extends AbstractMojo {
 
-	/**
-	 * Get the executed project from the forked life cycle.
-	 * 
-	 * @parameter default-value="${project}"
-	 * @required
-	 * @readonly
-	 */
-	private MavenProject project;
+    /**
+     * Get the executed project from the forked life cycle.
+     * 
+     * @parameter default-value="${project}"
+     * @required
+     * @readonly
+     */
+    private MavenProject project;
 
-	/**
-	 * The name of the generated Java package.
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private String pkg;
+    /**
+     * The name of the generated Java package.
+     * 
+     * @parameter
+     * @required
+     */
+    private String pkg;
 
-	/**
-	 * The main ASN.1 module.
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private String module;
+    /**
+     * The main ASN.1 module.
+     * 
+     * @parameter
+     * @required
+     */
+    private String module;
 
-	/**
-	 * The output directory for generated sources.
-	 * 
-	 * @parameter property="outputDirectory"
-	 *            default-value="${project.build.directory}/generated-sources/asn4j"
-	 * @required
-	 */
-	private String outputDirectory;
+    /**
+     * The output directory for generated sources.
+     * 
+     * @parameter property="outputDirectory"
+     *            default-value="${project.build.directory}/generated-sources/asn4j"
+     * @required
+     */
+    private String outputDirectory;
 
-	/**
-	 * The directories for the files to include.
-	 * 
-	 * @parameter
-	 * @required
-	 */
-	private List<String> includePaths;
+    /**
+     * The directories for the files to include.
+     * 
+     * @parameter
+     * @required
+     */
+    private List<String> includePaths;
 
-	/**
-	 * Executes the mojo.
-	 */
-	public void execute() throws MojoExecutionException, MojoFailureException {
-		StringBuilder paths = new StringBuilder();
+    /**
+     * Executes the mojo.
+     */
+    public void execute() throws MojoExecutionException, MojoFailureException {
+    	StringBuilder paths = new StringBuilder();
 
-		for (String path : includePaths) {
-			if (paths.length() > 0) {
-				paths.append(File.pathSeparator);
-			}
+    	for (String path : includePaths) {
+    		if (paths.length() > 0) {
+    			paths.append(File.pathSeparator);
+    		}
 
-			paths.append(project.getBasedir().getAbsolutePath())
-					.append(File.separator).append(path);
-		}
+    		paths.append(project.getBasedir().getAbsolutePath())
+    				.append(File.separator).append(path);
+    	}
 
-		getLog().info("Executing ASN.1 Compiler:");
-		getLog().info("- ASN.1 module = " + module);
-		getLog().info("- ASN.1 module include path = " + paths.toString());
-		getLog().info("- Java package = " + pkg);
-		getLog().info("- Output directory = " + outputDirectory);
+    	getLog().info("Executing ASN.1 Compiler:");
+    	getLog().info("- ASN.1 module = " + module);
+    	getLog().info("- ASN.1 module include path = " + paths.toString());
+    	getLog().info("- Java package = " + pkg);
+    	getLog().info("- Output directory = " + outputDirectory);
 
-		CompilerImpl compiler = new CompilerImpl(module, paths.toString(), pkg,
-				outputDirectory);
+    	CompilerImpl compiler = new CompilerImpl(module, paths.toString(), pkg,
+    			outputDirectory);
 
-		try {
-			compiler.run();
-			project.addCompileSourceRoot(outputDirectory);
-		} catch (Exception e) {
-			throw new MojoExecutionException("Asn4j compilation failed: "
-					+ e.getMessage(), e);
-		}
-	}
+    	try {
+    		compiler.run();
+    		project.addCompileSourceRoot(outputDirectory);
+    	} catch (Exception e) {
+    		throw new MojoExecutionException("Asn4j compilation failed: "
+    				+ e.getMessage(), e);
+    	}
+    }
 
 }

@@ -32,26 +32,26 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class TupleNode implements Value {
 
-	private short column;
+    private short column;
 
-	private short row;
+    private short row;
 
-	public TupleNode(short column, short row) {
-		this.column = column;
-		this.row = row;
-	}
+    public TupleNode(short column, short row) {
+    	this.column = column;
+    	this.row = row;
+    }
 
-	public short getColumn() {
-		return column;
-	}
+    public short getColumn() {
+    	return column;
+    }
 
-	public short getRow() {
-		return row;
-	}
+    public short getRow() {
+    	return row;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("Tuple[column=", column, ",row=", row, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("Tuple[column=", column, ",row=", row, "]");
+    }
 
 }

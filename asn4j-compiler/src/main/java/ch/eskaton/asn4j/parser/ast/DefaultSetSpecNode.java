@@ -28,30 +28,30 @@
 package ch.eskaton.asn4j.parser.ast;
 
 public class DefaultSetSpecNode extends
-		DefaultOptionalitySpecNode<SetSpecsNode> {
+    	DefaultOptionalitySpecNode<SetSpecsNode> {
 
-	public DefaultSetSpecNode(SetSpecsNode spec) {
-		super(spec);
-	}
+    public DefaultSetSpecNode(SetSpecsNode spec) {
+    	super(spec);
+    }
 
-	public DefaultValueSetSpecNode toDefaultValueSetOptionalitySpec() {
-		ElementSetSpecsNode specs = getSpec().toElementSetSpecs();
+    public DefaultValueSetSpecNode toDefaultValueSetOptionalitySpec() {
+    	ElementSetSpecsNode specs = getSpec().toElementSetSpecs();
 
-		if (specs != null) {
-			return new DefaultValueSetSpecNode(specs);
-		}
+    	if (specs != null) {
+    		return new DefaultValueSetSpecNode(specs);
+    	}
 
-		return null;
-	}
+    	return null;
+    }
 
-	public DefaultObjectSetSpecNode toDefaultObjectSetOptionalitySpec() {
-		ObjectSetSpecNode specs = getSpec().toObjectSetSpec();
+    public DefaultObjectSetSpecNode toDefaultObjectSetOptionalitySpec() {
+    	ObjectSetSpecNode specs = getSpec().toObjectSetSpec();
 
-		if (specs != null) {
-			return new DefaultObjectSetSpecNode(specs);
-		}
+    	if (specs != null) {
+    		return new DefaultObjectSetSpecNode(specs);
+    	}
 
-		return null;
-	}
+    	return null;
+    }
 
 }

@@ -31,30 +31,30 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ObjectSetAssignmentNode extends AssignmentNode {
 
-	private ObjectClassReferenceNode objectClass;
+    private ObjectClassReferenceNode objectClass;
 
-	private SetSpecsNode objectSet;
+    private SetSpecsNode objectSet;
 
-	public ObjectSetAssignmentNode(String reference,
-			ObjectClassReferenceNode objectClass, SetSpecsNode objectSet) {
-		super(reference);
-		this.objectClass = objectClass;
-		this.objectSet = objectSet;
-	}
+    public ObjectSetAssignmentNode(String reference,
+    		ObjectClassReferenceNode objectClass, SetSpecsNode objectSet) {
+    	super(reference);
+    	this.objectClass = objectClass;
+    	this.objectSet = objectSet;
+    }
 
-	public ObjectClassReferenceNode getObjectClass() {
-		return objectClass;
-	}
+    public ObjectClassReferenceNode getObjectClass() {
+    	return objectClass;
+    }
 
-	public SetSpecsNode getObjectSet() {
-		return objectSet;
-	}
+    public SetSpecsNode getObjectSet() {
+    	return objectSet;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ObjectSetAssignment[reference=",
-				getReference(), ", objectClass=", objectClass, ", objectSet=",
-				objectSet, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ObjectSetAssignment[reference=",
+    			getReference(), ", objectClass=", objectClass, ", objectSet=",
+    			objectSet, "]");
+    }
 
 }

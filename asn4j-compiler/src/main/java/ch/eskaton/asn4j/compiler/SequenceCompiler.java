@@ -32,16 +32,16 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 
 public class SequenceCompiler implements NamedCompiler<SequenceType> {
 
-	public void compile(CompilerContext ctx, String name, SequenceType node)
-			throws CompilerException {
-		ctx.createClass(name, node, true);
+    public void compile(CompilerContext ctx, String name, SequenceType node)
+    		throws CompilerException {
+    	ctx.createClass(name, node, true);
 
-		for (ComponentType component : node.getAllComponents()) {
-			ctx.<ComponentType, ComponentTypeCompiler> getCompiler(
-					ComponentType.class).compile(ctx, component);
-		}
+    	for (ComponentType component : node.getAllComponents()) {
+    		ctx.<ComponentType, ComponentTypeCompiler> getCompiler(
+    				ComponentType.class).compile(ctx, component);
+    	}
 
-		ctx.finishClass();
-	}
+    	ctx.finishClass();
+    }
 
 }

@@ -33,19 +33,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class OIDNode implements Node {
 
-	private List<OIDComponentNode> oidComponents;
+    private List<OIDComponentNode> oidComponents;
 
-	public OIDNode(List<OIDComponentNode> oidComponents) {
-		this.oidComponents = oidComponents;
-	}
+    public OIDNode(List<OIDComponentNode> oidComponents) {
+    	this.oidComponents = oidComponents;
+    }
 
-	public List<OIDComponentNode> getOidComponents() {
-		return oidComponents;
-	}
+    public List<OIDComponentNode> getOidComponents() {
+    	return oidComponents;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.join(oidComponents.toArray(), " ");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.join(oidComponents.toArray(), " ");
+    }
 
 }

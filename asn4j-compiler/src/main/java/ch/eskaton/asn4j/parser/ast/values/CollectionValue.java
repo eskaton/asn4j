@@ -31,17 +31,17 @@ import java.util.List;
 
 public class CollectionValue implements Value {
 
-	private List<Value> values;
+    private List<Value> values;
 
-	public CollectionValue() {
-	}
+    public CollectionValue() {
+    }
 
-	public CollectionValue(List<Value> values) {
-		this.values = values;
-	}
+    public CollectionValue(List<Value> values) {
+    	this.values = values;
+    }
 
-	public List<Value> getValues() {
-		return values;
-	}
+    public List<Value> getValues() {
+    	return values;
+    }
 
 }

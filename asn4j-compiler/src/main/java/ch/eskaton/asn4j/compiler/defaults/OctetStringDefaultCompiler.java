@@ -37,17 +37,17 @@ import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 
 public class OctetStringDefaultCompiler implements DefaultCompiler {
 
-	public void compileDefault(CompilerContext ctx, JavaClass clazz,
-			String field, Value value) throws CompilerException {
-		if (!(value instanceof StringValue)) {
-			throw new CompilerException("Invalid default value");
-		}
+    public void compileDefault(CompilerContext ctx, JavaClass clazz,
+    		String field, Value value) throws CompilerException {
+    	if (!(value instanceof StringValue)) {
+    		throw new CompilerException("Invalid default value");
+    	}
 
-		String strValue = ((StringValue) value).getCString();
+    	String strValue = ((StringValue) value).getCString();
 
-		clazz.addInitializer(new JavaInitializer("\t\t" + field + " = "
-				+ ASN1OctetString.class.getSimpleName() + ".valueOf(\""
-				+ strValue + "\");"));
-	}
+    	clazz.addInitializer(new JavaInitializer("\t\t" + field + " = "
+    			+ ASN1OctetString.class.getSimpleName() + ".valueOf(\""
+    			+ strValue + "\");"));
+    }
 
 }

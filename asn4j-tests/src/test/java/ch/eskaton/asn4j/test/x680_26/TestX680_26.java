@@ -41,18 +41,18 @@ import ch.eskaton.asn4jtest.x680_26.TestSequenceOf1;
 
 public class TestX680_26 {
 
-	@Test
-	public void testSequenceOf() throws ASN1RuntimeException, IOException {
-		TestSequenceOf1 a = new TestSequenceOf1();
-		a.setValues(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23));
+    @Test
+    public void testSequenceOf() throws ASN1RuntimeException, IOException {
+    	TestSequenceOf1 a = new TestSequenceOf1();
+    	a.setValues(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23));
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+    	BEREncoder encoder = new BEREncoder();
+    	BERDecoder decoder = new BERDecoder();
 
-		TestSequenceOf1 b = decoder.decode(TestSequenceOf1.class,
-				encoder.encode(a));
+    	TestSequenceOf1 b = decoder.decode(TestSequenceOf1.class,
+    			encoder.encode(a));
 
-		assertEquals(a, b);
-	}
+    	assertEquals(a, b);
+    }
 
 }

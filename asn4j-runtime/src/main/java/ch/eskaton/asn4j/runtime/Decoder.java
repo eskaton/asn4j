@@ -36,17 +36,17 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 public interface Decoder {
 
-	<T extends ASN1Type> T decode(Class<T> type, byte[] buf)
-			throws DecodingException;
+    <T extends ASN1Type> T decode(Class<T> type, byte[] buf)
+    		throws DecodingException;
 
-	<T extends ASN1Type> T decode(Class<T> type, DecoderStates states)
-			throws DecodingException;
+    <T extends ASN1Type> T decode(Class<T> type, DecoderStates states)
+    		throws DecodingException;
 
-	<T extends ASN1Type> T decode(Class<T> type, DecoderStates states,
-			ASN1Tag tag, boolean optional) throws DecodingException;
+    <T extends ASN1Type> T decode(Class<T> type, DecoderStates states,
+    		ASN1Tag tag, boolean optional) throws DecodingException;
 
-	ASN1Type decode(DecoderStates states,
-			Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags)
-			throws DecodingException;
+    ASN1Type decode(DecoderStates states,
+    		Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags)
+    		throws DecodingException;
 
 }

@@ -33,119 +33,119 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class StringValue implements Value {
 
-	private String cString;
+    private String cString;
 
-	private String simpleString;
+    private String simpleString;
 
-	private String tString;
+    private String tString;
 
-	private int flags;
+    private int flags;
 
-	public StringValue(String value, int flags) {
-		this.cString = value;
-		this.flags = flags;
+    public StringValue(String value, int flags) {
+    	this.cString = value;
+    	this.flags = flags;
 
-		if ((flags & StringToken.SIMPLE_STRING) != 0) {
-			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < value.length(); i++) {
-				char c = value.charAt(i);
-				switch (c) {
-					case '\n':
-					case '\r':
-					case '\f':
-					case 0x0b:
-						sb.append(" ");
-						break;
-					default:
-						sb.append(c);
-				}
-			}
+    	if ((flags & StringToken.SIMPLE_STRING) != 0) {
+    		StringBuilder sb = new StringBuilder();
+    		for (int i = 0; i < value.length(); i++) {
+    			char c = value.charAt(i);
+    			switch (c) {
+    				case '\n':
+    				case '\r':
+    				case '\f':
+    				case 0x0b:
+    					sb.append(" ");
+    					break;
+    				default:
+    					sb.append(c);
+    			}
+    		}
 
-			this.simpleString = sb.toString();
-		}
+    		this.simpleString = sb.toString();
+    	}
 
-		if ((flags & StringToken.TSTRING) != 0) {
-			this.tString = value;
-		}
+    	if ((flags & StringToken.TSTRING) != 0) {
+    		this.tString = value;
+    	}
 
-		StringBuilder sb = new StringBuilder();
-		boolean skipWS = false;
+    	StringBuilder sb = new StringBuilder();
+    	boolean skipWS = false;
 
-		for (int i = 0; i < value.length(); i++) {
-			char c = value.charAt(i);
-			switch (c) {
-				case '\n':
-				case '\r':
-				case '\f':
-				case 0x0b:
-					int length = sb.length();
-					char ws;
+    	for (int i = 0; i < value.length(); i++) {
+    		char c = value.charAt(i);
+    		switch (c) {
+    			case '\n':
+    			case '\r':
+    			case '\f':
+    			case 0x0b:
+    				int length = sb.length();
+    				char ws;
 
-					for (; length > 0; length--) {
-						ws = sb.charAt(length - 1);
+    				for (; length > 0; length--) {
+    					ws = sb.charAt(length - 1);
 
-						if (!(ws == ' ' || ws == '\t')) {
-							break;
-						}
-					}
+    					if (!(ws == ' ' || ws == '\t')) {
+    						break;
+    					}
+    				}
 
-					sb.setLength(length);
+    				sb.setLength(length);
 
-					skipWS = true;
-					break;
-				case ' ':
-				case '\t':
-					if (!skipWS) {
-						sb.append(c);
-					}
-					break;
-				default:
-					sb.append(c);
-					skipWS = false;
-			}
-		}
+    				skipWS = true;
+    				break;
+    			case ' ':
+    			case '\t':
+    				if (!skipWS) {
+    					sb.append(c);
+    				}
+    				break;
+    			default:
+    				sb.append(c);
+    				skipWS = false;
+    		}
+    	}
 
-		this.cString = sb.toString();
+    	this.cString = sb.toString();
 
-	}
+    }
 
-	public boolean isCString() {
-		return (flags & StringToken.CSTRING) != 0;
-	}
+    public boolean isCString() {
+    	return (flags & StringToken.CSTRING) != 0;
+    }
 
-	public boolean isSimpleString() {
-		return (flags & StringToken.SIMPLE_STRING) != 0;
-	}
+    public boolean isSimpleString() {
+    	return (flags & StringToken.SIMPLE_STRING) != 0;
+    }
 
-	public boolean isTString() {
-		return (flags & StringToken.TSTRING) != 0;
-	}
+    public boolean isTString() {
+    	return (flags & StringToken.TSTRING) != 0;
+    }
 
-	public String getCString() {
-		return cString;
-	}
+    public String getCString() {
+    	return cString;
+    }
 
-	public String getSimpleString() throws ParserException {
-		if (simpleString == null) {
-			throw new ParserException(
-					"simpleString contains invalid characters or is empty");
-		}
+    public String getSimpleString() throws ParserException {
+    	if (simpleString == null) {
+    		throw new ParserException(
+    				"simpleString contains invalid characters or is empty");
+    	}
 
-		return simpleString;
-	}
+    	return simpleString;
+    }
 
-	public TimeValue getTimeValue() throws ParserException {
-		if (tString == null) {
-			throw new ParserException(
-					"tstring contains invalid characters or is empty");
-		}
+    public TimeValue getTimeValue() throws ParserException {
+    	if (tString == null) {
+    		throw new ParserException(
+    				"tstring contains invalid characters or is empty");
+    	}
 
-		return new TimeValue(tString);
-	}
+    	return new TimeValue(tString);
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("String[", simpleString, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("String[", simpleString, "]");
+    }
 
 }

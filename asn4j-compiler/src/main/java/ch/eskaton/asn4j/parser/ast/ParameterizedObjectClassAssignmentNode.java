@@ -30,11 +30,11 @@ package ch.eskaton.asn4j.parser.ast;
 import java.util.List;
 
 public class ParameterizedObjectClassAssignmentNode extends
-		ParameterizedTypeOrObjectClassAssignmentNode<ObjectClassNode> {
+    	ParameterizedTypeOrObjectClassAssignmentNode<ObjectClassNode> {
 
-	public ParameterizedObjectClassAssignmentNode(String reference,
-			List<ParameterNode> parameters, ObjectClassNode objectClass) {
-		super(reference, parameters, objectClass);
-	}
+    public ParameterizedObjectClassAssignmentNode(String reference,
+    		List<ParameterNode> parameters, ObjectClassNode objectClass) {
+    	super(reference, parameters, objectClass);
+    }
 
 }

@@ -31,54 +31,54 @@ import java.math.BigDecimal;
 
 public class RealValue implements Value {
 
-	public enum Type {
-		PositiveInf, NegativeInf, NaN, Normal, Special
-	};
+    public enum Type {
+    	PositiveInf, NegativeInf, NaN, Normal, Special
+    };
 
-	private Type type;
+    private Type type;
 
-	private BigDecimal value;
+    private BigDecimal value;
 
-	private Long mantissa;
+    private Long mantissa;
 
-	private Long base;
+    private Long base;
 
-	private Long exponent;
+    private Long exponent;
 
-	public RealValue(Type type) {
-		this.type = type;
-	}
+    public RealValue(Type type) {
+    	this.type = type;
+    }
 
-	public RealValue(BigDecimal value) {
-		this.type = Type.Normal;
-		this.value = value;
-	}
+    public RealValue(BigDecimal value) {
+    	this.type = Type.Normal;
+    	this.value = value;
+    }
 
-	public RealValue(Long mantissa, Long base, Long exponent) {
-		this.type = Type.Special;
-		this.mantissa = mantissa;
-		this.base = base;
-		this.exponent = exponent;
-	}
+    public RealValue(Long mantissa, Long base, Long exponent) {
+    	this.type = Type.Special;
+    	this.mantissa = mantissa;
+    	this.base = base;
+    	this.exponent = exponent;
+    }
 
-	public BigDecimal getValue() {
-		return value;
-	}
+    public BigDecimal getValue() {
+    	return value;
+    }
 
-	public Long getMantissa() {
-		return mantissa;
-	}
+    public Long getMantissa() {
+    	return mantissa;
+    }
 
-	public Long getBase() {
-		return base;
-	}
+    public Long getBase() {
+    	return base;
+    }
 
-	public Long getExponent() {
-		return exponent;
-	}
+    public Long getExponent() {
+    	return exponent;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
 }

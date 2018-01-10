@@ -28,10 +28,10 @@
 package ch.eskaton.asn4j.parser.ast;
 
 public class DefaultObjectSpecNode extends
-		DefaultOptionalitySpecNode<ObjectNode> {
+    	DefaultOptionalitySpecNode<ObjectNode> {
 
-	public DefaultObjectSpecNode(ObjectNode object) {
-		super(object);
-	}
+    public DefaultObjectSpecNode(ObjectNode object) {
+    	super(object);
+    }
 
 }

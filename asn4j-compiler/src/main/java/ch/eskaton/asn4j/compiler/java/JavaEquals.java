@@ -35,58 +35,58 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaEquals extends JavaMethod {
 
-	private List<String> fieldNames;
+    private List<String> fieldNames;
 
-	private String className;
+    private String className;
 
-	public JavaEquals(String className, List<String> fieldNames) {
-		this.className = className;
-		this.fieldNames = fieldNames;
-	}
+    public JavaEquals(String className, List<String> fieldNames) {
+    	this.className = className;
+    	this.fieldNames = fieldNames;
+    }
 
-	public void write(BufferedWriter writer, String prefix) throws IOException {
-		writer.write(prefix);
-		writer.write("\tpublic boolean equals(Object obj) {\n");
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+    	writer.write(prefix);
+    	writer.write("\tpublic boolean equals(Object obj) {\n");
 
-		writer.write(prefix);
-		writer.write("\t\tif (this == obj)\n");
-		writer.write(prefix);
-		writer.write("\t\t\treturn true;\n");
-		writer.write("\t\tif (obj == null)\n");
-		writer.write(prefix);
-		writer.write("\t\t\treturn false;\n");
-		writer.write(prefix);
-		writer.write(StringUtils
-				.concat("\t\tif (getClass() != obj.getClass())\n"));
-		writer.write(prefix);
-		writer.write("\t\t\treturn false;\n");
+    	writer.write(prefix);
+    	writer.write("\t\tif (this == obj)\n");
+    	writer.write(prefix);
+    	writer.write("\t\t\treturn true;\n");
+    	writer.write("\t\tif (obj == null)\n");
+    	writer.write(prefix);
+    	writer.write("\t\t\treturn false;\n");
+    	writer.write(prefix);
+    	writer.write(StringUtils
+    			.concat("\t\tif (getClass() != obj.getClass())\n"));
+    	writer.write(prefix);
+    	writer.write("\t\t\treturn false;\n");
 
-		if (!fieldNames.isEmpty()) {
-			writer.write(prefix);
-			writer.write(StringUtils.concat("\t\t", className, " other = (",
-					className, ") obj;\n"));
+    	if (!fieldNames.isEmpty()) {
+    		writer.write(prefix);
+    		writer.write(StringUtils.concat("\t\t", className, " other = (",
+    				className, ") obj;\n"));
 
-			for (String fieldName : fieldNames) {
-				writer.write(prefix);
-				writer.write(StringUtils.concat("\t\tif (", fieldName,
-						" == null) {\n"));
-				writer.write(prefix);
-				writer.write(StringUtils.concat("\t\t\tif (other.", fieldName,
-						" != null)\n"));
-				writer.write(prefix);
-				writer.write("\t\t\t\treturn false;\n");
-				writer.write(prefix);
-				writer.write(StringUtils.concat("\t\t} else if (!", fieldName,
-						".equals(other.", fieldName, "))\n"));
-				writer.write(prefix);
-				writer.write("\t\t\treturn false;\n");
-			}
-		}
+    		for (String fieldName : fieldNames) {
+    			writer.write(prefix);
+    			writer.write(StringUtils.concat("\t\tif (", fieldName,
+    					" == null) {\n"));
+    			writer.write(prefix);
+    			writer.write(StringUtils.concat("\t\t\tif (other.", fieldName,
+    					" != null)\n"));
+    			writer.write(prefix);
+    			writer.write("\t\t\t\treturn false;\n");
+    			writer.write(prefix);
+    			writer.write(StringUtils.concat("\t\t} else if (!", fieldName,
+    					".equals(other.", fieldName, "))\n"));
+    			writer.write(prefix);
+    			writer.write("\t\t\treturn false;\n");
+    		}
+    	}
 
-		writer.write(prefix);
-		writer.write("\t\treturn true;\n");
-		writer.write(prefix);
-		writer.write("\t}\n\n");
-	}
+    	writer.write(prefix);
+    	writer.write("\t\treturn true;\n");
+    	writer.write(prefix);
+    	writer.write("\t}\n\n");
+    }
 
 }

@@ -31,30 +31,30 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class BinaryStringValue implements Value {
 
-	private String value;
+    private String value;
 
-	public BinaryStringValue(String value) {
-		this.value = value;
-	}
+    public BinaryStringValue(String value) {
+    	this.value = value;
+    }
 
-	public BitStringValue toBitString() {
-		return new BitStringValue(Integer.parseInt(value, 2));
-	}
+    public BitStringValue toBitString() {
+    	return new BitStringValue(Integer.parseInt(value, 2));
+    }
 
-	public OctetStringValue toOctetString() {
-		int trailor = 8 - value.length() % 8;
+    public OctetStringValue toOctetString() {
+    	int trailor = 8 - value.length() % 8;
 
-		if (trailor != 0) {
-			value += StringUtils.repeat("0", trailor);
-		}
+    	if (trailor != 0) {
+    		value += StringUtils.repeat("0", trailor);
+    	}
 
-		char[] buf = new char[value.length() / 8];
+    	char[] buf = new char[value.length() / 8];
 
-		for (int i = 0, pos = 0; pos < value.length(); i++, pos += 8) {
-			buf[i] = (char) Short.parseShort(value.substring(pos, pos + 8), 2);
-		}
+    	for (int i = 0, pos = 0; pos < value.length(); i++, pos += 8) {
+    		buf[i] = (char) Short.parseShort(value.substring(pos, pos + 8), 2);
+    	}
 
-		return new OctetStringValue(buf);
-	}
+    	return new OctetStringValue(buf);
+    }
 
 }

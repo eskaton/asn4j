@@ -29,17 +29,17 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class ExtensionAndExceptionNode implements Node {
 
-	private ExceptionIdentificationNode exceptionId;
+    private ExceptionIdentificationNode exceptionId;
 
-	public ExtensionAndExceptionNode() {
-	}
+    public ExtensionAndExceptionNode() {
+    }
 
-	public ExtensionAndExceptionNode(ExceptionIdentificationNode exceptionId) {
-		this.exceptionId = exceptionId;
-	}
+    public ExtensionAndExceptionNode(ExceptionIdentificationNode exceptionId) {
+    	this.exceptionId = exceptionId;
+    }
 
-	public ExceptionIdentificationNode getExceptionId() {
-		return exceptionId;
-	}
+    public ExceptionIdentificationNode getExceptionId() {
+    	return exceptionId;
+    }
 
 }

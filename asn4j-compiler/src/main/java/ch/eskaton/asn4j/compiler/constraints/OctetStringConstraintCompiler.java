@@ -35,32 +35,32 @@ import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 
 public class OctetStringConstraintCompiler extends
-		AbstractConstraintCompiler<String> {
+    	AbstractConstraintCompiler<String> {
 
-	public OctetStringConstraintCompiler(ConstraintCompiler constraintCompiler,
-			TypeResolver typeResolver) {
-		super(constraintCompiler, typeResolver);
-	}
+    public OctetStringConstraintCompiler(ConstraintCompiler constraintCompiler,
+    		TypeResolver typeResolver) {
+    	super(constraintCompiler, typeResolver);
+    }
 
-	@Override
-	protected Collection<String> compileConstraint(ElementSet set)
-			throws CompilerException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected Collection<String> compileConstraint(ElementSet set)
+    		throws CompilerException {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
-	@Override
-	protected Collection<String> calculateIntersection(Collection<?> op1,
-			Collection<?> op2) throws CompilerException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected Collection<String> calculateIntersection(Collection<?> op1,
+    		Collection<?> op2) throws CompilerException {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
-	@Override
-	protected void addConstraint(JavaClass clazz, Collection<?> values)
-			throws CompilerException {
-		// TODO Auto-generated method stub
+    @Override
+    protected void addConstraint(JavaClass clazz, Collection<?> values)
+    		throws CompilerException {
+    	// TODO Auto-generated method stub
 
-	}
+    }
 
 }

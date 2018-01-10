@@ -29,14 +29,14 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 public class EnumeratedValue implements Value {
 
-	private String id;
+    private String id;
 
-	public EnumeratedValue(String id) {
-		this.id = id;
-	}
+    public EnumeratedValue(String id) {
+    	this.id = id;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+    	return id;
+    }
 
 }

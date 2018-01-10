@@ -31,9 +31,9 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class FixedTypeValueSetFieldSpecNode extends SetFieldSpecNode {
 
-	public FixedTypeValueSetFieldSpecNode(String reference, Type type,
-			OptionalitySpecNode optionalitySpec) {
-		super(reference, type, optionalitySpec);
-	}
+    public FixedTypeValueSetFieldSpecNode(String reference, Type type,
+    		OptionalitySpecNode optionalitySpec) {
+    	super(reference, type, optionalitySpec);
+    }
 
 }

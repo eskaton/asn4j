@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class T61String extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "T61String";
-	}
+    @Override
+    public String toString() {
+    	return "T61String";
+    }
 
 }

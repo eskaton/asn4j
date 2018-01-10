@@ -28,5 +28,5 @@
 package ch.eskaton.asn4j.compiler.java;
 
 public enum JavaVisibility {
-	Default, Public, Protected, Private
+    Default, Public, Protected, Private
 }

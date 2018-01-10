@@ -32,26 +32,26 @@ import java.util.List;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class ParameterizedValueSetTypeAssignmentNode extends
-		ParameterizedAssignmentNode {
+    	ParameterizedAssignmentNode {
 
-	private Type type;
+    private Type type;
 
-	private ElementSetSpecsNode elementSet;
+    private ElementSetSpecsNode elementSet;
 
-	public ParameterizedValueSetTypeAssignmentNode(String reference,
-			List<ParameterNode> parameters, Type type,
-			ElementSetSpecsNode elementSet) {
-		super(reference, parameters);
-		this.type = type;
-		this.elementSet = elementSet;
-	}
+    public ParameterizedValueSetTypeAssignmentNode(String reference,
+    		List<ParameterNode> parameters, Type type,
+    		ElementSetSpecsNode elementSet) {
+    	super(reference, parameters);
+    	this.type = type;
+    	this.elementSet = elementSet;
+    }
 
-	public Type getTypeClass() {
-		return type;
-	}
+    public Type getTypeClass() {
+    	return type;
+    }
 
-	public ElementSetSpecsNode getElementSet() {
-		return elementSet;
-	}
+    public ElementSetSpecsNode getElementSet() {
+    	return elementSet;
+    }
 
 }

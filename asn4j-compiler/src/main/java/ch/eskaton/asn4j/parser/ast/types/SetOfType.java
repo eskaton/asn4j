@@ -31,19 +31,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class SetOfType extends AbstractType {
 
-	private Type type;
+    private Type type;
 
-	public SetOfType(Type type) {
-		this.type = type;
-	}
+    public SetOfType(Type type) {
+    	this.type = type;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("SetOf[", type, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("SetOf[", type, "]");
+    }
 
 }

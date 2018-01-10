@@ -33,19 +33,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class DummyGovernor extends ParamGovernorNode {
 
-	private ReferenceNode reference;
+    private ReferenceNode reference;
 
-	public DummyGovernor(ReferenceNode reference) {
-		this.reference = reference;
-	}
+    public DummyGovernor(ReferenceNode reference) {
+    	this.reference = reference;
+    }
 
-	public ReferenceNode getReference() {
-		return reference;
-	}
+    public ReferenceNode getReference() {
+    	return reference;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("DummyGovernor[", reference, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("DummyGovernor[", reference, "]");
+    }
 
 }

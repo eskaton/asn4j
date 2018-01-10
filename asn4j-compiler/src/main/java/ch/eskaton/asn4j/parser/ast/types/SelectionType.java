@@ -29,21 +29,21 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class SelectionType extends AbstractType {
 
-	private String id;
+    private String id;
 
-	private Type type;
+    private Type type;
 
-	public SelectionType(String id, Type type) {
-		this.id = id;
-		this.type = type;
-	}
+    public SelectionType(String id, Type type) {
+    	this.id = id;
+    	this.type = type;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+    	return id;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
 }

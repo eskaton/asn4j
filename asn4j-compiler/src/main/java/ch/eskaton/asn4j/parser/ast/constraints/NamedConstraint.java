@@ -29,21 +29,21 @@ package ch.eskaton.asn4j.parser.ast.constraints;
 
 public class NamedConstraint extends AbstractConstraint implements Constraint {
 
-	private String name;
+    private String name;
 
-	private Constraint constraint;
+    private Constraint constraint;
 
-	public NamedConstraint(String name, Constraint constraint) {
-		this.name = name;
-		this.constraint = constraint;
-	}
+    public NamedConstraint(String name, Constraint constraint) {
+    	this.name = name;
+    	this.constraint = constraint;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
-	public Constraint getConstraint() {
-		return constraint;
-	}
+    public Constraint getConstraint() {
+    	return constraint;
+    }
 
 }

@@ -32,29 +32,29 @@ import java.util.List;
 
 public class IdentifierUniquenessChecker<T> {
 
-	private String typeName;
+    private String typeName;
 
-	private List<String> names = new ArrayList<String>();
+    private List<String> names = new ArrayList<String>();
 
-	private List<T> values = new ArrayList<T>();
+    private List<T> values = new ArrayList<T>();
 
-	public IdentifierUniquenessChecker(String typeName) {
-		this.typeName = typeName;
-	}
+    public IdentifierUniquenessChecker(String typeName) {
+    	this.typeName = typeName;
+    }
 
-	public void add(String name, T value) throws CompilerException {
-		if (names.contains(name)) {
-			throw new CompilerException("Duplicate identifier '" + name
-					+ "' in " + typeName);
-		}
+    public void add(String name, T value) throws CompilerException {
+    	if (names.contains(name)) {
+    		throw new CompilerException("Duplicate identifier '" + name
+    				+ "' in " + typeName);
+    	}
 
-		if (values.contains(value)) {
-			throw new CompilerException("Duplicate value '" + value + "' in "
-					+ typeName);
-		}
+    	if (values.contains(value)) {
+    		throw new CompilerException("Duplicate value '" + value + "' in "
+    				+ typeName);
+    	}
 
-		names.add(name);
-		values.add(value);
-	}
+    	names.add(name);
+    	values.add(value);
+    }
 
 }

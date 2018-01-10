@@ -32,10 +32,10 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 26, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1VisibleString extends AbstractASN1String {
 
-	public static ASN1VisibleString fromString(String s) {
-		ASN1VisibleString vs = new ASN1VisibleString();
-		vs.setValue(s);
-		return vs;
-	}
+    public static ASN1VisibleString fromString(String s) {
+    	ASN1VisibleString vs = new ASN1VisibleString();
+    	vs.setValue(s);
+    	return vs;
+    }
 
 }

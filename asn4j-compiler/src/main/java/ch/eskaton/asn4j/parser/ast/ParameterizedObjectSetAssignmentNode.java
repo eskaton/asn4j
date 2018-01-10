@@ -30,26 +30,26 @@ package ch.eskaton.asn4j.parser.ast;
 import java.util.List;
 
 public class ParameterizedObjectSetAssignmentNode extends
-		ParameterizedAssignmentNode {
+    	ParameterizedAssignmentNode {
 
-	private ObjectClassReferenceNode objectClass;
+    private ObjectClassReferenceNode objectClass;
 
-	private ObjectSetSpecNode objectSet;
+    private ObjectSetSpecNode objectSet;
 
-	public ParameterizedObjectSetAssignmentNode(String reference,
-			List<ParameterNode> parameters,
-			ObjectClassReferenceNode objectClass, ObjectSetSpecNode objectSet) {
-		super(reference, parameters);
-		this.objectClass = objectClass;
-		this.objectSet = objectSet;
-	}
+    public ParameterizedObjectSetAssignmentNode(String reference,
+    		List<ParameterNode> parameters,
+    		ObjectClassReferenceNode objectClass, ObjectSetSpecNode objectSet) {
+    	super(reference, parameters);
+    	this.objectClass = objectClass;
+    	this.objectSet = objectSet;
+    }
 
-	public ObjectClassReferenceNode getObjectClass() {
-		return objectClass;
-	}
+    public ObjectClassReferenceNode getObjectClass() {
+    	return objectClass;
+    }
 
-	public ObjectSetSpecNode getObjectSet() {
-		return objectSet;
-	}
+    public ObjectSetSpecNode getObjectSet() {
+    	return objectSet;
+    }
 
 }

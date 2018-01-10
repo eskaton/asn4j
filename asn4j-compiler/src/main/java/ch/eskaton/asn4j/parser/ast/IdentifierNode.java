@@ -29,14 +29,14 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class IdentifierNode implements Node {
 
-	private String name;
+    private String name;
 
-	public IdentifierNode(String name) {
-		this.name = name;
-	}
+    public IdentifierNode(String name) {
+    	this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
 }

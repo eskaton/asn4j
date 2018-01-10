@@ -44,52 +44,52 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 public class DefaultsCompiler {
 
-	private Map<Class<? extends Type>, DefaultCompiler> compilers;
+    private Map<Class<? extends Type>, DefaultCompiler> compilers;
 
-	private CompilerContext ctx;
+    private CompilerContext ctx;
 
-	private TypeResolver typeResolver;
+    private TypeResolver typeResolver;
 
-	@SuppressWarnings("serial")
-	public DefaultsCompiler(CompilerContext ctx, TypeResolver typeResolver) {
-		this.ctx = ctx;
-		this.typeResolver = typeResolver;
-		compilers = new HashMap<Class<? extends Type>, DefaultCompiler>() {
-			{
-				put(IntegerType.class, new IntegerDefaultCompiler());
-				put(OctetString.class, new OctetStringDefaultCompiler());
-			}
-		};
-	}
+    @SuppressWarnings("serial")
+    public DefaultsCompiler(CompilerContext ctx, TypeResolver typeResolver) {
+    	this.ctx = ctx;
+    	this.typeResolver = typeResolver;
+    	compilers = new HashMap<Class<? extends Type>, DefaultCompiler>() {
+    		{
+    			put(IntegerType.class, new IntegerDefaultCompiler());
+    			put(OctetString.class, new OctetStringDefaultCompiler());
+    		}
+    	};
+    }
 
-	public void compileDefault(JavaClass clazz, String field,
-			ComponentType component) throws CompilerException {
-		Type type = component.getCompType() == CompType.Type ? component
-				.getType() : component.getNamedType().getType();
-		Type base = null;
+    public void compileDefault(JavaClass clazz, String field,
+    		ComponentType component) throws CompilerException {
+    	Type type = component.getCompType() == CompType.Type ? component
+    			.getType() : component.getNamedType().getType();
+    	Type base = null;
 
-		if (type instanceof TypeReference) {
-			base = typeResolver.getBase(((TypeReference) type).getType());
-		} else {
-			base = type;
-		}
+    	if (type instanceof TypeReference) {
+    		base = typeResolver.getBase(((TypeReference) type).getType());
+    	} else {
+    		base = type;
+    	}
 
-		if (!compilers.containsKey(base.getClass())) {
-			throw new CompilerException("Defaults for type "
-					+ base.getClass().getSimpleName() + " not yet supported");
-		}
+    	if (!compilers.containsKey(base.getClass())) {
+    		throw new CompilerException("Defaults for type "
+    				+ base.getClass().getSimpleName() + " not yet supported");
+    	}
 
-		DefaultCompiler compiler = compilers.get(base.getClass());
+    	DefaultCompiler compiler = compilers.get(base.getClass());
 
-		try {
-			compiler.compileDefault(ctx, clazz, field, component.getValue());
-		} catch (CompilerException e) {
-			throw new CompilerException("Error in default for type "
-					+ (type instanceof NamedType ? ((NamedType) type).getName()
-							: type.getClass().getSimpleName()) + ": "
-					+ e.getMessage(), e);
-		}
+    	try {
+    		compiler.compileDefault(ctx, clazz, field, component.getValue());
+    	} catch (CompilerException e) {
+    		throw new CompilerException("Error in default for type "
+    				+ (type instanceof NamedType ? ((NamedType) type).getName()
+    						: type.getClass().getSimpleName()) + ": "
+    				+ e.getMessage(), e);
+    	}
 
-		return;
-	}
+    	return;
+    }
 }

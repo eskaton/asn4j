@@ -28,17 +28,17 @@
 package ch.eskaton.asn4j.parser.ast;
 
 public class ObjectAssignmentNode extends
-		ValueOrObjectAssignmentNode<ObjectClassReferenceNode, ObjectNode> {
+    	ValueOrObjectAssignmentNode<ObjectClassReferenceNode, ObjectNode> {
 
-	public ObjectAssignmentNode(String reference,
-			ObjectClassReferenceNode objectClass, ObjectNode object) {
-		super(reference, objectClass, object);
-	}
+    public ObjectAssignmentNode(String reference,
+    		ObjectClassReferenceNode objectClass, ObjectNode object) {
+    	super(reference, objectClass, object);
+    }
 
-	@Override
-	public String toString() {
-		return "ObjectAssignment[" + getReference() + "(" + getType() + ") = "
-				+ getValue() + "]";
-	}
+    @Override
+    public String toString() {
+    	return "ObjectAssignment[" + getReference() + "(" + getType() + ") = "
+    			+ getValue() + "]";
+    }
 
 }

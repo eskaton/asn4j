@@ -29,23 +29,23 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class ValueSetTypeOrObjectSetAssignmentNode extends AssignmentNode {
 
-	private Node type;
+    private Node type;
 
-	private Node valueSet;
+    private Node valueSet;
 
-	public ValueSetTypeOrObjectSetAssignmentNode(String reference, Node type,
-			Node valueSet) {
-		super(reference);
-		this.type = type;
-		this.valueSet = valueSet;
-	}
+    public ValueSetTypeOrObjectSetAssignmentNode(String reference, Node type,
+    		Node valueSet) {
+    	super(reference);
+    	this.type = type;
+    	this.valueSet = valueSet;
+    }
 
-	public Node getType() {
-		return type;
-	}
+    public Node getType() {
+    	return type;
+    }
 
-	public Node getValueSet() {
-		return valueSet;
-	}
+    public Node getValueSet() {
+    	return valueSet;
+    }
 
 }

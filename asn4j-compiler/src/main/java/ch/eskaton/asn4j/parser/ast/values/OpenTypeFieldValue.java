@@ -32,27 +32,27 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class OpenTypeFieldValue implements Value {
 
-	private Type type;
+    private Type type;
 
-	private Value value;
+    private Value value;
 
-	public OpenTypeFieldValue(Type type, Value value) {
-		this.type = type;
-		this.value = value;
-	}
+    public OpenTypeFieldValue(Type type, Value value) {
+    	this.type = type;
+    	this.value = value;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	public Value getValue() {
-		return value;
-	}
+    public Value getValue() {
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat(getClass().getSimpleName(), "[type=", type,
-				", value=", value, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat(getClass().getSimpleName(), "[type=", type,
+    			", value=", value, "]");
+    }
 
 }

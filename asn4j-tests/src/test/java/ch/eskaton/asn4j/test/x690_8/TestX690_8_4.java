@@ -41,34 +41,34 @@ import ch.eskaton.asn4jtest.X690_8.TestEnumeration;
 
 public class TestX690_8_4 {
 
-	@Test
-	public void testEncode() throws ASN1RuntimeException, IOException {
-		BEREncoder encoder = new BEREncoder();
+    @Test
+    public void testEncode() throws ASN1RuntimeException, IOException {
+    	BEREncoder encoder = new BEREncoder();
 
-		assertArrayEquals(new byte[] { 0x0A, 0x01, 0x00 },
-				encoder.encode(TestEnumeration.A));
-		assertArrayEquals(new byte[] { 0x0A, 0x01, 0x01 },
-				encoder.encode(TestEnumeration.B));
-		assertArrayEquals(new byte[] { 0x0A, 0x02, 0x00, (byte) 0x80 },
-				encoder.encode(TestEnumeration.C));
-	}
+    	assertArrayEquals(new byte[] { 0x0A, 0x01, 0x00 },
+    			encoder.encode(TestEnumeration.A));
+    	assertArrayEquals(new byte[] { 0x0A, 0x01, 0x01 },
+    			encoder.encode(TestEnumeration.B));
+    	assertArrayEquals(new byte[] { 0x0A, 0x02, 0x00, (byte) 0x80 },
+    			encoder.encode(TestEnumeration.C));
+    }
 
-	@Test
-	public void testDecode() throws ASN1RuntimeException, IOException {
-		BERDecoder decoder = new BERDecoder();
+    @Test
+    public void testDecode() throws ASN1RuntimeException, IOException {
+    	BERDecoder decoder = new BERDecoder();
 
-		assertEquals(
-				TestEnumeration.A,
-				decoder.decode(TestEnumeration.class, new byte[] { 0x0A, 0x01,
-						0x00 }));
-		assertEquals(
-				TestEnumeration.B,
-				decoder.decode(TestEnumeration.class, new byte[] { 0x0A, 0x01,
-						0x01 }));
-		assertEquals(
-				TestEnumeration.C,
-				decoder.decode(TestEnumeration.class, new byte[] { 0x0A, 0x02,
-						0x00, (byte) 0x80 }));
-	}
+    	assertEquals(
+    			TestEnumeration.A,
+    			decoder.decode(TestEnumeration.class, new byte[] { 0x0A, 0x01,
+    					0x00 }));
+    	assertEquals(
+    			TestEnumeration.B,
+    			decoder.decode(TestEnumeration.class, new byte[] { 0x0A, 0x01,
+    					0x01 }));
+    	assertEquals(
+    			TestEnumeration.C,
+    			decoder.decode(TestEnumeration.class, new byte[] { 0x0A, 0x02,
+    					0x00, (byte) 0x80 }));
+    }
 
 }

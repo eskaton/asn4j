@@ -46,74 +46,74 @@ import ch.eskaton.asn4jtest.x680_22.TestBitString2;
 
 public class TestX680_22 {
 
-	@Test
-	public void testEncoding() throws ASN1RuntimeException, IOException {
-		BEREncoder encoder = new BEREncoder();
-		TestBitString1 a = new TestBitString1();
-		a.setValue(new byte[] { 0x00 });
+    @Test
+    public void testEncoding() throws ASN1RuntimeException, IOException {
+    	BEREncoder encoder = new BEREncoder();
+    	TestBitString1 a = new TestBitString1();
+    	a.setValue(new byte[] { 0x00 });
 
-		assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, 0x00 }, encoder.encode(a));
+    	assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, 0x00 }, encoder.encode(a));
 
-		a.setBit(0);
+    	a.setBit(0);
 
-		assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, (byte) 0x80 },
-				encoder.encode(a));
+    	assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, (byte) 0x80 },
+    			encoder.encode(a));
 
-		a.setBit(7);
+    	a.setBit(7);
 
-		assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, (byte) 0x81 },
-				encoder.encode(a));
-	}
+    	assertArrayEquals(new byte[] { 0x03, 0x02, 0x00, (byte) 0x81 },
+    			encoder.encode(a));
+    }
 
-	@Test
-	public void test1() throws ASN1RuntimeException, IOException {
-		testBitString(TestBitString1.TEST_A, 0);
-	}
+    @Test
+    public void test1() throws ASN1RuntimeException, IOException {
+    	testBitString(TestBitString1.TEST_A, 0);
+    }
 
-	@Test
-	public void test2() throws ASN1RuntimeException, IOException {
-		testBitString(TestBitString1.TEST_B, 1);
-	}
+    @Test
+    public void test2() throws ASN1RuntimeException, IOException {
+    	testBitString(TestBitString1.TEST_B, 1);
+    }
 
-	@Test
-	public void test3() throws ASN1RuntimeException, IOException {
-		testBitString(TestBitString1.TEST_C, 2);
-	}
+    @Test
+    public void test3() throws ASN1RuntimeException, IOException {
+    	testBitString(TestBitString1.TEST_C, 2);
+    }
 
-	@Test
-	public void test4() throws ASN1RuntimeException, IOException {
-		TestBitString2 a = new TestBitString2();
-		a.setValue(new byte[] { 0x00 });
+    @Test
+    public void test4() throws ASN1RuntimeException, IOException {
+    	TestBitString2 a = new TestBitString2();
+    	a.setValue(new byte[] { 0x00 });
 
-		a.setBit(5);
+    	a.setBit(5);
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+    	BEREncoder encoder = new BEREncoder();
+    	BERDecoder decoder = new BERDecoder();
 
-		TestBitString2 b = decoder.decode(TestBitString2.class,
-				encoder.encode(a));
+    	TestBitString2 b = decoder.decode(TestBitString2.class,
+    			encoder.encode(a));
 
-		assertEquals(a, b);
-		assertTrue(b.testBit(5));
+    	assertEquals(a, b);
+    	assertTrue(b.testBit(5));
 
-	}
+    }
 
-	private void testBitString(int namedValue, int value)
-			throws ASN1RuntimeException, DecodingException, EncodingException,
-			ConstraintViolatedException {
-		TestBitString1 a = new TestBitString1();
-		a.setValue(new byte[] { 0x00 });
+    private void testBitString(int namedValue, int value)
+    		throws ASN1RuntimeException, DecodingException, EncodingException,
+    		ConstraintViolatedException {
+    	TestBitString1 a = new TestBitString1();
+    	a.setValue(new byte[] { 0x00 });
 
-		a.setBit(namedValue);
+    	a.setBit(namedValue);
 
-		BEREncoder encoder = new BEREncoder();
-		BERDecoder decoder = new BERDecoder();
+    	BEREncoder encoder = new BEREncoder();
+    	BERDecoder decoder = new BERDecoder();
 
-		TestBitString1 b = decoder.decode(TestBitString1.class,
-				encoder.encode(a));
+    	TestBitString1 b = decoder.decode(TestBitString1.class,
+    			encoder.encode(a));
 
-		assertEquals(a, b);
-		assertTrue(b.testBit(value));
-	}
+    	assertEquals(a, b);
+    	assertTrue(b.testBit(value));
+    }
 
 }

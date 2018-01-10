@@ -29,16 +29,16 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class VariableTypeValueFieldSpecNode extends AbstractASN1FieldSpecNode {
 
-	private FieldNameNode fieldName;
+    private FieldNameNode fieldName;
 
-	public VariableTypeValueFieldSpecNode(String reference,
-			FieldNameNode fieldName, OptionalitySpecNode optionalitySpec) {
-		super(reference, optionalitySpec);
-		this.fieldName = fieldName;
-	}
+    public VariableTypeValueFieldSpecNode(String reference,
+    		FieldNameNode fieldName, OptionalitySpecNode optionalitySpec) {
+    	super(reference, optionalitySpec);
+    	this.fieldName = fieldName;
+    }
 
-	public FieldNameNode getFieldName() {
-		return fieldName;
-	}
+    public FieldNameNode getFieldName() {
+    	return fieldName;
+    }
 
 }

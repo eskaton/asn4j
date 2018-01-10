@@ -31,14 +31,14 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class PatternConstraint extends AbstractConstraint implements Constraint {
 
-	private Value pattern;
+    private Value pattern;
 
-	public PatternConstraint(Value pattern) {
-		this.pattern = pattern;
-	}
+    public PatternConstraint(Value pattern) {
+    	this.pattern = pattern;
+    }
 
-	public Value getPattern() {
-		return pattern;
-	}
+    public Value getPattern() {
+    	return pattern;
+    }
 
 }

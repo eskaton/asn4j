@@ -35,6 +35,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ASN1ComponentTypeParam {
 
-	Class<? extends ASN1Type> typeParam();
+    Class<? extends ASN1Type> typeParam();
 
 }

@@ -37,49 +37,49 @@ import ch.eskaton.commons.utils.StringUtils;
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 6, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1ObjectIdentifier implements ASN1Type {
 
-	private List<Integer> components;
+    private List<Integer> components;
 
-	public void setValue(Integer... ints) {
-		components = new ArrayList<Integer>(Arrays.asList(ints));
-	}
+    public void setValue(Integer... ints) {
+    	components = new ArrayList<Integer>(Arrays.asList(ints));
+    }
 
-	public void setValue(List<Integer> components) {
-		this.components = new ArrayList<Integer>(components);
-	}
+    public void setValue(List<Integer> components) {
+    	this.components = new ArrayList<Integer>(components);
+    }
 
-	public List<Integer> getValue() {
-		return components;
-	}
+    public List<Integer> getValue() {
+    	return components;
+    }
 
-	@Override
-	public String toString() {
-		return components != null ? StringUtils.join(components, ".") : "null";
-	}
+    @Override
+    public String toString() {
+    	return components != null ? StringUtils.join(components, ".") : "null";
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((components == null) ? 0 : components.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+    	final int prime = 31;
+    	int result = 1;
+    	result = prime * result
+    			+ ((components == null) ? 0 : components.hashCode());
+    	return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ASN1ObjectIdentifier other = (ASN1ObjectIdentifier) obj;
-		if (components == null) {
-			if (other.components != null)
-				return false;
-		} else if (!components.equals(other.components))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj)
+    		return true;
+    	if (obj == null)
+    		return false;
+    	if (getClass() != obj.getClass())
+    		return false;
+    	ASN1ObjectIdentifier other = (ASN1ObjectIdentifier) obj;
+    	if (components == null) {
+    		if (other.components != null)
+    			return false;
+    	} else if (!components.equals(other.components))
+    		return false;
+    	return true;
+    }
 
 }

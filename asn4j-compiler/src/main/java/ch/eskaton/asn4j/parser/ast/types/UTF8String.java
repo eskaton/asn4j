@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class UTF8String extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "UTF8String";
-	}
+    @Override
+    public String toString() {
+    	return "UTF8String";
+    }
 
 }

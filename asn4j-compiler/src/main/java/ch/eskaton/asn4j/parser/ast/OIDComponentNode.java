@@ -31,56 +31,56 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 
 public class OIDComponentNode implements Node {
 
-	private String name;
+    private String name;
 
-	private Integer id;
+    private Integer id;
 
-	private DefinedValue definedValue;
+    private DefinedValue definedValue;
 
-	public OIDComponentNode(int id) {
-		this.id = id;
-	}
+    public OIDComponentNode(int id) {
+    	this.id = id;
+    }
 
-	public OIDComponentNode(String name) {
-		this.name = name;
-	}
+    public OIDComponentNode(String name) {
+    	this.name = name;
+    }
 
-	public OIDComponentNode(int id, String name) {
-		this.id = id;
-		this.name = name;
-	}
+    public OIDComponentNode(int id, String name) {
+    	this.id = id;
+    	this.name = name;
+    }
 
-	public OIDComponentNode(DefinedValue definedValue) {
-		this.definedValue = definedValue;
-	}
+    public OIDComponentNode(DefinedValue definedValue) {
+    	this.definedValue = definedValue;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+    	this.name = name;
+    }
 
-	public Integer getId() {
-		return id;
-	}
+    public Integer getId() {
+    	return id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public void setId(Integer id) {
+    	this.id = id;
+    }
 
-	public DefinedValue getDefinedValue() {
-		return definedValue;
-	}
+    public DefinedValue getDefinedValue() {
+    	return definedValue;
+    }
 
-	@Override
-	public String toString() {
-		return definedValue != null ? definedValue.toString()
-				: (name != null ? name : "")
-						+ (id != null ? (name != null ? "(" : "")
-								+ String.valueOf(id)
-								+ (name != null ? ")" : "") : "");
-	}
+    @Override
+    public String toString() {
+    	return definedValue != null ? definedValue.toString()
+    			: (name != null ? name : "")
+    					+ (id != null ? (name != null ? "(" : "")
+    							+ String.valueOf(id)
+    							+ (name != null ? ")" : "") : "");
+    }
 
 }

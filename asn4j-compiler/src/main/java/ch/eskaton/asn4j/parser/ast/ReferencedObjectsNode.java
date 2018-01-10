@@ -29,6 +29,6 @@ package ch.eskaton.asn4j.parser.ast;
 
 public interface ReferencedObjectsNode extends Node {
 
-	String getReference();
+    String getReference();
 
 }

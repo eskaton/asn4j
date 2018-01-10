@@ -31,43 +31,43 @@ import ch.eskaton.asn4j.parser.Token.TokenType;
 
 public class PrimitiveFieldNameNode implements Node {
 
-	private String reference;
+    private String reference;
 
-	private TokenType type;
+    private TokenType type;
 
-	public PrimitiveFieldNameNode(String reference, TokenType type) {
-		this.reference = reference;
-		this.type = type;
-	}
+    public PrimitiveFieldNameNode(String reference, TokenType type) {
+    	this.reference = reference;
+    	this.type = type;
+    }
 
-	public String getReference() {
-		return reference;
-	}
+    public String getReference() {
+    	return reference;
+    }
 
-	public boolean isTypeFieldReference() {
-		return type == TokenType.TypeFieldReference;
-	}
+    public boolean isTypeFieldReference() {
+    	return type == TokenType.TypeFieldReference;
+    }
 
-	public boolean isValueSetFieldReference() {
-		return isTypeFieldReference();
-	}
+    public boolean isValueSetFieldReference() {
+    	return isTypeFieldReference();
+    }
 
-	public boolean isObjectSetFieldReference() {
-		return isTypeFieldReference();
-	}
+    public boolean isObjectSetFieldReference() {
+    	return isTypeFieldReference();
+    }
 
-	public boolean isValueFieldReference() {
-		return type == TokenType.ValueFieldReference;
-	}
+    public boolean isValueFieldReference() {
+    	return type == TokenType.ValueFieldReference;
+    }
 
-	public boolean isObjectFieldReference() {
-		return isValueFieldReference();
-	}
+    public boolean isObjectFieldReference() {
+    	return isValueFieldReference();
+    }
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[reference=" + reference
-				+ ", type=" + type + "]";
-	}
+    @Override
+    public String toString() {
+    	return getClass().getSimpleName() + "[reference=" + reference
+    			+ ", type=" + type + "]";
+    }
 
 }

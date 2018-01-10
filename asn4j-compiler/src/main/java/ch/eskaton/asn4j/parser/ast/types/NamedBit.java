@@ -33,26 +33,26 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class NamedBit implements Node {
 
-	private String id;
+    private String id;
 
-	private int num;
+    private int num;
 
-	private SimpleDefinedValue ref;
+    private SimpleDefinedValue ref;
 
-	public NamedBit(String id, int num) {
-		this.id = id;
-		this.num = num;
-	}
+    public NamedBit(String id, int num) {
+    	this.id = id;
+    	this.num = num;
+    }
 
-	public NamedBit(String id, SimpleDefinedValue ref) {
-		this.id = id;
-		this.ref = ref;
-	}
+    public NamedBit(String id, SimpleDefinedValue ref) {
+    	this.id = id;
+    	this.ref = ref;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("NamedBit[", id, "(",
-				(ref == null ? String.valueOf(num) : ref), ")]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("NamedBit[", id, "(",
+    			(ref == null ? String.valueOf(num) : ref), ")]");
+    }
 
 }

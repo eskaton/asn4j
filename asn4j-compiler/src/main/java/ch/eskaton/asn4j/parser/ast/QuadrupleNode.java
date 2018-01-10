@@ -32,41 +32,41 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class QuadrupleNode implements Value {
 
-	private short group;
+    private short group;
 
-	private short plane;
+    private short plane;
 
-	private short row;
+    private short row;
 
-	private short cell;
+    private short cell;
 
-	public QuadrupleNode(short group, short plane, short row, short cell) {
-		this.group = group;
-		this.plane = plane;
-		this.row = row;
-		this.cell = cell;
-	}
+    public QuadrupleNode(short group, short plane, short row, short cell) {
+    	this.group = group;
+    	this.plane = plane;
+    	this.row = row;
+    	this.cell = cell;
+    }
 
-	public short getGroup() {
-		return group;
-	}
+    public short getGroup() {
+    	return group;
+    }
 
-	public short getPlane() {
-		return plane;
-	}
+    public short getPlane() {
+    	return plane;
+    }
 
-	public short getRow() {
-		return row;
-	}
+    public short getRow() {
+    	return row;
+    }
 
-	public short getCell() {
-		return cell;
-	}
+    public short getCell() {
+    	return cell;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("Quadruple[group=", group, ",plane=", plane,
-				",row=", row, ",cell=", cell, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("Quadruple[group=", group, ",plane=", plane,
+    			",row=", row, ",cell=", cell, "]");
+    }
 
 }

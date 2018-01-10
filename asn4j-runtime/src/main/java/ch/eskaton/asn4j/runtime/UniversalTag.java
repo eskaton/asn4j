@@ -28,11 +28,11 @@
 package ch.eskaton.asn4j.runtime;
 
 public enum UniversalTag {
-	Reserved0, Boolean, Integer, Bitstring, Octetstring, Null, OID,
-	ObjectDescriptor, External, Real, Enumerated, EmbeddedPDV, UTF8String,
-	RelativeOID, Time, Reserved15, Sequence, Set, NumericString,
-	PrintableString, T61String, VideotexString, IA5String, UTCTime,
-	GeneralizedTime, GraphicString, ISO646String, GeneralString,
-	UniversalString, Unused, BMPString, Date, TimeOfDay, DateTime, Duration,
-	OIDIntResId, RelativeOIDIntResId
+    Reserved0, Boolean, Integer, Bitstring, Octetstring, Null, OID,
+    ObjectDescriptor, External, Real, Enumerated, EmbeddedPDV, UTF8String,
+    RelativeOID, Time, Reserved15, Sequence, Set, NumericString,
+    PrintableString, T61String, VideotexString, IA5String, UTCTime,
+    GeneralizedTime, GraphicString, ISO646String, GeneralString,
+    UniversalString, Unused, BMPString, Date, TimeOfDay, DateTime, Duration,
+    OIDIntResId, RelativeOIDIntResId
 }

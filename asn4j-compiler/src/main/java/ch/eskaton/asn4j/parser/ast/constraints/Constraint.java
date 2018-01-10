@@ -31,8 +31,8 @@ import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
 
 public interface Constraint extends Elements {
 
-	void setExceptionSpec(ExceptionIdentificationNode exceptionSpec);
+    void setExceptionSpec(ExceptionIdentificationNode exceptionSpec);
 
-	ExceptionIdentificationNode getExceptionSpec();
+    ExceptionIdentificationNode getExceptionSpec();
 
 }

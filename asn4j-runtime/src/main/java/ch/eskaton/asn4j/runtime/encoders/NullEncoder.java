@@ -33,9 +33,9 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 
 public class NullEncoder implements TypeEncoder<ASN1Null> {
 
-	public byte[] encode(Encoder encoder, ASN1Null obj)
-			throws EncodingException {
-		return new byte[0];
-	}
+    public byte[] encode(Encoder encoder, ASN1Null obj)
+    		throws EncodingException {
+    	return new byte[0];
+    }
 
 }

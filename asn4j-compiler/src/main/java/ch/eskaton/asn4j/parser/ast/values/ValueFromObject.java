@@ -33,8 +33,8 @@ import ch.eskaton.asn4j.parser.ast.types.InformationFromObjects;
 
 public class ValueFromObject extends InformationFromObjects implements Value {
 
-	public ValueFromObject(ReferencedObjectsNode reference, FieldNameNode field) {
-		super(reference, field);
-	}
+    public ValueFromObject(ReferencedObjectsNode reference, FieldNameNode field) {
+    	super(reference, field);
+    }
 
 }

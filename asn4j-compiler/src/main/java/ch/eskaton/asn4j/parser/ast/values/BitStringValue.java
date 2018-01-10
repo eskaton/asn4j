@@ -34,51 +34,51 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class BitStringValue implements Value {
 
-	private int stringValue;
+    private int stringValue;
 
-	private List<String> namedValues;
+    private List<String> namedValues;
 
-	private Value value;
+    private Value value;
 
-	public BitStringValue() {
-		this.namedValues = new ArrayList<String>();
-	}
+    public BitStringValue() {
+    	this.namedValues = new ArrayList<String>();
+    }
 
-	public BitStringValue(int stringValue) {
-		this.stringValue = stringValue;
-	}
+    public BitStringValue(int stringValue) {
+    	this.stringValue = stringValue;
+    }
 
-	public BitStringValue(List<String> namedValues) {
-		this.namedValues = namedValues;
-	}
+    public BitStringValue(List<String> namedValues) {
+    	this.namedValues = namedValues;
+    }
 
-	public BitStringValue(Value value) {
-		this.value = value;
-	}
+    public BitStringValue(Value value) {
+    	this.value = value;
+    }
 
-	public boolean isStringValue() {
-		return namedValues == null && value == null;
-	}
+    public boolean isStringValue() {
+    	return namedValues == null && value == null;
+    }
 
-	public int getStringValue() {
-		return stringValue;
-	}
+    public int getStringValue() {
+    	return stringValue;
+    }
 
-	public Value getValue() {
-		return value;
-	}
+    public Value getValue() {
+    	return value;
+    }
 
-	public List<String> getNamedValues() {
-		return namedValues;
-	}
+    public List<String> getNamedValues() {
+    	return namedValues;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat(
-				"BitStringValue[",
-				isStringValue() ? Integer.toBinaryString(stringValue)
-						: (namedValues != null ? StringUtils.join(namedValues,
-								", ") : value), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat(
+    			"BitStringValue[",
+    			isStringValue() ? Integer.toBinaryString(stringValue)
+    					: (namedValues != null ? StringUtils.join(namedValues,
+    							", ") : value), "]");
+    }
 
 }

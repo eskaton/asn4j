@@ -32,28 +32,28 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 5, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1Null implements ASN1Type {
 
-	@Override
-	public String toString() {
-		return "null";
-	}
+    @Override
+    public String toString() {
+    	return "null";
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + "null".hashCode();
-		return result;
-	}
+    @Override
+    public int hashCode() {
+    	final int prime = 31;
+    	int result = 1;
+    	result = prime * result + "null".hashCode();
+    	return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj)
+    		return true;
+    	if (obj == null)
+    		return false;
+    	if (getClass() != obj.getClass())
+    		return false;
+    	return true;
+    }
 
 }

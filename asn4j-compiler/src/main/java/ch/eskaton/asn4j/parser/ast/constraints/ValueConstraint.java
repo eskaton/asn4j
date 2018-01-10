@@ -31,15 +31,15 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ValueConstraint extends AbstractConstraint {
 
-	private Constraint constraint;
+    private Constraint constraint;
 
-	public ValueConstraint(Constraint constraint) {
-		this.constraint = constraint;
-	}
+    public ValueConstraint(Constraint constraint) {
+    	this.constraint = constraint;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ValueConstraint[", constraint, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ValueConstraint[", constraint, "]");
+    }
 
 }

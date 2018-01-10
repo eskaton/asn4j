@@ -31,14 +31,14 @@ import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
 
 abstract public class AbstractConstraint implements Constraint {
 
-	private ExceptionIdentificationNode exceptionSpec;
+    private ExceptionIdentificationNode exceptionSpec;
 
-	public void setExceptionSpec(ExceptionIdentificationNode exceptionSpec) {
-		this.exceptionSpec = exceptionSpec;
-	}
+    public void setExceptionSpec(ExceptionIdentificationNode exceptionSpec) {
+    	this.exceptionSpec = exceptionSpec;
+    }
 
-	public ExceptionIdentificationNode getExceptionSpec() {
-		return exceptionSpec;
-	}
+    public ExceptionIdentificationNode getExceptionSpec() {
+    	return exceptionSpec;
+    }
 
 }

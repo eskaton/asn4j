@@ -33,22 +33,22 @@ import ch.eskaton.asn4j.parser.ast.ReferencedObjectsNode;
 
 public abstract class InformationFromObjects implements Node {
 
-	private ReferencedObjectsNode reference;
+    private ReferencedObjectsNode reference;
 
-	private FieldNameNode field;
+    private FieldNameNode field;
 
-	public InformationFromObjects(ReferencedObjectsNode reference,
-			FieldNameNode field) {
-		this.reference = reference;
-		this.field = field;
-	}
+    public InformationFromObjects(ReferencedObjectsNode reference,
+    		FieldNameNode field) {
+    	this.reference = reference;
+    	this.field = field;
+    }
 
-	public ReferencedObjectsNode getReference() {
-		return reference;
-	}
+    public ReferencedObjectsNode getReference() {
+    	return reference;
+    }
 
-	public FieldNameNode getField() {
-		return field;
-	}
+    public FieldNameNode getField() {
+    	return field;
+    }
 
 }

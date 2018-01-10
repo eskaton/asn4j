@@ -38,80 +38,80 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 public class TLVUtils {
 
-	private static final double LOG10_2_DIV_8 = Math.log10(2) / 8;
+    private static final double LOG10_2_DIV_8 = Math.log10(2) / 8;
 
-	@SuppressWarnings("unchecked")
-	static byte[] getTagLength(ASN1Type obj, int contentLen)
-			throws EncodingException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    @SuppressWarnings("unchecked")
+    static byte[] getTagLength(ASN1Type obj, int contentLen)
+    		throws EncodingException {
+    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-		Stack<byte[]> bufs = new Stack<>();
-		Class<ASN1Type> clazz = (Class<ASN1Type>) obj.getClass();
-		List<ASN1Tag> tags = Utils.getTags(clazz);
-		ASN1Tag tag;
+    	Stack<byte[]> bufs = new Stack<>();
+    	Class<ASN1Type> clazz = (Class<ASN1Type>) obj.getClass();
+    	List<ASN1Tag> tags = Utils.getTags(clazz);
+    	ASN1Tag tag;
 
-		for (int i = tags.size() - 1; i >= 0; i--) {
-			tag = tags.get(i);
-			byte[] lenBuf = getLength(contentLen);
-			byte[] tagBuf = getTag(tag);
-			bufs.push(lenBuf);
-			bufs.push(tagBuf);
-			contentLen += lenBuf.length + tagBuf.length;
-		}
+    	for (int i = tags.size() - 1; i >= 0; i--) {
+    		tag = tags.get(i);
+    		byte[] lenBuf = getLength(contentLen);
+    		byte[] tagBuf = getTag(tag);
+    		bufs.push(lenBuf);
+    		bufs.push(tagBuf);
+    		contentLen += lenBuf.length + tagBuf.length;
+    	}
 
-		for (int i = bufs.size() - 1; i >= 0; i--) {
-			try {
-				baos.write(bufs.get(i));
-			} catch (IOException e) {
-				throw new EncodingException(e);
-			}
-		}
+    	for (int i = bufs.size() - 1; i >= 0; i--) {
+    		try {
+    			baos.write(bufs.get(i));
+    		} catch (IOException e) {
+    			throw new EncodingException(e);
+    		}
+    	}
 
-		return baos.toByteArray();
-	}
+    	return baos.toByteArray();
+    }
 
-	public static byte[] getLength(int contentLen) {
-		byte[] buf;
+    public static byte[] getLength(int contentLen) {
+    	byte[] buf;
 
-		if (contentLen > 127) {
-			int len = (int) Math.ceil(Math.log10(contentLen + 1)
-					/ LOG10_2_DIV_8);
-			buf = new byte[len + 1];
-			buf[0] = (byte) (len & 0x7f | 0x80);
+    	if (contentLen > 127) {
+    		int len = (int) Math.ceil(Math.log10(contentLen + 1)
+    				/ LOG10_2_DIV_8);
+    		buf = new byte[len + 1];
+    		buf[0] = (byte) (len & 0x7f | 0x80);
 
-			for (int i = len; i > 0; i--) {
-				buf[i] = (byte) (contentLen & 0xFF);
-				contentLen >>= 8;
-			}
-		} else {
-			buf = new byte[] { (byte) (contentLen & 0x7f) };
-		}
+    		for (int i = len; i > 0; i--) {
+    			buf[i] = (byte) (contentLen & 0xFF);
+    			contentLen >>= 8;
+    		}
+    	} else {
+    		buf = new byte[] { (byte) (contentLen & 0x7f) };
+    	}
 
-		return buf;
-	}
+    	return buf;
+    }
 
-	public static byte[] getTag(ASN1Tag tag) {
-		byte[] buf;
-		int tagNum = tag.tag();
+    public static byte[] getTag(ASN1Tag tag) {
+    	byte[] buf;
+    	int tagNum = tag.tag();
 
-		if (tagNum > 30) {
-			int len = (int) Math.ceil(Math.log10(tagNum + 1) / Math.log10(2)
-					/ 7);
-			buf = new byte[len + 1];
-			buf[0] |= 0x1f;
-			for (int i = len; i > 0; i--) {
-				buf[i] = (byte) ((tagNum & 0x7f) | 0x80);
-				tagNum >>= 7;
-			}
-			buf[len] &= ~0x80;
-		} else {
-			buf = new byte[] { (byte) (tagNum & 0x1f) };
-		}
+    	if (tagNum > 30) {
+    		int len = (int) Math.ceil(Math.log10(tagNum + 1) / Math.log10(2)
+    				/ 7);
+    		buf = new byte[len + 1];
+    		buf[0] |= 0x1f;
+    		for (int i = len; i > 0; i--) {
+    			buf[i] = (byte) ((tagNum & 0x7f) | 0x80);
+    			tagNum >>= 7;
+    		}
+    		buf[len] &= ~0x80;
+    	} else {
+    		buf = new byte[] { (byte) (tagNum & 0x1f) };
+    	}
 
-		buf[0] |= (byte) ((tag.clazz().ordinal() & 0x3) << 6)
-				| (byte) ((tag.constructed() ? 1 : 0) << 5);
+    	buf[0] |= (byte) ((tag.clazz().ordinal() & 0x3) << 6)
+    			| (byte) ((tag.constructed() ? 1 : 0) << 5);
 
-		return buf;
-	}
+    	return buf;
+    }
 
 }

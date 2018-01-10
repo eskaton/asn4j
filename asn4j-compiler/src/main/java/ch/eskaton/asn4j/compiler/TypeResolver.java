@@ -32,8 +32,8 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public interface TypeResolver {
 
-	TypeAssignmentNode getType(String type);
+    TypeAssignmentNode getType(String type);
 
-	Type getBase(String type);
+    Type getBase(String type);
 
 }
