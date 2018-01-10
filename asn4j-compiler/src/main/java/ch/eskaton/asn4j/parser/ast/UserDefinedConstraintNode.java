@@ -27,19 +27,18 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ch.eskaton.asn4j.parser.ast.constraints.AbstractConstraint;
 import ch.eskaton.commons.utils.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDefinedConstraintNode extends AbstractConstraint {
 
     private List<UserDefinedConstraintParamNode> params;
 
     public UserDefinedConstraintNode(List<UserDefinedConstraintParamNode> params) {
-    	this.params = params != null ? params
-    			: new ArrayList<UserDefinedConstraintParamNode>();
+        this.params = params != null ? params : new ArrayList<>();
     }
 
     public List<UserDefinedConstraintParamNode> getParams() {

@@ -100,8 +100,8 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
     	javaClass.addImport(ConstraintViolatedException.class);
 
     	javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, name,
-    			Collections.<JavaParameter> emptyList(), "\t\tsuper();",
-    			Collections.<String> emptyList()));
+    			Collections.emptyList(), "\t\tsuper();",
+    			Collections.emptyList()));
 
     	javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, name,
     			Arrays.asList(new JavaParameter("long", "value")),

@@ -41,9 +41,6 @@ public class ModuleBodyNode implements Node {
 
     private Map<String, AssignmentNode> assignments;
 
-    public ModuleBodyNode() {
-    }
-
     public ModuleBodyNode(ExportsNode exports, List<ImportNode> imports,
     		List<AssignmentNode> assignments) {
 
@@ -54,7 +51,7 @@ public class ModuleBodyNode implements Node {
     	}
 
     	if (assignments != null) {
-    		this.assignments = new HashMap<String, AssignmentNode>();
+    		this.assignments = new HashMap<>();
     		for (AssignmentNode assignment : assignments) {
     			this.assignments.put(assignment.getReference(), assignment);
     		}
