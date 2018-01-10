@@ -61,6 +61,24 @@ public class TLVUtilsTest {
                 .getTag(PrivateConstructedTest.class.getAnnotation(ASN1Tag.class)));
     }
 
+    @Test
+    public void testGetTagNumber() {
+        assertArrayEquals(new byte[] { (byte) 0xDE }, TLVUtils
+                .getTag(PrivatePrimitive30Test.class.getAnnotation(ASN1Tag.class)));
+
+        assertArrayEquals(new byte[] { (byte) 0xDF, 0x1F }, TLVUtils
+                .getTag(PrivatePrimitive31Test.class.getAnnotation(ASN1Tag.class)));
+
+        assertArrayEquals(new byte[] { (byte) 0xDF, (byte)0x81, 0x00 }, TLVUtils
+                .getTag(PrivatePrimitive128Test.class.getAnnotation(ASN1Tag.class)));
+
+        assertArrayEquals(new byte[] { (byte) 0xDF, (byte)0xFF, 0x7F }, TLVUtils
+                .getTag(PrivatePrimitive16383Test.class.getAnnotation(ASN1Tag.class)));
+
+        assertArrayEquals(new byte[] { (byte) 0xDF, (byte)0x81, (byte)0x80, 0x00 }, TLVUtils
+                .getTag(PrivatePrimitive16384Test.class.getAnnotation(ASN1Tag.class)));
+    }
+
     @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = false)
     private static class UniversalPrimitiveTest {
     }
@@ -93,5 +111,24 @@ public class TLVUtilsTest {
     private static class PrivateConstructedTest {
     }
 
+    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 30, constructed = false)
+    private static class PrivatePrimitive30Test {
+    }
+
+    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 31, constructed = false)
+    private static class PrivatePrimitive31Test {
+    }
+
+    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 128, constructed = false)
+    private static class PrivatePrimitive128Test {
+    }
+
+    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 16383, constructed = false)
+    private static class PrivatePrimitive16383Test {
+    }
+
+    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 16384, constructed = false)
+    private static class PrivatePrimitive16384Test {
+    }
 
 }
