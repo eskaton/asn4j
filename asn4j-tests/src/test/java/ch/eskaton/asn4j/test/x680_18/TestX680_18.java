@@ -41,7 +41,7 @@ import ch.eskaton.asn4jtest.x680_18.TestBoolean;
 public class TestX680_18 {
 
     @Test
-    public void test1() throws ASN1RuntimeException, IOException {
+    public void test1() {
         TestBoolean a = new TestBoolean();
 
         a.setValue(true);

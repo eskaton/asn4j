@@ -185,4 +185,5 @@ public class BEREncoder implements Encoder {
 
         return baos.toByteArray();
     }
+
 }

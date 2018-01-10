@@ -42,7 +42,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 public class TestX690_8_3 {
 
     @Test
-    public void testEncode() throws ASN1RuntimeException, IOException {
+    public void testEncode() {
         BEREncoder encoder = new BEREncoder();
 
         assertArrayEquals(new byte[] { 0x02, 0x01, 0x00 },
@@ -60,7 +60,7 @@ public class TestX690_8_3 {
     }
 
     @Test
-    public void testDecode() throws ASN1RuntimeException, IOException {
+    public void testDecode() {
         BERDecoder decoder = new BERDecoder();
 
         assertEquals(ASN1Integer.valueOf(0), decoder.decode(ASN1Integer.class,

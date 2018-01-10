@@ -49,7 +49,7 @@ import ch.eskaton.asn4jtest.x680_25.TestSequence6;
 public class TestX680_25 {
 
     @Test
-    public void testSequence0() throws ASN1RuntimeException, IOException {
+    public void testSequence0() {
         TestSequence0 a = new TestSequence0();
         a.setA(ASN1Boolean.TRUE);
 
@@ -63,7 +63,7 @@ public class TestX680_25 {
     }
 
     @Test
-    public void testSequence1() throws ASN1RuntimeException, IOException {
+    public void testSequence1() {
         TestSequence1 a = new TestSequence1();
         a.setA(ASN1Integer.valueOf(4711));
         a.setB(ASN1Boolean.TRUE);
@@ -79,7 +79,7 @@ public class TestX680_25 {
     }
 
     @Test
-    public void testOptional() throws ASN1RuntimeException, IOException {
+    public void testOptional() {
         TestSequence2 a = new TestSequence2();
         a.setA(ASN1Integer.valueOf(4711));
         a.setC(ASN1OctetString.valueOf("test"));
@@ -94,7 +94,7 @@ public class TestX680_25 {
     }
 
     @Test
-    public void testDefaultAtEnd() throws ASN1RuntimeException, IOException {
+    public void testDefaultAtEnd() {
         TestSequence3 a = new TestSequence3();
         a.setA(ASN1Integer.valueOf(4711));
         a.setB(ASN1Boolean.TRUE);
@@ -110,7 +110,7 @@ public class TestX680_25 {
     }
 
     @Test
-    public void testDefaultAtStart() throws ASN1RuntimeException, IOException {
+    public void testDefaultAtStart() {
         TestSequence4 a = new TestSequence4();
         a.setB(ASN1Boolean.TRUE);
         a.setC(ASN1OctetString.valueOf("test"));
@@ -126,7 +126,7 @@ public class TestX680_25 {
     }
 
     @Test
-    public void testComponentsOf() throws ASN1RuntimeException, IOException {
+    public void testComponentsOf() {
         TestSequence6 a = new TestSequence6();
         a.setA(ASN1Integer.valueOf(4711));
         a.setB(ASN1Boolean.TRUE);
@@ -141,8 +141,7 @@ public class TestX680_25 {
     }
 
     @Test
-    public void testComponentsOfDefault() throws ASN1RuntimeException,
-            IOException {
+    public void testComponentsOfDefault() {
         TestSequence6 a = new TestSequence6();
         a.setB(ASN1Boolean.TRUE);
 

@@ -41,7 +41,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 public class TestX680_24 {
 
     @Test
-    public void test1() throws ASN1RuntimeException, IOException {
+    public void test1() {
     	ASN1Null a = new ASN1Null();
 
     	BEREncoder encoder = new BEREncoder();
