@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class OctetString extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "OctetString";
-	}
+    @Override
+    public String toString() {
+    	return "OctetString";
+    }
 
 }

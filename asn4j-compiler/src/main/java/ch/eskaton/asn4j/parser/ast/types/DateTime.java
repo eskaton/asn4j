@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class DateTime extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "DateTime";
-	}
+    @Override
+    public String toString() {
+    	return "DateTime";
+    }
 
 }

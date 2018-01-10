@@ -32,68 +32,68 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ComponentType extends AbstractType {
 
-	public enum CompType {
-		NamedType, NamedTypeOpt, NamedTypeDef, Type
-	}
+    public enum CompType {
+    	NamedType, NamedTypeOpt, NamedTypeDef, Type
+    }
 
-	private CompType compType;
+    private CompType compType;
 
-	private NamedType namedType;
+    private NamedType namedType;
 
-	private Type type;
+    private Type type;
 
-	private Value value;
+    private Value value;
 
-	public ComponentType(CompType compType, Type type) {
-		this.compType = compType;
-		this.type = type;
-	}
+    public ComponentType(CompType compType, Type type) {
+    	this.compType = compType;
+    	this.type = type;
+    }
 
-	public ComponentType(CompType compType, NamedType namedType) {
-		this.compType = compType;
-		this.namedType = namedType;
-	}
+    public ComponentType(CompType compType, NamedType namedType) {
+    	this.compType = compType;
+    	this.namedType = namedType;
+    }
 
-	public ComponentType(CompType compType, NamedType namedType, Value value) {
-		this.compType = compType;
-		this.namedType = namedType;
-		this.value = value;
-	}
+    public ComponentType(CompType compType, NamedType namedType, Value value) {
+    	this.compType = compType;
+    	this.namedType = namedType;
+    	this.value = value;
+    }
 
-	public CompType getCompType() {
-		return compType;
-	}
+    public CompType getCompType() {
+    	return compType;
+    }
 
-	public NamedType getNamedType() {
-		return namedType;
-	}
+    public NamedType getNamedType() {
+    	return namedType;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	public Value getValue() {
-		return value;
-	}
+    public Value getValue() {
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		switch (compType) {
-			case NamedType:
-				return StringUtils.concat("ComponentType[namedType=",
-						namedType, "]");
-			case NamedTypeOpt:
-				return StringUtils.concat("ComponentType[namedType=",
-						namedType, ",optional", "]");
-			case NamedTypeDef:
-				return StringUtils.concat("ComponentType[namedType=",
-						namedType, ",default=", value, "]");
-			case Type:
-				return StringUtils.concat("ComponentType[Components of type=",
-						type, "]");
-			default:
-				throw new RuntimeException("Implementation error");
-		}
-	}
+    @Override
+    public String toString() {
+    	switch (compType) {
+    		case NamedType:
+    			return StringUtils.concat("ComponentType[namedType=",
+    					namedType, "]");
+    		case NamedTypeOpt:
+    			return StringUtils.concat("ComponentType[namedType=",
+    					namedType, ",optional", "]");
+    		case NamedTypeDef:
+    			return StringUtils.concat("ComponentType[namedType=",
+    					namedType, ",default=", value, "]");
+    		case Type:
+    			return StringUtils.concat("ComponentType[Components of type=",
+    					type, "]");
+    		default:
+    			throw new RuntimeException("Implementation error");
+    	}
+    }
 
 }

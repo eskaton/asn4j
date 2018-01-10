@@ -29,22 +29,22 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class ModuleIdentifierNode implements Node {
 
-	private String moduleName;
+    private String moduleName;
 
-	private DefinitiveIdentificationNode id;
+    private DefinitiveIdentificationNode id;
 
-	public ModuleIdentifierNode(String moduleName,
-			DefinitiveIdentificationNode id) {
-		this.moduleName = moduleName;
-		this.id = id;
-	}
+    public ModuleIdentifierNode(String moduleName,
+    		DefinitiveIdentificationNode id) {
+    	this.moduleName = moduleName;
+    	this.id = id;
+    }
 
-	public String getModuleName() {
-		return moduleName;
-	}
+    public String getModuleName() {
+    	return moduleName;
+    }
 
-	public DefinitiveIdentificationNode getId() {
-		return id;
-	}
+    public DefinitiveIdentificationNode getId() {
+    	return id;
+    }
 
 }

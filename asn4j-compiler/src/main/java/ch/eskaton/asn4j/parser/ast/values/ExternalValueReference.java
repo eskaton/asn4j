@@ -33,29 +33,29 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ExternalValueReference extends SimpleDefinedValue {
 
-	private String module;
+    private String module;
 
-	public ExternalValueReference(String module, String value) {
-		super(value);
-		this.module = module;
-	}
+    public ExternalValueReference(String module, String value) {
+    	super(value);
+    	this.module = module;
+    }
 
-	public String getModule() {
-		return module;
-	}
+    public String getModule() {
+    	return module;
+    }
 
-	@Override
-	public ObjectNode toObjectValue() {
-		ExternalObjectReferenceNode ref = new ExternalObjectReferenceNode(
-				getValue(), module);
-		ref.setParameters(getParameters());
-		return ref;
-	}
+    @Override
+    public ObjectNode toObjectValue() {
+    	ExternalObjectReferenceNode ref = new ExternalObjectReferenceNode(
+    			getValue(), module);
+    	ref.setParameters(getParameters());
+    	return ref;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ExternalValueReference[", module, ".",
-				getValue(), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ExternalValueReference[", module, ".",
+    			getValue(), "]");
+    }
 
 }

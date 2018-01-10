@@ -32,29 +32,29 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class ContentsConstraint extends AbstractConstraint {
 
-	private Type containedType;
+    private Type containedType;
 
-	private Value encodedByValue;
+    private Value encodedByValue;
 
-	public ContentsConstraint(Type containedType) {
-		this(containedType, null);
-	}
+    public ContentsConstraint(Type containedType) {
+    	this(containedType, null);
+    }
 
-	public ContentsConstraint(Value encodedByValue) {
-		this(null, encodedByValue);
-	}
+    public ContentsConstraint(Value encodedByValue) {
+    	this(null, encodedByValue);
+    }
 
-	public ContentsConstraint(Type containedType, Value encodedByValue) {
-		this.containedType = containedType;
-		this.encodedByValue = encodedByValue;
-	}
+    public ContentsConstraint(Type containedType, Value encodedByValue) {
+    	this.containedType = containedType;
+    	this.encodedByValue = encodedByValue;
+    }
 
-	public Type getContainedType() {
-		return containedType;
-	}
+    public Type getContainedType() {
+    	return containedType;
+    }
 
-	public Value getEncodedByValue() {
-		return encodedByValue;
-	}
+    public Value getEncodedByValue() {
+    	return encodedByValue;
+    }
 
 }

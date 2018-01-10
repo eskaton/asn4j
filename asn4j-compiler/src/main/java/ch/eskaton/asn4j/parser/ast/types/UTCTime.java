@@ -29,8 +29,8 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class UTCTime extends UsefulType {
 
-	public UTCTime(String type) {
-		super(type);
-	}
+    public UTCTime(String type) {
+    	super(type);
+    }
 
 }

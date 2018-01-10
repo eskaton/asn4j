@@ -31,21 +31,21 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ExternalTypeReference extends SimpleDefinedType {
 
-	private String module;
+    private String module;
 
-	public ExternalTypeReference(String module, String type) {
-		super(type);
-		this.module = module;
-	}
+    public ExternalTypeReference(String module, String type) {
+    	super(type);
+    	this.module = module;
+    }
 
-	public String getModule() {
-		return module;
-	}
+    public String getModule() {
+    	return module;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ExternalTypeReference[", module, ".",
-				getType(), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ExternalTypeReference[", module, ".",
+    			getType(), "]");
+    }
 
 }

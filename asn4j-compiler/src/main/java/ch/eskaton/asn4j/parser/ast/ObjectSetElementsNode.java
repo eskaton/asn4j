@@ -31,14 +31,14 @@ import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 
 public class ObjectSetElementsNode implements Elements {
 
-	private Node element;
+    private Node element;
 
-	public ObjectSetElementsNode(Node element) {
-		this.element = element;
-	}
+    public ObjectSetElementsNode(Node element) {
+    	this.element = element;
+    }
 
-	public Node getElement() {
-		return element;
-	}
+    public Node getElement() {
+    	return element;
+    }
 
 }

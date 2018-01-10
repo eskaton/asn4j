@@ -29,17 +29,17 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class ObjectFieldSpecNode extends AbstractASN1FieldSpecNode {
 
-	private ObjectClassReferenceNode objectClass;
+    private ObjectClassReferenceNode objectClass;
 
-	public ObjectFieldSpecNode(String reference,
-			ObjectClassReferenceNode objectClass,
-			OptionalitySpecNode optionalitySpec) {
-		super(reference, optionalitySpec);
-		this.objectClass = objectClass;
-	}
+    public ObjectFieldSpecNode(String reference,
+    		ObjectClassReferenceNode objectClass,
+    		OptionalitySpecNode optionalitySpec) {
+    	super(reference, optionalitySpec);
+    	this.objectClass = objectClass;
+    }
 
-	public ObjectClassReferenceNode getObjectClass() {
-		return objectClass;
-	}
+    public ObjectClassReferenceNode getObjectClass() {
+    	return objectClass;
+    }
 
 }

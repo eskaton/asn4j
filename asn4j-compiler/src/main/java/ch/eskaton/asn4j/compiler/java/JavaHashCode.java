@@ -35,30 +35,30 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaHashCode extends JavaMethod {
 
-	private List<String> fieldNames;
+    private List<String> fieldNames;
 
-	public JavaHashCode(List<String> fieldNames) {
-		this.fieldNames = fieldNames;
-	}
+    public JavaHashCode(List<String> fieldNames) {
+    	this.fieldNames = fieldNames;
+    }
 
-	public void write(BufferedWriter writer, String prefix) throws IOException {
-		writer.write(prefix);
-		writer.write("\tpublic int hashCode() {\n");
-		writer.write(prefix);
-		writer.write("\t\tfinal int prime = 31;\n");
-		writer.write(prefix);
-		writer.write("\t\tint result = super.hashCode();\n");
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+    	writer.write(prefix);
+    	writer.write("\tpublic int hashCode() {\n");
+    	writer.write(prefix);
+    	writer.write("\t\tfinal int prime = 31;\n");
+    	writer.write(prefix);
+    	writer.write("\t\tint result = super.hashCode();\n");
 
-		for (String fieldName : fieldNames) {
-			writer.write(StringUtils.concat(prefix,
-					"\t\tresult = prime * result + ((", fieldName,
-					" == null) ? 0 : ", fieldName, ".hashCode());\n"));
-		}
+    	for (String fieldName : fieldNames) {
+    		writer.write(StringUtils.concat(prefix,
+    				"\t\tresult = prime * result + ((", fieldName,
+    				" == null) ? 0 : ", fieldName, ".hashCode());\n"));
+    	}
 
-		writer.write(prefix);
-		writer.write("\t\treturn result;\n");
-		writer.write(prefix);
-		writer.write("\t}\n\n");
-	}
+    	writer.write(prefix);
+    	writer.write("\t\treturn result;\n");
+    	writer.write(prefix);
+    	writer.write("\t}\n\n");
+    }
 
 }

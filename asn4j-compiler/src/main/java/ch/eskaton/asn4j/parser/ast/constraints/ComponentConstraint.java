@@ -30,29 +30,29 @@ package ch.eskaton.asn4j.parser.ast.constraints;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class ComponentConstraint extends AbstractConstraint implements
-		Constraint {
+    	Constraint {
 
-	private Constraint value;
+    private Constraint value;
 
-	private PresenceConstraint presence;
+    private PresenceConstraint presence;
 
-	public ComponentConstraint(Constraint value, PresenceConstraint presence) {
-		this.value = value;
-		this.presence = presence;
-	}
+    public ComponentConstraint(Constraint value, PresenceConstraint presence) {
+    	this.value = value;
+    	this.presence = presence;
+    }
 
-	public Constraint getValue() {
-		return value;
-	}
+    public Constraint getValue() {
+    	return value;
+    }
 
-	public PresenceConstraint getPresence() {
-		return presence;
-	}
+    public PresenceConstraint getPresence() {
+    	return presence;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ComponentConstraint[", value != null ? value
-				+ ", " : "", presence, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ComponentConstraint[", value != null ? value
+    			+ ", " : "", presence, "]");
+    }
 
 }

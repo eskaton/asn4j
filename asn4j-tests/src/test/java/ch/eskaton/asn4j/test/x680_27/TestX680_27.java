@@ -42,17 +42,17 @@ public class TestX680_27 {
 
     @Test
     public void testSet1() {
-    	TestSet1 a = new TestSet1();
-    	a.setA(ASN1Integer.valueOf(4711));
-    	a.setB(ASN1OctetString.valueOf("test"));
+        TestSet1 a = new TestSet1();
+        a.setA(ASN1Integer.valueOf(4711));
+        a.setB(ASN1OctetString.valueOf("test"));
         a.setC(ASN1Integer.valueOf(23));
 
-    	BEREncoder encoder = new BEREncoder();
-    	BERDecoder decoder = new BERDecoder();
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-    	TestSet1 b = decoder.decode(TestSet1.class, encoder.encode(a));
+        TestSet1 b = decoder.decode(TestSet1.class, encoder.encode(a));
 
-    	assertEquals(a, b);
+        assertEquals(a, b);
     }
 
     @Test

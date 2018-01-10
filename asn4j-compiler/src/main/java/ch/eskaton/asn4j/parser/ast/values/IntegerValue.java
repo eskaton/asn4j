@@ -33,69 +33,69 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class IntegerValue implements Value {
 
-	private String ref;
+    private String ref;
 
-	private BigInteger value;
+    private BigInteger value;
 
-	public IntegerValue(String ref) {
-		this.ref = ref;
-	}
+    public IntegerValue(String ref) {
+    	this.ref = ref;
+    }
 
-	public IntegerValue(BigInteger value) {
-		this.value = value;
-	}
+    public IntegerValue(BigInteger value) {
+    	this.value = value;
+    }
 
-	public IntegerValue(long l) {
-		value = BigInteger.valueOf(l);
-	}
+    public IntegerValue(long l) {
+    	value = BigInteger.valueOf(l);
+    }
 
-	public String getRef() {
-		return ref;
-	}
+    public String getRef() {
+    	return ref;
+    }
 
-	public BigInteger getValue() {
-		return value;
-	}
+    public BigInteger getValue() {
+    	return value;
+    }
 
-	public boolean isReference() {
-		return ref != null;
-	}
+    public boolean isReference() {
+    	return ref != null;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((ref == null) ? 0 : ref.hashCode());
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+    	final int prime = 31;
+    	int result = 1;
+    	result = prime * result + ((ref == null) ? 0 : ref.hashCode());
+    	result = prime * result + ((value == null) ? 0 : value.hashCode());
+    	return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		IntegerValue other = (IntegerValue) obj;
-		if (ref == null) {
-			if (other.ref != null)
-				return false;
-		} else if (!ref.equals(other.ref))
-			return false;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj)
+    		return true;
+    	if (obj == null)
+    		return false;
+    	if (getClass() != obj.getClass())
+    		return false;
+    	IntegerValue other = (IntegerValue) obj;
+    	if (ref == null) {
+    		if (other.ref != null)
+    			return false;
+    	} else if (!ref.equals(other.ref))
+    		return false;
+    	if (value == null) {
+    		if (other.value != null)
+    			return false;
+    	} else if (!value.equals(other.value))
+    		return false;
+    	return true;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("IntegerValue[",
-				(ref != null ? ref : value.toString()), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("IntegerValue[",
+    			(ref != null ? ref : value.toString()), "]");
+    }
 
 }

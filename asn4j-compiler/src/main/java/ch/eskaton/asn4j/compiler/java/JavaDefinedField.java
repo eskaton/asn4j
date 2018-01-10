@@ -36,53 +36,53 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaDefinedField implements JavaField {
 
-	private String typeName;
+    private String typeName;
 
-	private String name;
+    private String name;
 
-	private Set<JavaAnnotation> annotations = new HashSet<JavaAnnotation>();
+    private Set<JavaAnnotation> annotations = new HashSet<JavaAnnotation>();
 
-	public JavaDefinedField(String typeName, String name, String params) {
-		this.typeName = typeName;
-		this.name = name;
-	}
+    public JavaDefinedField(String typeName, String name, String params) {
+    	this.typeName = typeName;
+    	this.name = name;
+    }
 
-	public JavaDefinedField(String typeName, String name) {
-		this.typeName = typeName;
-		this.name = name;
-	}
+    public JavaDefinedField(String typeName, String name) {
+    	this.typeName = typeName;
+    	this.name = name;
+    }
 
-	public void addAnnotation(JavaAnnotation annotation) {
-		annotations.add(annotation);
-	}
+    public void addAnnotation(JavaAnnotation annotation) {
+    	annotations.add(annotation);
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
-	public String getTypeName() {
-		return typeName;
-	}
+    public String getTypeName() {
+    	return typeName;
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see asn4j.compiler.JavaField#write(java.io.BufferedWriter)
-	 */
-	public void write(BufferedWriter writer, String prefix) throws IOException {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see asn4j.compiler.JavaField#write(java.io.BufferedWriter)
+     */
+    public void write(BufferedWriter writer, String prefix) throws IOException {
 
-		for (JavaAnnotation annotation : annotations) {
-			annotation.write(writer, prefix);
-		}
+    	for (JavaAnnotation annotation : annotations) {
+    		annotation.write(writer, prefix);
+    	}
 
-		writer.write(StringUtils.concat(prefix, "\tprivate ", typeName, " ",
-				name, ";\n\n"));
-	}
+    	writer.write(StringUtils.concat(prefix, "\tprivate ", typeName, " ",
+    			name, ";\n\n"));
+    }
 
-	@Override
-	public String toString() {
-		return "JavaDefinedField [typeName=" + typeName + ", name=" + name
-				+ ", annotations=" + annotations + "]";
-	}
+    @Override
+    public String toString() {
+    	return "JavaDefinedField [typeName=" + typeName + ", name=" + name
+    			+ ", annotations=" + annotations + "]";
+    }
 
 }

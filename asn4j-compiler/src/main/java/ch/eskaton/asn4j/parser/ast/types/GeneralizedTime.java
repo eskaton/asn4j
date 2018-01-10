@@ -29,8 +29,8 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class GeneralizedTime extends UsefulType {
 
-	public GeneralizedTime(String type) {
-		super(type);
-	}
+    public GeneralizedTime(String type) {
+    	super(type);
+    }
 
 }

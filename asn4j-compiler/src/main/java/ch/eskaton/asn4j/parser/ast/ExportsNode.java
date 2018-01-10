@@ -33,35 +33,35 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ExportsNode implements Node {
 
-	public enum Mode {
-		All, Specific
-	}
+    public enum Mode {
+    	All, Specific
+    }
 
-	private Mode mode;
+    private Mode mode;
 
-	private List<ReferenceNode> symbols;
+    private List<ReferenceNode> symbols;
 
-	public ExportsNode(Mode mode) {
-		this.mode = mode;
-	}
+    public ExportsNode(Mode mode) {
+    	this.mode = mode;
+    }
 
-	public ExportsNode(Mode mode, List<ReferenceNode> maybeList) {
-		this.mode = mode;
-		this.symbols = maybeList;
-	}
+    public ExportsNode(Mode mode, List<ReferenceNode> maybeList) {
+    	this.mode = mode;
+    	this.symbols = maybeList;
+    }
 
-	public Mode getMode() {
-		return mode;
-	}
+    public Mode getMode() {
+    	return mode;
+    }
 
-	public List<ReferenceNode> getSymbols() {
-		return symbols;
-	}
+    public List<ReferenceNode> getSymbols() {
+    	return symbols;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("Exports[", mode, symbols != null ? ", ("
-				+ StringUtils.join(symbols, ", ") + ")" : "", "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("Exports[", mode, symbols != null ? ", ("
+    			+ StringUtils.join(symbols, ", ") + ")" : "", "]");
+    }
 
 }

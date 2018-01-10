@@ -35,64 +35,64 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 2, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1Integer implements ASN1Type {
 
-	private BigInteger value;
+    private BigInteger value;
 
-	public ASN1Integer() {
-	}
+    public ASN1Integer() {
+    }
 
-	protected boolean checkConstraint(BigInteger value)
-			throws ConstraintViolatedException {
-		return true;
-	}
+    protected boolean checkConstraint(BigInteger value)
+    		throws ConstraintViolatedException {
+    	return true;
+    }
 
-	public BigInteger getValue() {
-		return value;
-	}
+    public BigInteger getValue() {
+    	return value;
+    }
 
-	public void setValue(BigInteger value) throws ConstraintViolatedException {
-		if (!checkConstraint(value)) {
-			throw new ConstraintViolatedException(String.format(
-					"%d doesn't satisfy a constraint", value));
-		}
-		
-		this.value = value;
-	}
+    public void setValue(BigInteger value) throws ConstraintViolatedException {
+    	if (!checkConstraint(value)) {
+    		throw new ConstraintViolatedException(String.format(
+    				"%d doesn't satisfy a constraint", value));
+    	}
+    	
+    	this.value = value;
+    }
 
-	public static ASN1Integer valueOf(long i)
-			throws ConstraintViolatedException {
-		ASN1Integer value = new ASN1Integer();
-		value.setValue(BigInteger.valueOf(i));
-		return value;
-	}
+    public static ASN1Integer valueOf(long i)
+    		throws ConstraintViolatedException {
+    	ASN1Integer value = new ASN1Integer();
+    	value.setValue(BigInteger.valueOf(i));
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		return String.valueOf(value);
-	}
+    @Override
+    public String toString() {
+    	return String.valueOf(value);
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+    	final int prime = 31;
+    	int result = 1;
+    	result = prime * result + ((value == null) ? 0 : value.hashCode());
+    	return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof ASN1Integer))
-			return false;
-		ASN1Integer other = (ASN1Integer) obj;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj)
+    		return true;
+    	if (obj == null)
+    		return false;
+    	if (!(obj instanceof ASN1Integer))
+    		return false;
+    	ASN1Integer other = (ASN1Integer) obj;
+    	if (value == null) {
+    		if (other.value != null)
+    			return false;
+    	} else if (!value.equals(other.value))
+    		return false;
+    	return true;
+    }
 
 }

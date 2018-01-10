@@ -31,20 +31,20 @@ import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
 
 public class SetType extends Collection {
 
-	public SetType() {
-	}
+    public SetType() {
+    }
 
-	public SetType(ComponentTypeListsNode compTypes) {
-		super(compTypes);
-	}
+    public SetType(ComponentTypeListsNode compTypes) {
+    	super(compTypes);
+    }
 
-	public SetType(Object extAndEx, Object optExtMarker) {
-		super(extAndEx, optExtMarker);
-	}
+    public SetType(Object extAndEx, Object optExtMarker) {
+    	super(extAndEx, optExtMarker);
+    }
 
-	@Override
-	protected String getType() {
-		return "Set";
-	}
+    @Override
+    protected String getType() {
+    	return "Set";
+    }
 
 }

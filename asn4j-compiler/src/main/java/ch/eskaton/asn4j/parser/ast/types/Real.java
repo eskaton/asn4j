@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class Real extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "RealString";
-	}
+    @Override
+    public String toString() {
+    	return "RealString";
+    }
 
 }

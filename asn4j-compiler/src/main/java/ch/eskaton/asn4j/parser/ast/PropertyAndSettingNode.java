@@ -31,27 +31,27 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class PropertyAndSettingNode implements Node {
 
-	private String property;
+    private String property;
 
-	private String setting;
+    private String setting;
 
-	public PropertyAndSettingNode(String property, String setting) {
-		this.property = property;
-		this.setting = setting;
-	}
+    public PropertyAndSettingNode(String property, String setting) {
+    	this.property = property;
+    	this.setting = setting;
+    }
 
-	public String getProperty() {
-		return property;
-	}
+    public String getProperty() {
+    	return property;
+    }
 
-	public String getSetting() {
-		return setting;
-	}
+    public String getSetting() {
+    	return setting;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat(getClass().getSimpleName(), "[property=",
-				property, ", setting=", setting, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat(getClass().getSimpleName(), "[property=",
+    			property, ", setting=", setting, "]");
+    }
 
 }

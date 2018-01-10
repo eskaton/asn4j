@@ -30,15 +30,15 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class TypeIdentifierObjectClassReferenceNode extends
-		ObjectClassReferenceNode {
+    	ObjectClassReferenceNode {
 
-	public TypeIdentifierObjectClassReferenceNode() {
-		super("TYPE-IDENTIFIER");
-	}
+    public TypeIdentifierObjectClassReferenceNode() {
+    	super("TYPE-IDENTIFIER");
+    }
 
-	public String toString() {
-		return StringUtils.concat(getClass().getSimpleName(), "[",
-				getReference(), "]");
-	}
+    public String toString() {
+    	return StringUtils.concat(getClass().getSimpleName(), "[",
+    			getReference(), "]");
+    }
 
 }

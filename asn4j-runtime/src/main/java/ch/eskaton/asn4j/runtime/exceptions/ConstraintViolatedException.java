@@ -29,10 +29,10 @@ package ch.eskaton.asn4j.runtime.exceptions;
 
 public class ConstraintViolatedException extends RuntimeException {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public ConstraintViolatedException(String message) {
-		super(message);
-	}
+    public ConstraintViolatedException(String message) {
+    	super(message);
+    }
 
 }

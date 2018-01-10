@@ -32,15 +32,15 @@ import java.util.List;
 
 public class DefaultSyntaxNode implements ObjectSyntaxNode {
 
-	private List<FieldSettingNode> fieldSetting;
+    private List<FieldSettingNode> fieldSetting;
 
-	public DefaultSyntaxNode(List<FieldSettingNode> fieldSetting) {
-		this.fieldSetting = fieldSetting != null ? fieldSetting
-				: new ArrayList<FieldSettingNode>();
-	}
+    public DefaultSyntaxNode(List<FieldSettingNode> fieldSetting) {
+    	this.fieldSetting = fieldSetting != null ? fieldSetting
+    			: new ArrayList<FieldSettingNode>();
+    }
 
-	public List<FieldSettingNode> getFieldSetting() {
-		return fieldSetting;
-	}
+    public List<FieldSettingNode> getFieldSetting() {
+    	return fieldSetting;
+    }
 
 }

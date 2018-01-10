@@ -31,29 +31,29 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ReferenceNode implements Node {
 
-	private String name;
+    private String name;
 
-	private boolean parameterized;
+    private boolean parameterized;
 
-	public ReferenceNode(String name) {
-		this.name = name;
-	}
+    public ReferenceNode(String name) {
+    	this.name = name;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
-	public void setIsParameterized() {
-		parameterized = true;
-	}
+    public void setIsParameterized() {
+    	parameterized = true;
+    }
 
-	public boolean isParameterized() {
-		return parameterized;
-	}
+    public boolean isParameterized() {
+    	return parameterized;
+    }
 
-	public String toString() {
-		return StringUtils.concat(getClass().getSimpleName(), "[", name,
-				(parameterized ? "{}" : ""), "]");
-	}
+    public String toString() {
+    	return StringUtils.concat(getClass().getSimpleName(), "[", name,
+    			(parameterized ? "{}" : ""), "]");
+    }
 
 }

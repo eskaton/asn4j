@@ -29,16 +29,16 @@ package ch.eskaton.asn4j.runtime;
 
 public class DecoderState {
 
-	public int pos;
+    public int pos;
 
-	public int length;
+    public int length;
 
-	public TLV tlv;
+    public TLV tlv;
 
-	@Override
-	public String toString() {
-		return "DecoderState [pos=" + pos + ", length=" + length + ", tlv="
-				+ tlv + "]";
-	}
+    @Override
+    public String toString() {
+    	return "DecoderState [pos=" + pos + ", length=" + length + ", tlv="
+    			+ tlv + "]";
+    }
 
 }

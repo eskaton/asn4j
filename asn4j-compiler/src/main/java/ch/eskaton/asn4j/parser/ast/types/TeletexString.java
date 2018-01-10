@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class TeletexString extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "TelexString";
-	}
+    @Override
+    public String toString() {
+    	return "TelexString";
+    }
 
 }

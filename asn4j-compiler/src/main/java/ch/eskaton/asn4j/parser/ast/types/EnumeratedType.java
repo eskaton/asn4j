@@ -35,52 +35,52 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class EnumeratedType extends AbstractType {
 
-	private List<EnumerationItemNode> rootEnum;
+    private List<EnumerationItemNode> rootEnum;
 
-	private ExceptionIdentificationNode exceptionSpec;
+    private ExceptionIdentificationNode exceptionSpec;
 
-	private List<EnumerationItemNode> additionalEnum;
+    private List<EnumerationItemNode> additionalEnum;
 
-	public EnumeratedType(List<EnumerationItemNode> rootEnum) {
-		this.rootEnum = rootEnum;
-	}
+    public EnumeratedType(List<EnumerationItemNode> rootEnum) {
+    	this.rootEnum = rootEnum;
+    }
 
-	public EnumeratedType(List<EnumerationItemNode> rootEnum,
-			ExceptionIdentificationNode exceptionSpec) {
-		this.rootEnum = rootEnum;
-		this.exceptionSpec = exceptionSpec;
-	}
+    public EnumeratedType(List<EnumerationItemNode> rootEnum,
+    		ExceptionIdentificationNode exceptionSpec) {
+    	this.rootEnum = rootEnum;
+    	this.exceptionSpec = exceptionSpec;
+    }
 
-	public EnumeratedType(List<EnumerationItemNode> rootEnum,
-			ExceptionIdentificationNode exceptionSpec,
-			List<EnumerationItemNode> additionalEnum) {
-		this.rootEnum = rootEnum;
-		this.exceptionSpec = exceptionSpec;
-		this.additionalEnum = additionalEnum;
-	}
+    public EnumeratedType(List<EnumerationItemNode> rootEnum,
+    		ExceptionIdentificationNode exceptionSpec,
+    		List<EnumerationItemNode> additionalEnum) {
+    	this.rootEnum = rootEnum;
+    	this.exceptionSpec = exceptionSpec;
+    	this.additionalEnum = additionalEnum;
+    }
 
-	public List<EnumerationItemNode> getRootEnum() {
-		return rootEnum;
-	}
+    public List<EnumerationItemNode> getRootEnum() {
+    	return rootEnum;
+    }
 
-	public boolean hasExceptionSpec() {
-		return exceptionSpec != null;
-	}
+    public boolean hasExceptionSpec() {
+    	return exceptionSpec != null;
+    }
 
-	public List<EnumerationItemNode> getAdditionalEnum() {
-		return additionalEnum;
-	}
+    public List<EnumerationItemNode> getAdditionalEnum() {
+    	return additionalEnum;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat(
-				"Enumeration[",
-				StringUtils.join(rootEnum, ", "),
-				(hasExceptionSpec() || additionalEnum != null ? ", " + "..."
-						: ""),
-				exceptionSpec != null ? " ! " + exceptionSpec : "",
-				(additionalEnum != null ? ", "
-						+ StringUtils.join(additionalEnum, ", ") : ""), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat(
+    			"Enumeration[",
+    			StringUtils.join(rootEnum, ", "),
+    			(hasExceptionSpec() || additionalEnum != null ? ", " + "..."
+    					: ""),
+    			exceptionSpec != null ? " ! " + exceptionSpec : "",
+    			(additionalEnum != null ? ", "
+    					+ StringUtils.join(additionalEnum, ", ") : ""), "]");
+    }
 
 }

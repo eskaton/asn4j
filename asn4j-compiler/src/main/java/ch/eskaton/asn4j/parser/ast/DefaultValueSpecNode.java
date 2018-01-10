@@ -31,8 +31,8 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class DefaultValueSpecNode extends DefaultOptionalitySpecNode<Value> {
 
-	public DefaultValueSpecNode(Value value) {
-		super(value);
-	}
+    public DefaultValueSpecNode(Value value) {
+    	super(value);
+    }
 
 }

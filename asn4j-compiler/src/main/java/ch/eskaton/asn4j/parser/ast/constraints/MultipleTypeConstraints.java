@@ -31,22 +31,22 @@ import java.util.List;
 
 public class MultipleTypeConstraints extends AbstractConstraint {
 
-	private List<NamedConstraint> constraints;
+    private List<NamedConstraint> constraints;
 
-	private boolean isPartial;
+    private boolean isPartial;
 
-	public MultipleTypeConstraints(List<NamedConstraint> constraints,
-			boolean isPartial) {
-		this.constraints = constraints;
-		this.isPartial = isPartial;
-	}
+    public MultipleTypeConstraints(List<NamedConstraint> constraints,
+    		boolean isPartial) {
+    	this.constraints = constraints;
+    	this.isPartial = isPartial;
+    }
 
-	public List<NamedConstraint> getConstraints() {
-		return constraints;
-	}
+    public List<NamedConstraint> getConstraints() {
+    	return constraints;
+    }
 
-	public boolean isPartial() {
-		return isPartial;
-	}
+    public boolean isPartial() {
+    	return isPartial;
+    }
 
 }

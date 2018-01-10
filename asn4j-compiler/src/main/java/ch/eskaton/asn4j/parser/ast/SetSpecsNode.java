@@ -32,69 +32,69 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class SetSpecsNode implements Node {
 
-	private ElementSet rootElements;
+    private ElementSet rootElements;
 
-	private ElementSet additionalElements;
+    private ElementSet additionalElements;
 
-	private boolean extensionMarker;
+    private boolean extensionMarker;
 
-	public SetSpecsNode(boolean extensionMarker) {
-		this(null, extensionMarker, null);
-	}
+    public SetSpecsNode(boolean extensionMarker) {
+    	this(null, extensionMarker, null);
+    }
 
-	public SetSpecsNode(ElementSet rootElements) {
-		this(rootElements, false, null);
-	}
+    public SetSpecsNode(ElementSet rootElements) {
+    	this(rootElements, false, null);
+    }
 
-	public SetSpecsNode(ElementSet rootElements, boolean extensionMarker) {
-		this(rootElements, extensionMarker, null);
-	}
+    public SetSpecsNode(ElementSet rootElements, boolean extensionMarker) {
+    	this(rootElements, extensionMarker, null);
+    }
 
-	public SetSpecsNode(ElementSet rootElements, boolean extensionMarker,
-			ElementSet additionalElements) {
-		this.rootElements = rootElements;
-		this.extensionMarker = extensionMarker;
-		this.additionalElements = additionalElements;
-	}
+    public SetSpecsNode(ElementSet rootElements, boolean extensionMarker,
+    		ElementSet additionalElements) {
+    	this.rootElements = rootElements;
+    	this.extensionMarker = extensionMarker;
+    	this.additionalElements = additionalElements;
+    }
 
-	public ElementSet getRootElements() {
-		return rootElements;
-	}
+    public ElementSet getRootElements() {
+    	return rootElements;
+    }
 
-	public ElementSet getAdditionalElements() {
-		return additionalElements;
-	}
+    public ElementSet getAdditionalElements() {
+    	return additionalElements;
+    }
 
-	public boolean hasExtensionMarker() {
-		return extensionMarker;
-	}
+    public boolean hasExtensionMarker() {
+    	return extensionMarker;
+    }
 
-	// public boolean isElementSetSpecs() {
-	// return rootElements != null;
-	// }
+    // public boolean isElementSetSpecs() {
+    // return rootElements != null;
+    // }
 
-	public ElementSetSpecsNode toElementSetSpecs() {
-		if (rootElements != null) {
-			return new ElementSetSpecsNode(rootElements, extensionMarker,
-					additionalElements);
-		}
+    public ElementSetSpecsNode toElementSetSpecs() {
+    	if (rootElements != null) {
+    		return new ElementSetSpecsNode(rootElements, extensionMarker,
+    				additionalElements);
+    	}
 
-		return null;
-	}
+    	return null;
+    }
 
-	public ObjectSetSpecNode toObjectSetSpec() {
-		return new ObjectSetSpecNode(rootElements, extensionMarker,
-				additionalElements);
-	}
+    public ObjectSetSpecNode toObjectSetSpec() {
+    	return new ObjectSetSpecNode(rootElements, extensionMarker,
+    			additionalElements);
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("SetSpecs[",
-				(rootElements != null ? String.valueOf(rootElements) : ""),
-				(extensionMarker ? (rootElements != null ? ", " : "") + "..."
-						: ""), (additionalElements != null ? (extensionMarker
-						|| rootElements != null ? ", " : "")
-						+ String.valueOf(additionalElements) : ""), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("SetSpecs[",
+    			(rootElements != null ? String.valueOf(rootElements) : ""),
+    			(extensionMarker ? (rootElements != null ? ", " : "") + "..."
+    					: ""), (additionalElements != null ? (extensionMarker
+    					|| rootElements != null ? ", " : "")
+    					+ String.valueOf(additionalElements) : ""), "]");
+    }
 
 }

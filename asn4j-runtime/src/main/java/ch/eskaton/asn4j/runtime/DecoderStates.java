@@ -32,14 +32,14 @@ import java.util.Stack;
 
 public class DecoderStates {
 
-	public byte[] buf;
+    public byte[] buf;
 
-	public Stack<DecoderState> states = new Stack<DecoderState>();
+    public Stack<DecoderState> states = new Stack<DecoderState>();
 
-	@Override
-	public String toString() {
-		return "DecoderStates [buf=" + Arrays.toString(buf) + ", states="
-				+ states + "]";
-	}
+    @Override
+    public String toString() {
+    	return "DecoderStates [buf=" + Arrays.toString(buf) + ", states="
+    			+ states + "]";
+    }
 
 }

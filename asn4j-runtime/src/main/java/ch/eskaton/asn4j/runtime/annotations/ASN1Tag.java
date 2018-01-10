@@ -33,20 +33,20 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ASN1Tag {
 
-	enum Clazz {
-		Universal, Application, ContextSpecific, Private
-	}
+    enum Clazz {
+    	Universal, Application, ContextSpecific, Private
+    }
 
-	enum Mode {
-		Implicit, Explicit
-	}
+    enum Mode {
+    	Implicit, Explicit
+    }
 
-	Clazz clazz();
+    Clazz clazz();
 
-	Mode mode();
+    Mode mode();
 
-	int tag();
+    int tag();
 
-	boolean constructed();
+    boolean constructed();
 
 }

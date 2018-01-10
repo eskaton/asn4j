@@ -31,19 +31,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class SizeConstraint extends AbstractConstraint {
 
-	private Constraint constraint;
+    private Constraint constraint;
 
-	public SizeConstraint(Constraint constraint) {
-		this.constraint = constraint;
-	}
+    public SizeConstraint(Constraint constraint) {
+    	this.constraint = constraint;
+    }
 
-	public Constraint getConstraint() {
-		return constraint;
-	}
+    public Constraint getConstraint() {
+    	return constraint;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("SizeConstraint[", constraint, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("SizeConstraint[", constraint, "]");
+    }
 
 }

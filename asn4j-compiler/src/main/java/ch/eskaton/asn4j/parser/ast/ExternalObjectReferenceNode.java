@@ -31,20 +31,20 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ExternalObjectReferenceNode extends ObjectReferenceNode {
 
-	private String module;
+    private String module;
 
-	public ExternalObjectReferenceNode(String module, String reference) {
-		super(reference);
-		this.module = module;
-	}
+    public ExternalObjectReferenceNode(String module, String reference) {
+    	super(reference);
+    	this.module = module;
+    }
 
-	public String getModule() {
-		return module;
-	}
+    public String getModule() {
+    	return module;
+    }
 
-	public String toString() {
-		return StringUtils.concat(getClass().getSimpleName(), "[", module, ".",
-				getReference(), "]");
-	}
+    public String toString() {
+    	return StringUtils.concat(getClass().getSimpleName(), "[", module, ".",
+    			getReference(), "]");
+    }
 
 }

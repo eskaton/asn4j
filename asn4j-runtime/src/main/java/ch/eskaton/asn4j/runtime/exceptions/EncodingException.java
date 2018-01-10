@@ -30,12 +30,12 @@ package ch.eskaton.asn4j.runtime.exceptions;
 @SuppressWarnings("serial")
 public class EncodingException extends RuntimeException {
 
-	public EncodingException(String message) {
-		super(message);
-	}
+    public EncodingException(String message) {
+    	super(message);
+    }
 
-	public EncodingException(Throwable e) {
-		super(e);
-	}
+    public EncodingException(Throwable e) {
+    	super(e);
+    }
 
 }

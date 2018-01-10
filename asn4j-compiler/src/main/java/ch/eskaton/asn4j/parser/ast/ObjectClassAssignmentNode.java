@@ -28,16 +28,16 @@
 package ch.eskaton.asn4j.parser.ast;
 
 public class ObjectClassAssignmentNode extends
-		TypeOrObjectClassAssignmentNode<ObjectClassNode> {
+    	TypeOrObjectClassAssignmentNode<ObjectClassNode> {
 
-	public ObjectClassAssignmentNode(String reference, ObjectClassNode type) {
-		super(reference, type);
-	}
+    public ObjectClassAssignmentNode(String reference, ObjectClassNode type) {
+    	super(reference, type);
+    }
 
-	@Override
-	public String toString() {
-		return "ObjectClassAssignment[" + getReference() + " = " + getType()
-				+ "]";
-	}
+    @Override
+    public String toString() {
+    	return "ObjectClassAssignment[" + getReference() + " = " + getType()
+    			+ "]";
+    }
 
 }

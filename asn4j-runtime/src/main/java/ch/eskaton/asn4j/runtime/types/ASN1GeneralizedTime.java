@@ -34,24 +34,24 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 24, mode = ASN1Tag.Mode.Implicit, constructed = false)
 public class ASN1GeneralizedTime extends ASN1VisibleString {
 
-	public static ASN1GeneralizedTime fromDate(Date d) {
-		ASN1GeneralizedTime date = new ASN1GeneralizedTime();
-		// TODO: time
-		// date.setTime(d);
-		return date;
-	}
+    public static ASN1GeneralizedTime fromDate(Date d) {
+    	ASN1GeneralizedTime date = new ASN1GeneralizedTime();
+    	// TODO: time
+    	// date.setTime(d);
+    	return date;
+    }
 
-	public void setValue(String value) {
-		super.setValue(value);
-	}
+    public void setValue(String value) {
+    	super.setValue(value);
+    }
 
-	public void setTime(Date time) {
-		// TODO: implement
-	}
+    public void setTime(Date time) {
+    	// TODO: implement
+    }
 
-	public Date getTime() {
-		// TODO: implement
-		return null;
-	}
+    public Date getTime() {
+    	// TODO: implement
+    	return null;
+    }
 
 }

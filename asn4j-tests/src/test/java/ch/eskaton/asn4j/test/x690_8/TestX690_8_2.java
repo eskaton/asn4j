@@ -41,30 +41,30 @@ import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 
 public class TestX690_8_2 {
 
-	@Test
-	public void testEncode() throws ASN1RuntimeException, IOException {
-		BEREncoder encoder = new BEREncoder();
+    @Test
+    public void testEncode() throws ASN1RuntimeException, IOException {
+    	BEREncoder encoder = new BEREncoder();
 
-		assertArrayEquals(new byte[] { 0x01, 0x01, 0x00 },
-				encoder.encode(ASN1Boolean.FALSE));
-		assertArrayEquals(new byte[] { 0x01, 0x01, (byte) 0xFF },
-				encoder.encode(ASN1Boolean.TRUE));
-		assertArrayEquals(new byte[] { 0x01, 0x01, (byte) 0x00 },
-				encoder.encode(ASN1Boolean.FALSE));
-	}
+    	assertArrayEquals(new byte[] { 0x01, 0x01, 0x00 },
+    			encoder.encode(ASN1Boolean.FALSE));
+    	assertArrayEquals(new byte[] { 0x01, 0x01, (byte) 0xFF },
+    			encoder.encode(ASN1Boolean.TRUE));
+    	assertArrayEquals(new byte[] { 0x01, 0x01, (byte) 0x00 },
+    			encoder.encode(ASN1Boolean.FALSE));
+    }
 
-	@Test
-	public void testDecode() throws ASN1RuntimeException, IOException {
-		BERDecoder decoder = new BERDecoder();
+    @Test
+    public void testDecode() throws ASN1RuntimeException, IOException {
+    	BERDecoder decoder = new BERDecoder();
 
-		assertEquals(ASN1Boolean.FALSE, decoder.decode(ASN1Boolean.class,
-				new byte[] { 0x01, 0x01, 0x00 }));
-		assertEquals(ASN1Boolean.TRUE, decoder.decode(ASN1Boolean.class,
-				new byte[] { 0x01, 0x01, 0x01 }));
-		assertEquals(
-				ASN1Boolean.TRUE,
-				decoder.decode(ASN1Boolean.class, new byte[] { 0x01, 0x01,
-						(byte) 0xFF }));
-	}
+    	assertEquals(ASN1Boolean.FALSE, decoder.decode(ASN1Boolean.class,
+    			new byte[] { 0x01, 0x01, 0x00 }));
+    	assertEquals(ASN1Boolean.TRUE, decoder.decode(ASN1Boolean.class,
+    			new byte[] { 0x01, 0x01, 0x01 }));
+    	assertEquals(
+    			ASN1Boolean.TRUE,
+    			decoder.decode(ASN1Boolean.class, new byte[] { 0x01, 0x01,
+    					(byte) 0xFF }));
+    }
 
 }

@@ -29,22 +29,22 @@ package ch.eskaton.asn4j.parser.ast;
 
 public abstract class AbstractASN1FieldSpecNode implements Node {
 
-	private String reference;
+    private String reference;
 
-	private OptionalitySpecNode optionalitySpec;
+    private OptionalitySpecNode optionalitySpec;
 
-	public AbstractASN1FieldSpecNode(String reference,
-			OptionalitySpecNode optionalitySpec) {
-		this.reference = reference;
-		this.optionalitySpec = optionalitySpec;
-	}
+    public AbstractASN1FieldSpecNode(String reference,
+    		OptionalitySpecNode optionalitySpec) {
+    	this.reference = reference;
+    	this.optionalitySpec = optionalitySpec;
+    }
 
-	public String getReference() {
-		return reference;
-	}
+    public String getReference() {
+    	return reference;
+    }
 
-	public OptionalitySpecNode getOptionalitySpec() {
-		return optionalitySpec;
-	}
+    public OptionalitySpecNode getOptionalitySpec() {
+    	return optionalitySpec;
+    }
 
 }

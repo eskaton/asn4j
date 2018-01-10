@@ -33,11 +33,11 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class ParameterizedValueAssignmentNode extends
-		ParameterizedValueOrObjectAssignmentNode<Type, Value> {
+    	ParameterizedValueOrObjectAssignmentNode<Type, Value> {
 
-	public ParameterizedValueAssignmentNode(String reference,
-			List<ParameterNode> parameters, Type type, Value value) {
-		super(reference, parameters, type, value);
-	}
+    public ParameterizedValueAssignmentNode(String reference,
+    		List<ParameterNode> parameters, Type type, Value value) {
+    	super(reference, parameters, type, value);
+    }
 
 }

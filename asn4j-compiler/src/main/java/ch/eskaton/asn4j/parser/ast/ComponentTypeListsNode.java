@@ -33,57 +33,57 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 
 public class ComponentTypeListsNode implements Node {
 
-	private List<ComponentType> rootComponents;
+    private List<ComponentType> rootComponents;
 
-	private List<ComponentType> extRootComponents;
+    private List<ComponentType> extRootComponents;
 
-	private ExtensionAndExceptionNode extAndEx;
+    private ExtensionAndExceptionNode extAndEx;
 
-	private Object extAdditions;
+    private Object extAdditions;
 
-	private Boolean extEndMarker = false;
+    private Boolean extEndMarker = false;
 
-	public ComponentTypeListsNode(List<ComponentType> rootComponents,
-			ExtensionAndExceptionNode extAndEx, Object extAdditions,
-			Boolean extEndMarker) {
-		this.rootComponents = rootComponents;
-		this.extAndEx = extAndEx;
-		this.extAdditions = extAdditions;
-		this.extEndMarker = extEndMarker;
-	}
+    public ComponentTypeListsNode(List<ComponentType> rootComponents,
+    		ExtensionAndExceptionNode extAndEx, Object extAdditions,
+    		Boolean extEndMarker) {
+    	this.rootComponents = rootComponents;
+    	this.extAndEx = extAndEx;
+    	this.extAdditions = extAdditions;
+    	this.extEndMarker = extEndMarker;
+    }
 
-	public ComponentTypeListsNode(List<ComponentType> rootComponents,
-			ExtensionAndExceptionNode extAndEx, Object extAdditions,
-			Boolean optExtMarker, List<ComponentType> extRootComponents) {
-		this.rootComponents = rootComponents;
-		this.extAndEx = extAndEx;
-		this.extAdditions = extAdditions;
-		this.extEndMarker = optExtMarker;
-		this.extRootComponents = extRootComponents;
-	}
+    public ComponentTypeListsNode(List<ComponentType> rootComponents,
+    		ExtensionAndExceptionNode extAndEx, Object extAdditions,
+    		Boolean optExtMarker, List<ComponentType> extRootComponents) {
+    	this.rootComponents = rootComponents;
+    	this.extAndEx = extAndEx;
+    	this.extAdditions = extAdditions;
+    	this.extEndMarker = optExtMarker;
+    	this.extRootComponents = extRootComponents;
+    }
 
-	public ComponentTypeListsNode(List<ComponentType> rootComponents) {
-		this.rootComponents = rootComponents;
-	}
+    public ComponentTypeListsNode(List<ComponentType> rootComponents) {
+    	this.rootComponents = rootComponents;
+    }
 
-	public List<ComponentType> getRootComponents() {
-		return rootComponents;
-	}
+    public List<ComponentType> getRootComponents() {
+    	return rootComponents;
+    }
 
-	public List<ComponentType> getExtRootComponents() {
-		return extRootComponents;
-	}
+    public List<ComponentType> getExtRootComponents() {
+    	return extRootComponents;
+    }
 
-	public ExtensionAndExceptionNode getExtAndEx() {
-		return extAndEx;
-	}
+    public ExtensionAndExceptionNode getExtAndEx() {
+    	return extAndEx;
+    }
 
-	public Object getExtAdditions() {
-		return extAdditions;
-	}
+    public Object getExtAdditions() {
+    	return extAdditions;
+    }
 
-	public Boolean getExtEndMarker() {
-		return extEndMarker;
-	}
+    public Boolean getExtEndMarker() {
+    	return extEndMarker;
+    }
 
 }

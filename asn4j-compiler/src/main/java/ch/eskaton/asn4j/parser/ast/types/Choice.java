@@ -35,54 +35,54 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class Choice extends AbstractType {
 
-	private List<NamedType> rootTypeList;
+    private List<NamedType> rootTypeList;
 
-	private boolean ext;
+    private boolean ext;
 
-	private ExceptionIdentificationNode exId;
+    private ExceptionIdentificationNode exId;
 
-	private List<ExtensionAdditionAlternativeNode> extAddAlts;
+    private List<ExtensionAdditionAlternativeNode> extAddAlts;
 
-	private boolean optExtMarker;
+    private boolean optExtMarker;
 
-	public Choice(AlternativeTypeLists alternatives) {
-		this.rootTypeList = alternatives.getRootTypeList();
-		this.ext = alternatives.getExtensionAndException() != null ? true
-				: false;
-		this.exId = this.ext ? alternatives.getExtensionAndException()
-				.getExceptionId() : null;
-		this.extAddAlts = alternatives.getExtAddAlts();
-		this.optExtMarker = alternatives.hasOptExtMarker();
-	}
+    public Choice(AlternativeTypeLists alternatives) {
+    	this.rootTypeList = alternatives.getRootTypeList();
+    	this.ext = alternatives.getExtensionAndException() != null ? true
+    			: false;
+    	this.exId = this.ext ? alternatives.getExtensionAndException()
+    			.getExceptionId() : null;
+    	this.extAddAlts = alternatives.getExtAddAlts();
+    	this.optExtMarker = alternatives.hasOptExtMarker();
+    }
 
-	public List<NamedType> getRootTypeList() {
-		return rootTypeList;
-	}
+    public List<NamedType> getRootTypeList() {
+    	return rootTypeList;
+    }
 
-	public boolean isExt() {
-		return ext;
-	}
+    public boolean isExt() {
+    	return ext;
+    }
 
-	public ExceptionIdentificationNode getExId() {
-		return exId;
-	}
+    public ExceptionIdentificationNode getExId() {
+    	return exId;
+    }
 
-	public List<ExtensionAdditionAlternativeNode> getExtAddAlts() {
-		return extAddAlts;
-	}
+    public List<ExtensionAdditionAlternativeNode> getExtAddAlts() {
+    	return extAddAlts;
+    }
 
-	public boolean isOptExtMarker() {
-		return optExtMarker;
-	}
+    public boolean isOptExtMarker() {
+    	return optExtMarker;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("Choice[ext=", ext, ", optExtMarker=",
-				optExtMarker, (exId != null ? ", exceptionId=" + exId : ""),
-				", root=(", StringUtils.join(rootTypeList, ","),
-				"), extAlts=(",
-				extAddAlts != null ? StringUtils.join(extAddAlts, ",") : "",
-				")", "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("Choice[ext=", ext, ", optExtMarker=",
+    			optExtMarker, (exId != null ? ", exceptionId=" + exId : ""),
+    			", root=(", StringUtils.join(rootTypeList, ","),
+    			"), extAlts=(",
+    			extAddAlts != null ? StringUtils.join(extAddAlts, ",") : "",
+    			")", "]");
+    }
 
 }

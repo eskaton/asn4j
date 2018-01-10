@@ -28,5 +28,5 @@
 package ch.eskaton.asn4j.parser.ast.types;
 
 public enum ClassType {
-	UNIVERSAL, APPLICATION, PRIVATE
+    UNIVERSAL, APPLICATION, PRIVATE
 }

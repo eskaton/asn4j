@@ -31,21 +31,21 @@ import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 
 public class DefinitiveIdentificationNode implements Node {
 
-	private OIDNode oid;
+    private OIDNode oid;
 
-	private IRIValue iri;
+    private IRIValue iri;
 
-	public DefinitiveIdentificationNode(OIDNode oid, IRIValue iri) {
-		this.oid = oid;
-		this.iri = iri;
-	}
+    public DefinitiveIdentificationNode(OIDNode oid, IRIValue iri) {
+    	this.oid = oid;
+    	this.iri = iri;
+    }
 
-	public OIDNode getOid() {
-		return oid;
-	}
+    public OIDNode getOid() {
+    	return oid;
+    }
 
-	public IRIValue getIri() {
-		return iri;
-	}
+    public IRIValue getIri() {
+    	return iri;
+    }
 
 }

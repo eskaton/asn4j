@@ -35,54 +35,54 @@ import java.util.Map;
 
 public class ModuleBodyNode implements Node {
 
-	private ExportsNode exports;
+    private ExportsNode exports;
 
-	private List<ImportNode> imports = new ArrayList<ImportNode>();
+    private List<ImportNode> imports = new ArrayList<ImportNode>();
 
-	private Map<String, AssignmentNode> assignments;
+    private Map<String, AssignmentNode> assignments;
 
-	public ModuleBodyNode() {
-	}
+    public ModuleBodyNode() {
+    }
 
-	public ModuleBodyNode(ExportsNode exports, List<ImportNode> imports,
-			List<AssignmentNode> assignments) {
+    public ModuleBodyNode(ExportsNode exports, List<ImportNode> imports,
+    		List<AssignmentNode> assignments) {
 
-		this.exports = exports;
+    	this.exports = exports;
 
-		if (imports != null) {
-			this.imports.addAll(imports);
-		}
+    	if (imports != null) {
+    		this.imports.addAll(imports);
+    	}
 
-		if (assignments != null) {
-			this.assignments = new HashMap<String, AssignmentNode>();
-			for (AssignmentNode assignment : assignments) {
-				this.assignments.put(assignment.getReference(), assignment);
-			}
-		}
-	}
+    	if (assignments != null) {
+    		this.assignments = new HashMap<String, AssignmentNode>();
+    		for (AssignmentNode assignment : assignments) {
+    			this.assignments.put(assignment.getReference(), assignment);
+    		}
+    	}
+    }
 
-	public ExportsNode getExports() {
-		return exports;
-	}
+    public ExportsNode getExports() {
+    	return exports;
+    }
 
-	public List<ImportNode> getImports() {
-		return imports;
-	}
+    public List<ImportNode> getImports() {
+    	return imports;
+    }
 
-	public Collection<AssignmentNode> getAssignments() {
-		if (assignments != null) {
-			return assignments.values();
-		} else {
-			return null;
-		}
-	}
+    public Collection<AssignmentNode> getAssignments() {
+    	if (assignments != null) {
+    		return assignments.values();
+    	} else {
+    		return null;
+    	}
+    }
 
-	public AssignmentNode getAssignments(String name) {
-		if (assignments != null && assignments.containsKey(name)) {
-			return assignments.get(name);
-		}
+    public AssignmentNode getAssignments(String name) {
+    	if (assignments != null && assignments.containsKey(name)) {
+    		return assignments.get(name);
+    	}
 
-		return null;
-	}
+    	return null;
+    }
 
 }

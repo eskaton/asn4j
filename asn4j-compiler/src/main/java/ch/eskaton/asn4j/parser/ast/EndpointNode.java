@@ -29,56 +29,56 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class EndpointNode {
 
-	private ch.eskaton.asn4j.parser.ast.values.Value value;
+    private ch.eskaton.asn4j.parser.ast.values.Value value;
 
-	private boolean inclusive;
+    private boolean inclusive;
 
-	public EndpointNode(ch.eskaton.asn4j.parser.ast.values.Value value,
-			boolean inclusive) {
-		this.value = value;
-		this.inclusive = inclusive;
-	}
+    public EndpointNode(ch.eskaton.asn4j.parser.ast.values.Value value,
+    		boolean inclusive) {
+    	this.value = value;
+    	this.inclusive = inclusive;
+    }
 
-	public ch.eskaton.asn4j.parser.ast.values.Value getValue() {
-		return value;
-	}
+    public ch.eskaton.asn4j.parser.ast.values.Value getValue() {
+    	return value;
+    }
 
-	public boolean isInclusive() {
-		return inclusive;
-	}
+    public boolean isInclusive() {
+    	return inclusive;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (inclusive ? 1231 : 1237);
-		result = prime * result + ((value == null) ? 0 : value.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+    	final int prime = 31;
+    	int result = 1;
+    	result = prime * result + (inclusive ? 1231 : 1237);
+    	result = prime * result + ((value == null) ? 0 : value.hashCode());
+    	return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		EndpointNode other = (EndpointNode) obj;
-		if (inclusive != other.inclusive)
-			return false;
-		if (value == null) {
-			if (other.value != null)
-				return false;
-		} else if (!value.equals(other.value))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object obj) {
+    	if (this == obj)
+    		return true;
+    	if (obj == null)
+    		return false;
+    	if (getClass() != obj.getClass())
+    		return false;
+    	EndpointNode other = (EndpointNode) obj;
+    	if (inclusive != other.inclusive)
+    		return false;
+    	if (value == null) {
+    		if (other.value != null)
+    			return false;
+    	} else if (!value.equals(other.value))
+    		return false;
+    	return true;
+    }
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[value=" + value + ", inclusive="
-				+ inclusive + "]";
-	}
+    @Override
+    public String toString() {
+    	return getClass().getSimpleName() + "[value=" + value + ", inclusive="
+    			+ inclusive + "]";
+    }
 
 }

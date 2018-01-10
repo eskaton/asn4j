@@ -38,53 +38,53 @@ import ch.eskaton.asn4j.runtime.TaggingMode;
 
 public class TypeFromObjects extends InformationFromObjects implements Type {
 
-	public TypeFromObjects(ReferencedObjectsNode reference, FieldNameNode field) {
-		super(reference, field);
-	}
+    public TypeFromObjects(ReferencedObjectsNode reference, FieldNameNode field) {
+    	super(reference, field);
+    }
 
-	public Tag getTag() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public Tag getTag() {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
-	public void setTag(Tag tag) {
-		// TODO Auto-generated method stub
+    public void setTag(Tag tag) {
+    	// TODO Auto-generated method stub
 
-	}
+    }
 
-	public TaggingMode getTaggingMode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public TaggingMode getTaggingMode() {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
-	public void setTaggingMode(TaggingMode mode) {
-		// TODO Auto-generated method stub
+    public void setTaggingMode(TaggingMode mode) {
+    	// TODO Auto-generated method stub
 
-	}
+    }
 
-	public void setConstraints(List<Constraint> constraints) {
-		// TODO Auto-generated method stub
+    public void setConstraints(List<Constraint> constraints) {
+    	// TODO Auto-generated method stub
 
-	}
+    }
 
-	public List<Constraint> getConstraints() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public List<Constraint> getConstraints() {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
-	public boolean hasConstraint() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    public boolean hasConstraint() {
+    	// TODO Auto-generated method stub
+    	return false;
+    }
 
-	public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
-		// TODO Auto-generated method stub
+    public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
+    	// TODO Auto-generated method stub
 
-	}
+    }
 
-	public EncodingPrefixNode getEncodingPrefix() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public EncodingPrefixNode getEncodingPrefix() {
+    	// TODO Auto-generated method stub
+    	return null;
+    }
 
 }

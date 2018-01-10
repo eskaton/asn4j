@@ -31,38 +31,38 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class NamedNumber implements Value {
 
-	private String id;
+    private String id;
 
-	private DefinedValue ref;
+    private DefinedValue ref;
 
-	private SignedNumber value;
+    private SignedNumber value;
 
-	public NamedNumber(String id, DefinedValue ref) {
-		this.id = id;
-		this.ref = ref;
-	}
+    public NamedNumber(String id, DefinedValue ref) {
+    	this.id = id;
+    	this.ref = ref;
+    }
 
-	public NamedNumber(String id, SignedNumber value) {
-		this.id = id;
-		this.value = value;
-	}
+    public NamedNumber(String id, SignedNumber value) {
+    	this.id = id;
+    	this.value = value;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+    	return id;
+    }
 
-	public DefinedValue getRef() {
-		return ref;
-	}
+    public DefinedValue getRef() {
+    	return ref;
+    }
 
-	public SignedNumber getValue() {
-		return value;
-	}
+    public SignedNumber getValue() {
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("NamedNumber[", id, "=", (ref != null ? ref
-				: value), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("NamedNumber[", id, "=", (ref != null ? ref
+    			: value), "]");
+    }
 
 }

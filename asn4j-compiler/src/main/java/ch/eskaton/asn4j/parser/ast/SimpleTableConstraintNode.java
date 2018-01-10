@@ -31,14 +31,14 @@ import ch.eskaton.asn4j.parser.ast.constraints.TableConstraint;
 
 public class SimpleTableConstraintNode extends TableConstraint {
 
-	private SetSpecsNode objectSet;
+    private SetSpecsNode objectSet;
 
-	public SimpleTableConstraintNode(SetSpecsNode objectSet) {
-		this.objectSet = objectSet;
-	}
+    public SimpleTableConstraintNode(SetSpecsNode objectSet) {
+    	this.objectSet = objectSet;
+    }
 
-	public SetSpecsNode getObjectSet() {
-		return objectSet;
-	}
+    public SetSpecsNode getObjectSet() {
+    	return objectSet;
+    }
 
 }

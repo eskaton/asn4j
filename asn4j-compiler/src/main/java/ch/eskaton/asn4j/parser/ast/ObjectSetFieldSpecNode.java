@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class ObjectSetFieldSpecNode extends SetFieldSpecNode {
 
-	public ObjectSetFieldSpecNode(String reference,
-			ObjectClassReferenceNode type, OptionalitySpecNode optionalitySpec) {
-		super(reference, type, optionalitySpec);
-	}
+    public ObjectSetFieldSpecNode(String reference,
+    		ObjectClassReferenceNode type, OptionalitySpecNode optionalitySpec) {
+    	super(reference, type, optionalitySpec);
+    }
 
 }

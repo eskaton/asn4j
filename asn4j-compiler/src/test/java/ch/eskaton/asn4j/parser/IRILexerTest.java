@@ -36,79 +36,79 @@ import org.junit.Test;
 
 public class IRILexerTest {
 
-	@Test
-	public void testSolidus() throws IOException, ParserException {
-		IRILexer lexer = new IRILexer("/");
+    @Test
+    public void testSolidus() throws IOException, ParserException {
+    	IRILexer lexer = new IRILexer("/");
 
-		assertEquals(IRIToken.Type.Solidus, lexer.nextToken().getType());
-	}
+    	assertEquals(IRIToken.Type.Solidus, lexer.nextToken().getType());
+    }
 
-	@Test
-	public void testIntegerUnicodeLabel() throws IOException, ParserException {
-		IRILexer lexer = new IRILexer("0");
+    @Test
+    public void testIntegerUnicodeLabel() throws IOException, ParserException {
+    	IRILexer lexer = new IRILexer("0");
 
-		IRIToken token = lexer.nextToken();
+    	IRIToken token = lexer.nextToken();
 
-		assertEquals(IRIToken.Type.IntegerUnicodeLabel, token.getType());
-		assertEquals("0", token.getText());
+    	assertEquals(IRIToken.Type.IntegerUnicodeLabel, token.getType());
+    	assertEquals("0", token.getText());
 
-		lexer = new IRILexer("1234567890");
+    	lexer = new IRILexer("1234567890");
 
-		token = lexer.nextToken();
+    	token = lexer.nextToken();
 
-		assertEquals(IRIToken.Type.IntegerUnicodeLabel, token.getType());
-		assertEquals("1234567890", token.getText());
+    	assertEquals(IRIToken.Type.IntegerUnicodeLabel, token.getType());
+    	assertEquals("1234567890", token.getText());
 
-		lexer = new IRILexer("01");
+    	lexer = new IRILexer("01");
 
-		try {
-			token = lexer.nextToken();
-			fail("ASN1ParserException expected");
-		} catch (ParserException e) {
-		}
-	}
+    	try {
+    		token = lexer.nextToken();
+    		fail("ASN1ParserException expected");
+    	} catch (ParserException e) {
+    	}
+    }
 
-	@Test
-	public void testNonIntegerUnicodeLabel() throws IOException,
-			ParserException {
-		IRILexer lexer = new IRILexer("abc\ud841\udf0e");
+    @Test
+    public void testNonIntegerUnicodeLabel() throws IOException,
+    		ParserException {
+    	IRILexer lexer = new IRILexer("abc\ud841\udf0e");
 
-		IRIToken token = lexer.nextToken();
+    	IRIToken token = lexer.nextToken();
 
-		assertEquals(IRIToken.Type.NonIntegerUnicodeLabel, token.getType());
-		assertEquals("abc\ud841\udf0e", token.getText());
+    	assertEquals(IRIToken.Type.NonIntegerUnicodeLabel, token.getType());
+    	assertEquals("abc\ud841\udf0e", token.getText());
 
-		lexer = new IRILexer("-invalid");
+    	lexer = new IRILexer("-invalid");
 
-		try {
-			lexer.nextToken();
-			fail("ASN1ParserException expected");
-		} catch (ParserException e) {
-		}
+    	try {
+    		lexer.nextToken();
+    		fail("ASN1ParserException expected");
+    	} catch (ParserException e) {
+    	}
 
-		lexer = new IRILexer("invalid-");
+    	lexer = new IRILexer("invalid-");
 
-		try {
-			lexer.nextToken();
-			fail("ASN1ParserException expected");
-		} catch (ParserException e) {
-		}
+    	try {
+    		lexer.nextToken();
+    		fail("ASN1ParserException expected");
+    	} catch (ParserException e) {
+    	}
 
-		lexer = new IRILexer("in--valid");
+    	lexer = new IRILexer("in--valid");
 
-		try {
-			lexer.nextToken();
-			fail("ASN1ParserException expected");
-		} catch (ParserException e) {
-		}
+    	try {
+    		lexer.nextToken();
+    		fail("ASN1ParserException expected");
+    	} catch (ParserException e) {
+    	}
 
-		lexer = new IRILexer("\ud841\udf0ex--");
+    	lexer = new IRILexer("\ud841\udf0ex--");
 
-		try {
-			lexer.nextToken();
-			fail("ASN1ParserException expected");
-		} catch (ParserException e) {
-		}
-	}
+    	try {
+    		lexer.nextToken();
+    		fail("ASN1ParserException expected");
+    	} catch (ParserException e) {
+    	}
+    }
 
 }

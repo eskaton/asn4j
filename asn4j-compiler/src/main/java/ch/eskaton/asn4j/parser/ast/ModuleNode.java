@@ -33,76 +33,76 @@ import java.util.Map;
 
 public class ModuleNode implements Node {
 
-	public enum TagMode {
-		Implicit, Explicit, Automatic
-	}
+    public enum TagMode {
+    	Implicit, Explicit, Automatic
+    }
 
-	public enum Encoding {
-		TAG, XER, PER
-	}
+    public enum Encoding {
+    	TAG, XER, PER
+    }
 
-	@SuppressWarnings("serial")
-	private static final Map<String, Encoding> encodings = new HashMap<String, Encoding>() {
-		{
-			put("TAG", Encoding.TAG);
-			put("XER", Encoding.XER);
-			put("PER", Encoding.PER);
-		}
-	};
+    @SuppressWarnings("serial")
+    private static final Map<String, Encoding> encodings = new HashMap<String, Encoding>() {
+    	{
+    		put("TAG", Encoding.TAG);
+    		put("XER", Encoding.XER);
+    		put("PER", Encoding.PER);
+    	}
+    };
 
-	private ModuleIdentifierNode moduleId;
+    private ModuleIdentifierNode moduleId;
 
-	private TagMode tagMode;
+    private TagMode tagMode;
 
-	private Encoding encoding;
+    private Encoding encoding;
 
-	private boolean extImplied;
+    private boolean extImplied;
 
-	private ModuleBodyNode body;
+    private ModuleBodyNode body;
 
-	private List<EncodingControlSectionNode> encodingControl;
+    private List<EncodingControlSectionNode> encodingControl;
 
-	public ModuleNode(ModuleIdentifierNode moduleId, Encoding encoding,
-			TagMode tagMode, boolean extImplied, ModuleBodyNode body,
-			List<EncodingControlSectionNode> encodingControl) {
-		this.moduleId = moduleId;
-		this.encoding = encoding;
-		this.tagMode = tagMode;
-		this.extImplied = extImplied;
-		this.body = body;
-		this.encodingControl = encodingControl;
-	}
+    public ModuleNode(ModuleIdentifierNode moduleId, Encoding encoding,
+    		TagMode tagMode, boolean extImplied, ModuleBodyNode body,
+    		List<EncodingControlSectionNode> encodingControl) {
+    	this.moduleId = moduleId;
+    	this.encoding = encoding;
+    	this.tagMode = tagMode;
+    	this.extImplied = extImplied;
+    	this.body = body;
+    	this.encodingControl = encodingControl;
+    }
 
-	public ModuleIdentifierNode getModuleId() {
-		return moduleId;
-	}
+    public ModuleIdentifierNode getModuleId() {
+    	return moduleId;
+    }
 
-	public static Encoding getEncoding(String enc) {
-		return encodings.get(enc);
-	}
+    public static Encoding getEncoding(String enc) {
+    	return encodings.get(enc);
+    }
 
-	public ModuleBodyNode getBody() {
-		return body;
-	}
+    public ModuleBodyNode getBody() {
+    	return body;
+    }
 
-	public TagMode getTagMode() {
-		return tagMode;
-	}
+    public TagMode getTagMode() {
+    	return tagMode;
+    }
 
-	public List<EncodingControlSectionNode> getEncodingControl() {
-		return encodingControl;
-	}
+    public List<EncodingControlSectionNode> getEncodingControl() {
+    	return encodingControl;
+    }
 
-	public static Map<String, Encoding> getEncodings() {
-		return encodings;
-	}
+    public static Map<String, Encoding> getEncodings() {
+    	return encodings;
+    }
 
-	public Encoding getEncoding() {
-		return encoding;
-	}
+    public Encoding getEncoding() {
+    	return encoding;
+    }
 
-	public boolean isExtImplied() {
-		return extImplied;
-	}
+    public boolean isExtImplied() {
+    	return extImplied;
+    }
 
 }

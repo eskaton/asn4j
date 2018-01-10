@@ -32,27 +32,27 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ContainedSubtype extends AbstractConstraint implements Constraint {
 
-	private Type type;
+    private Type type;
 
-	private boolean hasIncludes;
+    private boolean hasIncludes;
 
-	public ContainedSubtype(Type type, boolean hasIncludes) {
-		this.type = type;
-		this.hasIncludes = hasIncludes;
-	}
+    public ContainedSubtype(Type type, boolean hasIncludes) {
+    	this.type = type;
+    	this.hasIncludes = hasIncludes;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	public boolean hasIncludes() {
-		return hasIncludes;
-	}
+    public boolean hasIncludes() {
+    	return hasIncludes;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ContainedSubtype[",
-				(hasIncludes ? "INCLUDES " : ""), type, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ContainedSubtype[",
+    			(hasIncludes ? "INCLUDES " : ""), type, "]");
+    }
 
 }

@@ -32,25 +32,25 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class ExceptionIdentificationNode implements Node {
 
-	private Type type;
+    private Type type;
 
-	private Value value;
+    private Value value;
 
-	public ExceptionIdentificationNode(Value value) {
-		this.value = value;
-	}
+    public ExceptionIdentificationNode(Value value) {
+    	this.value = value;
+    }
 
-	public ExceptionIdentificationNode(Type type, Value value) {
-		this.type = type;
-		this.value = value;
-	}
+    public ExceptionIdentificationNode(Type type, Value value) {
+    	this.type = type;
+    	this.value = value;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	public Value getValue() {
-		return value;
-	}
+    public Value getValue() {
+    	return value;
+    }
 
 }

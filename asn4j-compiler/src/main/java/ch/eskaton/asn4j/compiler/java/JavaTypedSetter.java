@@ -34,32 +34,32 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaTypedSetter extends JavaMethod {
 
-	private String typeName;
+    private String typeName;
 
-	private String name;
+    private String name;
 
-	private String typeField;
+    private String typeField;
 
-	private String typeConstant;
+    private String typeConstant;
 
-	public JavaTypedSetter(String typeName, String name, String typeField,
-			String typeConstant) {
-		this.typeName = typeName;
-		this.name = name;
-		this.typeField = typeField;
-		this.typeConstant = typeConstant;
-	}
+    public JavaTypedSetter(String typeName, String name, String typeField,
+    		String typeConstant) {
+    	this.typeName = typeName;
+    	this.name = name;
+    	this.typeField = typeField;
+    	this.typeConstant = typeConstant;
+    }
 
-	public void write(BufferedWriter writer, String prefix) throws IOException {
-		writer.write(StringUtils.concat(prefix, "\tpublic void set",
-				StringUtils.initCap(name) + "(" + typeName + " " + name
-						+ ") {\n"));
-		writer.write(StringUtils.concat(prefix, "\t\tthis.", typeField, " = ",
-				typeConstant, ";\n"));
-		writer.write(StringUtils.concat(prefix, "\t\tthis.", name, " = ", name,
-				";\n"));
-		writer.write(prefix);
-		writer.write("\t}\n\n");
-	}
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+    	writer.write(StringUtils.concat(prefix, "\tpublic void set",
+    			StringUtils.initCap(name) + "(" + typeName + " " + name
+    					+ ") {\n"));
+    	writer.write(StringUtils.concat(prefix, "\t\tthis.", typeField, " = ",
+    			typeConstant, ";\n"));
+    	writer.write(StringUtils.concat(prefix, "\t\tthis.", name, " = ", name,
+    			";\n"));
+    	writer.write(prefix);
+    	writer.write("\t}\n\n");
+    }
 
 }

@@ -29,14 +29,14 @@ package ch.eskaton.asn4j.parser.ast;
 
 public class ObjectDefnNode implements ObjectNode {
 
-	private ObjectSyntaxNode syntax;
+    private ObjectSyntaxNode syntax;
 
-	public ObjectDefnNode(ObjectSyntaxNode syntax) {
-		this.syntax = syntax;
-	}
+    public ObjectDefnNode(ObjectSyntaxNode syntax) {
+    	this.syntax = syntax;
+    }
 
-	public ObjectSyntaxNode getSyntax() {
-		return syntax;
-	}
+    public ObjectSyntaxNode getSyntax() {
+    	return syntax;
+    }
 
 }

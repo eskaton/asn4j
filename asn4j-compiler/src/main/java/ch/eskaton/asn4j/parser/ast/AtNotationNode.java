@@ -31,32 +31,32 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class AtNotationNode implements Node {
 
-	private ComponentIdListNode componentIds;
+    private ComponentIdListNode componentIds;
 
-	private int level;
+    private int level;
 
-	public AtNotationNode(ComponentIdListNode componentIds) {
-		this.componentIds = componentIds;
-	}
+    public AtNotationNode(ComponentIdListNode componentIds) {
+    	this.componentIds = componentIds;
+    }
 
-	public AtNotationNode(ComponentIdListNode componentIds, int level) {
-		this.componentIds = componentIds;
-		this.level = level;
-	}
+    public AtNotationNode(ComponentIdListNode componentIds, int level) {
+    	this.componentIds = componentIds;
+    	this.level = level;
+    }
 
-	public ComponentIdListNode getComponentIds() {
-		return componentIds;
-	}
+    public ComponentIdListNode getComponentIds() {
+    	return componentIds;
+    }
 
-	public int getLevel() {
-		return level;
-	}
+    public int getLevel() {
+    	return level;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("AtNotation[@",
-				StringUtils.repeat(".", level),
-				StringUtils.join(componentIds.getIdentifiers(), "."), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("AtNotation[@",
+    			StringUtils.repeat(".", level),
+    			StringUtils.join(componentIds.getIdentifiers(), "."), "]");
+    }
 
 }

@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class TimeOfDay extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "TimeOfDay";
-	}
+    @Override
+    public String toString() {
+    	return "TimeOfDay";
+    }
 
 }

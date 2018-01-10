@@ -32,44 +32,44 @@ import java.io.IOException;
 
 public class LexerInputStream extends CharArrayReader {
 
-	private int mark = 0;
+    private int mark = 0;
 
-	public LexerInputStream(char[] buf) {
-		super(buf);
-	}
+    public LexerInputStream(char[] buf) {
+    	super(buf);
+    }
 
-	public int read() throws IOException {
-		int c = super.read();
+    public int read() throws IOException {
+    	int c = super.read();
 
-		if (c == -1) {
-			pos++;
-		}
+    	if (c == -1) {
+    		pos++;
+    	}
 
-		return c;
-	}
+    	return c;
+    }
 
-	public void unread() throws IOException {
-		if (pos == 0) {
-			throw new IOException("Invalid position");
-		}
+    public void unread() throws IOException {
+    	if (pos == 0) {
+    		throw new IOException("Invalid position");
+    	}
 
-		pos--;
-	}
+    	pos--;
+    }
 
-	public void mark() {
-		this.mark = pos;
-	}
+    public void mark() {
+    	this.mark = pos;
+    }
 
-	public void reset() {
-		pos = mark;
-	}
+    public void reset() {
+    	pos = mark;
+    }
 
-	public int getPos() {
-		return pos;
-	}
+    public int getPos() {
+    	return pos;
+    }
 
-	public void seek(int offset) {
-		pos = offset;
-	}
+    public void seek(int offset) {
+    	pos = offset;
+    }
 
 }

@@ -33,19 +33,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class SignedNumber implements Value {
 
-	private BigInteger number;
+    private BigInteger number;
 
-	public SignedNumber(BigInteger number) {
-		this.number = number;
-	}
+    public SignedNumber(BigInteger number) {
+    	this.number = number;
+    }
 
-	public BigInteger getNumber() {
-		return number;
-	}
+    public BigInteger getNumber() {
+    	return number;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("SignedNumber[", number.toString(), "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("SignedNumber[", number.toString(), "]");
+    }
 
 }

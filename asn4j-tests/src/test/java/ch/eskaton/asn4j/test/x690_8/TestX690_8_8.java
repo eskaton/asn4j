@@ -41,20 +41,20 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 
 public class TestX690_8_8 {
 
-	@Test
-	public void testEncode() throws ASN1RuntimeException, IOException {
-		BEREncoder encoder = new BEREncoder();
+    @Test
+    public void testEncode() throws ASN1RuntimeException, IOException {
+    	BEREncoder encoder = new BEREncoder();
 
-		assertArrayEquals(new byte[] { 0x05, 0x00 },
-				encoder.encode(new ASN1Null()));
-	}
+    	assertArrayEquals(new byte[] { 0x05, 0x00 },
+    			encoder.encode(new ASN1Null()));
+    }
 
-	@Test
-	public void testDecode() throws ASN1RuntimeException, IOException {
-		BERDecoder decoder = new BERDecoder();
+    @Test
+    public void testDecode() throws ASN1RuntimeException, IOException {
+    	BERDecoder decoder = new BERDecoder();
 
-		assertEquals(new ASN1Null(),
-				decoder.decode(ASN1Null.class, new byte[] { 0x05, 0x00 }));
-	}
+    	assertEquals(new ASN1Null(),
+    			decoder.decode(ASN1Null.class, new byte[] { 0x05, 0x00 }));
+    }
 
 }

@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class VisibleString extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "VisibleString";
-	}
+    @Override
+    public String toString() {
+    	return "VisibleString";
+    }
 
 }

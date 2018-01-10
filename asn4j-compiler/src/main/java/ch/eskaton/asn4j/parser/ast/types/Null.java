@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class Null extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "Null";
-	}
+    @Override
+    public String toString() {
+    	return "Null";
+    }
 
 }

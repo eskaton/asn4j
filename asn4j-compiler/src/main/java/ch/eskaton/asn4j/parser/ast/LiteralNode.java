@@ -31,19 +31,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class LiteralNode implements Node {
 
-	private String text;
+    private String text;
 
-	public LiteralNode(String text) {
-		this.text = text;
-	}
+    public LiteralNode(String text) {
+    	this.text = text;
+    }
 
-	public String getText() {
-		return text;
-	}
+    public String getText() {
+    	return text;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("Literal[text=", text, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("Literal[text=", text, "]");
+    }
 
 }

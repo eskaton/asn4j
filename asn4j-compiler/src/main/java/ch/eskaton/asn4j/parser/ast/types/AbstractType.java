@@ -36,48 +36,48 @@ import ch.eskaton.asn4j.runtime.TaggingMode;
 
 public abstract class AbstractType implements Type {
 
-	private Tag tag;
+    private Tag tag;
 
-	private TaggingMode taggingMode;
+    private TaggingMode taggingMode;
 
-	private List<Constraint> constraints;
+    private List<Constraint> constraints;
 
-	private EncodingPrefixNode encodingPrefix;
+    private EncodingPrefixNode encodingPrefix;
 
-	public Tag getTag() {
-		return tag;
-	}
+    public Tag getTag() {
+    	return tag;
+    }
 
-	public void setTag(Tag tag) {
-		this.tag = tag;
-	}
+    public void setTag(Tag tag) {
+    	this.tag = tag;
+    }
 
-	public TaggingMode getTaggingMode() {
-		return taggingMode;
-	}
+    public TaggingMode getTaggingMode() {
+    	return taggingMode;
+    }
 
-	public void setTaggingMode(TaggingMode taggingMode) {
-		this.taggingMode = taggingMode;
-	}
+    public void setTaggingMode(TaggingMode taggingMode) {
+    	this.taggingMode = taggingMode;
+    }
 
-	public void setConstraints(List<Constraint> constraint) {
-		this.constraints = constraint;
-	}
+    public void setConstraints(List<Constraint> constraint) {
+    	this.constraints = constraint;
+    }
 
-	public List<Constraint> getConstraints() {
-		return constraints;
-	}
+    public List<Constraint> getConstraints() {
+    	return constraints;
+    }
 
-	public boolean hasConstraint() {
-		return constraints != null && constraints.size() > 0;
-	}
+    public boolean hasConstraint() {
+    	return constraints != null && constraints.size() > 0;
+    }
 
-	public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
-		this.encodingPrefix = encodingPrefix;
-	}
+    public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
+    	this.encodingPrefix = encodingPrefix;
+    }
 
-	public EncodingPrefixNode getEncodingPrefix() {
-		return encodingPrefix;
-	}
+    public EncodingPrefixNode getEncodingPrefix() {
+    	return encodingPrefix;
+    }
 
 }

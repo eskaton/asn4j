@@ -31,11 +31,11 @@ import ch.eskaton.asn4j.parser.ast.types.Real;
 
 public class RealCompiler extends BuiltinTypeCompiler<Real> {
 
-	@Override
-	public void compile(CompilerContext ctx, String name, Real node)
-			throws CompilerException {
-		ctx.createClass(name, node, false);
-		ctx.finishClass();
-	}
+    @Override
+    public void compile(CompilerContext ctx, String name, Real node)
+    		throws CompilerException {
+    	ctx.createClass(name, node, false);
+    	ctx.finishClass();
+    }
 
 }

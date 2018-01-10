@@ -33,19 +33,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class Governor extends ParamGovernorNode {
 
-	private Node type;
+    private Node type;
 
-	public Governor(Node type) {
-		this.type = type;
-	}
+    public Governor(Node type) {
+    	this.type = type;
+    }
 
-	public Node getType() {
-		return type;
-	}
+    public Node getType() {
+    	return type;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("Governor[", type, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("Governor[", type, "]");
+    }
 
 }

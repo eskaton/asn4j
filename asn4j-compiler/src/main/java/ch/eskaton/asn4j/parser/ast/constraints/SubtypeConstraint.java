@@ -32,19 +32,19 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class SubtypeConstraint extends AbstractConstraint {
 
-	private ElementSetSpecsNode elementSetSpecs;
+    private ElementSetSpecsNode elementSetSpecs;
 
-	public SubtypeConstraint(ElementSetSpecsNode elementSetSpecs) {
-		this.elementSetSpecs = elementSetSpecs;
-	}
+    public SubtypeConstraint(ElementSetSpecsNode elementSetSpecs) {
+    	this.elementSetSpecs = elementSetSpecs;
+    }
 
-	public ElementSetSpecsNode getElementSetSpecs() {
-		return elementSetSpecs;
-	}
+    public ElementSetSpecsNode getElementSetSpecs() {
+    	return elementSetSpecs;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("SubtypeConstraint[", elementSetSpecs, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("SubtypeConstraint[", elementSetSpecs, "]");
+    }
 
 }

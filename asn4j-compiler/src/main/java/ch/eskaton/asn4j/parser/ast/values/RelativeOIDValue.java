@@ -33,14 +33,14 @@ import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 
 public class RelativeOIDValue implements Value {
 
-	private List<OIDComponentNode> components;
+    private List<OIDComponentNode> components;
 
-	public RelativeOIDValue(List<OIDComponentNode> components) {
-		this.components = components;
-	}
+    public RelativeOIDValue(List<OIDComponentNode> components) {
+    	this.components = components;
+    }
 
-	public List<OIDComponentNode> getComponents() {
-		return components;
-	}
+    public List<OIDComponentNode> getComponents() {
+    	return components;
+    }
 
 }

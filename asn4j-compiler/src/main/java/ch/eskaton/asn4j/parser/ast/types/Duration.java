@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class Duration extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "Duration";
-	}
+    @Override
+    public String toString() {
+    	return "Duration";
+    }
 
 }

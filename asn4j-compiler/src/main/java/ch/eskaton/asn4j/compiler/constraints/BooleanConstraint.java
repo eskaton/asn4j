@@ -32,33 +32,33 @@ import java.util.Set;
 
 public class BooleanConstraint implements Constraint<BooleanConstraint> {
 
-	private Set<Boolean> booleans = new HashSet<Boolean>();
+    private Set<Boolean> booleans = new HashSet<Boolean>();
 
-	public BooleanConstraint(boolean... values) {
-		for (boolean value : values) {
-			booleans.add(value);
-		}
-	}
+    public BooleanConstraint(boolean... values) {
+    	for (boolean value : values) {
+    		booleans.add(value);
+    	}
+    }
 
-	public static BooleanConstraint all() {
-		return new BooleanConstraint(true, false);
-	}
+    public static BooleanConstraint all() {
+    	return new BooleanConstraint(true, false);
+    }
 
-	public void union(BooleanConstraint c) {
-		booleans.addAll(c.booleans);
+    public void union(BooleanConstraint c) {
+    	booleans.addAll(c.booleans);
 
-	}
+    }
 
-	public void intersect(BooleanConstraint c) {
-		booleans.retainAll(c.booleans);
-	}
+    public void intersect(BooleanConstraint c) {
+    	booleans.retainAll(c.booleans);
+    }
 
-	public void minus(BooleanConstraint c) {
-		booleans.removeAll(c.booleans);
-	}
+    public void minus(BooleanConstraint c) {
+    	booleans.removeAll(c.booleans);
+    }
 
-	Set<Boolean> getValues() {
-		return booleans;
-	}
+    Set<Boolean> getValues() {
+    	return booleans;
+    }
 
 }

@@ -31,26 +31,26 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class NamedType extends AbstractType {
 
-	private String name;
+    private String name;
 
-	private Type type;
+    private Type type;
 
-	public NamedType(String name, Type type) {
-		this.name = name;
-		this.type = type;
-	}
+    public NamedType(String name, Type type) {
+    	this.name = name;
+    	this.type = type;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
-	public Type getType() {
-		return type;
-	}
+    public Type getType() {
+    	return type;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("NamedType[", name, "=", type, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("NamedType[", name, "=", type, "]");
+    }
 
 }

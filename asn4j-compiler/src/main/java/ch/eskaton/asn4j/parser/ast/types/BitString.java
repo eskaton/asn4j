@@ -34,24 +34,24 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class BitString extends AbstractType {
 
-	private List<NamedBitNode> namedBits;
+    private List<NamedBitNode> namedBits;
 
-	public BitString() {
-	}
+    public BitString() {
+    }
 
-	public BitString(List<NamedBitNode> namedBits) {
-		this.namedBits = namedBits;
-	}
+    public BitString(List<NamedBitNode> namedBits) {
+    	this.namedBits = namedBits;
+    }
 
-	public List<NamedBitNode> getNamedBits() {
-		return namedBits;
-	}
+    public List<NamedBitNode> getNamedBits() {
+    	return namedBits;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("BitString[",
-				(namedBits != null ? StringUtils.join(namedBits, ", ") : ""),
-				"]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("BitString[",
+    			(namedBits != null ? StringUtils.join(namedBits, ", ") : ""),
+    			"]");
+    }
 
 }

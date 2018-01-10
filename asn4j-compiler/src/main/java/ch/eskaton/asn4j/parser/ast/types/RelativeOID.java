@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class RelativeOID extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "RelativeOID";
-	}
+    @Override
+    public String toString() {
+    	return "RelativeOID";
+    }
 
 }

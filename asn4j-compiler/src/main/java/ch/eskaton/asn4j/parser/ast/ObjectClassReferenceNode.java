@@ -32,31 +32,31 @@ import java.util.List;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class ObjectClassReferenceNode implements ObjectClassNode,
-		ParameterizedNode {
+    	ParameterizedNode {
 
-	private String reference;
+    private String reference;
 
-	private List<Node> parameters;
+    private List<Node> parameters;
 
-	public ObjectClassReferenceNode(String reference) {
-		this.reference = reference;
-	}
+    public ObjectClassReferenceNode(String reference) {
+    	this.reference = reference;
+    }
 
-	public String getReference() {
-		return reference;
-	}
+    public String getReference() {
+    	return reference;
+    }
 
-	public void setParameters(List<Node> parameters) {
-		this.parameters = parameters;
-	}
+    public void setParameters(List<Node> parameters) {
+    	this.parameters = parameters;
+    }
 
-	public List<Node> getParameters() {
-		return parameters;
-	}
+    public List<Node> getParameters() {
+    	return parameters;
+    }
 
-	public String toString() {
-		return StringUtils.concat(getClass().getSimpleName(), "[", reference,
-				"]");
-	}
+    public String toString() {
+    	return StringUtils.concat(getClass().getSimpleName(), "[", reference,
+    			"]");
+    }
 
 }

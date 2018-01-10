@@ -33,31 +33,31 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class ExtensionAdditionAlternativeNode implements Node {
 
-	private NamedType namedType;
+    private NamedType namedType;
 
-	private ExtensionAdditionAlternativesGroup altGroups;
+    private ExtensionAdditionAlternativesGroup altGroups;
 
-	public ExtensionAdditionAlternativeNode(NamedType namedType) {
-		this.namedType = namedType;
-	}
+    public ExtensionAdditionAlternativeNode(NamedType namedType) {
+    	this.namedType = namedType;
+    }
 
-	public ExtensionAdditionAlternativeNode(
-			ExtensionAdditionAlternativesGroup altGroups) {
-		this.altGroups = altGroups;
-	}
+    public ExtensionAdditionAlternativeNode(
+    		ExtensionAdditionAlternativesGroup altGroups) {
+    	this.altGroups = altGroups;
+    }
 
-	public NamedType getNamedType() {
-		return namedType;
-	}
+    public NamedType getNamedType() {
+    	return namedType;
+    }
 
-	public ExtensionAdditionAlternativesGroup getAltGroups() {
-		return altGroups;
-	}
+    public ExtensionAdditionAlternativesGroup getAltGroups() {
+    	return altGroups;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("ExtensionAdditionAlternative[",
-				namedType != null ? namedType : altGroups, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("ExtensionAdditionAlternative[",
+    			namedType != null ? namedType : altGroups, "]");
+    }
 
 }

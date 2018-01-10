@@ -31,34 +31,34 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 
 public class EnumerationItemNode implements Node {
 
-	private String name;
+    private String name;
 
-	private Integer number;
+    private Integer number;
 
-	private DefinedValue ref;
+    private DefinedValue ref;
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+    	this.name = name;
+    }
 
-	public Integer getNumber() {
-		return number;
-	}
+    public Integer getNumber() {
+    	return number;
+    }
 
-	public void setNumber(Integer number) {
-		this.number = number;
-	}
+    public void setNumber(Integer number) {
+    	this.number = number;
+    }
 
-	public DefinedValue getRef() {
-		return ref;
-	}
+    public DefinedValue getRef() {
+    	return ref;
+    }
 
-	public void setRef(DefinedValue ref) {
-		this.ref = ref;
-	}
+    public void setRef(DefinedValue ref) {
+    	this.ref = ref;
+    }
 
 }

@@ -31,20 +31,20 @@ import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
 
 public class SequenceType extends Collection {
 
-	public SequenceType() {
-	}
+    public SequenceType() {
+    }
 
-	public SequenceType(ComponentTypeListsNode compTypes) {
-		super(compTypes);
-	}
+    public SequenceType(ComponentTypeListsNode compTypes) {
+    	super(compTypes);
+    }
 
-	public SequenceType(Object extAndEx, Object optExtMarker) {
-		super(extAndEx, optExtMarker);
-	}
+    public SequenceType(Object extAndEx, Object optExtMarker) {
+    	super(extAndEx, optExtMarker);
+    }
 
-	@Override
-	protected String getType() {
-		return "Sequence";
-	}
+    @Override
+    protected String getType() {
+    	return "Sequence";
+    }
 
 }

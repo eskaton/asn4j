@@ -33,74 +33,74 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 public class FieldSpecNode extends AbstractASN1FieldSpecNode {
 
-	private Node type;
+    private Node type;
 
-	private boolean unique;
+    private boolean unique;
 
-	public FieldSpecNode(String reference, Node type, boolean unique,
-			OptionalitySpecNode optionalitySpec) {
-		super(reference, optionalitySpec);
-		this.type = type;
-		this.unique = unique;
-	}
+    public FieldSpecNode(String reference, Node type, boolean unique,
+    		OptionalitySpecNode optionalitySpec) {
+    	super(reference, optionalitySpec);
+    	this.type = type;
+    	this.unique = unique;
+    }
 
-	public FixedTypeValueFieldSpecNode toFixedTypeValueFieldSpec() {
-		if ((type instanceof ObjectClassReferenceNode)) {
-			return null;
-		}
+    public FixedTypeValueFieldSpecNode toFixedTypeValueFieldSpec() {
+    	if ((type instanceof ObjectClassReferenceNode)) {
+    		return null;
+    	}
 
-		return new FixedTypeValueFieldSpecNode(getReference(), (Type) type,
-				unique, getOptionalitySpec());
-	}
+    	return new FixedTypeValueFieldSpecNode(getReference(), (Type) type,
+    			unique, getOptionalitySpec());
+    }
 
-	public ObjectFieldSpecNode toObjectFieldSpec() {
-		if (unique) {
-			return null;
-		}
+    public ObjectFieldSpecNode toObjectFieldSpec() {
+    	if (unique) {
+    		return null;
+    	}
 
-		OptionalitySpecNode optionalitySpec = getOptionalitySpec();
+    	OptionalitySpecNode optionalitySpec = getOptionalitySpec();
 
-		if (optionalitySpec instanceof DefaultSpecNode) {
-			optionalitySpec = ((DefaultSpecNode) optionalitySpec)
-					.toDefaultObjectSpec();
+    	if (optionalitySpec instanceof DefaultSpecNode) {
+    		optionalitySpec = ((DefaultSpecNode) optionalitySpec)
+    				.toDefaultObjectSpec();
 
-			if (optionalitySpec == null) {
-				return null;
-			}
-		}
+    		if (optionalitySpec == null) {
+    			return null;
+    		}
+    	}
 
-		if (type instanceof TypeReference) {
-			TypeReference typeRef = (TypeReference) type;
+    	if (type instanceof TypeReference) {
+    		TypeReference typeRef = (TypeReference) type;
 
-			if (typeRef.getConstraints() != null) {
-				return null;
-			}
+    		if (typeRef.getConstraints() != null) {
+    			return null;
+    		}
 
-			ObjectClassReferenceNode objRef = new ObjectClassReferenceNode(
-					typeRef.getType());
-			objRef.setParameters(typeRef.getParameters());
+    		ObjectClassReferenceNode objRef = new ObjectClassReferenceNode(
+    				typeRef.getType());
+    		objRef.setParameters(typeRef.getParameters());
 
-			return new ObjectFieldSpecNode(getReference(), objRef,
-					optionalitySpec);
-		} else if (type instanceof ExternalTypeReference) {
-			ExternalTypeReference typeRef = (ExternalTypeReference) type;
+    		return new ObjectFieldSpecNode(getReference(), objRef,
+    				optionalitySpec);
+    	} else if (type instanceof ExternalTypeReference) {
+    		ExternalTypeReference typeRef = (ExternalTypeReference) type;
 
-			if (typeRef.getConstraints() != null) {
-				return null;
-			}
+    		if (typeRef.getConstraints() != null) {
+    			return null;
+    		}
 
-			ExternalObjectClassReferenceNode objRef = new ExternalObjectClassReferenceNode(
-					typeRef.getModule(), typeRef.getType());
-			objRef.setParameters(typeRef.getParameters());
+    		ExternalObjectClassReferenceNode objRef = new ExternalObjectClassReferenceNode(
+    				typeRef.getModule(), typeRef.getType());
+    		objRef.setParameters(typeRef.getParameters());
 
-			return new ObjectFieldSpecNode(getReference(), objRef,
-					optionalitySpec);
-		} else if (type instanceof ObjectClassReferenceNode) {
-			return new ObjectFieldSpecNode(getReference(),
-					(ObjectClassReferenceNode) type, optionalitySpec);
-		}
+    		return new ObjectFieldSpecNode(getReference(), objRef,
+    				optionalitySpec);
+    	} else if (type instanceof ObjectClassReferenceNode) {
+    		return new ObjectFieldSpecNode(getReference(),
+    				(ObjectClassReferenceNode) type, optionalitySpec);
+    	}
 
-		return null;
-	}
+    	return null;
+    }
 
 }

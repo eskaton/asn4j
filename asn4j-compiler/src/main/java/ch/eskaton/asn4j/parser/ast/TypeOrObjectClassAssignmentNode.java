@@ -28,17 +28,17 @@
 package ch.eskaton.asn4j.parser.ast;
 
 public class TypeOrObjectClassAssignmentNode<T extends Node> extends
-		AssignmentNode {
+    	AssignmentNode {
 
-	private T type;
+    private T type;
 
-	public TypeOrObjectClassAssignmentNode(String reference, T type) {
-		super(reference);
-		this.type = type;
-	}
+    public TypeOrObjectClassAssignmentNode(String reference, T type) {
+    	super(reference);
+    	this.type = type;
+    }
 
-	public T getType() {
-		return type;
-	}
+    public T getType() {
+    	return type;
+    }
 
 }

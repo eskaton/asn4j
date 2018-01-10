@@ -34,22 +34,22 @@ import ch.eskaton.asn4j.parser.ast.AbstractASN1FieldSpecNode;
 
 public class ObjectClassDefn implements ObjectClassNode {
 
-	private List<AbstractASN1FieldSpecNode> fieldSpec;
+    private List<AbstractASN1FieldSpecNode> fieldSpec;
 
-	private List<Object> syntaxSpec;
+    private List<Object> syntaxSpec;
 
-	public ObjectClassDefn(List<AbstractASN1FieldSpecNode> fieldSpec,
-			List<Object> syntaxSpec) {
-		this.fieldSpec = fieldSpec;
-		this.syntaxSpec = syntaxSpec;
-	}
+    public ObjectClassDefn(List<AbstractASN1FieldSpecNode> fieldSpec,
+    		List<Object> syntaxSpec) {
+    	this.fieldSpec = fieldSpec;
+    	this.syntaxSpec = syntaxSpec;
+    }
 
-	public List<AbstractASN1FieldSpecNode> getFieldSpec() {
-		return fieldSpec;
-	}
+    public List<AbstractASN1FieldSpecNode> getFieldSpec() {
+    	return fieldSpec;
+    }
 
-	public List<Object> getSyntaxSpec() {
-		return syntaxSpec;
-	}
+    public List<Object> getSyntaxSpec() {
+    	return syntaxSpec;
+    }
 
 }

@@ -33,14 +33,14 @@ import ch.eskaton.asn4j.parser.IRIToken;
 
 public class RelativeIRIValue implements Value {
 
-	private List<IRIToken> arcIdentifiers;
+    private List<IRIToken> arcIdentifiers;
 
-	public RelativeIRIValue(List<IRIToken> arcIdentifiers) {
-		this.arcIdentifiers = arcIdentifiers;
-	}
+    public RelativeIRIValue(List<IRIToken> arcIdentifiers) {
+    	this.arcIdentifiers = arcIdentifiers;
+    }
 
-	public List<IRIToken> getArcIdentifiers() {
-		return arcIdentifiers;
-	}
+    public List<IRIToken> getArcIdentifiers() {
+    	return arcIdentifiers;
+    }
 
 }

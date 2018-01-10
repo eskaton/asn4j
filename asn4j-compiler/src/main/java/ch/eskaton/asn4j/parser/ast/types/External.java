@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 public class External extends AbstractType {
 
-	@Override
-	public String toString() {
-		return "External";
-	}
+    @Override
+    public String toString() {
+    	return "External";
+    }
 
 }

@@ -36,33 +36,33 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaEnum implements JavaObject {
 
-	private String name;
+    private String name;
 
-	private List<String> enumConstants = new ArrayList<String>();
+    private List<String> enumConstants = new ArrayList<String>();
 
-	public JavaEnum(String name) {
-		this.name = name;
-	}
+    public JavaEnum(String name) {
+    	this.name = name;
+    }
 
-	public void write(BufferedWriter writer, String prefix) throws IOException {
-		writer.write(StringUtils.concat(prefix, "public enum ", name, " {\n"));
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+    	writer.write(StringUtils.concat(prefix, "public enum ", name, " {\n"));
 
-		boolean first = true;
+    	boolean first = true;
 
-		for (String ec : enumConstants) {
-			if (first) {
-				first = false;
-			} else {
-				writer.write(",\n");
-			}
-			writer.write(StringUtils.concat(prefix, "\t", ec));
-		}
+    	for (String ec : enumConstants) {
+    		if (first) {
+    			first = false;
+    		} else {
+    			writer.write(",\n");
+    		}
+    		writer.write(StringUtils.concat(prefix, "\t", ec));
+    	}
 
-		writer.write(StringUtils.concat("\n", prefix, "};\n\n"));
-	}
+    	writer.write(StringUtils.concat("\n", prefix, "};\n\n"));
+    }
 
-	public void addEnumConstant(String enumConstant) {
-		enumConstants.add(enumConstant);
-	}
+    public void addEnumConstant(String enumConstant) {
+    	enumConstants.add(enumConstant);
+    }
 
 }

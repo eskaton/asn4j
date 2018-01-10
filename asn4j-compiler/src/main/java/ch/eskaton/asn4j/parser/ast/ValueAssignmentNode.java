@@ -31,16 +31,16 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class ValueAssignmentNode extends
-		ValueOrObjectAssignmentNode<Type, Value> {
+    	ValueOrObjectAssignmentNode<Type, Value> {
 
-	public ValueAssignmentNode(String reference, Type type, Value value) {
-		super(reference, type, value);
-	}
+    public ValueAssignmentNode(String reference, Type type, Value value) {
+    	super(reference, type, value);
+    }
 
-	@Override
-	public String toString() {
-		return "ValueAssignment[" + getReference() + "(" + getType() + ") = "
-				+ getValue() + "]";
-	}
+    @Override
+    public String toString() {
+    	return "ValueAssignment[" + getReference() + "(" + getType() + ") = "
+    			+ getValue() + "]";
+    }
 
 }

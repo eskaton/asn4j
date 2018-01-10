@@ -29,21 +29,21 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 public class NamedValue implements Value {
 
-	private String name;
+    private String name;
 
-	private Value value;
+    private Value value;
 
-	public NamedValue(String name, Value value) {
-		this.name = name;
-		this.value = value;
-	}
+    public NamedValue(String name, Value value) {
+    	this.name = name;
+    	this.value = value;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+    	return name;
+    }
 
-	public Value getValue() {
-		return value;
-	}
+    public Value getValue() {
+    	return value;
+    }
 
 }

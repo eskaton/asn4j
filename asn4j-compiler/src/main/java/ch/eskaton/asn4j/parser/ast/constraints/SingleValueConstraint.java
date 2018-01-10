@@ -31,21 +31,21 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class SingleValueConstraint extends AbstractConstraint implements
-		Constraint {
+    	Constraint {
 
-	private Value value;
+    private Value value;
 
-	public SingleValueConstraint(Value value) {
-		this.value = value;
-	}
+    public SingleValueConstraint(Value value) {
+    	this.value = value;
+    }
 
-	public Value getValue() {
-		return value;
-	}
+    public Value getValue() {
+    	return value;
+    }
 
-	@Override
-	public String toString() {
-		return StringUtils.concat("SingleValueConstraint[", value, "]");
-	}
+    @Override
+    public String toString() {
+    	return StringUtils.concat("SingleValueConstraint[", value, "]");
+    }
 
 }
