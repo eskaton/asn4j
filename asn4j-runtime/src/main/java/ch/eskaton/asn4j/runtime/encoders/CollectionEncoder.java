@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.Utils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
+import ch.eskaton.asn4j.runtime.types.ASN1CollectionOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.utils.ReflectionUtils;
 
@@ -52,8 +53,8 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements
                 ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
                 if (annotation != null) {
                     compField.setAccessible(true);
-
-                    ASN1Tag tag = ReflectionUtils.getAnnotation(compField, ASN1Tag.class);
+                    
+                    ASN1Tag tag = compField.getDeclaredAnnotation(ASN1Tag.class);
 
                     try {
                         Object value = compField.get(obj);

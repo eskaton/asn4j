@@ -95,16 +95,16 @@ public class CompilerUtils {
     		}
     	}
 
-    	switch (module.getTagMode()) {
-    		case Explicit:
-    			return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Explicit;
-    		case Implicit:
-    			return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Implicit;
-    		default:
-    			throw new CompilerException("Automatic tagging not supported");
-
-    	}
-
+        switch (module.getTagMode()) {
+            case Explicit:
+                return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Explicit;
+            case Implicit:
+                return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Implicit;
+            case Automatic:
+                throw new CompilerException("Automatic tagging not supported");
+            default:
+                return Mode.Explicit;
+        }
     }
 
     static JavaAnnotation getTagAnnotation(ModuleNode module, Tag tag,
@@ -125,7 +125,7 @@ public class CompilerUtils {
     									: ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Clazz.ContextSpecific
     											.toString()));
     	// TODO: dynamic
-    	tagAnnotation.addParameter("constructed", "false");
+    	tagAnnotation.addParameter("constructed", "true");
 
     	if (taggingMode != null) {
     		tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName()

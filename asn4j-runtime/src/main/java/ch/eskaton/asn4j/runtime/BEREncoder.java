@@ -27,15 +27,7 @@
 
 package ch.eskaton.asn4j.runtime;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ch.eskaton.asn4j.runtime.encoders.BitStringEncoder;
 import ch.eskaton.asn4j.runtime.encoders.BooleanEncoder;
 import ch.eskaton.asn4j.runtime.encoders.ChoiceEncoder;
@@ -68,6 +60,13 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.utils.HexDump;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BEREncoder implements Encoder {
 
@@ -174,7 +173,9 @@ public class BEREncoder implements Encoder {
         }
 
         try {
-            if (tag == null || tag.mode() != ASN1Tag.Mode.Implicit) {
+            if (tag != null) {
+                baos.write(TLVUtils.getTagLength(tag, obj, buf.length));
+            } else {
                 baos.write(TLVUtils.getTagLength(obj, buf.length));
             }
 
