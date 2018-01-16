@@ -3,13 +3,13 @@ BEGIN
 
 TestSet1 ::= SET {
 	a [0] INTEGER,
-	b [1] OCTET STRING,
-	c INTEGER
+	b [1] INTEGER OPTIONAL
 }
 
 TestSet2 ::= SET {
 	a [0] INTEGER,
-	b [1] INTEGER OPTIONAL
+	b [1] OCTET STRING,
+	c INTEGER OPTIONAL
 }
 
 END

@@ -27,47 +27,76 @@
 
 package ch.eskaton.asn4j.runtime;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Stack;
-
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 public class TLVUtils {
 
     private static final double LOG10_2_DIV_8 = Math.log10(2) / 8;
 
-    @SuppressWarnings("unchecked")
-    static byte[] getTagLength(ASN1Type obj, int contentLen)
+      public static byte[] getTagLength(ASN1Type obj, int contentLen)
     		throws EncodingException {
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        List<ASN1Tag> tags = Utils.getTags(obj.getClass());
 
-    	Stack<byte[]> bufs = new Stack<>();
-    	Class<ASN1Type> clazz = (Class<ASN1Type>) obj.getClass();
-    	List<ASN1Tag> tags = Utils.getTags(clazz);
-    	ASN1Tag tag;
+        return getTagLength(tags, contentLen);
+    }
 
-    	for (int i = tags.size() - 1; i >= 0; i--) {
-    		tag = tags.get(i);
-    		byte[] lenBuf = getLength(contentLen);
-    		byte[] tagBuf = getTag(tag);
-    		bufs.push(lenBuf);
-    		bufs.push(tagBuf);
-    		contentLen += lenBuf.length + tagBuf.length;
-    	}
+    public static byte[] getTagLength(ASN1Tag tag, ASN1Type obj, int contentLength) {
+        if (tag.mode() != ASN1Tag.Mode.Implicit) {
+            ArrayList<ASN1Tag> tags = new ArrayList<>();
 
-    	for (int i = bufs.size() - 1; i >= 0; i--) {
-    		try {
-    			baos.write(bufs.get(i));
-    		} catch (IOException e) {
-    			throw new EncodingException(e);
-    		}
-    	}
+            tags.add(tag);
+            tags.addAll(Utils.getTags(obj.getClass()));
 
-    	return baos.toByteArray();
+            return getTagLength(tags, contentLength);
+        } else {
+            return getTagLength(tag, contentLength);
+        }
+    }
+
+    public static byte[] getTagLength(List<ASN1Tag> tags, int contentLen) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Stack<byte[]> bufs = new Stack<>();
+        ASN1Tag tag;
+
+        for (int i = tags.size() - 1; i >= 0; i--) {
+            tag = tags.get(i);
+            byte[] lenBuf = getLength(contentLen);
+            byte[] tagBuf = getTag(tag);
+            bufs.push(lenBuf);
+            bufs.push(tagBuf);
+            contentLen += lenBuf.length + tagBuf.length;
+        }
+
+        try {
+            for (int i = bufs.size() - 1; i >= 0; i--) {
+                baos.write(bufs.get(i));
+            }
+        } catch (IOException e) {
+            throw new EncodingException(e);
+        }
+
+        return baos.toByteArray();
+    }
+
+    public static byte[] getTagLength(ASN1Tag tag, int contentLen) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            baos.write(getTag(tag));
+            baos.write(getLength(contentLen));
+        } catch (IOException e) {
+            throw new EncodingException(e);
+        }
+
+        return baos.toByteArray();
     }
 
     public static byte[] getLength(int contentLen) {

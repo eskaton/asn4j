@@ -313,6 +313,10 @@ public class BERDecoder implements Decoder {
         public boolean accept(TLV tlv) {
             ASN1Tag tag = tags.next();
 
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Trying: tag={}, class={}", tag.tag(), tag.clazz());
+            }
+
             if (!tag.clazz().equals(tlv.clazz) || tag.tag() != tlv.tag) {
                 return false;
             }
@@ -430,6 +434,10 @@ public class BERDecoder implements Decoder {
         public TagNode accept(TLV tlv) {
             for (TagNode child : childs) {
                 ASN1Tag tag = child.getTag();
+
+                if (LOGGER.isTraceEnabled()) {
+                    LOGGER.trace("Trying: tag={}, class={}", tag.tag(), tag.clazz());
+                }
 
                 if (tag.clazz().equals(tlv.clazz) && tag.tag() == tlv.tag) {
                     return child;

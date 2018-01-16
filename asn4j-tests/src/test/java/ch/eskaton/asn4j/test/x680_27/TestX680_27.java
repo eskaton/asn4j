@@ -44,8 +44,6 @@ public class TestX680_27 {
     public void testSet1() {
         TestSet1 a = new TestSet1();
         a.setA(ASN1Integer.valueOf(4711));
-        a.setB(ASN1OctetString.valueOf("test"));
-        a.setC(ASN1Integer.valueOf(23));
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
@@ -59,6 +57,8 @@ public class TestX680_27 {
     public void testSet2() {
         TestSet2 a = new TestSet2();
         a.setA(ASN1Integer.valueOf(4711));
+        a.setB(ASN1OctetString.valueOf("test"));
+        a.setC(ASN1Integer.valueOf(23));
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
