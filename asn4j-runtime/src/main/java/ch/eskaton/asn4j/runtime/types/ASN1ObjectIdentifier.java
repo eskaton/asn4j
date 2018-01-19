@@ -27,14 +27,16 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.commons.utils.StringUtils;
 
-@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 6, mode = ASN1Tag.Mode.Explicit, constructed = false)
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
+@ASN1Tag(clazz = Clazz.Universal, tag = 6, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1ObjectIdentifier implements ASN1Type {
 
     private List<Integer> components;
@@ -58,11 +60,7 @@ public class ASN1ObjectIdentifier implements ASN1Type {
 
     @Override
     public int hashCode() {
-    	final int prime = 31;
-    	int result = 1;
-    	result = prime * result
-    			+ ((components == null) ? 0 : components.hashCode());
-    	return result;
+    	return Objects.hash(components);
     }
 
     @Override

@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,13 +26,6 @@
  */
 
 package ch.eskaton.asn4j.runtime;
-
-import java.util.*;
-
-import ch.eskaton.commons.utils.ReflectionUtils;
-import ch.eskaton.commons.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.decoders.BitStringDecoder;
@@ -66,6 +59,19 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.utils.CollectionUtils;
+import ch.eskaton.commons.utils.ReflectionUtils;
+import ch.eskaton.commons.utils.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static ch.eskaton.asn4j.runtime.Assert.notEmpty;
 import static ch.eskaton.asn4j.runtime.Assert.notEmptyCollection;
@@ -76,26 +82,35 @@ public class BERDecoder implements Decoder {
             .getLogger(BERDecoder.class);
 
     private BooleanDecoder booleanDecoder = new BooleanDecoder();
+
     private BitStringDecoder bitStringDecoder = new BitStringDecoder();
+
     private ChoiceDecoder choiceDecoder = new ChoiceDecoder();
+
     private EnumeratedTypeDecoder enumeratedTypeDecoder = new EnumeratedTypeDecoder();
+
     private IntegerDecoder integerDecoder = new IntegerDecoder();
+
     private RealDecoder realDecoder = new RealDecoder();
+
     private OIDDecoder oidDecoder = new OIDDecoder();
+
     private OctetStringDecoder octetStringDecoder = new OctetStringDecoder();
+
     private SequenceDecoder sequenceDecoder = new SequenceDecoder();
+
     private SequenceOfDecoder sequenceOfDecoder = new SequenceOfDecoder();
+
     private SetDecoder setDecoder = new SetDecoder();
+
     private VisibleStringDecoder visibleStringDecoder = new VisibleStringDecoder();
 
     public <T extends ASN1Type> T decode(Class<T> type, byte[] buf)
             throws DecodingException {
         DecoderStates states = new DecoderStates();
-        DecoderState state = new DecoderState();
+        DecoderState state = new DecoderState(0, buf.length);
         states.buf = buf;
-        state.pos = 0;
-        state.length = buf.length;
-        states.states.push(state);
+        states.push(state);
         return decode(type, states);
     }
 
@@ -117,8 +132,8 @@ public class BERDecoder implements Decoder {
         return decodeState(type, states, state);
     }
 
-    public <T extends ASN1Type> T decode(Class<T> type, DecoderStates states,
-                                         ASN1Tag tag, boolean optional) throws DecodingException {
+    public <T extends ASN1Type> T decode(Class<T> type, DecoderStates states, ASN1Tag tag, boolean optional)
+            throws DecodingException {
         List<ASN1Tag> tags;
 
         if (ReflectionUtils.extendsClazz(type, ASN1Choice.class)) {
@@ -194,24 +209,23 @@ public class BERDecoder implements Decoder {
 
             throw new DecodingException(th);
         } finally {
-            state = states.states.pop();
+            state = states.pop();
 
-            if (states.states.size() > 0 && state.tlv.nextTlv != -1) {
-                states.states.peek().length -= state.tlv.nextTlv
-                        - states.states.peek().pos;
-                states.states.peek().pos = state.tlv.nextTlv;
+            if (states.size() > 0 && state.tlv.nextTlv != -1) {
+                states.peek().length -= state.tlv.nextTlv - states.peek().pos;
+                states.peek().pos = state.tlv.nextTlv;
             }
         }
 
         return obj;
     }
 
-    private DecoderState consumeMultipleTags(DecoderStates states,
-                                             MultipleTagsMatcher matcher) throws DecodingException {
+    private DecoderState consumeMultipleTags(DecoderStates states, MultipleTagsMatcher matcher)
+            throws DecodingException {
         DecoderState state = consumeTags(states, matcher);
 
         if (state == null) {
-            DecoderState lastState = states.states.peek();
+            DecoderState lastState = states.peek();
 
             if (lastState.length == 0) {
                 throw new PrematureEndOfInputException();
@@ -229,7 +243,7 @@ public class BERDecoder implements Decoder {
         DecoderState state = consumeTags(states, matcher);
 
         if (state == null && !optional) {
-            DecoderState lastState = states.states.peek();
+            DecoderState lastState = states.peek();
 
             if (lastState.length == 0) {
                 throw new PrematureEndOfInputException();
@@ -243,15 +257,14 @@ public class BERDecoder implements Decoder {
 
     private DecoderState consumeTags(DecoderStates states, TagsMatcher tags)
             throws DecodingException {
-        TLV tlv = null;
-        DecoderState state = new DecoderState();
-        DecoderState lastState = states.states.peek();
-        int pos = lastState.pos;
-        int length = lastState.length;
-
         if (!tags.hasNext()) {
             throw new DecodingException("Empty tag list");
         }
+
+        TLV tlv = null;
+        DecoderState lastState = states.peek();
+        int pos = lastState.pos;
+        int length = lastState.length;
 
         try {
 
@@ -270,22 +283,17 @@ public class BERDecoder implements Decoder {
                 }
 
                 if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace(StringUtils.concat("Found: tag=", tlv.tag,
-                            ", class=", tlv.clazz, ", length=", tlv.length));
+                    LOGGER.trace(StringUtils.concat("Found: tag=", tlv.tag, ", class=", tlv.clazz,
+                            ", length=", tlv.length));
                 }
             }
 
-            state.tlv = tlv;
-            state.pos = tlv.pos;
-            state.length = tlv.length;
-            states.states.push(state);
+            return states.push(new DecoderState(tlv, pos, length));
         } catch (DecodingException e) {
             throw e;
         } catch (Throwable th) {
             throw new DecodingException(th);
         }
-
-        return state;
     }
 
     private interface TagsMatcher {
@@ -457,7 +465,7 @@ public class BERDecoder implements Decoder {
 
         @Override
         public int hashCode() {
-            return 31  + ((tag == null) ? 0 : tag.hashCode());
+            return Objects.hashCode(tag);
         }
 
         @Override

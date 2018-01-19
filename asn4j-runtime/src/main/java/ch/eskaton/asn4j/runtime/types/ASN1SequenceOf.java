@@ -27,14 +27,17 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 16, mode = ASN1Tag.Mode.Explicit, constructed = true)
+import java.util.Objects;
+
+@ASN1Tag(clazz = Clazz.Universal, tag = 16, mode = ASN1Tag.Mode.Explicit, constructed = true)
 public class ASN1SequenceOf<T extends ASN1Type> extends ASN1CollectionOf<T> {
 
     @Override
     public int hashCode() {
-        return 31 + ((values == null) ? 0 : values.hashCode());
+        return Objects.hash(values);
     }
 
     @Override

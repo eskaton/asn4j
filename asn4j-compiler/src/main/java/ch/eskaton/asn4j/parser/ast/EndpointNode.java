@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import java.util.Objects;
+
 public class EndpointNode {
 
     private ch.eskaton.asn4j.parser.ast.values.Value value;
@@ -49,11 +51,7 @@ public class EndpointNode {
 
     @Override
     public int hashCode() {
-    	final int prime = 31;
-    	int result = 1;
-    	result = prime * result + (inclusive ? 1231 : 1237);
-    	result = prime * result + ((value == null) ? 0 : value.hashCode());
-    	return result;
+        return Objects.hash(inclusive, value);
     }
 
     @Override
@@ -77,8 +75,7 @@ public class EndpointNode {
 
     @Override
     public String toString() {
-    	return getClass().getSimpleName() + "[value=" + value + ", inclusive="
-    			+ inclusive + "]";
+    	return getClass().getSimpleName() + "[value=" + value + ", inclusive=" + inclusive + "]";
     }
 
 }

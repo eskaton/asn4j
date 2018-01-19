@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
+import java.util.Objects;
+
 public class AbstractASN1String implements ASN1Type {
 
     private String value;
@@ -46,10 +48,7 @@ public class AbstractASN1String implements ASN1Type {
 
     @Override
     public int hashCode() {
-    	final int prime = 31;
-    	int result = 1;
-    	result = prime * result + ((value == null) ? 0 : value.hashCode());
-    	return result;
+        return Objects.hash(value);
     }
 
     @Override

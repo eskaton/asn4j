@@ -57,7 +57,7 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        TLV tlv = getTlv(ASN1Tag.Clazz.Universal, 3, false);
+        TLV tlv = getTlv(Clazz.Universal, 3, false);
 
         assertTrue(matcher.accept(tlv));
         assertFalse(matcher.hasNext());
@@ -67,7 +67,7 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        tlv = getTlv(ASN1Tag.Clazz.Universal, 1, false);
+        tlv = getTlv(Clazz.Universal, 1, false);
 
         assertTrue(matcher.accept(tlv));
         assertFalse(matcher.hasNext());
@@ -80,7 +80,7 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        TLV tlv = getTlv(ASN1Tag.Clazz.Application, 2, false);
+        TLV tlv = getTlv(Clazz.Application, 2, false);
 
         assertFalse(matcher.accept(tlv));
         assertFalse(matcher.hasNext());
@@ -95,13 +95,13 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        TLV tlv = getTlv(ASN1Tag.Clazz.Application, 4, false);
+        TLV tlv = getTlv(Clazz.Application, 4, false);
 
         assertTrue(matcher.accept(tlv));
         assertTrue(matcher.hasNext());
         assertNull(matcher.getMatch());
 
-        tlv = getTlv(ASN1Tag.Clazz.Universal, 3, false);
+        tlv = getTlv(Clazz.Universal, 3, false);
 
         assertTrue(matcher.accept(tlv));
         assertFalse(matcher.hasNext());
@@ -111,13 +111,13 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        tlv = getTlv(ASN1Tag.Clazz.Application, 2, false);
+        tlv = getTlv(Clazz.Application, 2, false);
 
         assertTrue(matcher.accept(tlv));
         assertTrue(matcher.hasNext());
         assertNull(matcher.getMatch());
 
-        tlv = getTlv(ASN1Tag.Clazz.Universal, 1, false);
+        tlv = getTlv(Clazz.Universal, 1, false);
 
         assertTrue(matcher.accept(tlv));
         assertFalse(matcher.hasNext());
@@ -130,32 +130,32 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        TLV tlv = getTlv(ASN1Tag.Clazz.Application, 4, false);
+        TLV tlv = getTlv(Clazz.Application, 4, false);
 
         assertTrue(matcher.accept(tlv));
         assertTrue(matcher.hasNext());
         assertNull(matcher.getMatch());
 
-        tlv = getTlv(ASN1Tag.Clazz.Universal, 1, false);
+        tlv = getTlv(Clazz.Universal, 1, false);
 
         assertFalse(matcher.accept(tlv));
         assertFalse(matcher.hasNext());
         assertNull(matcher.getMatch());
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 1, mode = ASN1Tag.Mode.Explicit, constructed = false)
+    @ASN1Tag(clazz = Clazz.Universal, tag = 1, mode = ASN1Tag.Mode.Explicit, constructed = false)
     private static class TestTag1a implements ASN1Type {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Application, tag = 2, mode = ASN1Tag.Mode.Explicit, constructed = false)
+    @ASN1Tag(clazz = Clazz.Application, tag = 2, mode = ASN1Tag.Mode.Explicit, constructed = false)
     private static class TestTag1b extends TestTag1a {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
+    @ASN1Tag(clazz = Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
     private static class TestTag2a implements ASN1Type {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Application, tag = 4, mode = ASN1Tag.Mode.Explicit, constructed = false)
+    @ASN1Tag(clazz = Clazz.Application, tag = 4, mode = ASN1Tag.Mode.Explicit, constructed = false)
     private static class TestTag2b extends TestTag2a {
     }
 

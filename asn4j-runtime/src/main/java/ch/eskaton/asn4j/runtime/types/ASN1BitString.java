@@ -27,11 +27,14 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.commons.utils.HexDump;
 
-@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
+import java.util.Objects;
+
+@ASN1Tag(clazz = Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1BitString implements ASN1Type {
 
     protected byte[] value = new byte[0];
@@ -108,7 +111,7 @@ public class ASN1BitString implements ASN1Type {
 
     @Override
     public int hashCode() {
-        return 31 + ((value == null) ? 0 : value.hashCode());
+        return Objects.hash(value);
     }
 
     @Override

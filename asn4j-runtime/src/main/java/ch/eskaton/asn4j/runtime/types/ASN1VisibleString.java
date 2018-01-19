@@ -27,9 +27,10 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 26, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.Universal, tag = 26, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1VisibleString extends AbstractASN1String {
 
     public static ASN1VisibleString fromString(String s) {

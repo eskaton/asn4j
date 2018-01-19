@@ -27,11 +27,13 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-import java.util.Arrays;
-
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 4, mode = ASN1Tag.Mode.Explicit, constructed = false)
+import java.util.Arrays;
+import java.util.Objects;
+
+@ASN1Tag(clazz = Clazz.Universal, tag = 4, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1OctetString implements ASN1Type {
 
     private byte[] value;
@@ -62,10 +64,7 @@ public class ASN1OctetString implements ASN1Type {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(value);
-        return result;
+        return Objects.hash(value);
     }
 
     @Override

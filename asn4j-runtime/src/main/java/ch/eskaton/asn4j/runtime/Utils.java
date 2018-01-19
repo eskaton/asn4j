@@ -57,7 +57,7 @@ public class Utils {
     		tags.add(tag);
 
     		if (tag.mode() != ASN1Tag.Mode.Explicit
-    				|| tag.clazz() == ASN1Tag.Clazz.Universal) {
+    				|| tag.clazz() == Clazz.Universal) {
     			break;
     		}
 
