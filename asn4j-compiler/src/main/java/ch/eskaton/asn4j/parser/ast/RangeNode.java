@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.ast.constraints.AbstractConstraint;
 import ch.eskaton.commons.utils.StringUtils;
 
+import java.util.Objects;
+
 public class RangeNode extends AbstractConstraint {
 
     private EndpointNode lower;
@@ -51,11 +53,7 @@ public class RangeNode extends AbstractConstraint {
 
     @Override
     public int hashCode() {
-    	final int prime = 31;
-    	int result = 1;
-    	result = prime * result + ((lower == null) ? 0 : lower.hashCode());
-    	result = prime * result + ((upper == null) ? 0 : upper.hashCode());
-    	return result;
+        return Objects.hash(lower, upper);
     }
 
     @Override

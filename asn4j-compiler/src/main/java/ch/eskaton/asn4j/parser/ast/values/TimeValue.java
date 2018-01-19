@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import java.util.Objects;
+
 public class TimeValue implements Value {
 
     private String value;
@@ -37,10 +39,7 @@ public class TimeValue implements Value {
 
     @Override
     public int hashCode() {
-    	final int prime = 31;
-    	int result = 1;
-    	result = prime * result + ((value == null) ? 0 : value.hashCode());
-    	return result;
+        return Objects.hash(value);
     }
 
     @Override

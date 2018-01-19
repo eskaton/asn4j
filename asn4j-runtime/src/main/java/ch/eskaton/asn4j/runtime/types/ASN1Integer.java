@@ -27,12 +27,14 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-import java.math.BigInteger;
-
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
-@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 2, mode = ASN1Tag.Mode.Explicit, constructed = false)
+import java.math.BigInteger;
+import java.util.Objects;
+
+@ASN1Tag(clazz = Clazz.Universal, tag = 2, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1Integer implements ASN1Type {
 
     private BigInteger value;
@@ -72,10 +74,7 @@ public class ASN1Integer implements ASN1Type {
 
     @Override
     public int hashCode() {
-    	final int prime = 31;
-    	int result = 1;
-    	result = prime * result + ((value == null) ? 0 : value.hashCode());
-    	return result;
+    	return Objects.hash(value);
     }
 
     @Override

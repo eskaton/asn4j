@@ -35,7 +35,7 @@ public class TLV {
 
     public int pos;
 
-    public ASN1Tag.Clazz clazz;
+    public Clazz clazz;
 
     public boolean constructed;
 
@@ -56,7 +56,7 @@ public class TLV {
 
     	TLV tlv = new TLV();
     	int id = buf[pos++];
-    	tlv.clazz = ASN1Tag.Clazz.values()[(id >> 6) & 0x3];
+    	tlv.clazz = Clazz.values()[(id >> 6) & 0x3];
     	tlv.constructed = ((id >> 5) & 0x1) == 1 ? true : false;
     	tlv.tag = id & 0x1f;
 

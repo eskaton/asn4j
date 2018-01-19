@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.java;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Objects;
 
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -57,11 +58,7 @@ public class JavaParameter implements JavaObject {
 
     @Override
     public int hashCode() {
-    	final int prime = 31;
-    	int result = 1;
-    	result = prime * result + ((name == null) ? 0 : name.hashCode());
-    	result = prime * result + ((type == null) ? 0 : type.hashCode());
-    	return result;
+        return Objects.hash(name, type);
     }
 
     @Override
