@@ -27,11 +27,12 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-import java.util.Date;
-
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 24, mode = ASN1Tag.Mode.Implicit, constructed = false)
+import java.util.Date;
+
+@ASN1Tag(clazz = Clazz.Universal, tag = 24, mode = ASN1Tag.Mode.Implicit, constructed = false)
 public class ASN1GeneralizedTime extends ASN1VisibleString {
 
     public static ASN1GeneralizedTime fromDate(Date d) {

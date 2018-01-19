@@ -44,7 +44,7 @@ public class ChoiceDecoder {
 
     public <T extends ASN1Type> T decode(Decoder decoder, Class<T> type,
                                          DecoderStates states) throws DecodingException {
-        DecoderState lastState = states.states.peek();
+        DecoderState lastState = states.peek();
         int pos = lastState.pos;
         int length = lastState.length;
 

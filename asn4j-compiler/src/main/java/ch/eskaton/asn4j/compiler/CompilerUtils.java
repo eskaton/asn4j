@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode;
@@ -89,17 +90,17 @@ public class CompilerUtils {
     	if (taggingMode != null) {
     		switch (taggingMode) {
     			case Explicit:
-    				return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Explicit;
+    				return ASN1Tag.Mode.Explicit;
     			case Implicit:
-    				return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Implicit;
+    				return ASN1Tag.Mode.Implicit;
     		}
     	}
 
         switch (module.getTagMode()) {
             case Explicit:
-                return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Explicit;
+                return ASN1Tag.Mode.Explicit;
             case Implicit:
-                return ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode.Implicit;
+                return ASN1Tag.Mode.Implicit;
             case Automatic:
                 throw new CompilerException("Automatic tagging not supported");
             default:
@@ -107,23 +108,13 @@ public class CompilerUtils {
         }
     }
 
-    static JavaAnnotation getTagAnnotation(ModuleNode module, Tag tag,
-    		TaggingMode taggingMode) {
-    	JavaAnnotation tagAnnotation = new JavaAnnotation(
-    			ch.eskaton.asn4j.runtime.annotations.ASN1Tag.class);
+    static JavaAnnotation getTagAnnotation(ModuleNode module, Tag tag, TaggingMode taggingMode) {
+    	JavaAnnotation tagAnnotation = new JavaAnnotation(ASN1Tag.class);
 
-    	tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz()
-    			.toString());
-    	tagAnnotation
-    			.addParameter(
-    					"clazz",
-    					ASN1Tag.class.getSimpleName()
-    							+ ".Clazz."
-    							+ (tag.getClazz() != null ? StringUtils
-    									.initCap(tag.getClazz().toString()
-    											.toLowerCase())
-    									: ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Clazz.ContextSpecific
-    											.toString()));
+    	tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz()	.toString());
+        tagAnnotation.addParameter("clazz", "Clazz."
+                                + (tag.getClazz() != null ? StringUtils.initCap(tag.getClazz().toString().toLowerCase())
+                                : Clazz.ContextSpecific.toString()));
     	// TODO: dynamic
     	tagAnnotation.addParameter("constructed", "true");
 
@@ -134,6 +125,7 @@ public class CompilerUtils {
     		tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName()
     				+ ".Mode." + module.getTagMode().toString());
     	}
+
     	return tagAnnotation;
     }
 

@@ -27,9 +27,12 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-@ASN1Tag(clazz = ASN1Tag.Clazz.Universal, tag = 5, mode = ASN1Tag.Mode.Explicit, constructed = false)
+import java.util.Objects;
+
+@ASN1Tag(clazz = Clazz.Universal, tag = 5, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1Null implements ASN1Type {
 
     @Override
@@ -39,10 +42,7 @@ public class ASN1Null implements ASN1Type {
 
     @Override
     public int hashCode() {
-    	final int prime = 31;
-    	int result = 1;
-    	result = prime * result + "null".hashCode();
-    	return result;
+        return Objects.hash("null");
     }
 
     @Override

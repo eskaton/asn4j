@@ -38,7 +38,7 @@ public class AbstractTagsMatcherTest {
         return Utils.getTags(clazz);
     }
 
-    TLV getTlv(ASN1Tag.Clazz clazz, int tag, boolean constructed) {
+    TLV getTlv(Clazz clazz, int tag, boolean constructed) {
         TLV tlv = new TLV();
 
         tlv.clazz = clazz;

@@ -79,55 +79,55 @@ public class TLVUtilsTest {
                 .getTag(PrivatePrimitive16384Test.class.getAnnotation(ASN1Tag.class)));
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = false)
+    @ASN1Tag(clazz = Clazz.Universal, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = false)
     private static class UniversalPrimitiveTest {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Application, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = false)
+    @ASN1Tag(clazz = Clazz.Application, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = false)
     private static class ApplicationPrimitiveTest {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.ContextSpecific, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = false)
+    @ASN1Tag(clazz = Clazz.ContextSpecific, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = false)
     private static class ContextSpecificPrimitiveTest {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = false)
+    @ASN1Tag(clazz = Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = false)
     private static class PrivatePrimitiveTest {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Universal, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = true)
+    @ASN1Tag(clazz = Clazz.Universal, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = true)
     private static class UniversalConstructedTest {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Application, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = true)
+    @ASN1Tag(clazz = Clazz.Application, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = true)
     private static class ApplicationConstructedTest {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.ContextSpecific, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = true)
+    @ASN1Tag(clazz = Clazz.ContextSpecific, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = true)
     private static class ContextSpecificConstructedTest {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = true)
+    @ASN1Tag(clazz = Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 1, constructed = true)
     private static class PrivateConstructedTest {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 30, constructed = false)
+    @ASN1Tag(clazz = Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 30, constructed = false)
     private static class PrivatePrimitive30Test {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 31, constructed = false)
+    @ASN1Tag(clazz = Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 31, constructed = false)
     private static class PrivatePrimitive31Test {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 128, constructed = false)
+    @ASN1Tag(clazz = Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 128, constructed = false)
     private static class PrivatePrimitive128Test {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 16383, constructed = false)
+    @ASN1Tag(clazz = Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 16383, constructed = false)
     private static class PrivatePrimitive16383Test {
     }
 
-    @ASN1Tag(clazz = ASN1Tag.Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 16384, constructed = false)
+    @ASN1Tag(clazz = Clazz.Private, mode = ASN1Tag.Mode.Implicit, tag = 16384, constructed = false)
     private static class PrivatePrimitive16384Test {
     }
 

@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
+import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 import java.util.HashMap;
@@ -68,22 +69,22 @@ public class SetCompiler implements NamedCompiler<SetType> {
         Tag tag = type.getTag();
 
         if (tag != null) {
-            ASN1Tag.Clazz clazz;
+            Clazz clazz;
             ClassType clazzType = tag.getClazz();
 
             if (clazzType == null) {
-                clazz = ASN1Tag.Clazz.ContextSpecific;
+                clazz = Clazz.ContextSpecific;
             } else {
 
                 switch (clazzType) {
                     case APPLICATION:
-                        clazz = ASN1Tag.Clazz.Application;
+                        clazz = Clazz.Application;
                         break;
                     case PRIVATE:
-                        clazz = ASN1Tag.Clazz.Private;
+                        clazz = Clazz.Private;
                         break;
                     case UNIVERSAL:
-                        clazz = ASN1Tag.Clazz.Universal;
+                        clazz = Clazz.Universal;
                         break;
                     default:
                         throw new CompilerException("Unknown class type: " + clazzType.name());
@@ -127,11 +128,11 @@ public class SetCompiler implements NamedCompiler<SetType> {
 
     private static class TagId {
 
-        private ASN1Tag.Clazz clazz;
+        private Clazz clazz;
 
         private int tag;
 
-        public TagId(ASN1Tag.Clazz clazz, int tag) {
+        public TagId(Clazz clazz, int tag) {
             this.clazz = clazz;
             this.tag = tag;
         }
@@ -140,7 +141,7 @@ public class SetCompiler implements NamedCompiler<SetType> {
             return new TagId(tag.clazz(), tag.tag());
         }
 
-        public ASN1Tag.Clazz getClazz() {
+        public Clazz getClazz() {
             return clazz;
         }
 
