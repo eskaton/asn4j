@@ -27,7 +27,12 @@
 
 package ch.eskaton.asn4j.runtime.decoders;
 
-import ch.eskaton.asn4j.runtime.*;
+import ch.eskaton.asn4j.runtime.Decoder;
+import ch.eskaton.asn4j.runtime.DecoderState;
+import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.DecodingResult;
+import ch.eskaton.asn4j.runtime.TLV;
+import ch.eskaton.asn4j.runtime.Utils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
@@ -42,7 +47,7 @@ import java.util.List;
 
 public class ChoiceDecoder {
 
-    public <T extends ASN1Type> T decode(Decoder decoder, Class<T> type,
+    public <T extends ASN1Type> DecodingResult<T> decode(Decoder decoder, Class<T> type,
                                          DecoderStates states) throws DecodingException {
         DecoderState lastState = states.peek();
         int pos = lastState.pos;
@@ -50,7 +55,6 @@ public class ChoiceDecoder {
 
         try {
             TLV tlv = TLV.getTLV(states.buf, pos, length);
-
             T obj = type.newInstance();
 
             List<Field> altFields = Utils.getComponents(obj);
@@ -84,16 +88,17 @@ public class ChoiceDecoder {
                     }
 
                     @SuppressWarnings("unchecked")
-                    ASN1Type value = decoder.decode(
-                            (Class<? extends ASN1Type>) altField.getType(),
-                            states, tag, false);
+                    DecodingResult<? extends ASN1Type> result = decoder
+                            .decode((Class<? extends ASN1Type>) altField.getType(), states, tag, false);
 
+                    ASN1Type value = result.getObj();
 
                     Method m = obj.getClass()
-                            .getMethod(StringUtils.concat("set", StringUtils.initCap(altField.getName())),
-                                       value.getClass());
+                            .getMethod(StringUtils.concat("set", StringUtils.initCap(altField.getName())), value
+                                    .getClass());
                     m.invoke(obj, value);
-                    return obj;
+
+                    return new DecodingResult<>(tlv, obj);
                 }
             }
         } catch (IOException | IllegalAccessException | InstantiationException | SecurityException |

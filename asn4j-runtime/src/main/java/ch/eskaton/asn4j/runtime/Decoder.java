@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,26 +27,22 @@
 
 package ch.eskaton.asn4j.runtime;
 
-import java.util.List;
-import java.util.Map;
-
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
+import java.util.List;
+import java.util.Map;
+
 public interface Decoder {
 
-    <T extends ASN1Type> T decode(Class<T> type, byte[] buf)
-    		throws DecodingException;
+    <T extends ASN1Type> T decode(Class<T> type, byte[] buf) throws DecodingException;
 
-    <T extends ASN1Type> T decode(Class<T> type, DecoderStates states)
-    		throws DecodingException;
+    <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states) throws DecodingException;
 
-    <T extends ASN1Type> T decode(Class<T> type, DecoderStates states,
-    		ASN1Tag tag, boolean optional) throws DecodingException;
+    <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states, ASN1Tag tag,
+            boolean optional) throws DecodingException;
 
-    ASN1Type decode(DecoderStates states,
-    		Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags)
-    		throws DecodingException;
+    DecodingResult<? extends ASN1Type> decode(DecoderStates states, Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags) throws DecodingException;
 
 }

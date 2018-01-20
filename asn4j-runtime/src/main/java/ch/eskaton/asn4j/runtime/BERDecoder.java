@@ -111,15 +111,15 @@ public class BERDecoder implements Decoder {
         DecoderState state = new DecoderState(0, buf.length);
         states.buf = buf;
         states.push(state);
-        return decode(type, states);
+        DecodingResult<T> result = decode(type, states);
+        return result.getObj();
     }
 
-    public <T extends ASN1Type> T decode(Class<T> type, DecoderStates states)
-            throws DecodingException {
+    public <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states) throws DecodingException {
         return decode(type, states, null, false);
     }
 
-    public ASN1Type decode(DecoderStates states,
+    public DecodingResult<? extends ASN1Type> decode(DecoderStates states,
                            Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags)
             throws DecodingException {
         MultipleTagsMatcher matcher = new MultipleTagsMatcher(tags.keySet());
@@ -132,7 +132,7 @@ public class BERDecoder implements Decoder {
         return decodeState(type, states, state);
     }
 
-    public <T extends ASN1Type> T decode(Class<T> type, DecoderStates states, ASN1Tag tag, boolean optional)
+    public <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states, ASN1Tag tag, boolean optional)
             throws DecodingException {
         List<ASN1Tag> tags;
 
@@ -153,8 +153,7 @@ public class BERDecoder implements Decoder {
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private <T> T decodeState(Class<T> type, DecoderStates states,
-                              DecoderState state) {
+    private <T> DecodingResult<T> decodeState(Class<T> type, DecoderStates states, DecoderState state) {
         if (state == null) {
             return null;
         }
@@ -209,15 +208,10 @@ public class BERDecoder implements Decoder {
 
             throw new DecodingException(th);
         } finally {
-            state = states.pop();
-
-            if (states.size() > 0 && state.tlv.nextTlv != -1) {
-                states.peek().length -= state.tlv.nextTlv - states.peek().pos;
-                states.peek().pos = state.tlv.nextTlv;
-            }
+            state = states.back();
         }
 
-        return obj;
+        return new DecodingResult(state.tlv, obj);
     }
 
     private DecoderState consumeMultipleTags(DecoderStates states, MultipleTagsMatcher matcher)
