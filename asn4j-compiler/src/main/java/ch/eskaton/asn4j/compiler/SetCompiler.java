@@ -33,10 +33,10 @@ import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 import java.util.HashMap;
-import java.util.Objects;
 import java.util.function.Function;
 
 public class SetCompiler implements NamedCompiler<SetType> {
@@ -123,50 +123,6 @@ public class SetCompiler implements NamedCompiler<SetType> {
                 return function.apply(component);
             default:
                 throw new CompilerException("Unexpected component type: " + component.getCompType());
-        }
-    }
-
-    private static class TagId {
-
-        private Clazz clazz;
-
-        private int tag;
-
-        public TagId(Clazz clazz, int tag) {
-            this.clazz = clazz;
-            this.tag = tag;
-        }
-
-        public static TagId fromTag(ASN1Tag tag) {
-            return new TagId(tag.clazz(), tag.tag());
-        }
-
-        public Clazz getClazz() {
-            return clazz;
-        }
-
-        public int getTag() {
-            return tag;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-
-            TagId tagId = (TagId) o;
-
-            return tag == tagId.tag && clazz == tagId.clazz;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(clazz, tag);
         }
     }
 

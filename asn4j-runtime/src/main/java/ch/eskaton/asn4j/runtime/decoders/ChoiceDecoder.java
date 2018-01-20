@@ -66,8 +66,8 @@ public class ChoiceDecoder {
                     ASN1Tag tag = altField.getAnnotation(ASN1Tag.class);
 
                     if (tag != null) {
-                        if (!tag.clazz().equals(tlv.clazz)
-                                || tag.tag() != tlv.tag) {
+
+                        if (!tlv.getTagId().equals(tag)) {
                             continue;
                         }
                     } else {
@@ -80,8 +80,7 @@ public class ChoiceDecoder {
                         } else {
                             ASN1Tag firstTag = tags.get(tags.size() - 1);
 
-                            if (firstTag.clazz().equals(tlv.clazz)
-                                    || firstTag.tag() != tlv.tag) {
+                            if (!tlv.getTagId().equals(firstTag)) {
                                 continue;
                             }
                         }
