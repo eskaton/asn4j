@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.Utils;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 
@@ -36,9 +37,7 @@ public class VisibleStringDecoder {
 
     public void decode(DecoderStates states, DecoderState state, ASN1VisibleString obj)
             throws ConstraintViolatedException {
-        byte[] buf = new byte[state.tlv.length];
-        System.arraycopy(states.buf, state.tlv.pos, buf, 0, state.tlv.length);
-        obj.setValue(new String(buf));
+        obj.setValue(new String(Utils.getValue(states, state)));
     }
 
 }
