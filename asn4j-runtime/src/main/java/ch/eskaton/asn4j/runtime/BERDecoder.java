@@ -319,11 +319,7 @@ public class BERDecoder implements Decoder {
                 LOGGER.trace("Trying: tag={}, class={}", tag.tag(), tag.clazz());
             }
 
-            if (!tag.clazz().equals(tlv.clazz) || tag.tag() != tlv.tag) {
-                return false;
-            }
-
-            return true;
+            return tlv.getTagId().equalsASN1Tag(tag);
         }
 
     }
@@ -441,7 +437,7 @@ public class BERDecoder implements Decoder {
                     LOGGER.trace("Trying: tag={}, class={}", tag.tag(), tag.clazz());
                 }
 
-                if (tag.clazz().equals(tlv.clazz) && tag.tag() == tlv.tag) {
+                if (tlv.getTagId().equalsASN1Tag(tag)) {
                     return child;
                 }
             }

@@ -52,8 +52,22 @@ public class DecoderStates {
         return states.size();
     }
 
+    public DecoderState back() {
+        DecoderState removedState = pop();
+        int nextTlv = removedState.tlv.nextTlv;
+
+        if (size() > 0 && nextTlv != -1) {
+            DecoderState currentState = peek();
+            currentState.length -= nextTlv - currentState.pos;
+            currentState.pos = nextTlv;
+        }
+
+        return removedState;
+    }
+
     @Override
     public String toString() {
         return "DecoderStates [buf=" + Arrays.toString(buf) + ", states=" + states + "]";
     }
+
 }

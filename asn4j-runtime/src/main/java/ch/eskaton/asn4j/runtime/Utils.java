@@ -109,4 +109,15 @@ public class Utils {
     	return compFields;
     }
 
+    public static byte[] getValue(DecoderStates states, DecoderState state) {
+       return getValue(states, state, 0);
+    }
+
+    public static byte[] getValue(DecoderStates states, DecoderState state, int offset) {
+        byte[] buf = new byte[state.tlv.length - offset];
+        System.arraycopy(states.buf, state.tlv.pos + offset, buf, 0,
+                         state.tlv.length - offset);
+        return buf;
+    }
+
 }

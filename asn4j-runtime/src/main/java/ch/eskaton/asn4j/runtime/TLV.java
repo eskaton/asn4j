@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,8 +28,6 @@
 package ch.eskaton.asn4j.runtime;
 
 import java.io.IOException;
-
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 public class TLV {
 
@@ -49,75 +47,79 @@ public class TLV {
     }
 
     public static TLV getTLV(byte[] buf, int pos, int length)
-    		throws IOException {
-    	if (pos >= buf.length) {
-    		throw new IOException("Premature end of input");
-    	}
+            throws IOException {
+        if (pos >= buf.length) {
+            throw new IOException("Premature end of input");
+        }
 
-    	TLV tlv = new TLV();
-    	int id = buf[pos++];
-    	tlv.clazz = Clazz.values()[(id >> 6) & 0x3];
-    	tlv.constructed = ((id >> 5) & 0x1) == 1 ? true : false;
-    	tlv.tag = id & 0x1f;
+        int id = buf[pos++];
 
-    	if (tlv.tag == 0x1f) {
-    		int longTag = 0;
-    		int c = 0;
+        TLV tlv = new TLV();
 
-    		do {
-    			if (pos >= buf.length) {
-    				throw new IOException("Premature end of input");
-    			}
+        tlv.clazz = Clazz.values()[(id >> 6) & 0x3];
+        tlv.constructed = ((id >> 5) & 0x1) == 1 ? true : false;
+        tlv.tag = id & 0x1f;
 
-    			c = buf[pos++];
+        if (tlv.tag == 0x1f) {
+            int longTag = 0;
+            int c = 0;
 
-    			longTag = (longTag << 7) | (c & 0x7F);
+            do {
+                if (pos >= buf.length) {
+                    throw new IOException("Premature end of input");
+                }
 
-    		} while ((c & 0x80) != 0);
-    	}
+                c = buf[pos++];
 
-    	if (pos >= buf.length) {
-    		throw new IOException("Premature end of input");
-    	}
+                longTag = (longTag << 7) | (c & 0x7F);
 
-    	tlv.length = buf[pos++] & 0xFF;
+            } while ((c & 0x80) != 0);
+        }
 
-    	if ((tlv.length & 0x80) != 0) {
-    		int sizeLen = tlv.length & 0x7F;
-    		tlv.length = 0;
+        if (pos >= buf.length) {
+            throw new IOException("Premature end of input");
+        }
 
-    		while (sizeLen-- > 0) {
-    			if (pos >= buf.length) {
-    				throw new IOException("Premature end of input");
-    			}
+        tlv.length = buf[pos++] & 0xFF;
 
-    			int c = buf[pos++];
+        if ((tlv.length & 0x80) != 0) {
+            int sizeLen = tlv.length & 0x7F;
+            tlv.length = 0;
 
-    			tlv.length = (tlv.length << 8) | (c & 0xFF);
-    		}
-    	}
+            while (sizeLen-- > 0) {
+                if (pos >= buf.length) {
+                    throw new IOException("Premature end of input");
+                }
 
-    	tlv.pos = pos;
+                int c = buf[pos++];
 
-    	if (length > 0 && tlv.length >= length) {
-    		tlv.nextTlv = -1;
-    	} else {
-    		if (tlv.constructed && tlv.length == 0) {
-    			tlv.length = -1;
-    			tlv.nextTlv = -1;
-    		} else {
-    			tlv.nextTlv = pos + tlv.length;
-    		}
-    	}
+                tlv.length = (tlv.length << 8) | (c & 0xFF);
+            }
+        }
 
-    	return tlv;
+        tlv.pos = pos;
+        if (length > 0 && tlv.length >= length) {
+            tlv.nextTlv = -1;
+        } else {
+            if (tlv.constructed && tlv.length == 0) {
+                tlv.length = -1;
+                tlv.nextTlv = -1;
+            } else {
+                tlv.nextTlv = pos + tlv.length;
+            }
+        }
+
+        return tlv;
+    }
+
+    public TagId getTagId() {
+        return new TagId(clazz, tag);
     }
 
     @Override
     public String toString() {
-    	return "TLV [pos=" + pos + ", clazz=" + clazz + ", constructed="
-    			+ constructed + ", tag=" + tag + ", length=" + length
-    			+ ", nextTlv=" + nextTlv + "]";
+        return "TLV [pos=" + pos + ", clazz=" + clazz + ", constructed=" + constructed + ", tag=" + tag +
+                ", length=" + length + ", nextTlv=" + nextTlv + "]";
     }
 
 }

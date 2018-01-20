@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.Utils;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.commons.utils.ReflectionUtils;
@@ -42,13 +43,10 @@ public class EnumeratedTypeDecoder {
     @SuppressWarnings("unchecked")
     public <T extends ASN1EnumeratedType> T decode(Decoder decoder, DecoderStates states, DecoderState state,
             Class<T> type) throws DecodingException {
-        byte[] buf = new byte[state.tlv.length];
-        System.arraycopy(states.buf, state.tlv.pos, buf, 0, state.tlv.length);
-
         try {
             return (T) ReflectionUtils
-                    .invokeStaticMethod(type, "valueOf", new Object[] { new BigInteger(buf).intValue() },
-                                        new Class<?>[] { int.class });
+                    .invokeStaticMethod(type, "valueOf", new Object[] {
+                            new BigInteger(Utils.getValue(states, state)).intValue() }, new Class<?>[] { int.class });
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new DecodingException(e);
         }
