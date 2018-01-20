@@ -53,7 +53,7 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements
                 ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
                 if (annotation != null) {
                     compField.setAccessible(true);
-                    
+
                     ASN1Tag tag = compField.getDeclaredAnnotation(ASN1Tag.class);
 
                     try {

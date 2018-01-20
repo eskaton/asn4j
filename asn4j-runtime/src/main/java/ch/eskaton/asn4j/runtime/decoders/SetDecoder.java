@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.DecodingResult;
+import ch.eskaton.asn4j.runtime.TLV;
 import ch.eskaton.asn4j.runtime.Utils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
@@ -60,20 +62,25 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
             }
         }
 
-        ASN1Type comp;
+        DecodingResult<? extends ASN1Type> result;
 
         do {
-            comp = decoder.decode(states, tagsToTypes);
-            Field compField = typesToFields.get(comp.getClass());
+            result = decoder.decode(states, tagsToTypes);
+
+            ASN1Type comp = result.getObj();
+            TLV tlv = result.getTlv();
+
+            // TODO: tags to Fields
+            Field compField = typesToFields.get(result.getClass());
 
             if (compField == null) {
-                throw new DecodingException("Failed to decode a value of the type " + comp.getClass().getSimpleName());
+                throw new DecodingException("Failed to decode a value of the type " + result.getClass().getSimpleName());
             }
 
             compField.setAccessible(true);
 
             try {
-                compField.set(obj, comp);
+                compField.set(obj, result);
             } catch (IllegalArgumentException | IllegalAccessException e) {
                 throw new DecodingException(e);
             }
