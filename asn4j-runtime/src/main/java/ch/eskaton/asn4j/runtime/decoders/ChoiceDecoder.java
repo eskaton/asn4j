@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 
 public class ChoiceDecoder {
@@ -97,7 +98,7 @@ public class ChoiceDecoder {
                                     .getClass());
                     m.invoke(obj, value);
 
-                    return new DecodingResult<>(tlv, obj);
+                    return new DecodingResult<>(Arrays.asList(tlv.getTagId()), obj);
                 }
             }
         } catch (IOException | IllegalAccessException | InstantiationException | SecurityException |

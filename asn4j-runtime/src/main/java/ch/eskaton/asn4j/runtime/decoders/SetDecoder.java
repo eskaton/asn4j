@@ -30,35 +30,39 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
-import ch.eskaton.asn4j.runtime.TLV;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.Utils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.commons.utils.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SetDecoder implements CollectionDecoder<ASN1Set> {
 
+
+
     @SuppressWarnings("unchecked")
     public void decode(Decoder decoder, DecoderStates states, ASN1Set obj) throws DecodingException {
-        List<Field> compFields = Utils.getComponents(obj);
         Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = new HashMap<>();
-        Map<Class<? extends ASN1Type>, Field> typesToFields = new HashMap<>();
+        Map<List<TagId>, Field> tagsToFields = new HashMap<>();
 
-        for (Field compField : compFields) {
+        for (Field compField : Utils.getComponents(obj)) {
             ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
 
             if (annotation != null) {
                 Class<? extends ASN1Type> type = (Class<? extends ASN1Type>) compField.getType();
                 List<ASN1Tag> tags = Utils.getTags(type, compField.getAnnotation(ASN1Tag.class));
+                tagsToFields.put(tags.stream().map(TagId::fromTag).collect(Collectors.toList()), compField);
                 tagsToTypes.put(tags, type);
-                typesToFields.put(type, compField);
             }
         }
 
@@ -67,11 +71,21 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
         do {
             result = decoder.decode(states, tagsToTypes);
 
-            ASN1Type comp = result.getObj();
-            TLV tlv = result.getTlv();
+            if (result == null) {
+                Set<List<TagId>> mandatoryFields = tagsToTypes.keySet().stream().map(TagId::fromTags)
+                        .filter(t -> !tagsToFields.get(t).getAnnotation(ASN1Component.class).optional())
+                        .collect(Collectors.toSet());
 
-            // TODO: tags to Fields
-            Field compField = typesToFields.get(result.getClass());
+                if (!mandatoryFields.isEmpty()) {
+                    throw new DecodingException("Mandatory fields missing: " + StringUtils
+                            .join(mandatoryFields.stream().map(tag -> tag.iterator().next())
+                                          .collect(Collectors.toList()), ", "));
+                }
+
+                return;
+            }
+
+            Field compField = tagsToFields.get(result.getTags());
 
             if (compField == null) {
                 throw new DecodingException("Failed to decode a value of the type " + result.getClass().getSimpleName());
@@ -80,7 +94,7 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
             compField.setAccessible(true);
 
             try {
-                compField.set(obj, result);
+                compField.set(obj, result.getObj());
             } catch (IllegalArgumentException | IllegalAccessException e) {
                 throw new DecodingException(e);
             }
