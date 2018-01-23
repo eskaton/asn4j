@@ -72,6 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.runtime.Assert.notEmpty;
 import static ch.eskaton.asn4j.runtime.Assert.notEmptyCollection;
@@ -125,11 +126,17 @@ public class BERDecoder implements Decoder {
         MultipleTagsMatcher matcher = new MultipleTagsMatcher(tags.keySet());
         DecoderState state = consumeMultipleTags(states, matcher);
 
-        List<ASN1Tag> match = matcher.getMatch();
+        if (state != null) {
+            List<ASN1Tag> match = matcher.getMatch();
 
-        Class<? extends ASN1Type> type = tags.remove(match);
+            Class<? extends ASN1Type> type = tags.remove(match);
 
-        return decodeState(type, states, state);
+            state.setTagIds(match.stream().map(TagId::fromTag).collect(Collectors.toList()));
+
+            return decodeState(type, states, state);
+        }
+
+        return null;
     }
 
     public <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states, ASN1Tag tag, boolean optional)
@@ -172,7 +179,7 @@ public class BERDecoder implements Decoder {
                 } else if (obj instanceof ASN1BitString) {
                     bitStringDecoder.decode(states, state, (ASN1BitString) obj);
                 } else if (obj instanceof ASN1Null) {
-                    ; // nothing to do
+                    // nothing to do
                 } else if (obj instanceof ASN1Sequence) {
                     sequenceDecoder.decode(this, states, (ASN1Sequence) obj);
                 } else if (obj instanceof ASN1Set) {
@@ -211,29 +218,20 @@ public class BERDecoder implements Decoder {
             state = states.back();
         }
 
-        return new DecodingResult(state.tlv, obj);
+        return new DecodingResult(state.getTagIds(), obj);
     }
 
     private DecoderState consumeMultipleTags(DecoderStates states, MultipleTagsMatcher matcher)
             throws DecodingException {
-        DecoderState state = consumeTags(states, matcher);
-
-        if (state == null) {
-            DecoderState lastState = states.peek();
-
-            if (lastState.length == 0) {
-                throw new PrematureEndOfInputException();
-            } else {
-                throw new UnexpectedTagException();
-            }
-        }
-
-        return state;
+        return consumeTags(states, matcher, true);
     }
 
-    private DecoderState consumeTags(DecoderStates states, List<ASN1Tag> tags,
-                                     boolean optional) throws DecodingException {
-        TagsMatcher matcher = new SingleTagsMatcher(tags);
+    private DecoderState consumeTags(DecoderStates states, List<ASN1Tag> tags, boolean optional)
+            throws DecodingException {
+        return consumeTags(states, new SingleTagsMatcher(tags), optional);
+    }
+
+    private DecoderState consumeTags(DecoderStates states, TagsMatcher matcher, boolean optional) {
         DecoderState state = consumeTags(states, matcher);
 
         if (state == null && !optional) {

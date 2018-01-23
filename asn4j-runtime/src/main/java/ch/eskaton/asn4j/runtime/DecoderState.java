@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.runtime;
 
+import java.util.List;
+
 public class DecoderState {
 
     public int pos;
@@ -34,6 +36,8 @@ public class DecoderState {
     public int length;
 
     public TLV tlv;
+
+    public List<TagId> tagIds;
 
     public DecoderState(int pos, int length) {
         this(null, pos, length);
@@ -43,6 +47,14 @@ public class DecoderState {
         this.tlv = tlv;
         this.pos = pos;
         this.length = length;
+    }
+
+    public List<TagId> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<TagId> tagIds) {
+        this.tagIds = tagIds;
     }
 
     @Override
