@@ -78,20 +78,18 @@ public class ASN1Integer implements ASN1Type {
     }
 
     @Override
-    public boolean equals(Object obj) {
-    	if (this == obj)
-    		return true;
-    	if (obj == null)
-    		return false;
-    	if (!(obj instanceof ASN1Integer))
-    		return false;
-    	ASN1Integer other = (ASN1Integer) obj;
-    	if (value == null) {
-    		if (other.value != null)
-    			return false;
-    	} else if (!value.equals(other.value))
-    		return false;
-    	return true;
-    }
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
 
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ASN1Integer that = (ASN1Integer) o;
+
+        return Objects.equals(value, that.value);
+    }
+    
 }

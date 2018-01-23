@@ -29,19 +29,21 @@
 
 package ch.eskaton.asn4j.runtime;
 
+import java.util.List;
+
 public class DecodingResult<T> {
 
-    private final TLV tlv;
+    private final List<TagId> tags;
 
     private final T obj;
 
-    public DecodingResult(TLV tlv, T obj) {
-        this.tlv = tlv;
+    public DecodingResult(List<TagId> tags, T obj) {
+        this.tags = tags;
         this.obj = obj;
     }
 
-    public TLV getTlv() {
-        return tlv;
+    public List<TagId> getTags() {
+        return tags;
     }
 
     public T getObj() {

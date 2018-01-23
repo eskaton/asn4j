@@ -31,7 +31,9 @@ package ch.eskaton.asn4j.runtime;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class TagId {
 
@@ -46,6 +48,10 @@ public class TagId {
 
     public static TagId fromTag(ASN1Tag tag) {
         return new TagId(tag.clazz(), tag.tag());
+    }
+
+    public static List<TagId> fromTags(List<ASN1Tag> tags) {
+        return tags.stream().map(TagId::fromTag).collect(Collectors.toList());
     }
 
     public Clazz getClazz() {
