@@ -25,46 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime;
+package ch.eskaton.asn4j.runtime.objects;
 
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import org.junit.Test;
+import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1Set;
 
-import java.util.Arrays;
+public class TestSetA extends ASN1Set {
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+    @ASN1Tag(mode = ASN1Tag.Mode.Explicit, constructed = true, tag = 0, clazz = Clazz.ContextSpecific)
+    @ASN1Component
+    private ASN1Integer a;
 
-public class TagIdTest {
-
-    @Test
-    public void testFromTag() {
-        assertEquals(new TagId(Clazz.Application, 21), TagId.fromTag(getTag(TestA.class)));
-    }
-
-    @Test
-    public void testFromTags() {
-        assertEquals(Arrays.asList(new TagId(Clazz.Private, 37), new TagId(Clazz.Application, 21)),
-                TagId.fromTags(Arrays.asList(getTag(TestB.class), getTag(TestA.class))));
-    }
-
-    @Test
-    public void testEqualsASN1Tag() {
-        assertTrue(new TagId(Clazz.Application, 21).equalsASN1Tag(getTag(TestA.class)));
-    }
-
-    private ASN1Tag getTag(Class<?> clazz) {
-        return clazz.getAnnotation(ASN1Tag.class);
-    }
-
-    @ASN1Tag(clazz = Clazz.Application, tag = 21, mode = ASN1Tag.Mode.Explicit, constructed = true)
-    private static class TestA {
-
-    }
-
-    @ASN1Tag(clazz = Clazz.Private, tag = 37, mode = ASN1Tag.Mode.Explicit, constructed = true)
-    private static class TestB {
-
-    }
+    @ASN1Tag(mode = ASN1Tag.Mode.Explicit, constructed = true, tag = 1, clazz = Clazz.ContextSpecific)
+    @ASN1Component(optional = true)
+    private ASN1OctetString b;
 
 }

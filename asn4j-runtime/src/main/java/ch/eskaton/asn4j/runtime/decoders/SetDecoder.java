@@ -49,22 +49,12 @@ import java.util.stream.Collectors;
 public class SetDecoder implements CollectionDecoder<ASN1Set> {
 
 
-
     @SuppressWarnings("unchecked")
     public void decode(Decoder decoder, DecoderStates states, ASN1Set obj) throws DecodingException {
         Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = new HashMap<>();
         Map<List<TagId>, Field> tagsToFields = new HashMap<>();
 
-        for (Field compField : Utils.getComponents(obj)) {
-            ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
-
-            if (annotation != null) {
-                Class<? extends ASN1Type> type = (Class<? extends ASN1Type>) compField.getType();
-                List<ASN1Tag> tags = Utils.getTags(type, compField.getAnnotation(ASN1Tag.class));
-                tagsToFields.put(tags.stream().map(TagId::fromTag).collect(Collectors.toList()), compField);
-                tagsToTypes.put(tags, type);
-            }
-        }
+        fillMetaData(obj, tagsToTypes, tagsToFields);
 
         DecodingResult<? extends ASN1Type> result;
 
@@ -72,16 +62,7 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
             result = decoder.decode(states, tagsToTypes);
 
             if (result == null) {
-                Set<List<TagId>> mandatoryFields = tagsToTypes.keySet().stream().map(TagId::fromTags)
-                        .filter(t -> !tagsToFields.get(t).getAnnotation(ASN1Component.class).optional())
-                        .collect(Collectors.toSet());
-
-                if (!mandatoryFields.isEmpty()) {
-                    throw new DecodingException("Mandatory fields missing: " + StringUtils
-                            .join(mandatoryFields.stream().map(tag -> tag.iterator().next())
-                                          .collect(Collectors.toList()), ", "));
-                }
-
+                checkMandatoryFields(tagsToTypes, tagsToFields);
                 return;
             }
 
@@ -99,6 +80,42 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
                 throw new DecodingException(e);
             }
         } while (!tagsToTypes.isEmpty());
+    }
+
+    protected void fillMetaData(ASN1Set obj, Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes,
+            Map<List<TagId>, Field> tagsToFields) {
+        for (Field compField : Utils.getComponents(obj)) {
+            ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
+
+            if (annotation != null) {
+                Class<? extends ASN1Type> type = (Class<? extends ASN1Type>) compField.getType();
+                List<ASN1Tag> tags = Utils.getTags(type, compField.getAnnotation(ASN1Tag.class));
+                tagsToFields.put(tags.stream().map(TagId::fromTag).collect(Collectors.toList()), compField);
+                tagsToTypes.put(tags, type);
+            }
+        }
+    }
+
+    protected void checkMandatoryFields(Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes, Map<List<TagId>,
+            Field> tagsToFields) {
+        Set<List<TagId>> mandatoryFields = getMandatoryFields(tagsToTypes, tagsToFields);
+
+        if (!mandatoryFields.isEmpty()) {
+            throw new DecodingException("Mandatory fields missing: " +
+                    StringUtils.join(mandatoryFields.stream().map(tag -> getFieldName(tagsToFields.get(tag)))
+                            .collect(Collectors.toList()), ", "));
+        }
+    }
+
+    protected Set<List<TagId>> getMandatoryFields(Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes,
+            Map<List<TagId>, Field> tagsToFields) {
+        return tagsToTypes.keySet().stream().map(TagId::fromTags)
+                .filter(t -> !tagsToFields.get(t).getAnnotation(ASN1Component.class).optional())
+                .collect(Collectors.toSet());
+    }
+
+    protected String getFieldName(Field field) {
+        return field.getDeclaringClass().getSimpleName() + "." + field.getName();
     }
 
 }
