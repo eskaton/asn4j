@@ -27,44 +27,22 @@
 
 package ch.eskaton.asn4j.runtime;
 
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.objects.TestSetA;
 import org.junit.Test;
 
-import java.util.Arrays;
+import java.lang.reflect.Field;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-public class TagIdTest {
-
-    @Test
-    public void testFromTag() {
-        assertEquals(new TagId(Clazz.Application, 21), TagId.fromTag(getTag(TestA.class)));
-    }
+public class UtilsTest {
 
     @Test
-    public void testFromTags() {
-        assertEquals(Arrays.asList(new TagId(Clazz.Private, 37), new TagId(Clazz.Application, 21)),
-                TagId.fromTags(Arrays.asList(getTag(TestB.class), getTag(TestA.class))));
-    }
+    public void testGetComponent() {
+        Field field = Utils.getComponent(new TestSetA(), "a");
 
-    @Test
-    public void testEqualsASN1Tag() {
-        assertTrue(new TagId(Clazz.Application, 21).equalsASN1Tag(getTag(TestA.class)));
-    }
+        assertNotNull(field);
 
-    private ASN1Tag getTag(Class<?> clazz) {
-        return clazz.getAnnotation(ASN1Tag.class);
-    }
-
-    @ASN1Tag(clazz = Clazz.Application, tag = 21, mode = ASN1Tag.Mode.Explicit, constructed = true)
-    private static class TestA {
-
-    }
-
-    @ASN1Tag(clazz = Clazz.Private, tag = 37, mode = ASN1Tag.Mode.Explicit, constructed = true)
-    private static class TestB {
-
+        assertEquals("a", field.getName());
     }
 
 }
