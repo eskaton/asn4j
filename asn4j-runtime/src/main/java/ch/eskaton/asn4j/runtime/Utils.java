@@ -27,15 +27,15 @@
 
 package ch.eskaton.asn4j.runtime;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.utils.ReflectionUtils;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Utils {
 
@@ -107,6 +107,25 @@ public class Utils {
     			&& ReflectionUtils.implementsInterface(clazz, ASN1Type.class));
 
     	return compFields;
+    }
+
+    public static Field getComponent(ASN1Type type, String name) {
+        Class<?> clazz = type.getClass();
+
+        outer:
+        do {
+            Field[] fields = clazz.getDeclaredFields();
+
+            for (Field field : fields) {
+                if (field.getName().equals(name)) {
+                    return field;
+                }
+            }
+
+            clazz = clazz.getSuperclass();
+        } while (clazz != null && ReflectionUtils.implementsInterface(clazz, ASN1Type.class));
+
+        return null;
     }
 
     public static byte[] getValue(DecoderStates states, DecoderState state) {
