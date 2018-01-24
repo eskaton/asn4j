@@ -33,7 +33,8 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 public class TagId {
 
@@ -51,7 +52,7 @@ public class TagId {
     }
 
     public static List<TagId> fromTags(List<ASN1Tag> tags) {
-        return tags.stream().map(TagId::fromTag).collect(Collectors.toList());
+        return tags.stream().map(TagId::fromTag).collect(toList());
     }
 
     public Clazz getClazz() {
@@ -60,6 +61,15 @@ public class TagId {
 
     public int getTag() {
         return tag;
+    }
+
+    public boolean equalsASN1Tag(ASN1Tag asn1Tag) {
+        return asn1Tag.clazz().equals(clazz) && asn1Tag.tag() == tag;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(clazz, tag);
     }
 
     @Override
@@ -75,15 +85,6 @@ public class TagId {
         TagId tagId = (TagId) o;
 
         return tag == tagId.tag && clazz == tagId.clazz;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(clazz, tag);
-    }
-
-    public boolean equalsASN1Tag(ASN1Tag asn1Tag) {
-        return asn1Tag.clazz().equals(clazz) && asn1Tag.tag() == tag;
     }
 
 }
