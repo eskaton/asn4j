@@ -259,9 +259,8 @@ public class BERDecoder implements Decoder {
         int length = lastState.length;
 
         try {
-
             while (tags.hasNext()) {
-                if (length == 0) {
+                if (length <= 0) {
                     return null;
                 }
 
