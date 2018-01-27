@@ -1,0 +1,11 @@
+X680-29 DEFINITIONS ::=
+BEGIN
+
+TestChoice1 ::= CHOICE {
+	a INTEGER,
+	b OCTET STRING,
+	c BOOLEAN,
+	d VisibleString
+}
+
+END
