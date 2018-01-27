@@ -27,14 +27,20 @@
 
 package ch.eskaton.asn4j.test.x690_8;
 
+import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4jtest.x680_27.TestSet1;
 import ch.eskaton.asn4jtest.x680_27.TestSet2;
 import org.junit.Test;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class TestX690_8_11 {
 
@@ -72,20 +78,28 @@ public class TestX690_8_11 {
                 0x04, 0x74, 0x65, 0x73, 0x74, 0x02, 0x01, 0x17 }, encoder.encode(a));
     }
 
+    @Test
+    public void testDecodeTestSet2() {
+        BERDecoder decoder = new BERDecoder();
 
-// 31 0D 020117 80021267 810474657374
-//    @Test
-//    public void testDecode() {
-//        BERDecoder decoder = new BERDecoder();
-//
-//        TestSet1 a = new TestSet1();
-//        a.setA(ASN1Integer.valueOf(4711));
-//        a.setB(ASN1OctetString.valueOf("test"));
-//
-//        assertEquals(
-//                a,
-//                decoder.decode(TestSet1.class, new byte[] { 0x31, 0x0a, 0x04,
-//                        0x04, 0x74, 0x65, 0x73, 0x74, 0x02, 0x02, 0x12, 0x67 }));
-//    }
-// 31 11 020117 A00402 021267 A106040474657374
+        TestSet2 a = new TestSet2();
+        a.setA(ASN1Integer.valueOf(4711));
+        a.setB(ASN1OctetString.valueOf("test"));
+
+        assertEquals(a, decoder.decode(TestSet2.class, new byte[] { 0x31, 0x0e, (byte) 0xa1, 0x06, 0x04,
+                0x04, 0x74, 0x65, 0x73, 0x74, (byte) 0xa0, 0x04, 0x02, 0x02, 0x12, 0x67 }));
+    }
+
+    @Test
+    public void testDecodeTestSet2MissingField() {
+        BERDecoder decoder = new BERDecoder();
+
+        try {
+            decoder.decode(TestSet2.class, new byte[] { 0x31, 0x06, (byte) 0xa0, 0x04, 0x02, 0x02, 0x12, 0x67 });
+            fail("Decoding Exception expected");
+        } catch (DecodingException e) {
+            assertThat(e.getMessage(), containsString("Mandatory fields missing"));
+        }
+    }
+
 }
