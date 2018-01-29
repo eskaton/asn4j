@@ -27,31 +27,32 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.commons.utils.StringUtils;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.eskaton.commons.utils.StringUtils;
-
 public class JavaAnnotation implements JavaObject {
 
     private Class<?> annotation;
 
-    private Map<String, String> params = new HashMap<String, String>();
+    private Map<String, String> params = new HashMap<>();
 
     public JavaAnnotation(Class<?> annotation) {
     	this.annotation = annotation;
     }
 
-    public void addParameter(String name, String value) {
+    public JavaAnnotation addParameter(String name, String value) {
     	params.put(name, value);
+
+    	return this;
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {
-    	writer.write(StringUtils.concat(prefix, "\t@",
-    			annotation.getSimpleName(), "(",
-    			StringUtils.join(params, "=", ","), ")\n"));
+        writer.write(StringUtils.concat(prefix, "\t@", annotation.getSimpleName(), "(", StringUtils
+                .join(params, " = ", ", "), ")\n"));
     }
 
 }

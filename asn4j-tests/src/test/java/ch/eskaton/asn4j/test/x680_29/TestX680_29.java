@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,34 +25,30 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.test.x680_29;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.List;
+import ch.eskaton.asn4j.runtime.BERDecoder;
+import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4jtest.x680_29.TestChoice1;
+import org.junit.Test;
 
-public class JavaHashCode extends JavaMethod {
+import static org.junit.Assert.assertEquals;
 
-    private List<String> fieldNames;
+public class TestX680_29 {
 
-    public JavaHashCode(List<String> fieldNames) {
-    	this.fieldNames = fieldNames;
-    }
+    @Test
+    public void testChoice1() {
+        TestChoice1 a = new TestChoice1();
 
-    public void write(BufferedWriter writer, String prefix) throws IOException {
-        writer.write(prefix);
-        writer.write("\tpublic int hashCode() {\n");
-        writer.write(prefix);
-        writer.write("\t\treturn Objects.hash(");
+        a.setB(ASN1OctetString.valueOf("test"));
 
-        for (String fieldName : fieldNames) {
-            writer.write(fieldName);
-            writer.write(", ");
-        }
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
 
-        writer.write("super.hashCode());\n");
-        writer.write(prefix);
-        writer.write("\t}\n");
+        TestChoice1 b = decoder.decode(TestChoice1.class, encoder.encode(a));
+
+        assertEquals(a, b);
     }
 
 }

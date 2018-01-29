@@ -33,15 +33,60 @@ import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
-import ch.eskaton.asn4j.parser.ast.*;
-import ch.eskaton.asn4j.parser.ast.types.*;
-import ch.eskaton.asn4j.parser.ast.values.*;
-import ch.eskaton.asn4j.runtime.types.*;
+import ch.eskaton.asn4j.parser.ast.AssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ModuleNode;
+import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.BitString;
+import ch.eskaton.asn4j.parser.ast.types.BooleanType;
+import ch.eskaton.asn4j.parser.ast.types.Choice;
+import ch.eskaton.asn4j.parser.ast.types.ComponentType;
+import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
+import ch.eskaton.asn4j.parser.ast.types.IntegerType;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
+import ch.eskaton.asn4j.parser.ast.types.OctetString;
+import ch.eskaton.asn4j.parser.ast.types.Real;
+import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
+import ch.eskaton.asn4j.parser.ast.types.SequenceType;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
+import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.types.UTCTime;
+import ch.eskaton.asn4j.parser.ast.types.UsefulType;
+import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.runtime.types.ASN1BitString;
+import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1Choice;
+import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
+import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
+import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
+import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
+import ch.eskaton.asn4j.runtime.types.ASN1Set;
+import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 public class CompilerContext {
 
@@ -62,6 +107,7 @@ public class CompilerContext {
             put(SequenceType.class, new SequenceCompiler());
             put(SequenceOfType.class, new SequenceOfCompiler());
             put(SetType.class, new SetCompiler());
+            put(SetOfType.class, new SetOfCompiler());
             put(Type.class, new TypeCompiler());
             put(TypeAssignmentNode.class, new TypeAssignmentCompiler());
             put(VisibleString.class, new VisibleStringCompiler());
@@ -187,9 +233,8 @@ public class CompilerContext {
 
     public JavaClass createClass(String name, Type type, boolean constructed)
             throws CompilerException {
-        JavaClass javaClass = new JavaClass(pkg, name, type.getTag(),
-                                            CompilerUtils.getTaggingMode(getModule(), type), true,
-                                            runtimeTypes.get(type.getClass().getSimpleName()));
+        JavaClass javaClass = new JavaClass(pkg, name, type.getTag(), CompilerUtils
+                .getTaggingMode(getModule(), type), true, runtimeTypes.get(type.getClass().getSimpleName()));
         currentClass.push(javaClass);
         return javaClass;
     }
@@ -216,16 +261,14 @@ public class CompilerContext {
 
     public TypeAssignmentNode getType(String type) {
         // TODO: what to do if the type isn't known in the current module
-        return (TypeAssignmentNode) currentModule.peek().getBody()
-                .getAssignments(type);
+        return (TypeAssignmentNode) currentModule.peek().getBody().getAssignments(type);
     }
 
     public Type getBase(String type) {
         // TODO: what to do if the type isn't known in the current module
         while (true) {
             // Check for implicitly defined types
-            if (GeneralizedTime.class.getSimpleName().equals(type)
-                    || UTCTime.class.getSimpleName().equals(type)) {
+            if (GeneralizedTime.class.getSimpleName().equals(type) || UTCTime.class.getSimpleName().equals(type)) {
                 return new VisibleString();
             }
 
@@ -261,53 +304,52 @@ public class CompilerContext {
                 typeName = CompilerUtils.formatName(asn1TypeName);
             }
         } else if (type instanceof BooleanType) {
-            typeName = ch.eskaton.asn4j.runtime.types.ASN1Boolean.class
-                    .getSimpleName();
+            typeName = ASN1Boolean.class.getSimpleName();
         } else if (type instanceof VisibleString) {
-            typeName = ch.eskaton.asn4j.runtime.types.ASN1VisibleString.class
-                    .getSimpleName();
+            typeName = ASN1VisibleString.class.getSimpleName();
         } else if (type instanceof OctetString) {
-            typeName = ch.eskaton.asn4j.runtime.types.ASN1OctetString.class
-                    .getSimpleName();
+            typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof IntegerType) {
             if (((IntegerType) type).getNamedNumbers() != null && name != null) {
                 typeName = CompilerUtils.formatTypeName(name);
                 newType = true;
             } else {
-                typeName = ch.eskaton.asn4j.runtime.types.ASN1Integer.class
-                        .getSimpleName();
+                typeName = ASN1Integer.class.getSimpleName();
             }
         } else if (type instanceof BitString) {
             if (((BitString) type).getNamedBits() != null && name != null) {
                 typeName = CompilerUtils.formatTypeName(name);
                 newType = true;
             } else {
-                typeName = ch.eskaton.asn4j.runtime.types.ASN1BitString.class
-                        .getSimpleName();
-            }
-        } else if (type instanceof SequenceOfType) {
-            if (name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-                newType = true;
-            } else {
-                typeName = ch.eskaton.asn4j.runtime.types.ASN1SequenceOf.class
-                        .getSimpleName();
-            }
-        } else if (type instanceof SetType) {
-            if (name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-                newType = true;
-            } else {
-                typeName = ch.eskaton.asn4j.runtime.types.ASN1Set.class
-                        .getSimpleName();
+                typeName = ASN1BitString.class.getSimpleName();
             }
         } else if (type instanceof SequenceType) {
             if (name != null) {
                 typeName = CompilerUtils.formatTypeName(name);
                 newType = true;
             } else {
-                typeName = ch.eskaton.asn4j.runtime.types.ASN1Sequence.class
-                        .getSimpleName();
+                typeName = ASN1Sequence.class.getSimpleName();
+            }
+        } else if (type instanceof SequenceOfType) {
+            if (name != null) {
+                typeName = CompilerUtils.formatTypeName(name);
+                newType = true;
+            } else {
+                typeName = ASN1SequenceOf.class.getSimpleName();
+            }
+        } else if (type instanceof SetType) {
+            if (name != null) {
+                typeName = CompilerUtils.formatTypeName(name);
+                newType = true;
+            } else {
+                typeName = ASN1Set.class.getSimpleName();
+            }
+        } else if (type instanceof SetOfType) {
+            if (name != null) {
+                typeName = CompilerUtils.formatTypeName(name);
+                newType = true;
+            } else {
+                typeName = ASN1SetOf.class.getSimpleName();
             }
         } else if (type instanceof Choice) {
             typeName = CompilerUtils.formatTypeName(name);
@@ -328,7 +370,7 @@ public class CompilerContext {
         String moduleName = currentModule.peek().getModuleId().getModuleName();
 
         if (!referencedTypes.containsKey(moduleName)) {
-            referencedTypes.put(moduleName, new HashSet<String>());
+            referencedTypes.put(moduleName, new HashSet<>());
         }
 
         referencedTypes.get(moduleName).add(typeName);
@@ -382,15 +424,12 @@ public class CompilerContext {
                 AssignmentNode assignment = getModule().getBody()
                         .getAssignments(((TypeReference) type).getType());
 
-                if (assignment != null
-                        && assignment instanceof TypeAssignmentNode) {
+                if (assignment != null && assignment instanceof TypeAssignmentNode) {
                     TypeAssignmentNode typeAssignment = (TypeAssignmentNode) assignment;
 
                     if (typeAssignment.getType() instanceof IntegerType) {
-                        NamedNumber namedNumber = ((IntegerType) typeAssignment
-                                .getType())
-                                .getNamedNumber(((SimpleDefinedValue) value)
-                                                        .getValue());
+                        NamedNumber namedNumber = ((IntegerType) typeAssignment.getType())
+                                .getNamedNumber(((SimpleDefinedValue) value).getValue());
 
                         if (namedNumber.getValue() != null) {
                             return namedNumber.getValue().getNumber();
@@ -425,13 +464,11 @@ public class CompilerContext {
     public void writeClasses() throws CompilerException {
         String pkgDir = pkg.replace('.', File.separatorChar);
 
-        File pkgFile = new File(StringUtils.concat(outputDir, File.separator,
-                                                   pkgDir));
+        File pkgFile = new File(StringUtils.concat(outputDir, File.separator, pkgDir));
 
         if (!pkgFile.exists()) {
             if (!pkgFile.mkdirs()) {
-                throw new CompilerException("Failed to create directory "
-                                                    + pkgFile);
+                throw new CompilerException("Failed to create directory " + pkgFile);
             }
         }
 

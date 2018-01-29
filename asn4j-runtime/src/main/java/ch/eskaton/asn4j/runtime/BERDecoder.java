@@ -39,6 +39,7 @@ import ch.eskaton.asn4j.runtime.decoders.RealDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SequenceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SequenceOfDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SetDecoder;
+import ch.eskaton.asn4j.runtime.decoders.SetOfDecoder;
 import ch.eskaton.asn4j.runtime.decoders.VisibleStringDecoder;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.exceptions.PrematureEndOfInputException;
@@ -56,6 +57,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
+import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.utils.CollectionUtils;
@@ -66,6 +68,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -79,8 +82,7 @@ import static ch.eskaton.asn4j.runtime.Assert.notEmptyCollection;
 
 public class BERDecoder implements Decoder {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(BERDecoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BERDecoder.class);
 
     private BooleanDecoder booleanDecoder = new BooleanDecoder();
 
@@ -103,6 +105,8 @@ public class BERDecoder implements Decoder {
     private SequenceOfDecoder sequenceOfDecoder = new SequenceOfDecoder();
 
     private SetDecoder setDecoder = new SetDecoder();
+
+    private SetOfDecoder setOfDecoder = new SetOfDecoder();
 
     private VisibleStringDecoder visibleStringDecoder = new VisibleStringDecoder();
 
@@ -144,19 +148,32 @@ public class BERDecoder implements Decoder {
         List<ASN1Tag> tags;
 
         if (ReflectionUtils.extendsClazz(type, ASN1Choice.class)) {
-            return choiceDecoder.decode(this, type, states);
+            return decodeChoice(type, states);
         }
 
         tags = Utils.getTags(type, tag);
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(StringUtils.concat("Expecting: javatype=", type
-                    .getSimpleName(), ", tags=(", StringUtils.join(
-                    CollectionUtils.map(tags, value -> StringUtils.concat("tag=", value.tag(),
-                            ", class=", value.clazz())), ", "), ")"));
+            LOGGER.trace(StringUtils.concat("Expecting: javatype=", type.getSimpleName(), ", tags=(", StringUtils
+                    .join(CollectionUtils.map(tags, value -> StringUtils
+                            .concat("tag=", value.tag(), ", class=", value.clazz())), ", "), ")"));
         }
 
         return decodeState(type, states, consumeTags(states, tags, optional));
+    }
+
+    private <T extends ASN1Type> DecodingResult<T> decodeChoice(Class<T> type, DecoderStates states) {
+        T obj;
+
+        try {
+            obj = type.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+           throw new DecodingException(e);
+        }
+
+        choiceDecoder.decode(this, states, (ASN1Choice) obj);
+
+        return new DecodingResult<>(Collections.emptyList(), obj);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -169,8 +186,7 @@ public class BERDecoder implements Decoder {
 
         try {
             if (ReflectionUtils.extendsClazz(type, ASN1EnumeratedType.class)) {
-                obj = (T) enumeratedTypeDecoder.decode(this, states, state,
-                        (Class<ASN1EnumeratedType>) type);
+                obj = (T) enumeratedTypeDecoder.decode(this, states, state, (Class<ASN1EnumeratedType>) type);
             } else {
                 obj = type.newInstance();
 
@@ -182,31 +198,25 @@ public class BERDecoder implements Decoder {
                     // nothing to do
                 } else if (obj instanceof ASN1Sequence) {
                     sequenceDecoder.decode(this, states, (ASN1Sequence) obj);
+                } else if (obj instanceof ASN1SequenceOf) {
+                    sequenceOfDecoder.decode(this, states, (ASN1SequenceOf) obj);
                 } else if (obj instanceof ASN1Set) {
                     setDecoder.decode(this, states, (ASN1Set) obj);
-                } else if (obj instanceof ASN1SequenceOf) {
-                    sequenceOfDecoder
-                            .decode(this, states, (ASN1SequenceOf) obj);
-                } else if (obj instanceof ASN1Integer
-                        || ReflectionUtils
-                        .extendsClazz(type, ASN1NamedInteger.class)) {
+                } else if (obj instanceof ASN1SetOf) {
+                    setOfDecoder.decode(this, states, (ASN1SetOf) obj);
+                } else if (obj instanceof ASN1Integer || ReflectionUtils.extendsClazz(type, ASN1NamedInteger.class)) {
                     integerDecoder.decode(states, state, (ASN1Integer) obj);
                 } else if (obj instanceof ASN1Real) {
                     realDecoder.decode(states, state, (ASN1Real) obj);
                 } else if (obj instanceof ASN1OctetString) {
-                    octetStringDecoder.decode(states, state,
-                            (ASN1OctetString) obj);
+                    octetStringDecoder.decode(states, state, (ASN1OctetString) obj);
                 } else if (obj instanceof ASN1VisibleString) {
-                    visibleStringDecoder.decode(states, state,
-                            (ASN1VisibleString) obj);
+                    visibleStringDecoder.decode(states, state, (ASN1VisibleString) obj);
                 } else if (obj instanceof ASN1ObjectIdentifier) {
-                    oidDecoder
-                            .decode(states, state, (ASN1ObjectIdentifier) obj);
+                    oidDecoder.decode(states, state, (ASN1ObjectIdentifier) obj);
                 } else {
-                    throw new DecodingException("Decoding of object "
-                            + obj.getClass().getName() + " not supported");
+                    throw new DecodingException("Decoding of object " + obj.getClass().getName() + " not supported");
                 }
-
             }
         } catch (Throwable th) {
             if (DecodingException.class.isAssignableFrom(th.getClass())) {

@@ -51,15 +51,19 @@ public class Utils {
 
     		while (tag == null) {
     			clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
+
+    			if (clazz == null) {
+    			    return tags;
+                }
+
     			tag = clazz.getAnnotation(ASN1Tag.class);
     		}
 
     		tags.add(tag);
 
-    		if (tag.mode() != ASN1Tag.Mode.Explicit
-    				|| tag.clazz() == Clazz.Universal) {
-    			break;
-    		}
+            if (tag.mode() != ASN1Tag.Mode.Explicit || tag.clazz() == Clazz.Universal) {
+                break;
+            }
 
     		clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
     	}
@@ -82,11 +86,10 @@ public class Utils {
     		tags = getTags(type);
     	}
 
-    	if (tags.isEmpty()) {
-    		throw new DecodingException("Invalid type provided: "
-    				+ type.getClass().getSimpleName()
-    				+ ". No ASN1Tag annotation found");
-    	}
+        if (tags.isEmpty()) {
+            throw new DecodingException("Invalid type provided: " + type.getClass()
+                    .getSimpleName() + ". No ASN1Tag annotation found");
+        }
 
     	return tags;
     }
@@ -103,16 +106,14 @@ public class Utils {
     		}
 
     		clazz = clazz.getSuperclass();
-    	} while (clazz != null
-    			&& ReflectionUtils.implementsInterface(clazz, ASN1Type.class));
+        } while (clazz != null && ReflectionUtils.implementsInterface(clazz, ASN1Type.class));
 
-    	return compFields;
+        return compFields;
     }
 
     public static Field getComponent(ASN1Type type, String name) {
         Class<?> clazz = type.getClass();
 
-        outer:
         do {
             Field[] fields = clazz.getDeclaredFields();
 

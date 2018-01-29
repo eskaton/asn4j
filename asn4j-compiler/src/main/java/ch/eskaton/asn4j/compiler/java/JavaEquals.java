@@ -86,7 +86,7 @@ public class JavaEquals extends JavaMethod {
     	writer.write(prefix);
     	writer.write("\t\treturn true;\n");
     	writer.write(prefix);
-    	writer.write("\t}\n\n");
+    	writer.write("\t}\n");
     }
 
 }
