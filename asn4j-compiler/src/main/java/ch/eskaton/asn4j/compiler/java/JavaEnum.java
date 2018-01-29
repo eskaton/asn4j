@@ -38,14 +38,14 @@ public class JavaEnum implements JavaObject {
 
     private String name;
 
-    private List<String> enumConstants = new ArrayList<String>();
+    private List<String> enumConstants = new ArrayList<>();
 
     public JavaEnum(String name) {
     	this.name = name;
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {
-    	writer.write(StringUtils.concat(prefix, "public enum ", name, " {\n"));
+    	writer.write(StringUtils.concat(prefix, "public enum ", name, " {\n\t"));
 
     	boolean first = true;
 
@@ -53,9 +53,9 @@ public class JavaEnum implements JavaObject {
     		if (first) {
     			first = false;
     		} else {
-    			writer.write(",\n");
+    			writer.write(",");
     		}
-    		writer.write(StringUtils.concat(prefix, "\t", ec));
+    		writer.write(StringUtils.concat(prefix, ec));
     	}
 
     	writer.write(StringUtils.concat("\n", prefix, "};\n\n"));

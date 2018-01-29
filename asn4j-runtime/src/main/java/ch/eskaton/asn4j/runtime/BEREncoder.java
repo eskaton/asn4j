@@ -74,7 +74,8 @@ public class BEREncoder implements Encoder {
             .getLogger(BEREncoder.class);
 
     @SuppressWarnings("serial")
-    private Map<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>> encoders = new HashMap<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>>() {
+    private Map<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>> encoders =
+            new HashMap<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>>() {
         {
             put(ASN1BitString.class, new BitStringEncoder());
             put(ASN1Boolean.class, new BooleanEncoder());
@@ -88,30 +89,27 @@ public class BEREncoder implements Encoder {
             put(ASN1Sequence.class, new SequenceEncoder());
             put(ASN1SequenceOf.class, new SequenceOfEncoder());
             put(ASN1Set.class, new SetEncoder());
+            put(ASN1SetOf.class, new SetOfEncoder());
         }
     };
 
-    public byte[] encode(ASN1Type obj) throws EncodingException,
-            ConstraintViolatedException {
+    public byte[] encode(ASN1Type obj) throws EncodingException, ConstraintViolatedException {
         byte[] encoded = encode(obj, null);
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Encoded value of type "
-                    + obj.getClass().getSimpleName() + " = "
-                    + HexDump.toHexString(encoded));
+            LOGGER.trace("Encoded value of type " + obj.getClass().getSimpleName() + " = " + HexDump
+                    .toHexString(encoded));
         }
 
         return encoded;
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ASN1Type, C extends TypeEncoder<T>> C getEncoder(
-            Class<T> clazz) throws EncodingException {
+    public <T extends ASN1Type, C extends TypeEncoder<T>> C getEncoder(Class<T> clazz) throws EncodingException {
         TypeEncoder<?> encoder = encoders.get(clazz);
 
         if (encoder == null) {
-            throw new EncodingException("No encoder for node-type "
-                    + clazz.getSimpleName());
+            throw new EncodingException("No encoder for node-type " + clazz.getSimpleName());
         }
 
         return (C) encoder;
@@ -130,46 +128,37 @@ public class BEREncoder implements Encoder {
             buf = this.<ASN1Integer, IntegerEncoder> getEncoder(
                     ASN1Integer.class).encode(this, (ASN1Integer) obj);
         } else if (obj instanceof ASN1EnumeratedType) {
-            buf = this.<ASN1EnumeratedType, EnumerationTypeEncoder> getEncoder(
-                    ASN1EnumeratedType.class).encode(this,
-                    (ASN1EnumeratedType) obj);
+            buf = this.<ASN1EnumeratedType, EnumerationTypeEncoder>getEncoder(ASN1EnumeratedType.class)
+                    .encode(this, (ASN1EnumeratedType) obj);
         } else if (obj instanceof ASN1Real) {
-            buf = this.<ASN1Real, RealEncoder> getEncoder(ASN1Real.class)
-                    .encode(this, (ASN1Real) obj);
+            buf = this.<ASN1Real, RealEncoder>getEncoder(ASN1Real.class).encode(this, (ASN1Real) obj);
         } else if (obj instanceof ASN1BitString) {
             buf = this.<ASN1BitString, BitStringEncoder> getEncoder(
                     ASN1BitString.class).encode(this, (ASN1BitString) obj);
         } else if (obj instanceof ASN1OctetString) {
-            buf = this.<ASN1OctetString, OctetStringEncoder> getEncoder(
-                    ASN1OctetString.class).encode(this, (ASN1OctetString) obj);
+            buf = this.<ASN1OctetString, OctetStringEncoder>getEncoder(ASN1OctetString.class)
+                    .encode(this, (ASN1OctetString) obj);
         } else if (obj instanceof ASN1VisibleString) {
             buf = ((ASN1VisibleString) obj).getValue().getBytes();
         } else if (obj instanceof ASN1Null) {
-            buf = this.<ASN1Null, NullEncoder> getEncoder(ASN1Null.class)
-                    .encode(this, (ASN1Null) obj);
+            buf = this.<ASN1Null, NullEncoder>getEncoder(ASN1Null.class).encode(this, (ASN1Null) obj);
         } else if (obj instanceof ASN1ObjectIdentifier) {
-            buf = this
-                    .<ASN1ObjectIdentifier, ObjectIdentifierEncoder> getEncoder(
-                            ASN1ObjectIdentifier.class).encode(this,
-                            (ASN1ObjectIdentifier) obj);
+            buf = this.<ASN1ObjectIdentifier, ObjectIdentifierEncoder>getEncoder(ASN1ObjectIdentifier.class)
+                    .encode(this, (ASN1ObjectIdentifier) obj);
         } else if (obj instanceof ASN1Sequence) {
             buf = this.<ASN1Sequence, SequenceEncoder> getEncoder(
                     ASN1Sequence.class).encode(this, (ASN1Sequence) obj);
         } else if (obj instanceof ASN1Set) {
-            buf = this.<ASN1Set, SetEncoder> getEncoder(ASN1Set.class).encode(
-                    this, (ASN1Set) obj);
+            buf = this.<ASN1Set, SetEncoder> getEncoder(ASN1Set.class).encode(this, (ASN1Set) obj);
         } else if (obj instanceof ASN1SequenceOf) {
-            buf = this.<ASN1SequenceOf, SequenceOfEncoder> getEncoder(
-                    ASN1SequenceOf.class).encode(this, (ASN1SequenceOf<?>) obj);
+            buf = this.<ASN1SequenceOf, SequenceOfEncoder> getEncoder(ASN1SequenceOf.class)
+                    .encode(this, (ASN1SequenceOf<?>) obj);
         } else if (obj instanceof ASN1SetOf) {
-            buf = this.<ASN1SetOf, SetOfEncoder> getEncoder(ASN1SetOf.class)
-                    .encode(this, (ASN1SetOf<?>) obj);
+            buf = this.<ASN1SetOf, SetOfEncoder>getEncoder(ASN1SetOf.class).encode(this, (ASN1SetOf<?>) obj);
         } else if (obj instanceof ASN1Choice) {
-            buf = this.<ASN1Choice, ChoiceEncoder> getEncoder(ASN1Choice.class)
-                    .encode(this, (ASN1Choice) obj);
+            buf = this.<ASN1Choice, ChoiceEncoder>getEncoder(ASN1Choice.class).encode(this, (ASN1Choice) obj);
         } else {
-            throw new EncodingException("Unsupported type: "
-                    + obj.getClass().getSimpleName());
+            throw new EncodingException("Unsupported type: " + obj.getClass().getSimpleName());
         }
 
         try {

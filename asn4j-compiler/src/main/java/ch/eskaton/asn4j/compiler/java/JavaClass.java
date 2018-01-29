@@ -45,17 +45,17 @@ import java.util.Set;
 
 public class JavaClass implements JavaStructure {
 
-    private List<String> imports = new ArrayList<String>();
+    private List<String> imports = new ArrayList<>();
 
-    private List<JavaField> fields = new ArrayList<JavaField>();
+    private List<JavaField> fields = new ArrayList<>();
 
-    private List<JavaMethod> methods = new ArrayList<JavaMethod>();
+    private List<JavaMethod> methods = new ArrayList<>();
 
-    private List<JavaClass> innerClasses = new ArrayList<JavaClass>();
+    private List<JavaClass> innerClasses = new ArrayList<>();
 
-    private List<JavaEnum> enums = new ArrayList<JavaEnum>();
+    private List<JavaEnum> enums = new ArrayList<>();
 
-    private Set<JavaModifier> modifiers = new HashSet<JavaModifier>();
+    private Set<JavaModifier> modifiers = new HashSet<>();
 
     private List<JavaStaticInitializer> staticInitializers;
 
@@ -90,20 +90,20 @@ public class JavaClass implements JavaStructure {
         return name;
     }
 
-    public void setParent(String parent) {
-        this.parent = parent;
-    }
-
     public String getParent() {
         return parent;
     }
 
-    public void setInterfaze(String interfaze) {
-        this.interfaze = interfaze;
+    public void setParent(String parent) {
+        this.parent = parent;
     }
 
     public String getInterfaze() {
         return interfaze;
+    }
+
+    public void setInterfaze(String interfaze) {
+        this.interfaze = interfaze;
     }
 
     public void setTypeParam(String typeParam) {
@@ -128,8 +128,15 @@ public class JavaClass implements JavaStructure {
 
     public void addField(JavaDefinedField field, boolean hasGetter, boolean hasSetter) {
         String typeName = field.getTypeName();
-        addMethod(new JavaSetter(typeName, field.getName()));
-        addMethod(new JavaGetter(typeName, field.getName()));
+
+        if (hasSetter) {
+            addMethod(new JavaSetter(typeName, field.getName()));
+        }
+
+        if (hasGetter) {
+            addMethod(new JavaGetter(typeName, field.getName()));
+        }
+
         fields.add(field);
     }
 
@@ -168,7 +175,7 @@ public class JavaClass implements JavaStructure {
     }
 
     public List<JavaConstructor> getConstructors() {
-        List<JavaConstructor> constructors = new ArrayList<JavaConstructor>();
+        List<JavaConstructor> constructors = new ArrayList<>();
 
         for (JavaMethod method : methods) {
             if (method instanceof JavaConstructor) {
@@ -182,8 +189,8 @@ public class JavaClass implements JavaStructure {
     public void save(String dir) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(dir + File.separator
-                        + pkg.replace('.', File.separatorChar) + File.separator
-                        + name + ".java")));
+                                             + pkg.replace('.', File.separatorChar) + File.separator
+                                             + name + ".java")));
         write(writer, "");
         writer.close();
     }
@@ -223,6 +230,7 @@ public class JavaClass implements JavaStructure {
 
         for (JavaMethod method : methods) {
             method.write(writer, prefix);
+            writer.newLine();
         }
 
         writer.write("\n\n");
@@ -235,7 +243,6 @@ public class JavaClass implements JavaStructure {
     }
 
     private void writeClassHeader(BufferedWriter writer, String prefix) throws IOException {
-
         if (tag != null) {
             writer.write(StringUtils.concat(prefix, "@ASN1Tag(clazz=", Clazz.class.getCanonicalName(), "."));
 
@@ -255,15 +262,16 @@ public class JavaClass implements JavaStructure {
                 }
             }
 
-            writer.write(StringUtils.concat(",tag=", tag.getClassNumber().getClass(), ",mode=",
-                    ASN1Tag.Mode.class.getCanonicalName(), ".", mode, ",constructed=", constructed, ")\n"));
+            writer.write(StringUtils.concat(", tag=", tag.getClassNumber().getClass(), ", mode=", ASN1Tag.Mode.class
+                    .getCanonicalName(), ".", mode, ", constructed=", constructed, ")\n"));
         }
 
         writer.write(StringUtils.concat(prefix, "public ",
-                StringUtils.join(CollectionUtils.map(modifiers, value -> value.toString().toLowerCase()), " "),
-                " class ", name,
-                (parent != null ? " extends " + parent + (typeParam != null ? "<" + typeParam + ">" : "") : ""),
-                (interfaze != null ? " implements " + interfaze : ""), " {\n\n"));
+                                        StringUtils.join(CollectionUtils.map(modifiers, value -> value.toString()
+                                                .toLowerCase()), " "),
+                                        " class ", name,
+                                        (parent != null ? " extends " + parent + (typeParam != null ? "<" + typeParam + ">" : "") : ""),
+                                        (interfaze != null ? " implements " + interfaze : ""), " {\n\n"));
     }
 
     private void writeFileHeader(BufferedWriter writer) throws IOException {
@@ -275,22 +283,23 @@ public class JavaClass implements JavaStructure {
             writer.write(StringUtils.concat("import ", imp, ";\n"));
         }
 
-        writer.write("import ch.eskaton.asn4j.runtime.Clazz;\n");
-        writer.write("import ch.eskaton.asn4j.runtime.types.*;\n");
-        writer.write("import ch.eskaton.asn4j.runtime.annotations.*;\n");
+        String pkg = Clazz.class.getPackage().getName();
+
+        writer.write("import " + pkg + ".Clazz;\n");
+        writer.write("import " + pkg + ".types.*;\n");
+        writer.write("import " + pkg + ".annotations.*;\n");
         writer.write("import java.util.Objects;\n");
         writer.newLine();
     }
 
-    private void writeClassFooter(BufferedWriter writer, String prefix)
-            throws IOException {
+    private void writeClassFooter(BufferedWriter writer, String prefix) throws IOException {
         writer.write(prefix);
         writer.write("}");
         writer.newLine();
     }
 
     public void createEqualsAndHashCode() {
-        ArrayList<String> fieldNames = new ArrayList<String>(fields.size());
+        ArrayList<String> fieldNames = new ArrayList<>(fields.size());
 
         for (JavaField field : fields) {
             if (field instanceof JavaDefinedField) {

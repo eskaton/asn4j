@@ -48,7 +48,7 @@ public class JavaGetter extends JavaMethod {
     			StringUtils.initCap(name) + "() {\n"));
     	writer.write(StringUtils.concat(prefix, "\t\treturn ", name, ";\n"));
     	writer.write(prefix);
-    	writer.write("\t}\n\n");
+    	writer.write("\t}\n");
     }
 
 }

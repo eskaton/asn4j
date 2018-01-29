@@ -43,7 +43,7 @@ public class JavaLiteralMethod extends JavaMethod {
     public void write(BufferedWriter writer, String prefix) throws IOException {
     	writer.write(StringUtils.inject(body, "\n", prefix));
     	writer.write(prefix);
-    	writer.write("\n");
+    	writer.newLine();
     }
 
 }
