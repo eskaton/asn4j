@@ -27,8 +27,15 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.java.*;
-import ch.eskaton.asn4j.parser.ast.ModuleNode.TagMode;
+import ch.eskaton.asn4j.compiler.java.JavaUtils;
+import ch.eskaton.asn4j.compiler.java.JavaUtils.MethodBuilder;
+import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
+import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
+import ch.eskaton.asn4j.compiler.java.JavaEnum;
+import ch.eskaton.asn4j.compiler.java.JavaGetter;
+import ch.eskaton.asn4j.compiler.java.JavaLiteralMethod;
+import ch.eskaton.asn4j.compiler.java.JavaTypedSetter;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
@@ -38,75 +45,74 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static ch.eskaton.asn4j.compiler.java.JavaUtils.Modifier.Private;
+import static ch.eskaton.asn4j.compiler.java.JavaUtils.Modifier.Public;
 
 public class ChoiceCompiler implements NamedCompiler<Choice> {
 
-    private static final String CHOICE_TYPE_ENUM = "Type";
+    public static final String CLEAR_FIELDS = "clearFields";
 
-    private static final String CHOICE_TYPE_FIELD = "type";
+    private static final String CHOICE_ENUM = "Choice";
 
-    public void compile(CompilerContext ctx, String name, Choice node)
-            throws CompilerException {
+    private static final String CHOICE_FIELD = "choice";
 
+    public void compile(CompilerContext ctx, String name, Choice node) throws CompilerException {
         JavaClass javaClass = ctx.createClass(name, node, true);
+        List<String> fieldNames = new ArrayList<>();
+        JavaEnum typeEnum = new JavaEnum(CHOICE_ENUM);
 
-        List<String> fieldNames = new ArrayList<String>();
-        JavaEnum typeEnum = new JavaEnum(CHOICE_TYPE_ENUM);
+        MethodBuilder builder = JavaUtils.method().modifier(Public).annotation("@Override")
+                .returnType(ASN1Type.class.getSimpleName()).name("getValue");
 
-        StringBuilder sb = new StringBuilder();
+        String clearFields = "\t\t" + CLEAR_FIELDS + "();\n";
 
-        sb.append("\t@Override\n\tpublic ")
-                .append(ASN1Type.class.getSimpleName())
-                .append(" getValue() {\n\t\tswitch(type) {\n");
+        builder.appendBody("switch(" + CHOICE_FIELD + ") {");
 
         for (NamedType type : node.getRootTypeList()) {
             String typeConstant = CompilerUtils.formatConstant(type.getName());
-            String fieldName = compileChoiceNamedType(ctx, javaClass, type,
-                                                      CHOICE_TYPE_ENUM + "." + typeConstant);
-            typeEnum.addEnumConstant(typeConstant);
+            String fieldName = compileChoiceNamedType(ctx, javaClass, type, typeConstant, clearFields);
             fieldNames.add(fieldName);
-            sb.append("\t\t\tcase ").append(typeConstant)
-                    .append(":\n\t\t\t\treturn ").append(fieldName)
-                    .append(";\n");
+            typeEnum.addEnumConstant(typeConstant);
+            builder.appendBody("\tcase " + typeConstant + ":").appendBody("\t\treturn " + fieldName + ";");
         }
 
-        sb.append("\t\t}\n\n\t\treturn null;\n\t}\n\n");
+        builder.appendBody("}").appendBody("").appendBody("return null;");
 
         javaClass.addEnum(typeEnum);
-        javaClass.addField(new JavaDefinedField(CHOICE_TYPE_ENUM,
-                                                CHOICE_TYPE_FIELD));
-        javaClass
-                .addMethod(new JavaGetter(CHOICE_TYPE_ENUM, CHOICE_TYPE_FIELD));
-
-        javaClass.createEqualsAndHashCode();
-        javaClass.addMethod(new JavaLiteralMethod(sb.toString()));
+        javaClass.addField(new JavaDefinedField(CHOICE_ENUM, CHOICE_FIELD), true, false);
+        javaClass.addMethod(builder.build());
+        javaClass.addMethod(getClearFieldsMethod(fieldNames));
 
         ctx.finishClass();
     }
 
-    private String compileChoiceNamedType(CompilerContext ctx,
-            JavaClass javaClass, NamedType namedType, String typeConstant)
-            throws CompilerException {
-        String name;
+    private String compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,
+            String typeConstant, String beforeCode) throws CompilerException {
+        String name = CompilerUtils.formatName(namedType.getName());
         String typeName = ctx.getType(namedType);
-        name = CompilerUtils.formatName(namedType.getName());
         Tag tag = namedType.getType().getTag();
         TaggingMode taggingMode = namedType.getType().getTaggingMode();
-
         JavaDefinedField field = new JavaDefinedField(typeName, name);
 
-        field.addAnnotation(new JavaAnnotation(ASN1Alternative.class));
+        field.addAnnotation(new JavaAnnotation(ASN1Alternative.class).addParameter("name", '"' + typeConstant + '"' ));
 
         if (tag != null) {
-            JavaAnnotation tagAnnotation = CompilerUtils.getTagAnnotation(
-                    ctx.getModule(), tag, taggingMode);
+            JavaAnnotation tagAnnotation = CompilerUtils.getTagAnnotation(ctx.getModule(), tag, taggingMode);
             field.addAnnotation(tagAnnotation);
         }
 
-        javaClass.addField(field);
-        javaClass.addMethod(new JavaTypedSetter(typeName, name,
-                                                CHOICE_TYPE_FIELD, typeConstant));
+        javaClass.addField(field, false, false);
+        javaClass.addMethod(new JavaTypedSetter(typeName, name, CHOICE_FIELD, CHOICE_ENUM + "." + typeConstant, beforeCode));
+        javaClass.addMethod(new JavaGetter(typeName, name));
+
         return name;
+    }
+
+    private JavaLiteralMethod getClearFieldsMethod(List<String> fieldNames) {
+        return JavaUtils.method().modifier(Private).name(CLEAR_FIELDS)
+                .body(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).build();
     }
 
 }

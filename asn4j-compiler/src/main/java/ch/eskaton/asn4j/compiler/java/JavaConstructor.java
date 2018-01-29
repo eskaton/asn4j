@@ -106,7 +106,7 @@ public class JavaConstructor extends JavaMethod {
     	writer.write(StringUtils.inject(body, "\n", prefix));
     	writer.write("\n");
     	writer.write(prefix);
-    	writer.write("\t}\n\n");
+    	writer.write("\t}\n");
     }
 
     @Override

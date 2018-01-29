@@ -39,15 +39,12 @@ import java.lang.reflect.Field;
 
 public class ChoiceEncoder implements TypeEncoder<ASN1Choice> {
 
-    public byte[] encode(Encoder encoder, ASN1Choice obj)
-            throws EncodingException {
-        // TODO: choice
+    public byte[] encode(Encoder encoder, ASN1Choice obj) throws EncodingException {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
         ASN1Type value = obj.getValue();
         ASN1Tag tag = null;
 
-        // TODO: find field
         for (Field field : obj.getClass().getDeclaredFields()) {
             if (field.getType().equals(value.getClass())) {
                 tag = field.getAnnotation(ASN1Tag.class);
