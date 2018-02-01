@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -30,12 +30,15 @@ package ch.eskaton.asn4j.runtime;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.commons.utils.ReflectionUtils;
+import ch.eskaton.asn4j.runtime.utils.FieldIterator;
+import ch.eskaton.asn4j.runtime.utils.StreamsUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 public class Utils {
 
@@ -43,100 +46,73 @@ public class Utils {
     }
 
     public static List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
-    	List<ASN1Tag> tags = new ArrayList<>(10);
-    	ASN1Tag tag;
+        List<ASN1Tag> tags = new ArrayList<>(10);
+        ASN1Tag tag;
 
-    	while (true) {
-    		tag = clazz.getAnnotation(ASN1Tag.class);
+        while (true) {
+            tag = clazz.getAnnotation(ASN1Tag.class);
 
-    		while (tag == null) {
-    			clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
+            while (tag == null) {
+                clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
 
-    			if (clazz == null) {
-    			    return tags;
+                if (clazz == null) {
+                    return tags;
                 }
 
-    			tag = clazz.getAnnotation(ASN1Tag.class);
-    		}
+                tag = clazz.getAnnotation(ASN1Tag.class);
+            }
 
-    		tags.add(tag);
+            tags.add(tag);
 
             if (tag.mode() != ASN1Tag.Mode.Explicit || tag.clazz() == Clazz.Universal) {
                 break;
             }
 
-    		clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
-    	}
+            clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
+        }
 
-    	return tags;
+        return tags;
     }
 
     public static <T extends ASN1Type> List<ASN1Tag> getTags(Class<T> type, ASN1Tag tag) {
-    	List<ASN1Tag> tags;
+        List<ASN1Tag> tags;
 
-    	if (tag != null) {
-    		if (tag.mode() == ASN1Tag.Mode.Implicit) {
-    			tags = new LinkedList<>();
-    			tags.add(0, tag);
-    		} else {
-    			tags = getTags(type);
-    			tags.add(0, tag);
-    		}
-    	} else {
-    		tags = getTags(type);
-    	}
-
-        if (tags.isEmpty()) {
-            throw new DecodingException("Invalid type provided: " + type.getClass()
-                    .getSimpleName() + ". No ASN1Tag annotation found");
+        if (tag != null) {
+            if (tag.mode() == ASN1Tag.Mode.Implicit) {
+                tags = new LinkedList<>();
+                tags.add(0, tag);
+            } else {
+                tags = getTags(type);
+                tags.add(0, tag);
+            }
+        } else {
+            tags = getTags(type);
         }
 
-    	return tags;
+        if (tags.isEmpty()) {
+            throw new DecodingException("Invalid type provided: " + type.getClass().getSimpleName() +
+                    ". No ASN1Tag annotation found");
+        }
+
+        return tags;
     }
 
     public static List<Field> getComponents(ASN1Type type) {
-    	List<Field> compFields = new ArrayList<>(20);
-    	Class<?> clazz = type.getClass();
-
-    	do {
-    		Field[] fields = clazz.getDeclaredFields();
-
-    		for (Field field : fields) {
-    			compFields.add(field);
-    		}
-
-    		clazz = clazz.getSuperclass();
-        } while (clazz != null && ReflectionUtils.implementsInterface(clazz, ASN1Type.class));
-
-        return compFields;
+        return StreamsUtils.of(FieldIterator.of(type.getClass())).collect(toList());
     }
 
     public static Field getComponent(ASN1Type type, String name) {
-        Class<?> clazz = type.getClass();
-
-        do {
-            Field[] fields = clazz.getDeclaredFields();
-
-            for (Field field : fields) {
-                if (field.getName().equals(name)) {
-                    return field;
-                }
-            }
-
-            clazz = clazz.getSuperclass();
-        } while (clazz != null && ReflectionUtils.implementsInterface(clazz, ASN1Type.class));
-
-        return null;
+        return StreamsUtils.of(FieldIterator.of(type.getClass())).filter(f -> f.getName().equals(name)).findFirst()
+                .orElse(null);
     }
 
     public static byte[] getValue(DecoderStates states, DecoderState state) {
-       return getValue(states, state, 0);
+        return getValue(states, state, 0);
     }
 
     public static byte[] getValue(DecoderStates states, DecoderState state, int offset) {
         byte[] buf = new byte[state.tlv.length - offset];
-        System.arraycopy(states.buf, state.tlv.pos + offset, buf, 0,
-                         state.tlv.length - offset);
+        System.arraycopy(states.buf, state.tlv.pos + offset, buf, 0, state.tlv.length - offset);
         return buf;
     }
 
