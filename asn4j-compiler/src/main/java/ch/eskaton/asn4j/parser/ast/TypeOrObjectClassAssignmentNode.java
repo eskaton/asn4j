@@ -27,8 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
-public class TypeOrObjectClassAssignmentNode<T extends Node> extends
-    	AssignmentNode {
+public abstract class TypeOrObjectClassAssignmentNode<T extends Node> extends AssignmentNode {
 
     private T type;
 

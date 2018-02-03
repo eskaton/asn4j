@@ -41,6 +41,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
+import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import org.junit.Test;
 
 import ch.eskaton.asn4j.parser.Parser.ActualParameterListParser;
@@ -851,7 +852,7 @@ public class ParserTest {
     	List<AssignmentNode> result = parser.parse();
 
     	assertNotNull(result);
-    	assertTrue(result.get(0) instanceof TypeOrObjectClassAssignmentNode);
+    	assertTrue(result.get(0) instanceof TypeAssignmentNode);
     	assertTrue(result.get(1) instanceof ValueOrObjectAssignmentNode<?, ?>);
     }
 
@@ -863,7 +864,7 @@ public class ParserTest {
     	AssignmentNode result = parser.parse();
 
     	assertNotNull(result);
-    	assertTrue(result instanceof TypeOrObjectClassAssignmentNode);
+    	assertTrue(result instanceof TypeAssignmentNode);
 
     	parser = new Parser(new ByteArrayInputStream(
     			"value-reference VisibleString ::= \"string\"".getBytes())).new AssignmentParser();

@@ -1,8 +1,22 @@
 X690-8 DEFINITIONS ::=
 BEGIN
 
+-- 8.4
 TestEnumeration ::= ENUMERATED {
 	a(0), b(1), c(128)
 }
+
+-- 8.11
+Type1 ::= VisibleString
+
+Type2 ::= [APPLICATION 3] IMPLICIT Type1
+
+Type3 ::= [2] Type2
+
+Type4 ::= [APPLICATION 7] IMPLICIT Type3
+
+Type5 ::= [2] IMPLICIT Type2
+
+Type6 ::= [APPLICATION 11] Type3
 
 END
