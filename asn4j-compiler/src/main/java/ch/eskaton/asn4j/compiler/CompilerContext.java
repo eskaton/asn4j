@@ -109,6 +109,7 @@ public class CompilerContext {
             put(SetType.class, new SetCompiler());
             put(SetOfType.class, new SetOfCompiler());
             put(Type.class, new TypeCompiler());
+            put(TypeReference.class, new TypeReferenceCompiler());
             put(TypeAssignmentNode.class, new TypeAssignmentCompiler());
             put(VisibleString.class, new VisibleStringCompiler());
         }
@@ -130,32 +131,21 @@ public class CompilerContext {
     @SuppressWarnings("serial")
     private Map<String, String> runtimeTypes = new HashMap<String, String>() {
         {
-            put(BooleanType.class.getSimpleName(),
-                ASN1Boolean.class.getSimpleName());
-            put(BitString.class.getSimpleName(),
-                ASN1BitString.class.getSimpleName());
+            put(BooleanType.class.getSimpleName(), ASN1Boolean.class.getSimpleName());
+            put(BitString.class.getSimpleName(), ASN1BitString.class.getSimpleName());
             put(Choice.class.getSimpleName(), ASN1Choice.class.getSimpleName());
-            put(EnumeratedType.class.getSimpleName(),
-                ASN1EnumeratedType.class.getSimpleName());
-            put(GeneralizedTime.class.getSimpleName(),
-                ASN1GeneralizedTime.class.getSimpleName());
-            put(IntegerType.class.getSimpleName(),
-                ASN1Integer.class.getSimpleName());
+            put(EnumeratedType.class.getSimpleName(), ASN1EnumeratedType.class.getSimpleName());
+            put(GeneralizedTime.class.getSimpleName(), ASN1GeneralizedTime.class.getSimpleName());
+            put(IntegerType.class.getSimpleName(), ASN1Integer.class.getSimpleName());
             put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName());
-            put(ObjectIdentifier.class.getSimpleName(),
-                ASN1ObjectIdentifier.class.getSimpleName());
-            put(OctetString.class.getSimpleName(),
-                ASN1OctetString.class.getSimpleName());
-            put(SequenceType.class.getSimpleName(),
-                ASN1Sequence.class.getSimpleName());
-            put(SequenceOfType.class.getSimpleName(),
-                ASN1SequenceOf.class.getSimpleName());
+            put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName());
+            put(OctetString.class.getSimpleName(), ASN1OctetString.class.getSimpleName());
+            put(SequenceType.class.getSimpleName(), ASN1Sequence.class.getSimpleName());
+            put(SequenceOfType.class.getSimpleName(), ASN1SequenceOf.class.getSimpleName());
             put(SetType.class.getSimpleName(), ASN1Set.class.getSimpleName());
-            put(SetOfType.class.getSimpleName(),
-                ASN1SetOf.class.getSimpleName());
+            put(SetOfType.class.getSimpleName(), ASN1SetOf.class.getSimpleName());
             // put(Real.class.getSimpleName(), ASN1Real.class.getSimpleName());
-            put(VisibleString.class.getSimpleName(),
-                VisibleString.class.getSimpleName());
+            put(VisibleString.class.getSimpleName(), ASN1VisibleString.class.getSimpleName());
         }
     };
 
@@ -197,8 +187,7 @@ public class CompilerContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> clazz)
-            throws CompilerException {
+    public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> clazz) throws CompilerException {
         Compiler<?> compiler = compilers.get(clazz);
 
         if (compiler == null) {
@@ -231,10 +220,9 @@ public class CompilerContext {
         }
     }
 
-    public JavaClass createClass(String name, Type type, boolean constructed)
-            throws CompilerException {
+    public JavaClass createClass(String name, Type type, boolean constructed) throws CompilerException {
         JavaClass javaClass = new JavaClass(pkg, name, type.getTag(), CompilerUtils
-                .getTaggingMode(getModule(), type), true, runtimeTypes.get(type.getClass().getSimpleName()));
+                .getTaggingMode(getModule(), type), true, getType(type));
         currentClass.push(javaClass);
         return javaClass;
     }
@@ -284,8 +272,7 @@ public class CompilerContext {
         }
     }
 
-    public String getType(Type type)
-            throws CompilerException {
+    public String getType(Type type) throws CompilerException {
         String typeName;
         String name = null;
         boolean newType = false;
@@ -303,12 +290,16 @@ public class CompilerContext {
                 addReferencedType(asn1TypeName);
                 typeName = CompilerUtils.formatName(asn1TypeName);
             }
+        } else if (type instanceof Null) {
+            typeName = ASN1Null.class.getSimpleName();
         } else if (type instanceof BooleanType) {
             typeName = ASN1Boolean.class.getSimpleName();
         } else if (type instanceof VisibleString) {
             typeName = ASN1VisibleString.class.getSimpleName();
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
+        } else if (type instanceof EnumeratedType) {
+            typeName = ASN1EnumeratedType.class.getSimpleName();
         } else if (type instanceof IntegerType) {
             if (((IntegerType) type).getNamedNumbers() != null && name != null) {
                 typeName = CompilerUtils.formatTypeName(name);
@@ -352,8 +343,12 @@ public class CompilerContext {
                 typeName = ASN1SetOf.class.getSimpleName();
             }
         } else if (type instanceof Choice) {
-            typeName = CompilerUtils.formatTypeName(name);
-            newType = true;
+            if (name != null) {
+                typeName = CompilerUtils.formatTypeName(name);
+                newType = true;
+            } else {
+                typeName = ASN1Choice.class.getSimpleName();
+            }
         } else {
             throw new CompilerException("Unsupported type: " + type.getClass());
         }

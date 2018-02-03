@@ -72,8 +72,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         }
     }
 
-    private void compileComponentNamedType(CompilerContext ctx,
-            ComponentType component, NamedType namedType)
+    private void compileComponentNamedType(CompilerContext ctx, ComponentType component, NamedType namedType)
             throws CompilerException {
         JavaClass javaClass = ctx.getCurrentClass();
         Type type = namedType.getType();
@@ -112,8 +111,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             assignment = ctx.getTypeAssignment(refTypeName, null);
 
             if (assignment == null) {
-                throw new CompilerException("Type " + refTypeName
-                                                    + " referenced but not defined");
+                throw new CompilerException("Type " + refTypeName + " referenced but not defined");
             }
 
             ctx.duplicateModule();
@@ -125,9 +123,8 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             assignment = ctx.getTypeAssignment(refTypeName, refModuleName);
 
             if (assignment == null) {
-                throw new CompilerException("Type " + refTypeName
-                                                    + " from Module " + refModuleName
-                                                    + " referenced but not defined or not exported");
+                throw new CompilerException("Type " + refTypeName + " from Module " + refModuleName +
+                        " referenced but not defined or not exported");
             }
 
             ctx.pushModule(refModuleName);
@@ -143,8 +140,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         } else if (referencedType instanceof SequenceType) {
             componentTypes = ((SequenceType) referencedType).getAllComponents();
         } else {
-            throw new CompilerException("Components of type " + referencedType
-                                                + " not supported");
+            throw new CompilerException("Components of type " + referencedType + " not supported");
         }
 
         List<String> fieldNames = new ArrayList<>();

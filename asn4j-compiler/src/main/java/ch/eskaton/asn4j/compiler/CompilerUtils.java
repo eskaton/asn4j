@@ -108,25 +108,29 @@ public class CompilerUtils {
         }
     }
 
-    static JavaAnnotation getTagAnnotation(ModuleNode module, Tag tag, TaggingMode taggingMode) {
-    	JavaAnnotation tagAnnotation = new JavaAnnotation(ASN1Tag.class);
+    public static JavaAnnotation getTagAnnotation(ModuleNode module, Tag tag, TaggingMode taggingMode) {
+        String taggingModeString;
 
-    	tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz()	.toString());
+        if (taggingMode != null) {
+            taggingModeString = taggingMode.toString();
+        } else {
+            taggingModeString = module.getTagMode().toString();
+        }
+
+        return getTagAnnotation(tag, taggingModeString, Boolean.TRUE);
+    }
+
+    public static JavaAnnotation getTagAnnotation(Tag tag, String taggingModeString, Boolean constructed) {
+        JavaAnnotation tagAnnotation = new JavaAnnotation(ASN1Tag.class);
+
+        tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz()	.toString());
         tagAnnotation.addParameter("clazz", "Clazz."
-                                + (tag.getClazz() != null ? StringUtils.initCap(tag.getClazz().toString().toLowerCase())
-                                : Clazz.ContextSpecific.toString()));
-    	// TODO: dynamic
-    	tagAnnotation.addParameter("constructed", "true");
+                + (tag.getClazz() != null ? StringUtils.initCap(tag.getClazz().toString().toLowerCase())
+                : Clazz.ContextSpecific.toString()));
+        tagAnnotation.addParameter("constructed", constructed.toString().toLowerCase());
+        tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName() + ".Mode." + taggingModeString);
 
-    	if (taggingMode != null) {
-    		tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName()
-    				+ ".Mode." + taggingMode.toString());
-    	} else {
-    		tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName()
-    				+ ".Mode." + module.getTagMode().toString());
-    	}
-
-    	return tagAnnotation;
+        return tagAnnotation;
     }
 
 }

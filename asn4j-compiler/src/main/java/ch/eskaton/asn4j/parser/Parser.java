@@ -27,21 +27,6 @@
 
 package ch.eskaton.asn4j.parser;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.regex.Pattern;
-
 import ch.eskaton.asn4j.parser.Lexer.Context;
 import ch.eskaton.asn4j.parser.Token.TokenType;
 import ch.eskaton.asn4j.parser.ast.AbstractASN1FieldSpecNode;
@@ -237,6 +222,21 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.ValueFromObject;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.commons.utils.StringUtils;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+import java.util.regex.Pattern;
 
 public class Parser {
 
@@ -1626,32 +1626,18 @@ public class Parser {
     		RuleParser<TypeOrObjectClassAssignmentNode<?>> {
 
     	@SuppressWarnings("unchecked")
-    	public TypeOrObjectClassAssignmentNode<?> parse()
-    			throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.TypeReference,
-    				TokenType.Assign, new ChoiceParser<Node>(typeParser,
-    						objectClassParser)).parse();
+    	public TypeOrObjectClassAssignmentNode<?> parse() throws ParserException {
+    		List<Object> rule = new SequenceParser(TokenType.TypeReference, TokenType.Assign,
+                    new ChoiceParser<>(typeParser, objectClassParser)).parse();
 
     		if (rule != null) {
     			String reference = ((Token) rule.get(0)).getText();
     			Node type = (Node) rule.get(2);
 
     			if (type instanceof Type) {
-    				if (type instanceof SimpleDefinedType) {
-    					if (type instanceof UsefulType) {
-    						return new TypeAssignmentNode(reference,
-    								(Type) type);
-    					} else {
-    						return new TypeOrObjectClassAssignmentNode<Node>(
-    								((Token) rule.get(0)).getText(),
-    								(Node) rule.get(2));
-    					}
-    				} else {
-    					return new TypeAssignmentNode(reference, (Type) type);
-    				}
+    			    return new TypeAssignmentNode(reference, (Type) type);
     			} else if (type instanceof ObjectClassNode) {
-    				return new ObjectClassAssignmentNode(reference,
-    						(ObjectClassNode) type);
+    				return new ObjectClassAssignmentNode(reference, (ObjectClassNode) type);
     			}
     		}
 
