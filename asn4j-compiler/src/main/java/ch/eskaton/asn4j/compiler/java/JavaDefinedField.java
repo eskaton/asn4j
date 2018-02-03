@@ -72,6 +72,7 @@ public class JavaDefinedField implements JavaField {
     public void write(BufferedWriter writer, String prefix) throws IOException {
 
     	for (JavaAnnotation annotation : annotations) {
+    	    writer.write("\t");
     		annotation.write(writer, prefix);
     	}
 

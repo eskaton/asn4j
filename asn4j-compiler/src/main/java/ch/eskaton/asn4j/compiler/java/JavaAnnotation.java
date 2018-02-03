@@ -51,7 +51,7 @@ public class JavaAnnotation implements JavaObject {
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {
-        writer.write(StringUtils.concat(prefix, "\t@", annotation.getSimpleName(), "(", StringUtils
+        writer.write(StringUtils.concat(prefix, "@", annotation.getSimpleName(), "(", StringUtils
                 .join(params, " = ", ", "), ")\n"));
     }
 

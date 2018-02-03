@@ -32,15 +32,13 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class TypeAssignmentCompiler implements Compiler<TypeAssignmentNode> {
 
-    public void compile(CompilerContext ctx, TypeAssignmentNode node)
-    		throws CompilerException {
+    public void compile(CompilerContext ctx, TypeAssignmentNode node) throws CompilerException {
     	String typeName = CompilerUtils.formatTypeName(node.getReference());
 
     	System.out.println("Compiling type " + typeName);
 
     	Type typeDef = node.getType();
-    	TypeCompiler compiler = ctx
-    			.<Type, TypeCompiler> getCompiler(Type.class);
+    	TypeCompiler compiler = ctx.getCompiler(Type.class);
     	compiler.compile(ctx, typeName, typeDef);
     	ctx.addType(node.getReference());
     }

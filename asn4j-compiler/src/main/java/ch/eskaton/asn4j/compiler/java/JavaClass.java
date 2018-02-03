@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
@@ -244,34 +245,14 @@ public class JavaClass implements JavaStructure {
 
     private void writeClassHeader(BufferedWriter writer, String prefix) throws IOException {
         if (tag != null) {
-            writer.write(StringUtils.concat(prefix, "@ASN1Tag(clazz=", Clazz.class.getCanonicalName(), "."));
-
-            if (tag.getClazz() == null) {
-                writer.write(Clazz.ContextSpecific.toString());
-            } else {
-                switch (tag.getClazz()) {
-                    case APPLICATION:
-                        writer.write(Clazz.Application.toString());
-                        break;
-                    case PRIVATE:
-                        writer.write(Clazz.Private.toString());
-                        break;
-                    case UNIVERSAL:
-                        writer.write(Clazz.Universal.toString());
-                        break;
-                }
-            }
-
-            writer.write(StringUtils.concat(", tag=", tag.getClassNumber().getClass(), ", mode=", ASN1Tag.Mode.class
-                    .getCanonicalName(), ".", mode, ", constructed=", constructed, ")\n"));
+            CompilerUtils.getTagAnnotation(tag, mode.toString(), constructed).write(writer, "");
         }
 
         writer.write(StringUtils.concat(prefix, "public ",
-                                        StringUtils.join(CollectionUtils.map(modifiers, value -> value.toString()
-                                                .toLowerCase()), " "),
-                                        " class ", name,
-                                        (parent != null ? " extends " + parent + (typeParam != null ? "<" + typeParam + ">" : "") : ""),
-                                        (interfaze != null ? " implements " + interfaze : ""), " {\n\n"));
+                StringUtils.join(CollectionUtils.map(modifiers, value -> value.toString().toLowerCase()), " "),
+                " class ", name, (parent != null ? " extends " + parent +
+                        (typeParam != null ? "<" + typeParam + ">" : "") : ""),
+                (interfaze != null ? " implements " + interfaze : ""), " {\n\n"));
     }
 
     private void writeFileHeader(BufferedWriter writer) throws IOException {
