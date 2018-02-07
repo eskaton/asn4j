@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,28 +25,25 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.test.x690_8;
 
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.parser.ast.types.UsefulType;
+import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4jtest.X690_8.Type2;
+import org.junit.Test;
 
-public class TypeReferenceCompiler implements NamedCompiler<TypeReference> {
+import static org.junit.Assert.assertArrayEquals;
 
-    public void compile(CompilerContext ctx, String name, TypeReference node) throws CompilerException {
-        // TODO: set constructed according to X.690 8.14.3/4
-    	JavaClass javaClass = ctx.createClass(name, node, false);
-    	ctx.compileConstraint(javaClass, name, node);
-    	ctx.finishClass();
+public class TestX690_8_14 {
 
-    	if (node instanceof UsefulType) {
-    		// no-op
-    	} else if (node.getParameters() != null) {
-            throw new CompilerException("ParameterizedTypeReference not yet supported");
-        } else {
-    		ctx.addReferencedType(node.getType());
-    	}
+    @Test
+    public void testEncodeType2() {
+        BEREncoder encoder = new BEREncoder();
 
+        Type2 a = new Type2();
+
+        a.setValue("test");
+
+        assertArrayEquals(new byte[] { 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(a));
     }
 
 }

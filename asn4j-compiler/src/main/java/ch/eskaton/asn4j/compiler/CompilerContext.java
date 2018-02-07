@@ -47,7 +47,6 @@ import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
-import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
@@ -68,10 +67,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
-import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
-import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
@@ -125,27 +122,6 @@ public class CompilerContext {
             add(OctetString.class.getSimpleName());
             add(Real.class.getSimpleName());
             add(VisibleString.class.getSimpleName());
-        }
-    };
-
-    @SuppressWarnings("serial")
-    private Map<String, String> runtimeTypes = new HashMap<String, String>() {
-        {
-            put(BooleanType.class.getSimpleName(), ASN1Boolean.class.getSimpleName());
-            put(BitString.class.getSimpleName(), ASN1BitString.class.getSimpleName());
-            put(Choice.class.getSimpleName(), ASN1Choice.class.getSimpleName());
-            put(EnumeratedType.class.getSimpleName(), ASN1EnumeratedType.class.getSimpleName());
-            put(GeneralizedTime.class.getSimpleName(), ASN1GeneralizedTime.class.getSimpleName());
-            put(IntegerType.class.getSimpleName(), ASN1Integer.class.getSimpleName());
-            put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName());
-            put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName());
-            put(OctetString.class.getSimpleName(), ASN1OctetString.class.getSimpleName());
-            put(SequenceType.class.getSimpleName(), ASN1Sequence.class.getSimpleName());
-            put(SequenceOfType.class.getSimpleName(), ASN1SequenceOf.class.getSimpleName());
-            put(SetType.class.getSimpleName(), ASN1Set.class.getSimpleName());
-            put(SetOfType.class.getSimpleName(), ASN1SetOf.class.getSimpleName());
-            // put(Real.class.getSimpleName(), ASN1Real.class.getSimpleName());
-            put(VisibleString.class.getSimpleName(), ASN1VisibleString.class.getSimpleName());
         }
     };
 
@@ -222,7 +198,7 @@ public class CompilerContext {
 
     public JavaClass createClass(String name, Type type, boolean constructed) throws CompilerException {
         JavaClass javaClass = new JavaClass(pkg, name, type.getTag(), CompilerUtils
-                .getTaggingMode(getModule(), type), true, getType(type));
+                .getTaggingMode(getModule(), type), constructed, getType(type));
         currentClass.push(javaClass);
         return javaClass;
     }
