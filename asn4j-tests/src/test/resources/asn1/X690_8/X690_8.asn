@@ -15,7 +15,7 @@ Type3 ::= [2] Type2
 
 Type4 ::= [APPLICATION 7] IMPLICIT Type3
 
-Type5 ::= [2] IMPLICIT Type2
+Type5 ::= [4] Type2
 
 Type6 ::= [APPLICATION 11] Type3
 
