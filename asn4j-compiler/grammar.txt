@@ -513,10 +513,6 @@ Class ::=
     |     APPLICATION
     |     PRIVATE
     |     empty
-EncodingPrefixedType ::=
-    EncodingPrefix Type
-EncodingPrefix ::=
-    "[" EncodingReference EncodingInstruction "]"
 ObjectIdentifierType ::=
           OBJECT IDENTIFIER
 ObjectIdentifierValue ::=

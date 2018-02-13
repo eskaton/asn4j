@@ -29,6 +29,10 @@ package ch.eskaton.asn4j.test.x690_8;
 
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4jtest.X690_8.Type2;
+import ch.eskaton.asn4jtest.X690_8.Type3;
+import ch.eskaton.asn4jtest.X690_8.Type4;
+import ch.eskaton.asn4jtest.X690_8.Type5;
+import ch.eskaton.asn4jtest.X690_8.Type6;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -39,11 +43,36 @@ public class TestX690_8_14 {
     public void testEncodeType2() {
         BEREncoder encoder = new BEREncoder();
 
-        Type2 a = new Type2();
+        Type2 type2 = new Type2();
 
-        a.setValue("test");
+        type2.setValue("test");
 
-        assertArrayEquals(new byte[] { 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(a));
+        assertArrayEquals(new byte[] { 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type2));
+
+        Type3 type3 = new Type3();
+
+        type3.setValue("test");
+
+        assertArrayEquals(new byte[] { (byte) 0xa2, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type3));
+
+        Type4 type4 = new Type4();
+
+        type4.setValue("test");
+
+        assertArrayEquals(new byte[] { 0x67, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type4));
+
+        Type5 type5 = new Type5();
+
+        type5.setValue("test");
+
+        assertArrayEquals(new byte[] { (byte) 0xa4, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type5));
+
+        Type6 type6 = new Type6();
+
+        type6.setValue("test");
+
+        assertArrayEquals(new byte[] { (byte) 0x6b, 0x08, (byte) 0xa2, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder
+                .encode(type6));
     }
 
 }
