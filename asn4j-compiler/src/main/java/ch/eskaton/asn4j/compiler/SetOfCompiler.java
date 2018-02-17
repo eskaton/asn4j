@@ -33,8 +33,7 @@ import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 
 public class SetOfCompiler implements NamedCompiler<SetOfType> {
 
-    public void compile(CompilerContext ctx, String name, SetOfType node)
-    		throws CompilerException {
+    public void compile(CompilerContext ctx, String name, SetOfType node) throws CompilerException {
     	JavaClass javaClass = ctx.createClass(name, node, true);
     	javaClass.setTypeParam(ctx.getType(node.getType()));
     	ctx.finishClass();

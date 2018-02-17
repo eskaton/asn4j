@@ -19,4 +19,10 @@ Type5 ::= [4] Type2
 
 Type6 ::= [APPLICATION 11] Type3
 
+SetType1 ::= SET OF VisibleString
+
+SetType2 ::= [APPLICATION 1] IMPLICIT SetType1
+
+SetType3 ::= [0] SetType2
+
 END

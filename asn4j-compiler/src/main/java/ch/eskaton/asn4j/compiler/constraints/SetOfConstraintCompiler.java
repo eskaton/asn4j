@@ -27,30 +27,30 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.Collection;
-
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 
-public class NullConstraintCompiler extends AbstractConstraintCompiler<Null> {
+import java.util.Collection;
 
-    public NullConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
+public class SetOfConstraintCompiler extends AbstractConstraintCompiler<SetOfType> {
+
+    public SetOfConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
     	super(constraintCompiler, typeResolver);
     }
 
     @Override
-    protected Collection<Null> compileConstraint(ElementSet set) throws CompilerException {
+    protected Collection<SetOfType> compileConstraint(ElementSet set) throws CompilerException {
     	// TODO Auto-generated method stub
     	return null;
     }
 
     @Override
-    protected Collection<Null> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
-    	// TODO Auto-generated method stub
-    	return null;
+    protected Collection<SetOfType> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
