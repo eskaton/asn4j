@@ -27,10 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Stack;
-
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
@@ -43,20 +39,22 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Stack;
+
 public abstract class AbstractConstraintCompiler<T> {
 
     // protected ConstraintCompiler constraintCompiler;
 
     protected TypeResolver typeResolver;
 
-    public AbstractConstraintCompiler(ConstraintCompiler constraintCompiler,
-    		TypeResolver typeResolver) {
+    public AbstractConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
     	// this.constraintCompiler = constraintCompiler;
     	this.typeResolver = typeResolver;
     }
 
-    public Collection<T> compileConstraint(SetSpecsNode setSpecs,
-    		boolean includeAddition) throws CompilerException {
+    public Collection<T> compileConstraint(SetSpecsNode setSpecs, boolean includeAddition) throws CompilerException {
     	Collection<T> root = compileConstraint(setSpecs.getRootElements());
 
     	if (includeAddition) {
@@ -71,16 +69,14 @@ public abstract class AbstractConstraintCompiler<T> {
     	return root;
     }
 
-    Collection<T> compileConstraints(Type node, Type base)
-    		throws CompilerException {
-    	Stack<Collection<T>> cons = new Stack<Collection<T>>();
+    Collection<T> compileConstraints(Type node, Type base) throws CompilerException {
+    	Stack<Collection<T>> cons = new Stack<>();
 
     	boolean includeAdditions = true;
 
     	while (true) {
     		if (node.hasConstraint()) {
-    			cons.push(compileConstraints(node.getConstraints(),
-    					includeAdditions));
+    			cons.push(compileConstraints(node.getConstraints(), includeAdditions));
     		}
 
     		includeAdditions = false;
@@ -92,12 +88,12 @@ public abstract class AbstractConstraintCompiler<T> {
     		if (node instanceof UsefulType) {
     			break;
     		} else if (node instanceof TypeReference) {
-    			TypeAssignmentNode type = typeResolver
-    					.getType(((TypeReference) node).getType());
+    			TypeAssignmentNode type = typeResolver.getType(((TypeReference) node).getType());
+
     			if (type == null) {
-    				throw new CompilerException("Referenced type "
-    						+ ((TypeReference) node).getType() + " not found");
+    				throw new CompilerException("Referenced type " + ((TypeReference) node).getType() + " not found");
     			}
+
     			node = type.getType();
     		} else {
     			throw new CompilerException("not yet supported");
@@ -132,24 +128,21 @@ public abstract class AbstractConstraintCompiler<T> {
     	Collection<T> intersection = null;
 
     	for (Constraint constraint : constraints) {
-    		SetSpecsNode setSpecs = ((SubtypeConstraint) constraint)
-    				.getElementSetSpecs();
+    		SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
     		if (constraint instanceof SubtypeConstraint) {
     			if (intersection == null) {
     				intersection = compileConstraint(setSpecs, includeAdditions);
     				includeAdditions = false;
     			} else {
-    				intersection.retainAll(compileConstraint(setSpecs,
-    						includeAdditions));
+    				intersection.retainAll(compileConstraint(setSpecs, includeAdditions));
     				if (intersection.isEmpty()) {
     					return intersection;
     				}
     			}
     		} else {
-    			throw new CompilerException("Constraints of type "
-    					+ constraint.getClass().getName()
-    					+ " not yet supported");
+                throw new CompilerException("Constraints of type " + constraint.getClass().getName()
+                                                    + " not yet supported");
     		}
     	}
 

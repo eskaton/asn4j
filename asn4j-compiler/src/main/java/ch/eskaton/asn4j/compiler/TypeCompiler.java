@@ -41,8 +41,7 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 public class TypeCompiler implements NamedCompiler<Type> {
 
     @SuppressWarnings("unchecked")
-    public void compile(CompilerContext ctx, String name, Type node)
-            throws CompilerException {
+    public void compile(CompilerContext ctx, String name, Type node) throws CompilerException {
         if (node instanceof SequenceType) {
             ctx.<SequenceType, SequenceCompiler>getCompiler(SequenceType.class).compile(ctx, name, (SequenceType) node);
         } else if (node instanceof SequenceOfType) {
