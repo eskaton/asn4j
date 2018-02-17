@@ -47,6 +47,7 @@ import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
@@ -63,13 +64,17 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
@@ -122,6 +127,27 @@ public class CompilerContext {
             add(OctetString.class.getSimpleName());
             add(Real.class.getSimpleName());
             add(VisibleString.class.getSimpleName());
+        }
+    };
+
+    @SuppressWarnings("serial")
+    private Map<String, String> runtimeTypes = new HashMap<String, String>() {
+        {
+            put(BooleanType.class.getSimpleName(), ASN1Boolean.class.getSimpleName());
+            put(BitString.class.getSimpleName(), ASN1BitString.class.getSimpleName());
+            put(Choice.class.getSimpleName(), ASN1Choice.class.getSimpleName());
+            put(EnumeratedType.class.getSimpleName(), ASN1EnumeratedType.class.getSimpleName());
+            put(GeneralizedTime.class.getSimpleName(), ASN1GeneralizedTime.class.getSimpleName());
+            put(IntegerType.class.getSimpleName(), ASN1Integer.class.getSimpleName());
+            put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName());
+            put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName());
+            put(OctetString.class.getSimpleName(), ASN1OctetString.class.getSimpleName());
+            put(SequenceType.class.getSimpleName(), ASN1Sequence.class.getSimpleName());
+            put(SequenceOfType.class.getSimpleName(), ASN1SequenceOf.class.getSimpleName());
+            put(SetType.class.getSimpleName(), ASN1Set.class.getSimpleName());
+            put(SetOfType.class.getSimpleName(), ASN1SetOf.class.getSimpleName());
+            put(Real.class.getSimpleName(), ASN1Real.class.getSimpleName());
+            put(VisibleString.class.getSimpleName(), ASN1VisibleString.class.getSimpleName());
         }
     };
 
@@ -220,12 +246,12 @@ public class CompilerContext {
     }
 
     public void duplicateModule() {
-        currentModule.push(currentModule.peek());
+        currentModule.push(getModule());
     }
 
     public TypeAssignmentNode getType(String type) {
         // TODO: what to do if the type isn't known in the current module
-        return (TypeAssignmentNode) currentModule.peek().getBody().getAssignments(type);
+        return (TypeAssignmentNode) getModule().getBody().getAssignments(type);
     }
 
     public Type getBase(String type) {
@@ -236,8 +262,7 @@ public class CompilerContext {
                 return new VisibleString();
             }
 
-            TypeAssignmentNode assignment = (TypeAssignmentNode) currentModule
-                    .peek().getBody().getAssignments(type);
+            TypeAssignmentNode assignment = (TypeAssignmentNode) getModule().getBody().getAssignments(type);
             Type base = assignment.getType();
 
             if (base instanceof TypeReference) {
@@ -338,7 +363,7 @@ public class CompilerContext {
     }
 
     public void addReferencedType(String typeName) {
-        String moduleName = currentModule.peek().getModuleId().getModuleName();
+        String moduleName = getModule().getModuleId().getModuleName();
 
         if (!referencedTypes.containsKey(moduleName)) {
             referencedTypes.put(moduleName, new HashSet<>());
@@ -359,7 +384,7 @@ public class CompilerContext {
 
             module = modules.get(moduleName);
         } else {
-            module = currentModule.peek();
+            module = getModule();
         }
 
         for (AssignmentNode assignment : module.getBody().getAssignments()) {
@@ -455,5 +480,4 @@ public class CompilerContext {
             ComponentType component) throws CompilerException {
         defaultsCompiler.compileDefault(javaClass, field, component);
     }
-
 }

@@ -27,10 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
@@ -39,10 +35,15 @@ import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConstraintCompiler {
 
@@ -55,25 +56,20 @@ public class ConstraintCompiler {
         this.typeResolver = typeResolver;
         compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler<?>>() {
             {
-                put(IntegerType.class, new IntegerConstraintCompiler(
-                        ConstraintCompiler.this, typeResolver));
-                put(BooleanType.class, new BooleanConstraintCompiler(
-                        ConstraintCompiler.this, typeResolver));
-                put(BitString.class, new BitStringConstraintCompiler(
-                        ConstraintCompiler.this, typeResolver));
-                put(VisibleString.class, new VisibleStringConstraintCompiler(
-                        ConstraintCompiler.this, typeResolver));
-                put(OctetString.class, new OctetStringConstraintCompiler(
-                        ConstraintCompiler.this, typeResolver));
-                put(Null.class, new NullConstraintCompiler(
-                        ConstraintCompiler.this, typeResolver));
+                put(IntegerType.class, new IntegerConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(BooleanType.class, new BooleanConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(BitString.class, new BitStringConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(VisibleString.class, new VisibleStringConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(OctetString.class, new OctetStringConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(Null.class, new NullConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(SetOfType.class, new SetOfConstraintCompiler(ConstraintCompiler.this, typeResolver));
             }
         };
     }
 
     public void compileConstraint(JavaClass clazz, String name, Type node)
             throws CompilerException {
-        Type base = null;
+        Type base;
 
         if (node instanceof TypeReference) {
             base = typeResolver.getBase(((TypeReference) node).getType());
@@ -82,8 +78,8 @@ public class ConstraintCompiler {
         }
 
         if (!compilers.containsKey(base.getClass())) {
-            throw new CompilerException("Constraints for type "
-                    + base.getClass().getSimpleName() + " not yet supported");
+            throw new CompilerException("Constraints for type " + base.getClass().getSimpleName()
+                                                + " not yet supported");
         }
 
         AbstractConstraintCompiler<?> compiler = compilers.get(base.getClass());
@@ -93,15 +89,14 @@ public class ConstraintCompiler {
         try {
             cons = compiler.compileConstraints(node, base);
         } catch (CompilerException e) {
-            throw new CompilerException("Error in constraints for type " + name
-                    + ": " + e.getMessage(), e);
+            throw new CompilerException("Error in constraints for type " + name + ": " + e.getMessage(), e);
         }
 
         if (cons != null) {
             if (cons.isEmpty()) {
-                throw new CompilerException("Constraints for type " + name
-                        + " excludes all values");
+                throw new CompilerException("Constraints for type " + name + " excludes all values");
             }
+
             compiler.addConstraint(clazz, cons);
         }
 

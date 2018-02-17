@@ -28,6 +28,10 @@
 package ch.eskaton.asn4j.test.x690_8;
 
 import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
+import ch.eskaton.asn4jtest.X690_8.SetType1;
+import ch.eskaton.asn4jtest.X690_8.SetType2;
+import ch.eskaton.asn4jtest.X690_8.SetType3;
 import ch.eskaton.asn4jtest.X690_8.Type2;
 import ch.eskaton.asn4jtest.X690_8.Type3;
 import ch.eskaton.asn4jtest.X690_8.Type4;
@@ -40,7 +44,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class TestX690_8_14 {
 
     @Test
-    public void testEncodeType2() {
+    public void testEncodeVisibleString() {
         BEREncoder encoder = new BEREncoder();
 
         Type2 type2 = new Type2();
@@ -59,7 +63,7 @@ public class TestX690_8_14 {
 
         type4.setValue("test");
 
-        assertArrayEquals(new byte[] { 0x67, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type4));
+        assertArrayEquals(new byte[] { 0x47, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type4));
 
         Type5 type5 = new Type5();
 
@@ -73,6 +77,30 @@ public class TestX690_8_14 {
 
         assertArrayEquals(new byte[] { (byte) 0x6b, 0x08, (byte) 0xa2, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder
                 .encode(type6));
+    }
+
+    @Test
+    public void testEncodeSetOf() {
+        BEREncoder encoder = new BEREncoder();
+
+        SetType1 type1 = new SetType1();
+
+        type1.setValues(ASN1VisibleString.fromString("test"));
+
+        assertArrayEquals(new byte[] { 0x31, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type1));
+
+        SetType2 type2 = new SetType2();
+
+        type2.setValues(ASN1VisibleString.fromString("test"));
+
+        assertArrayEquals(new byte[] { 0x61, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type2));
+
+        SetType3 type3 = new SetType3();
+
+        type3.setValues(ASN1VisibleString.fromString("test"));
+
+        assertArrayEquals(new byte[] { (byte) 0xa0, 0x08, 0x61, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder
+                .encode(type3));
     }
 
 }

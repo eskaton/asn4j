@@ -30,11 +30,9 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
-public abstract class BuiltinTypeCompiler<T extends Type> implements
-    	NamedCompiler<T> {
+public abstract class BuiltinTypeCompiler<T extends Type> implements NamedCompiler<T> {
 
-    public void compile(CompilerContext ctx, String name, T node)
-    		throws CompilerException {
+    public void compile(CompilerContext ctx, String name, T node) throws CompilerException {
     	JavaClass javaClass = ctx.createClass(name, node, false);
 
     	if (node.hasConstraint()) {

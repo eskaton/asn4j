@@ -83,8 +83,7 @@ public class CompilerUtils {
     	return sb.toString();
     }
 
-    static Mode getTaggingMode(ModuleNode module, Type type)
-    		throws CompilerException {
+    static Mode getTaggingMode(ModuleNode module, Type type) throws CompilerException {
     	TaggingMode taggingMode = type.getTaggingMode();
 
     	if (taggingMode != null) {
