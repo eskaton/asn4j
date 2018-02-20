@@ -11,6 +11,7 @@
         <module>asn4j-maven-plugin</module>
         <module>asn4j-runtime</module>
         <module>asn4j-tests</module>
+        <module>asn4j-site</module>
     </modules>
 
     <properties>
@@ -19,6 +20,21 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>ch.eskaton</groupId>
+                <artifactId>asn4j-compiler</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.eskaton</groupId>
+                <artifactId>asn4j-runtime</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.eskaton</groupId>
+                <artifactId>asn4j-tests</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>ch.eskaton</groupId>
                 <artifactId>commons</artifactId>
@@ -66,6 +82,19 @@
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

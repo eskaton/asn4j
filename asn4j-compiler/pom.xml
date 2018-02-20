@@ -19,7 +19,6 @@
 		<dependency>
 			<groupId>ch.eskaton</groupId>
 			<artifactId>asn4j-runtime</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.eskaton</groupId>
