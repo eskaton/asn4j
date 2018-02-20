@@ -1,0 +1,18 @@
+X680-30 DEFINITIONS ::=
+BEGIN
+
+SetType ::= SET {
+   a a < ChoiceType OPTIONAL,
+   b b < ChoiceType OPTIONAL,
+   c SelectedType OPTIONAL
+}
+
+ChoiceType ::= CHOICE {
+   a  [0] IMPLICIT INTEGER,
+   b  [1] IMPLICIT VisibleString,
+   c  [2] IMPLICIT BOOLEAN
+ }
+
+SelectedType ::= c < ChoiceType
+
+END
