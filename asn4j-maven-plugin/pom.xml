@@ -24,7 +24,6 @@
 		<dependency>
 			<groupId>ch.eskaton</groupId>
 			<artifactId>asn4j-compiler</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 

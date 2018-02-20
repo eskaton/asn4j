@@ -13,12 +13,10 @@
 		<dependency>
 			<groupId>ch.eskaton</groupId>
 			<artifactId>asn4j-runtime</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.eskaton</groupId>
 			<artifactId>asn4j-compiler</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -221,6 +219,8 @@
                             </includePaths>
                         </configuration>
                     </execution>
+
+
 					
 					<execution>
 						<id>X690_8</id>
