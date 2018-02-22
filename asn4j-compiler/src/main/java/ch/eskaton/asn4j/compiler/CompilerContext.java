@@ -50,6 +50,7 @@ import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
+import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
@@ -114,6 +115,7 @@ public class CompilerContext {
             put(TypeReference.class, new TypeReferenceCompiler());
             put(TypeAssignmentNode.class, new TypeAssignmentCompiler());
             put(VisibleString.class, new VisibleStringCompiler());
+            put(SelectionType.class, new SelectionTypeCompiler());
         }
     };
 
@@ -349,6 +351,14 @@ public class CompilerContext {
                 newType = true;
             } else {
                 typeName = ASN1Choice.class.getSimpleName();
+            }
+        } else if (type instanceof SelectionType) {
+            newType = true;
+
+            if (name != null) {
+                typeName = CompilerUtils.formatTypeName(name);
+            } else {
+                typeName = null;
             }
         } else {
             throw new CompilerException("Unsupported type: " + type.getClass());
