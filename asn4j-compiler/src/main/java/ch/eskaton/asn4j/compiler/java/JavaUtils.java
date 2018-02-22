@@ -122,7 +122,11 @@ public class JavaUtils {
             sb.append(" ");
             sb.append(name);
             sb.append("() {\n");
-            sb.append(body.stream().collect(joining()));
+
+            if(body != null) {
+                sb.append(body.stream().collect(joining()));
+            }
+            
             sb.append("\t}");
 
             return sb.toString();
