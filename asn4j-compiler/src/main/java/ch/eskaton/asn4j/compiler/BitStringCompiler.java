@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,69 +27,62 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import java.math.BigInteger;
-import java.util.Collection;
-
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaLiteralField;
-import ch.eskaton.asn4j.compiler.java.JavaLiteralMethod;
+import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.commons.utils.StringUtils;
 
+import java.math.BigInteger;
+import java.util.Collection;
+
+import static ch.eskaton.asn4j.compiler.java.JavaUtils.Modifier.Public;
+
 public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
     @Override
-    public void compile(CompilerContext ctx, String name, BitString node)
-    		throws CompilerException {
-    	JavaClass javaClass = ctx.createClass(name, node, false);
-    	Collection<NamedBitNode> namedBits = node.getNamedBits();
-    	IdentifierUniquenessChecker<Long> iuc = new IdentifierUniquenessChecker<Long>(
-    			name);
+    public void compile(CompilerContext ctx, String name, BitString node) throws CompilerException {
+        JavaClass javaClass = ctx.createClass(name, node, false);
+        Collection<NamedBitNode> namedBits = node.getNamedBits();
+        IdentifierUniquenessChecker<Long> iuc = new IdentifierUniquenessChecker<>(name);
+        long msb = 0;
 
-    	javaClass
-    			.setParent(ch.eskaton.asn4j.runtime.types.ASN1NamedBitString.class
-    					.getSimpleName());
-    	long msb = 0;
+        javaClass.setParent(ch.eskaton.asn4j.runtime.types.ASN1NamedBitString.class.getSimpleName());
 
-    	if (namedBits != null && !namedBits.isEmpty()) {
-    		for (NamedBitNode namedBit : namedBits) {
-    			String fieldName = CompilerUtils.formatConstant(namedBit
-    					.getId());
-    			long value;
+        if (namedBits != null && !namedBits.isEmpty()) {
+            for (NamedBitNode namedBit : namedBits) {
+                String fieldName = CompilerUtils.formatConstant(namedBit.getId());
+                long value;
 
-    			if (namedBit.getRef() != null) {
-    				BigInteger bigValue = ctx.resolveIntegerValue(namedBit
-    						.getRef());
+                if (namedBit.getRef() != null) {
+                    BigInteger bigValue = ctx.resolveIntegerValue(namedBit.getRef());
 
-    				if (bigValue.bitLength() > 63) {
-    					throw new CompilerException("Named bit '" + fieldName
-    							+ "' too long: " + bigValue.toString());
-    				}
+                    if (bigValue.bitLength() > 63) {
+                        throw new CompilerException("Named bit '" + fieldName + "' too long: " + bigValue.toString());
+                    }
 
-    				value = bigValue.longValue();
-    			} else {
-    				value = namedBit.getNum();
-    			}
+                    value = bigValue.longValue();
+                } else {
+                    value = namedBit.getNum();
+                }
 
-    			iuc.add(namedBit.getId(), value);
+                iuc.add(namedBit.getId(), value);
 
-    			msb = value > msb ? value : msb;
+                msb = value > msb ? value : msb;
 
-    			javaClass.addField(new JavaLiteralField(StringUtils.concat(
-    					"\tpublic static final int ", fieldName, " = ", value,
-    					";\n\n")));
-    		}
-    	}
+                javaClass.addField(new JavaLiteralField(StringUtils.concat(
+                        "\tpublic static final int ", fieldName, " = ", value, ";\n\n")));
+            }
+        }
 
-    	javaClass.addMethod(new JavaLiteralMethod(StringUtils.concat(
-    			"\tpublic ", name, "() {\n", "\t\tsuper();", "\n\t}\n")));
+        javaClass.addMethod(JavaUtils.method().modifier(Public).name(name).build());
 
-    	if (node.hasConstraint()) {
-    		ctx.compileConstraint(javaClass, name, node);
-    	}
+        if (node.hasConstraint()) {
+            ctx.compileConstraint(javaClass, name, node);
+        }
 
-    	ctx.finishClass(false);
+        ctx.finishClass(false);
     }
 
 }

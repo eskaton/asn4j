@@ -146,8 +146,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         List<String> fieldNames = new ArrayList<>();
 
         for (ComponentType referencedComponent : componentTypes) {
-            ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
-                    .compile(ctx, referencedComponent);
+            ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class).compile(ctx, referencedComponent);
         }
 
         ctx.popModule();

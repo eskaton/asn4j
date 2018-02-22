@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
+import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
@@ -45,8 +46,7 @@ public class TypeCompiler implements NamedCompiler<Type> {
         if (node instanceof SequenceType) {
             ctx.<SequenceType, SequenceCompiler>getCompiler(SequenceType.class).compile(ctx, name, (SequenceType) node);
         } else if (node instanceof SequenceOfType) {
-            ctx.<SequenceOfType, SequenceOfCompiler>getCompiler(SequenceOfType.class)
-                    .compile(ctx, name, (SequenceOfType) node);
+            ctx.<SequenceOfType, SequenceOfCompiler>getCompiler(SequenceOfType.class).compile(ctx, name, (SequenceOfType) node);
         } else if (node instanceof SetType) {
             ctx.<SetType, SetCompiler>getCompiler(SetType.class).compile(ctx, name, (SetType) node);
         } else if (node instanceof SetOfType) {
@@ -63,13 +63,15 @@ public class TypeCompiler implements NamedCompiler<Type> {
                 ctx.<TypeReference, TypeReferenceCompiler>getCompiler(TypeReference.class)
                         .compile(ctx, name, (TypeReference) node);
             }
+        } else if (node instanceof SelectionType) {
+            ctx.<SelectionType, SelectionTypeCompiler>getCompiler(SelectionType.class)
+                    .compile(ctx, name, (SelectionType) node);
         } else if (node instanceof EnumeratedType) {
             ctx.<EnumeratedType, EnumeratedTypeCompiler>getCompiler(EnumeratedType.class)
                     .compile(ctx, name, (EnumeratedType) node);
         } else {
             if (ctx.isBuiltin(node.getClass().getSimpleName())) {
-                ctx.<Type, BuiltinTypeCompiler<Type>>getCompiler((Class<Type>) node.getClass())
-                        .compile(ctx, name, node);
+                ctx.<Type, BuiltinTypeCompiler<Type>>getCompiler((Class<Type>) node.getClass()).compile(ctx, name, node);
             } else {
                 throw new CompilerException("Unsupported Type: " + node.getClass());
             }
