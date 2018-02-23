@@ -28,5 +28,17 @@
 package ch.eskaton.asn4j.compiler.java;
 
 public enum JavaVisibility {
-    Default, Public, Protected, Private
+    PackagePrivate(""), Private("private"), Protected("protected"), Public("public");
+
+    private final String visibility;
+
+    JavaVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
+    @Override
+    public String toString() {
+        return visibility;
+    }
+
 }

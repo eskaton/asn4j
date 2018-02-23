@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,11 +27,11 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.commons.utils.StringUtils;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Objects;
-
-import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaParameter implements JavaObject {
 
@@ -40,20 +40,25 @@ public class JavaParameter implements JavaObject {
     private String name;
 
     public JavaParameter(String type, String name) {
-    	this.type = type;
-    	this.name = name;
+        this.type = type;
+        this.name = name;
     }
 
     public String getType() {
-    	return type;
+        return type;
     }
 
     public String getName() {
-    	return name;
+        return name;
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {
-    	writer.write(StringUtils.concat(type, " ", name));
+        writer.write(StringUtils.concat(type, " ", name));
+    }
+
+    @Override
+    public String toString() {
+        return type + " " + name;
     }
 
     @Override
@@ -63,24 +68,7 @@ public class JavaParameter implements JavaObject {
 
     @Override
     public boolean equals(Object obj) {
-    	if (this == obj)
-    		return true;
-    	if (obj == null)
-    		return false;
-    	if (getClass() != obj.getClass())
-    		return false;
-    	JavaParameter other = (JavaParameter) obj;
-    	if (name == null) {
-    		if (other.name != null)
-    			return false;
-    	} else if (!name.equals(other.name))
-    		return false;
-    	if (type == null) {
-    		if (other.type != null)
-    			return false;
-    	} else if (!type.equals(other.type))
-    		return false;
-    	return true;
+        return Objects.equals(this, obj);
     }
 
 }

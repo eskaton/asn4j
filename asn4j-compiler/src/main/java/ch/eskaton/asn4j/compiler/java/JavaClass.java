@@ -40,9 +40,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 public class JavaClass implements JavaStructure {
 
@@ -290,6 +295,150 @@ public class JavaClass implements JavaStructure {
 
         addMethod(new JavaEquals(getName(), fieldNames));
         addMethod(new JavaHashCode(fieldNames));
+    }
+
+    public MethodBuilder method() {
+        return new MethodBuilder();
+    }
+
+    public static class MethodBuilder {
+
+        private List<String> annotations = new ArrayList<>();
+
+        private JavaVisibility visibility = Public;
+
+        private String returnType = "void";
+
+        private String name;
+
+        private List<JavaParameter> parameters = new ArrayList<>();
+
+        private Set<String> exceptions = new HashSet<>();
+
+        private List<String> body;
+
+        private boolean isStatic;
+
+        private boolean isFinal;
+
+        public MethodBuilder annotation(String annotation) {
+            annotations.add(annotation);
+            return this;
+        }
+
+        public MethodBuilder modifier(JavaVisibility visibility) {
+            this.visibility = visibility;
+            return this;
+        }
+
+        public MethodBuilder asStatic() {
+            this.isStatic = true;
+            return this;
+        }
+
+        public MethodBuilder asFinal() {
+            this.isFinal = true;
+            return this;
+        }
+
+        public MethodBuilder returnType(String returnType) {
+            this.returnType = returnType;
+            return this;
+        }
+
+        public MethodBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public MethodBuilder parameter(JavaParameter parameter) {
+            parameters.add(parameter);
+            return this;
+        }
+
+        public MethodBuilder parameter(String type, String name) {
+            return parameter(new JavaParameter(type, name));
+        }
+
+        public MethodBuilder parameter(JavaType type, String name) {
+            return parameter(type.toString(), name);
+        }
+
+        public MethodBuilder exception(Class<? extends  Throwable> exception) {
+            return exception(exception.getSimpleName());
+        }
+
+        public MethodBuilder exception(String exception) {
+            exceptions.add(exception);
+            return this;
+        }
+
+        public MethodBuilder body(String body) {
+            return body(Arrays.asList(body.split("\n")));
+        }
+
+        public MethodBuilder body(List<String> body) {
+            this.body = body.stream().map(b -> "\t\t" + b + "\n").collect(toList());
+            return this;
+        }
+
+        public MethodBuilder appendBody(String body) {
+            if (this.body == null) {
+                this.body = new ArrayList<>();
+            }
+
+            this.body.add("\t\t" + body + "\n");
+
+            return this;
+        }
+
+        public JavaLiteralMethod build() {
+            return new JavaLiteralMethod(toString());
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(annotations.stream().map(a -> "\t" + a + "\n").collect(joining()));
+
+            sb.append("\t");
+            sb.append(visibility);
+
+            if (isStatic) {
+                sb.append(" static");
+            }
+
+            if (isFinal) {
+                sb.append(" final");
+            }
+
+            sb.append(" ");
+            sb.append(returnType);
+            sb.append(" ");
+            sb.append(name);
+            sb.append("(");
+
+            sb.append(parameters.stream().map(JavaParameter::toString).collect(joining(", ")));
+
+            sb.append(") ");
+
+            if (!exceptions.isEmpty()) {
+                sb.append("throws ");
+                sb.append(exceptions.stream().map(String::toString).collect(joining(", ")));
+                sb.append(" ");
+            }
+
+            sb.append("{\n");
+
+            if (body != null) {
+                sb.append(body.stream().collect(joining()));
+            }
+
+            sb.append("\t}");
+
+            return sb.toString();
+        }
+
     }
 
 }
