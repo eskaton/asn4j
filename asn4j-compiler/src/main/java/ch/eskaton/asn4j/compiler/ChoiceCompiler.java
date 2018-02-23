@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.java.JavaUtils;
-import ch.eskaton.asn4j.compiler.java.JavaUtils.MethodBuilder;
 import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
@@ -47,8 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.JavaUtils.Modifier.Private;
-import static ch.eskaton.asn4j.compiler.java.JavaUtils.Modifier.Public;
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Private;
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 
 public class ChoiceCompiler implements NamedCompiler<Choice> {
 
@@ -63,7 +61,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         List<String> fieldNames = new ArrayList<>();
         JavaEnum typeEnum = new JavaEnum(CHOICE_ENUM);
 
-        MethodBuilder builder = JavaUtils.method().modifier(Public).annotation("@Override")
+        JavaClass.MethodBuilder builder = javaClass.method().modifier(Public).annotation("@Override")
                 .returnType(ASN1Type.class.getSimpleName()).name("getValue");
 
         String clearFields = "\t\t" + CLEAR_FIELDS + "();\n";
@@ -83,7 +81,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         javaClass.addEnum(typeEnum);
         javaClass.addField(new JavaDefinedField(CHOICE_ENUM, CHOICE_FIELD), true, false);
         javaClass.addMethod(builder.build());
-        javaClass.addMethod(getClearFieldsMethod(fieldNames));
+        javaClass.addMethod(getClearFieldsMethod(javaClass, fieldNames));
 
         ctx.finishClass();
     }
@@ -110,8 +108,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         return name;
     }
 
-    private JavaLiteralMethod getClearFieldsMethod(List<String> fieldNames) {
-        return JavaUtils.method().modifier(Private).name(CLEAR_FIELDS)
+    private JavaLiteralMethod getClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
+        return javaClass.method().modifier(Private).name(CLEAR_FIELDS)
                 .body(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).build();
     }
 

@@ -50,8 +50,7 @@ import java.util.List;
 
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
-    public void compile(CompilerContext ctx, ComponentType node)
-            throws CompilerException {
+    public void compile(CompilerContext ctx, ComponentType node) throws CompilerException {
 
         TagMode mode = ctx.getModule().getTagMode();
 
@@ -93,15 +92,14 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         field.addAnnotation(compAnnotation);
 
         if (tag != null) {
-            field.addAnnotation(CompilerUtils.getTagAnnotation(ctx.getModule(),
-                                                               tag, taggingMode));
+            field.addAnnotation(CompilerUtils.getTagAnnotation(ctx.getModule(), tag, taggingMode));
         }
 
         javaClass.addField(field);
     }
 
-    private Collection<String> compileComponentType(CompilerContext ctx, TagMode mode,
-            Type type) throws CompilerException {
+    private Collection<String> compileComponentType(CompilerContext ctx, TagMode mode, Type type)
+            throws CompilerException {
         TypeAssignmentNode assignment;
 
         if (type instanceof TypeReference) {

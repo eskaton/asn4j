@@ -35,6 +35,8 @@ import java.util.Objects;
 
 import ch.eskaton.commons.utils.StringUtils;
 
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.PackagePrivate;
+
 public class JavaConstructor extends JavaMethod {
 
     private JavaVisibility visibility;
@@ -85,8 +87,7 @@ public class JavaConstructor extends JavaMethod {
     	int paramCount = 0;
 
     	writer.write(StringUtils.concat(prefix, "\t",
-    			(visibility == JavaVisibility.Default ? "" : visibility
-    					.toString().toLowerCase()), " ", clazz, "("));
+    			(visibility == PackagePrivate ? "" : visibility.toString().toLowerCase()), " ", clazz, "("));
 
     	for (JavaParameter parameter : parameters) {
     		if (paramCount != 0) {
