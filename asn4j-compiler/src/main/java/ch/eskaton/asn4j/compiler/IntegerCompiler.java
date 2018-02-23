@@ -50,7 +50,7 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
     		throws CompilerException {
     	JavaClass javaClass = ctx.createClass(name, node, false);
     	Collection<NamedNumber> namedNumbers = node.getNamedNumbers();
-    	IdentifierUniquenessChecker<BigInteger> iuc = new IdentifierUniquenessChecker<BigInteger>(
+    	IdentifierUniquenessChecker<BigInteger> iuc = new IdentifierUniquenessChecker<>(
     			name);
 
     	if (namedNumbers != null && !namedNumbers.isEmpty()) {
