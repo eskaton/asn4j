@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.java.JavaClass.MethodBuilder;
 import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.java.JavaEnum;
 import ch.eskaton.asn4j.compiler.java.JavaGetter;
@@ -61,7 +62,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         List<String> fieldNames = new ArrayList<>();
         JavaEnum typeEnum = new JavaEnum(CHOICE_ENUM);
 
-        JavaClass.MethodBuilder builder = javaClass.method().modifier(Public).annotation("@Override")
+        MethodBuilder builder = javaClass.method().modifier(Public).annotation("@Override")
                 .returnType(ASN1Type.class.getSimpleName()).name("getValue");
 
         String clearFields = "\t\t" + CLEAR_FIELDS + "();\n";

@@ -44,13 +44,11 @@ public class IdentifierUniquenessChecker<T> {
 
     public void add(String name, T value) throws CompilerException {
     	if (names.contains(name)) {
-    		throw new CompilerException("Duplicate identifier '" + name
-    				+ "' in " + typeName);
+    		throw new CompilerException("Duplicate identifier '" + name	+ "' in " + typeName);
     	}
 
     	if (values.contains(value)) {
-    		throw new CompilerException("Duplicate value '" + value + "' in "
-    				+ typeName);
+    		throw new CompilerException("Duplicate value '" + value + "' in " + typeName);
     	}
 
     	names.add(name);
