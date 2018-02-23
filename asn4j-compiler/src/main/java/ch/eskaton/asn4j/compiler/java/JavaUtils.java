@@ -29,108 +29,15 @@ package ch.eskaton.asn4j.compiler.java;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public class JavaUtils {
 
-    public static MethodBuilder method() {
-        return new MethodBuilder();
-    }
-
-    public enum Modifier {
-        PackagePrivate(""), Private("private"), Protected("protected"), Public("public");
-
-        private final String modifier;
-
-        Modifier(String modifier) {
-            this.modifier = modifier;
-        }
-
-        @Override
-        public String toString() {
-            return modifier;
-        }
-    }
-
-    public static class MethodBuilder {
-
-        private List<String> annotations = new ArrayList<>();
-
-        private Modifier modifier = Modifier.Public;
-
-        private String returnType = "void";
-
-        private String name;
-
-        private List<String> body;
-
-        public MethodBuilder annotation(String annotation) {
-            annotations.add(annotation);
-            return this;
-        }
-
-        public MethodBuilder modifier(Modifier modifier) {
-            this.modifier = modifier;
-            return this;
-        }
-
-        public MethodBuilder returnType(String returnType) {
-            this.returnType = returnType;
-            return this;
-        }
-
-        public MethodBuilder name(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public MethodBuilder body(String body) {
-            return body(Arrays.asList(body.split("\n")));
-        }
-
-        public MethodBuilder body(List<String> body) {
-            this.body = body.stream().map(b -> "\t\t" + b + "\n").collect(toList());
-            return this;
-        }
-
-        public MethodBuilder appendBody(String body) {
-            if (this.body == null) {
-                this.body = new ArrayList<>();
-            }
-
-            this.body.add("\t\t" + body + "\n");
-
-            return this;
-        }
-
-        public JavaLiteralMethod build() {
-            return new JavaLiteralMethod(toString());
-        }
-
-        public String toString() {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append(annotations.stream().map(a -> "\t" + a + "\n").collect(joining()));
-
-            sb.append("\t");
-            sb.append(modifier);
-            sb.append(" ");
-            sb.append(returnType);
-            sb.append(" ");
-            sb.append(name);
-            sb.append("() {\n");
-
-            if(body != null) {
-                sb.append(body.stream().collect(joining()));
-            }
-            
-            sb.append("\t}");
-
-            return sb.toString();
-        }
-    }
 
 }

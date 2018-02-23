@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaLiteralField;
-import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.commons.utils.StringUtils;
@@ -37,7 +36,7 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.math.BigInteger;
 import java.util.Collection;
 
-import static ch.eskaton.asn4j.compiler.java.JavaUtils.Modifier.Public;
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 
 public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
@@ -76,7 +75,7 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
             }
         }
 
-        javaClass.addMethod(JavaUtils.method().modifier(Public).name(name).build());
+        javaClass.addMethod(javaClass.method().modifier(Public).name(name).build());
 
         if (node.hasConstraint()) {
             ctx.compileConstraint(javaClass, name, node);

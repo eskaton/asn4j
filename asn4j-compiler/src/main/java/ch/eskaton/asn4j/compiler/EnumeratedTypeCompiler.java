@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,6 +27,17 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.java.JavaClass.MethodBuilder;
+import ch.eskaton.asn4j.compiler.java.JavaConstructor;
+import ch.eskaton.asn4j.compiler.java.JavaLiteralField;
+import ch.eskaton.asn4j.compiler.java.JavaParameter;
+import ch.eskaton.asn4j.compiler.java.JavaVisibility;
+import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
+import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.commons.utils.StringUtils;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,164 +46,143 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaConstructor;
-import ch.eskaton.asn4j.compiler.java.JavaLiteralField;
-import ch.eskaton.asn4j.compiler.java.JavaLiteralMethod;
-import ch.eskaton.asn4j.compiler.java.JavaParameter;
-import ch.eskaton.asn4j.compiler.java.JavaVisibility;
-import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
-import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.commons.utils.StringUtils;
+import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
 
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
 
     public void compile(CompilerContext ctx, String name, EnumeratedType node)
-    		throws CompilerException {
-    	JavaClass javaClass = ctx.createClass(name, node, true);
-    	List<String> names = new ArrayList<String>();
-    	List<Integer> numbers = new ArrayList<Integer>();
+            throws CompilerException {
+        JavaClass javaClass = ctx.createClass(name, node, true);
+        List<String> names = new ArrayList<>();
+        List<Integer> numbers = new ArrayList<>();
 
-    	for (EnumerationItemNode item : node.getRootEnum()) {
-    		String eName = item.getName();
-    		Integer eNumber;
+        for (EnumerationItemNode item : node.getRootEnum()) {
+            String eName = item.getName();
+            Integer eNumber;
 
-    		if (item.getRef() != null) {
-    			BigInteger bigValue = ctx.resolveIntegerValue(item.getRef());
+            if (item.getRef() != null) {
+                BigInteger bigValue = ctx.resolveIntegerValue(item.getRef());
 
-    			if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-    				throw new CompilerException("Value " + bigValue
-    						+ " too large in type " + name);
-    			}
+                if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+                    throw new CompilerException("Value " + bigValue + " too large in type " + name);
+                }
 
-    			eNumber = bigValue.intValue();
-    		} else {
-    			eNumber = item.getNumber();
-    		}
+                eNumber = bigValue.intValue();
+            } else {
+                eNumber = item.getNumber();
+            }
 
-    		addEnumerationItem(name, names, numbers, eName, eNumber);
-    	}
+            addEnumerationItem(name, names, numbers, eName, eNumber);
+        }
 
-    	int i = 0, n = 0;
+        int i = 0, n = 0;
 
-    	for (i = 0; i < numbers.size(); i++) {
-    		if (numbers.get(i) == null) {
-    			while (numbers.contains(n)) {
-    				n++;
-    			}
-    			numbers.set(i, n);
-    		}
-    	}
+        for (i = 0; i < numbers.size(); i++) {
+            if (numbers.get(i) == null) {
+                while (numbers.contains(n)) {
+                    n++;
+                }
+                numbers.set(i, n);
+            }
+        }
 
-    	if (node.getAdditionalEnum() != null) {
-    		for (EnumerationItemNode item : node.getAdditionalEnum()) {
-    			String eName = item.getName();
-    			Integer eNumber;
+        if (node.getAdditionalEnum() != null) {
+            for (EnumerationItemNode item : node.getAdditionalEnum()) {
+                String eName = item.getName();
+                Integer eNumber;
 
-    			if (item.getRef() != null) {
-    				BigInteger bigValue = ctx
-    						.resolveIntegerValue(item.getRef());
+                if (item.getRef() != null) {
+                    BigInteger bigValue = ctx.resolveIntegerValue(item.getRef());
 
-    				if (bigValue.compareTo(BigInteger
-    						.valueOf(Integer.MAX_VALUE)) > 0) {
-    					throw new CompilerException("Value " + bigValue
-    							+ " too large in type " + name);
-    				}
+                    if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+                        throw new CompilerException("Value " + bigValue + " too large in type " + name);
+                    }
 
-    				eNumber = bigValue.intValue();
-    			} else {
-    				eNumber = item.getNumber();
-    			}
+                    eNumber = bigValue.intValue();
+                } else {
+                    eNumber = item.getNumber();
+                }
 
-    			addEnumerationItem(name, names, numbers, eName, eNumber);
-    		}
+                addEnumerationItem(name, names, numbers, eName, eNumber);
+            }
 
-    		for (; i < numbers.size(); i++) {
-    			if (numbers.get(i) == null) {
-    				n = getNextNumber(numbers, i);
-    				if (numbers.contains(n)) {
-    					throw new CompilerException(
-    							"Duplicate enumeration value " + names.get(i)
-    									+ "(" + n + ") in " + name);
-    				}
-    				numbers.set(i, n);
-    			}
-    		}
-    	}
+            for (; i < numbers.size(); i++) {
+                if (numbers.get(i) == null) {
+                    n = getNextNumber(numbers, i);
+                    if (numbers.contains(n)) {
+                        throw new CompilerException("Duplicate enumeration value " + names.get(i)
+                                + "(" + n + ") in " + name);
+                    }
+                    numbers.set(i, n);
+                }
+            }
+        }
 
-    	if (node.hasExceptionSpec()) {
-    		// TODO: figure out what to do
-    	}
+        if (node.hasExceptionSpec()) {
+            // TODO: figure out what to do
+        }
 
-    	Map<Integer, String> cases = new HashMap<Integer, String>();
+        Map<Integer, String> cases = new HashMap<>();
 
-    	for (int j = 0; j < names.size(); j++) {
-    		String fieldName = CompilerUtils.formatConstant(names.get(j));
-    		int value = numbers.get(j);
+        for (int j = 0; j < names.size(); j++) {
+            String fieldName = CompilerUtils.formatConstant(names.get(j));
+            int value = numbers.get(j);
 
-    		cases.put(value, fieldName);
+            cases.put(value, fieldName);
 
-    		javaClass.addField(new JavaLiteralField(StringUtils.concat(
-    				"\tpublic static final ", name, " ", fieldName, " = ",
-    				"new ", name, "(", value, ");\n\n")));
-    	}
+            javaClass.addField(new JavaLiteralField(StringUtils.concat(
+                    "\tpublic static final ", name, " ", fieldName, " = ",
+                    "new ", name, "(", value, ");\n\n")));
+        }
 
-    	javaClass.addMethod(new JavaConstructor(JavaVisibility.Private, name,
-    			Arrays.asList(new JavaParameter("int", "value")),
-    			"\t\tsuper.setValue(value);\n"));
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.Private, name,
+                Arrays.asList(new JavaParameter("int", "value")),
+                "\t\tsuper.setValue(value);\n"));
 
-    	StringBuilder body = new StringBuilder();
-    	body.append("\tpublic static ").append(name)
-    			.append(" valueOf(int value").append(") throws ")
-    			.append(ASN1RuntimeException.class.getSimpleName())
-    			.append(" {\n");
-    	body.append("\t\tswitch(value) {\n");
+        MethodBuilder builder = javaClass.method().asStatic().returnType(name).name("valueOf")
+                .parameter(INT, "value").exception(ASN1RuntimeException.class);
 
-    	for (Entry<Integer, String> entry : cases.entrySet()) {
-    		body.append("\t\tcase ").append(String.valueOf(entry.getKey()))
-    				.append(":\n");
-    		body.append("\t\t\treturn ").append(entry.getValue()).append(";\n");
-    	}
+        builder.appendBody("\t\tswitch(value) {\n");
 
-    	body.append("\t\tdefault:\n");
-    	body.append("\t\t\tthrow new ")
-    			.append(ASN1RuntimeException.class.getSimpleName())
-    			.append("(\"Undefined value: \" + value);\n");
-    	body.append("\t\t}\n");
-    	body.append("\t}\n");
+        for (Entry<Integer, String> entry : cases.entrySet()) {
+            builder.appendBody("\t\tcase " + String.valueOf(entry.getKey()) + ":");
+            builder.appendBody("\t\t\treturn " + entry.getValue() + ";");
+        }
 
-    	javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
-    	javaClass.addMethod(new JavaLiteralMethod(body.toString()));
+        builder.appendBody("\t\tdefault:");
+        builder.appendBody("\t\t\tthrow new " + ASN1RuntimeException.class.getSimpleName() +
+                "(\"Undefined value: \" + value);");
+        builder.appendBody("\t\t}");
 
-    	ctx.finishClass();
+        javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
+        javaClass.addMethod(builder.build());
+
+        ctx.finishClass();
     }
 
     private Integer getNextNumber(List<Integer> numbers, int last) {
-    	int n = 0;
+        int n = 0;
 
-    	for (int i = 0; i < last; i++) {
-    		n = Math.max(numbers.get(i), n);
-    	}
+        for (int i = 0; i < last; i++) {
+            n = Math.max(numbers.get(i), n);
+        }
 
-    	return n + 1;
+        return n + 1;
     }
 
     private void addEnumerationItem(String typeName, List<String> names,
-    		List<Integer> values, String name, Integer value)
-    		throws CompilerException {
-    	if (names.contains(name)) {
-    		throw new CompilerException("Duplicate enumeration item '" + name
-    				+ "' in " + typeName);
-    	}
+            List<Integer> values, String name, Integer value)
+            throws CompilerException {
+        if (names.contains(name)) {
+            throw new CompilerException("Duplicate enumeration item '" + name + "' in " + typeName);
+        }
 
-    	if (value != null && values.contains(value)) {
-    		throw new CompilerException("Duplicate enumeration value " + name
-    				+ "(" + value + ") in " + typeName);
-    	}
+        if (value != null && values.contains(value)) {
+            throw new CompilerException("Duplicate enumeration value " + name + "(" + value + ") in " + typeName);
+        }
 
-    	names.add(name);
-    	values.add(value);
+        names.add(name);
+        values.add(value);
     }
 
 }
