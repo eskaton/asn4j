@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -195,8 +196,8 @@ public class JavaClass implements JavaStructure {
     public void save(String dir) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(dir + File.separator
-                                             + pkg.replace('.', File.separatorChar) + File.separator
-                                             + name + ".java")));
+                        + pkg.replace('.', File.separatorChar) + File.separator
+                        + name + ".java")));
         write(writer, "");
         writer.close();
     }
@@ -327,6 +328,15 @@ public class JavaClass implements JavaStructure {
             this.javaClass = javaClass;
         }
 
+        public MethodBuilder annotation(Class<? extends Annotation> annotation) {
+            if (!"java.lang".equals(annotation.getPackage().toString())) {
+                javaClass.addImport(annotation);
+            }
+
+            annotations.add("@" + annotation.getClass().getSimpleName());
+            return this;
+        }
+
         public MethodBuilder annotation(String annotation) {
             annotations.add(annotation);
             return this;
@@ -374,7 +384,7 @@ public class JavaClass implements JavaStructure {
             return parameter(type.toString(), name);
         }
 
-        public MethodBuilder exception(Class<? extends  Throwable> exception) {
+        public MethodBuilder exception(Class<? extends Throwable> exception) {
             if (!"java.lang".equals(exception.getPackage().toString())) {
                 javaClass.addImport(exception);
             }
