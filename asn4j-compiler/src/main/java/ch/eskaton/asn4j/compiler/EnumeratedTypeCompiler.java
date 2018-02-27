@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaClass.MethodBuilder;
+import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.java.JavaConstructor;
 import ch.eskaton.asn4j.compiler.java.JavaLiteralField;
 import ch.eskaton.asn4j.compiler.java.JavaParameter;
@@ -139,23 +139,23 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
                 Arrays.asList(new JavaParameter("int", "value")),
                 "\t\tsuper.setValue(value);\n"));
 
-        MethodBuilder builder = javaClass.method().asStatic().returnType(name).name("valueOf")
-                .parameter(INT, "value").exception(ASN1RuntimeException.class);
+        BodyBuilder builder = javaClass.method().asStatic().returnType(name).name("valueOf")
+                .parameter(INT, "value").exception(ASN1RuntimeException.class).body();
 
-        builder.appendBody("\t\tswitch(value) {\n");
+        builder.append("switch(value) {");
 
         for (Entry<Integer, String> entry : cases.entrySet()) {
-            builder.appendBody("\t\tcase " + String.valueOf(entry.getKey()) + ":");
-            builder.appendBody("\t\t\treturn " + entry.getValue() + ";");
+            builder.append("\tcase " + String.valueOf(entry.getKey()) + ":");
+            builder.append("\t\treturn " + entry.getValue() + ";");
         }
 
-        builder.appendBody("\t\tdefault:");
-        builder.appendBody("\t\t\tthrow new " + ASN1RuntimeException.class.getSimpleName() +
-                "(\"Undefined value: \" + value);");
-        builder.appendBody("\t\t}");
+        builder.append("\tdefault:")
+                .append("\t\tthrow new " + ASN1RuntimeException.class.getSimpleName() +
+                        "(\"Undefined value: \" + value);").append("}");
+
+        builder.finish().build();
 
         javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
-        javaClass.addMethod(builder.build());
 
         ctx.finishClass();
     }
