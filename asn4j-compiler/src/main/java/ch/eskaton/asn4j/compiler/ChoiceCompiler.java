@@ -29,11 +29,10 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaClass.MethodBuilder;
+import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.java.JavaEnum;
 import ch.eskaton.asn4j.compiler.java.JavaGetter;
-import ch.eskaton.asn4j.compiler.java.JavaLiteralMethod;
 import ch.eskaton.asn4j.compiler.java.JavaTypedSetter;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -62,27 +61,29 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         List<String> fieldNames = new ArrayList<>();
         JavaEnum typeEnum = new JavaEnum(CHOICE_ENUM);
 
-        MethodBuilder builder = javaClass.method().modifier(Public).annotation("@Override")
-                .returnType(ASN1Type.class.getSimpleName()).name("getValue");
+        BodyBuilder builder = javaClass.method().modifier(Public).annotation("@Override")
+                .returnType(ASN1Type.class.getSimpleName()).name("getValue").body();
 
         String clearFields = "\t\t" + CLEAR_FIELDS + "();\n";
 
-        builder.appendBody("switch(" + CHOICE_FIELD + ") {");
+        builder.append("switch(" + CHOICE_FIELD + ") {");
 
         for (NamedType type : node.getRootTypeList()) {
             String typeConstant = CompilerUtils.formatConstant(type.getName());
             String fieldName = compileChoiceNamedType(ctx, javaClass, type, typeConstant, clearFields);
             fieldNames.add(fieldName);
             typeEnum.addEnumConstant(typeConstant);
-            builder.appendBody("\tcase " + typeConstant + ":").appendBody("\t\treturn " + fieldName + ";");
+            builder.append("\tcase " + typeConstant + ":").append("\t\treturn " + fieldName + ";");
         }
 
-        builder.appendBody("}").appendBody("").appendBody("return null;");
+        builder.append("}").append("").append("return null;");
+
+        builder.finish().build();
 
         javaClass.addEnum(typeEnum);
         javaClass.addField(new JavaDefinedField(CHOICE_ENUM, CHOICE_FIELD), true, false);
-        javaClass.addMethod(builder.build());
-        javaClass.addMethod(getClearFieldsMethod(javaClass, fieldNames));
+
+        addClearFieldsMethod(javaClass, fieldNames);
 
         ctx.finishClass();
     }
@@ -109,8 +110,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         return name;
     }
 
-    private JavaLiteralMethod getClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
-        return javaClass.method().modifier(Private).name(CLEAR_FIELDS)
+    private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
+        javaClass.method().modifier(Private).name(CLEAR_FIELDS)
                 .body(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).build();
     }
 
