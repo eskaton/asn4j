@@ -298,14 +298,20 @@ public class JavaClass implements JavaStructure {
     }
 
     public MethodBuilder method() {
-        return new MethodBuilder();
+        return new MethodBuilder(this);
     }
 
     public static class MethodBuilder {
 
+        private final JavaClass javaClass;
+
         private List<String> annotations = new ArrayList<>();
 
         private JavaVisibility visibility = Public;
+
+        private boolean isStatic;
+
+        private boolean isFinal;
 
         private String returnType = "void";
 
@@ -317,9 +323,9 @@ public class JavaClass implements JavaStructure {
 
         private List<String> body;
 
-        private boolean isStatic;
-
-        private boolean isFinal;
+        private MethodBuilder(JavaClass javaClass) {
+            this.javaClass = javaClass;
+        }
 
         public MethodBuilder annotation(String annotation) {
             annotations.add(annotation);
@@ -346,6 +352,10 @@ public class JavaClass implements JavaStructure {
             return this;
         }
 
+        public MethodBuilder returnType(Class<?> returnType) {
+            return returnType(returnType.getClass().getSimpleName());
+        }
+
         public MethodBuilder name(String name) {
             this.name = name;
             return this;
@@ -365,12 +375,20 @@ public class JavaClass implements JavaStructure {
         }
 
         public MethodBuilder exception(Class<? extends  Throwable> exception) {
+            if (!"java.lang".equals(exception.getPackage().toString())) {
+                javaClass.addImport(exception);
+            }
+
             return exception(exception.getSimpleName());
         }
 
         public MethodBuilder exception(String exception) {
             exceptions.add(exception);
             return this;
+        }
+
+        public BodyBuilder body() {
+            return new BodyBuilder(this);
         }
 
         public MethodBuilder body(String body) {
@@ -382,18 +400,8 @@ public class JavaClass implements JavaStructure {
             return this;
         }
 
-        public MethodBuilder appendBody(String body) {
-            if (this.body == null) {
-                this.body = new ArrayList<>();
-            }
-
-            this.body.add("\t\t" + body + "\n");
-
-            return this;
-        }
-
-        public JavaLiteralMethod build() {
-            return new JavaLiteralMethod(toString());
+        public void build() {
+            javaClass.addMethod(new JavaLiteralMethod(toString()));
         }
 
         public String toString() {
@@ -437,6 +445,36 @@ public class JavaClass implements JavaStructure {
             sb.append("\t}");
 
             return sb.toString();
+        }
+
+    }
+
+    public static class BodyBuilder {
+
+        private MethodBuilder methodBuilder;
+
+        private List<String> body;
+
+        private BodyBuilder(MethodBuilder methodBuilder) {
+            this.methodBuilder = methodBuilder;
+        }
+
+        public BodyBuilder append(Object body) {
+            return append(String.valueOf(body));
+        }
+
+        public BodyBuilder append(String body) {
+            if (this.body == null) {
+                this.body = new ArrayList<>();
+            }
+
+            this.body.add(body);
+
+            return this;
+        }
+
+        public MethodBuilder finish() {
+            return methodBuilder.body(body);
         }
 
     }

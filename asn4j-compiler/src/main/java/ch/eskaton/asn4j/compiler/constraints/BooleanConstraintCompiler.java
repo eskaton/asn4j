@@ -30,8 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaLiteralMethod;
-import ch.eskaton.asn4j.compiler.java.JavaMethod;
+import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
@@ -48,6 +47,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static ch.eskaton.asn4j.compiler.java.JavaType.BOOLEAN;
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
 public class BooleanConstraintCompiler extends
         AbstractConstraintCompiler<Boolean> {
@@ -167,7 +169,6 @@ public class BooleanConstraintCompiler extends
     }
 
     private Set<Boolean> calculateContainedSubtype(Type type) throws CompilerException {
-
         if (type instanceof BooleanType) {
             Set<Boolean> cons = new HashSet<>();
             cons.addAll(ALL);
@@ -178,7 +179,6 @@ public class BooleanConstraintCompiler extends
         } else {
             throw new CompilerException("Invalid type " + type + " in constraint for BOOLEAN type");
         }
-
     }
 
     @Override
@@ -187,30 +187,23 @@ public class BooleanConstraintCompiler extends
             return;
         }
 
-
-        StringBuilder body = new StringBuilder();
-
-        body.append("\t@Override\n");
-        body.append("\tprotected boolean checkConstraint(Boolean v) throws ")
-                .append(ConstraintViolatedException.class.getSimpleName())
-                .append(" {\n");
+        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
+                .returnType(boolean.class).name("checkConstraint").parameter(BOOLEAN, "v")
+                .exception(ConstraintViolatedException.class).body();
 
         if (values.isEmpty()) {
-            body.append("\t\treturn false;\n");
+            builder.append("return false;");
         } else {
-            body.append("\t\tif(v == ").append(values.iterator().next())
-                    .append(") {\n");
-            body.append("\t\t\treturn true;\n");
-            body.append("\t\t} else {\n");
-            body.append("\t\t\treturn false;\n");
-            body.append("\t\t}\n");
+            builder.append("if(v == ")
+                    .append(values.iterator().next())
+                    .append(") {")
+                    .append("\treturn true;")
+                    .append("} else {")
+                    .append("\treturn false;")
+                    .append("}");
         }
 
-        body.append("\t}");
-
-        JavaMethod constrMethod = new JavaLiteralMethod(body.toString());
-        javaClass.addMethod(constrMethod);
-        javaClass.addImport(ConstraintViolatedException.class);
+        builder.finish().build();
     }
 
 }

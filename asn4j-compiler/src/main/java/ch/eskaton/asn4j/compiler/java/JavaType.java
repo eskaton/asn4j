@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.compiler.java;
 
 public enum JavaType {
-    BYTE("byte"), SHORT("short"), INT("int"), LONG("long");
+    BYTE("byte"), SHORT("short"), INT("int"), LONG("long"), BOOLEAN("boolean");
 
     private final String type;
 
