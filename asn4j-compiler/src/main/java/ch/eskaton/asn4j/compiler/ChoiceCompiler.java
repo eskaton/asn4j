@@ -96,7 +96,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         TaggingMode taggingMode = namedType.getType().getTaggingMode();
         JavaDefinedField field = new JavaDefinedField(typeName, name);
 
-        field.addAnnotation(new JavaAnnotation(ASN1Alternative.class).addParameter("name", '"' + typeConstant + '"' ));
+        field.addAnnotation(new JavaAnnotation(ASN1Alternative.class).addParameter("name", '"' + typeConstant + '"'));
 
         if (tag != null) {
             JavaAnnotation tagAnnotation = CompilerUtils.getTagAnnotation(ctx.getModule(), tag, taggingMode);
@@ -104,15 +104,16 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         }
 
         javaClass.addField(field, false, false);
-        javaClass.addMethod(new JavaTypedSetter(typeName, name, CHOICE_FIELD, CHOICE_ENUM + "." + typeConstant, beforeCode));
+        javaClass.addMethod(new JavaTypedSetter(typeName, name, CHOICE_FIELD, CHOICE_ENUM + "." + typeConstant,
+                beforeCode));
         javaClass.addMethod(new JavaGetter(typeName, name));
 
         return name;
     }
 
     private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
-        javaClass.method().modifier(Private).name(CLEAR_FIELDS)
-                .body(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).build();
+        javaClass.method().modifier(Private).name(CLEAR_FIELDS).body()
+                .append(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).finish().build();
     }
 
 }

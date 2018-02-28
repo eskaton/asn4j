@@ -65,7 +65,7 @@ public class JavaWriter {
     					}
     				} else if (parentStruct instanceof JavaInterface) {
     					clazz.setParent(null);
-    					clazz.setInterfaze(parent);
+    					clazz.setInterface(parent);
     					parent = null;
     				} else {
     					parent = null;
