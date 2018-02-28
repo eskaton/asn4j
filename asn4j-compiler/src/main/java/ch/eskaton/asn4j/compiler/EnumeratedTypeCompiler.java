@@ -47,35 +47,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
 
-    public void compile(CompilerContext ctx, String name, EnumeratedType node)
-            throws CompilerException {
+    public void compile(CompilerContext ctx, String name, EnumeratedType node) throws CompilerException {
         JavaClass javaClass = ctx.createClass(name, node, true);
         List<String> names = new ArrayList<>();
         List<Integer> numbers = new ArrayList<>();
 
-        for (EnumerationItemNode item : node.getRootEnum()) {
-            String eName = item.getName();
-            Integer eNumber;
+        addEnumerationItems(ctx, name, names, numbers, node.getRootEnum());
 
-            if (item.getRef() != null) {
-                BigInteger bigValue = ctx.resolveIntegerValue(item.getRef());
-
-                if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-                    throw new CompilerException("Value " + bigValue + " too large in type " + name);
-                }
-
-                eNumber = bigValue.intValue();
-            } else {
-                eNumber = item.getNumber();
-            }
-
-            addEnumerationItem(name, names, numbers, eName, eNumber);
-        }
-
-        int i = 0, n = 0;
+        int i, n = 0;
 
         for (i = 0; i < numbers.size(); i++) {
             if (numbers.get(i) == null) {
@@ -87,24 +70,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
         }
 
         if (node.getAdditionalEnum() != null) {
-            for (EnumerationItemNode item : node.getAdditionalEnum()) {
-                String eName = item.getName();
-                Integer eNumber;
-
-                if (item.getRef() != null) {
-                    BigInteger bigValue = ctx.resolveIntegerValue(item.getRef());
-
-                    if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-                        throw new CompilerException("Value " + bigValue + " too large in type " + name);
-                    }
-
-                    eNumber = bigValue.intValue();
-                } else {
-                    eNumber = item.getNumber();
-                }
-
-                addEnumerationItem(name, names, numbers, eName, eNumber);
-            }
+            addEnumerationItems(ctx, name, names, numbers, node.getAdditionalEnum());
 
             for (; i < numbers.size(); i++) {
                 if (numbers.get(i) == null) {
@@ -130,9 +96,8 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
 
             cases.put(value, fieldName);
 
-            javaClass.addField(new JavaLiteralField(StringUtils.concat(
-                    "\tpublic static final ", name, " ", fieldName, " = ",
-                    "new ", name, "(", value, ");\n\n")));
+            javaClass.field().modifier(Public).asStatic().asFinal().type(name).name(fieldName)
+                    .initializer("new " + name + "(" + value + ")").build();
         }
 
         javaClass.addMethod(new JavaConstructor(JavaVisibility.Private, name,
@@ -160,6 +125,30 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
         ctx.finishClass();
     }
 
+    private void addEnumerationItems(CompilerContext ctx, String name, List<String> names, List<Integer> numbers,
+            List<EnumerationItemNode> rootEnum) {
+        for (EnumerationItemNode item : rootEnum) {
+            addEnumerationItem(name, names, numbers, item.getName(), getNumber(ctx, name, item));
+        }
+    }
+
+    private Integer getNumber(CompilerContext ctx, String name, EnumerationItemNode item) {
+        Integer number;
+
+        if (item.getRef() != null) {
+            BigInteger bigValue = ctx.resolveIntegerValue(item.getRef());
+
+            if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+                throw new CompilerException("Value " + bigValue + " too large in type " + name);
+            }
+
+            number = bigValue.intValue();
+        } else {
+            number = item.getNumber();
+        }
+        return number;
+    }
+
     private Integer getNextNumber(List<Integer> numbers, int last) {
         int n = 0;
 
@@ -170,9 +159,8 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
         return n + 1;
     }
 
-    private void addEnumerationItem(String typeName, List<String> names,
-            List<Integer> values, String name, Integer value)
-            throws CompilerException {
+    private void addEnumerationItem(String typeName, List<String> names, List<Integer> values, String name,
+            Integer value) throws CompilerException {
         if (names.contains(name)) {
             throw new CompilerException("Duplicate enumeration item '" + name + "' in " + typeName);
         }

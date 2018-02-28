@@ -74,7 +74,7 @@ public class JavaClass implements JavaStructure {
 
     private String parent;
 
-    private String interfaze;
+    private String interf;
 
     private Tag tag;
 
@@ -105,12 +105,12 @@ public class JavaClass implements JavaStructure {
         this.parent = parent;
     }
 
-    public String getInterfaze() {
-        return interfaze;
+    public String getInterface() {
+        return interf;
     }
 
-    public void setInterfaze(String interfaze) {
-        this.interfaze = interfaze;
+    public void setInterface(String interf) {
+        this.interf = interf;
     }
 
     public void setTypeParam(String typeParam) {
@@ -217,6 +217,7 @@ public class JavaClass implements JavaStructure {
 
         for (JavaField field : fields) {
             field.write(writer, prefix);
+            writer.newLine();
         }
 
         if (staticInitializers != null) {
@@ -258,7 +259,7 @@ public class JavaClass implements JavaStructure {
                 StringUtils.join(CollectionUtils.map(modifiers, value -> value.toString().toLowerCase()), " "),
                 " class ", name, (parent != null ? " extends " + parent +
                         (typeParam != null ? "<" + typeParam + ">" : "") : ""),
-                (interfaze != null ? " implements " + interfaze : ""), " {\n\n"));
+                (interf != null ? " implements " + interf : ""), " {\n\n"));
     }
 
     private void writeFileHeader(BufferedWriter writer) throws IOException {
@@ -302,21 +303,67 @@ public class JavaClass implements JavaStructure {
         return new MethodBuilder(this);
     }
 
-    public static class MethodBuilder {
+    public FieldBuilder field() {
+        return new FieldBuilder(this);
+    }
 
-        private final JavaClass javaClass;
+    public static class AbstractJavaBuilder<T extends AbstractJavaBuilder> {
 
-        private List<String> annotations = new ArrayList<>();
+        protected final JavaClass javaClass;
 
-        private JavaVisibility visibility = Public;
+        protected List<String> annotations = new ArrayList<>();
 
-        private boolean isStatic;
+        protected JavaVisibility visibility = Public;
 
-        private boolean isFinal;
+        protected boolean isStatic;
+
+        protected boolean isFinal;
+
+        protected String name;
+
+        public AbstractJavaBuilder(JavaClass javaClass) {
+            this.javaClass = javaClass;
+        }
+
+        public T annotation(Class<? extends Annotation> annotation) {
+            if (!"java.lang".equals(annotation.getPackage().toString())) {
+                javaClass.addImport(annotation);
+            }
+
+            annotations.add("@" + annotation.getClass().getSimpleName());
+            return (T) this;
+        }
+
+        public T annotation(String annotation) {
+            annotations.add(annotation);
+            return (T) this;
+        }
+
+        public T modifier(JavaVisibility visibility) {
+            this.visibility = visibility;
+            return (T) this;
+        }
+
+        public T asStatic() {
+            this.isStatic = true;
+            return (T) this;
+        }
+
+        public T asFinal() {
+            this.isFinal = true;
+            return (T) this;
+        }
+
+        public T name(String name) {
+            this.name = name;
+            return (T) this;
+        }
+
+    }
+
+    public static class MethodBuilder extends AbstractJavaBuilder<MethodBuilder> {
 
         private String returnType = "void";
-
-        private String name;
 
         private List<JavaParameter> parameters = new ArrayList<>();
 
@@ -325,36 +372,7 @@ public class JavaClass implements JavaStructure {
         private List<String> body;
 
         private MethodBuilder(JavaClass javaClass) {
-            this.javaClass = javaClass;
-        }
-
-        public MethodBuilder annotation(Class<? extends Annotation> annotation) {
-            if (!"java.lang".equals(annotation.getPackage().toString())) {
-                javaClass.addImport(annotation);
-            }
-
-            annotations.add("@" + annotation.getClass().getSimpleName());
-            return this;
-        }
-
-        public MethodBuilder annotation(String annotation) {
-            annotations.add(annotation);
-            return this;
-        }
-
-        public MethodBuilder modifier(JavaVisibility visibility) {
-            this.visibility = visibility;
-            return this;
-        }
-
-        public MethodBuilder asStatic() {
-            this.isStatic = true;
-            return this;
-        }
-
-        public MethodBuilder asFinal() {
-            this.isFinal = true;
-            return this;
+            super(javaClass);
         }
 
         public MethodBuilder returnType(String returnType) {
@@ -364,11 +382,6 @@ public class JavaClass implements JavaStructure {
 
         public MethodBuilder returnType(Class<?> returnType) {
             return returnType(returnType.getClass().getSimpleName());
-        }
-
-        public MethodBuilder name(String name) {
-            this.name = name;
-            return this;
         }
 
         public MethodBuilder parameter(JavaParameter parameter) {
@@ -401,11 +414,11 @@ public class JavaClass implements JavaStructure {
             return new BodyBuilder(this);
         }
 
-        public MethodBuilder body(String body) {
+        private MethodBuilder body(String body) {
             return body(Arrays.asList(body.split("\n")));
         }
 
-        public MethodBuilder body(List<String> body) {
+        private MethodBuilder body(List<String> body) {
             this.body = body.stream().map(b -> "\t\t" + b + "\n").collect(toList());
             return this;
         }
@@ -483,8 +496,77 @@ public class JavaClass implements JavaStructure {
             return this;
         }
 
+        public BodyBuilder append(List<String> body) {
+            this.body = new ArrayList<>(body.size());
+
+            this.body.addAll(body);
+
+            return this;
+        }
+
         public MethodBuilder finish() {
             return methodBuilder.body(body);
+        }
+
+    }
+
+    public class FieldBuilder extends AbstractJavaBuilder<FieldBuilder> {
+
+        private String initializer;
+
+        private String type;
+
+        public FieldBuilder(JavaClass javaClass) {
+            super(javaClass);
+        }
+
+        public FieldBuilder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public FieldBuilder type(Class<?> type) {
+            return type(type.getClass().getSimpleName());
+        }
+
+        public FieldBuilder initializer(String initializer) {
+            this.initializer = initializer;
+            return this;
+        }
+
+        public void build() {
+            javaClass.addField(new JavaLiteralField(toString()));
+        }
+
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+
+            sb.append(annotations.stream().map(a -> "\t" + a + "\n").collect(joining()));
+
+            sb.append("\t");
+            sb.append(visibility);
+
+            if (isStatic) {
+                sb.append(" static");
+            }
+
+            if (isFinal) {
+                sb.append(" final");
+            }
+
+            sb.append(" ");
+            sb.append(type);
+            sb.append(" ");
+            sb.append(name);
+
+            if (initializer != null) {
+                sb.append(" = ");
+                sb.append(initializer);
+            }
+
+            sb.append(";\n");
+
+            return sb.toString();
         }
 
     }
