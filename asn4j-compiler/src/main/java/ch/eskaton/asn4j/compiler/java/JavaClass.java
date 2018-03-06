@@ -526,7 +526,7 @@ public class JavaClass implements JavaStructure {
         }
 
         public FieldBuilder type(Class<?> type) {
-            return type(type.getClass().getSimpleName());
+            return type(type.getSimpleName());
         }
 
         public FieldBuilder initializer(String initializer) {
