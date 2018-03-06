@@ -78,19 +78,17 @@ public class ASN1Boolean implements ASN1Type {
 
     @Override
     public boolean equals(Object obj) {
-    	if (this == obj)
-    		return true;
-    	if (obj == null)
-    		return false;
-    	if (getClass() != obj.getClass())
-    		return false;
+    	if (this == obj) {
+            return true;
+        }
+
+    	if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
     	ASN1Boolean other = (ASN1Boolean) obj;
-    	if (value == null) {
-    		if (other.value != null)
-    			return false;
-    	} else if (!value.equals(other.value))
-    		return false;
-    	return true;
+
+    	return Objects.equals(value, other.value);
     }
 
 }
