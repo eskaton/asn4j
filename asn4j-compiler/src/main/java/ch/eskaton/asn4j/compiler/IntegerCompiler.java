@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -42,6 +42,8 @@ import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.utils.StringUtils;
+
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
@@ -78,9 +80,7 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
     			value = bigValue.longValue();
 
-    			javaClass.addField(new JavaLiteralField(StringUtils
-    					.concat("\tpublic static final ", name, " ", fieldName,
-    							";\n\n")));
+    			javaClass.field().modifier(Public).asStatic().asFinal().type(name).name(fieldName).build();
 
     			staticBody.append(StringUtils.concat("\t\t\t", fieldName,
     					" = ", "new ", name, "(", value, ");\n"));
@@ -96,12 +96,11 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
     				.toString()));
     	}
 
-    	javaClass.addImport(BigInteger.class);
-    	javaClass.addImport(ConstraintViolatedException.class);
+    	javaClass.addImport(BigInteger.class, ConstraintViolatedException.class);
 
-    	javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, name,
-    			Collections.emptyList(), "\t\tsuper();",
-    			Collections.emptyList()));
+    	javaClass.addMethod(new JavaConstructor(Public, name,
+                                                Collections.emptyList(), "\t\tsuper();",
+                                                Collections.emptyList()));
 
     	javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, name,
     			Arrays.asList(new JavaParameter("long", "value")),
