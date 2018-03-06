@@ -64,11 +64,6 @@ public class JavaDefinedField implements JavaField {
     	return typeName;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see asn4j.compiler.JavaField#write(java.io.BufferedWriter)
-     */
     public void write(BufferedWriter writer, String prefix) throws IOException {
 
     	for (JavaAnnotation annotation : annotations) {
