@@ -52,6 +52,12 @@ import static java.util.stream.Collectors.toList;
 
 public class JavaClass implements JavaStructure {
 
+    private static final String STATIC = "static";
+
+    private static final String FINAL = "final";
+
+    private static final String THROWS = "throws";
+
     private List<String> imports = new ArrayList<>();
 
     private List<JavaField> fields = new ArrayList<>();
@@ -226,7 +232,7 @@ public class JavaClass implements JavaStructure {
 
         if (staticInitializers != null) {
             for (JavaStaticInitializer jsi : staticInitializers) {
-                writer.write("\tstatic {\n");
+                writer.write("\t" + STATIC + " {\n");
                 writer.write(jsi.toString());
                 writer.write("\n\t}\n\n");
             }
@@ -441,11 +447,11 @@ public class JavaClass implements JavaStructure {
             sb.append(visibility);
 
             if (isStatic) {
-                sb.append(" static");
+                sb.append(" " + STATIC);
             }
 
             if (isFinal) {
-                sb.append(" final");
+                sb.append(" " + FINAL);
             }
 
             sb.append(" ");
@@ -459,7 +465,7 @@ public class JavaClass implements JavaStructure {
             sb.append(") ");
 
             if (!exceptions.isEmpty()) {
-                sb.append("throws ");
+                sb.append(THROWS + " ");
                 sb.append(exceptions.stream().map(String::toString).collect(joining(", ")));
                 sb.append(" ");
             }
@@ -568,11 +574,11 @@ public class JavaClass implements JavaStructure {
             sb.append(visibility);
 
             if (isStatic) {
-                sb.append(" static");
+                sb.append(" " + STATIC);
             }
 
             if (isFinal) {
-                sb.append(" final");
+                sb.append(" " + FINAL);
             }
 
             sb.append(" ");

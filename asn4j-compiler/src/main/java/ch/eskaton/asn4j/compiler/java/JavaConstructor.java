@@ -117,24 +117,21 @@ public class JavaConstructor extends JavaMethod {
 
     @Override
     public boolean equals(Object obj) {
-    	if (this == obj)
-    		return true;
-    	if (obj == null)
-    		return false;
-    	if (getClass() != obj.getClass())
-    		return false;
-    	JavaConstructor other = (JavaConstructor) obj;
-    	if (clazz == null) {
-    		if (other.clazz != null)
-    			return false;
-    	} else if (!clazz.equals(other.clazz))
-    		return false;
-    	if (parameters == null) {
-    		if (other.parameters != null)
-    			return false;
-    	} else if (!parameters.equals(other.parameters))
-    		return false;
-    	return true;
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        JavaConstructor other = (JavaConstructor) obj;
+
+        return visibility == other.visibility &&
+                Objects.equals(clazz, other.clazz) &&
+                Objects.equals(parameters, other.parameters) &&
+                Objects.equals(body, other.body) &&
+                Objects.equals(exceptions, other.exceptions);
     }
 
 }
