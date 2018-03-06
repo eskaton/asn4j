@@ -58,18 +58,18 @@ public abstract class ASN1CollectionOf<T extends ASN1Type> implements ASN1Type {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-        ASN1CollectionOf<?> that = (ASN1CollectionOf<?>) o;
+        ASN1CollectionOf<?> other = (ASN1CollectionOf<?>) obj;
 
-        return Objects.equals(values, that.values);
+        return Objects.equals(values, other.values);
     }
 
 }

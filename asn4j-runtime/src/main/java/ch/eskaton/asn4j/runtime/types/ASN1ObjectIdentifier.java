@@ -65,19 +65,17 @@ public class ASN1ObjectIdentifier implements ASN1Type {
 
     @Override
     public boolean equals(Object obj) {
-    	if (this == obj)
-    		return true;
-    	if (obj == null)
-    		return false;
-    	if (getClass() != obj.getClass())
-    		return false;
-    	ASN1ObjectIdentifier other = (ASN1ObjectIdentifier) obj;
-    	if (components == null) {
-    		if (other.components != null)
-    			return false;
-    	} else if (!components.equals(other.components))
-    		return false;
-    	return true;
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        ASN1ObjectIdentifier other = (ASN1ObjectIdentifier) obj;
+
+        return Objects.equals(components, other.components);
     }
 
 }

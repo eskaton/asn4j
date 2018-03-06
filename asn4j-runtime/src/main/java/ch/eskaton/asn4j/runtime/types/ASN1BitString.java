@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.commons.utils.HexDump;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
@@ -116,33 +117,17 @@ public class ASN1BitString implements ASN1Type {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
+        }
 
-        if (obj == null)
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
-
-        if (getClass() != obj.getClass())
-            return false;
+        }
 
         ASN1BitString other = (ASN1BitString) obj;
 
-        if (value == null) {
-            if (other.value != null)
-                return false;
-        } else {
-            if (value.length != other.value.length) {
-                return false;
-            }
-
-            for (int i = 0; i < value.length; i++) {
-                if ((value[i] != other.value[i])) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return unusedBits == other.unusedBits && Arrays.equals(value, other.value);
     }
 
     @Override
