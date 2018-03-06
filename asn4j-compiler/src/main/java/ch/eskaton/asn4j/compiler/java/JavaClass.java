@@ -121,6 +121,10 @@ public class JavaClass implements JavaStructure {
         addImport(clazz.getName());
     }
 
+    public void addImport(Class<?>... clazz) {
+        Arrays.stream(clazz).forEach(this::addImport);
+    }
+
     public void addImport(String imp) {
         imports.add(imp);
     }
