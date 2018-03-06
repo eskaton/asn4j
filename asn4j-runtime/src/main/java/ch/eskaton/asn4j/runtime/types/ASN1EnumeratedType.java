@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
+import java.util.Objects;
+
 @ASN1Tag(clazz = Clazz.Universal, tag = 10, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1EnumeratedType implements ASN1Type {
 
@@ -41,6 +43,26 @@ public class ASN1EnumeratedType implements ASN1Type {
 
     protected void setValue(int value) {
     	this.value = value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        ASN1EnumeratedType other = (ASN1EnumeratedType) obj;
+
+        return value == other.value;
     }
 
 }

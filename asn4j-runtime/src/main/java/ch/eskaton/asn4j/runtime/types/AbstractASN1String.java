@@ -53,19 +53,17 @@ public class AbstractASN1String implements ASN1Type {
 
     @Override
     public boolean equals(Object obj) {
-    	if (this == obj)
-    		return true;
-    	if (obj == null)
-    		return false;
-    	if (!(obj instanceof AbstractASN1String))
-    		return false;
-    	AbstractASN1String other = (AbstractASN1String) obj;
-    	if (value == null) {
-    		if (other.value != null)
-    			return false;
-    	} else if (!value.equals(other.value))
-    		return false;
-    	return true;
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        AbstractASN1String other = (AbstractASN1String) obj;
+
+        return Objects.equals(value, other.value);
     }
 
 }
