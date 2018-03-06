@@ -200,8 +200,8 @@ public class JavaClass implements JavaStructure {
     public void save(String dir) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(dir + File.separator
-                        + pkg.replace('.', File.separatorChar) + File.separator
-                        + name + ".java")));
+                                             + pkg.replace('.', File.separatorChar) + File.separator
+                                             + name + ".java")));
         write(writer, "");
         writer.close();
     }
@@ -260,10 +260,11 @@ public class JavaClass implements JavaStructure {
         }
 
         writer.write(StringUtils.concat(prefix, "public ",
-                StringUtils.join(CollectionUtils.map(modifiers, value -> value.toString().toLowerCase()), " "),
-                " class ", name, (parent != null ? " extends " + parent +
+                                        StringUtils.join(CollectionUtils.map(modifiers, value -> value.toString()
+                                                .toLowerCase()), " "),
+                                        " class ", name, (parent != null ? " extends " + parent +
                         (typeParam != null ? "<" + typeParam + ">" : "") : ""),
-                (interf != null ? " implements " + interf : ""), " {\n\n"));
+                                        (interf != null ? " implements " + interf : ""), " {\n\n"));
     }
 
     private void writeFileHeader(BufferedWriter writer) throws IOException {
@@ -474,6 +475,22 @@ public class JavaClass implements JavaStructure {
             return sb.toString();
         }
 
+        private static class JavaLiteralMethod extends JavaMethod {
+
+            private String body;
+
+            public JavaLiteralMethod(String body) {
+                this.body = body;
+            }
+
+            public void write(BufferedWriter writer, String prefix) throws IOException {
+                writer.write(StringUtils.inject(body, "\n", prefix));
+                writer.write(prefix);
+                writer.newLine();
+            }
+
+        }
+
     }
 
     public static class BodyBuilder {
@@ -514,7 +531,7 @@ public class JavaClass implements JavaStructure {
 
     }
 
-    public class FieldBuilder extends AbstractJavaBuilder<FieldBuilder> {
+    public static class FieldBuilder extends AbstractJavaBuilder<FieldBuilder> {
 
         private String initializer;
 
@@ -573,6 +590,22 @@ public class JavaClass implements JavaStructure {
             return sb.toString();
         }
 
+        private static class JavaLiteralField implements JavaField {
+
+            private String fieldDef;
+
+            public JavaLiteralField(String fieldDef) {
+                this.fieldDef = fieldDef;
+            }
+
+            public void write(BufferedWriter writer, String prefix) throws IOException {
+                writer.write(prefix);
+                writer.write(fieldDef);
+            }
+
+        }
+
     }
+
 
 }

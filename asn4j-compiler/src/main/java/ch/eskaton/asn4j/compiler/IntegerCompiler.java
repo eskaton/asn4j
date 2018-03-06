@@ -34,7 +34,6 @@ import java.util.Collections;
 
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaConstructor;
-import ch.eskaton.asn4j.compiler.java.JavaLiteralField;
 import ch.eskaton.asn4j.compiler.java.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.JavaStaticInitializer;
 import ch.eskaton.asn4j.compiler.java.JavaVisibility;
