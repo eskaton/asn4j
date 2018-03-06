@@ -30,13 +30,11 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.java.JavaConstructor;
-import ch.eskaton.asn4j.compiler.java.JavaLiteralField;
 import ch.eskaton.asn4j.compiler.java.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.JavaVisibility;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
