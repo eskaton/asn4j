@@ -28,10 +28,8 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaLiteralField;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -70,8 +68,8 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
                 msb = value > msb ? value : msb;
 
-                javaClass.addField(new JavaLiteralField(StringUtils.concat(
-                        "\tpublic static final int ", fieldName, " = ", value, ";\n\n")));
+                javaClass.field().modifier(Public).asStatic().asFinal().type(int.class).name(fieldName)
+                        .initializer(String.valueOf(value)).build();
             }
         }
 
