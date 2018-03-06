@@ -42,30 +42,7 @@ public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<T> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null) {
-            return false;
-        }
-
-        if (!(obj instanceof ASN1SetOf)) {
-            return false;
-        }
-        @SuppressWarnings("rawtypes")
-
-        ASN1SetOf other = (ASN1SetOf) obj;
-
-        if (values == null) {
-            if (other.values != null) {
-                return false;
-            }
-        } else if (!values.equals(other.values)) {
-            return false;
-        }
-
-        return true;
+        return super.equals(obj);
     }
 
 }
