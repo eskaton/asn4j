@@ -90,7 +90,7 @@ public class ASN4JCompile extends AbstractMojo {
     /**
      * Executes the mojo.
      */
-    public void execute() throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException {
     	StringBuilder paths = new StringBuilder();
 
     	for (String path : includePaths) {
