@@ -47,7 +47,15 @@ public class ASN1Null implements ASN1Type {
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return true;
     }
 
 }
