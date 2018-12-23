@@ -1,15 +1,15 @@
 X680-30 DEFINITIONS ::=
 BEGIN
 
-SelectedType ::= c < ChoiceType
+SelectedType1 ::= c < TestSelectionChoiceType1
 
-SetType ::= SET {
-   a a < ChoiceType OPTIONAL,
-   b b < ChoiceType OPTIONAL,
-   c SelectedType OPTIONAL
+TestSelectionSetType ::= SET {
+   a a < TestSelectionChoiceType1 OPTIONAL,
+   b b < TestSelectionChoiceType1 OPTIONAL,
+   c SelectedType1 OPTIONAL
 }
 
-ChoiceType ::= CHOICE {
+TestSelectionChoiceType1 ::= CHOICE {
    a  [0] IMPLICIT INTEGER,
    b  [1] IMPLICIT VisibleString,
    c  [2] IMPLICIT BOOLEAN
