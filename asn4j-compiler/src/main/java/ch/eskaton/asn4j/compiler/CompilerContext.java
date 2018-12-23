@@ -65,6 +65,8 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.Tag;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
@@ -91,9 +93,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
+import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
+
 public class CompilerContext {
 
-    private Set<String> definedTypes = new HashSet<>();
+    private HashMap<String, HashMap<String, Type>> definedTypes = new HashMap<>();
 
     @SuppressWarnings("serial")
     private Map<Class<?>, Compiler<?>> compilers = new HashMap<Class<?>, Compiler<?>>() {
@@ -155,7 +159,7 @@ public class CompilerContext {
 
     private TypeResolver typeResolver = new TypeResolver() {
         public TypeAssignmentNode getType(String type) {
-            return CompilerContext.this.getType(type);
+            return CompilerContext.this.getTypeName(type);
         }
 
         public Type getBase(String type) {
@@ -177,17 +181,22 @@ public class CompilerContext {
 
     private Stack<ModuleNode> currentModule = new Stack<>();
 
+    private CompilerImpl compiler;
+
     private String pkg;
 
     private String outputDir;
 
-    public CompilerContext(String pkg, String outputDir) {
+    public CompilerContext(CompilerImpl compiler, String pkg, String outputDir) {
+        this.compiler = compiler;
         this.pkg = pkg;
         this.outputDir = outputDir;
     }
 
-    public void addType(String type) {
-        definedTypes.add(type);
+    public void addType(String typeName, Type typeDef) {
+        String moduleName = currentModule.peek().getModuleId().getModuleName();
+        HashMap<String, Type> moduleTypes = definedTypes.computeIfAbsent(moduleName, key -> new HashMap<>());
+        moduleTypes.put(typeName, typeDef);
     }
 
     @SuppressWarnings("unchecked")
@@ -226,7 +235,7 @@ public class CompilerContext {
 
     public JavaClass createClass(String name, Type type, boolean constructed) throws CompilerException {
         JavaClass javaClass = new JavaClass(pkg, name, type.getTag(), CompilerUtils
-                .getTaggingMode(getModule(), type), constructed, getType(type));
+                .getTaggingMode(getModule(), type), constructed, getTypeName(type));
         currentClass.push(javaClass);
         return javaClass;
     }
@@ -251,7 +260,7 @@ public class CompilerContext {
         currentModule.push(getModule());
     }
 
-    public TypeAssignmentNode getType(String type) {
+    public TypeAssignmentNode getTypeName(String type) {
         // TODO: what to do if the type isn't known in the current module
         return (TypeAssignmentNode) getModule().getBody().getAssignments(type);
     }
@@ -275,7 +284,7 @@ public class CompilerContext {
         }
     }
 
-    public String getType(Type type) throws CompilerException {
+    public String getTypeName(Type type) throws CompilerException {
         String typeName;
         String name = null;
         boolean newType = false;
@@ -291,7 +300,7 @@ public class CompilerContext {
             } else {
                 String asn1TypeName = ((TypeReference) type).getType();
                 addReferencedType(asn1TypeName);
-                typeName = CompilerUtils.formatName(asn1TypeName);
+                typeName = formatName(asn1TypeName);
             }
         } else if (type instanceof Null) {
             typeName = ASN1Null.class.getSimpleName();
@@ -353,20 +362,20 @@ public class CompilerContext {
                 typeName = ASN1Choice.class.getSimpleName();
             }
         } else if (type instanceof SelectionType) {
-            newType = true;
+            Type selectionType = resolveType(type);
 
-            if (name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-            } else {
-                typeName = null;
+            if (selectionType != type) {
+                return getTypeName(selectionType);
             }
+
+            throw new CompilerException("Unsupported type in SelectionType: " + selectionType.getClass());
         } else {
             throw new CompilerException("Unsupported type: " + type.getClass());
         }
 
         if (newType) {
             this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
-            definedTypes.add(name);
+            addType(name, type);
         }
 
         return typeName;
@@ -490,4 +499,57 @@ public class CompilerContext {
             ComponentType component) throws CompilerException {
         defaultsCompiler.compileDefault(javaClass, field, component);
     }
+
+    public Type resolveType(Type type) {
+        if (type instanceof SelectionType) {
+            String selectedId = ((SelectionType) type).getId();
+            Type selectedType = ((SelectionType) type).getType();
+
+            if (selectedType instanceof TypeReference) {
+                Object assignment = getModule().getBody().getAssignments(((TypeReference) selectedType).getType());
+
+                if (assignment instanceof TypeAssignmentNode) {
+                    Type collectionType = ((TypeAssignmentNode) assignment).getType();
+
+                    if (collectionType instanceof Choice) {
+                        return ((Choice) collectionType).getRootTypeList().stream()
+                                .filter(t -> t.getName().equals(selectedId))
+                                .findFirst().orElseThrow(() -> new CompilerException("Selected type not found")).getType();
+                    }
+                }
+            }
+        }
+
+        return type;
+    }
+
+    public TagId getTagId(Type type) {
+        if (type instanceof TypeReference) {
+            HashMap<String, Type> moduleTypes = getTypesOfCurrentModule();
+
+            Type referencedType = moduleTypes.computeIfAbsent(((TypeReference) type).getType(), compiler::compileType);
+            Tag tag = referencedType.getTag();
+
+            if (tag != null) {
+                return CompilerUtils.toTagId(tag);
+            } else {
+                return getTagId(referencedType);
+            }
+        }
+
+        String typeName = getTypeName(type);
+
+        try {
+            Class<?> typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
+            ASN1Tag tagAnnotation = typeClazz.getAnnotation(ASN1Tag.class);
+            return TagId.fromTag(tagAnnotation);
+        } catch (ClassNotFoundException e) {
+            throw new CompilerException("Unknown type: " + type);
+        }
+    }
+
+    private HashMap<String, Type> getTypesOfCurrentModule() {
+        return definedTypes.computeIfAbsent(currentModule.peek().getModuleId().getModuleName(), key -> new HashMap<>());
+    }
+
 }

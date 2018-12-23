@@ -91,7 +91,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
     private String compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,
             String typeConstant, String beforeCode) throws CompilerException {
         String name = CompilerUtils.formatName(namedType.getName());
-        String typeName = ctx.getType(namedType);
+        String typeName = ctx.getTypeName(namedType);
         Tag tag = namedType.getType().getTag();
         TaggingMode taggingMode = namedType.getType().getTaggingMode();
         JavaDefinedField field = new JavaDefinedField(typeName, name);

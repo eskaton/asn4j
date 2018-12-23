@@ -87,4 +87,9 @@ public class TagId {
         return tag == tagId.tag && clazz == tagId.clazz;
     }
 
+    @Override
+    public String toString() {
+        return "TagId[class=" + clazz + ", tag=" + tag + ']';
+    }
+
 }

@@ -53,7 +53,7 @@ public class SetCompiler implements NamedCompiler<SetType> {
 
             if (seenComponent != null) {
                 throw new CompilerException(String.format("Duplicate tags in set %s: %s and %s", name,
-                                                          getName(seenComponent), getName(component)));
+                        getName(seenComponent), getName(component)));
             }
 
             seenTags.put(tagId, component);
@@ -66,44 +66,13 @@ public class SetCompiler implements NamedCompiler<SetType> {
 
     private TagId getTagId(CompilerContext ctx, ComponentType component) {
         Type type = getAttribute(component, c -> c.getNamedType().getType(), ComponentType::getType);
-        Tag tag = type.getTag();
+        Tag tag = ctx.resolveType(type).getTag();
 
         if (tag != null) {
-            Clazz clazz;
-            ClassType clazzType = tag.getClazz();
-
-            if (clazzType == null) {
-                clazz = Clazz.ContextSpecific;
-            } else {
-
-                switch (clazzType) {
-                    case APPLICATION:
-                        clazz = Clazz.Application;
-                        break;
-                    case PRIVATE:
-                        clazz = Clazz.Private;
-                        break;
-                    case UNIVERSAL:
-                        clazz = Clazz.Universal;
-                        break;
-                    default:
-                        throw new CompilerException("Unknown class type: " + clazzType.name());
-                }
-            }
-
-            // TODO: handle references in class number
-            return new TagId(clazz, tag.getClassNumber().getClazz());
+            return CompilerUtils.toTagId(tag);
         }
 
-        String typeName = ctx.getType(type);
-
-        try {
-            Class<?> typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
-            ASN1Tag tagAnnotation = typeClazz.getAnnotation(ASN1Tag.class);
-            return TagId.fromTag(tagAnnotation);
-        } catch (ClassNotFoundException e) {
-            throw new CompilerException("Unknown type: " + type);
-        }
+        return ctx.getTagId(type);
     }
 
     private String getName(ComponentType seenComponent) {

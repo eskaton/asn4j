@@ -28,14 +28,13 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 
 public class SetOfCompiler implements NamedCompiler<SetOfType> {
 
     public void compile(CompilerContext ctx, String name, SetOfType node) throws CompilerException {
     	JavaClass javaClass = ctx.createClass(name, node, true);
-    	javaClass.setTypeParam(ctx.getType(node.getType()));
+    	javaClass.setTypeParam(ctx.getTypeName(node.getType()));
     	ctx.finishClass();
     }
 

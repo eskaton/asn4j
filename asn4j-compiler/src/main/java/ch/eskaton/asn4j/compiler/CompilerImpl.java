@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,15 +27,6 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
@@ -49,7 +40,18 @@ import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.commons.utils.StringUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.Stack;
 
 public class CompilerImpl {
 
@@ -59,164 +61,172 @@ public class CompilerImpl {
 
     private Map<String, ModuleNode> modules = new HashMap<String, ModuleNode>();
 
-    // private Stack<ASN1Module> currentModule = new Stack<ASN1Module>();
-
     private CompilerContext compilerContext;
 
-    public static void main(String[] args) throws IOException, ParserException,
-    		CompilerException {
-    	if (args.length != 4) {
-    		System.err
-    				.println("Usage: ASN1Compiler <ASN1Module> <Include-Path> <Java-Package> <Output-Dir>");
-    		System.exit(1);
-    	}
+    private Stack<AssignmentNode> assignments;
 
-    	new CompilerImpl(args[0], args[1], args[2], args[3]).run();
+    public static void main(String[] args) throws IOException, ParserException,
+            CompilerException {
+        if (args.length != 4) {
+            System.err
+                    .println("Usage: ASN1Compiler <ASN1Module> <Include-Path> <Java-Package> <Output-Dir>");
+            System.exit(1);
+        }
+
+        new CompilerImpl(args[0], args[1], args[2], args[3]).run();
     }
 
     public CompilerImpl(String module, String path, String pkg, String outputDir) {
-    	this.module = module;
-    	this.includePath = path.split(File.pathSeparator);
-    	compilerContext = new CompilerContext(pkg, outputDir);
+        this.module = module;
+        this.includePath = path.split(File.pathSeparator);
+        compilerContext = new CompilerContext(this, pkg, outputDir);
     }
 
     public void run() throws IOException, ParserException, CompilerException {
-    	long begin = System.currentTimeMillis();
+        long begin = System.currentTimeMillis();
 
-    	module = stripExtension(module);
+        module = stripExtension(module);
 
-    	loadAndCompileModule(module);
+        loadAndCompileModule(module);
 
-    	compilerContext.writeClasses();
+        compilerContext.writeClasses();
 
-    	System.out.println("Total compilation time "
-    			+ String.format("%.3f",
-    					(System.currentTimeMillis() - begin) / 1000.0) + "s");
+        System.out.println("Total compilation time "
+                + String.format("%.3f",
+                (System.currentTimeMillis() - begin) / 1000.0) + "s");
     }
 
     private void loadAndCompileModule(String moduleName) throws IOException,
-    		ParserException, CompilerException {
-    	load(moduleName);
+            ParserException, CompilerException {
+        load(moduleName);
 
-    	try {
-    		compilerContext.pushModule(modules.get(moduleName));
-    		compileModule(moduleName, null);
-    	} finally {
-    		compilerContext.popModule();
-    	}
+        try {
+            compilerContext.pushModule(modules.get(moduleName));
+            compileModule(moduleName, null);
+        } finally {
+            compilerContext.popModule();
+        }
     }
 
     private void compileModule(String moduleName, Set<String> neededSymbols)
-    		throws CompilerException, IOException, ParserException {
-    	System.out.println("Compiling module " + moduleName + "...");
+            throws CompilerException, IOException, ParserException {
+        System.out.println("Compiling module " + moduleName + "...");
 
-    	ModuleNode module = modules.get(moduleName);
+        ModuleNode module = modules.get(moduleName);
 
-    	compileImports(module);
-    	compileBody(neededSymbols, module);
+        compileImports(module);
+        compileBody(neededSymbols, module);
     }
 
-    private void compileBody(Set<String> neededSymbols, ModuleNode module)
-    		throws CompilerException {
-    	ModuleBodyNode moduleBody = module.getBody();
+    private void compileBody(Set<String> neededSymbols, ModuleNode module) throws CompilerException {
+        ModuleBodyNode moduleBody = module.getBody();
 
-    	if (moduleBody != null) {
-    		Collection<AssignmentNode> assignments = moduleBody
-    				.getAssignments();
-    		if (assignments != null) {
-    			for (AssignmentNode assignment : assignments) {
-    				compileAssignment(assignment);
-    			}
-    		}
-    	}
+        if (moduleBody != null) {
+            assignments = new Stack<>();
+            assignments.addAll(moduleBody.getAssignments());
+
+            while (!assignments.isEmpty()) {
+                compileAssignment(assignments.pop());
+            }
+        }
     }
 
-    private void compileAssignment(AssignmentNode assignment)
-    		throws CompilerException {
-    	if (assignment instanceof TypeAssignmentNode) {
-    		compilerContext
-    				.<TypeAssignmentNode, TypeAssignmentCompiler> getCompiler(
-    						TypeAssignmentNode.class).compile(compilerContext,
-    						(TypeAssignmentNode) assignment);
-    	} else if (assignment instanceof ValueAssignmentNode) {
-    		// ignore values, they are resolved when needed
-    	} else if (assignment instanceof ParameterizedAssignmentNode) {
-    		compileParameterizedAssignment((ParameterizedAssignmentNode) assignment);
-    	} else if (assignment instanceof ObjectSetAssignmentNode) {
-    		compileObjectSetAssignment((ObjectSetAssignmentNode) assignment);
-    	} else if (assignment instanceof ObjectAssignmentNode) {
-    		// ignore objects, they are resolved when needed
-    	} else if (assignment instanceof ObjectClassAssignmentNode) {
-    		compileObjectClassAssignment((ObjectClassAssignmentNode) assignment);
-    	}
+    private void compileAssignment(AssignmentNode assignment) throws CompilerException {
+        if (assignment instanceof TypeAssignmentNode) {
+            compileTypeAssignment((TypeAssignmentNode) assignment);
+        } else if (assignment instanceof ValueAssignmentNode) {
+            // ignore values, they are resolved when needed
+        } else if (assignment instanceof ParameterizedAssignmentNode) {
+            compileParameterizedAssignment((ParameterizedAssignmentNode) assignment);
+        } else if (assignment instanceof ObjectSetAssignmentNode) {
+            compileObjectSetAssignment((ObjectSetAssignmentNode) assignment);
+        } else if (assignment instanceof ObjectAssignmentNode) {
+            // ignore objects, they are resolved when needed
+        } else if (assignment instanceof ObjectClassAssignmentNode) {
+            compileObjectClassAssignment((ObjectClassAssignmentNode) assignment);
+        }
     }
 
-    private void compileObjectClassAssignment(
-    		ObjectClassAssignmentNode assignment) {
-    	// TODO Auto-generated method stub
+    private Type compileTypeAssignment(TypeAssignmentNode assignment) {
+        return compilerContext.<TypeAssignmentNode, TypeAssignmentCompiler>getCompiler(TypeAssignmentNode.class).compile(compilerContext,
+                assignment);
+    }
+
+    private void compileObjectClassAssignment(ObjectClassAssignmentNode assignment) {
+        // TODO Auto-generated method stub
     }
 
     private void compileObjectSetAssignment(ObjectSetAssignmentNode assignment) {
-    	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
     }
 
-    private void compileParameterizedAssignment(
-    		ParameterizedAssignmentNode assignment) {
-    	// TODO Auto-generated method stub
+    private void compileParameterizedAssignment(ParameterizedAssignmentNode assignment) {
+        // TODO Auto-generated method stub
     }
 
-    private void compileImports(ModuleNode module) throws IOException,
-    		ParserException, CompilerException {
-    	List<ImportNode> imports = module.getBody().getImports();
+    private void compileImports(ModuleNode module) throws IOException, ParserException, CompilerException {
+        List<ImportNode> imports = module.getBody().getImports();
 
-    	for (ImportNode imp : imports) {
-    		ModuleRefNode importedModule = imp.getReference();
-    		String importedModuleName = importedModule.getName();
+        for (ImportNode imp : imports) {
+            ModuleRefNode importedModule = imp.getReference();
+            String importedModuleName = importedModule.getName();
 
-    		if (!modules.containsKey(importedModuleName)) {
-    			loadAndCompileModule(importedModuleName);
-    		}
-    	}
+            if (!modules.containsKey(importedModuleName)) {
+                loadAndCompileModule(importedModuleName);
+            }
+        }
     }
 
     public void load(String moduleName) throws IOException, ParserException {
-    	System.out.println("Loading module " + moduleName + "...");
+        System.out.println("Loading module " + moduleName + "...");
 
-    	String moduleFile = null;
+        String moduleFile = null;
 
-    	for (String path : includePath) {
-    		String file = StringUtils.concat(path, File.separator, moduleName);
-    		if (new File(file + ".asn1").exists()) {
-    			moduleFile = file + ".asn1";
-    		} else if (new File(file + ".asn").exists()) {
-    			moduleFile = file + ".asn";
-    		}
-    	}
+        for (String path : includePath) {
+            String file = StringUtils.concat(path, File.separator, moduleName);
+            if (new File(file + ".asn1").exists()) {
+                moduleFile = file + ".asn1";
+            } else if (new File(file + ".asn").exists()) {
+                moduleFile = file + ".asn";
+            }
+        }
 
-    	if (moduleFile == null) {
-    		throw new IOException("Module " + moduleName
-    				+ " not found in include path");
-    	}
+        if (moduleFile == null) {
+            throw new IOException("Module " + moduleName
+                    + " not found in include path");
+        }
 
-    	Parser parser = new Parser(new FileInputStream(moduleFile));
+        Parser parser = new Parser(new FileInputStream(moduleFile));
 
-    	try {
-    		ModuleNode module = parser.parse();
-    		modules.put(moduleName, module);
-    		System.out.println("Loaded module " + moduleName);
-    	} catch (ParserException e) {
-    		throw new ParserException("Failed to load module " + moduleName, e);
-    	}
+        try {
+            ModuleNode module = parser.parse();
+            modules.put(moduleName, module);
+            System.out.println("Loaded module " + moduleName);
+        } catch (ParserException e) {
+            throw new ParserException("Failed to load module " + moduleName, e);
+        }
     }
 
     private String stripExtension(String module) {
-    	if (module.endsWith(".asn1")) {
-    		module = module.substring(0, module.length() - 5);
-    	} else if (module.endsWith(".asn")) {
-    		module = module.substring(0, module.length() - 4);
-    	}
+        if (module.endsWith(".asn1")) {
+            module = module.substring(0, module.length() - 5);
+        } else if (module.endsWith(".asn")) {
+            module = module.substring(0, module.length() - 4);
+        }
 
-    	return module;
+        return module;
+    }
+
+    public Type compileType(String name) {
+        Optional<AssignmentNode> maybeTypeAssignment = assignments.stream().filter(
+                obj -> obj instanceof TypeAssignmentNode && name.equals(obj.getReference())).findFirst();
+
+        TypeAssignmentNode assignment = (TypeAssignmentNode) maybeTypeAssignment.orElseThrow(
+                () -> new CompilerException("Undefined type: " + name));
+
+        assignments.remove(assignment);
+
+        return compileTypeAssignment(assignment);
     }
 
 }
