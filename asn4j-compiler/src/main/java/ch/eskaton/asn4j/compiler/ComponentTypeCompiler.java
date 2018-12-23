@@ -66,8 +66,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
                 compileComponentType(ctx, mode, node.getType());
                 return;
             default:
-                throw new CompilerException("Unsupported ComponentType: "
-                                                    + node.getCompType());
+                throw new CompilerException("Unsupported ComponentType: " + node.getCompType());
         }
     }
 
@@ -75,10 +74,9 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             throws CompilerException {
         JavaClass javaClass = ctx.getCurrentClass();
         Type type = namedType.getType();
-        Tag tag = type.getTag();
         TaggingMode taggingMode = type.getTaggingMode();
-
-        JavaDefinedField field = new JavaDefinedField(ctx.getType(namedType), CompilerUtils
+        Tag tag = ctx.resolveType(type).getTag();
+        JavaDefinedField field = new JavaDefinedField(ctx.getTypeName(namedType), CompilerUtils
                 .formatName(namedType.getName()));
         JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
 
