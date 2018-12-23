@@ -35,7 +35,7 @@ public class SequenceOfCompiler implements NamedCompiler<SequenceOfType> {
     public void compile(CompilerContext ctx, String name, SequenceOfType node)
     		throws CompilerException {
     	JavaClass javaClass = ctx.createClass(name, node, true);
-    	javaClass.setTypeParam(ctx.getType(node.getType()));
+    	javaClass.setTypeParam(ctx.getTypeName(node.getType()));
     	ctx.finishClass();
     }
 

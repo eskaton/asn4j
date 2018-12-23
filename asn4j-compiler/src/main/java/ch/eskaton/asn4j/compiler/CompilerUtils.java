@@ -29,9 +29,11 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
+import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode;
@@ -132,4 +134,30 @@ public class CompilerUtils {
         return tagAnnotation;
     }
 
+    public static TagId toTagId(Tag tag) {
+        Clazz clazz;
+        ClassType clazzType = tag.getClazz();
+
+        if (clazzType == null) {
+            clazz = Clazz.ContextSpecific;
+        } else {
+
+            switch (clazzType) {
+                case APPLICATION:
+                    clazz = Clazz.Application;
+                    break;
+                case PRIVATE:
+                    clazz = Clazz.Private;
+                    break;
+                case UNIVERSAL:
+                    clazz = Clazz.Universal;
+                    break;
+                default:
+                    throw new CompilerException("Unknown class type: " + clazzType.name());
+            }
+        }
+
+        // TODO: handle references in class number
+        return new TagId(clazz, tag.getClassNumber().getClazz());
+    }
 }
