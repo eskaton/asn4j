@@ -362,13 +362,15 @@ public class CompilerContext {
                 typeName = ASN1Choice.class.getSimpleName();
             }
         } else if (type instanceof SelectionType) {
-            Type selectionType = resolveType(type);
+            SelectionType selectionType = (SelectionType) type;
+            Type selectedType = resolveType(type);
 
-            if (selectionType != type) {
-                return getTypeName(selectionType);
+            if (selectedType != type) {
+                return getTypeName(selectedType);
             }
 
-            throw new CompilerException("Unsupported type in SelectionType: " + selectionType.getClass());
+            throw new CompilerException(String.format("Unknown SelectionType: %s < %s",
+                    selectionType.getId(), ((TypeReference) selectionType.getType()).getType()));
         } else {
             throw new CompilerException("Unsupported type: " + type.getClass());
         }
