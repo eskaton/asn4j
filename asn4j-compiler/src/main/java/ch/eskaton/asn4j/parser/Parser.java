@@ -2451,8 +2451,7 @@ public class Parser {
 
     	public EncodingPrefixNode parse() throws ParserException {
     		List<Object> rule = new SequenceParser(TokenType.LBracket,
-    				new SingleTokenParser(TokenType.EncodingReference,
-    						Context.Encoding)).parse();
+    				encodingReferenceParser).parse();
 
     		List<Token> encodingInstruction = new ArrayList<Token>();
 
@@ -2475,8 +2474,7 @@ public class Parser {
     				encodingInstruction.add(token);
     			}
 
-    			return new EncodingPrefixNode(((Token) rule.get(1)).getText(),
-    					encodingInstruction);
+    			return new EncodingPrefixNode((String)rule.get(1), encodingInstruction);
     		}
 
     		return null;
@@ -2541,12 +2539,16 @@ public class Parser {
     protected class EncodingReferenceParser implements RuleParser<String> {
 
     	public String parse() throws ParserException {
-    		Token token = new SingleTokenParser(TokenType.EncodingReference,
-    				Context.Encoding).parse();
+            List<Object> rule = new SequenceParser(
+                    new SingleTokenParser(TokenType.EncodingReference, Context.Encoding), TokenType.Colon).parse();
 
-    		if (token != null) {
-    			return token.getText();
-    		}
+    	    if (rule != null) {
+    	        Token token = (Token) rule.get(0);
+
+                if (token != null) {
+                    return token.getText();
+                }
+    	    }
 
     		return null;
     	}
