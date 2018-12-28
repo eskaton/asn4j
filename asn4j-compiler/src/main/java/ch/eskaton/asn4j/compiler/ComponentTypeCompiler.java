@@ -76,15 +76,16 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         Type type = namedType.getType();
         TaggingMode taggingMode = type.getTaggingMode();
         Tag tag = ctx.resolveType(type).getTag();
-        JavaDefinedField field = new JavaDefinedField(ctx.getTypeName(namedType), CompilerUtils
-                .formatName(namedType.getName()));
+        String typeName = ctx.getTypeName(namedType);
         JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
+        boolean hasDefault = component.getCompType() == CompType.NamedTypeDef;
+        JavaDefinedField field = new JavaDefinedField(typeName, CompilerUtils.formatName(namedType.getName()), hasDefault);
 
         if (component.getCompType() == CompType.NamedTypeOpt) {
             compAnnotation.addParameter("optional", "true");
-        } else if (component.getCompType() == CompType.NamedTypeDef) {
+        } else if (hasDefault) {
             compAnnotation.addParameter("hasDefault", "true");
-            ctx.compileDefault(javaClass, field.getName(), component);
+            ctx.compileDefault(javaClass, typeName, field.getName(), component);
         }
 
         field.addAnnotation(compAnnotation);
