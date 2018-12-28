@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -41,44 +41,43 @@ public class JavaEquals extends JavaMethod {
     private String className;
 
     public JavaEquals(String className, List<String> fieldNames) {
-    	this.className = className;
-    	this.fieldNames = fieldNames;
+        this.className = className;
+        this.fieldNames = fieldNames;
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {
-    	writer.write(prefix);
-    	writer.write("\tpublic boolean equals(Object obj) {\n");
+        writer.write(prefix);
+        writer.write("\tpublic boolean equals(Object obj) {\n");
 
-    	writer.write(prefix);
-    	writer.write("\t\tif (this == obj) {\n");
-    	writer.write(prefix);
-    	writer.write("\t\t\treturn true;\n");
-    	writer.write(prefix);
-    	writer.write("\t\t}\n\n");
         writer.write(prefix);
-    	writer.write("\t\tif (obj == null || getClass() != obj.getClass()) {\n");
-    	writer.write(prefix);
-    	writer.write("\t\t\treturn false;\n");
-    	writer.write(prefix);
-    	writer.write("\t\t}\n\n");
+        writer.write("\t\tif (this == obj) {\n");
         writer.write(prefix);
+        writer.write("\t\t\treturn true;\n");
+        writer.write(prefix);
+        writer.write("\t\t}\n\n");
+        writer.write(prefix);
+        writer.write("\t\tif (obj == null || getClass() != obj.getClass()) {\n");
+        writer.write(prefix);
+        writer.write("\t\t\treturn false;\n");
+        writer.write(prefix);
+        writer.write("\t\t}\n\n");
 
         if (!fieldNames.isEmpty()) {
             writer.write(prefix);
-            writer.write(StringUtils.concat("\t\t", className, " other = (", className, ") obj;\n"));
+            writer.write(StringUtils.concat("\t\t", className, " other = (", className, ") obj;\n\n"));
             writer.write(prefix);
-            writer.write("return ");
+            writer.write("\t\treturn ");
             writer.write(fieldNames.stream()
-                                 .map(fieldName -> "Objects.equals(" + fieldName + ", other." + fieldName + ")")
-                                 .collect(Collectors.joining(" && \n")) + ";\n");
+                    .map(fieldName -> "Objects.equals(" + fieldName + ", other." + fieldName + ")")
+                    .collect(Collectors.joining(" &&\n" + prefix + "\t\t\t")) + ";");
         } else {
             writer.write(prefix);
             writer.write("\t\treturn super.equals(obj);");
         }
 
         writer.write("\n");
-   	    writer.write(prefix);
-       	writer.write("\t}\n");
+        writer.write(prefix);
+        writer.write("\t}\n");
     }
 
 }
