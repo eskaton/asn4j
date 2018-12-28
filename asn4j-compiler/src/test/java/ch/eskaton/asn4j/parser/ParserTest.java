@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -985,7 +985,7 @@ public class ParserTest {
     @Test
     public void testTypeAssignmentParser() throws IOException, ParserException {
     	TypeAssignmentParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference ::= [TAG APPLICATION 23] INTEGER ((0..MAX))"
+    			"Type-Reference ::= [TAG: APPLICATION 23] INTEGER ((0..MAX))"
     					.getBytes())).new TypeAssignmentParser();
 
     	TypeOrObjectClassAssignmentNode<?> result = parser.parse();
@@ -1221,7 +1221,7 @@ public class ParserTest {
     	assertTrue(result instanceof SetOfType);
 
     	parser = new Parser(new ByteArrayInputStream(
-    			"[TAG APPLICATION 23] INTEGER".getBytes())).new BuiltinTypeParser();
+    			"[TAG: APPLICATION 23] INTEGER".getBytes())).new BuiltinTypeParser();
 
     	result = parser.parse();
 
@@ -2764,12 +2764,13 @@ public class ParserTest {
     @Test
     public void testPrefixedTypeParser() throws IOException, ParserException {
     	PrefixedTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"[TAG APPLICATION 23] INTEGER".getBytes())).new PrefixedTypeParser();
+    			"[TAG: APPLICATION 23] INTEGER".getBytes())).new PrefixedTypeParser();
 
     	Type result = parser.parse();
 
     	assertNotNull(result);
     	assertTrue(result instanceof IntegerType);
+        assertEquals(ClassType.APPLICATION,  result.getTag().getClazz());
     	assertEquals(23, (int) result.getTag().getClassNumber().getClazz());
 
     	parser = new Parser(new ByteArrayInputStream(
@@ -2779,13 +2780,23 @@ public class ParserTest {
 
     	assertNotNull(result);
     	assertTrue(result instanceof IntegerType);
-    	assertNotNull(result.getEncodingPrefix());
+        assertNull(result.getTag().getClazz());
+        assertEquals(4711, (int) result.getTag().getClassNumber().getClazz());
+
+    	parser = new Parser(new ByteArrayInputStream(
+    			"[PER: \"encoding instructions\"] INTEGER".getBytes())).new PrefixedTypeParser();
+
+    	result = parser.parse();
+
+    	assertNotNull(result);
+    	assertTrue(result instanceof IntegerType);
+        assertNotNull(result.getEncodingPrefix());
     }
 
     @Test
     public void testTaggedTypeParser() throws IOException, ParserException {
     	TaggedTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"[TAG APPLICATION 1] INTEGER".getBytes())).new TaggedTypeParser();
+    			"[TAG: APPLICATION 1] INTEGER".getBytes())).new TaggedTypeParser();
 
     	Type result = parser.parse();
 
@@ -2797,7 +2808,7 @@ public class ParserTest {
     @Test
     public void testTagParser() throws IOException, ParserException {
     	TagParser parser = new Parser(new ByteArrayInputStream(
-    			"[TAG UNIVERSAL 10]".getBytes())).new TagParser();
+    			"[TAG: UNIVERSAL 10]".getBytes())).new TagParser();
 
     	Tag result = parser.parse();
 
@@ -2811,7 +2822,7 @@ public class ParserTest {
     public void testEncodingReferenceParser() throws IOException,
     		ParserException {
     	EncodingReferenceParser parser = new Parser(new ByteArrayInputStream(
-    			"TAG".getBytes())).new EncodingReferenceParser();
+    			"TAG:".getBytes())).new EncodingReferenceParser();
 
     	String result = parser.parse();
 
@@ -2880,13 +2891,13 @@ public class ParserTest {
     @Test
     public void testEncodingPrefixParser() throws IOException, ParserException {
     	EncodingPrefixParser parser = new Parser(new ByteArrayInputStream(
-    			"[TAG: 1]".getBytes())).new EncodingPrefixParser();
+    			"[TAG: \"encoding instruction\"]".getBytes())).new EncodingPrefixParser();
 
     	EncodingPrefixNode result = parser.parse();
 
     	assertNotNull(result);
     	assertEquals("TAG", result.getEncodingReference());
-    	assertEquals(2, result.getEncodingInstruction().size());
+    	assertEquals(1, result.getEncodingInstruction().size());
     }
 
     /**
