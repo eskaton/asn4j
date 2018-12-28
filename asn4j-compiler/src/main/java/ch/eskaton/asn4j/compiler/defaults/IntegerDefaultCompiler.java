@@ -40,7 +40,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 public class IntegerDefaultCompiler implements DefaultCompiler {
 
     public void compileDefault(CompilerContext ctx, JavaClass clazz,
-    		String field, Value value) throws CompilerException {
+            String typeName, String field, Value value) throws CompilerException {
     	long intValue;
 
     	if (value instanceof IntegerValue) {
@@ -59,10 +59,11 @@ public class IntegerDefaultCompiler implements DefaultCompiler {
     		throw new CompilerException("Invalid default value");
     	}
 
+        String defaultField = addDefaultField(clazz, typeName, field);
     	StringBuilder body = new StringBuilder();
 
     	body.append("\t\ttry {\n");
-    	body.append("\t\t\t").append(field).append(" = ")
+    	body.append("\t\t\t").append(defaultField).append(" = ")
     			.append(ASN1Integer.class.getSimpleName()).append(".valueOf(")
     			.append(intValue).append(");\n");
     	body.append("\t\t} catch(")

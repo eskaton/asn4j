@@ -151,7 +151,7 @@ public class JavaClass implements JavaStructure {
         }
 
         if (hasGetter) {
-            addMethod(new JavaGetter(typeName, field.getName()));
+            addMethod(new JavaGetter(typeName, field.getName(), field.hasDefault()));
         }
 
         fields.add(field);

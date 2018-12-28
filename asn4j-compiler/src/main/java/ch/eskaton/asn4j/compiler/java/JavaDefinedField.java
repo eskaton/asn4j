@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,12 +27,12 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.commons.utils.StringUtils;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-
-import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaDefinedField implements JavaField {
 
@@ -40,40 +40,50 @@ public class JavaDefinedField implements JavaField {
 
     private String name;
 
+    private boolean hasDefault;
+
     private Set<JavaAnnotation> annotations = new HashSet<>();
 
     public JavaDefinedField(String typeName, String name) {
-    	this.typeName = typeName;
-    	this.name = name;
+        this(typeName, name, false);
+    }
+
+    public JavaDefinedField(String typeName, String name, boolean hasDefault) {
+        this.typeName = typeName;
+        this.name = name;
+        this.hasDefault = hasDefault;
     }
 
     public void addAnnotation(JavaAnnotation annotation) {
-    	annotations.add(annotation);
+        annotations.add(annotation);
     }
 
     public String getName() {
-    	return name;
+        return name;
     }
 
     public String getTypeName() {
-    	return typeName;
+        return typeName;
+    }
+
+    public boolean hasDefault() {
+        return hasDefault;
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {
 
-    	for (JavaAnnotation annotation : annotations) {
-    	    writer.write("\t");
-    		annotation.write(writer, prefix);
-    	}
+        for (JavaAnnotation annotation : annotations) {
+            writer.write("\t");
+            annotation.write(writer, prefix);
+        }
 
-    	writer.write(StringUtils.concat(prefix, "\tprivate ", typeName, " ",
-    			name, ";\n\n"));
+        writer.write(StringUtils.concat(prefix, "\tprivate ", typeName, " ", name, ";\n"));
     }
 
     @Override
     public String toString() {
-    	return "JavaDefinedField [typeName=" + typeName + ", name=" + name
-    			+ ", annotations=" + annotations + "]";
+        return "JavaDefinedField [typeName=" + typeName + ", name=" + name + ", hasDefault=" + hasDefault +
+                ", annotations=" + annotations + "]";
     }
 
 }

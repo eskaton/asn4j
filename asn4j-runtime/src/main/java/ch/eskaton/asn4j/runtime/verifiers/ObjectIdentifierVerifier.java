@@ -25,14 +25,45 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.exceptions;
+package ch.eskaton.asn4j.runtime.verifiers;
 
-public class PrematureEndOfInputException extends DecodingException {
+import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
 
-    private static final long serialVersionUID = 1L;
+import java.util.List;
 
-    public PrematureEndOfInputException() {
-        super("Premature end of input");
+public class ObjectIdentifierVerifier {
+
+    private ObjectIdentifierVerifier() {
+    }
+
+    public static void verifyComponents(List<Integer> components) throws ValidationException {
+        int i = 0;
+        int firstComponent = 0;
+
+        for (int component : components) {
+            if (component < 0) {
+                throwValidationException(i, component);
+                return;
+            }
+
+            if (i == 0) {
+                firstComponent = component;
+
+                if (component > 2) {
+                    throwValidationException(i, component);
+                }
+            }
+
+            if (i == 1 && firstComponent < 2 && component > 39) {
+                throwValidationException(i, component);
+            }
+
+            i++;
+        }
+    }
+
+    public static void throwValidationException(int pos, int component) {
+        throw new ValidationException("Invalid object identifier value in component(" + pos + "): " + component);
     }
 
 }

@@ -106,7 +106,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         javaClass.addField(field, false, false);
         javaClass.addMethod(new JavaTypedSetter(typeName, name, CHOICE_FIELD, CHOICE_ENUM + "." + typeConstant,
                 beforeCode));
-        javaClass.addMethod(new JavaGetter(typeName, name));
+        javaClass.addMethod(new JavaGetter(typeName, name, field.hasDefault()));
 
         return name;
     }

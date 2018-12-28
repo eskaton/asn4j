@@ -65,6 +65,7 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
+import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TagId;
@@ -121,6 +122,7 @@ public class CompilerContext {
             put(TypeAssignmentNode.class, new TypeAssignmentCompiler());
             put(VisibleString.class, new VisibleStringCompiler());
             put(SelectionType.class, new SelectionTypeCompiler());
+            put(ObjectIdentifier.class, new ObjectIdentifierCompiler());
         }
     };
 
@@ -294,7 +296,6 @@ public class CompilerContext {
     public String getTypeName(Type type) throws CompilerException {
         String typeName;
         String name = null;
-        boolean newType = false;
 
         if (type instanceof NamedType) {
             name = ((NamedType) type).getName();
@@ -320,54 +321,16 @@ public class CompilerContext {
         } else if (type instanceof EnumeratedType) {
             typeName = ASN1EnumeratedType.class.getSimpleName();
         } else if (type instanceof IntegerType) {
-            if (((IntegerType) type).getNamedNumbers() != null && name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-                newType = true;
-            } else {
-                typeName = ASN1Integer.class.getSimpleName();
-            }
+            typeName = defineType(type, name, ((IntegerType) type).getNamedNumbers() != null);
         } else if (type instanceof BitString) {
-            if (((BitString) type).getNamedBits() != null && name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-                newType = true;
-            } else {
-                typeName = ASN1BitString.class.getSimpleName();
-            }
-        } else if (type instanceof SequenceType) {
-            if (name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-                newType = true;
-            } else {
-                typeName = ASN1Sequence.class.getSimpleName();
-            }
-        } else if (type instanceof SequenceOfType) {
-            if (name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-                newType = true;
-            } else {
-                typeName = ASN1SequenceOf.class.getSimpleName();
-            }
-        } else if (type instanceof SetType) {
-            if (name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-                newType = true;
-            } else {
-                typeName = ASN1Set.class.getSimpleName();
-            }
-        } else if (type instanceof SetOfType) {
-            if (name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-                newType = true;
-            } else {
-                typeName = ASN1SetOf.class.getSimpleName();
-            }
-        } else if (type instanceof Choice) {
-            if (name != null) {
-                typeName = CompilerUtils.formatTypeName(name);
-                newType = true;
-            } else {
-                typeName = ASN1Choice.class.getSimpleName();
-            }
+            typeName = defineType(type, name, ((BitString) type).getNamedBits() != null);
+        } else if (type instanceof SequenceType
+                || type instanceof SequenceOfType
+                || type instanceof SetType
+                || type instanceof SetOfType
+                || type instanceof Choice
+                || type instanceof ObjectIdentifier) {
+            typeName = defineType(type, name);
         } else if (type instanceof SelectionType) {
             SelectionType selectionType = (SelectionType) type;
             Type selectedType = resolveType(type);
@@ -382,12 +345,36 @@ public class CompilerContext {
             throw new CompilerException("Unsupported type: " + type.getClass());
         }
 
-        if (newType) {
-            this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
-            addType(name, type);
+        return typeName;
+    }
+
+
+    private String defineType(Type type, String name) {
+        return defineType(type, name, true);
+    }
+
+    private String defineType(Type type, String name, boolean newType) {
+        String typeName;
+
+        if (newType && name != null) {
+            typeName = CompilerUtils.formatTypeName(name);
+            compileType(type, typeName, name);
+        } else {
+            String runtimeClass = runtimeTypes.get(type.getClass().getSimpleName());
+
+            if (runtimeClass == null) {
+                throw new CompilerException("No runtime class available for type " + type);
+            }
+
+            typeName = runtimeClass;
         }
 
         return typeName;
+    }
+
+    private void compileType(Type type, String typeName, String name) {
+        this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
+        addType(name, type);
     }
 
     public void addReferencedType(String typeName) {
@@ -430,9 +417,31 @@ public class CompilerContext {
         return builtinTypes.contains(name);
     }
 
-    public BigInteger resolveIntegerValue(DefinedValue ref)
-            throws CompilerException {
+    public ObjectIdentifierValue resolveObjectIdentifierValue(DefinedValue ref) throws CompilerException {
         ValueOrObjectAssignmentNode<?, ?> valueAssignment = resolveDefinedValue(ref);
+        Node type = valueAssignment.getType();
+        Node value = valueAssignment.getValue();
+
+        if (type instanceof ObjectIdentifier) {
+            if (!(value instanceof ObjectIdentifierValue)) {
+                throw new CompilerException("Object identifier expected");
+            }
+
+            return ((ObjectIdentifierValue) value);
+        }
+
+        throw new CompilerException("Failed to resolve an object identifier value");
+    }
+
+    public BigInteger resolveIntegerValue(DefinedValue ref) throws CompilerException {
+        return resolveIntegerValue(resolveDefinedValue(ref));
+    }
+
+    public BigInteger resolveIntegerValue(String ref) throws CompilerException {
+        return resolveIntegerValue(resolveReference(ref));
+    }
+
+    private BigInteger resolveIntegerValue(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
         Node type = valueAssignment.getType();
         Node value = valueAssignment.getValue();
 
@@ -468,21 +477,23 @@ public class CompilerContext {
         throw new CompilerException("Failed to resolve an integer value");
     }
 
-    public ValueOrObjectAssignmentNode<?, ?> resolveDefinedValue(
-            DefinedValue ref) throws CompilerException {
+    public ValueOrObjectAssignmentNode<?, ?> resolveDefinedValue(DefinedValue ref) throws CompilerException {
         if (ref instanceof ExternalValueReference) {
             throw new CompilerException("External references not yet supported");
             // TODO: external references
         } else {
-            AssignmentNode assignment = getModule().getBody().getAssignments(
-                    ((SimpleDefinedValue) ref).getValue());
-
-            if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
-                throw new CompilerException("Value assignment expected");
-            }
-
-            return (ValueOrObjectAssignmentNode<?, ?>) assignment;
+            return resolveReference(((SimpleDefinedValue) ref).getValue());
         }
+    }
+
+    private ValueOrObjectAssignmentNode<?, ?> resolveReference(String reference) {
+        AssignmentNode assignment = getModule().getBody().getAssignments(reference);
+
+        if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
+            throw new CompilerException("Failed to resolve reference " + reference);
+        }
+
+        return (ValueOrObjectAssignmentNode<?, ?>) assignment;
     }
 
     public void writeClasses() throws CompilerException {
@@ -504,9 +515,8 @@ public class CompilerContext {
         constraintCompiler.compileConstraint(javaClass, name, node);
     }
 
-    public void compileDefault(JavaClass javaClass, String field,
-            ComponentType component) throws CompilerException {
-        defaultsCompiler.compileDefault(javaClass, field, component);
+    public void compileDefault(JavaClass javaClass, String typeName, String field, ComponentType component) throws CompilerException {
+        defaultsCompiler.compileDefault(javaClass, typeName, field, component);
     }
 
     public Type resolveType(Type type) {
