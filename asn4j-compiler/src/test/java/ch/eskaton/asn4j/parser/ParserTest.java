@@ -2770,6 +2770,7 @@ public class ParserTest {
 
     	assertNotNull(result);
     	assertTrue(result instanceof IntegerType);
+    	assertEquals("TAG", result.getTag().getEncodingReference());
         assertEquals(ClassType.APPLICATION,  result.getTag().getClazz());
     	assertEquals(23, (int) result.getTag().getClassNumber().getClazz());
 
@@ -2780,6 +2781,18 @@ public class ParserTest {
 
     	assertNotNull(result);
     	assertTrue(result instanceof IntegerType);
+        assertEquals("TAG", result.getTag().getEncodingReference());
+        assertNull(result.getTag().getClazz());
+        assertEquals(4711, (int) result.getTag().getClassNumber().getClazz());
+
+        parser = new Parser(new ByteArrayInputStream(
+                "[4711] INTEGER".getBytes())).new PrefixedTypeParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result instanceof IntegerType);
+        assertNull(result.getTag().getEncodingReference());
         assertNull(result.getTag().getClazz());
         assertEquals(4711, (int) result.getTag().getClassNumber().getClazz());
 
@@ -2791,6 +2804,8 @@ public class ParserTest {
     	assertNotNull(result);
     	assertTrue(result instanceof IntegerType);
         assertNotNull(result.getEncodingPrefix());
+        assertEquals("PER", result.getEncodingPrefix().getEncodingReference());
+        assertNotNull(result.getEncodingPrefix().getEncodingInstruction());
     }
 
     @Test
@@ -2813,7 +2828,7 @@ public class ParserTest {
     	Tag result = parser.parse();
 
     	assertNotNull(result);
-    	assertEquals("TAG", result.getEncodingRef());
+    	assertEquals("TAG", result.getEncodingReference());
     	assertEquals(ClassType.UNIVERSAL, result.getClazz());
     	assertEquals(10, (int) result.getClassNumber().getClazz());
     }
@@ -2898,6 +2913,15 @@ public class ParserTest {
     	assertNotNull(result);
     	assertEquals("TAG", result.getEncodingReference());
     	assertEquals(1, result.getEncodingInstruction().size());
+
+        parser = new Parser(new ByteArrayInputStream(
+                "[\"encoding instruction\"]".getBytes())).new EncodingPrefixParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertNull(result.getEncodingReference());
+        assertEquals(1, result.getEncodingInstruction().size());
     }
 
     /**
