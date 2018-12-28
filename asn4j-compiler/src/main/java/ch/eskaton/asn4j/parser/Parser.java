@@ -2446,14 +2446,12 @@ public class Parser {
 
     // EncodingPrefix ::=
     // "[" EncodingReference EncodingInstruction "]"
-    protected class EncodingPrefixParser implements
-    		RuleParser<EncodingPrefixNode> {
+    protected class EncodingPrefixParser implements RuleParser<EncodingPrefixNode> {
 
     	public EncodingPrefixNode parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.LBracket,
-    				encodingReferenceParser).parse();
-
-    		List<Token> encodingInstruction = new ArrayList<Token>();
+            List<Object> rule = new SequenceParser(new boolean[] { true, false }, TokenType.LBracket,
+                    encodingReferenceParser).parse();
+            List<Token> encodingInstruction = new ArrayList<>();
 
     		if (rule != null) {
     			while (true) {
@@ -2466,8 +2464,7 @@ public class Parser {
     				} else if (token.getType() == TokenType.RBracket) {
     					break;
     				} else if (token.getType() == TokenType.LBracket) {
-    					throw new ParserException("Invalid token " + token
-    							+ " in EncodingInstruction");
+    					throw new ParserException("Invalid token " + token + " in EncodingInstruction");
     				}
 
     				clearMark();
