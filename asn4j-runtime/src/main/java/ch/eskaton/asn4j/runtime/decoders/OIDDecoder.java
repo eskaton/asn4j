@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 
 import java.util.ArrayList;
@@ -63,7 +65,11 @@ public class OIDDecoder {
             }
         }
 
-        obj.setValue(components);
+        try {
+            obj.setValue(components);
+        } catch (ValidationException e) {
+            throw new DecodingException(e);
+        }
     }
 
 }

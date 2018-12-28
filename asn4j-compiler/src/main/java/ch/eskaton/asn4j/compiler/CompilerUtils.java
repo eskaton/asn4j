@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -41,61 +41,64 @@ import ch.eskaton.commons.utils.StringUtils;
 
 public class CompilerUtils {
 
+    private CompilerUtils() {
+    }
+
     static String formatTypeName(String name) {
-    	return StringUtils.initCap(formatName(name));
+        return StringUtils.initCap(formatName(name));
     }
 
     static String formatName(String name) {
-    	StringBuilder sb = new StringBuilder();
-    	boolean cap = false;
+        StringBuilder sb = new StringBuilder();
+        boolean cap = false;
 
-    	for (char c : name.toCharArray()) {
-    		if (c == '-') {
-    			cap = true;
-    		} else if (cap == true) {
-    			cap = false;
-    			if ('a' <= c && c <= 'z') {
-    				sb.append((char) (c & ~0x20));
-    			} else {
-    				sb.append(c);
-    			}
-    		} else {
-    			sb.append(c);
-    		}
-    	}
+        for (char c : name.toCharArray()) {
+            if (c == '-') {
+                cap = true;
+            } else if (cap == true) {
+                cap = false;
+                if ('a' <= c && c <= 'z') {
+                    sb.append((char) (c & ~0x20));
+                } else {
+                    sb.append(c);
+                }
+            } else {
+                sb.append(c);
+            }
+        }
 
-    	return sb.toString();
+        return sb.toString();
     }
 
     static String formatConstant(String name) {
-    	StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-    	for (char c : name.toCharArray()) {
-    		if (c == '-') {
-    			sb.append('_');
-    		} else {
-    			if ('a' <= c && c <= 'z') {
-    				sb.append((char) (c & ~0x20));
-    			} else {
-    				sb.append(c);
-    			}
-    		}
-    	}
+        for (char c : name.toCharArray()) {
+            if (c == '-') {
+                sb.append('_');
+            } else {
+                if ('a' <= c && c <= 'z') {
+                    sb.append((char) (c & ~0x20));
+                } else {
+                    sb.append(c);
+                }
+            }
+        }
 
-    	return sb.toString();
+        return sb.toString();
     }
 
     static Mode getTaggingMode(ModuleNode module, Type type) throws CompilerException {
-    	TaggingMode taggingMode = type.getTaggingMode();
+        TaggingMode taggingMode = type.getTaggingMode();
 
-    	if (taggingMode != null) {
-    		switch (taggingMode) {
-    			case Explicit:
-    				return ASN1Tag.Mode.Explicit;
-    			case Implicit:
-    				return ASN1Tag.Mode.Implicit;
-    		}
-    	}
+        if (taggingMode != null) {
+            switch (taggingMode) {
+                case Explicit:
+                    return ASN1Tag.Mode.Explicit;
+                case Implicit:
+                    return ASN1Tag.Mode.Implicit;
+            }
+        }
 
         switch (module.getTagMode()) {
             case Explicit:
@@ -124,7 +127,7 @@ public class CompilerUtils {
     public static JavaAnnotation getTagAnnotation(Tag tag, String taggingModeString, Boolean constructed) {
         JavaAnnotation tagAnnotation = new JavaAnnotation(ASN1Tag.class);
 
-        tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz()	.toString());
+        tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz().toString());
         tagAnnotation.addParameter("clazz", "Clazz."
                 + (tag.getClazz() != null ? StringUtils.initCap(tag.getClazz().toString().toLowerCase())
                 : Clazz.ContextSpecific.toString()));
@@ -160,4 +163,9 @@ public class CompilerUtils {
         // TODO: handle references in class number
         return new TagId(clazz, tag.getClassNumber().getClazz());
     }
+
+    public static String getDefaultFieldName(String field) {
+        return "$default_" + field;
+    }
+
 }

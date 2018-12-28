@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -58,15 +59,14 @@ public class DefaultsCompiler {
     		{
     			put(IntegerType.class, new IntegerDefaultCompiler());
     			put(OctetString.class, new OctetStringDefaultCompiler());
+    			put(ObjectIdentifier.class, new ObjectIdentifierDefaultCompiler());
     		}
     	};
     }
 
-    public void compileDefault(JavaClass clazz, String field,
-    		ComponentType component) throws CompilerException {
-    	Type type = component.getCompType() == CompType.Type ? component
-    			.getType() : component.getNamedType().getType();
-    	Type base = null;
+    public void compileDefault(JavaClass clazz, String typeName, String field, ComponentType component) throws CompilerException {
+    	Type type = component.getCompType() == CompType.Type ? component.getType() : component.getNamedType().getType();
+    	Type base;
 
     	if (type instanceof TypeReference) {
     		base = typeResolver.getBase(((TypeReference) type).getType());
@@ -75,14 +75,13 @@ public class DefaultsCompiler {
     	}
 
     	if (!compilers.containsKey(base.getClass())) {
-    		throw new CompilerException("Defaults for type "
-    				+ base.getClass().getSimpleName() + " not yet supported");
+    		throw new CompilerException("Defaults for type " + base.getClass().getSimpleName() + " not yet supported");
     	}
 
     	DefaultCompiler compiler = compilers.get(base.getClass());
 
     	try {
-    		compiler.compileDefault(ctx, clazz, field, component.getValue());
+    		compiler.compileDefault(ctx, clazz, typeName, field, component.getValue());
     	} catch (CompilerException e) {
     		throw new CompilerException("Error in default for type "
     				+ (type instanceof NamedType ? ((NamedType) type).getName()
@@ -92,4 +91,5 @@ public class DefaultsCompiler {
 
     	return;
     }
+
 }
