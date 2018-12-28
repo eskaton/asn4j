@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
+import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
@@ -234,7 +235,13 @@ public class CompilerContext {
     }
 
     public JavaClass createClass(String name, Type type, boolean constructed) throws CompilerException {
-        JavaClass javaClass = new JavaClass(pkg, name, type.getTag(), CompilerUtils
+        Tag tag = type.getTag();
+
+        if (tag != null && ClassType.UNIVERSAL.equals(tag.getClazz())) {
+            throw new CompilerException("UNIVERSAL class not allowed in type " + name);
+        }
+
+        JavaClass javaClass = new JavaClass(pkg, name, tag, CompilerUtils
                 .getTaggingMode(getModule(), type), constructed, getTypeName(type));
         currentClass.push(javaClass);
         return javaClass;

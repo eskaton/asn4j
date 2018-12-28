@@ -1,0 +1,11 @@
+X680-31 DEFINITIONS ::=
+BEGIN
+
+TestPrefixedType1 ::= [1] IMPLICIT VisibleString
+TestPrefixedType2 ::= [PRIVATE 2] IMPLICIT VisibleString
+TestPrefixedType3 ::= [APPLICATION 3] IMPLICIT VisibleString
+TestPrefixedType4 ::= [1] IMPLICIT VisibleString
+TestPrefixedType5 ::= [PRIVATE 2] EXPLICIT VisibleString
+TestPrefixedType6 ::= [APPLICATION 3] EXPLICIT VisibleString
+
+END
