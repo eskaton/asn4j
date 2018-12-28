@@ -217,8 +217,7 @@ public class JavaClass implements JavaStructure {
         writeClass(writer, prefix);
     }
 
-    private void writeClass(BufferedWriter writer, String prefix)
-            throws IOException {
+    private void writeClass(BufferedWriter writer, String prefix) throws IOException {
         writeClassHeader(writer, prefix);
 
         for (JavaEnum theEnum : enums) {
@@ -251,10 +250,9 @@ public class JavaClass implements JavaStructure {
             writer.newLine();
         }
 
-        writer.write("\n\n");
-
         for (JavaClass innerClass : innerClasses) {
             innerClass.writeClass(writer, prefix + "\t");
+            writer.newLine();
         }
 
         writeClassFooter(writer, prefix);
