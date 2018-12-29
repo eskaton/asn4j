@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -37,42 +37,43 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
+import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+
 public class IntegerDefaultCompiler implements DefaultCompiler {
 
     public void compileDefault(CompilerContext ctx, JavaClass clazz,
             String typeName, String field, Value value) throws CompilerException {
-    	long intValue;
+        long intValue;
 
-    	if (value instanceof IntegerValue) {
-    		intValue = ((IntegerValue) value).getValue().longValue();
+        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
+            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
+            intValue = ctx.resolveIntegerValue(((SimpleDefinedValue) value)).longValue();
+        } else if (value instanceof IntegerValue) {
+            intValue = ((IntegerValue) value).getValue().longValue();
 
-    		try {
-    			ASN1Integer.valueOf(intValue);
-    		} catch (ConstraintViolatedException e) {
-    			throw new CompilerException(
-    					"Default value doesn't satisfy constraints", e);
-    		}
-    	} else if (value instanceof SimpleDefinedValue) {
-    		intValue = ctx.resolveIntegerValue(((SimpleDefinedValue) value))
-    				.longValue();
-    	} else {
-    		throw new CompilerException("Invalid default value");
-    	}
+            try {
+                ASN1Integer.valueOf(intValue);
+            } catch (ConstraintViolatedException e) {
+                throw new CompilerException("Default value doesn't satisfy constraints", e);
+            }
+        } else {
+            throw new CompilerException("Invalid default value");
+        }
 
         String defaultField = addDefaultField(clazz, typeName, field);
-    	StringBuilder body = new StringBuilder();
+        StringBuilder body = new StringBuilder();
 
-    	body.append("\t\ttry {\n");
-    	body.append("\t\t\t").append(defaultField).append(" = ")
-    			.append(ASN1Integer.class.getSimpleName()).append(".valueOf(")
-    			.append(intValue).append(");\n");
-    	body.append("\t\t} catch(")
-    			.append(ConstraintViolatedException.class.getSimpleName())
-    			.append(" e) {\n");
-    	body.append("\t\t}");
+        body.append("\t\ttry {\n");
+        body.append("\t\t\t").append(defaultField).append(" = ")
+                .append(ASN1Integer.class.getSimpleName()).append(".valueOf(")
+                .append(intValue).append(");\n");
+        body.append("\t\t} catch(")
+                .append(ConstraintViolatedException.class.getSimpleName())
+                .append(" e) {\n");
+        body.append("\t\t}");
 
-    	clazz.addInitializer(new JavaInitializer(body.toString()));
-    	clazz.addImport(ConstraintViolatedException.class);
+        clazz.addInitializer(new JavaInitializer(body.toString()));
+        clazz.addImport(ConstraintViolatedException.class);
     }
 
 }
