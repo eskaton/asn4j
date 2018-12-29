@@ -29,8 +29,8 @@ package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
@@ -43,6 +43,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+
 public class ObjectIdentifierDefaultCompiler implements DefaultCompiler {
 
     @Override
@@ -52,7 +54,8 @@ public class ObjectIdentifierDefaultCompiler implements DefaultCompiler {
 
         if (value instanceof ObjectIdentifierValue) {
             oidValue = (ObjectIdentifierValue) value;
-        } else if (value instanceof SimpleDefinedValue) {
+        } else if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
+            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
             oidValue = ctx.resolveObjectIdentifierValue(((SimpleDefinedValue) value));
         } else {
             throw new CompilerException("Invalid default value");
@@ -60,21 +63,38 @@ public class ObjectIdentifierDefaultCompiler implements DefaultCompiler {
 
         List<Integer> ids = new ArrayList<>();
 
-        ObjectIdentifierVerifier.verifyComponents(ids);
+        resolveComponents(ctx, field, oidValue, ids);
 
-        for (OIDComponentNode component : oidValue.getOidValues()) {
-            try {
-                ids.add(getComponentId(ctx, component));
-            } catch (CompilerException e) {
-                throw new CompilerException("Failed to resolve component of object identifier value " + field, e);
-            }
-        }
+        ObjectIdentifierVerifier.verifyComponents(ids);
 
         String defaultField = addDefaultField(clazz, typeName, field);
         String idsString = ids.stream().map(Object::toString).collect(Collectors.joining(", "));
 
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName+ "();\n"
+        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
                 + "\t\t" + defaultField + ".setValue(" + idsString + ");"));
+    }
+
+    public void resolveComponents(CompilerContext ctx, String field, ObjectIdentifierValue oidValue, List<Integer> ids) {
+        int componentNum = 1;
+
+        for (OIDComponentNode component : oidValue.getComponents()) {
+            try {
+                try {
+                    ids.add(getComponentId(ctx, component));
+                } catch(CompilerException e) {
+                    if (componentNum == 1) {
+                        ObjectIdentifierValue referencedOidValue = ctx.resolveObjectIdentifierValue(component.getName());
+                        resolveComponents(ctx, field, referencedOidValue, ids);
+                    } else {
+                        throw e;
+                    }
+                }
+            } catch (CompilerException e) {
+                throw new CompilerException("Failed to resolve component of object identifier value " + field, e);
+            }
+
+            componentNum++;
+        }
     }
 
     private Integer getComponentId(CompilerContext ctx, OIDComponentNode component) {

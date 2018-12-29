@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
@@ -39,6 +40,8 @@ public class OctetStringDefaultCompiler implements DefaultCompiler {
 
     public void compileDefault(CompilerContext ctx, JavaClass clazz,
             String typeName, String field, Value value) throws CompilerException {
+        value = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
+
     	if (!(value instanceof StringValue)) {
     		throw new CompilerException("Invalid default value");
     	}

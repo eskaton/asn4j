@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -56,13 +57,16 @@ public class DefaultSpecNode extends DefaultOptionalitySpecNode<Node> {
     	Node spec = getSpec();
 
     	if (spec != null) {
-    		if (spec instanceof ObjectDefnNode
-    				|| spec instanceof ObjectFromObjectNode) {
+    		if (spec instanceof ObjectDefnNode || spec instanceof ObjectFromObjectNode) {
     			return new DefaultObjectSpecNode((ObjectNode) spec);
-    		} else if (spec instanceof SimpleDefinedValue) {
+    		} else if (spec instanceof SimpleDefinedValue || spec instanceof AmbiguousValue
+                    && ((AmbiguousValue) spec).getValue(SimpleDefinedValue.class) != null) {
+    		    if (spec instanceof AmbiguousValue) {
+    		        spec = ((AmbiguousValue) spec).getValue(SimpleDefinedValue.class);
+                }
+
     			SimpleDefinedValue valueRef = (SimpleDefinedValue) spec;
-    			ObjectReferenceNode objectRef = new ObjectReferenceNode(
-    					valueRef.getValue());
+    			ObjectReferenceNode objectRef = new ObjectReferenceNode(valueRef.getValue());
     			objectRef.setParameters(valueRef.getParameters());
 
     			return new DefaultObjectSpecNode(objectRef);

@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -52,8 +53,9 @@ public class ConstraintCompiler {
     private TypeResolver typeResolver;
 
     @SuppressWarnings("serial")
-    public ConstraintCompiler(final TypeResolver typeResolver) {
+    public ConstraintCompiler(TypeResolver typeResolver) {
         this.typeResolver = typeResolver;
+
         compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler<?>>() {
             {
                 put(IntegerType.class, new IntegerConstraintCompiler(ConstraintCompiler.this, typeResolver));
@@ -63,12 +65,12 @@ public class ConstraintCompiler {
                 put(OctetString.class, new OctetStringConstraintCompiler(ConstraintCompiler.this, typeResolver));
                 put(Null.class, new NullConstraintCompiler(ConstraintCompiler.this, typeResolver));
                 put(SetOfType.class, new SetOfConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(ObjectIdentifier.class, new ObjectIdentifierConstrintCompiler(ConstraintCompiler.this, typeResolver));
             }
         };
     }
 
-    public void compileConstraint(JavaClass clazz, String name, Type node)
-            throws CompilerException {
+    public void compileConstraint(JavaClass clazz, String name, Type node) throws CompilerException {
         Type base;
 
         if (node instanceof TypeReference) {

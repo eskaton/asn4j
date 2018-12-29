@@ -34,6 +34,9 @@ import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers;
 import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier1;
 import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier2;
 import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier3;
+import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier4;
+import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier5;
+import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier6;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -46,6 +49,9 @@ public class TestX680_32 {
         TestObjectIdentifier1 testObjectIdentifier1 = createOID(new TestObjectIdentifier1(), 1, 3, 6, 1);
         TestObjectIdentifier2 testObjectIdentifier2 = createOID(new TestObjectIdentifier2(), 1, 3, 6, 1);
         TestObjectIdentifier3 testObjectIdentifier3 = createOID(new TestObjectIdentifier3(), 1, 3, 6, 1);
+        TestObjectIdentifier4 testObjectIdentifier4 = createOID(new TestObjectIdentifier4(), 1, 3, 6, 1, 23);
+        TestObjectIdentifier5 testObjectIdentifier5 = createOID(new TestObjectIdentifier5(), 1, 3, 6, 1);
+        TestObjectIdentifier6 testObjectIdentifier6 = createOID(new TestObjectIdentifier6(), 1, 3, 6, 2);
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
@@ -56,9 +62,16 @@ public class TestX680_32 {
         assertEquals(testObjectIdentifier1, a.getTestObjectIdentifier1());
         assertEquals(testObjectIdentifier2, a.getTestObjectIdentifier2());
         assertEquals(testObjectIdentifier3, a.getTestObjectIdentifier3());
+        assertEquals(testObjectIdentifier4, a.getTestObjectIdentifier4());
+        assertEquals(testObjectIdentifier5, a.getTestObjectIdentifier5());
+        assertEquals(testObjectIdentifier6, a.getTestObjectIdentifier6());
+
         assertEquals(testObjectIdentifier1, b.getTestObjectIdentifier1());
         assertEquals(testObjectIdentifier2, b.getTestObjectIdentifier2());
         assertEquals(testObjectIdentifier3, b.getTestObjectIdentifier3());
+        assertEquals(testObjectIdentifier4, b.getTestObjectIdentifier4());
+        assertEquals(testObjectIdentifier5, b.getTestObjectIdentifier5());
+        assertEquals(testObjectIdentifier6, b.getTestObjectIdentifier6());
     }
 
     @Test
@@ -67,24 +80,36 @@ public class TestX680_32 {
         TestObjectIdentifier1 testObjectIdentifier1 = createOID(new TestObjectIdentifier1(), 2, 3);
         TestObjectIdentifier2 testObjectIdentifier2 = createOID(new TestObjectIdentifier2(), 0, 7, 1, 1);
         TestObjectIdentifier3 testObjectIdentifier3 = createOID(new TestObjectIdentifier3(), 1, 9, 6, 7);
+        TestObjectIdentifier4 testObjectIdentifier4 = createOID(new TestObjectIdentifier4(), 1, 9, 6, 7, 17);
+        TestObjectIdentifier5 testObjectIdentifier5 = createOID(new TestObjectIdentifier5(), 1, 9, 6, 7, 13);
+        TestObjectIdentifier6 testObjectIdentifier6 = createOID(new TestObjectIdentifier6(), 1, 9, 6, 7, 11);
 
         a.setTestObjectIdentifier1(testObjectIdentifier1);
         a.setTestObjectIdentifier2(testObjectIdentifier2);
         a.setTestObjectIdentifier3(testObjectIdentifier3);
+        a.setTestObjectIdentifier4(testObjectIdentifier4);
+        a.setTestObjectIdentifier5(testObjectIdentifier5);
+        a.setTestObjectIdentifier6(testObjectIdentifier6);
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
 
         TestObjectIdentifiers b = decoder.decode(TestObjectIdentifiers.class, encoder.encode(a));
 
-
         assertEquals(a, b);
         assertEquals(testObjectIdentifier1, a.getTestObjectIdentifier1());
         assertEquals(testObjectIdentifier2, a.getTestObjectIdentifier2());
         assertEquals(testObjectIdentifier3, a.getTestObjectIdentifier3());
+        assertEquals(testObjectIdentifier4, a.getTestObjectIdentifier4());
+        assertEquals(testObjectIdentifier5, a.getTestObjectIdentifier5());
+        assertEquals(testObjectIdentifier6, a.getTestObjectIdentifier6());
+
         assertEquals(testObjectIdentifier1, b.getTestObjectIdentifier1());
         assertEquals(testObjectIdentifier2, b.getTestObjectIdentifier2());
         assertEquals(testObjectIdentifier3, b.getTestObjectIdentifier3());
+        assertEquals(testObjectIdentifier4, b.getTestObjectIdentifier4());
+        assertEquals(testObjectIdentifier5, b.getTestObjectIdentifier5());
+        assertEquals(testObjectIdentifier6, b.getTestObjectIdentifier6());
     }
 
     public <T extends ASN1ObjectIdentifier> T createOID(ASN1ObjectIdentifier oid, int... components) {
