@@ -96,6 +96,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
+import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class CompilerContext {
 
@@ -387,9 +388,7 @@ public class CompilerContext {
         referencedTypes.get(moduleName).add(typeName);
     }
 
-    public TypeAssignmentNode getTypeAssignment(String typeName,
-            String moduleName) {
-
+    public TypeAssignmentNode getTypeAssignment(String typeName, String moduleName) {
         ModuleNode module;
 
         if (moduleName != null) {
@@ -418,11 +417,23 @@ public class CompilerContext {
     }
 
     public ObjectIdentifierValue resolveObjectIdentifierValue(DefinedValue ref) throws CompilerException {
-        ValueOrObjectAssignmentNode<?, ?> valueAssignment = resolveDefinedValue(ref);
+        return resolveObjectIdentifierValue(resolveDefinedValue(ref));
+    }
+
+    public ObjectIdentifierValue resolveObjectIdentifierValue(String ref) throws CompilerException {
+        return resolveObjectIdentifierValue(resolveReference(ref));
+    }
+
+    public ObjectIdentifierValue resolveObjectIdentifierValue(ValueOrObjectAssignmentNode<?, ?> valueAssignment)
+            throws CompilerException {
         Node type = valueAssignment.getType();
         Node value = valueAssignment.getValue();
 
+        type = resolveTypeReference(type);
+
         if (type instanceof ObjectIdentifier) {
+            value = CompilerUtils.resolveAmbiguousValue(value, ObjectIdentifierValue.class);
+
             if (!(value instanceof ObjectIdentifierValue)) {
                 throw new CompilerException("Object identifier expected");
             }
@@ -431,6 +442,22 @@ public class CompilerContext {
         }
 
         throw new CompilerException("Failed to resolve an object identifier value");
+    }
+
+    public Node resolveTypeReference(Node type) {
+        while (type instanceof TypeReference) {
+            TypeAssignmentNode assignment = getTypeAssignment(((TypeReference) type).getType());
+
+            if (assignment != null) {
+                type = assignment.getType();
+            }
+        }
+
+        return type;
+    }
+
+    private TypeAssignmentNode getTypeAssignment(String type) {
+        return getTypeAssignment(type, null);
     }
 
     public BigInteger resolveIntegerValue(DefinedValue ref) throws CompilerException {
@@ -451,11 +478,9 @@ public class CompilerContext {
             }
             return ((IntegerValue) value).getValue();
         } else if (type instanceof TypeReference) {
-            if (value instanceof IntegerValue) {
-                return ((IntegerValue) value).getValue();
-            } else if (value instanceof SimpleDefinedValue) {
-                AssignmentNode assignment = getModule().getBody()
-                        .getAssignments(((TypeReference) type).getType());
+            if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
+                value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
+                AssignmentNode assignment = getModule().getBody().getAssignments(((TypeReference) type).getType());
 
                 if (assignment != null && assignment instanceof TypeAssignmentNode) {
                     TypeAssignmentNode typeAssignment = (TypeAssignmentNode) assignment;
@@ -471,6 +496,8 @@ public class CompilerContext {
                         }
                     }
                 }
+            } else if (value instanceof IntegerValue) {
+                return ((IntegerValue) value).getValue();
             }
         }
 
@@ -510,12 +537,12 @@ public class CompilerContext {
         new JavaWriter().write(structs, outputDir);
     }
 
-    public void compileConstraint(JavaClass javaClass, String name, Type node)
-            throws CompilerException {
+    public void compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
         constraintCompiler.compileConstraint(javaClass, name, node);
     }
 
-    public void compileDefault(JavaClass javaClass, String typeName, String field, ComponentType component) throws CompilerException {
+    public void compileDefault(JavaClass javaClass, String typeName, String field, ComponentType component)
+            throws CompilerException {
         defaultsCompiler.compileDefault(javaClass, typeName, field, component);
     }
 

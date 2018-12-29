@@ -25,38 +25,34 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
-import ch.eskaton.commons.utils.StringUtils;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeResolver;
+import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
+import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 
-import java.util.List;
+import java.util.Collection;
 
-public class ObjectIdentifierValue implements Value {
+public class ObjectIdentifierConstrintCompiler extends AbstractConstraintCompiler<ObjectIdentifier> {
 
-    private List<OIDComponentNode> components;
-
-    private DefinedValue reference;
-
-    public ObjectIdentifierValue(List<OIDComponentNode> components) {
-        this.components = components;
-    }
-
-    public ObjectIdentifierValue(DefinedValue reference) {
-        this.reference = reference;
-    }
-
-    public List<OIDComponentNode> getComponents() {
-        return components;
-    }
-
-    public DefinedValue getReference() {
-        return reference;
+    public ObjectIdentifierConstrintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
+        super(constraintCompiler, typeResolver);
     }
 
     @Override
-    public String toString() {
-        return StringUtils.concat("ObjectIdentifierValue[reference=", reference, ", components=", components, "]");
+    protected Collection<ObjectIdentifier> compileConstraint(ElementSet set) throws CompilerException {
+        return null;
     }
 
+    @Override
+    protected Collection<ObjectIdentifier> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
+        return null;
+    }
+
+    @Override
+    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
+
+    }
 }

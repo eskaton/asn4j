@@ -1,0 +1,21 @@
+X680-32 DEFINITIONS ::=
+BEGIN
+
+iso INTEGER ::= 1
+
+identified-organization INTEGER ::= 3
+
+dod INTEGER ::= 6
+
+internet INTEGER ::= 1
+
+testRelativeObjectIdentifier1 OBJECT IDENTIFIER ::= { iso identified-organization }
+
+testRelativeObjectIdentifier2 OBJECT IDENTIFIER ::= { testRelativeObjectIdentifier2 dod(6) internet(1) }
+
+TestRelativeObjectIdentifiers ::= SEQUENCE {
+    testObjectIdentifier1 OBJECT IDENTIFIER DEFAULT testRelativeObjectIdentifier1,
+    testObjectIdentifier2 OBJECT IDENTIFIER DEFAULT testRelativeObjectIdentifier2
+}
+
+END

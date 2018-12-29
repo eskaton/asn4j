@@ -27,8 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
-public class ValueOrObjectAssignmentNode<T extends Node, V extends Node>
-    	extends AssignmentNode {
+public class ValueOrObjectAssignmentNode<T extends Node, V extends Node> extends AssignmentNode {
 
     private T type;
 
@@ -36,6 +35,7 @@ public class ValueOrObjectAssignmentNode<T extends Node, V extends Node>
 
     public ValueOrObjectAssignmentNode(String reference, T type, V value) {
     	super(reference);
+
     	this.type = type;
     	this.value = value;
     }
@@ -50,8 +50,7 @@ public class ValueOrObjectAssignmentNode<T extends Node, V extends Node>
 
     @Override
     public String toString() {
-    	return "ValueOrObjectAssignment[" + getReference() + "(" + type
-    			+ ") = " + value + "]";
+    	return "ValueOrObjectAssignment[" + getReference() + "(" + type	+ ") = " + value + "]";
     }
 
 }

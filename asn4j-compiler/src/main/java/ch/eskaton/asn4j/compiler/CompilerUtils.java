@@ -29,9 +29,12 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
+import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.TaggingMode;
@@ -166,6 +169,19 @@ public class CompilerUtils {
 
     public static String getDefaultFieldName(String field) {
         return "$default_" + field;
+    }
+
+
+    public static <T extends Value> T resolveAmbiguousValue(Node value, Class<T> valueClass) {
+        if (value instanceof AmbiguousValue) {
+            return ((AmbiguousValue) value).getValue(valueClass);
+        }
+
+        if (valueClass.isAssignableFrom(value.getClass())) {
+            return (T) value;
+        }
+
+        return null;
     }
 
 }

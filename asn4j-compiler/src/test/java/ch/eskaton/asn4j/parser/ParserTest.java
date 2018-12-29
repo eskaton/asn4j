@@ -27,23 +27,6 @@
 
 package ch.eskaton.asn4j.parser;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.List;
-
-import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
-import org.junit.Test;
-
 import ch.eskaton.asn4j.parser.Parser.ActualParameterListParser;
 import ch.eskaton.asn4j.parser.Parser.ActualParameterParser;
 import ch.eskaton.asn4j.parser.Parser.AlternativeTypeListParser;
@@ -262,6 +245,7 @@ import ch.eskaton.asn4j.parser.Parser.VariableTypeValueFieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.VariableTypeValueSetFieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.VersionNumberParser;
 import ch.eskaton.asn4j.parser.Parser.WithSyntaxSpecParser;
+import ch.eskaton.asn4j.parser.ast.AbstractASN1FieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.AbstractSyntaxObjectClassReferenceNode;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.AtNotationNode;
@@ -293,21 +277,21 @@ import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.LiteralNode;
 import ch.eskaton.asn4j.parser.ast.LowerEndpointNode;
-import ch.eskaton.asn4j.parser.ast.ModuleNode.Encoding;
-import ch.eskaton.asn4j.parser.ast.ModuleNode.TagMode;
 import ch.eskaton.asn4j.parser.ast.ModuleBodyNode;
 import ch.eskaton.asn4j.parser.ast.ModuleIdentifierNode;
+import ch.eskaton.asn4j.parser.ast.ModuleNode.Encoding;
+import ch.eskaton.asn4j.parser.ast.ModuleNode.TagMode;
 import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.Node;
-import ch.eskaton.asn4j.parser.ast.OIDNode;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
-import ch.eskaton.asn4j.parser.ast.ObjectNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+import ch.eskaton.asn4j.parser.ast.OIDNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
+import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElementsNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReferenceNode;
@@ -333,6 +317,7 @@ import ch.eskaton.asn4j.parser.ast.SetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraintNode;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
+import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeIdentifierObjectClassReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
@@ -343,7 +328,6 @@ import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueSetFieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.AbstractASN1FieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ComponentConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ComponentRelationConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
@@ -369,11 +353,11 @@ import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.CharacterString;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
-import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.ClassNumber;
+import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
-import ch.eskaton.asn4j.parser.ast.types.DateType;
 import ch.eskaton.asn4j.parser.ast.types.DateTime;
+import ch.eskaton.asn4j.parser.ast.types.DateType;
 import ch.eskaton.asn4j.parser.ast.types.Duration;
 import ch.eskaton.asn4j.parser.ast.types.EmbeddedPDV;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
@@ -401,10 +385,10 @@ import ch.eskaton.asn4j.parser.ast.types.Real;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
-import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
-import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
+import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.T61String;
 import ch.eskaton.asn4j.parser.ast.types.TeletexString;
@@ -419,6 +403,7 @@ import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
@@ -447,6 +432,23 @@ import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.ValueFromObject;
+import org.junit.Test;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class ParserTest {
 
@@ -751,7 +753,7 @@ public class ParserTest {
 
     	assertNotNull(result);
     	assertEquals("Application-Context", result.getName());
-    	assertNotNull(result.getValue().getOidValues());
+    	assertNotNull(result.getValue().getComponents());
 
     	parser = new Parser(new ByteArrayInputStream(
     			"Application-Context oid-reference".getBytes())).new GlobalModuleReferenceParser();
@@ -765,8 +767,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testAssignedIdentifierParser() throws IOException,
-    		ParserException {
+    public void testAssignedIdentifierParser() throws IOException, ParserException {
     	AssignedIdentifierParser parser = new Parser(new ByteArrayInputStream(
     			"value-reference".getBytes())).new AssignedIdentifierParser();
 
@@ -781,7 +782,7 @@ public class ParserTest {
     	result = parser.parse();
 
     	assertNotNull(result);
-    	assertNotNull(result.getOidValues());
+    	assertNotNull(result.getComponents());
     }
 
     @Test
@@ -1000,17 +1001,26 @@ public class ParserTest {
     	ValueAssignmentParser parser = new Parser(new ByteArrayInputStream(
     			"value-reference INTEGER ::= 4711".getBytes())).new ValueAssignmentParser();
 
-    	ValueOrObjectAssignmentNode<?, ?> result = parser.parse();
+    	ValueOrObjectAssignmentNode result = parser.parse();
 
     	assertNotNull(result);
     	assertEquals("value-reference", result.getReference());
     	assertTrue(result.getType() instanceof IntegerType);
     	assertTrue(result.getValue() instanceof IntegerValue);
+
+        parser = new Parser(new ByteArrayInputStream(
+                "oid OBJECT IDENTIFIER ::= { oid-reference 23 }".getBytes())).new ValueAssignmentParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertEquals("oid", result.getReference());
+        assertTrue(result.getType() instanceof ObjectIdentifier);
+        testAmbiguousValue(result.getValue(), ObjectIdentifierValue.class);
     }
 
     @Test
-    public void testValueSetAssignmentParser() throws IOException,
-    		ParserException {
+    public void testValueSetAssignmentParser() throws IOException, ParserException {
     	ValueSetTypeAssignmentParser parser = new Parser(
     			new ByteArrayInputStream(
     					"Type-Reference INTEGER ::= { ALL EXCEPT (4..6) }"
@@ -1153,8 +1163,7 @@ public class ParserTest {
     	assertNotNull(result);
     	assertTrue(result instanceof ObjectClassFieldTypeNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"OBJECT IDENTIFIER".getBytes())).new BuiltinTypeParser();
+    	parser = new Parser(new ByteArrayInputStream("OBJECT IDENTIFIER".getBytes())).new BuiltinTypeParser();
 
     	result = parser.parse();
 
@@ -1175,8 +1184,7 @@ public class ParserTest {
     	assertNotNull(result);
     	assertTrue(result instanceof Real);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"RELATIVE-OID-IRI".getBytes())).new BuiltinTypeParser();
+    	parser = new Parser(new ByteArrayInputStream("RELATIVE-OID-IRI".getBytes())).new BuiltinTypeParser();
 
     	result = parser.parse();
 
@@ -1304,7 +1312,7 @@ public class ParserTest {
     			"value-reference".getBytes())).new ValueParser();
 
     	result = parser.parse();
-    	assertTrue(result instanceof SimpleDefinedValue);
+    	testAmbiguousValue(result, SimpleDefinedValue.class);
 
     	parser = new Parser(
     			new ByteArrayInputStream("INTEGER: 4711".getBytes())).new ValueParser();
@@ -1314,28 +1322,31 @@ public class ParserTest {
     }
 
     @Test
-    public void testBuiltinOrReferencedValueParser() throws IOException,
-    		ParserException {
+    public void testBuiltinOrReferencedValueParser() throws IOException, ParserException {
     	BuiltinOrReferencedValueParser parser = new Parser(
     			new ByteArrayInputStream("'1101'B".getBytes())).new BuiltinOrReferencedValueParser();
 
     	Value result = parser.parse();
+
     	assertTrue(result instanceof BinaryStringValue);
 
     	parser = new Parser(new ByteArrayInputStream("'5AF'H".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
+
     	assertTrue(result instanceof HexStringValue);
 
     	parser = new Parser(new ByteArrayInputStream("{}".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
+
     	assertTrue(result instanceof EmptyValue);
 
     	parser = new Parser(
     			new ByteArrayInputStream("CONTAINING 23".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
+
     	assertTrue(result instanceof ContainingStringValue);
 
     	parser = new Parser(new ByteArrayInputStream(
@@ -1343,22 +1354,25 @@ public class ParserTest {
 
     	result = parser.parse();
 
-    	assertTrue(result instanceof BitStringValue);
+        testAmbiguousValue(result, BitStringValue.class);
 
     	parser = new Parser(new ByteArrayInputStream("TRUE".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
+
     	assertTrue(result instanceof BooleanValue);
 
     	parser = new Parser(new ByteArrayInputStream("\"string\"".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
-    	assertTrue(result instanceof StringValue);
+
+        testAmbiguousValue(result, StringValue.class);
 
     	parser = new Parser(new ByteArrayInputStream(
     			"aString: \"string\"".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
+
     	assertTrue(result instanceof ChoiceValue);
 
     	// TODO: EmbeddedPDVValue
@@ -1366,19 +1380,21 @@ public class ParserTest {
     	parser = new Parser(new ByteArrayInputStream("enum-value".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
-    	assertTrue(result instanceof SimpleDefinedValue);
-    	assertEquals("enum-value", ((SimpleDefinedValue) result).getValue());
 
-    	// TODO: ExternalValue
+        testAmbiguousValue(result, SimpleDefinedValue.class, value -> assertEquals("enum-value", value.getValue()));
+
+        // TODO: ExternalValue
 
     	parser = new Parser(new ByteArrayInputStream("4711".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
+
     	assertTrue(result instanceof IntegerValue);
 
     	parser = new Parser(new ByteArrayInputStream("NULL".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
+
     	assertTrue(result instanceof NullValue);
 
     	parser = new Parser(new ByteArrayInputStream(
@@ -1387,8 +1403,7 @@ public class ParserTest {
 
     	result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectIdentifierValue);
+        testAmbiguousValue(result, ObjectIdentifierValue.class);
 
     	parser = new Parser(new ByteArrayInputStream("3.14e2".getBytes())).new BuiltinOrReferencedValueParser();
 
@@ -1402,8 +1417,7 @@ public class ParserTest {
 
     	result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RealValue);
+        testAmbiguousValue(result, RealValue.class);
 
     	parser = new Parser(new ByteArrayInputStream(
     			"MINUS-INFINITY".getBytes())).new BuiltinOrReferencedValueParser();
@@ -1418,32 +1432,27 @@ public class ParserTest {
 
     	result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionValue);
+        testAmbiguousValue(result, CollectionValue.class);
 
     	parser = new Parser(new ByteArrayInputStream("{ 1, 2 }".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
+        testAmbiguousValue(result, CollectionOfValue.class);
 
     	parser = new Parser(new ByteArrayInputStream(
     			"\"P0Y29M0DT0H0.00M\"".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof StringValue);
-    	assertTrue(((StringValue) result).isTString());
+    	testAmbiguousValue(result, StringValue.class, value -> assertTrue(value.isTString()));
 
     	parser = new Parser(new ByteArrayInputStream(
     			"value-reference".getBytes())).new BuiltinOrReferencedValueParser();
 
     	result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SimpleDefinedValue);
+        testAmbiguousValue(result, SimpleDefinedValue.class);
 
     	parser = new Parser(new ByteArrayInputStream(
     			"object-reference {Object}.&value-reference1".getBytes())).new BuiltinOrReferencedValueParser();
@@ -2943,8 +2952,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectIdentifierValueParser() throws IOException,
-    		ParserException {
+    public void testObjectIdentifierValueParser() throws IOException, ParserException {
     	ObjectIdentifierValueParser parser = new Parser(
     			new ByteArrayInputStream(
     					"{ oid-component1 Module.oid-component 4711 oid-comp (42)}"
@@ -2953,12 +2961,11 @@ public class ParserTest {
     	ObjectIdentifierValue result = parser.parse();
 
     	assertNotNull(result);
-    	assertEquals(4, result.getOidValues().size());
+    	assertEquals(4, result.getComponents().size());
     }
 
     @Test
-    public void testObjectIdComponentListParser() throws IOException,
-    		ParserException {
+    public void testObjectIdComponentListParser() throws IOException, ParserException {
     	ObjIdComponentsListParser parser = new Parser(new ByteArrayInputStream(
     			"oid-component1 Module.oid-component 4711 oid-comp (42)"
     					.getBytes())).new ObjIdComponentsListParser();
@@ -4746,8 +4753,8 @@ public class ParserTest {
     	result = parser.parse();
 
     	assertNotNull(result);
-    	assertTrue(result.getValue() instanceof StringValue);
-    	assertTrue(result.getType() instanceof VisibleString);
+        assertTrue(result.getType() instanceof VisibleString);
+        testAmbiguousValue(result.getValue(), StringValue.class);
     }
 
     /**
@@ -5679,7 +5686,7 @@ public class ParserTest {
     					"invertMatrix OPERATION ::= { &ArgumentType Matrix, &ResultType Matrix, &Errors {determinantIsZero}, &operationCode 7 }"
     							.getBytes())).new ValueAssignmentParser();
 
-    	ValueOrObjectAssignmentNode<?, ?> result = parser.parse();
+    	ValueOrObjectAssignmentNode result = parser.parse();
 
     	assertNotNull(result);
     	assertEquals("invertMatrix", result.getReference());
@@ -5998,8 +6005,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectClassFieldValueParser() throws IOException,
-    		ParserException {
+    public void testObjectClassFieldValueParser() throws IOException, ParserException {
     	ObjectClassFieldValueParser parser = new Parser(
     			new ByteArrayInputStream("INTEGER: 4711".getBytes())).new ObjectClassFieldValueParser();
 
@@ -6037,7 +6043,8 @@ public class ParserTest {
 
     	assertNotNull(result);
     	assertTrue(result.getType() instanceof VisibleString);
-    	assertTrue(result.getValue() instanceof DefinedValue);
+    	assertTrue(result.getValue() instanceof AmbiguousValue);
+    	testAmbiguousValue(result.getValue(), DefinedValue.class);
     }
 
     @Test
@@ -6055,8 +6062,7 @@ public class ParserTest {
 
     	result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof StringValue);
+    	testAmbiguousValue(result, StringValue.class);
     }
 
     /**
@@ -6903,6 +6909,17 @@ public class ParserTest {
     	assertTrue(((TypeReference) result).getParameters().get(0) instanceof ObjectClassFieldTypeNode);
     	assertTrue(((ObjectClassFieldTypeNode) ((TypeReference) result)
     			.getParameters().get(0)).hasConstraint());
+    }
+
+    private <T extends Value> void testAmbiguousValue(Object value, Class<T> valueClass) {
+        testAmbiguousValue(value, valueClass, v -> {});
+    }
+
+    private <T extends Value> void testAmbiguousValue(Object value, Class<T> valueClass, Consumer<T> valueTest) {
+        assertNotNull(value);
+        assertTrue(value instanceof AmbiguousValue);
+        assertNotNull(((AmbiguousValue) value).getValue(valueClass));
+        valueTest.accept(((AmbiguousValue) value).getValue(valueClass));
     }
 
 }

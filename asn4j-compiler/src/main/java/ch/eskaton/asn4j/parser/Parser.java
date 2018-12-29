@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -192,6 +192,7 @@ import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
@@ -229,6 +230,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -544,16 +546,22 @@ public class Parser {
     	}
     }
 
-    private void resetToMark() {
-    	int mark = marks.pop();
+    private int getMark() {
+        return marks.peek();
+    }
 
-    	while (tokens.size() > mark) {
-    		lexer.pushBack(tokens.pop());
-    	}
+    private void resetToMark(int mark) {
+        while (tokens.size() > mark) {
+            lexer.pushBack(tokens.pop());
+        }
+    }
+
+    private void resetToMark() {
+    	resetToMark(marks.pop());
     }
 
     private Token expect(TokenType type) throws ParserException {
-    	Token token = null;
+    	Token token;
 
     	try {
     		token = getToken();
@@ -591,6 +599,51 @@ public class Parser {
     	T parse() throws ParserException;
     }
 
+    protected class AmbiguousChoiceParser<T> {
+
+        private RuleParser<? extends T>[] choices;
+
+        AmbiguousChoiceParser(RuleParser<? extends T>... objects) {
+            this.choices = objects;
+        }
+
+        public Set<T> parse() throws ParserException {
+            RuleParser<? extends T> matching = null;
+            int longestMatch = 0;
+            Map<Integer, Set<T>> result = new HashMap<>();
+
+            for (RuleParser<? extends T> o : choices) {
+                mark();
+
+                try {
+                    T choice = o.parse();
+                    int matchLen = tokens.size();
+
+                    if (choice != null) {
+                        if (matchLen > longestMatch) {
+                            matching = o;
+                            longestMatch = matchLen;
+                        }
+
+                        result.computeIfAbsent(matchLen, (key) -> new HashSet<>()).add(choice);
+                    }
+
+                    resetToMark();
+                } catch (ParserException e) {
+                    resetToMark();
+                }
+            }
+
+            if (matching != null) {
+                matching.parse();
+                return result.get(longestMatch);
+            }
+
+            return Collections.emptySet();
+        }
+
+    }
+
     protected class ChoiceParser<T> implements RuleParser<T> {
 
     	private RuleParser<? extends T>[] choices;
@@ -606,7 +659,6 @@ public class Parser {
     	}
 
     	public T parse() throws ParserException {
-
     		if (choices != null) {
     			for (RuleParser<? extends T> o : choices) {
     				mark();
@@ -616,7 +668,7 @@ public class Parser {
 
     					if (choice != null) {
     						clearMark();
-    						return choice;
+                            return choice;
     					} else {
     						resetToMark();
     					}
@@ -773,7 +825,7 @@ public class Parser {
     	}
 
     	public List<Object> parse() throws ParserException {
-    		ArrayList<Object> result = new ArrayList<Object>();
+    		ArrayList<Object> result = new ArrayList<>();
     		mark();
 
     		for (int i = 0; i < sequence.length; i++) {
@@ -858,8 +910,7 @@ public class Parser {
     		list.add(obj);
 
     		List<T> moreObjs = new RepetitionParser<T>(new ValueExtractor<T>(1,
-    				new SequenceParser(new ChoiceParser<Token>(types), parser)))
-    				.parse();
+    				new SequenceParser(new ChoiceParser<Token>(types), parser))).parse();
 
     		if (moreObjs != null) {
     			list.addAll(moreObjs);
@@ -1452,8 +1503,7 @@ public class Parser {
 
     	public ObjectIdentifierValue parse() throws ParserException {
     		List<OIDComponentNode> rule = new ValueExtractor<List<OIDComponentNode>>(
-    				1, new SequenceParser(TokenType.LBrace,
-    						objIdComponentsListParser, TokenType.RBrace))
+    				1, new SequenceParser(TokenType.LBrace, objIdComponentsListParser, TokenType.RBrace))
     				.parse();
 
     		if (rule != null) {
@@ -1468,12 +1518,10 @@ public class Parser {
     // ObjIdComponentsList ::=
     // ObjIdComponents
     // | ObjIdComponents ObjIdComponentsList
-    protected class ObjIdComponentsListParser implements
-    		RuleParser<List<OIDComponentNode>> {
+    protected class ObjIdComponentsListParser implements RuleParser<List<OIDComponentNode>> {
 
     	public List<OIDComponentNode> parse() throws ParserException {
-    		return new RepetitionParser<OIDComponentNode>(objIdComponentsParser)
-    				.parse();
+    		return new RepetitionParser<>(objIdComponentsParser).parse();
     	}
 
     }
@@ -1483,13 +1531,11 @@ public class Parser {
     // | NumberForm
     // | NameAndNumberForm
     // | DefinedValue
-    protected class ObjIdComponentsParser implements
-    		RuleParser<OIDComponentNode> {
+    protected class ObjIdComponentsParser implements RuleParser<OIDComponentNode> {
 
     	@SuppressWarnings("unchecked")
     	public OIDComponentNode parse() throws ParserException {
-    		return new ChoiceParser<OIDComponentNode>(nameAndNumberFormParser,
-    				nameFormParser, numberFormParser).parse();
+    		return new ChoiceParser<>(nameAndNumberFormParser, nameFormParser, numberFormParser).parse();
     	}
 
     }
@@ -1591,12 +1637,10 @@ public class Parser {
     // AssignmentList ::=
     // Assignment
     // | AssignmentList Assignment
-    protected class AssignmentListParser implements
-    		RuleParser<List<AssignmentNode>> {
+    protected class AssignmentListParser implements	RuleParser<List<AssignmentNode>> {
 
     	public List<AssignmentNode> parse() throws ParserException {
-    		return new RepetitionParser<AssignmentNode>(assignmentParser)
-    				.parse();
+    		return new RepetitionParser<AssignmentNode>(assignmentParser).parse();
     	}
 
     }
@@ -1613,8 +1657,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public AssignmentNode parse() throws ParserException {
-    		return new ChoiceParser<AssignmentNode>(typeAssignmentParser,
-    				valueAssignmentParser, valueSetTypeAssignmentParser,
+    		return new ChoiceParser<>(typeAssignmentParser,	valueAssignmentParser, valueSetTypeAssignmentParser,
     				parameterizedAssignmentParser).parse();
     	}
 
@@ -2379,7 +2422,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ComponentType parse() throws ParserException {
-    		List<Object> rule = new ChoiceParser<List<Object>>(
+    		List<Object> rule = new ChoiceParser<>(
     				new SequenceParser(namedTypeParser, TokenType.OPTIONAL_KW),
     				new SequenceParser(namedTypeParser, TokenType.DEFAULT_KW,
     						valueParser), new SequenceParser(namedTypeParser),
@@ -2987,7 +3030,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ExceptionIdentificationNode parse() throws ParserException {
-    		List<Object> rule = new ChoiceParser<List<Object>>(
+    		List<Object> rule = new ChoiceParser<>(
     				new SequenceParser(signedNumberParser), new SequenceParser(
     						definedValueParser), new SequenceParser(typeParser,
     						TokenType.Colon, valueParser)).parse();
@@ -3036,8 +3079,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    		return new ChoiceParser<Value>(objectClassFieldValueParser,
-    				builtinOrReferencedValueParser).parse();
+    		return new ChoiceParser<>(objectClassFieldValueParser, builtinOrReferencedValueParser).parse();
     	}
 
     }
@@ -3072,7 +3114,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    		return new ChoiceParser<Value>(bitStringValueParser,
+    		Set<Value> rules = new AmbiguousChoiceParser<>(bitStringValueParser,
     				booleanValueParser, realValueParser,
     				characterStringValueParser, choiceValueParser,
     				valueFromObjectParser, definedValueParser,
@@ -3080,6 +3122,14 @@ public class Parser {
     				nullValueParser, objectIdentifierValueParser,
     				relativeIRIValueParser, relativeOIDValueParser,
     				collectionValueParser, emptyValueParser).parse();
+
+    		if (rules.size() == 1) {
+    		    return rules.iterator().next();
+            } else if (rules.size() > 1) {
+    		    return new AmbiguousValue(rules);
+            }
+
+            return null;
     	}
 
     }
@@ -3097,7 +3147,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    		Object rule = new ChoiceParser<Object>(new SingleTokenParser(
+    		Object rule = new ChoiceParser<>(new SingleTokenParser(
     				TokenType.BString),
     				new SingleTokenParser(TokenType.HString),
     				new SequenceParser(TokenType.LBrace, identifierListParser,
@@ -3202,15 +3252,12 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    		Object rule = new ChoiceParser<Object>(new SingleTokenParser(
-    				TokenType.CString), characterStringListParser,
+    		Object rule = new ChoiceParser<>(new SingleTokenParser(TokenType.CString), characterStringListParser,
     				collectionValueParser).parse();
 
     		if (rule != null) {
     			if (rule instanceof StringToken) {
-    				StringValue string = new StringValue(
-    						((Token) rule).getText(),
-    						((StringToken) rule).getFlags());
+    				StringValue string = new StringValue(((Token) rule).getText(), ((StringToken) rule).getFlags());
 
     				if (!string.isCString() && !string.isTString()) {
     					return null;
@@ -3219,8 +3266,7 @@ public class Parser {
     				return string;
     			} else {
     				if (rule instanceof CollectionOfValue) {
-    					if (((CollectionOfValue) rule).isTuple()
-    							|| ((CollectionOfValue) rule).isQuadruple()) {
+    					if (((CollectionOfValue) rule).isTuple() || ((CollectionOfValue) rule).isQuadruple()) {
     						return (Value) rule;
     					}
 
@@ -3457,8 +3503,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public RealValue parse() throws ParserException {
-    		return new ChoiceParser<RealValue>(numericRealValueParser,
-    				specialRealValueParser).parse();
+    		return new ChoiceParser<>(numericRealValueParser, specialRealValueParser).parse();
     	}
 
     }
@@ -3471,7 +3516,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public RealValue parse() throws ParserException {
-    		Object rule = new ChoiceParser<Object>(new SingleTokenParser(
+    		Object rule = new ChoiceParser<>(new SingleTokenParser(
     				TokenType.RealNumber), new SequenceParser(TokenType.Minus,
     				TokenType.RealNumber), collectionValueParser).parse();
 
@@ -3680,11 +3725,9 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    		List<Object> rule = new ChoiceParser<List<Object>>(
-    				new SequenceParser(TokenType.LBrace, namedValueListParser,
+    		List<Object> rule = new ChoiceParser<>(new SequenceParser(TokenType.LBrace, namedValueListParser,
     						TokenType.RBrace),
-    				new SequenceParser(TokenType.LBrace, valueListParser,
-    						TokenType.RBrace)).parse();
+    				new SequenceParser(TokenType.LBrace, valueListParser, TokenType.RBrace)).parse();
 
     		if (rule != null) {
     			List<Value> values = (List<Value>) rule.get(1);
@@ -3722,12 +3765,10 @@ public class Parser {
     protected class NamedValueParser implements RuleParser<NamedValue> {
 
     	public NamedValue parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.Identifier,
-    				valueParser).parse();
+    		List<Object> rule = new SequenceParser(TokenType.Identifier, valueParser).parse();
 
     		if (rule != null) {
-    			return new NamedValue(((Token) rule.get(0)).getText(),
-    					(Value) rule.get(1));
+    			return new NamedValue(((Token) rule.get(0)).getText(),(Value) rule.get(1));
     		}
 
     		return null;
@@ -3741,7 +3782,7 @@ public class Parser {
     protected class ValueListParser implements RuleParser<List<Value>> {
 
     	public List<Value> parse() throws ParserException {
-    		return new CommaSeparatedRuleParser<Value>(valueParser).parse();
+    		return new CommaSeparatedRuleParser<>(valueParser).parse();
     	}
 
     }
@@ -3752,12 +3793,10 @@ public class Parser {
     // ComponentValueList ::=
     // NamedValue
     // | ComponentValueList "," NamedValue
-    protected class NamedValueListParser implements
-    		RuleParser<List<NamedValue>> {
+    protected class NamedValueListParser implements	RuleParser<List<NamedValue>> {
 
     	public List<NamedValue> parse() throws ParserException {
-    		return new CommaSeparatedRuleParser<NamedValue>(namedValueParser)
-    				.parse();
+    		return new CommaSeparatedRuleParser<>(namedValueParser).parse();
     	}
 
     }
@@ -3988,15 +4027,12 @@ public class Parser {
     	public ValueSetTypeOrObjectSetAssignmentNode parse()
     			throws ParserException {
     		List<Object> rule = new SequenceParser(TokenType.TypeReference,
-    				new ChoiceParser<Node>(typeParser,
-    						usefulObjectClassReferenceParser),
-    				TokenType.Assign, new ChoiceParser<Node>(valueSetParser,
-    						objectSetParser)).parse();
+    				new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
+    				TokenType.Assign, new ChoiceParser<Node>(valueSetParser, objectSetParser)).parse();
 
     		if (rule != null) {
     			return new ValueSetTypeOrObjectSetAssignmentNode(
-    					((Token) rule.get(0)).getText(), (Node) rule.get(1),
-    					(SetSpecsNode) rule.get(3));
+    					((Token) rule.get(0)).getText(), (Node) rule.get(1), (SetSpecsNode) rule.get(3));
     		}
 
     		return null;
@@ -4274,7 +4310,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Constraint parse() throws ParserException {
-    		return new ChoiceParser<Constraint>(containedSubtypeParser,
+    		return new ChoiceParser<>(containedSubtypeParser,
     				valueRangeParser, permittedAlphabetParser,
     				sizeConstraintParser, typeConstraintParser,
     				innerTypeConstraintsParser, patternConstraintParser,
@@ -4393,8 +4429,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    		Object rule = new ChoiceParser<Object>(valueParser,
-    				new SingleTokenParser(TokenType.MIN_KW)).parse();
+    		Object rule = new ChoiceParser<>(valueParser, new SingleTokenParser(TokenType.MIN_KW)).parse();
 
     		if (rule != null) {
     			if (rule instanceof Token) {
@@ -4413,8 +4448,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    		Object rule = new ChoiceParser<Object>(valueParser,
-    				new SingleTokenParser(TokenType.MAX_KW)).parse();
+    		Object rule = new ChoiceParser<>(valueParser, new SingleTokenParser(TokenType.MAX_KW)).parse();
 
     		if (rule != null) {
     			if (rule instanceof Token) {
@@ -4658,11 +4692,16 @@ public class Parser {
     		RuleParser<PatternConstraint> {
 
     	public PatternConstraint parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.PATTERN_KW,
-    				valueParser).parse();
+    		List<Object> rule = new SequenceParser(TokenType.PATTERN_KW, valueParser).parse();
 
     		if (rule != null) {
-    			return new PatternConstraint((Value) rule.get(1));
+    		    Value value = (Value) rule.get(1);
+
+                if (value instanceof AmbiguousValue && ((AmbiguousValue) value).getValue(DefinedValue.class) != null) {
+                    value = ((AmbiguousValue) value).getValue(DefinedValue.class);
+                }
+
+    			return new PatternConstraint(value);
     		}
 
     		return null;
@@ -5165,10 +5204,9 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public OptionalitySpecNode parse() throws ParserException {
-    		Object rule = new ChoiceParser<Object>(new SingleTokenParser(
+    		Object rule = new ChoiceParser<>(new SingleTokenParser(
     				TokenType.OPTIONAL_KW), new SequenceParser(
-    				TokenType.DEFAULT_KW, new ChoiceParser<Node>(valueParser,
-    						objectParser))).parse();
+    				TokenType.DEFAULT_KW, new ChoiceParser<>(valueParser, objectParser))).parse();
 
     		if (rule != null) {
     			if (rule instanceof List) {
@@ -5619,8 +5657,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Node parse() throws ParserException {
-    		return new ChoiceParser<Node>(typeParser, valueParser,
-    				valueSetParser, objectParser, objectSetParser).parse();
+    		return new ChoiceParser<>(typeParser, valueParser, valueSetParser, objectParser, objectSetParser).parse();
     	}
 
     }
@@ -5711,8 +5748,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    		return new ChoiceParser<Value>(openTypeFieldValParser,
-    				fixedTypeFieldValParser).parse();
+    		return new ChoiceParser<>(openTypeFieldValParser, fixedTypeFieldValParser).parse();
     	}
 
     }
@@ -5722,12 +5758,10 @@ public class Parser {
     		RuleParser<OpenTypeFieldValue> {
 
     	public OpenTypeFieldValue parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(typeParser, TokenType.Colon,
-    				valueParser).parse();
+    		List<Object> rule = new SequenceParser(typeParser, TokenType.Colon,	valueParser).parse();
 
     		if (rule != null) {
-    			return new OpenTypeFieldValue((Type) rule.get(0),
-    					(Value) rule.get(2));
+    			return new OpenTypeFieldValue((Type) rule.get(0), (Value) rule.get(2));
     		}
 
     		return null;
@@ -5877,16 +5911,14 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public UserDefinedConstraintParamNode parse() throws ParserException {
-    		Object rule = new ChoiceParser<Object>(new SequenceParser(
-    				governorParser, TokenType.Colon, new ChoiceParser<Node>(
-    						valueParser, objectParser)), typeParser,
+    		Object rule = new ChoiceParser<>(new SequenceParser(
+    				governorParser, TokenType.Colon, new ChoiceParser<>(valueParser, objectParser)), typeParser,
     				usefulObjectClassReferenceParser).parse();
 
     		if (rule != null) {
     			if (rule instanceof List) {
     				List<Object> ruleList = (List<Object>) rule;
-    				return new UserDefinedConstraintParamNode(
-    						(Governor) ruleList.get(0), (Node) ruleList.get(2));
+    				return new UserDefinedConstraintParamNode((Governor) ruleList.get(0), (Node) ruleList.get(2));
     			} else {
     				return new UserDefinedConstraintParamNode((Node) rule);
     			}
@@ -6022,12 +6054,11 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ContentsConstraint parse() throws ParserException {
-    		List<Object> rule = new ChoiceParser<List<Object>>(
+    		List<Object> rule = new ChoiceParser<>(
     				new SequenceParser(TokenType.CONTAINING_KW, typeParser,
     						TokenType.ENCODED_KW, TokenType.BY_KW, valueParser),
     				new SequenceParser(TokenType.CONTAINING_KW, typeParser),
-    				new SequenceParser(TokenType.ENCODED_KW, TokenType.BY_KW,
-    						valueParser)).parse();
+    				new SequenceParser(TokenType.ENCODED_KW, TokenType.BY_KW, valueParser)).parse();
 
     		if (rule != null) {
     			switch (rule.size()) {
@@ -6038,8 +6069,7 @@ public class Parser {
     				return new ContentsConstraint((Value) rule.get(2));
 
     			case 5:
-    				return new ContentsConstraint((Type) rule.get(1),
-    						(Value) rule.get(4));
+    				return new ContentsConstraint((Type) rule.get(1), (Value) rule.get(4));
     			}
     		}
 
@@ -6123,42 +6153,40 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public ParameterizedValueOrObjectAssignmentNode<?, ?> parse()
     			throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.Identifier,
-    				parameterListParser, new ChoiceParser<Node>(typeParser,
-    						usefulObjectClassReferenceParser),
-    				TokenType.Assign, new ChoiceParser<Node>(
-    						informationFromObjectsParser, valueParser,
-    						objectDefnParser)).parse();
+    		List<Object> rule = new SequenceParser(TokenType.Identifier, parameterListParser,
+                    new ChoiceParser<>(typeParser,usefulObjectClassReferenceParser), TokenType.Assign,
+                    new ChoiceParser<>(informationFromObjectsParser, valueParser, objectDefnParser)).parse();
 
     		if (rule != null) {
     			Node typeNode = (Node) rule.get(2);
     			Node valueNode = (Node) rule.get(4);
 
-    			if (valueNode instanceof ObjectDefnNode
-    					|| valueNode instanceof ObjectFromObjectNode) {
-    				if (typeNode instanceof TypeReference
-    						&& !(typeNode instanceof UsefulType)) {
+    			if (valueNode instanceof ObjectDefnNode	|| valueNode instanceof ObjectFromObjectNode) {
+    				if (typeNode instanceof TypeReference && !(typeNode instanceof UsefulType)) {
     					return new ParameterizedObjectAssignmentNode(
     							((Token) rule.get(0)).getText(),
     							(List<ParameterNode>) rule.get(1),
-    							new ObjectClassReferenceNode(
-    									((TypeReference) typeNode).getType()),
-    							(ObjectNode) valueNode);
+    							new ObjectClassReferenceNode(((TypeReference) typeNode).getType()),
+                                (ObjectNode) valueNode);
     				} else if (typeNode instanceof ExternalTypeReference) {
     					return new ParameterizedObjectAssignmentNode(
     							((Token) rule.get(0)).getText(),
     							(List<ParameterNode>) rule.get(1),
     							new ExternalObjectClassReferenceNode(
-    									((ExternalTypeReference) typeNode)
-    											.getModule(),
-    									((ExternalTypeReference) typeNode)
-    											.getType()),
+    									((ExternalTypeReference) typeNode).getModule(),
+    									((ExternalTypeReference) typeNode).getType()),
     							(ObjectNode) valueNode);
     				}
     				// TODO: error
     			} else if (typeNode instanceof ObjectClassReferenceNode) {
-    				if (valueNode instanceof DefinedValue) {
-    					valueNode = ((DefinedValue) valueNode).toObjectValue();
+    			    Node definedValue = valueNode;
+
+    			    if (valueNode instanceof AmbiguousValue) {
+    			        definedValue = ((AmbiguousValue) valueNode).getValue(DefinedValue.class);
+                    }
+
+    				if (definedValue instanceof DefinedValue) {
+                        valueNode = ((DefinedValue) definedValue).toObjectValue();
     				} else if (!(valueNode instanceof ObjectNode)) {
     					return null;
     				}
@@ -6172,12 +6200,26 @@ public class Parser {
     					&& !(typeNode instanceof UsefulType) || typeNode instanceof ExternalTypeReference)
     					&& valueNode instanceof DefinedValue
     					|| valueNode instanceof TypeFromObjects
-    					|| valueNode instanceof ValueFromObject) {
-    				return new ParameterizedValueOrObjectAssignmentNode<Node, Node>(
+    					|| valueNode instanceof ValueFromObject
+                        || valueNode instanceof AmbiguousValue
+                        && ((AmbiguousValue) valueNode).getValue(DefinedValue.class) != null) {
+    			    if (valueNode instanceof AmbiguousValue) {
+    			        valueNode = ((AmbiguousValue) valueNode).getValue(DefinedValue.class);
+                    }
+
+    				return new ParameterizedValueOrObjectAssignmentNode<>(
     						((Token) rule.get(0)).getText(),
     						(List<ParameterNode>) rule.get(1), typeNode,
     						valueNode);
     			} else if (valueNode instanceof Value) {
+    			    if (valueNode instanceof AmbiguousValue) {
+    			        Value collectionValue = ((AmbiguousValue) valueNode).getValue(CollectionValue.class);
+
+    			        if (collectionValue != null) {
+    			            valueNode = collectionValue;
+                        }
+                     }
+
     				return new ParameterizedValueAssignmentNode(
     						((Token) rule.get(0)).getText(),
     						(List<ParameterNode>) rule.get(1), (Type) typeNode,
@@ -6493,9 +6535,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Node parse() throws ParserException {
-    		return new ChoiceParser<Node>(typeParser, objectParser,
-    				objectSetParser, valueParser, valueSetParser,
-    				definedObjectClassParser).parse();
+    		return new ChoiceParser<>(typeParser, objectParser,	objectSetParser, valueParser, valueSetParser,
+                    definedObjectClassParser).parse();
     	}
 
     }

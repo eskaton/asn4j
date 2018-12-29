@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import java.util.Objects;
+
 public class NamedValue implements Value {
 
     private String name;
@@ -34,16 +36,42 @@ public class NamedValue implements Value {
     private Value value;
 
     public NamedValue(String name, Value value) {
-    	this.name = name;
-    	this.value = value;
+        this.name = name;
+        this.value = value;
     }
 
     public String getName() {
-    	return name;
+        return name;
     }
 
     public Value getValue() {
-    	return value;
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return "NamedValue[name=" + name + ", value=" + value + ']';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        NamedValue that = (NamedValue) o;
+
+        return Objects.equals(name, that.name) &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value);
     }
 
 }
