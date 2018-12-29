@@ -60,6 +60,11 @@ public class ObjectIdentifierVerifier {
 
             i++;
         }
+
+        if (i < 2) {
+            throw new ValidationException(
+                    "An object identifier must at least contain two components, but contains only: " + components);
+        }
     }
 
     public static void throwValidationException(int pos, int component) {

@@ -11,6 +11,7 @@ public class ASN1ObjectIdentifierTest {
 
     @Test
     public void testInvalidObjectIdentifiers() {
+        testInvalidIdentifier(() -> ASN1ObjectIdentifier.from(0));
         testInvalidIdentifier(() -> ASN1ObjectIdentifier.from(3));
         testInvalidIdentifier(() -> ASN1ObjectIdentifier.from(-1));
         testInvalidIdentifier(() -> ASN1ObjectIdentifier.from(0, 40));
@@ -20,9 +21,9 @@ public class ASN1ObjectIdentifierTest {
 
     @Test
     public void testValidObjectIdentifiers() {
-        ASN1ObjectIdentifier.from(0);
-        ASN1ObjectIdentifier.from(1);
-        ASN1ObjectIdentifier.from(2);
+        ASN1ObjectIdentifier.from(0, 1);
+        ASN1ObjectIdentifier.from(1, 1);
+        ASN1ObjectIdentifier.from(2, 1);
         ASN1ObjectIdentifier.from(0, 39);
         ASN1ObjectIdentifier.from(1, 39);
         ASN1ObjectIdentifier.from(2, 40);
@@ -33,7 +34,6 @@ public class ASN1ObjectIdentifierTest {
             supplier.get();
             fail("Expected a ValidationException");
         } catch (ValidationException e) {
-
         }
     }
 
