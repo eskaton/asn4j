@@ -27,35 +27,19 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier.verifyComponents;
 
 @ASN1Tag(clazz = Clazz.Universal, tag = 6, mode = ASN1Tag.Mode.Explicit, constructed = false)
-public class ASN1ObjectIdentifier implements ASN1Type {
-
-    private List<Integer> components;
-
-    public void setValue(int... components) throws ValidationException {
-        setValue(new ArrayList<>(IntStream.of(components).boxed().collect(Collectors.toList())));
-    }
-
-    public void setValue(List<Integer> components) throws ValidationException {
-        this.components = verifiedComponents(new ArrayList<>(components));
-    }
-
-    public List<Integer> getValue() {
-        return components;
-    }
+public class ASN1ObjectIdentifier extends AbstractASN1OID {
 
     public static ASN1ObjectIdentifier from(int... components) throws ValidationException {
         ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier();
@@ -73,7 +57,7 @@ public class ASN1ObjectIdentifier implements ASN1Type {
         return oid;
     }
 
-    private ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) throws ValidationException {
+    protected ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) throws ValidationException {
         verifyComponents(components);
 
         return components;

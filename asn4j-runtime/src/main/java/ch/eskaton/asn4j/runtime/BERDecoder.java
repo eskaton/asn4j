@@ -33,9 +33,10 @@ import ch.eskaton.asn4j.runtime.decoders.BooleanDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ChoiceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.EnumeratedTypeDecoder;
 import ch.eskaton.asn4j.runtime.decoders.IntegerDecoder;
-import ch.eskaton.asn4j.runtime.decoders.OIDDecoder;
+import ch.eskaton.asn4j.runtime.decoders.ObjectIdentifierDecoder;
 import ch.eskaton.asn4j.runtime.decoders.OctetStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.RealDecoder;
+import ch.eskaton.asn4j.runtime.decoders.RelativeOIDDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SequenceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SequenceOfDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SetDecoder;
@@ -54,6 +55,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
@@ -96,7 +98,9 @@ public class BERDecoder implements Decoder {
 
     private RealDecoder realDecoder = new RealDecoder();
 
-    private OIDDecoder oidDecoder = new OIDDecoder();
+    private ObjectIdentifierDecoder oidDecoder = new ObjectIdentifierDecoder();
+
+    private RelativeOIDDecoder relativeOidDecoder = new RelativeOIDDecoder();
 
     private OctetStringDecoder octetStringDecoder = new OctetStringDecoder();
 
@@ -214,6 +218,8 @@ public class BERDecoder implements Decoder {
                     visibleStringDecoder.decode(states, state, (ASN1VisibleString) obj);
                 } else if (obj instanceof ASN1ObjectIdentifier) {
                     oidDecoder.decode(states, state, (ASN1ObjectIdentifier) obj);
+                } else if (obj instanceof ASN1RelativeOID) {
+                    relativeOidDecoder.decode(states, state, (ASN1RelativeOID) obj);
                 } else {
                     throw new DecodingException("Decoding of object " + obj.getClass().getName() + " not supported");
                 }

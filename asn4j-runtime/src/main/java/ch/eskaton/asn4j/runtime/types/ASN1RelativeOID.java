@@ -41,21 +41,7 @@ import java.util.stream.IntStream;
 import static ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier.verifyComponents;
 
 @ASN1Tag(clazz = Clazz.Universal, tag = 13, mode = ASN1Tag.Mode.Explicit, constructed = false)
-public class ASN1RelativeOID implements ASN1Type {
-
-    private List<Integer> components;
-
-    public void setValue(int... components) throws ValidationException {
-        setValue(new ArrayList<>(IntStream.of(components).boxed().collect(Collectors.toList())));
-    }
-
-    public void setValue(List<Integer> components) throws ValidationException {
-        this.components = verifiedComponents(new ArrayList<>(components));
-    }
-
-    public List<Integer> getValue() {
-        return components;
-    }
+public class ASN1RelativeOID extends AbstractASN1OID {
 
     public static ASN1RelativeOID from(int... components) throws ValidationException {
         ASN1RelativeOID oid = new ASN1RelativeOID();
@@ -73,9 +59,7 @@ public class ASN1RelativeOID implements ASN1Type {
         return oid;
     }
 
-    private ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) throws ValidationException {
-        verifyComponents(components);
-
+    protected ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) throws ValidationException {
         return components;
     }
 
