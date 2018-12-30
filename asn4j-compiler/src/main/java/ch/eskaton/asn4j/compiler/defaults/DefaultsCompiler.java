@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
+import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
@@ -53,6 +54,7 @@ public class DefaultsCompiler {
                     put(OctetString.class, new OctetStringDefaultCompiler());
                     put(ObjectIdentifier.class, new ObjectIdentifierDefaultCompiler());
                     put(RelativeOID.class, new RelativeOIDDefaultCompiler());
+                    put(IRI.class, new IRIDefaultCompiler());
                 }
             };
 

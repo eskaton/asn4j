@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
@@ -60,6 +61,8 @@ public class TypeCompiler implements NamedCompiler<Type> {
         } else if (node instanceof RelativeOID) {
             ctx.<RelativeOID, RelativeOIDCompiler>getCompiler(RelativeOID.class)
                     .compile(ctx, name, (RelativeOID) node);
+        } else if (node instanceof IRI) {
+            ctx.<IRI, IRICompiler>getCompiler(IRI.class).compile(ctx, name, (IRI) node);
         } else if (node instanceof TypeReference) {
             if (node instanceof UsefulType) {
                 ctx.<UsefulType, UsefulTypeCompiler>getCompiler(UsefulType.class).compile(ctx, name, (UsefulType) node);

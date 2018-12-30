@@ -45,6 +45,7 @@ import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
+import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
@@ -64,6 +65,7 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
+import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
@@ -77,6 +79,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
+import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
@@ -128,6 +131,7 @@ public class CompilerContext {
             put(SelectionType.class, new SelectionTypeCompiler());
             put(ObjectIdentifier.class, new ObjectIdentifierCompiler());
             put(RelativeOID.class, new RelativeOIDCompiler());
+            put(IRI.class, new IRICompiler());
         }
     };
 
@@ -156,6 +160,7 @@ public class CompilerContext {
             put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName());
             put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName());
             put(RelativeOID.class.getSimpleName(), ASN1RelativeOID.class.getSimpleName());
+            put(IRI.class.getSimpleName(), ASN1IRI.class.getSimpleName());
             put(OctetString.class.getSimpleName(), ASN1OctetString.class.getSimpleName());
             put(SequenceType.class.getSimpleName(), ASN1Sequence.class.getSimpleName());
             put(SequenceOfType.class.getSimpleName(), ASN1SequenceOf.class.getSimpleName());
@@ -336,7 +341,8 @@ public class CompilerContext {
                 || type instanceof SetOfType
                 || type instanceof Choice
                 || type instanceof ObjectIdentifier
-                || type instanceof RelativeOID) {
+                || type instanceof RelativeOID
+                || type instanceof IRI) {
             typeName = defineType(type, name);
         } else if (type instanceof SelectionType) {
             SelectionType selectionType = (SelectionType) type;
@@ -446,6 +452,29 @@ public class CompilerContext {
         }
 
         throw new CompilerException("Failed to resolve an object identifier value");
+    }
+
+    public IRIValue resolveIRIValue(DefinedValue ref) throws CompilerException {
+        return resolveIRIValue(resolveDefinedValue(ref));
+    }
+
+    public IRIValue resolveIRIValue(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
+        Node type = valueAssignment.getType();
+        Node value = valueAssignment.getValue();
+
+        type = resolveTypeReference(type);
+
+        if (type instanceof IRI) {
+            value = CompilerUtils.resolveAmbiguousValue(value, IRIValue.class);
+
+            if (!(value instanceof IRIValue)) {
+                throw new CompilerException("IRI value expected");
+            }
+
+            return ((IRIValue) value);
+        }
+
+        throw new CompilerException("Failed to resolve an IRI value");
     }
 
     public ObjectIdentifierValue resolveObjectIdentifierValue(DefinedValue ref) throws CompilerException {
