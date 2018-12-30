@@ -3667,12 +3667,10 @@ public class Parser {
     // RelativeOIDComponentsList ::=
     // RelativeOIDComponents
     // | RelativeOIDComponents RelativeOIDComponentsList
-    protected class RelativeOIDComponentsListParser implements
-    		RuleParser<List<OIDComponentNode>> {
+    protected class RelativeOIDComponentsListParser implements RuleParser<List<OIDComponentNode>> {
 
     	public List<OIDComponentNode> parse() throws ParserException {
-    		return new RepetitionParser<OIDComponentNode>(
-    				relativeOIDComponentsParser).parse();
+    		return new RepetitionParser<>(relativeOIDComponentsParser).parse();
     	}
 
     }
@@ -3681,13 +3679,11 @@ public class Parser {
     // NumberForm
     // | NameAndNumberForm
     // | DefinedValue
-    protected class RelativeOIDComponentsParser implements
-    		RuleParser<OIDComponentNode> {
+    protected class RelativeOIDComponentsParser implements RuleParser<OIDComponentNode> {
 
     	@SuppressWarnings("unchecked")
     	public OIDComponentNode parse() throws ParserException {
-    		Node rule = new ChoiceParser<Node>(nameAndNumberFormParser,
-    				numberFormParser, definedValueParser).parse();
+    		Node rule = new ChoiceParser<>(nameAndNumberFormParser,	numberFormParser, definedValueParser).parse();
 
     		if (rule != null) {
     			if (rule instanceof OIDComponentNode) {

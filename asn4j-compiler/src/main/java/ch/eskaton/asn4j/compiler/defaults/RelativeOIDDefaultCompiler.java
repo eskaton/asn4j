@@ -25,33 +25,47 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.defaults;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
-import ch.eskaton.commons.utils.StringUtils;
+import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
-public class ObjectIdentifierValue extends AbstractOIDValue {
+public class RelativeOIDDefaultCompiler extends AbstractOIDDefaultCompiler<RelativeOIDValue> {
 
-    private DefinedValue reference;
-
-    public ObjectIdentifierValue(List<OIDComponentNode> components) {
-        super(components);
-    }
-
-    public ObjectIdentifierValue(DefinedValue reference) {
-        this.reference = reference;
-    }
-
-
-    public DefinedValue getReference() {
-        return reference;
+    @Override
+    public BiFunction<CompilerContext, DefinedValue, RelativeOIDValue> getDefinedValueResolver() {
+        return CompilerContext::resolveRelativeOIDValue;
     }
 
     @Override
-    public String toString() {
-        return StringUtils.concat("ObjectIdentifierValue[reference=", reference, ", components=", components, "]");
+    public BiFunction<CompilerContext, String, RelativeOIDValue> getReferenceResolver() {
+        return CompilerContext::resolveRelativeOIDValue;
+    }
+
+    @Override
+    public void resolveComponents(CompilerContext ctx, String field, Value value, List<Integer> ids) {
+        resolveComponents(ctx, field, resolveValue(ctx, value, RelativeOIDValue.class), ids);
+    }
+
+    public void resolveComponents(CompilerContext ctx, String field, RelativeOIDValue value, List<Integer> ids) {
+        for (OIDComponentNode component : value.getComponents()) {
+            try {
+                try {
+                    ids.add(getComponentId(ctx, component));
+                } catch (CompilerException e) {
+                    resolveOIDReference(ctx, field, ids, component);
+                }
+            } catch (CompilerException e) {
+                throw new CompilerException("Failed to resolve component of object identifier value " + field, e);
+            }
+        }
     }
 
 }
