@@ -27,37 +27,15 @@
 
 package ch.eskaton.asn4j.runtime.decoders;
 
-import ch.eskaton.asn4j.runtime.DecoderState;
-import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
-import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
-import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class RelativeOIDDecoder {
+public class RelativeOIDDecoder extends AbstractOIDDecoder<ASN1RelativeOID> {
 
-    public void decode(DecoderStates states, DecoderState state, ASN1RelativeOID obj) {
-        List<Integer> components = new ArrayList<>();
-        int component = 0;
-
-        for (int i = 0; i < state.length; i++) {
-            component <<= 7;
-            component |= states.buf[state.pos + i] & 0x7F;
-
-            if ((states.buf[state.pos + i] & 0x80) == 0) {
-                components.add(component);
-                component = 0;
-            }
-        }
-
-        try {
-            obj.setValue(components);
-        } catch (ValidationException e) {
-            throw new DecodingException(e);
-        }
+    @Override
+    protected void decodeComponent(List<Integer> components, int component) {
+        components.add(component);
     }
 
 }

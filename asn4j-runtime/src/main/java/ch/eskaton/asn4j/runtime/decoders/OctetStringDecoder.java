@@ -29,15 +29,16 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.Utils;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 
-public class OctetStringDecoder {
+public class OctetStringDecoder implements TypeDecoder<ASN1OctetString> {
 
+    @Override
     public void decode(DecoderStates states, DecoderState state, ASN1OctetString obj)
             throws ConstraintViolatedException {
-        obj.setValue(Utils.getValue(states, state));
+        obj.setValue(RuntimeUtils.getValue(states, state));
     }
 
 }

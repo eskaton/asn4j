@@ -25,11 +25,12 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime;
+package ch.eskaton.asn4j.runtime.utils;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class TLVUtils {
 
       public static byte[] getTagLength(ASN1Type obj, int contentLen)
     		throws EncodingException {
-        List<ASN1Tag> tags = Utils.getTags(obj.getClass());
+        List<ASN1Tag> tags = RuntimeUtils.getTags(obj.getClass());
 
         return getTagLength(tags, contentLen);
     }
@@ -53,7 +54,7 @@ public class TLVUtils {
             ArrayList<ASN1Tag> tags = new ArrayList<>();
 
             tags.add(tag);
-            tags.addAll(Utils.getTags(obj.getClass()));
+            tags.addAll(RuntimeUtils.getTags(obj.getClass()));
 
             return getTagLength(tags, contentLength);
         } else {

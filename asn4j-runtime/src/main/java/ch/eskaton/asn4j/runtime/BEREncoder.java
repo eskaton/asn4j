@@ -61,6 +61,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
+import ch.eskaton.asn4j.runtime.utils.TLVUtils;
 import ch.eskaton.commons.utils.HexDump;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,8 +73,7 @@ import java.util.Map;
 
 public class BEREncoder implements Encoder {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(BEREncoder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BEREncoder.class);
 
     @SuppressWarnings("serial")
     private Map<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>> encoders =
@@ -119,8 +119,7 @@ public class BEREncoder implements Encoder {
     }
 
     @SuppressWarnings("rawtypes")
-    public byte[] encode(ASN1Type obj, ASN1Tag tag)
-            throws EncodingException, ConstraintViolatedException {
+    public byte[] encode(ASN1Type obj, ASN1Tag tag) throws EncodingException, ConstraintViolatedException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf;
 
