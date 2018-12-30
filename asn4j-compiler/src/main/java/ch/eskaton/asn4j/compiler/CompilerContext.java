@@ -51,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
+import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
@@ -66,6 +67,7 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TagId;
@@ -80,6 +82,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
@@ -124,6 +127,7 @@ public class CompilerContext {
             put(VisibleString.class, new VisibleStringCompiler());
             put(SelectionType.class, new SelectionTypeCompiler());
             put(ObjectIdentifier.class, new ObjectIdentifierCompiler());
+            put(RelativeOID.class, new RelativeOIDCompiler());
         }
     };
 
@@ -151,6 +155,7 @@ public class CompilerContext {
             put(IntegerType.class.getSimpleName(), ASN1Integer.class.getSimpleName());
             put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName());
             put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName());
+            put(RelativeOID.class.getSimpleName(), ASN1RelativeOID.class.getSimpleName());
             put(OctetString.class.getSimpleName(), ASN1OctetString.class.getSimpleName());
             put(SequenceType.class.getSimpleName(), ASN1Sequence.class.getSimpleName());
             put(SequenceOfType.class.getSimpleName(), ASN1SequenceOf.class.getSimpleName());
@@ -330,7 +335,8 @@ public class CompilerContext {
                 || type instanceof SetType
                 || type instanceof SetOfType
                 || type instanceof Choice
-                || type instanceof ObjectIdentifier) {
+                || type instanceof ObjectIdentifier
+                || type instanceof RelativeOID) {
             typeName = defineType(type, name);
         } else if (type instanceof SelectionType) {
             SelectionType selectionType = (SelectionType) type;
@@ -348,7 +354,6 @@ public class CompilerContext {
 
         return typeName;
     }
-
 
     private String defineType(Type type, String name) {
         return defineType(type, name, true);
@@ -414,6 +419,33 @@ public class CompilerContext {
 
     public boolean isBuiltin(String name) {
         return builtinTypes.contains(name);
+    }
+
+    public RelativeOIDValue resolveRelativeOIDValue(DefinedValue ref) {
+        return resolveRelativeOIDValueValue(resolveDefinedValue(ref));
+    }
+
+    public RelativeOIDValue resolveRelativeOIDValue(String ref) {
+        return resolveRelativeOIDValueValue(resolveReference(ref));
+    }
+
+    private RelativeOIDValue resolveRelativeOIDValueValue(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
+        Node type = valueAssignment.getType();
+        Node value = valueAssignment.getValue();
+
+        type = resolveTypeReference(type);
+
+        if (type instanceof RelativeOID) {
+            value = CompilerUtils.resolveAmbiguousValue(value, RelativeOIDValue.class);
+
+            if (!(value instanceof RelativeOIDValue)) {
+                throw new CompilerException("Relative object identifier expected");
+            }
+
+            return ((RelativeOIDValue) value);
+        }
+
+        throw new CompilerException("Failed to resolve an object identifier value");
     }
 
     public ObjectIdentifierValue resolveObjectIdentifierValue(DefinedValue ref) throws CompilerException {
