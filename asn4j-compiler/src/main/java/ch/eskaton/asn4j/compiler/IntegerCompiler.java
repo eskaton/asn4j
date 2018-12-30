@@ -47,8 +47,7 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
     @Override
-    public void compile(CompilerContext ctx, String name, IntegerType node)
-    		throws CompilerException {
+    public void compile(CompilerContext ctx, String name, IntegerType node)	throws CompilerException {
     	JavaClass javaClass = ctx.createClass(name, node, false);
     	Collection<NamedNumber> namedNumbers = node.getNamedNumbers();
     	IdentifierUniquenessChecker<BigInteger> iuc = new IdentifierUniquenessChecker<>(
@@ -59,13 +58,12 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
     		staticBody.append("\t\ttry {\n");
 
     		for (NamedNumber namedNumber : namedNumbers) {
-    			String fieldName = CompilerUtils.formatConstant(namedNumber
-    					.getId());
+    			String fieldName = CompilerUtils.formatConstant(namedNumber.getId());
     			BigInteger bigValue;
     			long value;
 
     			if (namedNumber.getRef() != null) {
-    				bigValue = ctx.resolveIntegerValue(namedNumber.getRef());
+    				bigValue = ctx.resolveValue(BigInteger.class, namedNumber.getRef());
     			} else {
     				bigValue = namedNumber.getValue().getNumber();
     			}

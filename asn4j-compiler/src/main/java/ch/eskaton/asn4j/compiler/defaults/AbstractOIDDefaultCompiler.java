@@ -10,6 +10,7 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -48,9 +49,16 @@ public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> imp
         return oidValue;
     }
 
-    abstract public BiFunction<CompilerContext, DefinedValue, T> getDefinedValueResolver();
+    public BiFunction<CompilerContext, DefinedValue, T> getDefinedValueResolver() {
+        return (ctx, ref) -> ctx.resolveValue(getValueClass(), ref);
+    }
 
-    abstract public BiFunction<CompilerContext, String, T> getReferenceResolver();
+    public BiFunction<CompilerContext, String, T> getReferenceResolver() {
+        return (ctx, ref) -> ctx.resolveValue(getValueClass(), ref);
+    }
+
+    protected abstract Class<T> getValueClass();
+
 
     abstract public void resolveComponents(CompilerContext ctx, String field, Value value, List<Integer> ids);
 
@@ -67,10 +75,10 @@ public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> imp
         DefinedValue definedValue = component.getDefinedValue();
 
         if (definedValue != null) {
-            return ctx.resolveIntegerValue(definedValue).intValue();
+            return ctx.resolveValue(BigInteger.class, definedValue).intValue();
         }
 
-        return ctx.resolveIntegerValue(component.getName()).intValue();
+        return ctx.resolveValue(BigInteger.class, component.getName()).intValue();
     }
 
     public void resolveOIDReference(CompilerContext ctx, String field, List<Integer> ids, OIDComponentNode component) {

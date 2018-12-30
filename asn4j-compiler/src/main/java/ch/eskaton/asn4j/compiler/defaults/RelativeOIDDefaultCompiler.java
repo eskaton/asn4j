@@ -40,13 +40,8 @@ import java.util.function.BiFunction;
 public class RelativeOIDDefaultCompiler extends AbstractOIDDefaultCompiler<RelativeOIDValue> {
 
     @Override
-    public BiFunction<CompilerContext, DefinedValue, RelativeOIDValue> getDefinedValueResolver() {
-        return CompilerContext::resolveRelativeOIDValue;
-    }
-
-    @Override
-    public BiFunction<CompilerContext, String, RelativeOIDValue> getReferenceResolver() {
-        return CompilerContext::resolveRelativeOIDValue;
+    public Class<RelativeOIDValue> getValueClass() {
+        return RelativeOIDValue.class;
     }
 
     @Override
