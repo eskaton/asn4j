@@ -25,30 +25,25 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.decoders;
+package ch.eskaton.asn4j.runtime.utils;
 
-import ch.eskaton.asn4j.runtime.DecoderState;
-import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.objects.TestSetA;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
-import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
-import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
-import ch.eskaton.commons.utils.ReflectionUtils;
+import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
-import java.math.BigInteger;
+import java.lang.reflect.Field;
 
-public class EnumeratedTypeDecoder {
+import static org.junit.Assert.*;
 
-    @SuppressWarnings("unchecked")
-    public <T extends ASN1EnumeratedType> T decode(DecoderStates states, DecoderState state, Class<T> type)
-            throws DecodingException {
-        try {
-            return (T) ReflectionUtils.invokeStaticMethod(type, "valueOf", new Object[] {
-                    new BigInteger(RuntimeUtils.getValue(states, state)).intValue()
-            }, new Class<?>[] { int.class });
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new DecodingException(e);
-        }
+public class RuntimeUtilsTest {
+
+    @Test
+    public void testGetComponent() {
+        Field field = RuntimeUtils.getComponent(new TestSetA(), "a");
+
+        assertNotNull(field);
+
+        assertEquals("a", field.getName());
     }
 
 }

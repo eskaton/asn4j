@@ -29,13 +29,14 @@ package ch.eskaton.asn4j.runtime;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 import java.util.List;
 
 public class AbstractTagsMatcherTest {
 
     List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
-        return Utils.getTags(clazz);
+        return RuntimeUtils.getTags(clazz);
     }
 
     TLV getTlv(Clazz clazz, int tag, boolean constructed) {

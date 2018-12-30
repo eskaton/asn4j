@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.runtime.decoders.SequenceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SequenceOfDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SetDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SetOfDecoder;
+import ch.eskaton.asn4j.runtime.decoders.TypeDecoder;
 import ch.eskaton.asn4j.runtime.decoders.VisibleStringDecoder;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.exceptions.PrematureEndOfInputException;
@@ -62,6 +63,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.commons.utils.CollectionUtils;
 import ch.eskaton.commons.utils.ReflectionUtils;
 import ch.eskaton.commons.utils.StringUtils;
@@ -71,6 +73,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -86,23 +89,23 @@ public class BERDecoder implements Decoder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BERDecoder.class);
 
-    private BooleanDecoder booleanDecoder = new BooleanDecoder();
-
-    private BitStringDecoder bitStringDecoder = new BitStringDecoder();
-
-    private ChoiceDecoder choiceDecoder = new ChoiceDecoder();
+    private Map<Class<? extends ASN1Type>, TypeDecoder<? extends ASN1Type>> decoders =
+            new HashMap<Class<? extends ASN1Type>, TypeDecoder<? extends ASN1Type>>() {
+                {
+                    put(ASN1BitString.class, new BitStringDecoder());
+                    put(ASN1Boolean.class, new BooleanDecoder());
+                    put(ASN1Integer.class, new IntegerDecoder());
+                    put(ASN1Real.class, new RealDecoder());
+                    put(ASN1ObjectIdentifier.class, new ObjectIdentifierDecoder());
+                    put(ASN1RelativeOID.class, new RelativeOIDDecoder());
+                    put(ASN1OctetString.class, new OctetStringDecoder());
+                    put(ASN1VisibleString.class, new VisibleStringDecoder());
+                }
+            };
 
     private EnumeratedTypeDecoder enumeratedTypeDecoder = new EnumeratedTypeDecoder();
 
-    private IntegerDecoder integerDecoder = new IntegerDecoder();
-
-    private RealDecoder realDecoder = new RealDecoder();
-
-    private ObjectIdentifierDecoder oidDecoder = new ObjectIdentifierDecoder();
-
-    private RelativeOIDDecoder relativeOidDecoder = new RelativeOIDDecoder();
-
-    private OctetStringDecoder octetStringDecoder = new OctetStringDecoder();
+    private ChoiceDecoder choiceDecoder = new ChoiceDecoder();
 
     private SequenceDecoder sequenceDecoder = new SequenceDecoder();
 
@@ -112,10 +115,7 @@ public class BERDecoder implements Decoder {
 
     private SetOfDecoder setOfDecoder = new SetOfDecoder();
 
-    private VisibleStringDecoder visibleStringDecoder = new VisibleStringDecoder();
-
-    public <T extends ASN1Type> T decode(Class<T> type, byte[] buf)
-            throws DecodingException {
+    public <T extends ASN1Type> T decode(Class<T> type, byte[] buf) throws DecodingException {
         DecoderStates states = new DecoderStates();
         DecoderState state = new DecoderState(0, buf.length);
         states.buf = buf;
@@ -128,9 +128,8 @@ public class BERDecoder implements Decoder {
         return decode(type, states, null, false);
     }
 
-    public DecodingResult<? extends ASN1Type> decode(DecoderStates states,
-                           Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags)
-            throws DecodingException {
+    public DecodingResult<? extends ASN1Type> decode(DecoderStates states, Map<List<ASN1Tag>,
+            Class<? extends ASN1Type>> tags) throws DecodingException {
         MultipleTagsMatcher matcher = new MultipleTagsMatcher(tags.keySet());
         DecoderState state = consumeMultipleTags(states, matcher);
 
@@ -155,7 +154,7 @@ public class BERDecoder implements Decoder {
             return decodeChoice(type, states);
         }
 
-        tags = Utils.getTags(type, tag);
+        tags = RuntimeUtils.getTags(type, tag);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(StringUtils.concat("Expecting: javatype=", type.getSimpleName(), ", tags=(", StringUtils
@@ -180,6 +179,16 @@ public class BERDecoder implements Decoder {
         return new DecodingResult<>(Collections.emptyList(), obj);
     }
 
+    public <T extends ASN1Type, C extends TypeDecoder<T>> C getDecoder(Class<T> clazz) throws DecodingException {
+        TypeDecoder<?> decoder = decoders.get(clazz);
+
+        if (decoder == null) {
+            throw new DecodingException("No decoder for node-type " + clazz.getSimpleName());
+        }
+
+        return (C) decoder;
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     private <T> DecodingResult<T> decodeState(Class<T> type, DecoderStates states, DecoderState state) {
         if (state == null) {
@@ -190,14 +199,14 @@ public class BERDecoder implements Decoder {
 
         try {
             if (ReflectionUtils.extendsClazz(type, ASN1EnumeratedType.class)) {
-                obj = (T) enumeratedTypeDecoder.decode(this, states, state, (Class<ASN1EnumeratedType>) type);
+                obj = (T) enumeratedTypeDecoder.decode(states, state, (Class<ASN1EnumeratedType>) type);
             } else {
                 obj = type.newInstance();
 
                 if (obj instanceof ASN1Boolean) {
-                    booleanDecoder.decode(states, state, (ASN1Boolean) obj);
+                    getDecoder(ASN1Boolean.class).decode(states, state, (ASN1Boolean) obj);
                 } else if (obj instanceof ASN1BitString) {
-                    bitStringDecoder.decode(states, state, (ASN1BitString) obj);
+                    getDecoder(ASN1BitString.class).decode(states, state, (ASN1BitString) obj);
                 } else if (obj instanceof ASN1Null) {
                     // nothing to do
                 } else if (obj instanceof ASN1Sequence) {
@@ -209,17 +218,17 @@ public class BERDecoder implements Decoder {
                 } else if (obj instanceof ASN1SetOf) {
                     setOfDecoder.decode(this, states, (ASN1SetOf) obj);
                 } else if (obj instanceof ASN1Integer || ReflectionUtils.extendsClazz(type, ASN1NamedInteger.class)) {
-                    integerDecoder.decode(states, state, (ASN1Integer) obj);
+                    getDecoder(ASN1Integer.class).decode(states, state, (ASN1Integer) obj);
                 } else if (obj instanceof ASN1Real) {
-                    realDecoder.decode(states, state, (ASN1Real) obj);
+                    getDecoder(ASN1Real.class).decode(states, state, (ASN1Real) obj);
                 } else if (obj instanceof ASN1OctetString) {
-                    octetStringDecoder.decode(states, state, (ASN1OctetString) obj);
+                    getDecoder(ASN1OctetString.class).decode(states, state, (ASN1OctetString) obj);
                 } else if (obj instanceof ASN1VisibleString) {
-                    visibleStringDecoder.decode(states, state, (ASN1VisibleString) obj);
+                    getDecoder(ASN1VisibleString.class).decode(states, state, (ASN1VisibleString) obj);
                 } else if (obj instanceof ASN1ObjectIdentifier) {
-                    oidDecoder.decode(states, state, (ASN1ObjectIdentifier) obj);
+                    getDecoder(ASN1ObjectIdentifier.class).decode(states, state, (ASN1ObjectIdentifier) obj);
                 } else if (obj instanceof ASN1RelativeOID) {
-                    relativeOidDecoder.decode(states, state, (ASN1RelativeOID) obj);
+                    getDecoder(ASN1RelativeOID.class).decode(states, state, (ASN1RelativeOID) obj);
                 } else {
                     throw new DecodingException("Decoding of object " + obj.getClass().getName() + " not supported");
                 }

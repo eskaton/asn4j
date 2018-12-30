@@ -25,24 +25,41 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime;
+package ch.eskaton.asn4j.runtime.decoders;
 
-import ch.eskaton.asn4j.runtime.objects.TestSetA;
-import org.junit.Test;
+import ch.eskaton.asn4j.runtime.DecoderState;
+import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
+import ch.eskaton.asn4j.runtime.types.AbstractASN1OID;
 
-import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.Assert.*;
+public abstract class AbstractOIDDecoder<T extends AbstractASN1OID> implements TypeDecoder<T> {
 
-public class UtilsTest {
+    @Override
+    public void decode(DecoderStates states, DecoderState state, T obj) {
+        List<Integer> components = new ArrayList<>();
+        int component = 0;
 
-    @Test
-    public void testGetComponent() {
-        Field field = Utils.getComponent(new TestSetA(), "a");
+        for (int i = 0; i < state.length; i++) {
+            component <<= 7;
+            component |= states.buf[state.pos + i] & 0x7F;
 
-        assertNotNull(field);
+            if ((states.buf[state.pos + i] & 0x80) == 0) {
+                decodeComponent(components, component);
+                component = 0;
+            }
+        }
 
-        assertEquals("a", field.getName());
+        try {
+            obj.setValue(components);
+        } catch (ValidationException e) {
+            throw new DecodingException(e);
+        }
     }
+
+    protected abstract void decodeComponent(List<Integer> components, int component);
 
 }
