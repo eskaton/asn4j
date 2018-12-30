@@ -25,41 +25,29 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
+package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.parser.IRIToken;
-import ch.eskaton.asn4j.parser.ast.values.IRIValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.commons.utils.StringUtils;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 
-import java.util.stream.Collectors;
+public abstract class AbstractValueResolver<T> implements ValueResolver<T> {
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+    protected CompilerContext ctx;
 
-public class IRIDefaultCompiler implements DefaultCompiler {
-
-    @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String typeName, String field, Value value) throws CompilerException {
-        IRIValue iriValue;
-
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            iriValue = ctx.resolveValue(IRIValue.class, (SimpleDefinedValue) value);
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
-
-        String defaultField = addDefaultField(clazz, typeName, field);
-
-        String valueString = iriValue.getArcIdentifiers().stream().map(IRIToken::getText).map(StringUtils::dquote).collect(Collectors.joining(", "));
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
-                + "\t\t" + defaultField + ".setValue(" + valueString + ");"));
+    public AbstractValueResolver(CompilerContext ctx) {
+        this.ctx = ctx;
     }
+
+    public T resolve(DefinedValue ref) throws CompilerException {
+        return resolve(ctx.resolveDefinedValue(ref));
+    }
+
+    public T resolve(String ref) throws CompilerException {
+        return resolve(ctx.resolveReference(ref));
+    }
+
+    protected abstract T resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException;
 
 }

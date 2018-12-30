@@ -25,41 +25,40 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
+package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.parser.IRIToken;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.commons.utils.StringUtils;
 
-import java.util.stream.Collectors;
+public class IRIValueResolver extends AbstractValueResolver<IRIValue> {
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
-
-public class IRIDefaultCompiler implements DefaultCompiler {
+    public IRIValueResolver(CompilerContext ctx) {
+        super(ctx);
+    }
 
     @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String typeName, String field, Value value) throws CompilerException {
-        IRIValue iriValue;
+    protected IRIValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
+        Node type = valueAssignment.getType();
+        Node value = valueAssignment.getValue();
 
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            iriValue = ctx.resolveValue(IRIValue.class, (SimpleDefinedValue) value);
-        } else {
-            throw new CompilerException("Invalid default value");
+        type = ctx.resolveTypeReference(type);
+
+        if (type instanceof IRI) {
+            value = CompilerUtils.resolveAmbiguousValue(value, IRIValue.class);
+
+            if (!(value instanceof IRIValue)) {
+                throw new CompilerException("IRI value expected");
+            }
+
+            return ((IRIValue) value);
         }
 
-        String defaultField = addDefaultField(clazz, typeName, field);
-
-        String valueString = iriValue.getArcIdentifiers().stream().map(IRIToken::getText).map(StringUtils::dquote).collect(Collectors.joining(", "));
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
-                + "\t\t" + defaultField + ".setValue(" + valueString + ");"));
+        throw new CompilerException("Failed to resolve an IRI value");
     }
 
 }

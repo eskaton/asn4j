@@ -31,24 +31,17 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<ObjectIdentifierValue> {
 
     @Override
-    public BiFunction<CompilerContext, DefinedValue, ObjectIdentifierValue> getDefinedValueResolver() {
-        return CompilerContext::resolveObjectIdentifierValue;
-    }
-
-    @Override
-    public BiFunction<CompilerContext, String, ObjectIdentifierValue> getReferenceResolver() {
-        return CompilerContext::resolveObjectIdentifierValue;
+    public Class<ObjectIdentifierValue> getValueClass() {
+        return ObjectIdentifierValue.class;
     }
 
     @Override
