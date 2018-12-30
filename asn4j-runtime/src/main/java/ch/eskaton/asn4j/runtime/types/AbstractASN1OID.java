@@ -12,7 +12,7 @@ public abstract class AbstractASN1OID implements ASN1Type {
     protected List<Integer> components;
 
     public void setValue(int... components) throws ValidationException {
-        setValue(new ArrayList<>(IntStream.of(components).boxed().collect(Collectors.toList())));
+        setValue(IntStream.of(components).boxed().collect(Collectors.toList()));
     }
 
     public void setValue(List<Integer> components) throws ValidationException {

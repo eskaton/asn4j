@@ -27,9 +27,9 @@
 
 package ch.eskaton.asn4j.parser;
 
-import java.io.IOException;
-
 import ch.eskaton.asn4j.parser.IRIToken.Type;
+
+import java.io.IOException;
 
 public class IRILexer {
 
@@ -60,8 +60,7 @@ public class IRILexer {
     		} else if (c == '/') {
     			return new IRIToken(Type.Solidus, pos);
     		} else if (c == '-') {
-    			throw new ParserException(
-    					"A non-integerUnicodeLabel must not start with a hyphen");
+    			throw new ParserException("A non-integerUnicodeLabel must not start with a hyphen");
     		} else {
     			StringBuilder sb = new StringBuilder();
 
@@ -99,8 +98,7 @@ public class IRILexer {
     							sb.append((char) c);
     							break;
     						default:
-    							if (c >= '0' && c <= '9' || c >= 'a'
-    									&& c <= 'z' || c >= 'A' && c <= 'Z') {
+    							if (c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') {
     								sb.append((char) c);
     							} else {
     								int cp, cn;
@@ -116,12 +114,10 @@ public class IRILexer {
     									} else if (!Character
     											.isLowSurrogate((char) cn)) {
     										throw new ParserException(
-    												"A low surrogate character was expected, but found "
-    														+ (char) cn);
+    												"A low surrogate character was expected, but found " + (char) cn);
     									}
 
-    									cp = Character.toCodePoint((char) c,
-    											(char) cn);
+    									cp = Character.toCodePoint((char) c, (char) cn);
     								} else {
     									cp = c;
     								}
@@ -145,10 +141,10 @@ public class IRILexer {
     										|| cp >= 0xe0000 && cp <= 0xefffd) {
     									sb.append(Character.toChars(cp));
     								} else {
-    									throw new ParserException(
-    											String.format(
-    													"Invalid character in non-integerUnicodeLabel found: %c",
-    													cp));
+                                        throw new ParserException(
+                                                String.format(
+                                                        "Invalid character in non-integerUnicodeLabel found: %c",
+                                                        cp));
     								}
     							}
     					}
@@ -158,24 +154,18 @@ public class IRILexer {
 
     			if (nonInteger) {
     				if (sb.charAt(sb.length() - 1) == '-') {
-    					throw new ParserException(
-    							"A non-integerUnicodeLabel must not end with a hyphen");
+    					throw new ParserException("A non-integerUnicodeLabel must not end with a hyphen");
     				}
 
-    				return new IRIToken(Type.NonIntegerUnicodeLabel, pos,
-    						sb.toString());
+    				return new IRIToken(Type.NonIntegerUnicodeLabel, pos, sb.toString());
     			} else {
     				if (sb.length() > 1 && sb.charAt(0) == '0') {
-    					throw new ParserException(
-    							"Invalid integerUnicodeLabel: " + sb.toString());
+    					throw new ParserException("Invalid integerUnicodeLabel: " + sb.toString());
     				}
 
-    				return new IRIToken(Type.IntegerUnicodeLabel, pos,
-    						sb.toString());
+    				return new IRIToken(Type.IntegerUnicodeLabel, pos, sb.toString());
     			}
-
     		}
-
     	} catch (IOException e) {
     		throw new ParserException(e);
     	}
