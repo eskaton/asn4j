@@ -33,6 +33,11 @@ import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
+import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
@@ -132,6 +137,15 @@ public class CompilerContext {
             put(ObjectIdentifier.class, new ObjectIdentifierCompiler());
             put(RelativeOID.class, new RelativeOIDCompiler());
             put(IRI.class, new IRICompiler());
+        }
+    };
+
+    private Map<Class<?>, ValueResolver<?>> valueResolvers = new HashMap<Class<?>, ValueResolver<?>>() {
+        {
+            put(BigInteger.class, new IntegerValueResolver(CompilerContext.this));
+            put(ObjectIdentifierValue.class, new ObjectIdentifierValueResolver(CompilerContext.this));
+            put(RelativeOIDValue.class, new RelativeOIDValueResolver(CompilerContext.this));
+            put(IRIValue.class, new IRIValueResolver(CompilerContext.this));
         }
     };
 
@@ -427,82 +441,22 @@ public class CompilerContext {
         return builtinTypes.contains(name);
     }
 
-    public RelativeOIDValue resolveRelativeOIDValue(DefinedValue ref) {
-        return resolveRelativeOIDValueValue(resolveDefinedValue(ref));
+    public <T> T resolveValue(Class<T> valueClass, DefinedValue ref) {
+        return (T) getValueResolver(valueClass).resolve(ref);
     }
 
-    public RelativeOIDValue resolveRelativeOIDValue(String ref) {
-        return resolveRelativeOIDValueValue(resolveReference(ref));
+    public <T> T resolveValue(Class<T> valueClass, String ref) {
+        return (T) getValueResolver(valueClass).resolve(ref);
     }
 
-    private RelativeOIDValue resolveRelativeOIDValueValue(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Node type = valueAssignment.getType();
-        Node value = valueAssignment.getValue();
+    private <T> ValueResolver<?> getValueResolver(Class<T> valueClass) {
+        ValueResolver<T> valueResolver = (ValueResolver<T>) valueResolvers.get(valueClass);
 
-        type = resolveTypeReference(type);
-
-        if (type instanceof RelativeOID) {
-            value = CompilerUtils.resolveAmbiguousValue(value, RelativeOIDValue.class);
-
-            if (!(value instanceof RelativeOIDValue)) {
-                throw new CompilerException("Relative object identifier expected");
-            }
-
-            return ((RelativeOIDValue) value);
+        if (valueResolver == null) {
+            throw new CompilerException("No value resolver defined for type " + valueClass.getSimpleName());
         }
 
-        throw new CompilerException("Failed to resolve an object identifier value");
-    }
-
-    public IRIValue resolveIRIValue(DefinedValue ref) throws CompilerException {
-        return resolveIRIValue(resolveDefinedValue(ref));
-    }
-
-    public IRIValue resolveIRIValue(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
-        Node type = valueAssignment.getType();
-        Node value = valueAssignment.getValue();
-
-        type = resolveTypeReference(type);
-
-        if (type instanceof IRI) {
-            value = CompilerUtils.resolveAmbiguousValue(value, IRIValue.class);
-
-            if (!(value instanceof IRIValue)) {
-                throw new CompilerException("IRI value expected");
-            }
-
-            return ((IRIValue) value);
-        }
-
-        throw new CompilerException("Failed to resolve an IRI value");
-    }
-
-    public ObjectIdentifierValue resolveObjectIdentifierValue(DefinedValue ref) throws CompilerException {
-        return resolveObjectIdentifierValue(resolveDefinedValue(ref));
-    }
-
-    public ObjectIdentifierValue resolveObjectIdentifierValue(String ref) throws CompilerException {
-        return resolveObjectIdentifierValue(resolveReference(ref));
-    }
-
-    public ObjectIdentifierValue resolveObjectIdentifierValue(ValueOrObjectAssignmentNode<?, ?> valueAssignment)
-            throws CompilerException {
-        Node type = valueAssignment.getType();
-        Node value = valueAssignment.getValue();
-
-        type = resolveTypeReference(type);
-
-        if (type instanceof ObjectIdentifier) {
-            value = CompilerUtils.resolveAmbiguousValue(value, ObjectIdentifierValue.class);
-
-            if (!(value instanceof ObjectIdentifierValue)) {
-                throw new CompilerException("Object identifier expected");
-            }
-
-            return ((ObjectIdentifierValue) value);
-        }
-
-        throw new CompilerException("Failed to resolve an object identifier value");
+        return valueResolver;
     }
 
     public Node resolveTypeReference(Node type) {
@@ -521,50 +475,6 @@ public class CompilerContext {
         return getTypeAssignment(type, null);
     }
 
-    public BigInteger resolveIntegerValue(DefinedValue ref) throws CompilerException {
-        return resolveIntegerValue(resolveDefinedValue(ref));
-    }
-
-    public BigInteger resolveIntegerValue(String ref) throws CompilerException {
-        return resolveIntegerValue(resolveReference(ref));
-    }
-
-    private BigInteger resolveIntegerValue(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Node type = valueAssignment.getType();
-        Node value = valueAssignment.getValue();
-
-        if (type instanceof IntegerType) {
-            if (!(value instanceof IntegerValue)) {
-                throw new CompilerException("Integer expected");
-            }
-            return ((IntegerValue) value).getValue();
-        } else if (type instanceof TypeReference) {
-            if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-                value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-                AssignmentNode assignment = getModule().getBody().getAssignments(((TypeReference) type).getType());
-
-                if (assignment != null && assignment instanceof TypeAssignmentNode) {
-                    TypeAssignmentNode typeAssignment = (TypeAssignmentNode) assignment;
-
-                    if (typeAssignment.getType() instanceof IntegerType) {
-                        NamedNumber namedNumber = ((IntegerType) typeAssignment.getType())
-                                .getNamedNumber(((SimpleDefinedValue) value).getValue());
-
-                        if (namedNumber.getValue() != null) {
-                            return namedNumber.getValue().getNumber();
-                        } else {
-                            return resolveIntegerValue(namedNumber.getRef());
-                        }
-                    }
-                }
-            } else if (value instanceof IntegerValue) {
-                return ((IntegerValue) value).getValue();
-            }
-        }
-
-        throw new CompilerException("Failed to resolve an integer value");
-    }
-
     public ValueOrObjectAssignmentNode<?, ?> resolveDefinedValue(DefinedValue ref) throws CompilerException {
         if (ref instanceof ExternalValueReference) {
             throw new CompilerException("External references not yet supported");
@@ -574,7 +484,7 @@ public class CompilerContext {
         }
     }
 
-    private ValueOrObjectAssignmentNode<?, ?> resolveReference(String reference) {
+    public ValueOrObjectAssignmentNode<?, ?> resolveReference(String reference) {
         AssignmentNode assignment = getModule().getBody().getAssignments(reference);
 
         if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
