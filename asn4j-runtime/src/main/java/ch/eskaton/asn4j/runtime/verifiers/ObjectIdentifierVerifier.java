@@ -68,7 +68,7 @@ public class ObjectIdentifierVerifier {
     }
 
     public static void throwValidationException(int pos, int component) {
-        throw new ValidationException("Invalid object identifier value in component(" + pos + "): " + component);
+        throw new ValidationException("Invalid object identifier value in component(" + (pos + 1) + "): " + component);
     }
 
 }
