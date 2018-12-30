@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
 import ch.eskaton.asn4j.runtime.TagId;
-import ch.eskaton.asn4j.runtime.Utils;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
@@ -84,12 +84,12 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
 
     protected void fillMetaData(ASN1Set obj, Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes,
             Map<List<TagId>, Field> tagsToFields) {
-        for (Field compField : Utils.getComponents(obj)) {
+        for (Field compField : RuntimeUtils.getComponents(obj)) {
             ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
 
             if (annotation != null) {
                 Class<? extends ASN1Type> type = (Class<? extends ASN1Type>) compField.getType();
-                List<ASN1Tag> tags = Utils.getTags(type, compField.getAnnotation(ASN1Tag.class));
+                List<ASN1Tag> tags = RuntimeUtils.getTags(type, compField.getAnnotation(ASN1Tag.class));
                 tagsToFields.put(tags.stream().map(TagId::fromTag).collect(Collectors.toList()), compField);
                 tagsToTypes.put(tags, type);
             }

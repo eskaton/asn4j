@@ -25,8 +25,11 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime;
+package ch.eskaton.asn4j.runtime.utils;
 
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.DecoderState;
+import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
@@ -40,9 +43,9 @@ import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
-public class Utils {
+public class RuntimeUtils {
 
-    private Utils() {
+    private RuntimeUtils() {
     }
 
     public static List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {

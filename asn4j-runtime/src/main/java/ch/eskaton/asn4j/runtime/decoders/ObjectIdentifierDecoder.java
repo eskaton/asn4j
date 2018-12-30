@@ -27,48 +27,27 @@
 
 package ch.eskaton.asn4j.runtime.decoders;
 
-import ch.eskaton.asn4j.runtime.DecoderState;
-import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
-import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class ObjectIdentifierDecoder {
+public class ObjectIdentifierDecoder extends AbstractOIDDecoder<ASN1ObjectIdentifier> {
 
-    public void decode(DecoderStates states, DecoderState state, ASN1ObjectIdentifier obj) {
-        List<Integer> components = new ArrayList<>();
-        int component = 0;
-
-        for (int i = 0; i < state.length; i++) {
-            component <<= 7;
-            component |= states.buf[state.pos + i] & 0x7F;
-
-            if ((states.buf[state.pos + i] & 0x80) == 0) {
-                if (components.size() == 0) {
-                    if (component >= 80) {
-                        components.add(2);
-                        components.add(component - 80);
-                    } else if (component >= 40) {
-                        components.add(1);
-                        components.add(component - 40);
-                    } else {
-                        components.add(0);
-                        components.add(component);
-                    }
-                } else {
-                    components.add(component);
-                }
-                component = 0;
+    @Override
+    public void decodeComponent(List<Integer> components, int component) {
+        if (components.size() == 0) {
+            if (component >= 80) {
+                components.add(2);
+                components.add(component - 80);
+            } else if (component >= 40) {
+                components.add(1);
+                components.add(component - 40);
+            } else {
+                components.add(0);
+                components.add(component);
             }
-        }
-
-        try {
-            obj.setValue(components);
-        } catch (ValidationException e) {
-            throw new DecodingException(e);
+        } else {
+            components.add(component);
         }
     }
 

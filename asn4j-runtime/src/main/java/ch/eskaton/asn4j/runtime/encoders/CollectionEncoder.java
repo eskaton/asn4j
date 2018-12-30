@@ -28,13 +28,11 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.Utils;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
-import ch.eskaton.asn4j.runtime.types.ASN1CollectionOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.commons.utils.ReflectionUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
@@ -46,7 +44,7 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements
     public byte[] encode(Encoder encoder, T obj) throws EncodingException {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
-        List<Field> compFields = Utils.getComponents(obj);
+        List<Field> compFields = RuntimeUtils.getComponents(obj);
 
         if (compFields.size() > 0) {
             for (Field compField : compFields) {

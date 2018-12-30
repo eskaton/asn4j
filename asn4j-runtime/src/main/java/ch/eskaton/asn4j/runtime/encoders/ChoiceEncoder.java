@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.TLVUtils;
+import ch.eskaton.asn4j.runtime.utils.TLVUtils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;

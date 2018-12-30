@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.Utils;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
@@ -37,7 +37,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Real.Type;
 
 import java.math.BigDecimal;
 
-public class RealDecoder {
+public class RealDecoder implements TypeDecoder<ASN1Real> {
 
     public void decode(DecoderStates states, DecoderState state, ASN1Real obj) throws ConstraintViolatedException {
         outer:
@@ -67,7 +67,7 @@ public class RealDecoder {
 
             default:
                 if ((states.buf[state.tlv.pos] >> 6) == 0x00) {
-                    obj.setValue(new BigDecimal(new String(Utils.getValue(states, state,
+                    obj.setValue(new BigDecimal(new String(RuntimeUtils.getValue(states, state,
                         1 + (states.buf[state.tlv.pos + 1] == 0x20 ? 1 : 0)))));
                 } else {
                     throw new DecodingException("Binary encoding not yet supported");

@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
 import ch.eskaton.asn4j.runtime.TagId;
-import ch.eskaton.asn4j.runtime.Utils;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
@@ -48,7 +48,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ChoiceDecoder {
-
 
     public void decode(Decoder decoder, DecoderStates states, ASN1Choice obj) throws DecodingException {
         Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = new HashMap<>();
@@ -87,12 +86,12 @@ public class ChoiceDecoder {
 
     protected void fillMetaData(ASN1Choice obj, Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes,
             Map<List<TagId>, Field> tagsToFields) {
-        for (Field altField : Utils.getComponents(obj)) {
+        for (Field altField : RuntimeUtils.getComponents(obj)) {
             ASN1Alternative annotation = altField.getAnnotation(ASN1Alternative.class);
 
             if (annotation != null) {
                 Class<? extends ASN1Type> type = (Class<? extends ASN1Type>) altField.getType();
-                List<ASN1Tag> tags = Utils.getTags(type, altField.getAnnotation(ASN1Tag.class));
+                List<ASN1Tag> tags = RuntimeUtils.getTags(type, altField.getAnnotation(ASN1Tag.class));
                 tagsToFields.put(tags.stream().map(TagId::fromTag).collect(Collectors.toList()), altField);
                 tagsToTypes.put(tags, type);
             }

@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
-import ch.eskaton.asn4j.runtime.Utils;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
@@ -44,7 +44,7 @@ import java.util.List;
 public class SequenceDecoder implements CollectionDecoder<ASN1Sequence> {
 
     public void decode(Decoder decoder, DecoderStates states, ASN1Sequence obj) throws DecodingException {
-        List<Field> compFields = Utils.getComponents(obj);
+        List<Field> compFields = RuntimeUtils.getComponents(obj);
 
         for (Field compField : compFields) {
             ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
