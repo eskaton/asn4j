@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
+import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
@@ -56,12 +57,14 @@ public class TypeCompiler implements NamedCompiler<Type> {
         } else if (node instanceof ObjectIdentifier) {
             ctx.<ObjectIdentifier, ObjectIdentifierCompiler>getCompiler(ObjectIdentifier.class)
                     .compile(ctx, name, (ObjectIdentifier) node);
+        } else if (node instanceof RelativeOID) {
+            ctx.<RelativeOID, RelativeOIDCompiler>getCompiler(RelativeOID.class)
+                    .compile(ctx, name, (RelativeOID) node);
         } else if (node instanceof TypeReference) {
             if (node instanceof UsefulType) {
                 ctx.<UsefulType, UsefulTypeCompiler>getCompiler(UsefulType.class).compile(ctx, name, (UsefulType) node);
             } else {
-                ctx.<TypeReference, TypeReferenceCompiler>getCompiler(TypeReference.class)
-                        .compile(ctx, name, (TypeReference) node);
+                ctx.<TypeReference, TypeReferenceCompiler>getCompiler(TypeReference.class).compile(ctx, name, (TypeReference) node);
             }
         } else if (node instanceof SelectionType) {
             ctx.<SelectionType, SelectionTypeCompiler>getCompiler(SelectionType.class)

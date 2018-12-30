@@ -29,62 +29,48 @@ package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.CompilerUtils;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.BiFunction;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
-
-public class ObjectIdentifierDefaultCompiler implements DefaultCompiler {
+public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<ObjectIdentifierValue> {
 
     @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String typeName, String field,
-            Value value) throws CompilerException {
-        ObjectIdentifierValue oidValue;
-
-        if (value instanceof ObjectIdentifierValue) {
-            oidValue = (ObjectIdentifierValue) value;
-        } else if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            oidValue = ctx.resolveObjectIdentifierValue(((SimpleDefinedValue) value));
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
-
-        List<Integer> ids = new ArrayList<>();
-
-        resolveComponents(ctx, field, oidValue, ids);
-
-        ObjectIdentifierVerifier.verifyComponents(ids);
-
-        String defaultField = addDefaultField(clazz, typeName, field);
-        String idsString = ids.stream().map(Object::toString).collect(Collectors.joining(", "));
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
-                + "\t\t" + defaultField + ".setValue(" + idsString + ");"));
+    public BiFunction<CompilerContext, DefinedValue, ObjectIdentifierValue> getDefinedValueResolver() {
+        return CompilerContext::resolveObjectIdentifierValue;
     }
 
-    public void resolveComponents(CompilerContext ctx, String field, ObjectIdentifierValue oidValue, List<Integer> ids) {
+    @Override
+    public BiFunction<CompilerContext, String, ObjectIdentifierValue> getReferenceResolver() {
+        return CompilerContext::resolveObjectIdentifierValue;
+    }
+
+    @Override
+    public void resolveComponents(CompilerContext ctx, String field, Value value, List<Integer> ids) {
+        resolveComponents(ctx, field, resolveValue(ctx, value, ObjectIdentifierValue.class), ids);
+    }
+
+    @Override
+    public void verifyObjectIds(List<Integer> ids) {
+        ObjectIdentifierVerifier.verifyComponents(ids);
+    }
+
+    public void resolveComponents(CompilerContext ctx, String field, AbstractOIDValue value, List<Integer> ids) {
         int componentNum = 1;
 
-        for (OIDComponentNode component : oidValue.getComponents()) {
+        for (OIDComponentNode component : value.getComponents()) {
             try {
                 try {
                     ids.add(getComponentId(ctx, component));
-                } catch(CompilerException e) {
+                } catch (CompilerException e) {
                     if (componentNum == 1) {
-                        ObjectIdentifierValue referencedOidValue = ctx.resolveObjectIdentifierValue(component.getName());
-                        resolveComponents(ctx, field, referencedOidValue, ids);
+                        resolveOIDReference(ctx, field, ids, component);
                     } else {
                         throw e;
                     }
@@ -95,22 +81,6 @@ public class ObjectIdentifierDefaultCompiler implements DefaultCompiler {
 
             componentNum++;
         }
-    }
-
-    private Integer getComponentId(CompilerContext ctx, OIDComponentNode component) {
-        Integer id = component.getId();
-
-        if (id != null) {
-            return id;
-        }
-
-        DefinedValue definedValue = component.getDefinedValue();
-
-        if (definedValue != null) {
-            return ctx.resolveIntegerValue(definedValue).intValue();
-        }
-
-        return ctx.resolveIntegerValue(component.getName()).intValue();
     }
 
 }
