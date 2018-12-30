@@ -25,51 +25,30 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.decoders;
+package ch.eskaton.asn4j.runtime.encoders;
 
-import ch.eskaton.asn4j.runtime.DecoderState;
-import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
-import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
-import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
+import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 
-import java.util.ArrayList;
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-public class OIDDecoder {
+public class RelativeOIDEncoder extends AbstractOIDEncoder<ASN1RelativeOID> {
 
-    public void decode(DecoderStates states, DecoderState state, ASN1ObjectIdentifier obj) {
-        List<Integer> components = new ArrayList<>();
-        int component = 0;
+    public byte[] encode(Encoder encoder, ASN1RelativeOID obj) throws EncodingException {
+        List<Integer> components = obj.getValue();
+        ByteArrayOutputStream value = new ByteArrayOutputStream();
 
-        for (int i = 0; i < state.length; i++) {
-            component <<= 7;
-            component |= states.buf[state.pos + i] & 0x7F;
-
-            if ((states.buf[state.pos + i] & 0x80) == 0) {
-                if (components.size() == 0) {
-                    if (component >= 80) {
-                        components.add(2);
-                        components.add(component - 80);
-                    } else if (component >= 40) {
-                        components.add(1);
-                        components.add(component - 40);
-                    } else {
-                        components.add(0);
-                        components.add(component);
-                    }
-                } else {
-                    components.add(component);
-                }
-                component = 0;
-            }
+        if (components == null) {
+            throw new EncodingException("Invalid Relative OID: " + obj);
         }
 
-        try {
-            obj.setValue(components);
-        } catch (ValidationException e) {
-            throw new DecodingException(e);
+        for (int i = 0; i < components.size(); i++) {
+            writeComponent(value, components.get(i));
         }
+
+        return value.toByteArray();
     }
 
 }
