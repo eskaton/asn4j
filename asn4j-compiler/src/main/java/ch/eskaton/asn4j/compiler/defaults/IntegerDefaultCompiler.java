@@ -63,18 +63,10 @@ public class IntegerDefaultCompiler implements DefaultCompiler {
         }
 
         String defaultField = addDefaultField(clazz, typeName, field);
-        StringBuilder body = new StringBuilder();
 
-        body.append("\t\ttry {\n");
-        body.append("\t\t\t").append(defaultField).append(" = ")
-                .append(ASN1Integer.class.getSimpleName()).append(".valueOf(")
-                .append(intValue).append(");\n");
-        body.append("\t\t} catch(")
-                .append(ConstraintViolatedException.class.getSimpleName())
-                .append(" e) {\n");
-        body.append("\t\t}");
+        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
+                + ASN1Integer.class.getSimpleName() + ".valueOf(" + intValue + ");"));
 
-        clazz.addInitializer(new JavaInitializer(body.toString()));
         clazz.addImport(ConstraintViolatedException.class);
     }
 
