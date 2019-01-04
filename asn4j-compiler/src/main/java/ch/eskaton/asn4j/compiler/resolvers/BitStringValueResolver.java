@@ -1,0 +1,133 @@
+/*
+ *  Copyright (c) 2015, Adrian Moser
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions are met:
+ *  * Redistributions of source code must retain the above copyright
+ *  notice, this list of conditions and the following disclaimer.
+ *  * Redistributions in binary form must reproduce the above copyright
+ *  notice, this list of conditions and the following disclaimer in the
+ *  documentation and/or other materials provided with the distribution.
+ *  * Neither the name of the author nor the
+ *  names of its contributors may be used to endorse or promote products
+ *  derived from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL AUTHOR BE LIABLE FOR ANY
+ *  DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ *  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ *  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+package ch.eskaton.asn4j.compiler.resolvers;
+
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.NamedBitNode;
+import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.BitString;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+
+public class BitStringValueResolver extends AbstractValueResolver<BitStringValue> {
+
+    public BitStringValueResolver(CompilerContext ctx) {
+        super(ctx);
+    }
+
+    @Override
+    protected BitStringValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
+        Node type = valueAssignment.getType();
+        Node value = valueAssignment.getValue();
+
+        if (type instanceof BitString) {
+            if (!(value instanceof BitStringValue)) {
+                throw new CompilerException("Integer expected");
+            }
+
+            return (BitStringValue) value;
+        } else if (type instanceof TypeReference) {
+            TypeReference typeReference = (TypeReference) type;
+            String typeName = typeReference.getType();
+            Type base = ctx.getBase(typeReference);
+
+            if (base instanceof BitString) {
+                BitString bitString = (BitString) base;
+                Map<String, BigInteger> namedBits = getNamedBits(bitString);
+
+                if (resolveAmbiguousValue(value, BitStringValue.class) != null) {
+                    BitStringValue bitStringValue = resolveAmbiguousValue(value, BitStringValue.class);
+
+                    return resolveValue(typeName, namedBits, bitStringValue);
+                }
+            }
+        }
+
+        throw new CompilerException("Failed to resolve a bit string value");
+    }
+
+    public BitStringValue resolveValue(String typeName, Map<String, BigInteger> namedBits, BitStringValue bitStringValue) {
+        List<BigInteger> bits = new ArrayList<>(bitStringValue.getNamedValues().size());
+
+        for (String namedValue : bitStringValue.getNamedValues()) {
+            if (!namedBits.containsKey(namedValue)) {
+                throw new CompilerException(typeName + " has no component " + namedValue);
+            }
+
+            bits.add(namedBits.get(namedValue));
+        }
+
+        bits.sort(Comparator.reverseOrder());
+        long length = bits.get(0).intValue() / 8 + 1;
+
+        byte[] byteValue = new byte[(int) length];
+
+        for (BigInteger bit : bits) {
+            int pos = bit.intValue() / 8;
+            byteValue[pos] = byteValue[pos] |= 1 << 7 - (bit.intValue() % 8);
+        }
+
+        bitStringValue.setByteValue(byteValue);
+
+        return bitStringValue;
+    }
+
+    public Map<String, BigInteger> getNamedBits(BitString bitString) {
+        Map<String, BigInteger> namedBits = new HashMap<>();
+
+        if (bitString.getNamedBits() != null) {
+            for (NamedBitNode namedBit : bitString.getNamedBits()) {
+                String id = namedBit.getId();
+                BigInteger intValue;
+
+                if (namedBit.getRef() != null) {
+                    intValue = ctx.resolveValue(BigInteger.class, namedBit.getRef());
+                } else {
+                    intValue = BigInteger.valueOf(namedBit.getNum());
+                }
+
+                namedBits.put(id, intValue);
+            }
+        }
+
+        return namedBits;
+    }
+
+}

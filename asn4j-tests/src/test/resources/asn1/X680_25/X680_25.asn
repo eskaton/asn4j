@@ -17,10 +17,33 @@ TestSequence2 ::= SEQUENCE {
 	c OCTET STRING 
 }
 
+TestBitString1 ::= BIT STRING {
+  test-a(0),
+  test-b(one),
+  test-c(two)
+}
+
+TestBitString2 ::= TestBitString1
+
+TestNamedInteger2 ::= INTEGER {
+	two(2)
+}
+
+one INTEGER ::= 1
+
+two TestNamedInteger2 ::= two
+
+testBitString2 TestBitString2 ::= { test-a, test-b }
+
 TestSequence3 ::= SEQUENCE {
 	a INTEGER,
 	b BOOLEAN,
-	c OCTET STRING DEFAULT "test"
+	c OCTET STRING DEFAULT "test",
+	d BIT STRING DEFAULT '000100100011010001010110011110011010101111001101111011110000'B,
+	e BIT STRING DEFAULT '0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'H,
+	f BIT STRING DEFAULT testBitString2,
+	g TestBitString2 DEFAULT { test-a, test-c },
+	h TestBitString2 DEFAULT { }
 }
 
 intValue INTEGER ::= 4711

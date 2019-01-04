@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -43,8 +44,8 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class IntegerDefaultCompiler implements DefaultCompiler {
 
-    public void compileDefault(CompilerContext ctx, JavaClass clazz,
-            String typeName, String field, Value value) throws CompilerException {
+    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
+            Value value) throws CompilerException {
         long intValue;
 
         if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {

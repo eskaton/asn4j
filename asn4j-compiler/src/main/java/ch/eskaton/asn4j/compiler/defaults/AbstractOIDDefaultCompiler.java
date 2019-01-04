@@ -5,6 +5,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -20,7 +21,8 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> implements DefaultCompiler {
 
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String typeName, String field, Value value) throws CompilerException {
+    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
+            Value value) throws CompilerException {
         List<Integer> ids = new ArrayList<>();
 
         resolveComponents(ctx, field, value, ids);

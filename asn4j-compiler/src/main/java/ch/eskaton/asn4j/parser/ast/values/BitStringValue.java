@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,58 +27,70 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ch.eskaton.commons.utils.StringUtils;
+
+import java.util.List;
 
 public class BitStringValue implements Value {
 
-    private int stringValue;
+    private Integer intValue;
+
+    private byte[] byteValue;
 
     private List<String> namedValues;
 
     private Value value;
 
     public BitStringValue() {
-    	this.namedValues = new ArrayList<String>();
     }
 
-    public BitStringValue(int stringValue) {
-    	this.stringValue = stringValue;
+    public BitStringValue(Integer intValue) {
+        this.intValue = intValue;
+    }
+
+    public BitStringValue(byte[] byteValue) {
+        this.byteValue = byteValue;
     }
 
     public BitStringValue(List<String> namedValues) {
-    	this.namedValues = namedValues;
+        this.namedValues = namedValues;
     }
 
     public BitStringValue(Value value) {
-    	this.value = value;
+        this.value = value;
     }
 
-    public boolean isStringValue() {
-    	return namedValues == null && value == null;
+    public boolean hasIntValue() {
+        return namedValues == null && value == null;
     }
 
-    public int getStringValue() {
-    	return stringValue;
+    public Integer getIntValue() {
+        return intValue;
+    }
+
+    public byte[] getByteValue() {
+        return byteValue;
+    }
+
+    public void setByteValue(byte[] byteValue) {
+        this.byteValue = byteValue;
     }
 
     public Value getValue() {
-    	return value;
+        return value;
     }
 
     public List<String> getNamedValues() {
-    	return namedValues;
+        return namedValues;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat(
-    			"BitStringValue[",
-    			isStringValue() ? Integer.toBinaryString(stringValue)
-    					: (namedValues != null ? StringUtils.join(namedValues,
-    							", ") : value), "]");
+        return StringUtils.concat(
+                "BitStringValue[",
+                intValue != null ? Integer.toBinaryString(intValue)
+                        : (namedValues != null ? StringUtils.join(namedValues,
+                        ", ") : value), "]");
     }
 
 }

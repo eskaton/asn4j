@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
+import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
@@ -68,15 +69,15 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
@@ -107,7 +108,6 @@ import java.util.Set;
 import java.util.Stack;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class CompilerContext {
 
@@ -143,6 +143,7 @@ public class CompilerContext {
     private Map<Class<?>, ValueResolver<?>> valueResolvers = new HashMap<Class<?>, ValueResolver<?>>() {
         {
             put(BigInteger.class, new IntegerValueResolver(CompilerContext.this));
+            put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this));
             put(ObjectIdentifierValue.class, new ObjectIdentifierValueResolver(CompilerContext.this));
             put(RelativeOIDValue.class, new RelativeOIDValueResolver(CompilerContext.this));
             put(IRIValue.class, new IRIValueResolver(CompilerContext.this));
@@ -262,15 +263,18 @@ public class CompilerContext {
     }
 
     public JavaClass createClass(String name, Type type, boolean constructed) throws CompilerException {
+        String className = formatName(name);
         Tag tag = type.getTag();
 
         if (tag != null && ClassType.UNIVERSAL.equals(tag.getClazz())) {
             throw new CompilerException("UNIVERSAL class not allowed in type " + name);
         }
 
-        JavaClass javaClass = new JavaClass(pkg, name, tag, CompilerUtils
+        JavaClass javaClass = new JavaClass(pkg, className, tag, CompilerUtils
                 .getTaggingMode(getModule(), type), constructed, getTypeName(type));
+
         currentClass.push(javaClass);
+
         return javaClass;
     }
 
@@ -299,6 +303,10 @@ public class CompilerContext {
         return (TypeAssignmentNode) getModule().getBody().getAssignments(type);
     }
 
+    public Type getBase(TypeReference typeReference) {
+        return getBase(typeReference.getType());
+    }
+
     public Type getBase(String type) {
         // TODO: what to do if the type isn't known in the current module
         while (true) {
@@ -308,6 +316,11 @@ public class CompilerContext {
             }
 
             TypeAssignmentNode assignment = (TypeAssignmentNode) getModule().getBody().getAssignments(type);
+
+            if (assignment == null) {
+                throw new CompilerException("Failed to resolve a type: " + type);
+            }
+
             Type base = assignment.getType();
 
             if (base instanceof TypeReference) {
@@ -331,9 +344,8 @@ public class CompilerContext {
             if (type instanceof UsefulType) {
                 typeName = ((UsefulType) type).getType();
             } else {
-                String asn1TypeName = ((TypeReference) type).getType();
-                addReferencedType(asn1TypeName);
-                typeName = formatName(asn1TypeName);
+                typeName = ((TypeReference) type).getType();
+                addReferencedType(typeName);
             }
         } else if (type instanceof Null) {
             typeName = ASN1Null.class.getSimpleName();
@@ -353,8 +365,9 @@ public class CompilerContext {
                 || type instanceof SequenceOfType
                 || type instanceof SetType
                 || type instanceof SetOfType
-                || type instanceof Choice
-                || type instanceof ObjectIdentifier
+                || type instanceof Choice) {
+            typeName = defineType(type, name, true);
+        } else if (type instanceof ObjectIdentifier
                 || type instanceof RelativeOID
                 || type instanceof IRI) {
             typeName = defineType(type, name);
@@ -376,7 +389,7 @@ public class CompilerContext {
     }
 
     private String defineType(Type type, String name) {
-        return defineType(type, name, true);
+        return defineType(type, name, false);
     }
 
     private String defineType(Type type, String name, boolean newType) {
@@ -512,9 +525,9 @@ public class CompilerContext {
         constraintCompiler.compileConstraint(javaClass, name, node);
     }
 
-    public void compileDefault(JavaClass javaClass, String typeName, String field, ComponentType component)
+    public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value)
             throws CompilerException {
-        defaultsCompiler.compileDefault(javaClass, typeName, field, component);
+        defaultsCompiler.compileDefault(javaClass, field, typeName, type, value);
     }
 
     public Type resolveType(Type type) {

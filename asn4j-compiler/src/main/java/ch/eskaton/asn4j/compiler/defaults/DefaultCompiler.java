@@ -32,12 +32,13 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public interface DefaultCompiler {
 
-    void compileDefault(CompilerContext ctx, JavaClass clazz, String typeName, String field,
-            Value value) throws CompilerException;
+    void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type, Value value)
+            throws CompilerException;
 
     default String addDefaultField(JavaClass clazz, String typeName, String field) {
         String defaultField = CompilerUtils.getDefaultFieldName(field);

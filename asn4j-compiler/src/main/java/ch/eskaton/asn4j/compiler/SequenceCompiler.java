@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,13 +33,22 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 public class SequenceCompiler implements NamedCompiler<SequenceType> {
 
     public void compile(CompilerContext ctx, String name, SequenceType node) throws CompilerException {
-    	ctx.createClass(name, node, true);
+        ctx.createClass(name, node, true);
 
-    	for (ComponentType component : node.getAllComponents()) {
-    		ctx.<ComponentType, ComponentTypeCompiler> getCompiler(ComponentType.class).compile(ctx, component);
-    	}
+        for (ComponentType component : node.getAllComponents()) {
+            try {
+                ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class).compile(ctx, component);
+            } catch (CompilerException e) {
+                if (component.getNamedType() != null) {
+                    throw new CompilerException("Failed to compile component " + component.getNamedType().getName() +
+                            " in SEQUENCE " + name, e);
+                } else {
+                    throw new CompilerException("Failed to compile a component in SEQUENCE " + name, e);
+                }
+            }
+        }
 
-    	ctx.finishClass();
+        ctx.finishClass();
     }
 
 }
