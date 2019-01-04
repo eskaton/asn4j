@@ -3972,9 +3972,9 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public ValueOrObjectAssignmentNode<?, ?> parse() throws ParserException {
     		List<Object> rule = new SequenceParser(new SingleTokenParser(
-    				TokenType.Identifier), new ChoiceParser<Node>(typeParser,
+    				TokenType.Identifier), new ChoiceParser<>(typeParser,
     				usefulObjectClassReferenceParser), TokenType.Assign,
-    				new ChoiceParser<Node>(valueParser, objectParser)).parse();
+    				new ChoiceParser<>(valueParser, objectParser)).parse();
 
     		if (rule != null) {
     			String reference = ((Token) rule.get(0)).getText();
@@ -3987,7 +3987,7 @@ public class Parser {
     						return new ValueAssignmentNode(reference,
     								(Type) type, (Value) value);
     					} else {
-    						return new ValueOrObjectAssignmentNode<Node, Node>(
+    						return new ValueOrObjectAssignmentNode<>(
     								((Token) rule.get(0)).getText(), type,
     								value);
     					}
@@ -4000,7 +4000,7 @@ public class Parser {
     						(ObjectClassReferenceNode) type, (ObjectNode) value);
     			}
 
-    			return new ValueOrObjectAssignmentNode<Node, Node>(reference,
+    			return new ValueOrObjectAssignmentNode<>(reference,
     					type, value);
 
     		}

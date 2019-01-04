@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
@@ -59,28 +60,34 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
 
         if (type instanceof BitString) {
             if (!(value instanceof BitStringValue)) {
-                throw new CompilerException("Integer expected");
+                throw new CompilerException("BIT STRING value expected");
             }
 
             return (BitStringValue) value;
         } else if (type instanceof TypeReference) {
-            TypeReference typeReference = (TypeReference) type;
-            String typeName = typeReference.getType();
-            Type base = ctx.getBase(typeReference);
+            BitStringValue bitStringValue = resolveAmbiguousValue(value, BitStringValue.class);
 
-            if (base instanceof BitString) {
-                BitString bitString = (BitString) base;
-                Map<String, BigInteger> namedBits = getNamedBits(bitString);
-
-                if (resolveAmbiguousValue(value, BitStringValue.class) != null) {
-                    BitStringValue bitStringValue = resolveAmbiguousValue(value, BitStringValue.class);
-
-                    return resolveValue(typeName, namedBits, bitStringValue);
-                }
+            if (bitStringValue != null) {
+                return resolve((Type) type, bitStringValue);
             }
         }
 
-        throw new CompilerException("Failed to resolve a bit string value");
+        throw new CompilerException("Failed to resolve a BIT STRING value");
+    }
+
+    public BitStringValue resolve(Type type, BitStringValue value) {
+        Type base = ctx.getBase(type);
+
+        if (base instanceof BitString) {
+            BitString bitString = (BitString) base;
+
+            BitStringValue bitStringValue = resolveAmbiguousValue(value, BitStringValue.class);
+            Map<String, BigInteger> namedBits = getNamedBits(bitString);
+
+            return resolveValue(CompilerUtils.getTypeName(type), namedBits, bitStringValue);
+        }
+
+        throw new CompilerException("Failed to resolve a BIT STRING value");
     }
 
     public BitStringValue resolveValue(String typeName, Map<String, BigInteger> namedBits, BitStringValue bitStringValue) {

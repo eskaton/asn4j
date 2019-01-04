@@ -303,6 +303,14 @@ public class CompilerContext {
         return (TypeAssignmentNode) getModule().getBody().getAssignments(type);
     }
 
+    public Type getBase(Type type) {
+        if (type instanceof TypeReference) {
+            return getBase(((TypeReference) type).getType());
+        }
+
+        return type;
+    }
+
     public Type getBase(TypeReference typeReference) {
         return getBase(typeReference.getType());
     }
