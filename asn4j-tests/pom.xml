@@ -282,6 +282,21 @@
                     </execution>
 
                     <execution>
+                        <id>X680_34</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>asn4j</goal>
+                        </goals>
+                        <configuration>
+                            <module>X680_34</module>
+                            <pkg>ch.eskaton.asn4jtest.x680_34</pkg>
+                            <includePaths>
+                                <includePath>src/test/resources/asn1/X680_34</includePath>
+                            </includePaths>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>X690_8</id>
                         <phase>generate-sources</phase>
                         <goals>

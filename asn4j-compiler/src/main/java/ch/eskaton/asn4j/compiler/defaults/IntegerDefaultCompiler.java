@@ -49,8 +49,8 @@ public class IntegerDefaultCompiler implements DefaultCompiler {
         long intValue;
 
         if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            intValue = ctx.resolveValue(BigInteger.class, (SimpleDefinedValue) value).longValue();
+            intValue = ctx.resolveValue(BigInteger.class,
+                    resolveAmbiguousValue(value, SimpleDefinedValue.class)).longValue();
         } else if (value instanceof IntegerValue) {
             intValue = ((IntegerValue) value).getValue().longValue();
 

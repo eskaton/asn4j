@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static ch.eskaton.asn4j.compiler.CompilerUtils.getTypeName;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class BitStringValueResolver extends AbstractValueResolver<BitStringValue> {
@@ -84,13 +85,13 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
             BitStringValue bitStringValue = resolveAmbiguousValue(value, BitStringValue.class);
             Map<String, BigInteger> namedBits = getNamedBits(bitString);
 
-            return resolveValue(CompilerUtils.getTypeName(type), namedBits, bitStringValue);
+            return resolveValue(getTypeName(type), namedBits, bitStringValue);
         }
 
         throw new CompilerException("Failed to resolve a BIT STRING value");
     }
 
-    public BitStringValue resolveValue(String typeName, Map<String, BigInteger> namedBits, BitStringValue bitStringValue) {
+    private BitStringValue resolveValue(String typeName, Map<String, BigInteger> namedBits, BitStringValue bitStringValue) {
         List<BigInteger> bits = new ArrayList<>(bitStringValue.getNamedValues().size());
 
         for (String namedValue : bitStringValue.getNamedValues()) {
@@ -116,7 +117,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
         return bitStringValue;
     }
 
-    public Map<String, BigInteger> getNamedBits(BitString bitString) {
+    private Map<String, BigInteger> getNamedBits(BitString bitString) {
         Map<String, BigInteger> namedBits = new HashMap<>();
 
         if (bitString.getNamedBits() != null) {

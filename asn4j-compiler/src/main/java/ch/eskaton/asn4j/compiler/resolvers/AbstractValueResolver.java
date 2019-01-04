@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 
 public abstract class AbstractValueResolver<T> implements ValueResolver<T> {
@@ -49,5 +50,11 @@ public abstract class AbstractValueResolver<T> implements ValueResolver<T> {
     }
 
     protected abstract T resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException;
+
+
+    @Override
+    public T resolve(Type type, T value) throws CompilerException {
+        return value;
+    }
 
 }
