@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -182,6 +183,14 @@ public class CompilerUtils {
         }
 
         return null;
+    }
+
+    public static String getTypeName(Type type) {
+        if (type instanceof TypeReference) {
+            return ((TypeReference) type).getType();
+        }
+
+        return type.getClass().getSimpleName();
     }
 
 }

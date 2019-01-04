@@ -441,7 +441,6 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1907,27 +1906,24 @@ public class ParserTest {
 
     	Value result = parser.parse();
 
-    	assertTrue(result instanceof BinaryStringValue);
-    	assertEquals(13,
-    			(((BinaryStringValue) result).toBitString()).getStringValue());
+        assertTrue(result instanceof BinaryStringValue);
+        assertEquals(13, (int) (((BinaryStringValue) result).toBitString()).getIntValue());
 
     	parser = new Parser(new ByteArrayInputStream("'AF'H".getBytes())).new BitOrOctetStringValueParser();
 
     	result = parser.parse();
 
-    	assertTrue(result instanceof HexStringValue);
-    	assertEquals(175,
-    			(((HexStringValue) result).toBitString()).getStringValue());
+        assertTrue(result instanceof HexStringValue);
+        assertEquals(175, (int) (((HexStringValue) result).toBitString()).getIntValue());
 
     	parser = new Parser(new ByteArrayInputStream(
     			"{a-value, b-value }".getBytes())).new BitOrOctetStringValueParser();
 
     	result = parser.parse();
 
-    	assertTrue(result instanceof BitStringValue);
-    	assertFalse(((BitStringValue) result).isStringValue());
-    	assertEquals(Arrays.asList("a-value", "b-value"),
-    			((BitStringValue) result).getNamedValues());
+        assertTrue(result instanceof BitStringValue);
+        assertNull(((BitStringValue) result).getIntValue());
+        assertEquals(Arrays.asList("a-value", "b-value"), ((BitStringValue) result).getNamedValues());
 
     	parser = new Parser(
     			new ByteArrayInputStream("CONTAINING 23".getBytes())).new BitOrOctetStringValueParser();
@@ -1970,38 +1966,32 @@ public class ParserTest {
     }
 
     @Test
-    public void testOctetStringValueParser() throws IOException,
-    		ParserException {
-    	BitOrOctetStringValueParser parser = new Parser(
-    			new ByteArrayInputStream("'11010000111'B".getBytes())).new BitOrOctetStringValueParser();
+    public void testOctetStringValueParser() throws IOException, ParserException {
+        BitOrOctetStringValueParser parser = new Parser(
+                new ByteArrayInputStream("'11010000111'B".getBytes())).new BitOrOctetStringValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BinaryStringValue);
-    	assertEquals(0xD0, ((BinaryStringValue) result).toOctetString()
-    			.getStringValue()[0]);
-    	assertEquals(0xE0, ((BinaryStringValue) result).toOctetString()
-    			.getStringValue()[1]);
+        assertNotNull(result);
+        assertTrue(result instanceof BinaryStringValue);
+        assertEquals(0xD0, ((BinaryStringValue) result).toOctetString().getStringValue()[0]);
+        assertEquals(0xE0, ((BinaryStringValue) result).toOctetString().getStringValue()[1]);
 
-    	parser = new Parser(new ByteArrayInputStream("'1CF'H".getBytes())).new BitOrOctetStringValueParser();
+        parser = new Parser(new ByteArrayInputStream("'1CF'H".getBytes())).new BitOrOctetStringValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof HexStringValue);
-    	assertEquals(0x1C, ((HexStringValue) result).toOctetString()
-    			.getStringValue()[0]);
-    	assertEquals(0xF0, ((HexStringValue) result).toOctetString()
-    			.getStringValue()[1]);
+        assertNotNull(result);
+        assertTrue(result instanceof HexStringValue);
+        assertEquals(0x1C, ((HexStringValue) result).toOctetString().getStringValue()[0]);
+        assertEquals(0xF0, ((HexStringValue) result).toOctetString().getStringValue()[1]);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("CONTAINING 23".getBytes())).new BitOrOctetStringValueParser();
+        parser = new Parser(new ByteArrayInputStream("CONTAINING 23".getBytes())).new BitOrOctetStringValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(((ContainingStringValue) result).getValue() instanceof IntegerValue);
+        assertNotNull(result);
+        assertTrue(((ContainingStringValue) result).getValue() instanceof IntegerValue);
     }
 
     /**

@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,35 +27,10 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-public class HexStringValue implements Value {
-
-    private String value;
+public class HexStringValue extends AbstractBaseXStringValue {
 
     public HexStringValue(String value) {
-    	this.value = value;
-    }
-
-    public BitStringValue toBitString() {
-    	return new BitStringValue(Integer.parseInt(value, 16));
-    }
-
-    public OctetStringValue toOctetString() {
-    	int trailor = value.length() & 0x1;
-
-    	String paddedValue = value;
-
-    	if (trailor != 0) {
-    		paddedValue += "0";
-    	}
-
-    	char[] buf = new char[paddedValue.length() / 2];
-
-    	for (int i = 0, pos = 0; pos < paddedValue.length(); i++, pos += 2) {
-    		buf[i] = (char) Short.parseShort(
-    				paddedValue.substring(pos, pos + 2), 16);
-    	}
-
-    	return new OctetStringValue(buf);
+        super(value, 16);
     }
 
 }
