@@ -1890,8 +1890,7 @@ public class Parser {
 
     			if (bitRule != null) {
     				if (bitRule.get(1) != null) {
-    					type = new BitString(
-    							(List<NamedBitNode>) bitRule.get(1));
+    					type = new BitString((List<NamedBitNode>) bitRule.get(1));
     				} else {
     					type = new BitString();
     				}
@@ -2048,12 +2047,10 @@ public class Parser {
     // NamedBitList ::=
     // NamedBit
     // | NamedBitList "," NamedBit
-    protected class NamedBitListParser implements
-    		RuleParser<List<NamedBitNode>> {
+    protected class NamedBitListParser implements RuleParser<List<NamedBitNode>> {
 
     	public List<NamedBitNode> parse() throws ParserException {
-    		return new CommaSeparatedRuleParser<NamedBitNode>(namedBitParser)
-    				.parse();
+    		return new CommaSeparatedRuleParser<>(namedBitParser).parse();
     	}
 
     }

@@ -31,8 +31,6 @@ import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4jtest.x680_33.TestRelativeObjectIdentifiers;
-import ch.eskaton.asn4jtest.x680_33.TestRelativeObjectIdentifiers.TestRelativeObjectIdentifier1;
-import ch.eskaton.asn4jtest.x680_33.TestRelativeObjectIdentifiers.TestRelativeObjectIdentifier2;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -42,8 +40,8 @@ public class TestX680_33 {
     @Test
     public void TestRelativeObjectIdentifiersWithDefaults() {
         TestRelativeObjectIdentifiers a = new TestRelativeObjectIdentifiers();
-        TestRelativeObjectIdentifier1 testRelativeObjectIdentifier1 = createRelativeOID(new TestRelativeObjectIdentifier1(), 3);
-        TestRelativeObjectIdentifier2 testRelativeObjectIdentifier2 = createRelativeOID(new TestRelativeObjectIdentifier2(),  3, 6, 1);
+        ASN1RelativeOID testRelativeObjectIdentifier1 = createRelativeOID(new ASN1RelativeOID(), 3);
+        ASN1RelativeOID testRelativeObjectIdentifier2 = createRelativeOID(new ASN1RelativeOID(), 3, 6, 1);
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
@@ -61,8 +59,8 @@ public class TestX680_33 {
     @Test
     public void TestRelativeObjectIdentifiersWithoutDefaults() {
         TestRelativeObjectIdentifiers a = new TestRelativeObjectIdentifiers();
-        TestRelativeObjectIdentifier1 testObjectIdentifier1 = createRelativeOID(new TestRelativeObjectIdentifier1(), 2, 3);
-        TestRelativeObjectIdentifier2 testObjectIdentifier2 = createRelativeOID(new TestRelativeObjectIdentifier2(), 0, 7, 1, 1);
+        ASN1RelativeOID testObjectIdentifier1 = createRelativeOID(new ASN1RelativeOID(), 2, 3);
+        ASN1RelativeOID testObjectIdentifier2 = createRelativeOID(new ASN1RelativeOID(), 0, 7, 1, 1);
 
         a.setTestRelativeObjectIdentifier1(testObjectIdentifier1);
         a.setTestRelativeObjectIdentifier2(testObjectIdentifier2);

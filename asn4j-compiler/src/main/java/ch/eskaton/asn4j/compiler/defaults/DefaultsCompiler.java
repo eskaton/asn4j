@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
@@ -41,9 +42,12 @@ import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static ch.eskaton.asn4j.compiler.CompilerUtils.getTypeName;
 
 public class DefaultsCompiler {
 
@@ -52,6 +56,7 @@ public class DefaultsCompiler {
                 {
                     put(IntegerType.class, new IntegerDefaultCompiler());
                     put(OctetString.class, new OctetStringDefaultCompiler());
+                    put(BitString.class, new BitStringDefaultCompiler());
                     put(ObjectIdentifier.class, new ObjectIdentifierDefaultCompiler());
                     put(RelativeOID.class, new RelativeOIDDefaultCompiler());
                     put(IRI.class, new IRIDefaultCompiler());
@@ -68,8 +73,8 @@ public class DefaultsCompiler {
         this.typeResolver = typeResolver;
     }
 
-    public void compileDefault(JavaClass clazz, String typeName, String field, ComponentType component) throws CompilerException {
-        Type type = component.getCompType() == CompType.Type ? component.getType() : component.getNamedType().getType();
+    public void compileDefault(JavaClass clazz, String field, String typeName, Type type, Value value)
+            throws CompilerException {
         Type base;
 
         if (type instanceof TypeReference) {
@@ -79,21 +84,23 @@ public class DefaultsCompiler {
         }
 
         if (!compilers.containsKey(base.getClass())) {
-            throw new CompilerException("Defaults for type " + base.getClass().getSimpleName() + " not yet supported");
+            throw new CompilerException("Defaults for type " + getTypeName(base) + " not yet supported");
         }
 
         DefaultCompiler compiler = compilers.get(base.getClass());
 
         try {
-            compiler.compileDefault(ctx, clazz, typeName, field, component.getValue());
+            compiler.compileDefault(ctx, clazz, field, typeName, type, value);
         } catch (CompilerException e) {
             throw new CompilerException("Error in default for type "
                     + (type instanceof NamedType ? ((NamedType) type).getName()
-                    : type.getClass().getSimpleName()) + ": "
+                    : getTypeName(type)) + ": "
                     + e.getMessage(), e);
         }
 
         return;
     }
+
+
 
 }

@@ -31,12 +31,6 @@ import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers;
-import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier1;
-import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier2;
-import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier3;
-import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier4;
-import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier5;
-import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers.TestObjectIdentifier6;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -46,12 +40,12 @@ public class TestX680_32 {
     @Test
     public void testObjectIdentifiersWithDefaults() {
         TestObjectIdentifiers a = new TestObjectIdentifiers();
-        TestObjectIdentifier1 testObjectIdentifier1 = createOID(new TestObjectIdentifier1(), 1, 3, 6, 1);
-        TestObjectIdentifier2 testObjectIdentifier2 = createOID(new TestObjectIdentifier2(), 1, 3, 6, 1);
-        TestObjectIdentifier3 testObjectIdentifier3 = createOID(new TestObjectIdentifier3(), 1, 3, 6, 1);
-        TestObjectIdentifier4 testObjectIdentifier4 = createOID(new TestObjectIdentifier4(), 1, 3, 6, 1, 23);
-        TestObjectIdentifier5 testObjectIdentifier5 = createOID(new TestObjectIdentifier5(), 1, 3, 6, 1);
-        TestObjectIdentifier6 testObjectIdentifier6 = createOID(new TestObjectIdentifier6(), 1, 3, 6, 2);
+        ASN1ObjectIdentifier testObjectIdentifier1 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
+        ASN1ObjectIdentifier testObjectIdentifier2 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
+        ASN1ObjectIdentifier testObjectIdentifier3 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
+        ASN1ObjectIdentifier testObjectIdentifier4 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1, 23);
+        ASN1ObjectIdentifier testObjectIdentifier5 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
+        ASN1ObjectIdentifier testObjectIdentifier6 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 2);
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
@@ -77,12 +71,12 @@ public class TestX680_32 {
     @Test
     public void testObjectIdentifiersWithoutDefaults() {
         TestObjectIdentifiers a = new TestObjectIdentifiers();
-        TestObjectIdentifier1 testObjectIdentifier1 = createOID(new TestObjectIdentifier1(), 2, 3);
-        TestObjectIdentifier2 testObjectIdentifier2 = createOID(new TestObjectIdentifier2(), 0, 7, 1, 1);
-        TestObjectIdentifier3 testObjectIdentifier3 = createOID(new TestObjectIdentifier3(), 1, 9, 6, 7);
-        TestObjectIdentifier4 testObjectIdentifier4 = createOID(new TestObjectIdentifier4(), 1, 9, 6, 7, 17);
-        TestObjectIdentifier5 testObjectIdentifier5 = createOID(new TestObjectIdentifier5(), 1, 9, 6, 7, 13);
-        TestObjectIdentifier6 testObjectIdentifier6 = createOID(new TestObjectIdentifier6(), 1, 9, 6, 7, 11);
+        ASN1ObjectIdentifier testObjectIdentifier1 = createOID(new ASN1ObjectIdentifier(), 2, 3);
+        ASN1ObjectIdentifier testObjectIdentifier2 = createOID(new ASN1ObjectIdentifier(), 0, 7, 1, 1);
+        ASN1ObjectIdentifier testObjectIdentifier3 = createOID(new ASN1ObjectIdentifier(), 1, 9, 6, 7);
+        ASN1ObjectIdentifier testObjectIdentifier4 = createOID(new ASN1ObjectIdentifier(), 1, 9, 6, 7, 17);
+        ASN1ObjectIdentifier testObjectIdentifier5 = createOID(new ASN1ObjectIdentifier(), 1, 9, 6, 7, 13);
+        ASN1ObjectIdentifier testObjectIdentifier6 = createOID(new ASN1ObjectIdentifier(), 1, 9, 6, 7, 11);
 
         a.setTestObjectIdentifier1(testObjectIdentifier1);
         a.setTestObjectIdentifier2(testObjectIdentifier2);

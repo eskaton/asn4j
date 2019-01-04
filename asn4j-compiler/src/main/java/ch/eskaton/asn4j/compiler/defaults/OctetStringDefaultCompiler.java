@@ -32,26 +32,27 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 
 public class OctetStringDefaultCompiler implements DefaultCompiler {
 
-    public void compileDefault(CompilerContext ctx, JavaClass clazz,
-            String typeName, String field, Value value) throws CompilerException {
+    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
+            Value value) throws CompilerException {
         value = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
 
-    	if (!(value instanceof StringValue)) {
-    		throw new CompilerException("Invalid default value");
-    	}
+        if (!(value instanceof StringValue)) {
+            throw new CompilerException("Invalid default value");
+        }
 
-    	String strValue = ((StringValue) value).getCString();
         String defaultField = addDefaultField(clazz, typeName, field);
+        String strValue = ((StringValue) value).getCString();
 
-    	clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-    			+ ASN1OctetString.class.getSimpleName() + ".valueOf(\""
-    			+ strValue + "\");"));
+        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
+                + ASN1OctetString.class.getSimpleName() + ".valueOf(\""
+                + strValue + "\");"));
     }
 
 }
