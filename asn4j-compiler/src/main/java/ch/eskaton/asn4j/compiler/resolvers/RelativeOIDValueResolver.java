@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 
