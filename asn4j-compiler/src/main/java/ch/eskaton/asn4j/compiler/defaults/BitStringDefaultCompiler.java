@@ -32,21 +32,16 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
-import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.math.BigInteger;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.getTypeName;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class BitStringDefaultCompiler implements DefaultCompiler {
@@ -66,20 +61,8 @@ public class BitStringDefaultCompiler implements DefaultCompiler {
                 value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
                 bitStringValue = ctx.resolveValue(BitStringValue.class, (SimpleDefinedValue) value);
             } else if (resolveAmbiguousValue(value, BitStringValue.class) != null) {
-                Type base = type;
-
-                if (type instanceof TypeReference) {
-                    base = ctx.getBase(((TypeReference) type).getType());
-                }
-
-                if (!(base instanceof BitString)) {
-                    throw new CompilerException(getTypeName(type) + " is not a BIT STRING");
-                }
-
-                bitStringValue = resolveAmbiguousValue(value, BitStringValue.class);
-
-                Map<String, BigInteger> namedBits = new BitStringValueResolver(ctx).getNamedBits((BitString) base);
-                bitStringValue = new BitStringValueResolver(ctx).resolveValue(typeName, namedBits, bitStringValue);
+                value = resolveAmbiguousValue(value, BitStringValue.class);
+                bitStringValue = new BitStringValueResolver(ctx).resolve(type, (BitStringValue) value);
             }
 
             bytes = bitStringValue.getByteValue();
