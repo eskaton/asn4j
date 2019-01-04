@@ -462,15 +462,19 @@ public class CompilerContext {
         return builtinTypes.contains(name);
     }
 
+    public <T> T resolveValue(Class<T> valueClass, Type type, T value) {
+        return getValueResolver(valueClass).resolve(type, value);
+    }
+
     public <T> T resolveValue(Class<T> valueClass, DefinedValue ref) {
-        return (T) getValueResolver(valueClass).resolve(ref);
+        return getValueResolver(valueClass).resolve(ref);
     }
 
     public <T> T resolveValue(Class<T> valueClass, String ref) {
-        return (T) getValueResolver(valueClass).resolve(ref);
+        return getValueResolver(valueClass).resolve(ref);
     }
 
-    private <T> ValueResolver<?> getValueResolver(Class<T> valueClass) {
+    private <T> ValueResolver<T> getValueResolver(Class<T> valueClass) {
         ValueResolver<T> valueResolver = (ValueResolver<T>) valueResolvers.get(valueClass);
 
         if (valueResolver == null) {

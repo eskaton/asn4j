@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 
 public interface ValueResolver<T> {
@@ -35,5 +36,7 @@ public interface ValueResolver<T> {
     T resolve(DefinedValue ref) throws CompilerException;
 
     T resolve(String ref) throws CompilerException;
+
+    T resolve(Type type, T value) throws CompilerException;
 
 }

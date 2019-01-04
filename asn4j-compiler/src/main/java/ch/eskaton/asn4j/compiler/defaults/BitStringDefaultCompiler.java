@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
@@ -58,11 +57,11 @@ public class BitStringDefaultCompiler implements DefaultCompiler {
             BitStringValue bitStringValue = null;
 
             if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-                value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-                bitStringValue = ctx.resolveValue(BitStringValue.class, (SimpleDefinedValue) value);
+                bitStringValue = ctx.resolveValue(BitStringValue.class,
+                        resolveAmbiguousValue(value, SimpleDefinedValue.class));
             } else if (resolveAmbiguousValue(value, BitStringValue.class) != null) {
-                value = resolveAmbiguousValue(value, BitStringValue.class);
-                bitStringValue = new BitStringValueResolver(ctx).resolve(type, (BitStringValue) value);
+                bitStringValue = ctx.resolveValue(BitStringValue.class, type,
+                        resolveAmbiguousValue(value, BitStringValue.class));
             }
 
             bytes = bitStringValue.getByteValue();
