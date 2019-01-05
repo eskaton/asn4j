@@ -115,15 +115,15 @@ public class BooleanConstraintCompiler extends
                 if (value instanceof BooleanValue) {
                     return new HashSet<>(Arrays.asList(((BooleanValue) value).getValue()));
                 } else {
-                    throw new CompilerException("Invalid single-value constraint " + value.getClass().getName()
-                            + " for BOOLEAN type");
+                    throw new CompilerException("Invalid single-value constraint %s for BOOLEAN type",
+                            value.getClass().getSimpleName());
                 }
             } else if (elements instanceof ContainedSubtype) {
                 Type type = ((ContainedSubtype) elements).getType();
                 return calculateContainedSubtype(type);
             } else {
-                throw new CompilerException("Invalid constraint "
-                        + elements.getClass().getName() + " for BOOLEAN type");
+                throw new CompilerException("Invalid constraint %s for BOOLEAN type",
+                        elements.getClass().getSimpleName());
             }
         }
     }
@@ -177,7 +177,7 @@ public class BooleanConstraintCompiler extends
             return (Set<Boolean>) compileConstraints(type,
                     typeResolver.getBase(((TypeReference) type).getType()));
         } else {
-            throw new CompilerException("Invalid type " + type + " in constraint for BOOLEAN type");
+            throw new CompilerException("Invalid type %s in constraint for BOOLEAN type", type);
         }
     }
 

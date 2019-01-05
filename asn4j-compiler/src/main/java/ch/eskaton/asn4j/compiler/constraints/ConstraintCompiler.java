@@ -86,8 +86,7 @@ public class ConstraintCompiler {
         }
 
         if (!compilers.containsKey(base.getClass())) {
-            throw new CompilerException("Constraints for type " + base.getClass().getSimpleName()
-                    + " not yet supported");
+            throw new CompilerException("Constraints for type %s not yet supported", base.getClass().getSimpleName());
         }
 
         AbstractConstraintCompiler<?> compiler = compilers.get(base.getClass());
@@ -97,12 +96,12 @@ public class ConstraintCompiler {
         try {
             cons = compiler.compileConstraints(node, base);
         } catch (CompilerException e) {
-            throw new CompilerException("Error in constraints for type " + name + ": " + e.getMessage(), e);
+            throw new CompilerException("Error in constraints for type %s: %s", e, name, e.getMessage());
         }
 
         if (cons != null) {
             if (cons.isEmpty()) {
-                throw new CompilerException("Constraints for type " + name + " excludes all values");
+                throw new CompilerException("Constraints for type %s excludes all values", name);
             }
 
             compiler.addConstraint(clazz, cons);

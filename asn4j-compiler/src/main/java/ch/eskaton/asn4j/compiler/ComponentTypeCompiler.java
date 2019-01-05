@@ -110,7 +110,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             assignment = ctx.getTypeAssignment(refTypeName, null);
 
             if (assignment == null) {
-                throw new CompilerException("Type " + refTypeName + " referenced but not defined");
+                throw new CompilerException("Type %s referenced but not defined", refTypeName);
             }
 
             ctx.duplicateModule();
@@ -122,8 +122,8 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             assignment = ctx.getTypeAssignment(refTypeName, refModuleName);
 
             if (assignment == null) {
-                throw new CompilerException("Type " + refTypeName + " from Module " + refModuleName +
-                        " referenced but not defined or not exported");
+                throw new CompilerException("Type %s from Module %s referenced but not defined or not exported",
+                        refTypeName, refModuleName);
             }
 
             ctx.pushModule(refModuleName);
@@ -139,7 +139,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         } else if (referencedType instanceof SequenceType) {
             componentTypes = ((SequenceType) referencedType).getAllComponents();
         } else {
-            throw new CompilerException("Components of type " + referencedType + " not supported");
+            throw new CompilerException("Components of type %s not supported", referencedType);
         }
 
         List<String> fieldNames = new ArrayList<>();
