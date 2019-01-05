@@ -25,35 +25,42 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.resolvers;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
+import ch.eskaton.asn4j.parser.ast.values.IRIValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 
-import java.util.Collection;
+public class RelativeIRIValueResolver extends AbstractValueResolver<RelativeIRIValue> {
 
-public class IRIConstraintCompiler extends AbstractConstraintCompiler<IRI> {
-
-    public IRIConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
+    public RelativeIRIValueResolver(CompilerContext ctx) {
+        super(ctx);
     }
 
     @Override
-    protected Collection<IRI> compileConstraint(ElementSet set) throws CompilerException {
-        return null;
+    protected RelativeIRIValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
+        Node type = valueAssignment.getType();
+        Node value = valueAssignment.getValue();
+
+        type = ctx.resolveTypeReference(type);
+
+        if (type instanceof RelativeIRI) {
+            value = CompilerUtils.resolveAmbiguousValue(value, RelativeIRIValue.class);
+
+            if (!(value instanceof RelativeIRIValue)) {
+                throw new CompilerException("RELATIVE-IRI value expected");
+            }
+
+            return ((RelativeIRIValue) value);
+        }
+
+        throw new CompilerException("Failed to resolve an RELATIVE-IRI value");
     }
 
-    @Override
-    protected Collection<IRI> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
-        return null;
-    }
-
-    @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
-
-    }
-    
 }

@@ -32,29 +32,11 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
 import ch.eskaton.commons.utils.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @ASN1Tag(clazz = Clazz.Universal, tag = 35, mode = ASN1Tag.Mode.Explicit, constructed = false)
-public class ASN1IRI implements ASN1Type {
-
-    protected List<String> components;
-
-    public void setValue(String... components) throws ValidationException {
-        setValue(Arrays.asList(components));
-    }
-
-    public void setValue(List<String> components) throws ValidationException {
-        this.components = new ArrayList<>(components);
-    }
-
-    public List<String> getValue() {
-        return components;
-    }
+public class ASN1IRI extends AbstractASN1IRI {
 
     public static ASN1IRI from(String... components) throws ValidationException {
         ASN1IRI iri = new ASN1IRI();

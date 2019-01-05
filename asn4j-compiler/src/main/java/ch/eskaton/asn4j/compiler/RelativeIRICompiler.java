@@ -25,35 +25,16 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 
-import java.util.Collection;
-
-public class IRIConstraintCompiler extends AbstractConstraintCompiler<IRI> {
-
-    public IRIConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
-    }
+public class RelativeIRICompiler implements NamedCompiler<RelativeIRI> {
 
     @Override
-    protected Collection<IRI> compileConstraint(ElementSet set) throws CompilerException {
-        return null;
+    public void compile(CompilerContext ctx, String name, RelativeIRI node) throws CompilerException {
+        ctx.createClass(name, node, false);
+        ctx.finishClass();
     }
 
-    @Override
-    protected Collection<IRI> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
-        return null;
-    }
-
-    @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
-
-    }
-    
 }

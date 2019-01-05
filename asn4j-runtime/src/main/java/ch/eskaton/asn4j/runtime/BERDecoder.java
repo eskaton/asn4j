@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.runtime.decoders.IntegerDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ObjectIdentifierDecoder;
 import ch.eskaton.asn4j.runtime.decoders.OctetStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.RealDecoder;
+import ch.eskaton.asn4j.runtime.decoders.RelativeIRIDecoder;
 import ch.eskaton.asn4j.runtime.decoders.RelativeOIDDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SequenceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SequenceOfDecoder;
@@ -58,6 +59,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
@@ -101,6 +103,7 @@ public class BERDecoder implements Decoder {
                     put(ASN1ObjectIdentifier.class, new ObjectIdentifierDecoder());
                     put(ASN1RelativeOID.class, new RelativeOIDDecoder());
                     put(ASN1IRI.class, new IRIDecoder());
+                    put(ASN1RelativeIRI.class, new RelativeIRIDecoder());
                     put(ASN1OctetString.class, new OctetStringDecoder());
                     put(ASN1VisibleString.class, new VisibleStringDecoder());
                 }
@@ -234,6 +237,8 @@ public class BERDecoder implements Decoder {
                     getDecoder(ASN1RelativeOID.class).decode(states, state, (ASN1RelativeOID) obj);
                 } else if (obj instanceof ASN1IRI) {
                     getDecoder(ASN1IRI.class).decode(states, state, (ASN1IRI) obj);
+                } else if (obj instanceof ASN1RelativeIRI) {
+                    getDecoder(ASN1RelativeIRI.class).decode(states, state, (ASN1RelativeIRI) obj);
                 } else {
                     throw new DecodingException("Decoding of object " + obj.getClass().getName() + " not supported");
                 }
