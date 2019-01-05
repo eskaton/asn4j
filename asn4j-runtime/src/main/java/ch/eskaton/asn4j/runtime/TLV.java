@@ -74,6 +74,8 @@ public class TLV {
                 longTag = (longTag << 7) | (c & 0x7F);
 
             } while ((c & 0x80) != 0);
+
+            tlv.tag = longTag;
         }
 
         if (pos >= buf.length) {
