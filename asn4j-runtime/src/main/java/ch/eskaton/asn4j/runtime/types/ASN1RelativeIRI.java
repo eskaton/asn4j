@@ -25,35 +25,58 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.runtime.types;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
+import ch.eskaton.commons.utils.StringUtils;
 
-import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
-public class IRIConstraintCompiler extends AbstractConstraintCompiler<IRI> {
+@ASN1Tag(clazz = Clazz.Universal, tag = 36, mode = ASN1Tag.Mode.Explicit, constructed = false)
+public class ASN1RelativeIRI extends AbstractASN1IRI {
 
-    public IRIConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
+    public static ASN1RelativeIRI from(String... components) throws ValidationException {
+        ASN1RelativeIRI iri = new ASN1RelativeIRI();
+
+        iri.setValue(components);
+
+        return iri;
+    }
+
+    public static ASN1RelativeIRI from(List<String> components) throws ValidationException {
+        ASN1RelativeIRI iri = new ASN1RelativeIRI();
+
+        iri.setValue(components);
+
+        return iri;
     }
 
     @Override
-    protected Collection<IRI> compileConstraint(ElementSet set) throws CompilerException {
-        return null;
+    public String toString() {
+        return components != null ? StringUtils.join(components, "/") : "null";
     }
 
     @Override
-    protected Collection<IRI> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
-        return null;
+    public int hashCode() {
+        return Objects.hash(components);
     }
 
     @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
 
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        ASN1RelativeIRI other = (ASN1RelativeIRI) obj;
+
+        return Objects.equals(components, other.components);
     }
-    
+
 }

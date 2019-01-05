@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -37,6 +37,8 @@ import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
+import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
+import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -67,7 +69,9 @@ public class ConstraintCompiler {
                 put(Null.class, new NullConstraintCompiler(ConstraintCompiler.this, typeResolver));
                 put(SetOfType.class, new SetOfConstraintCompiler(ConstraintCompiler.this, typeResolver));
                 put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(RelativeOID.class, new RelativeOIDConstraintCompiler(ConstraintCompiler.this, typeResolver));
                 put(IRI.class, new IRIConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(RelativeIRI.class, new RelativeIRIConstraintCompiler(ConstraintCompiler.this, typeResolver));
             }
         };
     }
@@ -83,7 +87,7 @@ public class ConstraintCompiler {
 
         if (!compilers.containsKey(base.getClass())) {
             throw new CompilerException("Constraints for type " + base.getClass().getSimpleName()
-                                                + " not yet supported");
+                    + " not yet supported");
         }
 
         AbstractConstraintCompiler<?> compiler = compilers.get(base.getClass());

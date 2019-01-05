@@ -25,35 +25,18 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.runtime.encoders;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
+import ch.eskaton.commons.utils.StringUtils;
 
-import java.util.Collection;
-
-public class IRIConstraintCompiler extends AbstractConstraintCompiler<IRI> {
-
-    public IRIConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
-    }
+public class RelativeIRIEncoder implements TypeEncoder<ASN1RelativeIRI> {
 
     @Override
-    protected Collection<IRI> compileConstraint(ElementSet set) throws CompilerException {
-        return null;
+    public byte[] encode(Encoder encoder, ASN1RelativeIRI obj) throws EncodingException {
+        return (StringUtils.join(obj.getValue(), "/")).getBytes();
     }
 
-    @Override
-    protected Collection<IRI> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
-        return null;
-    }
-
-    @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
-
-    }
-    
 }
