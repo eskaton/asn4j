@@ -1,0 +1,18 @@
+X680-34 DEFINITIONS ::=
+BEGIN
+
+IRI ::= OID-IRI
+
+IRI-ID ::= IRI
+
+testOidIri1 OID-IRI ::= "/ISO/Registration-Authority/19785.CBEFF/Organizations"
+
+testOidIri3 IRI-ID ::= "/ISO/Registration-Authority/19785.CBEFF"
+
+TestOidIris ::= SEQUENCE {
+    testOidIri1 OID-IRI DEFAULT testOidIri1,
+    testOidIri2 OID-IRI DEFAULT "/ISO/Registration-Authority/Test",
+    testOidIri3 OID-IRI DEFAULT testOidIri3
+}
+
+END

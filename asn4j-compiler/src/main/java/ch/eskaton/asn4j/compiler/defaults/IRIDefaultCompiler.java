@@ -52,6 +52,8 @@ public class IRIDefaultCompiler implements DefaultCompiler {
         if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
             value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
             iriValue = ctx.resolveValue(IRIValue.class, (SimpleDefinedValue) value);
+        } else if (resolveAmbiguousValue(value, IRIValue.class) != null) {
+            iriValue = resolveAmbiguousValue(value, IRIValue.class);
         } else {
             throw new CompilerException("Invalid default value");
         }

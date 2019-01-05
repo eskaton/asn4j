@@ -74,7 +74,7 @@ public class ASN1IRI implements ASN1Type {
 
     @Override
     public String toString() {
-        return components != null ? StringUtils.join(components, "/") : "null";
+        return components != null ? "/" + StringUtils.join(components, "/") : "null";
     }
 
     @Override
