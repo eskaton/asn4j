@@ -146,13 +146,10 @@ public class CompilerContext {
         {
             put(BigInteger.class, new IntegerValueResolver(CompilerContext.this));
             put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this));
-            put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this,
-                    ObjectIdentifier.class, ObjectIdentifierValue.class));
-            put(RelativeOIDValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeOID.class,
-                    RelativeOIDValue.class));
+            put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this, ObjectIdentifier.class, ObjectIdentifierValue.class));
+            put(RelativeOIDValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeOID.class, RelativeOIDValue.class));
             put(IRIValue.class, new DefaultValueResolver<>(CompilerContext.this, IRI.class, IRIValue.class));
-            put(RelativeIRIValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeIRI.class,
-                    RelativeIRIValue.class));
+            put(RelativeIRIValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeIRI.class, RelativeIRIValue.class));
         }
     };
 
@@ -395,8 +392,8 @@ public class CompilerContext {
                 return getTypeName(selectedType);
             }
 
-            throw new CompilerException("Unknown SelectionType: %s < %s",
-                    selectionType.getId(), ((TypeReference) selectionType.getType()).getType());
+            throw new CompilerException(String.format("Unknown SelectionType: %s < %s",
+                    selectionType.getId(), ((TypeReference) selectionType.getType()).getType()));
         } else {
             throw new CompilerException("Unsupported type: " + type.getClass());
         }

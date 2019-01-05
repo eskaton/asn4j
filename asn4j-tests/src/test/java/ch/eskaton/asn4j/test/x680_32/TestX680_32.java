@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.test.x680_32;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
+import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifierRootArcs;
 import ch.eskaton.asn4jtest.x680_32.TestObjectIdentifiers;
 import org.junit.Test;
 
@@ -104,6 +105,23 @@ public class TestX680_32 {
         assertEquals(testObjectIdentifier4, b.getTestObjectIdentifier4());
         assertEquals(testObjectIdentifier5, b.getTestObjectIdentifier5());
         assertEquals(testObjectIdentifier6, b.getTestObjectIdentifier6());
+    }
+
+    @Test
+    public void testObjectIdentifiersRootArcs() {
+        TestObjectIdentifierRootArcs a = new TestObjectIdentifierRootArcs();
+
+        ASN1ObjectIdentifier oidItuT = createOID(new ASN1ObjectIdentifier(), 0, 12);
+        ASN1ObjectIdentifier oidCcitt = createOID(new ASN1ObjectIdentifier(), 0, 12);
+        ASN1ObjectIdentifier oidIso = createOID(new ASN1ObjectIdentifier(), 1, 12);
+        ASN1ObjectIdentifier oidJointIsoItuT = createOID(new ASN1ObjectIdentifier(), 2, 12);
+        ASN1ObjectIdentifier oidIsoCcitt = createOID(new ASN1ObjectIdentifier(), 2, 12);
+
+        assertEquals(oidItuT, a.getTestOidItuT());
+        assertEquals(oidCcitt, a.getTestOidCcitt());
+        assertEquals(oidIso, a.getTestOidIso());
+        assertEquals(oidJointIsoItuT, a.getTestOidJointIsoItuT());
+        assertEquals(oidIsoCcitt, a.getTestOidJointIsoCcitt());
     }
 
     public <T extends ASN1ObjectIdentifier> T createOID(ASN1ObjectIdentifier oid, int... components) {
