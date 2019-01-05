@@ -74,8 +74,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
                 if (numbers.get(i) == null) {
                     n = getNextNumber(numbers, i);
                     if (numbers.contains(n)) {
-                        throw new CompilerException("Duplicate enumeration value " + names.get(i)
-                                + "(" + n + ") in " + name);
+                        throw new CompilerException("Duplicate enumeration value %s(%s) in %s", names.get(i), n, name);
                     }
                     numbers.set(i, n);
                 }
@@ -137,7 +136,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
             BigInteger bigValue = ctx.resolveValue(BigInteger.class, item.getRef());
 
             if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-                throw new CompilerException("Value " + bigValue + " too large in type " + name);
+                throw new CompilerException("Value %s too large in type %s", bigValue, name);
             }
 
             number = bigValue.intValue();
@@ -160,11 +159,11 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
     private void addEnumerationItem(String typeName, List<String> names, List<Integer> values, String name,
             Integer value) throws CompilerException {
         if (names.contains(name)) {
-            throw new CompilerException("Duplicate enumeration item '" + name + "' in " + typeName);
+            throw new CompilerException("Duplicate enumeration item '%s' in %s", name, typeName);
         }
 
         if (value != null && values.contains(value)) {
-            throw new CompilerException("Duplicate enumeration value " + name + "(" + value + ") in " + typeName);
+            throw new CompilerException("Duplicate enumeration value %s(%s) in %s", name, value, typeName);
         }
 
         names.add(name);

@@ -52,8 +52,8 @@ public class SetCompiler implements NamedCompiler<SetType> {
             ComponentType seenComponent = seenTags.get(tagId);
 
             if (seenComponent != null) {
-                throw new CompilerException(String.format("Duplicate tags in set %s: %s and %s", name,
-                        getName(seenComponent), getName(component)));
+                throw new CompilerException("Duplicate tags in set %s: %s and %s", name,
+                        getName(seenComponent), getName(component));
             }
 
             seenTags.put(tagId, component);

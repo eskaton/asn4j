@@ -86,7 +86,7 @@ public class DefaultsCompiler {
         }
 
         if (!compilers.containsKey(base.getClass())) {
-            throw new CompilerException("Defaults for type " + getTypeName(base) + " not yet supported");
+            throw new CompilerException("Defaults for type %s not yet supported", getTypeName(base));
         }
 
         DefaultCompiler compiler = compilers.get(base.getClass());

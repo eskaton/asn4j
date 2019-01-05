@@ -91,12 +91,13 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
         throw new CompilerException("Failed to resolve a BIT STRING value");
     }
 
-    private BitStringValue resolveValue(String typeName, Map<String, BigInteger> namedBits, BitStringValue bitStringValue) {
+    private BitStringValue resolveValue(String typeName, Map<String, BigInteger> namedBits,
+            BitStringValue bitStringValue) {
         List<BigInteger> bits = new ArrayList<>(bitStringValue.getNamedValues().size());
 
         for (String namedValue : bitStringValue.getNamedValues()) {
             if (!namedBits.containsKey(namedValue)) {
-                throw new CompilerException(typeName + " has no component " + namedValue);
+                throw new CompilerException("%s has no component %s", typeName, namedValue);
             }
 
             bits.add(namedBits.get(namedValue));
