@@ -34,11 +34,8 @@ import ch.eskaton.asn4j.compiler.java.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
@@ -149,10 +146,13 @@ public class CompilerContext {
         {
             put(BigInteger.class, new IntegerValueResolver(CompilerContext.this));
             put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this));
-            put(ObjectIdentifierValue.class, new ObjectIdentifierValueResolver(CompilerContext.this));
-            put(RelativeOIDValue.class, new RelativeOIDValueResolver(CompilerContext.this));
-            put(IRIValue.class, new IRIValueResolver(CompilerContext.this));
-            put(RelativeIRIValue.class, new RelativeIRIValueResolver(CompilerContext.this));
+            put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this,
+                    ObjectIdentifier.class, ObjectIdentifierValue.class));
+            put(RelativeOIDValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeOID.class,
+                    RelativeOIDValue.class));
+            put(IRIValue.class, new DefaultValueResolver<>(CompilerContext.this, IRI.class, IRIValue.class));
+            put(RelativeIRIValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeIRI.class,
+                    RelativeIRIValue.class));
         }
     };
 

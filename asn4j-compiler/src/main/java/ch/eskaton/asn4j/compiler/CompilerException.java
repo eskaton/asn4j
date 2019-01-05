@@ -34,6 +34,10 @@ public class CompilerException extends RuntimeException {
         super(message);
     }
 
+    public CompilerException(String format, String... args) {
+        super(String.format(format, args));
+    }
+
     public CompilerException(Throwable cause) {
         super(cause);
     }
