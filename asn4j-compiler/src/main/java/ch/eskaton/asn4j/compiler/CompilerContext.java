@@ -395,8 +395,8 @@ public class CompilerContext {
                 return getTypeName(selectedType);
             }
 
-            throw new CompilerException(String.format("Unknown SelectionType: %s < %s",
-                    selectionType.getId(), ((TypeReference) selectionType.getType()).getType()));
+            throw new CompilerException("Unknown SelectionType: %s < %s",
+                    selectionType.getId(), ((TypeReference) selectionType.getType()).getType());
         } else {
             throw new CompilerException("Unsupported type: " + type.getClass());
         }

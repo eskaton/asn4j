@@ -91,7 +91,7 @@ public abstract class AbstractConstraintCompiler<T> {
     			TypeAssignmentNode type = typeResolver.getType(((TypeReference) node).getType());
 
     			if (type == null) {
-    				throw new CompilerException("Referenced type " + ((TypeReference) node).getType() + " not found");
+    				throw new CompilerException("Referenced type %s not found", ((TypeReference) node).getType());
     			}
 
     			node = type.getType();
@@ -141,8 +141,8 @@ public abstract class AbstractConstraintCompiler<T> {
     				}
     			}
     		} else {
-                throw new CompilerException("Constraints of type " + constraint.getClass().getName()
-                                                    + " not yet supported");
+                throw new CompilerException("Constraints of type %s not yet supported",
+                        constraint.getClass().getSimpleName());
     		}
     	}
 

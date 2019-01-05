@@ -105,8 +105,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
                                 new EndpointNode(value, true)));
                     }
                 } else {
-                    throw new CompilerException("Invalid single-value constraint " + value.getClass().getName()
-                            + " for INTEGER type");
+                    throw new CompilerException("Invalid single-value constraint %s for INTEGER type",
+                            value.getClass().getSimpleName());
                 }
     		} else if (elements instanceof ContainedSubtype) {
     			Type type = ((ContainedSubtype) elements).getType();
@@ -116,7 +116,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
     			EndpointNode upper = canonicalizeEndpoint(((RangeNode) elements).getUpper(), false);
     			return Arrays.asList(new RangeNode(lower, upper));
     		} else {
-    			throw new CompilerException("Invalid constraint " + elements.getClass().getName() + " for INTEGER type");
+    			throw new CompilerException("Invalid constraint %s for INTEGER type",
+                        elements.getClass().getSimpleName());
     		}
     	}
     }
@@ -271,7 +272,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
     		return (List<RangeNode>) compileConstraints(type,
     				typeResolver.getBase(((TypeReference) type).getType()));
     	} else {
-    		throw new CompilerException("Invalid type " + type + " in constraint for INTEGER type");
+    		throw new CompilerException("Invalid type %s in constraint for INTEGER type", type);
     	}
     }
 
@@ -484,7 +485,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
 
     	for (Object value : values) {
             if (!(value instanceof RangeNode)) {
-                throw new CompilerException(String.format("Invalid type %s in INTEGER constraint", value.getClass()));
+                throw new CompilerException("Invalid type %s in INTEGER constraint", value.getClass());
             }
 
             RangeNode range = (RangeNode) value;

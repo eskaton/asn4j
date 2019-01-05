@@ -56,7 +56,7 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
                     BigInteger bigValue = ctx.resolveValue(BigInteger.class, namedBit.getRef());
 
                     if (bigValue.bitLength() > 63) {
-                        throw new CompilerException("Named bit '" + fieldName + "' too long: " + bigValue.toString());
+                        throw new CompilerException("Named bit '%s' too long: %s", fieldName, bigValue.toString());
                     }
 
                     value = bigValue.longValue();
