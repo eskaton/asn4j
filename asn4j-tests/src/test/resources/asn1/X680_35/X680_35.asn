@@ -1,0 +1,18 @@
+X680-35 DEFINITIONS ::=
+BEGIN
+
+RELATIVE-IRI ::= RELATIVE-OID-IRI
+
+RELATIVE-IRI-ID ::= RELATIVE-IRI
+
+testRelativeOidIri1 RELATIVE-OID-IRI ::= "Registration-Authority/19785.CBEFF/Organizations"
+
+testRelativeOidIri3 RELATIVE-IRI-ID ::= "19785.CBEFF"
+
+TestRelativeOidIris ::= SEQUENCE {
+    testRelativeOidIri1 RELATIVE-OID-IRI DEFAULT testRelativeOidIri1,
+    testRelativeOidIri2 RELATIVE-OID-IRI DEFAULT "Registration-Authority/Test",
+    testRelativeOidIri3 RELATIVE-OID-IRI DEFAULT testRelativeOidIri3
+}
+
+END

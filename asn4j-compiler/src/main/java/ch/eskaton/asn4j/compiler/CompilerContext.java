@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
@@ -58,6 +59,7 @@ import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
+import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
@@ -74,6 +76,7 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
@@ -91,6 +94,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
@@ -137,6 +141,7 @@ public class CompilerContext {
             put(ObjectIdentifier.class, new ObjectIdentifierCompiler());
             put(RelativeOID.class, new RelativeOIDCompiler());
             put(IRI.class, new IRICompiler());
+            put(RelativeIRI.class, new RelativeIRICompiler());
         }
     };
 
@@ -147,6 +152,7 @@ public class CompilerContext {
             put(ObjectIdentifierValue.class, new ObjectIdentifierValueResolver(CompilerContext.this));
             put(RelativeOIDValue.class, new RelativeOIDValueResolver(CompilerContext.this));
             put(IRIValue.class, new IRIValueResolver(CompilerContext.this));
+            put(RelativeIRIValue.class, new RelativeIRIValueResolver(CompilerContext.this));
         }
     };
 
@@ -176,6 +182,7 @@ public class CompilerContext {
             put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName());
             put(RelativeOID.class.getSimpleName(), ASN1RelativeOID.class.getSimpleName());
             put(IRI.class.getSimpleName(), ASN1IRI.class.getSimpleName());
+            put(RelativeIRI.class.getSimpleName(), ASN1RelativeIRI.class.getSimpleName());
             put(OctetString.class.getSimpleName(), ASN1OctetString.class.getSimpleName());
             put(SequenceType.class.getSimpleName(), ASN1Sequence.class.getSimpleName());
             put(SequenceOfType.class.getSimpleName(), ASN1SequenceOf.class.getSimpleName());
@@ -377,7 +384,8 @@ public class CompilerContext {
             typeName = defineType(type, name, true);
         } else if (type instanceof ObjectIdentifier
                 || type instanceof RelativeOID
-                || type instanceof IRI) {
+                || type instanceof IRI
+                || type instanceof RelativeIRI) {
             typeName = defineType(type, name);
         } else if (type instanceof SelectionType) {
             SelectionType selectionType = (SelectionType) type;
@@ -490,6 +498,8 @@ public class CompilerContext {
 
             if (assignment != null) {
                 type = assignment.getType();
+            } else {
+                throw new CompilerException("Failed to resolve reference to " + ((TypeReference) type).getType());
             }
         }
 

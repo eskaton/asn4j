@@ -39,6 +39,7 @@ import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
+import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -60,6 +61,7 @@ public class DefaultsCompiler {
                     put(ObjectIdentifier.class, new ObjectIdentifierDefaultCompiler());
                     put(RelativeOID.class, new RelativeOIDDefaultCompiler());
                     put(IRI.class, new IRIDefaultCompiler());
+                    put(RelativeIRI.class, new RelativeIRIDefaultCompiler());
                 }
             };
 

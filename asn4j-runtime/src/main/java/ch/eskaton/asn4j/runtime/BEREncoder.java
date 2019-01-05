@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.runtime.encoders.NullEncoder;
 import ch.eskaton.asn4j.runtime.encoders.ObjectIdentifierEncoder;
 import ch.eskaton.asn4j.runtime.encoders.OctetStringEncoder;
 import ch.eskaton.asn4j.runtime.encoders.RealEncoder;
+import ch.eskaton.asn4j.runtime.encoders.RelativeIRIEncoder;
 import ch.eskaton.asn4j.runtime.encoders.RelativeOIDEncoder;
 import ch.eskaton.asn4j.runtime.encoders.SequenceEncoder;
 import ch.eskaton.asn4j.runtime.encoders.SequenceOfEncoder;
@@ -56,6 +57,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
@@ -91,6 +93,7 @@ public class BEREncoder implements Encoder {
             put(ASN1ObjectIdentifier.class, new ObjectIdentifierEncoder());
             put(ASN1RelativeOID.class, new RelativeOIDEncoder());
             put(ASN1IRI.class, new IRIEncoder());
+            put(ASN1RelativeIRI.class, new RelativeIRIEncoder());
             put(ASN1OctetString.class, new OctetStringEncoder());
             put(ASN1Sequence.class, new SequenceEncoder());
             put(ASN1SequenceOf.class, new SequenceOfEncoder());
@@ -155,6 +158,8 @@ public class BEREncoder implements Encoder {
                     .encode(this, (ASN1RelativeOID) obj);
         } else if (obj instanceof ASN1IRI) {
             buf = this.<ASN1IRI, IRIEncoder>getEncoder(ASN1IRI.class).encode(this, (ASN1IRI) obj);
+        } else if (obj instanceof ASN1RelativeIRI) {
+            buf = this.<ASN1RelativeIRI, RelativeIRIEncoder>getEncoder(ASN1RelativeIRI.class).encode(this, (ASN1RelativeIRI) obj);
         } else if (obj instanceof ASN1Sequence) {
             buf = this.<ASN1Sequence, SequenceEncoder> getEncoder(
                     ASN1Sequence.class).encode(this, (ASN1Sequence) obj);
