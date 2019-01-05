@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.encoders.BitStringEncoder;
 import ch.eskaton.asn4j.runtime.encoders.BooleanEncoder;
 import ch.eskaton.asn4j.runtime.encoders.ChoiceEncoder;
 import ch.eskaton.asn4j.runtime.encoders.EnumerationTypeEncoder;
+import ch.eskaton.asn4j.runtime.encoders.IRIEncoder;
 import ch.eskaton.asn4j.runtime.encoders.IntegerEncoder;
 import ch.eskaton.asn4j.runtime.encoders.NullEncoder;
 import ch.eskaton.asn4j.runtime.encoders.ObjectIdentifierEncoder;
@@ -49,6 +50,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
@@ -88,6 +90,7 @@ public class BEREncoder implements Encoder {
             put(ASN1Null.class, new NullEncoder());
             put(ASN1ObjectIdentifier.class, new ObjectIdentifierEncoder());
             put(ASN1RelativeOID.class, new RelativeOIDEncoder());
+            put(ASN1IRI.class, new IRIEncoder());
             put(ASN1OctetString.class, new OctetStringEncoder());
             put(ASN1Sequence.class, new SequenceEncoder());
             put(ASN1SequenceOf.class, new SequenceOfEncoder());
@@ -150,6 +153,8 @@ public class BEREncoder implements Encoder {
         } else if (obj instanceof ASN1RelativeOID) {
             buf = this.<ASN1RelativeOID, RelativeOIDEncoder>getEncoder(ASN1RelativeOID.class)
                     .encode(this, (ASN1RelativeOID) obj);
+        } else if (obj instanceof ASN1IRI) {
+            buf = this.<ASN1IRI, IRIEncoder>getEncoder(ASN1IRI.class).encode(this, (ASN1IRI) obj);
         } else if (obj instanceof ASN1Sequence) {
             buf = this.<ASN1Sequence, SequenceEncoder> getEncoder(
                     ASN1Sequence.class).encode(this, (ASN1Sequence) obj);

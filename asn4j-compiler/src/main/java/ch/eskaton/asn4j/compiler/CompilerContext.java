@@ -352,7 +352,7 @@ public class CompilerContext {
             if (type instanceof UsefulType) {
                 typeName = ((UsefulType) type).getType();
             } else {
-                typeName = ((TypeReference) type).getType();
+                typeName = CompilerUtils.formatTypeName(((TypeReference) type).getType());
                 addReferencedType(typeName);
             }
         } else if (type instanceof Null) {

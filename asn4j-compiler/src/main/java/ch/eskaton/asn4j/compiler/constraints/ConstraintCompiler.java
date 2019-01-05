@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
+import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
@@ -65,7 +66,8 @@ public class ConstraintCompiler {
                 put(OctetString.class, new OctetStringConstraintCompiler(ConstraintCompiler.this, typeResolver));
                 put(Null.class, new NullConstraintCompiler(ConstraintCompiler.this, typeResolver));
                 put(SetOfType.class, new SetOfConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(ObjectIdentifier.class, new ObjectIdentifierConstrintCompiler(ConstraintCompiler.this, typeResolver));
+                put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(IRI.class, new IRIConstraintCompiler(ConstraintCompiler.this, typeResolver));
             }
         };
     }
