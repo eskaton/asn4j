@@ -63,7 +63,13 @@ public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<
                     ids.add(getComponentId(ctx, component));
                 } catch (CompilerException e) {
                     if (componentNum == 1) {
-                        resolveOIDReference(ctx, field, ids, component);
+                        Integer id = resolveRootArc(component.getName());
+
+                        if (id != null) {
+                            ids.add(id);
+                        } else {
+                            resolveOIDReference(ctx, field, ids, component);
+                        }
                     } else {
                         throw e;
                     }
@@ -74,6 +80,21 @@ public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<
 
             componentNum++;
         }
+    }
+
+    private Integer resolveRootArc(String name) {
+        switch (name) {
+            case "itu-t":
+            case "ccitt":
+                return 0;
+            case "iso":
+                return 1;
+            case "joint-iso-itu-t":
+            case "joint-iso-ccitt":
+                return 2;
+        }
+
+        return null;
     }
 
 }

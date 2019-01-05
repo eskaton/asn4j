@@ -34,4 +34,23 @@ TestObjectIdentifiers ::= SEQUENCE {
     testObjectIdentifier6 OBJECT IDENTIFIER DEFAULT testObjectIdentifier6
 }
 
+-- Test Root arcs according to X.660 A.2
+testOidItuT OBJECT IDENTIFIER ::= { itu-t test(12) }
+
+testOidCcitt OBJECT IDENTIFIER ::= { ccitt test(12) }
+
+testOidIso OBJECT IDENTIFIER ::= { iso test(12) }
+
+testOidJointIsoItuT OBJECT IDENTIFIER ::= { joint-iso-itu-t test(12) }
+
+testOidJointIsoCcitt OBJECT IDENTIFIER ::= { joint-iso-ccitt test(12) }
+
+TestObjectIdentifierRootArcs ::= SEQUENCE {
+   testOidItuT           OBJECT IDENTIFIER DEFAULT testOidItuT,
+   testOidCcitt          OBJECT IDENTIFIER DEFAULT testOidCcitt,
+   testOidIso            OBJECT IDENTIFIER DEFAULT testOidIso,
+   testOidJointIsoItuT   OBJECT IDENTIFIER DEFAULT testOidJointIsoItuT,
+   testOidJointIsoCcitt  OBJECT IDENTIFIER DEFAULT testOidJointIsoCcitt
+}
+
 END
