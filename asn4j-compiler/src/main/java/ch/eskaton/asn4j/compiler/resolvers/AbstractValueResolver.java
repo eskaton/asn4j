@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 
-public abstract class AbstractValueResolver<T> implements ValueResolver<T> {
+public abstract class AbstractValueResolver<V> implements ValueResolver<V> {
 
     protected CompilerContext ctx;
 
@@ -41,19 +41,19 @@ public abstract class AbstractValueResolver<T> implements ValueResolver<T> {
         this.ctx = ctx;
     }
 
-    public T resolve(DefinedValue ref) throws CompilerException {
+    public V resolve(DefinedValue ref) throws CompilerException {
         return resolve(ctx.resolveDefinedValue(ref));
     }
 
-    public T resolve(String ref) throws CompilerException {
+    public V resolve(String ref) throws CompilerException {
         return resolve(ctx.resolveReference(ref));
     }
 
-    protected abstract T resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException;
+    protected abstract V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException;
 
 
     @Override
-    public T resolve(Type type, T value) throws CompilerException {
+    public V resolve(Type type, V value) throws CompilerException {
         return value;
     }
 

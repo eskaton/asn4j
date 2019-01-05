@@ -173,13 +173,13 @@ public class CompilerUtils {
     }
 
 
-    public static <T extends Value> T resolveAmbiguousValue(Node value, Class<T> valueClass) {
+    public static <V extends Value> V resolveAmbiguousValue(Node value, Class<V> valueClass) {
         if (value instanceof AmbiguousValue) {
             return ((AmbiguousValue) value).getValue(valueClass);
         }
 
         if (valueClass.isAssignableFrom(value.getClass())) {
-            return (T) value;
+            return (V) value;
         }
 
         return null;

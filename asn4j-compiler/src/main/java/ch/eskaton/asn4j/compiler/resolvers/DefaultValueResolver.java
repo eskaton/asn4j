@@ -32,35 +32,42 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
-import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
-import ch.eskaton.asn4j.parser.ast.values.IRIValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class RelativeIRIValueResolver extends AbstractValueResolver<RelativeIRIValue> {
+public class DefaultValueResolver<T extends Type, V extends Value> extends AbstractValueResolver<V> {
 
-    public RelativeIRIValueResolver(CompilerContext ctx) {
+    private Class<T> typeClass;
+
+    private Class<V> valueClass;
+
+    public DefaultValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
         super(ctx);
+
+        this.typeClass = typeClass;
+        this.valueClass = valueClass;
     }
 
     @Override
-    protected RelativeIRIValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
+    protected V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
         Node type = valueAssignment.getType();
         Node value = valueAssignment.getValue();
 
         type = ctx.resolveTypeReference(type);
 
-        if (type instanceof RelativeIRI) {
-            value = CompilerUtils.resolveAmbiguousValue(value, RelativeIRIValue.class);
+        if (typeClass.isAssignableFrom(type.getClass())) {
+            value = CompilerUtils.resolveAmbiguousValue(value, valueClass);
 
-            if (!(value instanceof RelativeIRIValue)) {
-                throw new CompilerException("RELATIVE-IRI value expected");
+            if (!(valueClass.isAssignableFrom(value.getClass()))) {
+                throw new CompilerException("Expected a value of type %s but found %s", valueClass.getSimpleName(),
+                        value.getClass().getSimpleName());
             }
 
-            return ((RelativeIRIValue) value);
+            return (V) value;
         }
 
-        throw new CompilerException("Failed to resolve an RELATIVE-IRI value");
+        throw new CompilerException("Failed to resolve a value of type %s. Found type %s", typeClass.getSimpleName(),
+                type.getClass().getSimpleName());
     }
 
 }
