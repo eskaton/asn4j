@@ -85,7 +85,6 @@
                         </configuration>
                     </execution>
 
-
                     <execution>
                         <id>X680_21</id>
                         <phase>generate-sources</phase>

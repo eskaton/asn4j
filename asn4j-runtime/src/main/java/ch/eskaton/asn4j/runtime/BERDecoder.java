@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.decoders.BitStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.BooleanDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ChoiceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.EnumeratedTypeDecoder;
+import ch.eskaton.asn4j.runtime.decoders.IRIDecoder;
 import ch.eskaton.asn4j.runtime.decoders.IntegerDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ObjectIdentifierDecoder;
 import ch.eskaton.asn4j.runtime.decoders.OctetStringDecoder;
@@ -50,6 +51,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1NamedInteger;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
@@ -98,6 +100,7 @@ public class BERDecoder implements Decoder {
                     put(ASN1Real.class, new RealDecoder());
                     put(ASN1ObjectIdentifier.class, new ObjectIdentifierDecoder());
                     put(ASN1RelativeOID.class, new RelativeOIDDecoder());
+                    put(ASN1IRI.class, new IRIDecoder());
                     put(ASN1OctetString.class, new OctetStringDecoder());
                     put(ASN1VisibleString.class, new VisibleStringDecoder());
                 }
@@ -229,6 +232,8 @@ public class BERDecoder implements Decoder {
                     getDecoder(ASN1ObjectIdentifier.class).decode(states, state, (ASN1ObjectIdentifier) obj);
                 } else if (obj instanceof ASN1RelativeOID) {
                     getDecoder(ASN1RelativeOID.class).decode(states, state, (ASN1RelativeOID) obj);
+                } else if (obj instanceof ASN1IRI) {
+                    getDecoder(ASN1IRI.class).decode(states, state, (ASN1IRI) obj);
                 } else {
                     throw new DecodingException("Decoding of object " + obj.getClass().getName() + " not supported");
                 }
