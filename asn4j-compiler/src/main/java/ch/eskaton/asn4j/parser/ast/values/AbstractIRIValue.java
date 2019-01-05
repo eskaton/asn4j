@@ -31,10 +31,16 @@ import ch.eskaton.asn4j.parser.IRIToken;
 
 import java.util.List;
 
-public class RelativeIRIValue extends AbstractIRIValue {
+public class AbstractIRIValue implements Value {
 
-    public RelativeIRIValue(List<IRIToken> arcIdentifiers) {
-        super(arcIdentifiers);
+    private List<IRIToken> arcIdentifiers;
+
+    public AbstractIRIValue(List<IRIToken> arcIdentifiers) {
+        this.arcIdentifiers = arcIdentifiers;
+    }
+
+    public List<IRIToken> getArcIdentifiers() {
+        return arcIdentifiers;
     }
 
 }

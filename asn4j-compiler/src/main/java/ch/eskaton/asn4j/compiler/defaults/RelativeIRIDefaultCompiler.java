@@ -27,44 +27,13 @@
 
 package ch.eskaton.asn4j.compiler.defaults;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.parser.IRIToken;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.commons.utils.StringUtils;
 
-import java.util.stream.Collectors;
+public class RelativeIRIDefaultCompiler extends AbstractIRIDefaultCompiler<RelativeIRIValue> {
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
-public class RelativeIRIDefaultCompiler implements DefaultCompiler {
-
-    @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) throws CompilerException {
-        RelativeIRIValue relativeIRIValue;
-
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            relativeIRIValue = ctx.resolveValue(RelativeIRIValue.class, (SimpleDefinedValue) value);
-        } else if (resolveAmbiguousValue(value, RelativeIRIValue.class) != null) {
-            relativeIRIValue = resolveAmbiguousValue(value, RelativeIRIValue.class);
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
-
-        String defaultField = addDefaultField(clazz, typeName, field);
-
-        String valueString = relativeIRIValue.getArcIdentifiers().stream().map(IRIToken::getText).map(StringUtils::dquote).collect(Collectors.joining(", "));
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
-                + "\t\t" + defaultField + ".setValue(" + valueString + ");"));
+    public RelativeIRIDefaultCompiler() {
+        super(RelativeIRIValue.class);
     }
 
 }
