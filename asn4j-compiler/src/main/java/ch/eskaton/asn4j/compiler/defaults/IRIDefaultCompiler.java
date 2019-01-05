@@ -27,43 +27,12 @@
 
 package ch.eskaton.asn4j.compiler.defaults;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.parser.IRIToken;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.commons.utils.StringUtils;
 
-import java.util.stream.Collectors;
+public class IRIDefaultCompiler extends AbstractIRIDefaultCompiler<IRIValue> {
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
-
-public class IRIDefaultCompiler implements DefaultCompiler {
-
-    @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) throws CompilerException {
-        IRIValue iriValue;
-
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            iriValue = ctx.resolveValue(IRIValue.class, (SimpleDefinedValue) value);
-        } else if (resolveAmbiguousValue(value, IRIValue.class) != null) {
-            iriValue = resolveAmbiguousValue(value, IRIValue.class);
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
-
-        String defaultField = addDefaultField(clazz, typeName, field);
-
-        String valueString = iriValue.getArcIdentifiers().stream().map(IRIToken::getText).map(StringUtils::dquote).collect(Collectors.joining(", "));
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
-                + "\t\t" + defaultField + ".setValue(" + valueString + ");"));
+    public IRIDefaultCompiler() {
+        super(IRIValue.class);
     }
 
 }
