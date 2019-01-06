@@ -4725,9 +4725,7 @@ public class Parser {
     			Set<String> settings = PROPERTIES.get(property);
 
     			if (settings == null) {
-    				setException(
-    						String.format("Invalid property '%s'", property),
-    						propertyToken);
+    				setException(String.format("Invalid property '%s'", property), propertyToken);
     				return null;
     			}
 
@@ -4817,8 +4815,7 @@ public class Parser {
     }
 
     // SubtypeConstraint ::= ElementSetSpecs
-    protected class SubtypeConstraintParser implements
-    		RuleParser<SubtypeConstraint> {
+    protected class SubtypeConstraintParser implements RuleParser<SubtypeConstraint> {
 
     	public SubtypeConstraint parse() throws ParserException {
     		SetSpecsNode rule = setSpecsParser.parse();
@@ -4836,8 +4833,7 @@ public class Parser {
     // DefinedObjectClass ::=
     // ExternalObjectClassReference | objectclassreference |
     // UsefulObjectClassReference
-    protected class DefinedObjectClassParser implements
-    		RuleParser<ObjectClassReferenceNode> {
+    protected class DefinedObjectClassParser implements RuleParser<ObjectClassReferenceNode> {
 
     	@SuppressWarnings("unchecked")
     	public ObjectClassReferenceNode parse() throws ParserException {
@@ -4885,8 +4881,7 @@ public class Parser {
     // UsefulObjectClassReference ::=
     // TYPE-IDENTIFIER
     // | ABSTRACT-SYNTAX
-    protected class UsefulObjectClassReferenceParser implements
-    		RuleParser<ObjectClassReferenceNode> {
+    protected class UsefulObjectClassReferenceParser implements RuleParser<ObjectClassReferenceNode> {
 
     	public ObjectClassReferenceNode parse() throws ParserException {
     		Token rule = new ChoiceParser<Token>(TokenType.TYPE_IDENTIFIER_KW,
@@ -4919,8 +4914,7 @@ public class Parser {
     }
 
     // ObjectClassDefn ::= CLASS "{" FieldSpec "," + "}" WithSyntaxSpec?
-    protected class ObjectClassDefnParser implements
-    		RuleParser<ObjectClassDefn> {
+    protected class ObjectClassDefnParser implements RuleParser<ObjectClassDefn> {
 
     	@SuppressWarnings("unchecked")
     	public ObjectClassDefn parse() throws ParserException {
@@ -4945,8 +4939,7 @@ public class Parser {
     // | VariableTypeValueSetFieldSpec
     // | ObjectFieldSpec
     // | ObjectSetFieldSpec
-    protected class FieldSpecParser implements
-    		RuleParser<AbstractASN1FieldSpecNode> {
+    protected class FieldSpecParser implements RuleParser<AbstractASN1FieldSpecNode> {
 
     	@SuppressWarnings("unchecked")
     	public AbstractASN1FieldSpecNode parse() throws ParserException {
@@ -4965,24 +4958,20 @@ public class Parser {
     // | valuesetfieldreference
     // | objectfieldreference
     // | objectsetfieldreference
-    protected class PrimitiveFieldNameParser implements
-    		RuleParser<PrimitiveFieldNameNode> {
+    protected class PrimitiveFieldNameParser implements RuleParser<PrimitiveFieldNameNode> {
 
     	@SuppressWarnings("unchecked")
     	public PrimitiveFieldNameNode parse() throws ParserException {
     		Token rule = new ChoiceParser<>(new SingleTokenParser(
     				TokenType.TypeFieldReference, Context.TypeField),
-    				new SingleTokenParser(TokenType.ValueFieldReference,
-    						Context.ValueField)).parse();
+    				new SingleTokenParser(TokenType.ValueFieldReference, Context.ValueField)).parse();
 
     		if (rule != null) {
     			switch (rule.getType()) {
     			case TypeFieldReference:
-    				return new PrimitiveFieldNameNode(rule.getText().substring(
-    						1), TokenType.TypeFieldReference);
+    				return new PrimitiveFieldNameNode(rule.getText().substring(1), TokenType.TypeFieldReference);
     			case ValueFieldReference:
-    				return new PrimitiveFieldNameNode(rule.getText().substring(
-    						1), TokenType.ValueFieldReference);
+    				return new PrimitiveFieldNameNode(rule.getText().substring(1), TokenType.ValueFieldReference);
     			}
     		}
 
@@ -5008,17 +4997,14 @@ public class Parser {
     }
 
     // TypeFieldSpec ::= typefieldreference TypeOptionalitySpec?
-    protected class TypeFieldSpecParser implements
-    		RuleParser<TypeFieldSpecNode> {
+    protected class TypeFieldSpecParser implements RuleParser<TypeFieldSpecNode> {
 
     	public TypeFieldSpecNode parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(new boolean[] { true, true,
-    				false }, TokenType.Ampersand, TokenType.TypeReference,
-    				typeOptionalitySpecParser).parse();
+    		List<Object> rule = new SequenceParser(new boolean[] { true, true,false },
+                    TokenType.Ampersand, TokenType.TypeReference, typeOptionalitySpecParser).parse();
 
     		if (rule != null) {
-    			return new TypeFieldSpecNode(((Token) rule.get(1)).getText(),
-    					(OptionalitySpecNode) rule.get(2));
+    			return new TypeFieldSpecNode(((Token) rule.get(1)).getText(), (OptionalitySpecNode) rule.get(2));
     		}
 
     		return null;
@@ -5027,8 +5013,7 @@ public class Parser {
     }
 
     // TypeOptionalitySpec ::= OPTIONAL | DEFAULT Type
-    protected class TypeOptionalitySpecParser implements
-    		RuleParser<OptionalitySpecNode> {
+    protected class TypeOptionalitySpecParser implements RuleParser<OptionalitySpecNode> {
 
     	@SuppressWarnings("unchecked")
     	public OptionalitySpecNode parse() throws ParserException {
@@ -5054,16 +5039,16 @@ public class Parser {
     // ValueOptionalitySpec ?
     // ObjectFieldSpec ::= objectfieldreference DefinedObjectClass
     // ObjectOptionalitySpec?
-    protected class FixedTypeValueOrObjectFieldSpecParser implements
-    		RuleParser<FieldSpecNode> {
+    protected class FixedTypeValueOrObjectFieldSpecParser implements RuleParser<FieldSpecNode> {
 
     	@SuppressWarnings("unchecked")
     	public FieldSpecNode parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(new boolean[] { true, true,
-    				true, false, false }, TokenType.Ampersand,
-    				TokenType.Identifier, new ChoiceParser<>(typeParser,
-    						usefulObjectClassReferenceParser),
-    				TokenType.UNIQUE_KW, optionalitySpecParser).parse();
+    		List<Object> rule = new SequenceParser(new boolean[] { true, true, true, false, false },
+                    TokenType.Ampersand,
+    				TokenType.Identifier,
+                    new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
+    				TokenType.UNIQUE_KW,
+                    optionalitySpecParser).parse();
 
     		if (rule != null) {
     			boolean unique = rule.get(3) != null;
@@ -5083,8 +5068,7 @@ public class Parser {
     }
 
     // ValueOptionalitySpec ::= OPTIONAL | DEFAULT Value
-    protected class ValueOptionalitySpecParser implements
-    		RuleParser<OptionalitySpecNode> {
+    protected class ValueOptionalitySpecParser implements RuleParser<OptionalitySpecNode> {
 
     	public OptionalitySpecNode parse() throws ParserException {
     		mark();
@@ -5125,8 +5109,7 @@ public class Parser {
     // Merges the following productions:
     // ValueOptionalitySpec ::= OPTIONAL | DEFAULT Value
     // ObjectOptionalitySpec ::= OPTIONAL | DEFAULT Object
-    protected class OptionalitySpecParser implements
-    		RuleParser<OptionalitySpecNode> {
+    protected class OptionalitySpecParser implements RuleParser<OptionalitySpecNode> {
 
     	@SuppressWarnings("unchecked")
     	public OptionalitySpecNode parse() throws ParserException {
@@ -5149,12 +5132,11 @@ public class Parser {
 
     // VariableTypeValueFieldSpec ::= valuefieldreference FieldName
     // ValueOptionalitySpec ?
-    protected class VariableTypeValueFieldSpecParser implements
-    		RuleParser<VariableTypeValueFieldSpecNode> {
+    protected class VariableTypeValueFieldSpecParser implements RuleParser<VariableTypeValueFieldSpecNode> {
 
     	public VariableTypeValueFieldSpecNode parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(new boolean[] { true, true,
-    				true, false }, TokenType.Ampersand, TokenType.Identifier,
+    		List<Object> rule = new SequenceParser(new boolean[] { true, true, true, false },
+                    TokenType.Ampersand, TokenType.Identifier,
     				fieldNameParser, valueOptionalitySpecParser).parse();
 
     		if (rule != null) {
@@ -5177,8 +5159,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public SetFieldSpecNode parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(new boolean[] { true, true,
-    				true, false }, TokenType.Ampersand,
+    		List<Object> rule = new SequenceParser(new boolean[] { true, true, true, false }, TokenType.Ampersand,
     				TokenType.TypeReference, new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
     				setOptionalitySpecParser).parse();
 
@@ -5193,8 +5174,7 @@ public class Parser {
     }
 
     // ValueSetOptionalitySpec ::= OPTIONAL | DEFAULT ValueSet
-    protected class ValueSetOptionalitySpecParser implements
-    		RuleParser<OptionalitySpecNode> {
+    protected class ValueSetOptionalitySpecParser implements RuleParser<OptionalitySpecNode> {
 
     	public OptionalitySpecNode parse() throws ParserException {
     		mark();
@@ -5228,8 +5208,7 @@ public class Parser {
     }
 
     // ObjectSetOptionalitySpec ::= OPTIONAL | DEFAULT ObjectSet
-    protected class ObjectSetOptionalitySpecParser implements
-    		RuleParser<OptionalitySpecNode> {
+    protected class ObjectSetOptionalitySpecParser implements RuleParser<OptionalitySpecNode> {
 
     	public OptionalitySpecNode parse() throws ParserException {
     		mark();
@@ -5266,8 +5245,7 @@ public class Parser {
     // OPTIONAL
     // | DEFAULT ValueSet
     // | DEFAULT ObjectSet
-    protected class SetOptionalitySpecParser implements
-    		RuleParser<OptionalitySpecNode> {
+    protected class SetOptionalitySpecParser implements RuleParser<OptionalitySpecNode> {
 
     	@SuppressWarnings("unchecked")
     	public OptionalitySpecNode parse() throws ParserException {
@@ -5291,13 +5269,11 @@ public class Parser {
 
     // VariableTypeValueSetFieldSpec ::= valuesetfieldreference FieldName
     // ValueSetOptionalitySpec?
-    protected class VariableTypeValueSetFieldSpecParser implements
-    		RuleParser<VariableTypeValueSetFieldSpecNode> {
+    protected class VariableTypeValueSetFieldSpecParser implements RuleParser<VariableTypeValueSetFieldSpecNode> {
 
     	public VariableTypeValueSetFieldSpecNode parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(new boolean[] { true, true,
-    				true, false }, TokenType.Ampersand,
-    				TokenType.TypeReference, fieldNameParser,
+    		List<Object> rule = new SequenceParser(new boolean[] { true, true, true, false },
+                    TokenType.Ampersand, TokenType.TypeReference, fieldNameParser,
     				valueSetOptionalitySpecParser).parse();
 
     		if (rule != null) {
@@ -5313,8 +5289,7 @@ public class Parser {
     }
 
     // WithSyntaxSpec ::= WITH SYNTAX SyntaxList
-    protected class WithSyntaxSpecParser implements
-    		RuleParser<List<TokenOrGroup>> {
+    protected class WithSyntaxSpecParser implements RuleParser<List<TokenOrGroup>> {
 
     	public List<TokenOrGroup> parse() throws ParserException {
     		return new ValueExtractor<List<TokenOrGroup>>(2,
@@ -5501,8 +5476,7 @@ public class Parser {
     }
 
     // DefaultSyntax ::= "{" FieldSetting "," * "}"
-    protected class DefaultSyntaxParser implements
-    		RuleParser<DefaultSyntaxNode> {
+    protected class DefaultSyntaxParser implements RuleParser<DefaultSyntaxNode> {
 
     	@SuppressWarnings("unchecked")
     	public DefaultSyntaxNode parse() throws ParserException {
@@ -5539,8 +5513,7 @@ public class Parser {
     }
 
     // DefinedSyntax ::= "{" DefinedSyntaxToken empty * "}"
-    protected class DefinedSyntaxParser implements
-    		RuleParser<DefinedSyntaxNode> {
+    protected class DefinedSyntaxParser implements RuleParser<DefinedSyntaxNode> {
 
     	@SuppressWarnings("unchecked")
     	public DefinedSyntaxNode parse() throws ParserException {
@@ -5577,8 +5550,7 @@ public class Parser {
     }
 
     // DefinedObjectSet ::= ExternalObjectSetReference | objectsetreference
-    protected class DefinedObjectSetParser implements
-    		RuleParser<ObjectSetReferenceNode> {
+    protected class DefinedObjectSetParser implements RuleParser<ObjectSetReferenceNode> {
 
     	@SuppressWarnings("unchecked")
     	public ObjectSetReferenceNode parse() throws ParserException {
@@ -5599,8 +5571,7 @@ public class Parser {
     }
 
     // ExternalObjectSetReference ::= modulereference "." objectsetreference
-    protected class ExternalObjectSetReferenceParser implements
-    		RuleParser<ExternalObjectSetReferenceNode> {
+    protected class ExternalObjectSetReferenceParser implements RuleParser<ExternalObjectSetReferenceNode> {
 
     	public ExternalObjectSetReferenceNode parse() throws ParserException {
     		List<Object> rule = new SequenceParser(TokenType.TypeReference,
@@ -5619,8 +5590,7 @@ public class Parser {
 
     // ObjectSetElements ::=
     // Object | DefinedObjectSet | ObjectSetFromObjects | ParameterizedObjectSet
-    protected class ObjectSetElementsParser implements
-    		RuleParser<ObjectSetElementsNode> {
+    protected class ObjectSetElementsParser implements RuleParser<ObjectSetElementsNode> {
 
     	@SuppressWarnings("unchecked")
     	public ObjectSetElementsNode parse() throws ParserException {
@@ -5638,8 +5608,7 @@ public class Parser {
     }
 
     // ObjectClassFieldType ::= DefinedObjectClass "." FieldName
-    protected class ObjectClassFieldTypeParser implements
-    		RuleParser<ObjectClassFieldTypeNode> {
+    protected class ObjectClassFieldTypeParser implements RuleParser<ObjectClassFieldTypeNode> {
 
     	public ObjectClassFieldTypeNode parse() throws ParserException {
     		List<Object> rule = new SequenceParser(definedObjectClassParser,
@@ -5667,8 +5636,7 @@ public class Parser {
     }
 
     // OpenTypeFieldVal ::= Type ":" Value
-    protected class OpenTypeFieldValParser implements
-    		RuleParser<OpenTypeFieldValue> {
+    protected class OpenTypeFieldValParser implements RuleParser<OpenTypeFieldValue> {
 
     	public OpenTypeFieldValue parse() throws ParserException {
     		List<Object> rule = new SequenceParser(typeParser, TokenType.Colon,	valueParser).parse();
@@ -5711,8 +5679,7 @@ public class Parser {
     // | TypeFromObject
     // | ObjectFromObject
     // | ObjectSetFromObjects
-    protected class InformationFromObjectsParser implements
-    		RuleParser<InformationFromObjects> {
+    protected class InformationFromObjectsParser implements RuleParser<InformationFromObjects> {
 
     	@SuppressWarnings("unchecked")
     	public InformationFromObjects parse() throws ParserException {
@@ -5725,8 +5692,7 @@ public class Parser {
     // TypeFromObject ::= ReferencedObjects "." FieldName
     // ObjectFromObject ::= ReferencedObjects "." FieldName
     // ObjectSetFromObjects ::= ReferencedObjects "." FieldName
-    protected class TypeFromObjectsParser implements
-    		RuleParser<TypeFromObjects> {
+    protected class TypeFromObjectsParser implements RuleParser<TypeFromObjects> {
 
     	public TypeFromObjects parse() throws ParserException {
     		List<Object> rule = new SequenceParser(referencedObjectsParser,
@@ -5734,13 +5700,11 @@ public class Parser {
 
     		if (rule != null) {
     			FieldNameNode field = (FieldNameNode) rule.get(2);
-    			PrimitiveFieldNameNode lastField = field
-    					.getPrimitiveFieldNames().get(
-    							field.getPrimitiveFieldNames().size() - 1);
+    			PrimitiveFieldNameNode lastField =
+                        field.getPrimitiveFieldNames().get(field.getPrimitiveFieldNames().size() - 1);
 
     			if (!(lastField.isValueFieldReference())) {
-    				return new TypeFromObjects(
-    						(ReferencedObjectsNode) rule.get(0), field);
+    				return new TypeFromObjects((ReferencedObjectsNode) rule.get(0), field);
     			}
     		}
 
@@ -5750,8 +5714,7 @@ public class Parser {
     }
 
     // ValueFromObject ::= ReferencedObjects "." FieldName
-    protected class ValueFromObjectParser implements
-    		RuleParser<ValueFromObject> {
+    protected class ValueFromObjectParser implements RuleParser<ValueFromObject> {
 
     	public ValueFromObject parse() throws ParserException {
     		List<Object> rule = new SequenceParser(referencedObjectsParser,
@@ -5759,13 +5722,11 @@ public class Parser {
 
     		if (rule != null) {
     			FieldNameNode field = (FieldNameNode) rule.get(2);
-    			PrimitiveFieldNameNode lastField = field
-    					.getPrimitiveFieldNames().get(
-    							field.getPrimitiveFieldNames().size() - 1);
+    			PrimitiveFieldNameNode lastField =
+                        field.getPrimitiveFieldNames().get(field.getPrimitiveFieldNames().size() - 1);
 
     			if (lastField.isValueFieldReference()) {
-    				return new ValueFromObject(
-    						(ReferencedObjectsNode) rule.get(0), field);
+    				return new ValueFromObject((ReferencedObjectsNode) rule.get(0), field);
     			}
     		}
 
@@ -5788,8 +5749,7 @@ public class Parser {
 
     // UserDefinedConstraint ::= CONSTRAINED BY "{"
     // UserDefinedConstraintParameter "," * "}"
-    protected class UserDefinedConstraintParser implements
-    		RuleParser<UserDefinedConstraintNode> {
+    protected class UserDefinedConstraintParser implements RuleParser<UserDefinedConstraintNode> {
 
     	@SuppressWarnings("unchecked")
     	public UserDefinedConstraintNode parse() throws ParserException {
@@ -5802,8 +5762,7 @@ public class Parser {
     				TokenType.RBrace).parse();
 
     		if (rule != null) {
-    			return new UserDefinedConstraintNode(
-    					(List<UserDefinedConstraintParamNode>) rule.get(3));
+    			return new UserDefinedConstraintNode((List<UserDefinedConstraintParamNode>) rule.get(3));
     		}
 
     		return null;
@@ -5817,8 +5776,7 @@ public class Parser {
     // | DefinedObjectSet
     // | Type
     // | DefinedObjectClass
-    protected class UserDefinedConstraintParameterParser implements
-    		RuleParser<UserDefinedConstraintParamNode> {
+    protected class UserDefinedConstraintParameterParser implements RuleParser<UserDefinedConstraintParamNode> {
 
     	@SuppressWarnings("unchecked")
     	public UserDefinedConstraintParamNode parse() throws ParserException {
@@ -5841,8 +5799,7 @@ public class Parser {
     }
 
     // TableConstraint ::= SimpleTableConstraint | ComponentRelationConstraint
-    protected class TableConstraintParser implements
-    		RuleParser<TableConstraint> {
+    protected class TableConstraintParser implements RuleParser<TableConstraint> {
 
     	@SuppressWarnings("unchecked")
     	public TableConstraint parse() throws ParserException {
@@ -5852,8 +5809,7 @@ public class Parser {
     }
 
     // SimpleTableConstraint ::= ObjectSet
-    protected class SimpleTableConstraintParser implements
-    		RuleParser<SimpleTableConstraintNode> {
+    protected class SimpleTableConstraintParser implements RuleParser<SimpleTableConstraintNode> {
 
     	public SimpleTableConstraintNode parse() throws ParserException {
     		Object rule = objectSetParser.parse();
@@ -5869,8 +5825,7 @@ public class Parser {
 
     // ComponentRelationConstraint ::= "{" DefinedObjectSet "}" "{" AtNotation
     // "," + "}"
-    protected class ComponentRelationConstraintParser implements
-    		RuleParser<ComponentRelationConstraint> {
+    protected class ComponentRelationConstraintParser implements RuleParser<ComponentRelationConstraint> {
 
     	@SuppressWarnings("unchecked")
     	public ComponentRelationConstraint parse() throws ParserException {
@@ -5928,8 +5883,7 @@ public class Parser {
     }
 
     // ComponentIdList ::= identifier "." +
-    protected class ComponentIdListParser implements
-    		RuleParser<ComponentIdListNode> {
+    protected class ComponentIdListParser implements RuleParser<ComponentIdListNode> {
 
     	public ComponentIdListNode parse() throws ParserException {
     		List<Token> rule = new TokenSeparatedRuleParser<>(
@@ -5984,8 +5938,7 @@ public class Parser {
     // | ParameterizedObjectClassAssignment
     // | ParameterizedObjectAssignment
     // | ParameterizedObjectSetAssignment
-    protected class ParameterizedAssignmentParser implements
-    		RuleParser<ParameterizedAssignmentNode> {
+    protected class ParameterizedAssignmentParser implements RuleParser<ParameterizedAssignmentNode> {
 
     	@SuppressWarnings("unchecked")
     	public ParameterizedAssignmentNode parse() throws ParserException {
@@ -6045,11 +5998,10 @@ public class Parser {
     // ParameterizedObjectAssignment ::=
     // objectreference ParameterList DefinedObjectClass "::=" Object
     protected class ParameterizedValueAssignmentParser implements
-    		RuleParser<ParameterizedValueOrObjectAssignmentNode<?, ?>> {
+            RuleParser<ParameterizedValueOrObjectAssignmentNode<?, ?>> {
 
     	@SuppressWarnings("unchecked")
-    	public ParameterizedValueOrObjectAssignmentNode<?, ?> parse()
-    			throws ParserException {
+    	public ParameterizedValueOrObjectAssignmentNode<?, ?> parse() throws ParserException {
     		List<Object> rule = new SequenceParser(TokenType.Identifier, parameterListParser,
                     new ChoiceParser<>(typeParser,usefulObjectClassReferenceParser), TokenType.Assign,
                     new ChoiceParser<>(informationFromObjectsParser, valueParser, objectDefnParser)).parse();
@@ -6135,8 +6087,7 @@ public class Parser {
     		RuleParser<ParameterizedValueSetTypeAssignmentNode> {
 
     	@SuppressWarnings("unchecked")
-    	public ParameterizedValueSetTypeAssignmentNode parse()
-    			throws ParserException {
+    	public ParameterizedValueSetTypeAssignmentNode parse() throws ParserException {
     		List<Object> rule = new SequenceParser(TokenType.TypeReference,
     				parameterListParser, typeParser, TokenType.Assign,
     				valueSetParser).parse();
@@ -6155,8 +6106,7 @@ public class Parser {
 
     // ParameterizedObjectSetAssignment ::=
     // objectsetreference ParameterList DefinedObjectClass "::=" ObjectSet
-    protected class ParameterizedObjectSetAssignmentParser implements
-    		RuleParser<ParameterizedObjectSetAssignmentNode> {
+    protected class ParameterizedObjectSetAssignmentParser implements RuleParser<ParameterizedObjectSetAssignmentNode> {
 
     	@SuppressWarnings("unchecked")
     	public ParameterizedObjectSetAssignmentNode parse()
@@ -6179,8 +6129,7 @@ public class Parser {
     }
 
     // ParameterList ::= "{" Parameter "," + "}"
-    protected class ParameterListParser implements
-    		RuleParser<List<ParameterNode>> {
+    protected class ParameterListParser implements RuleParser<List<ParameterNode>> {
 
     	public List<ParameterNode> parse() throws ParserException {
     		return new ValueExtractor<List<ParameterNode>>(1,
@@ -6215,8 +6164,7 @@ public class Parser {
     }
 
     // ParamGovernor ::= Governor | DummyGovernor
-    protected class ParamGovernorParser implements
-    		RuleParser<ParamGovernorNode> {
+    protected class ParamGovernorParser implements RuleParser<ParamGovernorNode> {
 
     	@SuppressWarnings("unchecked")
     	public ParamGovernorNode parse() throws ParserException {
@@ -6266,8 +6214,7 @@ public class Parser {
     }
 
     // SimpleDefinedType ::= ExternalTypeReference | typereference
-    protected class SimpleDefinedTypeParser implements
-    		RuleParser<SimpleDefinedType> {
+    protected class SimpleDefinedTypeParser implements RuleParser<SimpleDefinedType> {
 
     	@SuppressWarnings("unchecked")
     	public SimpleDefinedType parse() throws ParserException {
@@ -6278,8 +6225,7 @@ public class Parser {
 
     // SimpleDefinedValue ::= ExternalValueReference | valuereference
     // EnumeratedValue ::= identifier
-    protected class SimpleDefinedValueParser implements
-    		RuleParser<DefinedValue> {
+    protected class SimpleDefinedValueParser implements RuleParser<DefinedValue> {
 
     	@SuppressWarnings("unchecked")
     	public SimpleDefinedValue parse() throws ParserException {
@@ -6301,8 +6247,7 @@ public class Parser {
 
     // ParameterizedType ::= SimpleDefinedType ActualParameterList
     // ParameterizedValueSetType ::= SimpleDefinedType ActualParameterList
-    protected class ParameterizedTypeParser implements
-    		RuleParser<SimpleDefinedType> {
+    protected class ParameterizedTypeParser implements RuleParser<SimpleDefinedType> {
 
     	@SuppressWarnings("unchecked")
     	public SimpleDefinedType parse() throws ParserException {
@@ -6322,8 +6267,7 @@ public class Parser {
     }
 
     // ParameterizedValue ::= SimpleDefinedValue ActualParameterList
-    protected class ParameterizedValueParser implements
-    		RuleParser<SimpleDefinedValue> {
+    protected class ParameterizedValueParser implements RuleParser<SimpleDefinedValue> {
 
     	@SuppressWarnings("unchecked")
     	public SimpleDefinedValue parse() throws ParserException {
@@ -6342,8 +6286,7 @@ public class Parser {
     }
 
     // ParameterizedObjectClass ::= DefinedObjectClass ActualParameterList
-    protected class ParameterizedObjectClassParser implements
-    		RuleParser<ObjectClassReferenceNode> {
+    protected class ParameterizedObjectClassParser implements RuleParser<ObjectClassReferenceNode> {
 
     	@SuppressWarnings("unchecked")
     	public ObjectClassReferenceNode parse() throws ParserException {
@@ -6363,8 +6306,7 @@ public class Parser {
     }
 
     // ParameterizedObjectSet ::= DefinedObjectSet ActualParameterList
-    protected class ParameterizedObjectSetParser implements
-    		RuleParser<ObjectSetReferenceNode> {
+    protected class ParameterizedObjectSetParser implements RuleParser<ObjectSetReferenceNode> {
 
     	@SuppressWarnings("unchecked")
     	public ObjectSetReferenceNode parse() throws ParserException {
