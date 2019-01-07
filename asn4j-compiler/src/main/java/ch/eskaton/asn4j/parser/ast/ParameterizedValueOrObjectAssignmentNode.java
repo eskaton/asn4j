@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,28 +27,31 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+
 import java.util.List;
 
 public class ParameterizedValueOrObjectAssignmentNode<T extends Node, V extends Node>
-    	extends ParameterizedAssignmentNode {
+        extends ParameterizedAssignmentNode {
 
     private T type;
 
     private V value;
 
-    public ParameterizedValueOrObjectAssignmentNode(String reference,
-    		List<ParameterNode> parameters, T type, V value) {
-    	super(reference, parameters);
-    	this.type = type;
-    	this.value = value;
+    public ParameterizedValueOrObjectAssignmentNode(Position position, String reference,
+            List<ParameterNode> parameters, T type, V value) {
+        super(position, reference, parameters);
+
+        this.type = type;
+        this.value = value;
     }
 
     public T getType() {
-    	return type;
+        return type;
     }
 
     public V getValue() {
-    	return value;
+        return value;
     }
 
 }

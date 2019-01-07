@@ -27,14 +27,17 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.InformationFromObjects;
 
-public class ObjectFromObjectNode implements ObjectNode {
+public class ObjectFromObjectNode extends ObjectNode {
 
     private InformationFromObjects object;
 
-    public ObjectFromObjectNode(InformationFromObjects object) {
-    	this.object = object;
+    public ObjectFromObjectNode(Position position, InformationFromObjects object) {
+    	super(position);
+
+        this.object = object;
     }
 
     public InformationFromObjects getObject() {

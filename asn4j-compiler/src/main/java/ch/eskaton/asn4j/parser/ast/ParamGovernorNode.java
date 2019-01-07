@@ -27,6 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
-public abstract class ParamGovernorNode implements Node {
+import ch.eskaton.asn4j.parser.Position;
+
+public abstract class ParamGovernorNode extends AbstractNode {
+
+    public ParamGovernorNode(Position position) {
+        super(position);
+    }
 
 }

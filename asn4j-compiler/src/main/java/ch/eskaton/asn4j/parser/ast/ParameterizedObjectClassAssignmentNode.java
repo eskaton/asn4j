@@ -27,14 +27,16 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+
 import java.util.List;
 
 public class ParameterizedObjectClassAssignmentNode extends
     	ParameterizedTypeOrObjectClassAssignmentNode<ObjectClassNode> {
 
-    public ParameterizedObjectClassAssignmentNode(String reference,
+    public ParameterizedObjectClassAssignmentNode(Position position, String reference,
     		List<ParameterNode> parameters, ObjectClassNode objectClass) {
-    	super(reference, parameters, objectClass);
+    	super(position, reference, parameters, objectClass);
     }
 
 }

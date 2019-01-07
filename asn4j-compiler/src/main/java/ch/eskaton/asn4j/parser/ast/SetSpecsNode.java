@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,10 +27,11 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class SetSpecsNode implements Node {
+public class SetSpecsNode extends AbstractNode {
 
     private ElementSet rootElements;
 
@@ -38,63 +39,61 @@ public class SetSpecsNode implements Node {
 
     private boolean extensionMarker;
 
-    public SetSpecsNode(boolean extensionMarker) {
-    	this(null, extensionMarker, null);
+    public SetSpecsNode(Position position, boolean extensionMarker) {
+        this(position, null, extensionMarker, null);
     }
 
     public SetSpecsNode(ElementSet rootElements) {
-    	this(rootElements, false, null);
+        this(rootElements.getPosition(), rootElements, false, null);
     }
 
     public SetSpecsNode(ElementSet rootElements, boolean extensionMarker) {
-    	this(rootElements, extensionMarker, null);
+        this(rootElements.getPosition(), rootElements, extensionMarker, null);
     }
 
-    public SetSpecsNode(ElementSet rootElements, boolean extensionMarker,
-    		ElementSet additionalElements) {
-    	this.rootElements = rootElements;
-    	this.extensionMarker = extensionMarker;
-    	this.additionalElements = additionalElements;
+    public SetSpecsNode(Position position, ElementSet rootElements, boolean extensionMarker,
+            ElementSet additionalElements) {
+        super(position);
+
+        this.rootElements = rootElements;
+        this.extensionMarker = extensionMarker;
+        this.additionalElements = additionalElements;
     }
 
     public ElementSet getRootElements() {
-    	return rootElements;
+        return rootElements;
     }
 
     public ElementSet getAdditionalElements() {
-    	return additionalElements;
+        return additionalElements;
     }
 
     public boolean hasExtensionMarker() {
-    	return extensionMarker;
+        return extensionMarker;
     }
 
-    // public boolean isElementSetSpecs() {
-    // return rootElements != null;
-    // }
-
     public ElementSetSpecsNode toElementSetSpecs() {
-    	if (rootElements != null) {
-    		return new ElementSetSpecsNode(rootElements, extensionMarker,
-    				additionalElements);
-    	}
+        if (rootElements != null) {
+            return new ElementSetSpecsNode(rootElements.getPosition(), rootElements, extensionMarker, additionalElements);
+        }
 
-    	return null;
+        return null;
     }
 
     public ObjectSetSpecNode toObjectSetSpec() {
-    	return new ObjectSetSpecNode(rootElements, extensionMarker,
-    			additionalElements);
+        Position position = Position.of(rootElements, additionalElements);
+
+        return new ObjectSetSpecNode(position, rootElements, extensionMarker, additionalElements);
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("SetSpecs[",
-    			(rootElements != null ? String.valueOf(rootElements) : ""),
-    			(extensionMarker ? (rootElements != null ? ", " : "") + "..."
-    					: ""), (additionalElements != null ? (extensionMarker
-    					|| rootElements != null ? ", " : "")
-    					+ String.valueOf(additionalElements) : ""), "]");
+        return StringUtils.concat("SetSpecs[",
+                (rootElements != null ? String.valueOf(rootElements) : ""),
+                (extensionMarker ? (rootElements != null ? ", " : "") + "..."
+                        : ""), (additionalElements != null ? (extensionMarker
+                        || rootElements != null ? ", " : "")
+                        + String.valueOf(additionalElements) : ""), "]");
     }
 
 }

@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class NamedType extends AbstractType {
@@ -35,7 +36,9 @@ public class NamedType extends AbstractType {
 
     private Type type;
 
-    public NamedType(String name, Type type) {
+    public NamedType(Position position, String name, Type type) {
+        super(position);
+
     	this.name = name;
     	this.type = type;
     }

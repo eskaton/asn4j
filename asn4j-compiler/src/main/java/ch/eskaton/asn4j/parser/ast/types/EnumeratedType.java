@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import java.util.List;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
 import ch.eskaton.commons.utils.StringUtils;
@@ -41,19 +42,24 @@ public class EnumeratedType extends AbstractType {
 
     private List<EnumerationItemNode> additionalEnum;
 
-    public EnumeratedType(List<EnumerationItemNode> rootEnum) {
+    public EnumeratedType(Position position, List<EnumerationItemNode> rootEnum) {
+        super(position);
+
     	this.rootEnum = rootEnum;
     }
 
-    public EnumeratedType(List<EnumerationItemNode> rootEnum,
-    		ExceptionIdentificationNode exceptionSpec) {
+    public EnumeratedType(Position position, List<EnumerationItemNode> rootEnum,
+            ExceptionIdentificationNode exceptionSpec) {
+        super(position);
+
     	this.rootEnum = rootEnum;
     	this.exceptionSpec = exceptionSpec;
     }
 
-    public EnumeratedType(List<EnumerationItemNode> rootEnum,
-    		ExceptionIdentificationNode exceptionSpec,
-    		List<EnumerationItemNode> additionalEnum) {
+    public EnumeratedType(Position position, List<EnumerationItemNode> rootEnum,
+            ExceptionIdentificationNode exceptionSpec, List<EnumerationItemNode> additionalEnum) {
+        super(position);
+
     	this.rootEnum = rootEnum;
     	this.exceptionSpec = exceptionSpec;
     	this.additionalEnum = additionalEnum;
@@ -76,11 +82,9 @@ public class EnumeratedType extends AbstractType {
     	return StringUtils.concat(
     			"Enumeration[",
     			StringUtils.join(rootEnum, ", "),
-    			(hasExceptionSpec() || additionalEnum != null ? ", " + "..."
-    					: ""),
+    			(hasExceptionSpec() || additionalEnum != null ? ", " + "..." : ""),
     			exceptionSpec != null ? " ! " + exceptionSpec : "",
-    			(additionalEnum != null ? ", "
-    					+ StringUtils.join(additionalEnum, ", ") : ""), "]");
+    			(additionalEnum != null ? ", " + StringUtils.join(additionalEnum, ", ") : ""), "]");
     }
 
 }

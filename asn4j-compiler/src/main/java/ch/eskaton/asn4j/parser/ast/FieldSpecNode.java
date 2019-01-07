@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -37,70 +38,69 @@ public class FieldSpecNode extends AbstractASN1FieldSpecNode {
 
     private boolean unique;
 
-    public FieldSpecNode(String reference, Node type, boolean unique,
-    		OptionalitySpecNode optionalitySpec) {
-    	super(reference, optionalitySpec);
-    	this.type = type;
-    	this.unique = unique;
+    public FieldSpecNode(Position position, String reference, Node type, boolean unique,
+            OptionalitySpecNode optionalitySpec) {
+        super(position, reference, optionalitySpec);
+
+        this.type = type;
+        this.unique = unique;
     }
 
     public FixedTypeValueFieldSpecNode toFixedTypeValueFieldSpec() {
-    	if ((type instanceof ObjectClassReferenceNode)) {
-    		return null;
-    	}
+        if ((type instanceof ObjectClassReferenceNode)) {
+            return null;
+        }
 
-    	return new FixedTypeValueFieldSpecNode(getReference(), (Type) type,
-    			unique, getOptionalitySpec());
+        return new FixedTypeValueFieldSpecNode(getPosition(), getReference(), (Type) type, unique,
+                getOptionalitySpec());
     }
 
     public ObjectFieldSpecNode toObjectFieldSpec() {
-    	if (unique) {
-    		return null;
-    	}
+        if (unique) {
+            return null;
+        }
 
-    	OptionalitySpecNode optionalitySpec = getOptionalitySpec();
+        OptionalitySpecNode optionalitySpec = getOptionalitySpec();
 
-    	if (optionalitySpec instanceof DefaultSpecNode) {
-    		optionalitySpec = ((DefaultSpecNode) optionalitySpec)
-    				.toDefaultObjectSpec();
+        if (optionalitySpec instanceof DefaultSpecNode) {
+            optionalitySpec = ((DefaultSpecNode) optionalitySpec).toDefaultObjectSpec();
 
-    		if (optionalitySpec == null) {
-    			return null;
-    		}
-    	}
+            if (optionalitySpec == null) {
+                return null;
+            }
+        }
 
-    	if (type instanceof TypeReference) {
-    		TypeReference typeRef = (TypeReference) type;
+        if (type instanceof TypeReference) {
+            TypeReference typeRef = (TypeReference) type;
 
-    		if (typeRef.getConstraints() != null) {
-    			return null;
-    		}
+            if (typeRef.getConstraints() != null) {
+                return null;
+            }
 
-    		ObjectClassReferenceNode objRef = new ObjectClassReferenceNode(
-    				typeRef.getType());
-    		objRef.setParameters(typeRef.getParameters());
+            ObjectClassReferenceNode objRef = new ObjectClassReferenceNode(typeRef.getPosition(), typeRef.getType());
 
-    		return new ObjectFieldSpecNode(getReference(), objRef,
-    				optionalitySpec);
-    	} else if (type instanceof ExternalTypeReference) {
-    		ExternalTypeReference typeRef = (ExternalTypeReference) type;
+            objRef.setParameters(typeRef.getParameters());
 
-    		if (typeRef.getConstraints() != null) {
-    			return null;
-    		}
+            return new ObjectFieldSpecNode(objRef.getPosition(), getReference(), objRef, optionalitySpec);
+        } else if (type instanceof ExternalTypeReference) {
+            ExternalTypeReference typeRef = (ExternalTypeReference) type;
 
-    		ExternalObjectClassReferenceNode objRef = new ExternalObjectClassReferenceNode(
-    				typeRef.getModule(), typeRef.getType());
-    		objRef.setParameters(typeRef.getParameters());
+            if (typeRef.getConstraints() != null) {
+                return null;
+            }
 
-    		return new ObjectFieldSpecNode(getReference(), objRef,
-    				optionalitySpec);
-    	} else if (type instanceof ObjectClassReferenceNode) {
-    		return new ObjectFieldSpecNode(getReference(),
-    				(ObjectClassReferenceNode) type, optionalitySpec);
-    	}
+            ExternalObjectClassReferenceNode objRef = new ExternalObjectClassReferenceNode(typeRef.getPosition(),
+                    typeRef.getModule(), typeRef.getType());
 
-    	return null;
+            objRef.setParameters(typeRef.getParameters());
+
+            return new ObjectFieldSpecNode(objRef.getPosition(), getReference(), objRef, optionalitySpec);
+        } else if (type instanceof ObjectClassReferenceNode) {
+            return new ObjectFieldSpecNode(type.getPosition(), getReference(), (ObjectClassReferenceNode) type,
+                    optionalitySpec);
+        }
+
+        return null;
     }
 
 }

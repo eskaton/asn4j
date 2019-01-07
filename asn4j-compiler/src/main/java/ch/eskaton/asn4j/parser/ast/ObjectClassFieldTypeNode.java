@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.AbstractType;
 
 public class ObjectClassFieldTypeNode extends AbstractType {
@@ -35,18 +36,19 @@ public class ObjectClassFieldTypeNode extends AbstractType {
 
     private FieldNameNode field;
 
-    public ObjectClassFieldTypeNode(ObjectClassReferenceNode objectClass,
-    		FieldNameNode field) {
-    	this.objectclass = objectClass;
-    	this.field = field;
+    public ObjectClassFieldTypeNode(Position position, ObjectClassReferenceNode objectClass, FieldNameNode field) {
+        super(position);
+
+        this.objectclass = objectClass;
+        this.field = field;
     }
 
     public ObjectClassReferenceNode getObjectclass() {
-    	return objectclass;
+        return objectclass;
     }
 
     public FieldNameNode getField() {
-    	return field;
+        return field;
     }
 
 }

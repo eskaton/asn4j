@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,14 +27,17 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
-import java.util.List;
-
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 
+import java.util.List;
+
 public abstract class AbstractType implements Type {
+
+    private Position position;
 
     private Tag tag;
 
@@ -44,40 +47,49 @@ public abstract class AbstractType implements Type {
 
     private EncodingPrefixNode encodingPrefix;
 
+    public AbstractType(Position position) {
+        this.position = position;
+    }
+
+    @Override
+    public Position getPosition() {
+        return position;
+    }
+
     public Tag getTag() {
-    	return tag;
+        return tag;
     }
 
     public void setTag(Tag tag) {
-    	this.tag = tag;
+        this.tag = tag;
     }
 
     public TaggingMode getTaggingMode() {
-    	return taggingMode;
+        return taggingMode;
     }
 
     public void setTaggingMode(TaggingMode taggingMode) {
-    	this.taggingMode = taggingMode;
+        this.taggingMode = taggingMode;
     }
 
     public void setConstraints(List<Constraint> constraint) {
-    	this.constraints = constraint;
+        this.constraints = constraint;
     }
 
     public List<Constraint> getConstraints() {
-    	return constraints;
+        return constraints;
     }
 
     public boolean hasConstraint() {
-    	return constraints != null && constraints.size() > 0;
+        return constraints != null && constraints.size() > 0;
     }
 
     public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
-    	this.encodingPrefix = encodingPrefix;
+        this.encodingPrefix = encodingPrefix;
     }
 
     public EncodingPrefixNode getEncodingPrefix() {
-    	return encodingPrefix;
+        return encodingPrefix;
     }
 
 }

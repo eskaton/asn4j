@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,24 +27,27 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
-public abstract class AbstractASN1FieldSpecNode implements Node {
+import ch.eskaton.asn4j.parser.Position;
+
+public abstract class AbstractASN1FieldSpecNode extends AbstractNode {
 
     private String reference;
 
     private OptionalitySpecNode optionalitySpec;
 
-    public AbstractASN1FieldSpecNode(String reference,
-    		OptionalitySpecNode optionalitySpec) {
-    	this.reference = reference;
-    	this.optionalitySpec = optionalitySpec;
+    public AbstractASN1FieldSpecNode(Position position, String reference, OptionalitySpecNode optionalitySpec) {
+        super(position);
+
+        this.reference = reference;
+        this.optionalitySpec = optionalitySpec;
     }
 
     public String getReference() {
-    	return reference;
+        return reference;
     }
 
     public OptionalitySpecNode getOptionalitySpec() {
-    	return optionalitySpec;
+        return optionalitySpec;
     }
 
 }

@@ -35,8 +35,7 @@ public class EndpointNode {
 
     private boolean inclusive;
 
-    public EndpointNode(ch.eskaton.asn4j.parser.ast.values.Value value,
-    		boolean inclusive) {
+    public EndpointNode(ch.eskaton.asn4j.parser.ast.values.Value value, boolean inclusive) {
     	this.value = value;
     	this.inclusive = inclusive;
     }

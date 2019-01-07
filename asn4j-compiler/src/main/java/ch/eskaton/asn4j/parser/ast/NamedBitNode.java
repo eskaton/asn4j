@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,9 +27,10 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 
-public class NamedBitNode implements Node {
+public class NamedBitNode extends AbstractNode {
 
     private String id;
 
@@ -37,31 +38,35 @@ public class NamedBitNode implements Node {
 
     private DefinedValue ref;
 
-    public NamedBitNode(String id, int num) {
-    	this.id = id;
-    	this.num = num;
+    public NamedBitNode(Position position, String id, int num) {
+        super(position);
+
+        this.id = id;
+        this.num = num;
     }
 
-    public NamedBitNode(String id, DefinedValue ref) {
-    	this.id = id;
-    	this.ref = ref;
+    public NamedBitNode(Position position, String id, DefinedValue ref) {
+        super(position);
+
+        this.id = id;
+        this.ref = ref;
     }
 
     public String getId() {
-    	return id;
+        return id;
     }
 
     public int getNum() {
-    	return num;
+        return num;
     }
 
     public DefinedValue getRef() {
-    	return ref;
+        return ref;
     }
 
     @Override
     public String toString() {
-    	return id + "(" + (ref == null ? String.valueOf(num) : ref) + ")";
+        return id + "(" + (ref == null ? String.valueOf(num) : ref) + ")";
     }
 
 }

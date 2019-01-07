@@ -27,14 +27,17 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class PatternConstraint extends AbstractConstraint implements Constraint {
+public class PatternConstraint extends AbstractConstraint {
 
     private Value pattern;
 
-    public PatternConstraint(Value pattern) {
-    	this.pattern = pattern;
+    public PatternConstraint(Position position, Value pattern) {
+    	super(position);
+
+        this.pattern = pattern;
     }
 
     public Value getPattern() {

@@ -27,10 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class QuadrupleNode implements Value {
+public class QuadrupleNode extends AbstractValue {
 
     private short group;
 
@@ -40,7 +42,9 @@ public class QuadrupleNode implements Value {
 
     private short cell;
 
-    public QuadrupleNode(short group, short plane, short row, short cell) {
+    public QuadrupleNode(Position position, short group, short plane, short row, short cell) {
+        super(position);
+
     	this.group = group;
     	this.plane = plane;
     	this.row = row;

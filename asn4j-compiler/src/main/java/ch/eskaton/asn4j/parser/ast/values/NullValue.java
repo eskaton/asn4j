@@ -27,6 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-public class NullValue implements Value {
+import ch.eskaton.asn4j.parser.Position;
+
+public class NullValue extends AbstractValue {
+
+    public NullValue(Position position) {
+        super(position);
+    }
 
 }

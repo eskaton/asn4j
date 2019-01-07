@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,27 +27,29 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ModuleNode implements Node {
+public class ModuleNode extends AbstractNode {
 
     public enum TagMode {
-    	Implicit, Explicit, Automatic
+        Implicit, Explicit, Automatic
     }
 
     public enum Encoding {
-    	TAG, XER, PER
+        TAG, XER, PER
     }
 
     @SuppressWarnings("serial")
     private static final Map<String, Encoding> encodings = new HashMap<String, Encoding>() {
-    	{
-    		put("TAG", Encoding.TAG);
-    		put("XER", Encoding.XER);
-    		put("PER", Encoding.PER);
-    	}
+        {
+            put("TAG", Encoding.TAG);
+            put("XER", Encoding.XER);
+            put("PER", Encoding.PER);
+        }
     };
 
     private ModuleIdentifierNode moduleId;
@@ -62,47 +64,48 @@ public class ModuleNode implements Node {
 
     private List<EncodingControlSectionNode> encodingControl;
 
-    public ModuleNode(ModuleIdentifierNode moduleId, Encoding encoding,
-    		TagMode tagMode, boolean extImplied, ModuleBodyNode body,
-    		List<EncodingControlSectionNode> encodingControl) {
-    	this.moduleId = moduleId;
-    	this.encoding = encoding;
-    	this.tagMode = tagMode;
-    	this.extImplied = extImplied;
-    	this.body = body;
-    	this.encodingControl = encodingControl;
+    public ModuleNode(Position position, ModuleIdentifierNode moduleId, Encoding encoding, TagMode tagMode,
+            boolean extImplied, ModuleBodyNode body, List<EncodingControlSectionNode> encodingControl) {
+        super(position);
+
+        this.moduleId = moduleId;
+        this.encoding = encoding;
+        this.tagMode = tagMode;
+        this.extImplied = extImplied;
+        this.body = body;
+        this.encodingControl = encodingControl;
     }
 
     public ModuleIdentifierNode getModuleId() {
-    	return moduleId;
+        return moduleId;
     }
 
     public static Encoding getEncoding(String enc) {
-    	return encodings.get(enc);
+        return encodings.get(enc);
     }
 
     public ModuleBodyNode getBody() {
-    	return body;
+        return body;
     }
 
     public TagMode getTagMode() {
-    	return tagMode;
+        return tagMode;
     }
 
     public List<EncodingControlSectionNode> getEncodingControl() {
-    	return encodingControl;
+        return encodingControl;
     }
 
     public static Map<String, Encoding> getEncodings() {
-    	return encodings;
+        return encodings;
     }
 
     public Encoding getEncoding() {
-    	return encoding;
+        return encoding;
     }
 
     public boolean isExtImplied() {
-    	return extImplied;
+        return extImplied;
     }
 
 }

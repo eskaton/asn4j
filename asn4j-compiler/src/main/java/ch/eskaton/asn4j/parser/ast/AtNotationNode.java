@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,36 +27,39 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class AtNotationNode implements Node {
+public class AtNotationNode extends AbstractNode {
 
     private ComponentIdListNode componentIds;
 
     private int level;
 
-    public AtNotationNode(ComponentIdListNode componentIds) {
-    	this.componentIds = componentIds;
+    public AtNotationNode(Position position, ComponentIdListNode componentIds) {
+        this(position, componentIds, 0);
     }
 
-    public AtNotationNode(ComponentIdListNode componentIds, int level) {
-    	this.componentIds = componentIds;
-    	this.level = level;
+    public AtNotationNode(Position position, ComponentIdListNode componentIds, int level) {
+        super(position);
+
+        this.componentIds = componentIds;
+        this.level = level;
     }
 
     public ComponentIdListNode getComponentIds() {
-    	return componentIds;
+        return componentIds;
     }
 
     public int getLevel() {
-    	return level;
+        return level;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("AtNotation[@",
-    			StringUtils.repeat(".", level),
-    			StringUtils.join(componentIds.getIdentifiers(), "."), "]");
+        return StringUtils.concat("AtNotation[@",
+                StringUtils.repeat(".", level),
+                StringUtils.join(componentIds.getIdentifiers(), "."), "]");
     }
 
 }

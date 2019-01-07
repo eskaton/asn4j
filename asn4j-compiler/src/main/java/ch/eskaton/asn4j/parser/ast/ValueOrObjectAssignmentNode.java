@@ -27,14 +27,16 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class ValueOrObjectAssignmentNode<T extends Node, V extends Node> extends AssignmentNode {
 
     private T type;
 
     private V value;
 
-    public ValueOrObjectAssignmentNode(String reference, T type, V value) {
-        super(reference);
+    public ValueOrObjectAssignmentNode(Position position, String reference, T type, V value) {
+        super(position, reference);
 
         this.type = type;
         this.value = value;

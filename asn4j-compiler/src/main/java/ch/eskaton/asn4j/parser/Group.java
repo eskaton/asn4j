@@ -29,11 +29,13 @@ package ch.eskaton.asn4j.parser;
 
 import java.util.List;
 
-public class Group implements TokenOrGroup {
+public class Group extends TokenOrGroup {
 
     private List<TokenOrGroup> group;
 
-    public Group(List<TokenOrGroup> group) {
+    public Group(Position position, List<TokenOrGroup> group) {
+    	super(position);
+
     	this.group = group;
     }
 

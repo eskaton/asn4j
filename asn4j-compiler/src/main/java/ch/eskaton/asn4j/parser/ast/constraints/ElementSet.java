@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,42 +27,45 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.commons.utils.StringUtils;
+
 import java.util.Arrays;
 import java.util.List;
 
-import ch.eskaton.commons.utils.StringUtils;
-
-public class ElementSet implements Elements {
+public class ElementSet extends Elements {
 
     public enum OpType {
-    	All, Exclude, Union, Intersection
+        All, Exclude, Union, Intersection
     }
 
     private OpType operation;
 
     private List<Elements> operands;
 
-    public ElementSet(OpType operation, Elements... operands) {
-    	this(operation, Arrays.asList(operands));
+    public ElementSet(Position position, OpType operation, Elements... operands) {
+        this(position, operation, Arrays.asList(operands));
     }
 
-    public ElementSet(OpType operation, List<Elements> operands) {
-    	this.operation = operation;
-    	this.operands = operands;
+    public ElementSet(Position position, OpType operation, List<Elements> operands) {
+        super(position);
+
+        this.operation = operation;
+        this.operands = operands;
     }
 
     public OpType getOperation() {
-    	return operation;
+        return operation;
     }
 
     public List<Elements> getOperands() {
-    	return operands;
+        return operands;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("ElementSet[op=", operation.toString(),
-    			", operands={", StringUtils.join(operands, ","), "}]");
+        return StringUtils.concat("ElementSet[op=", operation.toString(),
+                ", operands={", StringUtils.join(operands, ","), "}]");
     }
 
 }

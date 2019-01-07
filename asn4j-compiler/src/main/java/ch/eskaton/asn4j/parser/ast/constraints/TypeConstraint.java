@@ -27,14 +27,18 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.commons.utils.StringUtils;
+import javafx.geometry.Pos;
 
-public class TypeConstraint extends AbstractConstraint implements Constraint {
+public class TypeConstraint extends AbstractConstraint {
 
     private Type type;
 
-    public TypeConstraint(Type type) {
+    public TypeConstraint(Position position, Type type) {
+        super(position);
+
     	this.type = type;
     }
 

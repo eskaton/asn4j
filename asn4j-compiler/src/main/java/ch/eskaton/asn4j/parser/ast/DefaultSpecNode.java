@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -34,53 +35,53 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class DefaultSpecNode extends DefaultOptionalitySpecNode<Node> {
 
-    public DefaultSpecNode(Node node) {
-    	super(node);
+    public DefaultSpecNode(Position position, Node node) {
+        super(position, node);
     }
 
     public DefaultValueSpecNode toDefaultValueSpec() {
-    	Node spec = getSpec();
+        Node spec = getSpec();
 
-    	if (spec != null) {
-    		if (spec instanceof ObjectDefnNode
-    				|| spec instanceof ObjectFromObjectNode) {
-    			return null;
-    		}
+        if (spec != null) {
+            if (spec instanceof ObjectDefnNode || spec instanceof ObjectFromObjectNode) {
+                return null;
+            }
 
-    		return new DefaultValueSpecNode((Value) spec);
-    	}
+            return new DefaultValueSpecNode(getPosition(), (Value) spec);
+        }
 
-    	return null;
+        return null;
     }
 
     public DefaultObjectSpecNode toDefaultObjectSpec() {
-    	Node spec = getSpec();
+        Node spec = getSpec();
 
-    	if (spec != null) {
-    		if (spec instanceof ObjectDefnNode || spec instanceof ObjectFromObjectNode) {
-    			return new DefaultObjectSpecNode((ObjectNode) spec);
-    		} else if (spec instanceof SimpleDefinedValue || spec instanceof AmbiguousValue
+        if (spec != null) {
+            if (spec instanceof ObjectDefnNode || spec instanceof ObjectFromObjectNode) {
+                return new DefaultObjectSpecNode(getPosition(), (ObjectNode) spec);
+            } else if (spec instanceof SimpleDefinedValue || spec instanceof AmbiguousValue
                     && ((AmbiguousValue) spec).getValue(SimpleDefinedValue.class) != null) {
-    		    if (spec instanceof AmbiguousValue) {
-    		        spec = ((AmbiguousValue) spec).getValue(SimpleDefinedValue.class);
+                if (spec instanceof AmbiguousValue) {
+                    spec = ((AmbiguousValue) spec).getValue(SimpleDefinedValue.class);
                 }
 
-    			SimpleDefinedValue valueRef = (SimpleDefinedValue) spec;
-    			ObjectReferenceNode objectRef = new ObjectReferenceNode(valueRef.getValue());
-    			objectRef.setParameters(valueRef.getParameters());
+                SimpleDefinedValue valueRef = (SimpleDefinedValue) spec;
+                ObjectReferenceNode objectRef = new ObjectReferenceNode(getPosition(), valueRef.getValue());
+                objectRef.setParameters(valueRef.getParameters());
 
-    			return new DefaultObjectSpecNode(objectRef);
-    		} else if (spec instanceof ExternalValueReference) {
-    			ExternalValueReference valueRef = (ExternalValueReference) spec;
-    			ExternalObjectReferenceNode objectRef = new ExternalObjectReferenceNode(
-    					valueRef.getModule(), valueRef.getValue());
-    			objectRef.setParameters(valueRef.getParameters());
+                return new DefaultObjectSpecNode(getPosition(), objectRef);
+            } else if (spec instanceof ExternalValueReference) {
+                ExternalValueReference valueRef = (ExternalValueReference) spec;
+                ExternalObjectReferenceNode objectRef = new ExternalObjectReferenceNode(getPosition(), valueRef.getModule(),
+                        valueRef.getValue());
+                objectRef.setParameters(valueRef.getParameters());
 
-    			return new DefaultObjectSpecNode(objectRef);
-    		}
+                return new DefaultObjectSpecNode(getPosition(), objectRef);
+            }
 
-    	}
+        }
 
-    	return null;
+        return null;
     }
+
 }

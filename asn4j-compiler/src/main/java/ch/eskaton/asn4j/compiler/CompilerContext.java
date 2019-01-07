@@ -109,6 +109,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class CompilerContext {
 
@@ -324,7 +325,7 @@ public class CompilerContext {
         while (true) {
             // Check for implicitly defined types
             if (GeneralizedTime.class.getSimpleName().equals(type) || UTCTime.class.getSimpleName().equals(type)) {
-                return new VisibleString();
+                return new VisibleString(NO_POSITION);
             }
 
             TypeAssignmentNode assignment = (TypeAssignmentNode) getModule().getBody().getAssignments(type);

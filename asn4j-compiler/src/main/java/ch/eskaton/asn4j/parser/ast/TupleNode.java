@@ -27,16 +27,20 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class TupleNode implements Value {
+public class TupleNode extends AbstractValue {
 
     private short column;
 
     private short row;
 
-    public TupleNode(short column, short row) {
+    public TupleNode(Position position, short column, short row) {
+        super(position);
+
     	this.column = column;
     	this.row = row;
     }

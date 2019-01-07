@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,34 +27,39 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class OctetStringValue implements Value {
+public class OctetStringValue extends AbstractValue {
 
     private char[] stringValue;
 
     private Value value;
 
-    public OctetStringValue(char[] stringValue) {
-    	this.stringValue = stringValue;
+    public OctetStringValue(Position position, char[] stringValue) {
+        super(position);
+
+        this.stringValue = stringValue;
     }
 
-    public OctetStringValue(Value value) {
-    	this.value = value;
+    public OctetStringValue(Position position, Value value) {
+        super(position);
+
+        this.value = value;
     }
 
     public char[] getStringValue() {
-    	return stringValue;
+        return stringValue;
     }
 
     public Value getValue() {
-    	return value;
+        return value;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("OctetStringValue[",
-    			stringValue != null ? new String(stringValue) : value, "]");
+        return StringUtils.concat("OctetStringValue[",
+                stringValue != null ? new String(stringValue) : value, "]");
     }
 
 }

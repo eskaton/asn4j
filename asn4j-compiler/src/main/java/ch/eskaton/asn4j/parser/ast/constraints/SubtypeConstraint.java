@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -34,7 +35,9 @@ public class SubtypeConstraint extends AbstractConstraint {
 
     private ElementSetSpecsNode elementSetSpecs;
 
-    public SubtypeConstraint(ElementSetSpecsNode elementSetSpecs) {
+    public SubtypeConstraint(Position position, ElementSetSpecsNode elementSetSpecs) {
+        super(position);
+
     	this.elementSetSpecs = elementSetSpecs;
     }
 

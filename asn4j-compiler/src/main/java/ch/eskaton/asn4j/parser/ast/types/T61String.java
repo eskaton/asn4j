@@ -27,7 +27,13 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class T61String extends AbstractType {
+
+    public T61String(Position position) {
+        super(position);
+    }
 
     @Override
     public String toString() {

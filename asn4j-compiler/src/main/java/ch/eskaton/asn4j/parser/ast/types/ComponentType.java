@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -44,17 +45,23 @@ public class ComponentType extends AbstractType {
 
     private Value value;
 
-    public ComponentType(CompType compType, Type type) {
+    public ComponentType(Position position, CompType compType, Type type) {
+        super(position);
+
     	this.compType = compType;
     	this.type = type;
     }
 
-    public ComponentType(CompType compType, NamedType namedType) {
+    public ComponentType(Position position, CompType compType, NamedType namedType) {
+        super(position);
+
     	this.compType = compType;
     	this.namedType = namedType;
     }
 
-    public ComponentType(CompType compType, NamedType namedType, Value value) {
+    public ComponentType(Position position, CompType compType, NamedType namedType, Value value) {
+        super(position);
+
     	this.compType = compType;
     	this.namedType = namedType;
     	this.value = value;
@@ -80,17 +87,13 @@ public class ComponentType extends AbstractType {
     public String toString() {
     	switch (compType) {
     		case NamedType:
-    			return StringUtils.concat("ComponentType[namedType=",
-    					namedType, "]");
+    			return StringUtils.concat("ComponentType[namedType=", namedType, "]");
     		case NamedTypeOpt:
-    			return StringUtils.concat("ComponentType[namedType=",
-    					namedType, ",optional", "]");
+    			return StringUtils.concat("ComponentType[namedType=", namedType, ",optional", "]");
     		case NamedTypeDef:
-    			return StringUtils.concat("ComponentType[namedType=",
-    					namedType, ",default=", value, "]");
+    			return StringUtils.concat("ComponentType[namedType=", namedType, ",default=", value, "]");
     		case Type:
-    			return StringUtils.concat("ComponentType[Components of type=",
-    					type, "]");
+    			return StringUtils.concat("ComponentType[Components of type=", type, "]");
     		default:
     			throw new RuntimeException("Implementation error");
     	}

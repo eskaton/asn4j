@@ -27,13 +27,14 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class FixedTypeValueSetFieldSpecNode extends SetFieldSpecNode {
 
-    public FixedTypeValueSetFieldSpecNode(String reference, Type type,
+    public FixedTypeValueSetFieldSpecNode(Position position, String reference, Type type,
     		OptionalitySpecNode optionalitySpec) {
-    	super(reference, type, optionalitySpec);
+    	super(position, reference, type, optionalitySpec);
     }
 
 }

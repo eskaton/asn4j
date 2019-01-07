@@ -27,20 +27,25 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class ExceptionIdentificationNode implements Node {
+public class ExceptionIdentificationNode extends AbstractNode {
 
     private Type type;
 
     private Value value;
 
-    public ExceptionIdentificationNode(Value value) {
+    public ExceptionIdentificationNode(Position position, Value value) {
+    	super(position);
+
     	this.value = value;
     }
 
-    public ExceptionIdentificationNode(Type type, Value value) {
+    public ExceptionIdentificationNode(Position position, Type type, Value value) {
+        super(position);
+
     	this.type = type;
     	this.value = value;
     }

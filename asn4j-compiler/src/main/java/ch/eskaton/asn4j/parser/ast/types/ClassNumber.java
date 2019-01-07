@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,36 +27,40 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
-import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.AbstractNode;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class ClassNumber implements Node {
+public class ClassNumber extends AbstractNode {
 
     private Integer clazz;
 
     private DefinedValue ref;
 
-    public ClassNumber(int clazz) {
-    	this.clazz = clazz;
+    public ClassNumber(Position position, int clazz) {
+        super(position);
+
+        this.clazz = clazz;
     }
 
-    public ClassNumber(DefinedValue ref) {
-    	this.ref = ref;
+    public ClassNumber(Position position, DefinedValue ref) {
+        super(position);
+
+        this.ref = ref;
     }
 
     public Integer getClazz() {
-    	return clazz;
+        return clazz;
     }
 
     public DefinedValue getRef() {
-    	return ref;
+        return ref;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("ClassNumber[",
-    			(clazz != null ? clazz : ref), "]");
+        return StringUtils.concat("ClassNumber[", (clazz != null ? clazz : ref), "]");
     }
 
 }
