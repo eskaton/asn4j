@@ -27,10 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class GeneralizedTime extends UsefulType {
 
-    public GeneralizedTime(String type) {
-    	super(type);
+    public GeneralizedTime(Position position, String type) {
+    	super(position, type);
     }
 
 }

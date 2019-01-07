@@ -27,13 +27,17 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
-public class NamedConstraint extends AbstractConstraint implements Constraint {
+import ch.eskaton.asn4j.parser.Position;
+
+public class NamedConstraint extends AbstractConstraint {
 
     private String name;
 
     private Constraint constraint;
 
-    public NamedConstraint(String name, Constraint constraint) {
+    public NamedConstraint(Position position, String name, Constraint constraint) {
+        super(position);
+
     	this.name = name;
     	this.constraint = constraint;
     }

@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser;
 
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -378,8 +379,7 @@ public class LexerTest {
     }
 
     private static String getCString(Token token) {
-    	return new StringValue(token.getText(),
-    			((StringToken) token).getFlags()).getCString();
+    	return new StringValue(NO_POSITION, token.getText(), ((StringToken) token).getFlags()).getCString();
     }
 
     @Test
@@ -439,8 +439,7 @@ public class LexerTest {
     }
 
     private static String getSimpleString(Token token) throws ParserException {
-    	return new StringValue(token.getText(),
-    			((StringToken) token).getFlags()).getSimpleString();
+    	return new StringValue(NO_POSITION, token.getText(), ((StringToken) token).getFlags()).getSimpleString();
     }
 
     @Test
@@ -451,11 +450,11 @@ public class LexerTest {
 
     	assertEquals(Token.TokenType.CString,
     			(token = lexer.nextToken(Context.Normal)).getType());
-    	assertEquals(new TimeValue("."), getTimeValue(token));
+    	assertEquals(new TimeValue(NO_POSITION, "."), getTimeValue(token));
 
     	assertEquals(Token.TokenType.CString,
     			(token = lexer.nextToken(Context.Normal)).getType());
-    	assertEquals(new TimeValue("0123456789+-:.,/CDHMRPSTWYZ"),
+    	assertEquals(new TimeValue(NO_POSITION, "0123456789+-:.,/CDHMRPSTWYZ"),
     			getTimeValue(token));
 
     	assertNull(lexer.nextToken(Context.Normal));
@@ -497,8 +496,7 @@ public class LexerTest {
     }
 
     private static TimeValue getTimeValue(Token token) throws ParserException {
-    	return new StringValue(token.getText(),
-    			((StringToken) token).getFlags()).getTimeValue();
+    	return new StringValue(NO_POSITION, token.getText(), ((StringToken) token).getFlags()).getTimeValue();
     }
 
     @Test

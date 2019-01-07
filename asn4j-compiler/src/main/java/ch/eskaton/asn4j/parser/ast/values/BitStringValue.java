@@ -27,11 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
 
-public class BitStringValue implements Value {
+public class BitStringValue extends AbstractValue {
 
     private Integer intValue;
 
@@ -41,27 +42,32 @@ public class BitStringValue implements Value {
 
     private Value value;
 
-    public BitStringValue() {
+    public BitStringValue(Position position) {
+        super(position);
     }
 
-    public BitStringValue(Integer intValue) {
+    public BitStringValue(Position position, Integer intValue) {
+        super(position);
+
         this.intValue = intValue;
     }
 
-    public BitStringValue(byte[] byteValue) {
+    public BitStringValue(Position position, byte[] byteValue) {
+        super(position);
+
         this.byteValue = byteValue;
     }
 
-    public BitStringValue(List<String> namedValues) {
+    public BitStringValue(Position position, List<String> namedValues) {
+        super(position);
+
         this.namedValues = namedValues;
     }
 
-    public BitStringValue(Value value) {
-        this.value = value;
-    }
+    public BitStringValue(Position position, Value value) {
+        super(position);
 
-    public boolean hasIntValue() {
-        return namedValues == null && value == null;
+        this.value = value;
     }
 
     public Integer getIntValue() {
@@ -86,11 +92,8 @@ public class BitStringValue implements Value {
 
     @Override
     public String toString() {
-        return StringUtils.concat(
-                "BitStringValue[",
-                intValue != null ? Integer.toBinaryString(intValue)
-                        : (namedValues != null ? StringUtils.join(namedValues,
-                        ", ") : value), "]");
+        return StringUtils.concat("BitStringValue[", intValue != null ? Integer.toBinaryString(intValue)
+                : (namedValues != null ? StringUtils.join(namedValues, ", ") : value), "]");
     }
 
 }

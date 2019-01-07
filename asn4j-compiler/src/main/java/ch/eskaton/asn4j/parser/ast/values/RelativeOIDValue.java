@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -34,8 +35,8 @@ import java.util.List;
 
 public class RelativeOIDValue extends AbstractOIDValue {
 
-    public RelativeOIDValue(List<OIDComponentNode> components) {
-        super(components);
+    public RelativeOIDValue(Position position, List<OIDComponentNode> components) {
+        super(position, components);
     }
 
     @Override

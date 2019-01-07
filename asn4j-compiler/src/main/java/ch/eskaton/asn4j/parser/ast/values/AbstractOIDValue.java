@@ -1,17 +1,21 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 
 import java.util.List;
 
-public class AbstractOIDValue implements Value {
+public class AbstractOIDValue extends AbstractValue {
 
     protected List<OIDComponentNode> components;
 
-    public AbstractOIDValue() {
+    public AbstractOIDValue(Position position) {
+        super(position);
     }
 
-    public AbstractOIDValue(List<OIDComponentNode> components) {
+    public AbstractOIDValue(Position position, List<OIDComponentNode> components) {
+        super(position);
+
         this.components = components;
     }
 

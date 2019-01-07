@@ -27,6 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class OptionalSpecNode extends OptionalitySpecNode {
+
+    public OptionalSpecNode(Position position) {
+        super(position);
+    }
 
 }

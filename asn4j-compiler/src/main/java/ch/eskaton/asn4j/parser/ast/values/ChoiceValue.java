@@ -27,13 +27,17 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-public class ChoiceValue implements Value {
+import ch.eskaton.asn4j.parser.Position;
+
+public class ChoiceValue extends AbstractValue {
 
     private String id;
 
     private Value value;
 
-    public ChoiceValue(String id, Value value) {
+    public ChoiceValue(Position position, String id, Value value) {
+        super(position);
+
     	this.id = id;
     	this.value = value;
     }

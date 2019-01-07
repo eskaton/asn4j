@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,11 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
-import java.util.List;
-
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 
-public class ComponentTypeListsNode implements Node {
+import java.util.List;
+
+public class ComponentTypeListsNode extends AbstractNode {
 
     private List<ComponentType> rootComponents;
 
@@ -43,47 +44,52 @@ public class ComponentTypeListsNode implements Node {
 
     private Boolean extEndMarker = false;
 
-    public ComponentTypeListsNode(List<ComponentType> rootComponents,
-    		ExtensionAndExceptionNode extAndEx, Object extAdditions,
-    		Boolean extEndMarker) {
-    	this.rootComponents = rootComponents;
-    	this.extAndEx = extAndEx;
-    	this.extAdditions = extAdditions;
-    	this.extEndMarker = extEndMarker;
+    public ComponentTypeListsNode(Position position, List<ComponentType> rootComponents,
+            ExtensionAndExceptionNode extAndEx, Object extAdditions, Boolean extEndMarker) {
+        super(position);
+
+        this.rootComponents = rootComponents;
+        this.extAndEx = extAndEx;
+        this.extAdditions = extAdditions;
+        this.extEndMarker = extEndMarker;
     }
 
-    public ComponentTypeListsNode(List<ComponentType> rootComponents,
-    		ExtensionAndExceptionNode extAndEx, Object extAdditions,
-    		Boolean optExtMarker, List<ComponentType> extRootComponents) {
-    	this.rootComponents = rootComponents;
-    	this.extAndEx = extAndEx;
-    	this.extAdditions = extAdditions;
-    	this.extEndMarker = optExtMarker;
-    	this.extRootComponents = extRootComponents;
+    public ComponentTypeListsNode(Position position, List<ComponentType> rootComponents,
+            ExtensionAndExceptionNode extAndEx, Object extAdditions, Boolean optExtMarker,
+            List<ComponentType> extRootComponents) {
+        super(position);
+
+        this.rootComponents = rootComponents;
+        this.extAndEx = extAndEx;
+        this.extAdditions = extAdditions;
+        this.extEndMarker = optExtMarker;
+        this.extRootComponents = extRootComponents;
     }
 
-    public ComponentTypeListsNode(List<ComponentType> rootComponents) {
-    	this.rootComponents = rootComponents;
+    public ComponentTypeListsNode(Position position, List<ComponentType> rootComponents) {
+        super(position);
+
+        this.rootComponents = rootComponents;
     }
 
     public List<ComponentType> getRootComponents() {
-    	return rootComponents;
+        return rootComponents;
     }
 
     public List<ComponentType> getExtRootComponents() {
-    	return extRootComponents;
+        return extRootComponents;
     }
 
     public ExtensionAndExceptionNode getExtAndEx() {
-    	return extAndEx;
+        return extAndEx;
     }
 
     public Object getExtAdditions() {
-    	return extAdditions;
+        return extAdditions;
     }
 
     public Boolean getExtEndMarker() {
-    	return extEndMarker;
+        return extEndMarker;
     }
 
 }

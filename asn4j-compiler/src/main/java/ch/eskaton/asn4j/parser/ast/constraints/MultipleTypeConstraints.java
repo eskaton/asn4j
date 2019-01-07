@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
+import ch.eskaton.asn4j.parser.Position;
+
 import java.util.List;
 
 public class MultipleTypeConstraints extends AbstractConstraint {
@@ -35,8 +37,9 @@ public class MultipleTypeConstraints extends AbstractConstraint {
 
     private boolean isPartial;
 
-    public MultipleTypeConstraints(List<NamedConstraint> constraints,
-    		boolean isPartial) {
+    public MultipleTypeConstraints(Position position, List<NamedConstraint> constraints, boolean isPartial) {
+        super(position);
+
     	this.constraints = constraints;
     	this.isPartial = isPartial;
     }

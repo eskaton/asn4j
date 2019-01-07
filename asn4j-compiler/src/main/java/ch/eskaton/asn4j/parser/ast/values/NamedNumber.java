@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,9 +27,10 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class NamedNumber implements Value {
+public class NamedNumber extends AbstractValue {
 
     private String id;
 
@@ -37,32 +38,35 @@ public class NamedNumber implements Value {
 
     private SignedNumber value;
 
-    public NamedNumber(String id, DefinedValue ref) {
-    	this.id = id;
-    	this.ref = ref;
+    public NamedNumber(Position position, String id, DefinedValue ref) {
+        super(position);
+
+        this.id = id;
+        this.ref = ref;
     }
 
-    public NamedNumber(String id, SignedNumber value) {
-    	this.id = id;
-    	this.value = value;
+    public NamedNumber(Position position, String id, SignedNumber value) {
+        super(position);
+
+        this.id = id;
+        this.value = value;
     }
 
     public String getId() {
-    	return id;
+        return id;
     }
 
     public DefinedValue getRef() {
-    	return ref;
+        return ref;
     }
 
     public SignedNumber getValue() {
-    	return value;
+        return value;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("NamedNumber[", id, "=", (ref != null ? ref
-    			: value), "]");
+        return StringUtils.concat("NamedNumber[", id, "=", (ref != null ? ref : value), "]");
     }
 
 }

@@ -27,14 +27,18 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class DefinedSyntaxNode implements ObjectSyntaxNode {
+public class DefinedSyntaxNode extends ObjectSyntaxNode {
 
     private List<Node> nodes;
 
-    public DefinedSyntaxNode(List<Node> nodes) {
+    public DefinedSyntaxNode(Position position, List<Node> nodes) {
+    	super(position);
+
     	this.nodes = nodes != null ? nodes : new ArrayList<Node>();
     }
 

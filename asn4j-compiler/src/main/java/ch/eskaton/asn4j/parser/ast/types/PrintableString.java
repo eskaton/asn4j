@@ -27,7 +27,13 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class PrintableString extends AbstractType {
+
+    public PrintableString(Position position) {
+        super(position);
+    }
 
     @Override
     public String toString() {

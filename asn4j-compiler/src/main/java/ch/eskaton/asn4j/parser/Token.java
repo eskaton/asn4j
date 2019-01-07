@@ -108,6 +108,11 @@ public class Token {
     	return pos;
     }
 
+    public Position getPosition() {
+        // TODO: add module or file name
+        return new Position(null, line, pos);
+    }
+
     public String getText() {
     	return text;
     }

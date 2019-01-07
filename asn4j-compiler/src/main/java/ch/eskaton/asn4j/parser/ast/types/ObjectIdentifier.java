@@ -27,7 +27,13 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class ObjectIdentifier extends AbstractType {
+
+    public ObjectIdentifier(Position position) {
+        super(position);
+    }
 
     @Override
     public String toString() {

@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
 
@@ -49,8 +50,8 @@ public class CollectionOfValue extends CollectionValue {
 
     private Boolean isQuadruple = null;
 
-    public CollectionOfValue(List<Value> values) {
-        super(values);
+    public CollectionOfValue(Position position, List<Value> values) {
+        super(position, values);
     }
 
     public boolean isTuple() {
@@ -85,8 +86,7 @@ public class CollectionOfValue extends CollectionValue {
             return null;
         }
 
-        return new TupleNode(((IntegerValue) values.get(0)).getValue().shortValue(),
-                ((IntegerValue) values.get(1)).getValue().shortValue());
+        return new TupleNode(getPosition(), getShort(values, 0), getShort(values, 1));
     }
 
     public boolean isQuadruple() {
@@ -121,10 +121,12 @@ public class CollectionOfValue extends CollectionValue {
             return null;
         }
 
-        return new QuadrupleNode(((IntegerValue) values.get(0)).getValue().shortValue(),
-                ((IntegerValue) values.get(1)).getValue().shortValue(),
-                ((IntegerValue) values.get(2)).getValue().shortValue(),
-                ((IntegerValue) values.get(3)).getValue().shortValue());
+        return new QuadrupleNode(getPosition(), getShort(values, 0), getShort(values, 1),
+                getShort(values, 2), getShort(values, 3));
+    }
+
+    private short getShort(List<Value> values, int pos) {
+        return ((IntegerValue) values.get(pos)).getValue().shortValue();
     }
 
     @Override
@@ -149,7 +151,6 @@ public class CollectionOfValue extends CollectionValue {
 
     @Override
     public int hashCode() {
-        return Objects.hash
-                (super.hashCode(), isTuple, isQuadruple);
+        return Objects.hash(super.hashCode(), isTuple, isQuadruple);
     }
 }

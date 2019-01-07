@@ -27,13 +27,16 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class BooleanValue implements Value {
+public class BooleanValue extends AbstractValue {
 
     private boolean value;
 
-    public BooleanValue(boolean value) {
+    public BooleanValue(Position position, boolean value) {
+    	super(position);
+
     	this.value = value;
     }
 

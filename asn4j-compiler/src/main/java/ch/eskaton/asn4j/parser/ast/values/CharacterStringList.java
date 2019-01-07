@@ -27,13 +27,17 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
+
 import java.util.List;
 
-public class CharacterStringList implements Value {
+public class CharacterStringList extends AbstractValue {
 
     private List<Value> values;
 
-    public CharacterStringList(List<Value> values) {
+    public CharacterStringList(Position position, List<Value> values) {
+    	super(position);
+
     	this.values = values;
     }
 

@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,12 +27,15 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.Node;
-import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.ClassNumber;
+import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class Tag implements Node {
+
+    private Position position;
 
     private String encodingReference;
 
@@ -40,29 +43,34 @@ public class Tag implements Node {
 
     private ClassNumber classNumber;
 
-    public Tag(String encodingReference, ClassType clazz, ClassNumber classNumber) {
-    	this.encodingReference = encodingReference;
-    	this.clazz = clazz;
-    	this.classNumber = classNumber;
+    public Tag(Position position, String encodingReference, ClassType clazz, ClassNumber classNumber) {
+        this.position = position;
+        this.encodingReference = encodingReference;
+        this.clazz = clazz;
+        this.classNumber = classNumber;
+    }
+
+    @Override
+    public Position getPosition() {
+        return position;
     }
 
     public String getEncodingReference() {
-    	return encodingReference;
+        return encodingReference;
     }
 
     public ClassType getClazz() {
-    	return clazz;
+        return clazz;
     }
 
     public ClassNumber getClassNumber() {
-    	return classNumber;
+        return classNumber;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("Tag[", (encodingReference != null ? encodingReference
-    			+ " " : ""), (clazz != null ? clazz + " " : ""), classNumber,
-    			"]");
+        return StringUtils.concat("Tag[", (encodingReference != null ? encodingReference
+                + " " : ""), (clazz != null ? clazz + " " : ""), classNumber, "]");
     }
 
 }

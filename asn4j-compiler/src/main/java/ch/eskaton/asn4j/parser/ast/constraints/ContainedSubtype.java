@@ -27,16 +27,19 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class ContainedSubtype extends AbstractConstraint implements Constraint {
+public class ContainedSubtype extends AbstractConstraint {
 
     private Type type;
 
     private boolean hasIncludes;
 
-    public ContainedSubtype(Type type, boolean hasIncludes) {
+    public ContainedSubtype(Position position, Type type, boolean hasIncludes) {
+        super(position);
+
     	this.type = type;
     	this.hasIncludes = hasIncludes;
     }

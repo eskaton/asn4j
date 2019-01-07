@@ -27,15 +27,19 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
+
 import java.util.Objects;
 
-public class NamedValue implements Value {
+public class NamedValue extends AbstractValue {
 
     private String name;
 
     private Value value;
 
-    public NamedValue(String name, Value value) {
+    public NamedValue(Position position, String name, Value value) {
+        super(position);
+
         this.name = name;
         this.value = value;
     }

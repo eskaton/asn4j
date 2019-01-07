@@ -27,13 +27,17 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class SelectionType extends AbstractType {
 
     private String id;
 
     private Type type;
 
-    public SelectionType(String id, Type type) {
+    public SelectionType(Position position, String id, Type type) {
+        super(position);
+
         this.id = id;
         this.type = type;
     }

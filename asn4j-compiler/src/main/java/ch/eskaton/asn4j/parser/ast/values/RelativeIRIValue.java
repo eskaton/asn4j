@@ -28,13 +28,14 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.IRIToken;
+import ch.eskaton.asn4j.parser.Position;
 
 import java.util.List;
 
 public class RelativeIRIValue extends AbstractIRIValue {
 
-    public RelativeIRIValue(List<IRIToken> arcIdentifiers) {
-        super(arcIdentifiers);
+    public RelativeIRIValue(Position position, List<IRIToken> arcIdentifiers) {
+        super(position, arcIdentifiers);
     }
 
 }

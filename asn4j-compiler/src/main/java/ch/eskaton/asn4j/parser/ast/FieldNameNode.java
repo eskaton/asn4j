@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,31 +27,31 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
-import java.util.List;
-
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.CollectionUtils;
-import ch.eskaton.commons.utils.CollectionUtils.Folder;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class FieldNameNode implements Node {
+import java.util.List;
+
+public class FieldNameNode extends AbstractNode {
 
     private List<PrimitiveFieldNameNode> fieldNames;
 
-    public FieldNameNode(List<PrimitiveFieldNameNode> fieldNames) {
-    	this.fieldNames = fieldNames;
+    public FieldNameNode(Position position, List<PrimitiveFieldNameNode> fieldNames) {
+        super(position);
+
+        this.fieldNames = fieldNames;
     }
 
     public List<PrimitiveFieldNameNode> getPrimitiveFieldNames() {
-    	return fieldNames;
+        return fieldNames;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("FieldName[", CollectionUtils.foldr(
-    			fieldNames, new StringBuilder(),
+        return StringUtils.concat("FieldName[", CollectionUtils.foldr(fieldNames, new StringBuilder(),
                 (accumulator, value) -> (accumulator.length() != 0 ? accumulator
-                        .append(".") : accumulator).append("&").append(
-                        value.getReference())), "]");
+                        .append(".") : accumulator).append("&").append(value.getReference())), "]");
     }
 
 }

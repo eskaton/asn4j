@@ -1,16 +1,19 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
 
-public class AbstractBaseXStringValue implements Value {
+public class AbstractBaseXStringValue extends AbstractValue {
 
     private int base;
 
     protected String value;
 
-    public AbstractBaseXStringValue(String value, int base) {
+    public AbstractBaseXStringValue(Position position, String value, int base) {
+        super(position);
+
         this.value = value;
         this.base = base;
     }
@@ -20,7 +23,7 @@ public class AbstractBaseXStringValue implements Value {
     }
 
     public BitStringValue toBitString() {
-        return new BitStringValue(Integer.parseInt(value, base));
+        return new BitStringValue(getPosition(), Integer.parseInt(value, base));
     }
 
     public OctetStringValue toOctetString() {
@@ -37,7 +40,7 @@ public class AbstractBaseXStringValue implements Value {
             buf[i] = (char) Short.parseShort(value.substring(pos, pos + unitLength), base);
         }
 
-        return new OctetStringValue(buf);
+        return new OctetStringValue(getPosition(), buf);
     }
 
 }
