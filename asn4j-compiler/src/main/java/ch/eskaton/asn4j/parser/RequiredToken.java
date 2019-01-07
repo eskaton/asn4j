@@ -29,11 +29,13 @@ package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.ast.Node;
 
-public class RequiredToken implements TokenOrGroup {
+public class RequiredToken extends TokenOrGroup {
 
     private Node token;
 
-    public RequiredToken(Node token) {
+    public RequiredToken(Position position, Node token) {
+    	super(position);
+
     	this.token = token;
     }
 

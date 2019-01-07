@@ -27,10 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class HexStringValue extends AbstractBaseXStringValue {
 
-    public HexStringValue(String value) {
-        super(value, 16);
+    public HexStringValue(Position position, String value) {
+        super(position, value, 16);
     }
 
 }

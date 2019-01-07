@@ -27,11 +27,15 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-public class ContainingStringValue implements Value {
+import ch.eskaton.asn4j.parser.Position;
+
+public class ContainingStringValue extends AbstractValue {
 
     private Value value;
 
-    public ContainingStringValue(Value value) {
+    public ContainingStringValue(Position position, Value value) {
+        super(position);
+
     	this.value = value;
     }
 

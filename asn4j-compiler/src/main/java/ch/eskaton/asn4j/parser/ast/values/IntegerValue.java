@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,39 +27,56 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.commons.utils.StringUtils;
+
 import java.math.BigInteger;
 import java.util.Objects;
 
-import ch.eskaton.commons.utils.StringUtils;
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
-public class IntegerValue implements Value {
+public class IntegerValue extends AbstractValue {
 
     private String ref;
 
     private BigInteger value;
 
-    public IntegerValue(String ref) {
-    	this.ref = ref;
+    public IntegerValue(Position position, String ref) {
+        super(position);
+
+        this.ref = ref;
     }
 
     public IntegerValue(BigInteger value) {
-    	this.value = value;
+        this(NO_POSITION, value);
+    }
+
+    public IntegerValue(Position position, BigInteger value) {
+        super(position);
+
+        this.value = value;
     }
 
     public IntegerValue(long l) {
-    	value = BigInteger.valueOf(l);
+        this(NO_POSITION, l);
+    }
+
+    public IntegerValue(Position position, long l) {
+        super(position);
+
+        value = BigInteger.valueOf(l);
     }
 
     public String getRef() {
-    	return ref;
+        return ref;
     }
 
     public BigInteger getValue() {
-    	return value;
+        return value;
     }
 
     public boolean isReference() {
-    	return ref != null;
+        return ref != null;
     }
 
     @Override
@@ -69,30 +86,42 @@ public class IntegerValue implements Value {
 
     @Override
     public boolean equals(Object obj) {
-    	if (this == obj)
-    		return true;
-    	if (obj == null)
-    		return false;
-    	if (getClass() != obj.getClass())
-    		return false;
-    	IntegerValue other = (IntegerValue) obj;
-    	if (ref == null) {
-    		if (other.ref != null)
-    			return false;
-    	} else if (!ref.equals(other.ref))
-    		return false;
-    	if (value == null) {
-    		if (other.value != null)
-    			return false;
-    	} else if (!value.equals(other.value))
-    		return false;
-    	return true;
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null) {
+            return false;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        IntegerValue other = (IntegerValue) obj;
+
+        if (ref == null) {
+            if (other.ref != null) {
+                return false;
+            }
+        } else if (!ref.equals(other.ref)) {
+            return false;
+        }
+
+        if (value == null) {
+            if (other.value != null) {
+                return false;
+            }
+        } else if (!value.equals(other.value)) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("IntegerValue[",
-    			(ref != null ? ref : value.toString()), "]");
+        return StringUtils.concat("IntegerValue[", (ref != null ? ref : value.toString()), "]");
     }
 
 }

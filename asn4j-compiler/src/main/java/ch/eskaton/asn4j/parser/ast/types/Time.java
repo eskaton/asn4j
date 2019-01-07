@@ -27,7 +27,13 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class Time extends AbstractType {
+
+    public Time(Position position) {
+        super(position);
+    }
 
     @Override
     public String toString() {

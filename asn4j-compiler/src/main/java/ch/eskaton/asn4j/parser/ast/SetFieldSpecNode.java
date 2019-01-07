@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -36,65 +37,60 @@ public class SetFieldSpecNode extends AbstractASN1FieldSpecNode {
 
     private Node type;
 
-    public SetFieldSpecNode(String reference, Node type,
-    		OptionalitySpecNode optionalitySpec) {
-    	super(reference, optionalitySpec);
-    	this.type = type;
+    public SetFieldSpecNode(Position position, String reference, Node type, OptionalitySpecNode optionalitySpec) {
+        super(position, reference, optionalitySpec);
+
+        this.type = type;
     }
 
     public Node getType() {
-    	return type;
+        return type;
     }
 
     public FixedTypeValueSetFieldSpecNode toFixedTypeValueSetFieldSpec() {
-    	if (type instanceof ObjectClassReferenceNode) {
-    		return null;
-    	}
+        if (type instanceof ObjectClassReferenceNode) {
+            return null;
+        }
 
-    	OptionalitySpecNode optionalitySpec = getOptionalitySpec();
+        OptionalitySpecNode optionalitySpec = getOptionalitySpec();
 
-    	if (optionalitySpec instanceof DefaultSpecNode) {
-    		optionalitySpec = ((DefaultSetSpecNode) optionalitySpec)
-    				.toDefaultValueSetOptionalitySpec();
+        if (optionalitySpec instanceof DefaultSpecNode) {
+            optionalitySpec = ((DefaultSetSpecNode) optionalitySpec).toDefaultValueSetOptionalitySpec();
 
-    		if (optionalitySpec == null) {
-    			return null;
-    		}
-    	}
+            if (optionalitySpec == null) {
+                return null;
+            }
+        }
 
-    	return new FixedTypeValueSetFieldSpecNode(getReference(), (Type) type,
-    			optionalitySpec);
+        return new FixedTypeValueSetFieldSpecNode(getPosition(), getReference(), (Type) type, optionalitySpec);
     }
 
     public ObjectSetFieldSpecNode toObjectSetFieldSpec() {
-    	ObjectClassReferenceNode reference;
+        ObjectClassReferenceNode reference;
 
-    	if (type instanceof TypeReference && !(type instanceof UsefulType)) {
-    		reference = new ObjectClassReferenceNode(
-    				((TypeReference) type).getType());
-    	} else if (type instanceof ExternalTypeReference) {
-    		reference = new ExternalObjectClassReferenceNode(
-    				((ExternalTypeReference) type).getModule(),
-    				((ExternalTypeReference) type).getType());
-    	} else if (type instanceof ObjectClassReferenceNode) {
-    		reference = (ObjectClassReferenceNode) type;
-    	} else {
-    		return null;
-    	}
+        if (type instanceof TypeReference && !(type instanceof UsefulType)) {
+            reference = new ObjectClassReferenceNode(type.getPosition(),
+                    ((TypeReference) type).getType());
+        } else if (type instanceof ExternalTypeReference) {
+            reference = new ExternalObjectClassReferenceNode(type.getPosition(),
+                    ((ExternalTypeReference) type).getModule(), ((ExternalTypeReference) type).getType());
+        } else if (type instanceof ObjectClassReferenceNode) {
+            reference = (ObjectClassReferenceNode) type;
+        } else {
+            return null;
+        }
 
-    	OptionalitySpecNode optionalitySpec = getOptionalitySpec();
+        OptionalitySpecNode optionalitySpec = getOptionalitySpec();
 
-    	if (optionalitySpec instanceof DefaultSpecNode) {
-    		optionalitySpec = ((DefaultSetSpecNode) optionalitySpec)
-    				.toDefaultObjectSetOptionalitySpec();
+        if (optionalitySpec instanceof DefaultSpecNode) {
+            optionalitySpec = ((DefaultSetSpecNode) optionalitySpec).toDefaultObjectSetOptionalitySpec();
 
-    		if (optionalitySpec == null) {
-    			return null;
-    		}
-    	}
+            if (optionalitySpec == null) {
+                return null;
+            }
+        }
 
-    	return new ObjectSetFieldSpecNode(getReference(), reference,
-    			optionalitySpec);
+        return new ObjectSetFieldSpecNode(getPosition(), getReference(), reference, optionalitySpec);
     }
 
 }

@@ -27,9 +27,14 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class EmptyValue implements Value {
+public class EmptyValue extends AbstractValue {
+
+    public EmptyValue(Position position) {
+        super(position);
+    }
 
     @Override
     public String toString() {

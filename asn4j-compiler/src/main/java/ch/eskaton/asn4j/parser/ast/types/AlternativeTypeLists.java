@@ -29,12 +29,14 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import java.util.List;
 
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.AbstractNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class AlternativeTypeLists implements Node {
+public class AlternativeTypeLists extends AbstractNode {
 
     private List<NamedType> rootTypeList;
 
@@ -44,14 +46,17 @@ public class AlternativeTypeLists implements Node {
 
     private boolean optExtMarker;
 
-    public AlternativeTypeLists(List<NamedType> rootTypeList) {
+    public AlternativeTypeLists(Position position, List<NamedType> rootTypeList) {
+        super(position);
+
     	this.rootTypeList = rootTypeList;
     }
 
-    public AlternativeTypeLists(List<NamedType> rootTypeList,
-    		ExtensionAndExceptionNode extensionAndException,
-    		List<ExtensionAdditionAlternativeNode> extAddAlts,
+    public AlternativeTypeLists(Position position, List<NamedType> rootTypeList,
+    		ExtensionAndExceptionNode extensionAndException, List<ExtensionAdditionAlternativeNode> extAddAlts,
     		boolean optExtMarker) {
+        super(position);
+
     	this.rootTypeList = rootTypeList;
     	this.extensionAndException = extensionAndException;
     	this.extAddAlts = extAddAlts;
@@ -77,16 +82,14 @@ public class AlternativeTypeLists implements Node {
     @Override
     public String toString() {
     	return StringUtils
-    			.concat("AlternativeTypeLists[ext=",
-    					(extensionAndException != null ? "true" : "false"),
-    					", optExtMarker=",
-    					optExtMarker,
+    			.concat("AlternativeTypeLists[ext=", (extensionAndException != null ? "true" : "false"),
+    					", optExtMarker=", optExtMarker,
     					(extensionAndException != null
     							&& extensionAndException.getExceptionId() != null ? ", exceptionId="
     							+ extensionAndException.getExceptionId()
-    							: ""), ", root=(", StringUtils.join(
-    							rootTypeList, ","), "), extAlts=(",
+    							: ""), ", root=(", StringUtils.join(rootTypeList, ","), "), extAlts=(",
     					extAddAlts != null ? StringUtils.join(extAddAlts, ",")
     							: "", ")", "]");
     }
+
 }

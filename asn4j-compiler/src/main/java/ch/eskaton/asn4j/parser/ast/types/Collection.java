@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.parser.ast.types;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -45,10 +46,13 @@ public abstract class Collection extends AbstractType {
 
     private Object extAdditions;
 
-    public Collection() {
+    public Collection(Position position) {
+        super(position);
     }
 
-    public Collection(ComponentTypeListsNode compTypes) {
+    public Collection(Position position, ComponentTypeListsNode compTypes) {
+        super(position);
+
     	this.rootComponents = compTypes.getRootComponents();
     	this.extAndEx = compTypes.getExtAndEx();
     	this.extAdditions = compTypes.getExtAdditions();
@@ -56,7 +60,9 @@ public abstract class Collection extends AbstractType {
     	this.extRootComponents = compTypes.getExtRootComponents();
     }
 
-    public Collection(Object extAndEx, Object optExtMarker) {
+    public Collection(Position position, Object extAndEx, Object optExtMarker) {
+        super(position);
+
     	this.extAndEx = extAndEx;
     	this.optExtMarker = optExtMarker;
     }

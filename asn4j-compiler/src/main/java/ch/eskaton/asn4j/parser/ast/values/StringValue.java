@@ -28,10 +28,11 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.ParserException;
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.StringToken;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class StringValue implements Value {
+public class StringValue extends AbstractValue {
 
     private String cString;
 
@@ -41,7 +42,9 @@ public class StringValue implements Value {
 
     private int flags;
 
-    public StringValue(String value, int flags) {
+    public StringValue(Position position, String value, int flags) {
+        super(position);
+
     	this.cString = value;
     	this.flags = flags;
 
@@ -140,7 +143,7 @@ public class StringValue implements Value {
     				"tstring contains invalid characters or is empty");
     	}
 
-    	return new TimeValue(tString);
+    	return new TimeValue(getPosition(), tString);
     }
 
     @Override

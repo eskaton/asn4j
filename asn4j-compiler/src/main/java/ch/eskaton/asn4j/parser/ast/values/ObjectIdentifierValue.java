@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -36,11 +37,13 @@ public class ObjectIdentifierValue extends AbstractOIDValue {
 
     private DefinedValue reference;
 
-    public ObjectIdentifierValue(List<OIDComponentNode> components) {
-        super(components);
+    public ObjectIdentifierValue(Position position, List<OIDComponentNode> components) {
+        super(position, components);
     }
 
-    public ObjectIdentifierValue(DefinedValue reference) {
+    public ObjectIdentifierValue(Position position, DefinedValue reference) {
+        super(position);
+
         this.reference = reference;
     }
 

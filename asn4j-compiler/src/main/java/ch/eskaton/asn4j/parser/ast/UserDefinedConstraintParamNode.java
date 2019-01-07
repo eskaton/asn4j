@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -28,35 +28,38 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Governor;
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class UserDefinedConstraintParamNode {
+public class UserDefinedConstraintParamNode extends AbstractNode {
 
     private Governor governor;
 
     private Node value;
 
-    public UserDefinedConstraintParamNode(Governor governor, Node value) {
-    	this.governor = governor;
-    	this.value = value;
+    public UserDefinedConstraintParamNode(Position position, Governor governor, Node value) {
+        super(position);
+
+        this.governor = governor;
+        this.value = value;
     }
 
-    public UserDefinedConstraintParamNode(Node value) {
-    	this(null, value);
+    public UserDefinedConstraintParamNode(Position position, Node value) {
+        this(position, null, value);
     }
 
     public Governor getGovernor() {
-    	return governor;
+        return governor;
     }
 
     public Node getValue() {
-    	return value;
+        return value;
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("UserDefinedConstraintParam[governor=",
-    			governor, (value != null ? ",value=" + value : ""), "]");
+        return StringUtils.concat("UserDefinedConstraintParam[governor=", governor,
+                (value != null ? ",value=" + value : ""), "]");
     }
 
 }

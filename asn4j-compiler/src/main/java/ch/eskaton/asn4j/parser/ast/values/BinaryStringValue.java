@@ -27,10 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class BinaryStringValue extends AbstractBaseXStringValue {
 
-    public BinaryStringValue(String value) {
-        super(value, 2);
+    public BinaryStringValue(Position position, String value) {
+        super(position, value, 2);
     }
 
 }

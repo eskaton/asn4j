@@ -27,11 +27,15 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
-public class IdentifierNode implements Node {
+import ch.eskaton.asn4j.parser.Position;
+
+public class IdentifierNode extends AbstractNode {
 
     private String name;
 
-    public IdentifierNode(String name) {
+    public IdentifierNode(Position position, String name) {
+    	super(position);
+
     	this.name = name;
     }
 

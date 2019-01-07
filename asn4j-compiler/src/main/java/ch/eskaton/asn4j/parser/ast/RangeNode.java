@@ -27,10 +27,13 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.constraints.AbstractConstraint;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.Objects;
+
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class RangeNode extends AbstractConstraint {
 
@@ -39,6 +42,12 @@ public class RangeNode extends AbstractConstraint {
     private EndpointNode upper;
 
     public RangeNode(EndpointNode lower, EndpointNode upper) {
+        this(NO_POSITION, lower, upper);
+    }
+
+    public RangeNode(Position position, EndpointNode lower, EndpointNode upper) {
+        super(position);
+
     	this.lower = lower;
     	this.upper = upper;
     }

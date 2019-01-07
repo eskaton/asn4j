@@ -27,12 +27,17 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
 
-public interface Constraint extends Elements {
+public abstract class Constraint extends Elements {
 
-    void setExceptionSpec(ExceptionIdentificationNode exceptionSpec);
+    public Constraint(Position position) {
+        super(position);
+    }
 
-    ExceptionIdentificationNode getExceptionSpec();
+    public abstract void setExceptionSpec(ExceptionIdentificationNode exceptionSpec);
+
+    public abstract ExceptionIdentificationNode getExceptionSpec();
 
 }

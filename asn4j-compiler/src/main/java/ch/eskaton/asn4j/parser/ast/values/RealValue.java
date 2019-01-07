@@ -27,9 +27,11 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
+
 import java.math.BigDecimal;
 
-public class RealValue implements Value {
+public class RealValue extends AbstractValue {
 
     public enum Type {
     	PositiveInf, NegativeInf, NaN, Normal, Special
@@ -45,16 +47,22 @@ public class RealValue implements Value {
 
     private Long exponent;
 
-    public RealValue(Type type) {
+    public RealValue(Position position, Type type) {
+    	super(position);
+
     	this.type = type;
     }
 
-    public RealValue(BigDecimal value) {
+    public RealValue(Position position, BigDecimal value) {
+        super(position);
+
     	this.type = Type.Normal;
     	this.value = value;
     }
 
-    public RealValue(Long mantissa, Long base, Long exponent) {
+    public RealValue(Position position, Long mantissa, Long base, Long exponent) {
+        super(position);
+
     	this.type = Type.Special;
     	this.mantissa = mantissa;
     	this.base = base;

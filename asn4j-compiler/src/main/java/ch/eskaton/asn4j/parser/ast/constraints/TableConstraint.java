@@ -27,6 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
+import ch.eskaton.asn4j.parser.Position;
+
 public class TableConstraint extends AbstractConstraint {
+
+    public TableConstraint(Position position) {
+        super(position);
+    }
 
 }

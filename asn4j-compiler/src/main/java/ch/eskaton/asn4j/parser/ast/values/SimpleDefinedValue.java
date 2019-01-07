@@ -29,20 +29,23 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import java.util.List;
 
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.Token;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class SimpleDefinedValue extends DefinedValue implements
-    	ParameterizedNode {
+public class SimpleDefinedValue extends DefinedValue implements	ParameterizedNode {
 
     private String value;
 
     private List<Node> parameters;
 
-    public SimpleDefinedValue(String value) {
+    public SimpleDefinedValue(Position position, String value) {
+        super(position);
+
     	this.value = value;
     }
 
@@ -60,7 +63,7 @@ public class SimpleDefinedValue extends DefinedValue implements
 
     @Override
     public ObjectNode toObjectValue() {
-    	ObjectReferenceNode ref = new ObjectReferenceNode(value);
+    	ObjectReferenceNode ref = new ObjectReferenceNode(getPosition(), value);
     	ref.setParameters(parameters);
     	return ref;
     }

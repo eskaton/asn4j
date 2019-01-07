@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.constraints;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class PresenceConstraint extends AbstractConstraint {
@@ -37,7 +38,9 @@ public class PresenceConstraint extends AbstractConstraint {
 
     private Type type;
 
-    public PresenceConstraint(Type type) {
+    public PresenceConstraint(Position position, Type type) {
+        super(position);
+
     	this.type = type;
     }
 

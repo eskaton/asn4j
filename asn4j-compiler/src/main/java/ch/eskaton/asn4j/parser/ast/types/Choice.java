@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import java.util.List;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 import ch.eskaton.commons.utils.StringUtils;
@@ -45,12 +46,12 @@ public class Choice extends AbstractType {
 
     private boolean optExtMarker;
 
-    public Choice(AlternativeTypeLists alternatives) {
+    public Choice(Position position, AlternativeTypeLists alternatives) {
+        super(position);
+
     	this.rootTypeList = alternatives.getRootTypeList();
-    	this.ext = alternatives.getExtensionAndException() != null ? true
-    			: false;
-    	this.exId = this.ext ? alternatives.getExtensionAndException()
-    			.getExceptionId() : null;
+    	this.ext = alternatives.getExtensionAndException() != null ? true : false;
+    	this.exId = this.ext ? alternatives.getExtensionAndException().getExceptionId() : null;
     	this.extAddAlts = alternatives.getExtAddAlts();
     	this.optExtMarker = alternatives.hasOptExtMarker();
     }

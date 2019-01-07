@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,29 +27,30 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+
 import java.util.List;
 
-public class ParameterizedObjectSetAssignmentNode extends
-    	ParameterizedAssignmentNode {
+public class ParameterizedObjectSetAssignmentNode extends ParameterizedAssignmentNode {
 
     private ObjectClassReferenceNode objectClass;
 
     private ObjectSetSpecNode objectSet;
 
-    public ParameterizedObjectSetAssignmentNode(String reference,
-    		List<ParameterNode> parameters,
-    		ObjectClassReferenceNode objectClass, ObjectSetSpecNode objectSet) {
-    	super(reference, parameters);
-    	this.objectClass = objectClass;
-    	this.objectSet = objectSet;
+    public ParameterizedObjectSetAssignmentNode(Position position, String reference, List<ParameterNode> parameters,
+            ObjectClassReferenceNode objectClass, ObjectSetSpecNode objectSet) {
+        super(position, reference, parameters);
+
+        this.objectClass = objectClass;
+        this.objectSet = objectSet;
     }
 
     public ObjectClassReferenceNode getObjectClass() {
-    	return objectClass;
+        return objectClass;
     }
 
     public ObjectSetSpecNode getObjectSet() {
-    	return objectSet;
+        return objectSet;
     }
 
 }

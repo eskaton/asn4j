@@ -29,9 +29,10 @@ package ch.eskaton.asn4j.parser.ast;
 
 import java.util.List;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class ExportsNode implements Node {
+public class ExportsNode extends AbstractNode {
 
     public enum Mode {
     	All, Specific
@@ -41,11 +42,15 @@ public class ExportsNode implements Node {
 
     private List<ReferenceNode> symbols;
 
-    public ExportsNode(Mode mode) {
+    public ExportsNode(Position position, Mode mode) {
+    	super(position);
+
     	this.mode = mode;
     }
 
-    public ExportsNode(Mode mode, List<ReferenceNode> maybeList) {
+    public ExportsNode(Position position, Mode mode, List<ReferenceNode> maybeList) {
+        super(position);
+
     	this.mode = mode;
     	this.symbols = maybeList;
     }
