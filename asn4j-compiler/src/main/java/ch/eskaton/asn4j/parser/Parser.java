@@ -225,6 +225,7 @@ import ch.eskaton.asn4j.parser.ast.values.ValueFromObject;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.commons.utils.StringUtils;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -505,8 +506,15 @@ public class Parser {
     private WithSyntaxSpecParser withSyntaxSpecParser = new WithSyntaxSpecParser();
 
     public Parser(InputStream is) throws IOException {
-    	this.lexer = new Lexer(is);
+        this.lexer = new Lexer(is);
+
     	lexerContext.push(Context.Normal);
+    }
+
+    public Parser(String moduleFile) throws IOException {
+        this.lexer = new Lexer(moduleFile);
+
+        lexerContext.push(Context.Normal);
     }
 
     private Token getToken() throws ParserException {
@@ -520,8 +528,11 @@ public class Parser {
     }
 
     private void setException(String message, Token token) {
-    	lastException = new ParserException(String.format(
-    			"Line %d, position %d: %s", token.line, token.pos, message));
+        Position position = token.getPosition();
+
+        lastException = new ParserException(String.format(
+    			"File %s, Line %d, position %d: %s", position.getFile(), position.getLine(), position.getPosition(),
+                message));
     }
 
     private void clearError() {
@@ -976,18 +987,16 @@ public class Parser {
     					(Boolean) rule.get(4), body, encCtrl);
     		} else {
     			if (lastException == null) {
-    				throw new ParserException(StringUtils.concat("Token '",
-    						lastExpectedToken, "' expected, but found '",
-    						lastErrorToken.getType(),
-    						(lastErrorToken.getText() != null ? "("
-    								+ lastErrorToken.getText() + ")" : ""),
-    						"' at line ", lastErrorToken.getLine(),
-    						" position ", lastErrorToken.getPos()));
+                    Position position = lastErrorToken.getPosition();
+
+                    throw new ParserException(StringUtils.concat("Token '", lastExpectedToken,
+                            "' expected, but found '",  lastErrorToken.getType(),
+                            (lastErrorToken.getText() != null ? "(" + lastErrorToken.getText() + ")" : ""),
+                            "' at line ", position.getLine(), " position ", position.getPosition()));
     			} else {
     				throw lastException;
     			}
     		}
-
     	}
 
     }
