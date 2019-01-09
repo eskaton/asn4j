@@ -61,7 +61,7 @@ public class TypeReferenceCompiler implements NamedCompiler<TypeReference> {
             return true;
         }
 
-        if (ctx.isBuiltin(ctx.getBase(type).getClass().getSimpleName())) {
+        if (ctx.isBuiltin(ctx.getBase(base).getClass().getSimpleName())) {
             return false;
         }
 

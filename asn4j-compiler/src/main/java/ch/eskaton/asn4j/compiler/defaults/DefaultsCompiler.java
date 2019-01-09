@@ -80,7 +80,7 @@ public class DefaultsCompiler {
         Type base;
 
         if (type instanceof TypeReference) {
-            base = typeResolver.getBase(((TypeReference) type).getType());
+            base = typeResolver.getBase((TypeReference) type);
         } else {
             base = type;
         }
@@ -96,8 +96,7 @@ public class DefaultsCompiler {
         } catch (CompilerException e) {
             throw new CompilerException("Error in default for type "
                     + (type instanceof NamedType ? ((NamedType) type).getName()
-                    : getTypeName(type)) + ": "
-                    + e.getMessage(), e);
+                    : getTypeName(type)) + ": " + e.getMessage(), e);
         }
 
         return;
