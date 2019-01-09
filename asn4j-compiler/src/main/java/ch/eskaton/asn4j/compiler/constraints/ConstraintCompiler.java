@@ -80,7 +80,7 @@ public class ConstraintCompiler {
         Type base;
 
         if (node instanceof TypeReference) {
-            base = typeResolver.getBase(((TypeReference) node).getType());
+            base = typeResolver.getBase((TypeReference) node);
         } else {
             base = node;
         }

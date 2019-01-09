@@ -192,11 +192,11 @@ public class CompilerContext {
     };
 
     private TypeResolver typeResolver = new TypeResolver() {
-        public TypeAssignmentNode getType(String type) {
+        public TypeAssignmentNode getType(TypeReference type) {
             return CompilerContext.this.getTypeName(type);
         }
 
-        public Type getBase(String type) {
+        public Type getBase(TypeReference type) {
             return CompilerContext.this.getBase(type);
         }
     };
@@ -303,41 +303,40 @@ public class CompilerContext {
         currentModule.push(getModule());
     }
 
-    public TypeAssignmentNode getTypeName(String type) {
+    public TypeAssignmentNode getTypeName(TypeReference type) {
         // TODO: what to do if the type isn't known in the current module
-        return (TypeAssignmentNode) getModule().getBody().getAssignments(type);
+        return (TypeAssignmentNode) getModule().getBody().getAssignments(type.getType());
     }
 
     public Type getBase(Type type) {
         if (type instanceof TypeReference) {
-            return getBase(((TypeReference) type).getType());
+            return getBase((TypeReference) type);
         }
 
         return type;
     }
 
-    public Type getBase(TypeReference typeReference) {
-        return getBase(typeReference.getType());
-    }
-
-    public Type getBase(String type) {
+    public Type getBase(TypeReference type) {
         // TODO: what to do if the type isn't known in the current module
         while (true) {
+            String typeName = type.getType();
+
             // Check for implicitly defined types
-            if (GeneralizedTime.class.getSimpleName().equals(type) || UTCTime.class.getSimpleName().equals(type)) {
+            if (GeneralizedTime.class.getSimpleName().equals(typeName) ||
+                    UTCTime.class.getSimpleName().equals(typeName)) {
                 return new VisibleString(NO_POSITION);
             }
 
-            TypeAssignmentNode assignment = (TypeAssignmentNode) getModule().getBody().getAssignments(type);
+            TypeAssignmentNode assignment = (TypeAssignmentNode) getModule().getBody().getAssignments(typeName);
 
             if (assignment == null) {
-                throw new CompilerException("Failed to resolve a type: " + type);
+                throw new CompilerException(type.getPosition(), "Failed to resolve a type: " + typeName);
             }
 
             Type base = assignment.getType();
 
             if (base instanceof TypeReference) {
-                type = ((TypeReference) base).getType();
+                type = (TypeReference) base;
             } else {
                 return base;
             }

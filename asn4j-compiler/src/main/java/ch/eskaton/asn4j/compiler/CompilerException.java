@@ -27,6 +27,10 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.parser.Position;
+
+import java.nio.file.Paths;
+
 @SuppressWarnings("serial")
 public class CompilerException extends RuntimeException {
 
@@ -34,12 +38,24 @@ public class CompilerException extends RuntimeException {
         super(message);
     }
 
+    public CompilerException(Position position, String message) {
+        super(formatMessage(position, message));
+    }
+
     public CompilerException(String format, Object... args) {
         super(String.format(format, args));
     }
 
+    public CompilerException(Position position, String format, Object... args) {
+        super(formatMessage(position, String.format(format, args)));
+    }
+
     public CompilerException(String format, Throwable cause, Object... args) {
         super(String.format(format, args), cause);
+    }
+
+    public CompilerException(Position position, String format, Throwable cause, Object... args) {
+        super(formatMessage(position, String.format(format, args)), cause);
     }
 
     public CompilerException(Throwable cause) {
@@ -48,6 +64,15 @@ public class CompilerException extends RuntimeException {
 
     public CompilerException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public CompilerException(Position position, String message, Throwable cause) {
+        super(formatMessage(position, message), cause);
+    }
+
+    public static String formatMessage(Position position, String message) {
+        return String.format("In %s at (%d, %d): %s", Paths.get(position.getFile()).getFileName(), position.getLine(),
+                position.getPosition(), message);
     }
 
 }
