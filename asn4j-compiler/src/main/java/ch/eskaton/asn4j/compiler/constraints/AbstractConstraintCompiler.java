@@ -88,7 +88,7 @@ public abstract class AbstractConstraintCompiler<T> {
     		if (node instanceof UsefulType) {
     			break;
     		} else if (node instanceof TypeReference) {
-    			TypeAssignmentNode type = typeResolver.getType(((TypeReference) node).getType());
+    			TypeAssignmentNode type = typeResolver.getType((TypeReference) node);
 
     			if (type == null) {
     				throw new CompilerException("Referenced type %s not found", ((TypeReference) node).getType());

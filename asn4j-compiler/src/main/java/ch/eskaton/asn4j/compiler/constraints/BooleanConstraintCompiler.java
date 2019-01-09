@@ -174,8 +174,7 @@ public class BooleanConstraintCompiler extends
             cons.addAll(ALL);
             return cons;
         } else if (type instanceof TypeReference) {
-            return (Set<Boolean>) compileConstraints(type,
-                    typeResolver.getBase(((TypeReference) type).getType()));
+            return (Set<Boolean>) compileConstraints(type, typeResolver.getBase((TypeReference) type));
         } else {
             throw new CompilerException("Invalid type %s in constraint for BOOLEAN type", type);
         }

@@ -269,8 +269,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
     		// no restriction
     		return cons;
     	} else if (type instanceof TypeReference) {
-    		return (List<RangeNode>) compileConstraints(type,
-    				typeResolver.getBase(((TypeReference) type).getType()));
+    		return (List<RangeNode>) compileConstraints(type, typeResolver.getBase((TypeReference) type));
     	} else {
     		throw new CompilerException("Invalid type %s in constraint for INTEGER type", type);
     	}
