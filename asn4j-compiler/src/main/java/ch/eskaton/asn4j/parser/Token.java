@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,41 +32,41 @@ import ch.eskaton.asn4j.parser.Lexer.Context;
 public class Token {
 
     public enum TokenType {
-    	Minus, Ellipsis, Dot, Range, Assign, Colon, Ampersand, AT, LT, GT,
-    	Apostrophe, ASTERISK, Exclamation, Pipe, Comma, Semicolon, LParen,
-    	RParen, LBrace, RBrace, LBracket, RBracket, LVersionBrackets,
-    	RVersionBrackets, Equals, Identifier, BString, Number, RealNumber,
-    	TypeReference, ABSENT_KW, ABSTRACT_SYNTAX_KW, ALL_KW, APPLICATION_KW,
-    	AUTOMATIC_KW, BEGIN_KW, BIT_KW, BMPString_KW, BOOLEAN_KW, BY_KW,
-    	CHARACTER_KW, CHOICE_KW, CLASS_KW, COMPONENT_KW, COMPONENTS_KW,
-    	CONSTRAINED_KW, CONTAINING_KW, DATE_KW, DATE_TIME_KW, DEFAULT_KW,
-    	DEFINITIONS_KW, DURATION_KW, EMBEDDED_KW, ENCODED_KW,
-    	ENCODING_CONTROL_KW, END_KW, ENUMERATED_KW, EXCEPT_KW, EXPLICIT_KW,
-    	EXPORTS_KW, EXTENSIBILITY_KW, EXTERNAL_KW, FALSE_KW, FROM_KW,
-    	GeneralizedTime_KW, GeneralString_KW, GraphicString_KW, IA5String_KW,
-    	IDENTIFIER_KW, IMPLICIT_KW, IMPLIED_KW, IMPORTS_KW, INCLUDES_KW,
-    	INSTANCE_KW, INSTRUCTIONS_KW, INTEGER_KW, INTERSECTION_KW,
-    	ISO646String_KW, MAX_KW, MIN_KW, MINUS_INFINITY_KW, NOT_A_NUMBER_KW,
-    	NULL_KW, NumericString_KW, OBJECT_KW, ObjectDescriptor_KW, OCTET_KW,
-    	OF_KW, OID_IRI_KW, OPTIONAL_KW, PATTERN_KW, PDV_KW, PLUS_INFINITY_KW,
-    	PRESENT_KW, PrintableString_KW, PRIVATE_KW, REAL_KW, RELATIVE_OID_KW,
-    	RELATIVE_OID_IRI_KW, SEQUENCE_KW, SET_KW, SETTINGS_KW, SIZE_KW,
-    	STRING_KW, SYNTAX_KW, T61String_KW, TAGS_KW, TeletexString_KW, TIME_KW,
-    	TIME_OF_DAY_KW, TRUE_KW, TYPE_IDENTIFIER_KW, UNION_KW, UNIQUE_KW,
-    	UNIVERSAL_KW, UniversalString_KW, UTCTime_KW, UTF8String_KW,
-    	VideotexString_KW, VisibleString_KW, WITH_KW, Quotation, CString,
-    	Solidus, Asterisk, Circumflex, HString, EncodingReference,
-    	ValueReference, ModuleReference, ObjectClassReference, Word,
-    	ObjectReference, ObjectSetReference, ValueFieldReference,
-    	ObjectFieldReference, TypeFieldReference, ValueSetFieldReference,
-    	ObjectSetFieldReference
-    };
+        Minus, Ellipsis, Dot, Range, Assign, Colon, Ampersand, AT, LT, GT,
+        Apostrophe, ASTERISK, Exclamation, Pipe, Comma, Semicolon, LParen,
+        RParen, LBrace, RBrace, LBracket, RBracket, LVersionBrackets,
+        RVersionBrackets, Equals, Identifier, BString, Number, RealNumber,
+        TypeReference, ABSENT_KW, ABSTRACT_SYNTAX_KW, ALL_KW, APPLICATION_KW,
+        AUTOMATIC_KW, BEGIN_KW, BIT_KW, BMPString_KW, BOOLEAN_KW, BY_KW,
+        CHARACTER_KW, CHOICE_KW, CLASS_KW, COMPONENT_KW, COMPONENTS_KW,
+        CONSTRAINED_KW, CONTAINING_KW, DATE_KW, DATE_TIME_KW, DEFAULT_KW,
+        DEFINITIONS_KW, DURATION_KW, EMBEDDED_KW, ENCODED_KW,
+        ENCODING_CONTROL_KW, END_KW, ENUMERATED_KW, EXCEPT_KW, EXPLICIT_KW,
+        EXPORTS_KW, EXTENSIBILITY_KW, EXTERNAL_KW, FALSE_KW, FROM_KW,
+        GeneralizedTime_KW, GeneralString_KW, GraphicString_KW, IA5String_KW,
+        IDENTIFIER_KW, IMPLICIT_KW, IMPLIED_KW, IMPORTS_KW, INCLUDES_KW,
+        INSTANCE_KW, INSTRUCTIONS_KW, INTEGER_KW, INTERSECTION_KW,
+        ISO646String_KW, MAX_KW, MIN_KW, MINUS_INFINITY_KW, NOT_A_NUMBER_KW,
+        NULL_KW, NumericString_KW, OBJECT_KW, ObjectDescriptor_KW, OCTET_KW,
+        OF_KW, OID_IRI_KW, OPTIONAL_KW, PATTERN_KW, PDV_KW, PLUS_INFINITY_KW,
+        PRESENT_KW, PrintableString_KW, PRIVATE_KW, REAL_KW, RELATIVE_OID_KW,
+        RELATIVE_OID_IRI_KW, SEQUENCE_KW, SET_KW, SETTINGS_KW, SIZE_KW,
+        STRING_KW, SYNTAX_KW, T61String_KW, TAGS_KW, TeletexString_KW, TIME_KW,
+        TIME_OF_DAY_KW, TRUE_KW, TYPE_IDENTIFIER_KW, UNION_KW, UNIQUE_KW,
+        UNIVERSAL_KW, UniversalString_KW, UTCTime_KW, UTF8String_KW,
+        VideotexString_KW, VisibleString_KW, WITH_KW, Quotation, CString,
+        Solidus, Asterisk, Circumflex, HString, EncodingReference,
+        ValueReference, ModuleReference, ObjectClassReference, Word,
+        ObjectReference, ObjectSetReference, ValueFieldReference,
+        ObjectFieldReference, TypeFieldReference, ValueSetFieldReference,
+        ObjectSetFieldReference;
+    }
+
+    ;
 
     protected int offset;
 
-    protected int line;
-
-    protected int pos;
+    protected Position position;
 
     protected TokenType type;
 
@@ -74,53 +74,42 @@ public class Token {
 
     protected Context context;
 
-    public Token(Context context, TokenType type, int offset, int line, int pos) {
-    	this(context, type, offset, line, pos, null);
+    public Token(Context context, TokenType type, int offset, Position position) {
+        this(context, type, offset, position, null);
     }
 
-    public Token(Context context, TokenType type, int offset, int line,
-    		int pos, String text) {
-    	this.context = context;
-    	this.type = type;
-    	this.offset = offset;
-    	this.line = line;
-    	this.pos = pos;
-    	this.text = text;
+    public Token(Context context, TokenType type, int offset, Position position, String text) {
+        this.context = context;
+        this.type = type;
+        this.offset = offset;
+        this.position = position;
+        this.text = text;
     }
 
     public Context getContext() {
-    	return context;
+        return context;
     }
 
     public TokenType getType() {
-    	return type;
+        return type;
     }
 
     public int getOffset() {
-    	return offset;
-    }
-
-    public int getLine() {
-    	return line;
-    }
-
-    public int getPos() {
-    	return pos;
+        return offset;
     }
 
     public Position getPosition() {
-        // TODO: add module or file name
-        return new Position(null, line, pos);
+        return position;
     }
 
     public String getText() {
-    	return text;
+        return text;
     }
 
     @Override
     public String toString() {
-    	return "Token[" + type + ", offset=" + offset + ", line=" + line
-    			+ ", pos=" + pos + (text != null ? ", text=" + text : "") + "]";
+        return "Token[" + type + ", offset=" + offset + ", position=" + position +
+                (text != null ? ", text=" + text : "") + "]";
     }
 
 }

@@ -33,14 +33,14 @@ import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class Position {
 
-    private String module;
+    private String file;
 
     private int line;
 
     private int position;
 
-    public Position(String module, int line, int position) {
-        this.module = module;
+    public Position(String file, int line, int position) {
+        this.file = file;
         this.line = line;
         this.position = position;
     }
@@ -56,8 +56,8 @@ public class Position {
     }
 
 
-    public String getModule() {
-        return module;
+    public String getFile() {
+        return file;
     }
 
     public int getLine() {
@@ -66,6 +66,10 @@ public class Position {
 
     public int getPosition() {
         return position;
+    }
+
+    public void decrementPosition() {
+        position--;
     }
 
 }
