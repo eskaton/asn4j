@@ -65,11 +65,9 @@ public class CompilerImpl {
 
     private Stack<AssignmentNode> assignments;
 
-    public static void main(String[] args) throws IOException, ParserException,
-            CompilerException {
+    public static void main(String[] args) throws IOException, ParserException, CompilerException {
         if (args.length != 4) {
-            System.err
-                    .println("Usage: ASN1Compiler <ASN1Module> <Include-Path> <Java-Package> <Output-Dir>");
+            System.err.println("Usage: ASN1Compiler <ASN1Module> <Include-Path> <Java-Package> <Output-Dir>");
             System.exit(1);
         }
 
@@ -79,6 +77,7 @@ public class CompilerImpl {
     public CompilerImpl(String module, String path, String pkg, String outputDir) {
         this.module = module;
         this.includePath = path.split(File.pathSeparator);
+
         compilerContext = new CompilerContext(this, pkg, outputDir);
     }
 
@@ -91,13 +90,11 @@ public class CompilerImpl {
 
         compilerContext.writeClasses();
 
-        System.out.println("Total compilation time "
-                + String.format("%.3f",
+        System.out.println("Total compilation time " + String.format("%.3f",
                 (System.currentTimeMillis() - begin) / 1000.0) + "s");
     }
 
-    private void loadAndCompileModule(String moduleName) throws IOException,
-            ParserException, CompilerException {
+    private void loadAndCompileModule(String moduleName) throws IOException, ParserException, CompilerException {
         load(moduleName);
 
         try {
@@ -148,8 +145,7 @@ public class CompilerImpl {
     }
 
     private Type compileTypeAssignment(TypeAssignmentNode assignment) {
-        return compilerContext.<TypeAssignmentNode, TypeAssignmentCompiler>getCompiler(TypeAssignmentNode.class).compile(compilerContext,
-                assignment);
+        return compilerContext.<TypeAssignmentNode, TypeAssignmentCompiler>getCompiler(TypeAssignmentNode.class).compile(compilerContext, assignment);
     }
 
     private void compileObjectClassAssignment(ObjectClassAssignmentNode assignment) {
@@ -192,11 +188,10 @@ public class CompilerImpl {
         }
 
         if (moduleFile == null) {
-            throw new IOException("Module " + moduleName
-                    + " not found in include path");
+            throw new IOException("Module " + moduleName + " not found in include path");
         }
 
-        Parser parser = new Parser(new FileInputStream(moduleFile));
+        Parser parser = new Parser(moduleFile);
 
         try {
             ModuleNode module = parser.parse();

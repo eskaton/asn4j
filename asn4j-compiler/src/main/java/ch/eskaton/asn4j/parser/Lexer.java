@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.parser.Token.TokenType;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -137,12 +138,12 @@ public class Lexer {
     public static final String WITH_LIT = "WITH";
 
     /*
-     * @formatter:off 
-     * typereference: 1-n / letters, digits, hyphens / InitCap / !-$ && !-- 
-     * identifier: 1-n / letters, digits, hyphens / !InitCap / !-$ && !-- 
-     * valuereference: identifier 
-     * modulereference: typereference 
-     * psname: typereference 
+     * @formatter:off
+     * typereference: 1-n / letters, digits, hyphens / InitCap / !-$ && !--
+     * identifier: 1-n / letters, digits, hyphens / !InitCap / !-$ && !--
+     * valuereference: identifier
+     * modulereference: typereference
+     * psname: typereference
      * encodingreference: typereference with all caps
      * objectclassreference: typereference with all caps
      * objectreference: valuereference
@@ -255,6 +256,8 @@ public class Lexer {
 
     private LexerInputStream is;
 
+    private String moduleFile = "<stream>";
+
     private int line = 1;
 
     private int pos = 0;
@@ -275,6 +278,11 @@ public class Lexer {
     	this.is = new LexerInputStream(baos.toString("UTF-8").toCharArray());
     }
 
+    public Lexer(String moduleFile) throws IOException {
+        this(new FileInputStream(moduleFile));
+        this.moduleFile = moduleFile;
+    }
+
     public Token nextToken(Context ctx) throws ParserException {
     	int c, offset;
     	Token token = null;
@@ -285,8 +293,8 @@ public class Lexer {
     		} else {
     			token = tokens.pop();
     			is.seek(token.getOffset());
-    			pos = token.getPos() - 1;
-    			line = token.getLine();
+    			pos = token.getPosition().getPosition() - 1;
+    			line = token.getPosition().getLine();
     			tokens.clear();
     			token = null;
     			eof = false;
@@ -317,46 +325,36 @@ public class Lexer {
     					pos = 0;
     					break;
     				case '(':
-    					return new Token(ctx, TokenType.LParen, offset, line,
-    							pos);
+    					return new Token(ctx, TokenType.LParen, offset, position(line, pos));
     				case ')':
-    					return new Token(ctx, TokenType.RParen, offset, line,
-    							pos);
+    					return new Token(ctx, TokenType.RParen, offset, position(line, pos));
     				case '{':
-    					return new Token(ctx, TokenType.LBrace, offset, line,
-    							pos);
+    					return new Token(ctx, TokenType.LBrace, offset, position(line, pos));
     				case '}':
-    					return new Token(ctx, TokenType.RBrace, offset, line,
-    							pos);
+    					return new Token(ctx, TokenType.RBrace, offset, position(line, pos));
     				case '[':
     					if (ctx == Context.Syntax) {
-    						return new Token(ctx, TokenType.LBracket, offset,
-    								line, pos);
+    						return new Token(ctx, TokenType.LBracket, offset, position(line, pos));
     					}
 
     					if (is.read() == '[') {
     						pos++;
-    						return new Token(ctx, TokenType.LVersionBrackets,
-    								offset, line, pos - 1);
+    						return new Token(ctx, TokenType.LVersionBrackets, offset, position(line, pos - 1));
     					} else {
     						is.unread();
-    						return new Token(ctx, TokenType.LBracket, offset,
-    								line, pos);
+    						return new Token(ctx, TokenType.LBracket, offset, position(line, pos));
     					}
     				case ']':
     					if (ctx == Context.Syntax) {
-    						return new Token(ctx, TokenType.RBracket, offset,
-    								line, pos);
+    						return new Token(ctx, TokenType.RBracket, offset, position(line, pos));
     					}
 
     					if (is.read() == ']') {
     						pos++;
-    						return new Token(ctx, TokenType.RVersionBrackets,
-    								offset, line, pos - 1);
+    						return new Token(ctx, TokenType.RVersionBrackets, offset, position(line, pos - 1));
     					} else {
     						is.unread();
-    						return new Token(ctx, TokenType.RBracket, offset,
-    								line, pos);
+    						return new Token(ctx, TokenType.RBracket, offset, position(line, pos));
     					}
     				case ':':
     					switch (is.read()) {
@@ -364,30 +362,24 @@ public class Lexer {
     							switch (is.read()) {
     								case '=':
     									pos += 2;
-    									return new Token(ctx, TokenType.Assign,
-    											offset, line, pos - 2);
+    									return new Token(ctx, TokenType.Assign, offset, position(line, pos - 1));
     								default:
     									is.unread();
     							} // fall through
     						default:
     							is.unread();
     					}
-    					return new Token(ctx, TokenType.Colon, offset, line,
-    							pos);
+    					return new Token(ctx, TokenType.Colon, offset, position(line, pos));
     				case ';':
-    					return new Token(ctx, TokenType.Semicolon, offset,
-    							line, pos);
+    					return new Token(ctx, TokenType.Semicolon, offset, position(line, pos));
     				case ',':
-    					return new Token(ctx, TokenType.Comma, offset, line,
-    							pos);
+    					return new Token(ctx, TokenType.Comma, offset, position(line, pos));
     				case '|':
-    					return new Token(ctx, TokenType.Pipe, offset, line, pos);
+    					return new Token(ctx, TokenType.Pipe, offset, position(line, pos));
     				case '!':
-    					return new Token(ctx, TokenType.Exclamation, offset,
-    							line, pos);
+    					return new Token(ctx, TokenType.Exclamation, offset,position(line, pos));
     				case '*':
-    					return new Token(ctx, TokenType.Asterisk, offset, line,
-    							pos);
+    					return new Token(ctx, TokenType.Asterisk, offset, position(line, pos));
     				case '-':
     					if (is.read() == '-') {
     						pos++;
@@ -395,8 +387,7 @@ public class Lexer {
     						skipComment();
     					} else {
     						is.unread();
-    						return new Token(ctx, TokenType.Minus, offset,
-    								line, pos);
+    						return new Token(ctx, TokenType.Minus, offset, position(line, pos));
     					}
     					break;
     				case '/':
@@ -406,51 +397,42 @@ public class Lexer {
     						skipMLComment();
     					} else {
     						is.unread();
-    						return new Token(ctx, TokenType.Solidus, offset,
-    								line, pos);
+    						return new Token(ctx, TokenType.Solidus, offset, position(line, pos));
     					}
     					break;
     				case '&':
     					switch (ctx) {
     						case TypeField:
-    							return parseFieldReference(Context.Normal,
-    									TokenType.TypeReference,
+    							return parseFieldReference(Context.Normal, TokenType.TypeReference,
     									TokenType.TypeFieldReference);
     						case ValueField:
-    							return parseFieldReference(Context.Normal,
-    									TokenType.Identifier,
+    							return parseFieldReference(Context.Normal,TokenType.Identifier,
     									TokenType.ValueFieldReference);
     						default:
-    							return new Token(ctx, TokenType.Ampersand,
-    									offset, line, pos);
+    							return new Token(ctx, TokenType.Ampersand, offset, position(line, pos));
     					}
     				case '^':
-    					return new Token(ctx, TokenType.Circumflex, offset,
-    							line, pos);
+    					return new Token(ctx, TokenType.Circumflex, offset,position(line, pos));
     				case '@':
-    					return new Token(ctx, TokenType.AT, offset, line, pos);
+    					return new Token(ctx, TokenType.AT, offset, position(line, pos));
     				case '<':
-    					return new Token(ctx, TokenType.LT, offset, line, pos);
+    					return new Token(ctx, TokenType.LT, offset, position(line, pos));
     				case '>':
-    					return new Token(ctx, TokenType.GT, offset, line, pos);
+    					return new Token(ctx, TokenType.GT, offset, position(line, pos));
     				case '=':
-    					return new Token(ctx, TokenType.Equals, offset, line,
-    							pos);
+    					return new Token(ctx, TokenType.Equals, offset, position(line, pos));
     				case '\'':
     					if ((token = parseNumString(ctx)) != null) {
     						return token;
     					}
 
-    					return new Token(ctx, TokenType.Apostrophe, offset,
-    							line, pos);
+    					return new Token(ctx, TokenType.Apostrophe, offset, position(line, pos));
     				case '"':
-    					if (ctx != Context.PropertySettings
-    							&& (token = parseCharString(ctx)) != null) {
+    					if (ctx != Context.PropertySettings && (token = parseCharString(ctx)) != null) {
     						return token;
     					}
 
-    					return new Token(ctx, TokenType.Quotation, offset,
-    							line, pos);
+    					return new Token(ctx, TokenType.Quotation, offset, position(line, pos));
     				case '.':
     					if (ctx != Context.Level) {
     						if (is.read() == '.') {
@@ -459,19 +441,17 @@ public class Lexer {
     							if (is.read() == '.') {
     								pos++;
     								offset++;
-    								return new Token(ctx, TokenType.Ellipsis,
-    										offset - 2, line, pos - 2);
+    								return new Token(ctx, TokenType.Ellipsis,offset - 2, position(line, pos - 2));
     							} else {
     								is.unread();
-    								return new Token(ctx, TokenType.Range,
-    										offset - 1, line, pos - 1);
+    								return new Token(ctx, TokenType.Range, offset - 1, position(line, pos -1 ));
     							}
     						}
 
     						is.unread();
     					}
 
-    					return new Token(ctx, TokenType.Dot, offset, line, pos);
+    					return new Token(ctx, TokenType.Dot, offset, position(line, pos));
 
     				default:
     					if ('0' <= c && c <= '9') {
@@ -491,8 +471,7 @@ public class Lexer {
     			}
     		}
     	} catch (IOException e) {
-    		throw new ParserException("Error at line " + line + ", position "
-    				+ pos, e);
+    		throw new ParserException("Error at line " + line + ", position " + pos, e);
     	}
 
     	if (!eof) {
@@ -516,11 +495,10 @@ public class Lexer {
 
     			}
 
-    			throw new ParserException("Invalid token '" + sb.toString()
-    					+ "' at line " + line + ", position " + (pos + 1));
+    			throw new ParserException("Invalid token '" + sb.toString() + "' at line " + line +
+                        ", position " + (pos + 1));
     		} catch (IOException e) {
-    			throw new ParserException("Invalid token at line " + line
-    					+ ", position " + (pos + 1));
+    			throw new ParserException("Invalid token at line " + line + ", position " + (pos + 1));
     		} finally {
     			is.reset();
     		}
@@ -535,7 +513,7 @@ public class Lexer {
 
         if (token != null) {
             token.offset--;
-            token.pos--;
+            token.getPosition().decrementPosition();
             token.text = "&" + token.text;
 
             if (token.type == expected) {
@@ -554,8 +532,7 @@ public class Lexer {
     	int beginLine = line;
     	int tmpPos = pos;
     	int tmpLine = line;
-    	int flags = StringToken.CSTRING | StringToken.TSTRING
-    			| StringToken.SIMPLE_STRING;
+    	int flags = StringToken.CSTRING | StringToken.TSTRING | StringToken.SIMPLE_STRING;
     	is.mark();
 
     	loop: while (!eof) {
@@ -595,8 +572,8 @@ public class Lexer {
 
     				pos = tmpPos;
     				line = tmpLine;
-    				return new StringToken(ctx, TokenType.CString, beginOffset,
-    						beginLine, beginPos, sb.toString(), flags);
+    				return new StringToken(ctx, TokenType.CString, beginOffset, position(beginLine, beginPos),
+    						sb.toString(), flags);
     			default:
     				if (c < 32 || c > 126) {
     					flags &= ~StringToken.SIMPLE_STRING;
@@ -668,10 +645,12 @@ public class Lexer {
     				if (exp != -1) {
     					break loop;
     				}
+
     				type = TokenType.RealNumber;
     				exp = 0;
     				sb.append((char) c);
     				cn = is.read();
+
     				switch (cn) {
     					case '-':
     					case '+':
@@ -693,6 +672,7 @@ public class Lexer {
     					if (fractional != -1) {
     						break loop;
     					}
+
     					type = TokenType.RealNumber;
     					fractional = 0;
     					sb.append((char) c);
@@ -712,17 +692,17 @@ public class Lexer {
     						break loop;
     					}
 
-    					if (type == TokenType.Number && sb.length() != 1
-    							&& sb.charAt(0) == '0') {
+    					if (type == TokenType.Number && sb.length() != 1 && sb.charAt(0) == '0') {
     						type = TokenType.RealNumber;
     					}
 
     					if (c != -1) {
     						is.unread();
     					}
+
     					pos = tmpPos - 1;
-    					return new Token(ctx, type, beginOffset, line,
-    							beginPos, sb.toString());
+
+    					return new Token(ctx, type, beginOffset, position(line, beginPos), sb.toString());
     				}
     		}
     	}
@@ -759,9 +739,8 @@ public class Lexer {
     				cn = is.read();
     				if (cn == 'H' || cn == 'B' && type == TokenType.BString) {
     					pos = tmpPos + 1;
-    					return new Token(ctx, cn == 'H' ? TokenType.HString
-    							: type, beginOffset, line, beginPos,
-    							sb.toString());
+    					return new Token(ctx, cn == 'H' ? TokenType.HString : type, beginOffset,
+                                position(line, beginPos), sb.toString());
     				}
     				break loop;
     			default:
@@ -769,6 +748,7 @@ public class Lexer {
     					if (c != '0' && c != '1') {
     						type = TokenType.HString;
     					}
+
     					sb.append((char) c);
     				} else {
     					break loop;
@@ -778,6 +758,7 @@ public class Lexer {
     	}
 
     	is.reset();
+
     	return null;
     }
 
@@ -818,6 +799,7 @@ public class Lexer {
     				if (cn != -1) {
     					is.unread();
     				}
+
     				sb.append((char) c);
     				continue;
     			}
@@ -826,8 +808,7 @@ public class Lexer {
     		}
 
     		if (sb.length() == 0) {
-    			throw new IOException(String.format("Unexpected token '%c'",
-    					is.read()));
+    			throw new IOException(String.format("Unexpected token '%c'", is.read()));
     		}
 
     		int fc = sb.charAt(0);
@@ -851,14 +832,13 @@ public class Lexer {
 
     			if (kwType != null) {
     				pos = tmpPos - 1;
-    				return new Token(ctx, kwType, beginOffset, line, beginPos);
+    				return new Token(ctx, kwType, beginOffset, position(line, beginPos));
     			}
     		}
 
     		switch (ctx) {
     			case Encoding:
-    				if (type == TokenType.TypeReference
-    						&& ModuleNode.getEncoding(str) != null) {
+    				if (type == TokenType.TypeReference && ModuleNode.getEncoding(str) != null) {
     					type = TokenType.EncodingReference;
     					break;
     				}
@@ -898,7 +878,7 @@ public class Lexer {
     		}
 
     		pos = tmpPos - 1;
-    		return new Token(ctx, type, beginOffset, line, beginPos, value);
+    		return new Token(ctx, type, beginOffset, position(line, beginPos), value);
     	}
 
     	is.reset();
@@ -916,12 +896,12 @@ public class Lexer {
     		switch (c) {
     			case -1:
     				eof = true;
-    				throw new IOException(
-    						"Premature end-of-file in multi-line comment");
+    				throw new IOException("Premature end-of-file in multi-line comment");
     			case '\r':
     				if (is.read() != '\n') {
     					is.unread();
     				}
+
     				line++;
     				pos = 0;
     				break;
@@ -943,6 +923,7 @@ public class Lexer {
     				if (is.read() == '/') {
     					pos++;
     					level--;
+
     					if (level == 0) {
     						return;
     					}
@@ -977,6 +958,7 @@ public class Lexer {
     				if (is.read() != '\n') {
     					is.unread();
     				}
+
     				line++;
     				pos = 0;
     				return;
@@ -1000,6 +982,10 @@ public class Lexer {
 
     public int getOffset() {
     	return is.getPos();
+    }
+
+    private Position position(int line, int pos) {
+        return new Position(moduleFile, line, pos);
     }
 
 }
