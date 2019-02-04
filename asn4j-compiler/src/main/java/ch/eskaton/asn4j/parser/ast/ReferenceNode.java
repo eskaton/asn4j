@@ -46,12 +46,18 @@ public class ReferenceNode extends AbstractNode {
         return name;
     }
 
-    public void setIsParameterized() {
-        parameterized = true;
+    public void setParameterized(boolean parameterized) {
+        this.parameterized = parameterized;
     }
 
     public boolean isParameterized() {
         return parameterized;
+    }
+
+    public ReferenceNode parameterized(boolean parameterized) {
+        setParameterized(parameterized);
+
+        return this;
     }
 
     public String toString() {
