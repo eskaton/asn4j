@@ -71,6 +71,12 @@ public class OIDComponentNode extends AbstractNode {
         this.name = name;
     }
 
+    public OIDComponentNode name(String name) {
+        setName(name);
+
+        return this;
+    }
+
     public Integer getId() {
         return id;
     }
