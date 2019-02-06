@@ -29,6 +29,10 @@ package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.Lexer.Context;
 import ch.eskaton.asn4j.parser.Token.TokenType;
+import ch.eskaton.asn4j.parser.accessor.ListAccessor;
+import ch.eskaton.asn4j.parser.accessor.ObjectAccessor;
+import ch.eskaton.asn4j.parser.accessor.RepetitionListAccessor;
+import ch.eskaton.asn4j.parser.accessor.SequenceListAccessor;
 import ch.eskaton.asn4j.parser.ast.AbstractASN1FieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.AbstractSyntaxObjectClassReferenceNode;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
@@ -242,6 +246,7 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+import static ch.eskaton.asn4j.parser.ParserUtils.getPosition;
 
 public class Parser {
 
@@ -570,195 +575,34 @@ public class Parser {
     }
 
     private Token expect(TokenType type) throws ParserException {
-    	Token token;
+        Token token;
 
-    	try {
-    		token = getToken();
-    	} catch (ParserException e) {
-    		if (lexer.getOffset() > lastErrorOffset) {
-    			lastErrorOffset = lexer.getOffset();
-    			lastErrorToken = null;
-    			lastExpectedToken = type;
-    			lastException = e;
-    		}
+        try {
+            token = getToken();
+        } catch (ParserException e) {
+            if (lexer.getOffset() > lastErrorOffset) {
+                lastErrorOffset = lexer.getOffset();
+                lastErrorToken = null;
+                lastExpectedToken = type;
+                lastException = e;
+            }
 
-    		return null;
-    	}
-
-    	if (token != null && token.getType() != type) {
-    		if (token.getOffset() > lastErrorOffset) {
-    			lastErrorOffset = token.getOffset();
-    			lastErrorToken = token;
-    			lastExpectedToken = type;
-    			lastException = null;
-    		}
-
-    		pushBack();
-    		return null;
-    	}
-
-    	return token;
-    }
-
-    public static Position getPosition(List<? extends Object> rule) {
-        if (rule.isEmpty()) {
-            return NO_POSITION;
+            return null;
         }
 
-        Object item = rule.get(0);
+        if (token != null && token.getType() != type) {
+            if (token.getOffset() > lastErrorOffset) {
+                lastErrorOffset = token.getOffset();
+                lastErrorToken = token;
+                lastExpectedToken = type;
+                lastException = null;
+            }
 
-        return getPosition(item);
-    }
-
-    public static Position getPosition(Object item) {
-        if (item instanceof Token) {
-            return ((Token) item).getPosition();
-        } else if (item instanceof Node) {
-            return ((Node) item).getPosition();
+            pushBack();
+            return null;
         }
 
-        return NO_POSITION;
-    }
-
-    private static class SequenceListAccessor extends ListAccessor<Object> {
-
-        public SequenceListAccessor(List<Object> rule) {
-            super(rule);
-        }
-
-    }
-
-    private static class RepetitionListAccessor<T> extends ListAccessor<T> {
-
-        public RepetitionListAccessor(List<T> rule) {
-            super(rule);
-        }
-
-    }
-
-    private interface Accessor<S> {
-
-        boolean matched();
-
-        S p();
-
-    }
-
-    private class ObjectAccessor<S> implements Accessor<S> {
-
-        private final S rule;
-
-        private ObjectAccessor(S rule) {
-            this.rule = rule;
-        }
-
-        @Override
-        public boolean matched() {
-            return rule != null;
-        }
-
-        @Override
-        public S p() {
-            return rule;
-        }
-
-        public Token t() {
-            return (Token) (rule);
-        }
-
-        public <T> T n() {
-            return (T) rule;
-        }
-
-        public Position P() {
-            return getPosition(rule);
-        }
-
-    }
-
-    private static class ListAccessor<S> implements Accessor<List<S>> {
-
-        private final List<S> rule;
-
-        public ListAccessor(List<S> rule) {
-            this.rule = rule;
-        }
-
-        public boolean matched() {
-            return rule != null;
-        }
-
-        public Token t(int i) {
-            return (Token) (rule.get(i));
-        }
-
-        public Token t0() {
-            return t(0);
-        }
-
-        public Token t1() {
-            return t(1);
-        }
-
-        public Token t2() {
-            return t(2);
-        }
-
-        public String s0() {
-            return t0().getText();
-        }
-
-        public String s2() {
-            return t2().getText();
-        }
-
-        public TokenType $0() {
-            return t0().getType();
-        }
-
-        public <T> T n(int i) {
-            return (T) rule.get(i);
-        }
-
-        public <T> T n0() {
-            return n(0);
-        }
-
-        public <T> T n1() {
-            return n(1);
-        }
-
-        public <T> T n2() {
-            return n(2);
-        }
-
-        @Override
-        public List<S> p() {
-            return rule;
-        }
-
-        public Position P(int i) {
-            return getPosition(rule.get(i));
-        }
-
-        public Position P0() {
-            return P(0);
-        }
-
-        public Position P1() {
-            return P(1);
-        }
-
-        public Position P2() {
-            return P(2);
-        }
-
-    }
-
-    public interface ParserFunction<T, R> {
-
-        R apply(T t) throws ParserException;
-
+        return token;
     }
 
     private abstract class ListRuleParser<T> extends RuleParser<T> {
