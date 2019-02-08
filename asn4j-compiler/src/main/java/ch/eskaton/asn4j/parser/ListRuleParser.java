@@ -61,6 +61,16 @@ public abstract class ListRuleParser<T> implements RuleParser<T> {
         return consumer.apply(A);
     }
 
+    protected T parse(Parser.CommaSeparatedRuleParser parser, ParserFunction<SequenceListAccessor, T> consumer) throws ParserException {
+        SequenceListAccessor A = new SequenceListAccessor(parser.parse());
+
+        if (!A.matched()) {
+            return null;
+        }
+
+        return consumer.apply(A);
+    }
+
     protected boolean matched() {
         return A.matched();
     }

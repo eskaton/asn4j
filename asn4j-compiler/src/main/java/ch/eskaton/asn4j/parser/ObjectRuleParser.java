@@ -38,7 +38,7 @@ public abstract class ObjectRuleParser<T> implements RuleParser<T> {
     }
 
     protected <U> T parse(RuleParser<U> parser, ParserFunction<ObjectAccessor, T> consumer) throws ParserException {
-        ObjectAccessor A = new ObjectAccessor(parser.parse());
+        A = new ObjectAccessor(parser.parse());
 
         if (!A.matched()) {
             return null;
