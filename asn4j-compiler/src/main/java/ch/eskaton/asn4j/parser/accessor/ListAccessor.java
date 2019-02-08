@@ -67,6 +67,10 @@ public class ListAccessor<S> implements Accessor<List<S>> {
         return t0().getText();
     }
 
+    public String s1() {
+        return t1().getText();
+    }
+
     public String s2() {
         return t2().getText();
     }
@@ -90,6 +94,9 @@ public class ListAccessor<S> implements Accessor<List<S>> {
     public <T> T n2() {
         return n(2);
     }
+    public <T> T n3() {
+        return n(3);
+    }
 
     @Override
     public List<S> p() {
@@ -98,6 +105,10 @@ public class ListAccessor<S> implements Accessor<List<S>> {
 
     public Position P(int i) {
         return getPosition(rule.get(i));
+    }
+
+    public Position P() {
+        return P0();
     }
 
     public Position P0() {

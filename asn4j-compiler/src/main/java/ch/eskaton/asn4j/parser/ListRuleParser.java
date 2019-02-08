@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.parser.accessor.SequenceListAccessor;
 
 import java.util.List;
 
-public abstract class ListRuleParser<T> extends RuleParser<T> {
+public abstract class ListRuleParser<T> implements RuleParser<T> {
 
     protected ListAccessor A = null;
 

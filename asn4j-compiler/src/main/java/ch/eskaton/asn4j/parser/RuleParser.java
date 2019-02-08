@@ -27,8 +27,8 @@
 
 package ch.eskaton.asn4j.parser;
 
-public abstract class RuleParser<T> {
+public interface RuleParser<T> {
 
-    abstract T parse() throws ParserException;
+    T parse() throws ParserException;
 
 }

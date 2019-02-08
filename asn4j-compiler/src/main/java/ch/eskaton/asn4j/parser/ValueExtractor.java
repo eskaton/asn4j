@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser;
 
 import java.util.List;
 
-public class ValueExtractor<T> extends RuleParser<T> {
+public class ValueExtractor<T> implements RuleParser<T> {
 
     private int index;
 
