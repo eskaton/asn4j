@@ -55,6 +55,10 @@ public class ObjectAccessor<S> implements Accessor<S> {
         return (Token) (rule);
     }
 
+    public String s() {
+        return t().getText();
+    }
+
     public <T> T n() {
         return (T) rule;
     }

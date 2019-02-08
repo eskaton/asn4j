@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.accessor.ObjectAccessor;
 
-public abstract class ObjectRuleParser<T> extends RuleParser<T> {
+public abstract class ObjectRuleParser<T> implements RuleParser<T> {
 
     protected ObjectAccessor A = null;
 
