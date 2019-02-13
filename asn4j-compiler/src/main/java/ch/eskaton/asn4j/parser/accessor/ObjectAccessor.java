@@ -29,7 +29,9 @@ package ch.eskaton.asn4j.parser.accessor;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.Token;
-import ch.eskaton.asn4j.parser.accessor.Accessor;
+import ch.eskaton.asn4j.parser.Token.TokenType;
+
+import java.util.List;
 
 import static ch.eskaton.asn4j.parser.ParserUtils.getPosition;
 
@@ -55,12 +57,20 @@ public class ObjectAccessor<S> implements Accessor<S> {
         return (Token) (rule);
     }
 
+    public TokenType $() {
+        return t().getType();
+    }
+
     public String s() {
         return t().getText();
     }
 
     public <T> T n() {
         return (T) rule;
+    }
+
+    public <T> ListAccessor<T> l() {
+        return new ListAccessor<>((List<T>) p());
     }
 
     public Position P() {

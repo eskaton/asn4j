@@ -2278,7 +2278,7 @@ public class Parser {
                 Token token = a.t1();
 
                 if (token != null) {
-                    type.setTaggingMode(token.getType() == TokenType.IMPLICIT_KW ?
+                    type.setTaggingMode(a.$1() == TokenType.IMPLICIT_KW ?
                             TaggingMode.Implicit : TaggingMode.Explicit);
                 }
 
@@ -2336,7 +2336,7 @@ public class Parser {
         public ClassType parse() throws ParserException {
             return parse(new ChoiceParser<Token>(TokenType.UNIVERSAL_KW,
                     TokenType.APPLICATION_KW, TokenType.PRIVATE_KW), a -> {
-                switch (a.t().getType()) {
+                switch (a.$()) {
                     case UNIVERSAL_KW:
                         return ClassType.UNIVERSAL;
                     case APPLICATION_KW:
@@ -2655,7 +2655,7 @@ public class Parser {
                         } else {
                             String value = a.s().substring(0, a.s().length());
 
-                            if (a.t().getType() == TokenType.BString) {
+                            if (a.$() == TokenType.BString) {
                                 return new BinaryStringValue(a.P(), value);
                             } else {
                                 return new HexStringValue(a.P(), value);
@@ -2679,20 +2679,11 @@ public class Parser {
     }
 
     // BooleanValue ::= TRUE | FALSE
-    protected class BooleanValueParser implements RuleParser<Value> {
+    protected class BooleanValueParser extends ObjectRuleParser<Value> {
 
     	public Value parse() throws ParserException {
-    		Token token = new ChoiceParser<Token>(TokenType.TRUE_KW, TokenType.FALSE_KW).parse();
-
-    		if (token != null) {
-    			if (token.getType() == TokenType.TRUE_KW) {
-    				return new BooleanValue(token.getPosition(), true);
-    			} else {
-    				return new BooleanValue(token.getPosition(), false);
-    			}
-    		}
-
-    		return null;
+    		return parse(new ChoiceParser<Token>(TokenType.TRUE_KW, TokenType.FALSE_KW), a ->
+                new BooleanValue(a.P(), a.$() == TokenType.TRUE_KW));
     	}
 
     }
@@ -2856,25 +2847,14 @@ public class Parser {
     // IntegerValue ::=
     // SignedNumber
     // | identifier
-    protected class IntegerValueParser implements RuleParser<IntegerValue> {
+    protected class IntegerValueParser extends ObjectRuleParser<IntegerValue> {
 
     	@SuppressWarnings({ "unchecked" })
     	public IntegerValue parse() throws ParserException {
-    		Object rule = new ChoiceParser<>(signedNumberParser, new SingleTokenParser(TokenType.Identifier)).parse();
-
-    		if (rule != null) {
-    			if (rule instanceof Token) {
-                    Token value = (Token) rule;
-
-                    return new IntegerValue(value.getPosition(), value.getText());
-    			} else {
-                    SignedNumber value = (SignedNumber) rule;
-
-                    return new IntegerValue(value.getPosition(), value.getNumber());
-    			}
-    		}
-
-    		return null;
+    		return parse(new ChoiceParser<>(signedNumberParser, new SingleTokenParser(TokenType.Identifier)), a ->
+                    (a.p() instanceof Token) ? new IntegerValue(a.P(), a.s()) :
+                            new IntegerValue(a.P(), ((SignedNumber)a.n()).getNumber())
+            );
     	}
 
     }
@@ -2924,22 +2904,18 @@ public class Parser {
     // ArcIdentifier ::=
     // integerUnicodeLabel
     // | non-integerUnicodeLabel
-    protected class IRIValueParser implements RuleParser<Value> {
+    protected class IRIValueParser extends ObjectRuleParser<Value> {
 
     	public Value parse() throws ParserException {
-    		Token token = new SingleTokenParser(TokenType.CString).parse();
+    		return parse(new SingleTokenParser(TokenType.CString), a -> {
+                List<IRIToken> iriTokens = parseArcIdSequence(a.s(),false);
 
-    		if (token != null) {
-    			List<IRIToken> iriTokens = parseArcIdSequence(token.getText(),false);
+                if (iriTokens.size() == 0) {
+                    throw new ParserException("Empty IRIValue");
+                }
 
-    			if (iriTokens.size() == 0) {
-    				throw new ParserException("Empty IRIValue");
-    			}
-
-    			return new IRIValue(token.getPosition(), iriTokens);
-    		}
-
-    		return null;
+                return new IRIValue(a.P(), iriTokens);
+            });
     	}
 
     }
@@ -2975,69 +2951,64 @@ public class Parser {
     // realnumber
     // | "-" realnumber
     // | SequenceValue
-    protected class NumericRealValueParser implements RuleParser<RealValue> {
+    protected class NumericRealValueParser extends ObjectRuleParser<RealValue> {
 
     	@SuppressWarnings("unchecked")
-    	public RealValue parse() throws ParserException {
-    		Object rule = new ChoiceParser<>(new SingleTokenParser(TokenType.RealNumber),
-                    new SequenceParser(TokenType.Minus, TokenType.RealNumber), collectionValueParser).parse();
+        public RealValue parse() throws ParserException {
+            return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.RealNumber),
+                    new SequenceParser(TokenType.Minus, TokenType.RealNumber), collectionValueParser), a -> {
+                Object rule = a.p();
 
-    		if (rule != null) {
-    			if (rule instanceof Token) {
-                    Token token = (Token) rule;
+                if (rule instanceof Token) {
+                    return new RealValue(a.P(), new BigDecimal(a.s()));
+                } else if (rule instanceof CollectionValue) {
+                    List<Value> values = ((CollectionValue) rule).getValues();
+                    BigInteger mantissa = getValue(values, 0, "mantissa");
+                    BigInteger base = getValue(values, 1, "base");
+                    BigInteger exponent = getValue(values, 2, "exponent");
 
-                    return new RealValue(token.getPosition(), new BigDecimal(token.getText()));
-    			} else if (rule instanceof CollectionValue) {
-    				List<Value> values = ((CollectionValue) rule).getValues();
+                    if (mantissa == null || base == null || exponent == null) {
+                        throw new ParserException(
+                                "Invalid sequence. It must contain values for 'mantissa', 'base' and 'exponent'");
+                    }
 
-    				BigInteger mantissa, base, exponent;
+                    byte[] baseBytes = base.toByteArray();
 
-    				if (values.size() != 3
-    						|| !checkNamedValue(values.get(0), "mantissa")
-    						|| !checkNamedValue(values.get(1), "base")
-    						|| !checkNamedValue(values.get(2), "exponent")) {
-    					throw new ParserException(
-    							"Invalid sequence. It must contain values for 'mantissa', 'base' and 'exponent'");
-    				} else {
-    					mantissa = getValue(values.get(0));
-    					base = getValue(values.get(1));
-    					exponent = getValue(values.get(2));
+                    if (baseBytes.length != 1 || baseBytes[0] != 2 && baseBytes[0] != 10) {
+                        throw new ParserException("Invalid base: " + base);
+                    }
 
-    					byte[] baseBytes = base.toByteArray();
+                    if (mantissa.bitLength() > 63) {
+                        throw new ParserException("Mantissa to long: " + mantissa);
+                    }
 
-    					if (baseBytes.length != 1 || baseBytes[0] != 2 && baseBytes[0] != 10) {
-    						throw new ParserException("Invalid base: " + base);
-    					}
+                    if (exponent.bitLength() > 63) {
+                        throw new ParserException("Exponent to long: " + exponent);
+                    }
 
-    					if (mantissa.bitLength() > 63) {
-    						throw new ParserException("Mantissa to long: "+ mantissa.toString());
-    					}
 
-    					if (exponent.bitLength() > 63) {
-    						throw new ParserException("Exponent to long: "+ exponent.toString());
-    					}
-    				}
-
-    				return new RealValue(values.get(0).getPosition(), mantissa.longValue(), base.longValue(),
+                    return new RealValue(values.get(0).getPosition(), mantissa.longValue(), base.longValue(),
                             exponent.longValue());
-    			} else {
-    				return new RealValue(((Token) ((List<Object>) rule).get(1)).getPosition(),
+                } else {
+                    return new RealValue(((Token) ((List<Object>) rule).get(1)).getPosition(),
                             new BigDecimal("-" + ((Token) ((List<Object>) rule).get(1)).getText()));
-    			}
-    		}
+                }
+            });
+        }
 
-    		return null;
-    	}
+        private BigInteger getValue(List<Value> values, int i, String name) {
+            if (values.size() > i) {
+                Value value = values.get(i);
 
-    	private boolean checkNamedValue(Value value, String name) {
-    		return value instanceof NamedValue
-    				&& name.equals(((NamedValue) value).getName())
-    				&& ((NamedValue) value).getValue() instanceof IntegerValue
-    				&& !((IntegerValue) ((NamedValue) value).getValue()).isReference();
-    	}
+                if (value instanceof NamedValue
+                        && name.equals(((NamedValue) value).getName())
+                        && ((NamedValue) value).getValue() instanceof IntegerValue
+                        && !((IntegerValue) ((NamedValue) value).getValue()).isReference()) {
+                    return ((IntegerValue) ((NamedValue) value).getValue()).getValue();
+                }
+            }
 
-    	private BigInteger getValue(Value value) {
-    		return ((IntegerValue) ((NamedValue) value).getValue()).getValue();
+            return null;
     	}
 
     }
@@ -3046,24 +3017,22 @@ public class Parser {
     // PLUS-INFINITY
     // | MINUS-INFINITY
     // | NOT-A-NUMBER
-    protected class SpecialRealValueParser implements RuleParser<RealValue> {
+    protected class SpecialRealValueParser extends ObjectRuleParser<RealValue> {
 
     	public RealValue parse() throws ParserException {
-    		Token token = new ChoiceParser<Token>(TokenType.PLUS_INFINITY_KW,
-    				TokenType.MINUS_INFINITY_KW, TokenType.NOT_A_NUMBER_KW).parse();
-
-    		if (token != null) {
-                switch (token.getType()) {
+    		return parse(new ChoiceParser<Token>(TokenType.PLUS_INFINITY_KW,
+    				TokenType.MINUS_INFINITY_KW, TokenType.NOT_A_NUMBER_KW), a -> {
+                switch (a.$()) {
                     case PLUS_INFINITY_KW:
-                        return new RealValue(token.getPosition(), RealValue.Type.PositiveInf);
+                        return new RealValue(a.P(), RealValue.Type.PositiveInf);
                     case MINUS_INFINITY_KW:
-                        return new RealValue(token.getPosition(), RealValue.Type.NegativeInf);
+                        return new RealValue(a.P(), RealValue.Type.NegativeInf);
                     case NOT_A_NUMBER_KW:
-                        return new RealValue(token.getPosition(), RealValue.Type.NaN);
+                        return new RealValue(a.P(), RealValue.Type.NaN);
+                    default:
+                        return null;
                 }
-    		}
-
-    		return null;
+            });
     	}
 
     }
@@ -3080,22 +3049,18 @@ public class Parser {
     // ArcIdentifier ::=
     // integerUnicodeLabel
     // | non-integerUnicodeLabel
-    protected class RelativeIRIValueParser implements RuleParser<Value> {
+    protected class RelativeIRIValueParser extends ObjectRuleParser<Value> {
 
     	public Value parse() throws ParserException {
-    		Token token = new SingleTokenParser(TokenType.CString).parse();
+    		return parse(new SingleTokenParser(TokenType.CString), a -> {
+                List<IRIToken> iriTokens = parseArcIdSequence(a.s(), true);
 
-    		if (token != null) {
-    			List<IRIToken> iriTokens = parseArcIdSequence(token.getText(), true);
+                if (iriTokens.size() == 0) {
+                    throw new ParserException("Empty RelativeIRIValue");
+                }
 
-    			if (iriTokens.size() == 0) {
-    				throw new ParserException("Empty RelativeIRIValue");
-    			}
-
-    			return new RelativeIRIValue(token.getPosition(), iriTokens);
-    		}
-
-    		return null;
+                return new RelativeIRIValue(a.P(), iriTokens);
+            });
     	}
 
     }
@@ -3132,24 +3097,14 @@ public class Parser {
     // NumberForm
     // | NameAndNumberForm
     // | DefinedValue
-    protected class RelativeOIDComponentsParser implements RuleParser<OIDComponentNode> {
+    protected class RelativeOIDComponentsParser extends ObjectRuleParser<OIDComponentNode> {
 
     	@SuppressWarnings("unchecked")
     	public OIDComponentNode parse() throws ParserException {
-    		Node rule = new ChoiceParser<>(nameAndNumberFormParser,	numberFormParser, definedValueParser).parse();
-
-    		if (rule != null) {
-    			if (rule instanceof OIDComponentNode) {
-    				return (OIDComponentNode) rule;
-    			} else {
-                    DefinedValue definedValue = (DefinedValue) rule;
-
-                    return new OIDComponentNode(definedValue.getPosition(), definedValue);
-    			}
-    		}
-
-    		return null;
-    	}
+    		return parse(new ChoiceParser<>(nameAndNumberFormParser, numberFormParser, definedValueParser),
+                    a -> a.n() instanceof OIDComponentNode ? (OIDComponentNode) a.n() :
+                            new OIDComponentNode(a.P(), (DefinedValue) a.n()));
+        }
 
     }
 
@@ -3172,59 +3127,35 @@ public class Parser {
     // Plane ::= number
     // Row ::= number
     // Cell ::= number
-    protected class CollectionValueParser implements RuleParser<Value> {
+    protected class CollectionValueParser extends ObjectRuleParser<Value> {
 
     	@SuppressWarnings("unchecked")
-    	public Value parse() throws ParserException {
-    		List<Object> rule = new ChoiceParser<>(new SequenceParser(TokenType.LBrace, namedValueListParser,
-    						TokenType.RBrace),
-    				new SequenceParser(TokenType.LBrace, valueListParser, TokenType.RBrace)).parse();
-
-    		if (rule != null) {
-    		    Token token = (Token) rule.get(0);
-    			List<Value> values = (List<Value>) rule.get(1);
-
-    			if (values.get(0) instanceof NamedValue) {
-    				return new CollectionValue(token.getPosition(), values);
-    			} else {
-    				return new CollectionOfValue(token.getPosition(), values);
-    			}
-    		}
-
-    		return null;
-    	}
+        public Value parse() throws ParserException {
+            return parse(new ChoiceParser<>(
+                    new SequenceParser(TokenType.LBrace, namedValueListParser, TokenType.RBrace),
+                    new SequenceParser(TokenType.LBrace, valueListParser, TokenType.RBrace)), a ->
+                    a.l().n0() instanceof NamedValue ? new CollectionValue(a.P(), (List<Value>) a.l().n1()) :
+                            new CollectionOfValue(a.P(), (List<Value>) a.l().n1())
+            );
+        }
 
     }
 
     // SequenceValue ::= "{" "}"
-    protected class EmptyValueParser implements RuleParser<Value> {
+    protected class EmptyValueParser extends ListRuleParser<Value> {
 
-    	public Value parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.LBrace, TokenType.RBrace).parse();
-
-    		if (rule != null) {
-    			return new EmptyValue(getPosition(rule));
-
-    		}
-
-    		return null;
-    	}
+        public Value parse() throws ParserException {
+            return parse(new SequenceParser(TokenType.LBrace, TokenType.RBrace), a -> new EmptyValue(a.P()));
+        }
 
     }
 
     // NamedValue ::= identifier Value
-    protected class NamedValueParser implements RuleParser<NamedValue> {
+    protected class NamedValueParser extends ListRuleParser<NamedValue> {
 
     	public NamedValue parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.Identifier, valueParser).parse();
-
-    		if (rule != null) {
-                Token token = (Token) rule.get(0);
-
-                return new NamedValue(token.getPosition(), token.getText(), (Value) rule.get(1));
-    		}
-
-    		return null;
+    		return parse(new SequenceParser(TokenType.Identifier, valueParser),
+                    a -> new NamedValue(a.P(), a.s0(), a.n1()));
     	}
 
     }
@@ -3255,16 +3186,11 @@ public class Parser {
     }
 
     // UnrestrictedCharacterStringType ::= CHARACTER STRING
-    protected class UnrestrictedCharacterStringTypeParser implements RuleParser<Type> {
+    protected class UnrestrictedCharacterStringTypeParser extends ListRuleParser<Type> {
 
     	public Type parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.CHARACTER_KW, TokenType.STRING_KW).parse();
-
-    		if (rule != null) {
-    			return new CharacterString(getPosition(rule));
-    		}
-
-    		return null;
+    		return parse(new SequenceParser(TokenType.CHARACTER_KW, TokenType.STRING_KW),
+                    a -> new CharacterString(a.P()));
     	}
 
     }
@@ -3312,20 +3238,11 @@ public class Parser {
     // modulereference
     // "."
     // typereference
-    protected class ExternalTypeReferenceParser implements RuleParser<ExternalTypeReference> {
+    protected class ExternalTypeReferenceParser extends ListRuleParser<ExternalTypeReference> {
 
     	public ExternalTypeReference parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.TypeReference,
-    				TokenType.Dot, TokenType.TypeReference).parse();
-
-    		if (rule != null) {
-                Token token = (Token) rule.get(0);
-
-                return new ExternalTypeReference(token.getPosition(), token.getText(), ((Token) rule.get(2)).getText());
-            }
-
-    		return null;
-
+    		return parse(new SequenceParser(TokenType.TypeReference, TokenType.Dot, TokenType.TypeReference),
+                    a -> new ExternalTypeReference(a.P0(), a.s0(), a.s2()));
     	}
 
     }
