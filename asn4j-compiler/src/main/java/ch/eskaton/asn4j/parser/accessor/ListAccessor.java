@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.accessor;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.Token;
+import ch.eskaton.asn4j.parser.Token.TokenType;
 import ch.eskaton.asn4j.parser.accessor.Accessor;
 
 import java.util.List;
@@ -75,8 +76,16 @@ public class ListAccessor<S> implements Accessor<List<S>> {
         return t2().getText();
     }
 
-    public Token.TokenType $0() {
+    public TokenType $0() {
         return t0().getType();
+    }
+
+    public TokenType $1() {
+        return t1().getType();
+    }
+
+    public TokenType $2() {
+        return t2().getType();
     }
 
     public <T> T n(int i) {
