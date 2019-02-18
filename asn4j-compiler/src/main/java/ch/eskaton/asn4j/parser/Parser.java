@@ -1239,13 +1239,8 @@ public class Parser {
     	@SuppressWarnings("unchecked")
         public ReferenceNode parse() throws ParserException {
             return parse(new ChoiceParser<>(new SequenceParser(referenceParser, TokenType.LBrace, TokenType.RBrace),
-                    referenceParser), a -> {
-                if (a.p() instanceof List) {
-                    return ((ReferenceNode) ((List<Object>) a.p()).get(0)).parameterized(true);
-                } else {
-                    return (ReferenceNode) a.p();
-                }
-            });
+                    referenceParser), a -> a.p() instanceof List ?
+                    ((ReferenceNode) ((List<Object>) a.p()).get(0)).parameterized(true) : (ReferenceNode) a.p());
         }
 
     }
@@ -1339,24 +1334,16 @@ public class Parser {
     // ObjectIdentifierValue
     // | DefinedValue
     // | empty
-    protected class AssignedIdentifierParser implements RuleParser<ObjectIdentifierValue> {
+    protected class AssignedIdentifierParser extends ObjectRuleParser<ObjectIdentifierValue> {
 
-    	@SuppressWarnings("unchecked")
-    	public ObjectIdentifierValue parse() throws ParserException {
-    		Node rule = new ChoiceParser<>(objectIdentifierValueParser,
-    				new ValueExtractor<Node>(0, new SequenceParser(definedValueParser,
-                            new NegativeLookaheadParser(TokenType.Comma, TokenType.FROM_KW)))).parse();
-
-    		if (rule != null) {
-    			if (rule instanceof ObjectIdentifierValue) {
-    				return (ObjectIdentifierValue) rule;
-    			} else {
-    				return new ObjectIdentifierValue(rule.getPosition(), (DefinedValue) rule);
-    			}
-    		}
-
-    		return null;
-    	}
+        @SuppressWarnings("unchecked")
+        public ObjectIdentifierValue parse() throws ParserException {
+            return parse(new ChoiceParser<>(objectIdentifierValueParser,
+                            new ValueExtractor<Node>(0, new SequenceParser(definedValueParser,
+                                    new NegativeLookaheadParser(TokenType.Comma, TokenType.FROM_KW)))),
+                    a -> a.n() instanceof ObjectIdentifierValue ? (ObjectIdentifierValue) a.n() :
+                            new ObjectIdentifierValue(a.P(), (DefinedValue) a.n()));
+        }
 
     }
 
@@ -1404,25 +1391,13 @@ public class Parser {
     }
 
     // NumberForm ::= number | DefinedValue
-    protected class NumberFormParser implements RuleParser<OIDComponentNode> {
+    protected class NumberFormParser extends ObjectRuleParser<OIDComponentNode> {
 
     	@SuppressWarnings("unchecked")
     	public OIDComponentNode parse() throws ParserException {
-    		Object rule = new ChoiceParser<>(new SingleTokenParser(TokenType.Number), definedValueParser).parse();
-
-    		if (rule != null) {
-    			if (rule instanceof Token) {
-                    Token token = (Token) rule;
-
-                    return new OIDComponentNode(token.getPosition(), Integer.parseInt(token.getText()));
-    			} else {
-                    DefinedValue definedValue = (DefinedValue) rule;
-
-                    return new OIDComponentNode(definedValue.getPosition(), definedValue);
-    			}
-    		}
-
-    		return null;
+    		return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.Number), definedValueParser),
+                    a -> a.p() instanceof Token ? new OIDComponentNode(a.P(), Integer.parseInt(a.s())) :
+                    new OIDComponentNode(a.P(), (DefinedValue) a.n()));
     	}
 
     }
@@ -3248,45 +3223,35 @@ public class Parser {
     }
 
     // UsefulType ::= typereference
-    protected class UsefulTypeParser implements RuleParser<UsefulType> {
+    protected class UsefulTypeParser extends ObjectRuleParser<UsefulType> {
 
     	public UsefulType parse() throws ParserException {
-    		Token type = new ChoiceParser<Token>(TokenType.UTCTime_KW, TokenType.GeneralizedTime_KW,
-                    TokenType.ObjectDescriptor_KW).parse();
+    		return parse(new ChoiceParser<Token>(TokenType.UTCTime_KW, TokenType.GeneralizedTime_KW,
+                    TokenType.ObjectDescriptor_KW), a -> {
+                String tmp = a.$().toString();
+                String typeName = StringUtils.concat("ASN1", tmp.substring(0, tmp.length() - 3));
 
-    		if (type != null) {
-    			String tmp = type.getType().toString();
-    			String typeName = StringUtils.concat("ASN1", tmp.substring(0, tmp.length() - 3));
-
-                switch (type.getType()) {
+                switch (a.$()) {
                     case UTCTime_KW:
-                        return new UTCTime(type.getPosition(), typeName);
+                        return new UTCTime(a.P(), typeName);
                     case GeneralizedTime_KW:
-                        return new GeneralizedTime(type.getPosition(), typeName);
+                        return new GeneralizedTime(a.P(), typeName);
                     case ObjectDescriptor_KW:
-                        return new ObjectDescriptor(type.getPosition(), typeName);
+                        return new ObjectDescriptor(a.P(), typeName);
+                    default:
+                        return null;
                 }
-            }
-
-    		return null;
+            });
     	}
 
     }
 
     // SelectionType ::= identifier "<" Type
-    protected class SelectionTypeParser implements RuleParser<SelectionType> {
+    protected class SelectionTypeParser extends ListRuleParser<SelectionType> {
 
     	public SelectionType parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.Identifier, TokenType.LT, typeParser).parse();
-
-    		if (rule != null) {
-                Token token = (Token) rule.get(0);
-
-                return new SelectionType(token.getPosition(), token.getText(),(Type) rule.get(2));
-    		}
-
-
-    		return null;
+    		return parse(new SequenceParser(TokenType.Identifier, TokenType.LT, typeParser),
+                    a -> new SelectionType(a.P0(), a.s0(), a.n2()));
     	}
 
     }
@@ -3300,77 +3265,63 @@ public class Parser {
     // | SET SizeConstraint OF NamedType
     // | SEQUENCE Constraint OF NamedType
     // | SEQUENCE SizeConstraint OF NamedType
-    protected class TypeWithConstraintParser implements RuleParser<Type> {
+    protected class TypeWithConstraintParser extends ObjectRuleParser<Type> {
 
     	@SuppressWarnings("unchecked")
     	public Type parse() throws ParserException {
-    		List<Object> rule = new ChoiceParser<>(
+    		return parse(new ChoiceParser<>(
     				new SequenceParser(new ChoiceParser<Token>(TokenType.SET_KW, TokenType.SEQUENCE_KW),
     						sizeConstraintParser, TokenType.OF_KW,typeOrNamedTypeParser),
                     new SequenceParser(new ChoiceParser<Token>(TokenType.SET_KW,TokenType.SEQUENCE_KW),
-                            constraintParser, TokenType.OF_KW, typeOrNamedTypeParser)).parse();
+                            constraintParser, TokenType.OF_KW, typeOrNamedTypeParser)), a -> {
+                Type type;
 
-    		if (rule != null) {
-    			Type type;
-
-                Token token = (Token) rule.get(0);
-
-                switch (token.getType()) {
+                switch (a.l().$0()) {
                     case SET_KW:
-                        type = new SetOfType(token.getPosition(), (Type) rule.get(3));
+                        type = new SetOfType(a.l().P0(), (Type) a.l().n3());
                         break;
                     case SEQUENCE_KW:
-                        type = new SequenceOfType(token.getPosition(), (Type) rule.get(3));
+                        type = new SequenceOfType(a.l().P0(), (Type) a.l().n3());
                         break;
                     default:
                         throw new ParserException("Implementation error");
                 }
 
-    			type.setConstraints(Arrays.asList((Constraint) rule.get(1)));
+                type.setConstraints(Arrays.asList((Constraint) a.l().n1()));
 
-    			return type;
-    		}
-
-    		return null;
+                return type;
+            });
     	}
 
     }
 
     // ValueAssignment ::= valuereference Type "::=" Value
     // ObjectAssignment ::= objectreference DefinedObjectClass "::=" Object
-    protected class ValueAssignmentParser implements RuleParser<ValueOrObjectAssignmentNode<?, ?>> {
+    protected class ValueAssignmentParser extends ListRuleParser<ValueOrObjectAssignmentNode<?,?>> {
 
     	@SuppressWarnings("unchecked")
     	public ValueOrObjectAssignmentNode<?, ?> parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(new SingleTokenParser(TokenType.Identifier),
+    		return parse(new SequenceParser(new SingleTokenParser(TokenType.Identifier),
                     new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser), TokenType.Assign,
-    				new ChoiceParser<>(valueParser, objectParser)).parse();
+    				new ChoiceParser<>(valueParser, objectParser)), a-> {
+                Node type = a.n1();
 
-    		if (rule != null) {
-                Token token = (Token) rule.get(0);
-                String reference = token.getText();
-    			Node type = (Node) rule.get(1);
-    			Node value = (Node) rule.get(3);
+                if (type instanceof Type) {
+                    if (type instanceof SimpleDefinedType) {
+                        if (type instanceof UsefulType) {
+                            return new ValueAssignmentNode(a.P0(), a.s0(), (Type) type, a.n3());
+                        } else {
+                            return new ValueOrObjectAssignmentNode<>(a.P0(), a.s0(), type, a.n3());
+                        }
+                    } else {
+                        return new ValueAssignmentNode(a.P0(), a.s0(), (Type) type, a.n3());
+                    }
+                } else if (type instanceof ObjectClassReferenceNode) {
+                    return new ObjectAssignmentNode(a.P0(), a.s0(), (ObjectClassReferenceNode) type, a.n3());
+                }
 
-    			if (type instanceof Type) {
-    				if (type instanceof SimpleDefinedType) {
-    					if (type instanceof UsefulType) {
-    						return new ValueAssignmentNode(token.getPosition(), reference, (Type) type, (Value) value);
-    					} else {
-    						return new ValueOrObjectAssignmentNode<>(token.getPosition(), token.getText(), type, value);
-    					}
-    				} else {
-    					return new ValueAssignmentNode(token.getPosition(), reference, (Type) type, (Value) value);
-    				}
-    			} else if (type instanceof ObjectClassReferenceNode) {
-    				return new ObjectAssignmentNode(token.getPosition(), reference, (ObjectClassReferenceNode) type,
-                            (ObjectNode) value);
-    			}
-
-    			return new ValueOrObjectAssignmentNode<>(token.getPosition(), reference, type, value);
-    		}
-
-    		return null;
+                return new ValueOrObjectAssignmentNode<>(a.P0(), a.s0(), type, a.n3());
+    		});
     	}
 
     }
@@ -3378,23 +3329,15 @@ public class Parser {
     // ValueSetTypeAssignment ::= typereference Type "::=" ValueSet
     // ObjectSetAssignment ::= objectsetreference DefinedObjectClass "::="
     // ObjectSet
-    protected class ValueSetTypeAssignmentParser implements RuleParser<ValueSetTypeOrObjectSetAssignmentNode> {
+    protected class ValueSetTypeAssignmentParser extends ListRuleParser<ValueSetTypeOrObjectSetAssignmentNode> {
 
     	@SuppressWarnings("unchecked")
-    	public ValueSetTypeOrObjectSetAssignmentNode parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.TypeReference,
-    				new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
-    				TokenType.Assign, new ChoiceParser<Node>(valueSetParser, objectSetParser)).parse();
-
-    		if (rule != null) {
-                Token token = (Token) rule.get(0);
-
-                return new ValueSetTypeOrObjectSetAssignmentNode(token.getPosition(), token.getText(),
-                        (Node) rule.get(1), (SetSpecsNode) rule.get(3));
-    		}
-
-    		return null;
-    	}
+        public ValueSetTypeOrObjectSetAssignmentNode parse() throws ParserException {
+            return parse(new SequenceParser(TokenType.TypeReference,
+                            new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
+                            TokenType.Assign, new ChoiceParser<Node>(valueSetParser, objectSetParser)),
+                    a -> new ValueSetTypeOrObjectSetAssignmentNode(a.P0(), a.s0(), a.n1(), a.n3()));
+        }
 
     }
 
@@ -3459,8 +3402,7 @@ public class Parser {
 
     	public SetSpecsNode parse() throws ParserException {
     		return new ValueExtractor<SetSpecsNode>(1, new SequenceParser(
-    				TokenType.LBrace, setSpecsParser, TokenType.RBrace))
-    				.parse();
+    				TokenType.LBrace, setSpecsParser, TokenType.RBrace)).parse();
     	}
 
     }
@@ -3477,49 +3419,39 @@ public class Parser {
     // | RootElementSetSpec "," "..." "," AdditionalElementSetSpec
     // RootElementSetSpec ::= ElementSetSpec
     // AdditionalElementSetSpec ::= ElementSetSpec
-    protected class SetSpecsParser implements RuleParser<SetSpecsNode> {
+    protected class SetSpecsParser extends ObjectRuleParser<SetSpecsNode> {
 
     	@SuppressWarnings("unchecked")
     	public SetSpecsNode parse() throws ParserException {
-    		Object rule = new ChoiceParser<>(new SequenceParser(
-    				elementSetSpecParser, TokenType.Comma, TokenType.Ellipsis,
-    				TokenType.Comma, elementSetSpecParser), new SequenceParser(
-    				elementSetSpecParser, TokenType.Comma, TokenType.Ellipsis),
-    				elementSetSpecParser, new SequenceParser(
-    						TokenType.Ellipsis, TokenType.Comma,
-    						elementSetSpecParser), new SingleTokenParser(
-    						TokenType.Ellipsis)).parse();
-
-    		if (rule != null) {
-    			if (rule instanceof List) {
-    				List<Object> ruleList = (List<Object>) rule;
-
-    				switch (ruleList.size()) {
+    		return parse(new ChoiceParser<>(
+    		        new SequenceParser(elementSetSpecParser, TokenType.Comma, TokenType.Ellipsis, TokenType.Comma,
+                            elementSetSpecParser),
+                    new SequenceParser(elementSetSpecParser, TokenType.Comma, TokenType.Ellipsis), elementSetSpecParser,
+                    new SequenceParser(TokenType.Ellipsis, TokenType.Comma, elementSetSpecParser),
+                    new SingleTokenParser(TokenType.Ellipsis)), a -> {
+                if (a.p() instanceof List) {
+                    switch (a.l().size()) {
                         case 3:
-                            if (ruleList.get(2) instanceof Token) {
-                                return new SetSpecsNode((ElementSet) ruleList.get(0), true);
+                            if (a.l().n2() instanceof Token) {
+                                return new SetSpecsNode((ElementSet) a.l().n0(), true);
                             } else {
-                                ElementSet elementSet = (ElementSet) ruleList.get(2);
-
-                                return new SetSpecsNode(elementSet.getPosition(), null, true, elementSet);
+                                return new SetSpecsNode(a.l().P2(), null, true, (ElementSet) a.l().n2());
                             }
 
                         case 5:
-                            ElementSet elementSet = (ElementSet) ruleList.get(0);
+                            return new SetSpecsNode(a.l().P0(), (ElementSet) a.l().n0(), true,
+                                    (ElementSet) a.l().n4());
+                    }
+                } else {
+                    if (a.p() instanceof Token) {
+                        return new SetSpecsNode(a.t().getPosition(), true);
+                    } else {
+                        return new SetSpecsNode((ElementSet) a.n());
+                    }
+                }
 
-                            return new SetSpecsNode(elementSet.getPosition(), elementSet, true,
-                                    (ElementSet) ruleList.get(4));
-                        }
-    			} else {
-    				if (rule instanceof Token) {
-    					return new SetSpecsNode(((Token) rule).getPosition(), true);
-    				} else {
-    					return new SetSpecsNode((ElementSet) rule);
-    				}
-    			}
-    		}
-
-    		return null;
+                return null;
+            });
     	}
 
     }

@@ -48,6 +48,10 @@ public class ListAccessor<S> implements Accessor<List<S>> {
         return rule != null;
     }
 
+    public int size() {
+        return rule.size();
+    }
+
     public Token t(int i) {
         return (Token) (rule.get(i));
     }
@@ -103,8 +107,13 @@ public class ListAccessor<S> implements Accessor<List<S>> {
     public <T> T n2() {
         return n(2);
     }
+
     public <T> T n3() {
         return n(3);
+    }
+
+    public <T> T n4() {
+        return n(4);
     }
 
     @Override
