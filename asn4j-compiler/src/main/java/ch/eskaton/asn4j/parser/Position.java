@@ -55,7 +55,6 @@ public class Position {
         return NO_POSITION;
     }
 
-
     public String getFile() {
         return file;
     }
@@ -70,6 +69,11 @@ public class Position {
 
     public void decrementPosition() {
         position--;
+    }
+
+    @Override
+    public String toString() {
+        return "Position[file=" + file + ", line=" + line + ", position=" + position + ']';
     }
 
 }
