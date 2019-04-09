@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 import java.time.temporal.ChronoField;
 import java.time.temporal.Temporal;
 
@@ -53,18 +53,18 @@ public class GeneralizedTimeParserTest {
     }
 
     @Test
-    public void testParseZonedDateTime() throws ASN1RuntimeException {
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("20191231Z"), 2019, 12, 31, 0, 0, 0, 0, 0);
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("20191231+0000"), 2019, 12, 31, 0, 0, 0, 0, 0);
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("20191231+1230"), 2019, 12, 31, 0, 0, 0, 0, toOffset(12, 30));
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("2019123105+1100"), 2019, 12, 31, 05, 0, 0, 0, toOffset(11, 0));
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("201912310547+0030"), 2019, 12, 31, 05, 47, 0, 0, toOffset(0, 30));
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("20191231054731+0815"), 2019, 12, 31, 05, 47, 31, 0, toOffset(8, 15));
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("2019123123.123456789Z"), 2019, 12, 31, 23, 7, 24, 444440400, toOffset(0, 0));
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("2019123123.123456789+12"), 2019, 12, 31, 23, 7, 24, 444440400, toOffset(12, 0));
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("2019123123.123456789-1230"), 2019, 12, 31, 23, 7, 24, 444440400, -toOffset(12, 30));
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("20191231231507.123-1800"), 2019, 12, 31, 23, 15, 7, 123000000, -toOffset(18, 0));
-        verifyZonedDateTime(new GeneralizedTimeParser().parse("20191231231507.123+1800"), 2019, 12, 31, 23, 15, 7, 123000000, toOffset(18, 0));
+    public void testParseOffsetDateTime() throws ASN1RuntimeException {
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231Z"), 2019, 12, 31, 0, 0, 0, 0, 0);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231+0000"), 2019, 12, 31, 0, 0, 0, 0, 0);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231+1230"), 2019, 12, 31, 0, 0, 0, 0, toOffset(12, 30));
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123105+1100"), 2019, 12, 31, 05, 0, 0, 0, toOffset(11, 0));
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("201912310547+0030"), 2019, 12, 31, 05, 47, 0, 0, toOffset(0, 30));
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231054731+0815"), 2019, 12, 31, 05, 47, 31, 0, toOffset(8, 15));
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123123.123456789Z"), 2019, 12, 31, 23, 7, 24, 444440400, toOffset(0, 0));
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123123.123456789+12"), 2019, 12, 31, 23, 7, 24, 444440400, toOffset(12, 0));
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123123.123456789-1230"), 2019, 12, 31, 23, 7, 24, 444440400, -toOffset(12, 30));
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231231507.123-1800"), 2019, 12, 31, 23, 15, 7, 123000000, -toOffset(18, 0));
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231231507.123+1800"), 2019, 12, 31, 23, 15, 7, 123000000, toOffset(18, 0));
     }
 
     @Test
@@ -105,8 +105,8 @@ public class GeneralizedTimeParserTest {
         assertEquals(nanos, t.get(ChronoField.NANO_OF_SECOND));
     }
 
-    private void verifyZonedDateTime(Temporal t, int year, int month, int day, int hour, int minute, int second, int nanos, int offset) {
-        assertTrue(t instanceof ZonedDateTime);
+    private void verifyOffsetDateTime(Temporal t, int year, int month, int day, int hour, int minute, int second, int nanos, int offset) {
+        assertTrue(t instanceof OffsetDateTime);
         assertEquals(year, t.get(ChronoField.YEAR));
         assertEquals(month, t.get(ChronoField.MONTH_OF_YEAR));
         assertEquals(day, t.get(ChronoField.DAY_OF_MONTH));
