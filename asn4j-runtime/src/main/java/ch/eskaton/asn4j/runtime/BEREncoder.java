@@ -51,6 +51,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
@@ -146,6 +147,8 @@ public class BEREncoder implements Encoder {
         } else if (obj instanceof ASN1OctetString) {
             buf = this.<ASN1OctetString, OctetStringEncoder>getEncoder(ASN1OctetString.class)
                     .encode(this, (ASN1OctetString) obj);
+        } else if (obj instanceof ASN1GeneralizedTime) {
+            buf = ((ASN1GeneralizedTime) obj).getValue().getBytes();
         } else if (obj instanceof ASN1VisibleString) {
             buf = ((ASN1VisibleString) obj).getValue().getBytes();
         } else if (obj instanceof ASN1Null) {

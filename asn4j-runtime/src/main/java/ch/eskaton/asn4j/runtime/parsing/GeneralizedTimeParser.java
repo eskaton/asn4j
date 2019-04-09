@@ -32,8 +32,8 @@ import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.Temporal;
 
 
@@ -113,7 +113,11 @@ public class GeneralizedTimeParser {
                         LocalDateTime dateTime = LocalDateTime.of(ctx.year, ctx.month, ctx.day, ctx.hour, ctx.minute, ctx.second, ctx.nanos);
 
                         if (ctx.timeZone != null) {
-                            return ZonedDateTime.of(dateTime, ZoneId.of(ctx.timeZone));
+                            try {
+                                return OffsetDateTime.of(dateTime, ZoneOffset.of(ctx.timeZone));
+                            } catch (Exception e) {
+                                throw new ASN1RuntimeException(e.getMessage());
+                            }
                         }
 
                         return dateTime;

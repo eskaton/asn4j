@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
@@ -41,6 +42,7 @@ import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 
 public class TypeCompiler implements NamedCompiler<Type> {
 
@@ -68,7 +70,11 @@ public class TypeCompiler implements NamedCompiler<Type> {
             ctx.<RelativeIRI, RelativeIRICompiler>getCompiler(RelativeIRI.class).compile(ctx, name, (RelativeIRI) node);
         } else if (node instanceof TypeReference) {
             if (node instanceof UsefulType) {
-                ctx.<UsefulType, UsefulTypeCompiler>getCompiler(UsefulType.class).compile(ctx, name, (UsefulType) node);
+                if (((UsefulType) node).getType().equals(ASN1GeneralizedTime.class.getSimpleName())) {
+                    ctx.<GeneralizedTime, GeneralizedTimeCompiler>getCompiler(GeneralizedTime.class).compile(ctx, name, (UsefulType) node);
+                } else {
+                    throw new CompilerException("Unsupported UsefulType: " + ((UsefulType) node).getType());
+                }
             } else {
                 ctx.<TypeReference, TypeReferenceCompiler>getCompiler(TypeReference.class).compile(ctx, name, (TypeReference) node);
             }
