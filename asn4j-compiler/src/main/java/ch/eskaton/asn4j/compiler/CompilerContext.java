@@ -1,4 +1,5 @@
 /*
+/*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
  *
@@ -140,6 +141,7 @@ public class CompilerContext {
             put(RelativeOID.class, new RelativeOIDCompiler());
             put(IRI.class, new IRICompiler());
             put(RelativeIRI.class, new RelativeIRICompiler());
+            put(GeneralizedTime.class, new GeneralizedTimeCompiler());
         }
     };
 
