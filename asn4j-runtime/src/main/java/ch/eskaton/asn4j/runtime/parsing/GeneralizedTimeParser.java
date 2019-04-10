@@ -31,11 +31,6 @@ import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.temporal.Temporal;
-
 
 public class GeneralizedTimeParser {
 
@@ -50,7 +45,7 @@ public class GeneralizedTimeParser {
     public GeneralizedTimeParser() {
     }
 
-    public Temporal parse(String s) throws ASN1RuntimeException {
+    public DateTime parse(String s) throws ASN1RuntimeException {
         Context ctx = new Context(s);
 
         while (true) {
@@ -110,13 +105,13 @@ public class GeneralizedTimeParser {
                             throw new ASN1RuntimeException("Failed to parse: " + s);
                         }
 
-                        LocalDateTime dateTime = LocalDateTime.of(ctx.year, ctx.month, ctx.day, ctx.hour, ctx.minute, ctx.second, ctx.nanos);
+                        DateTime dateTime = new DateTime(ctx.year, ctx.month, ctx.day, ctx.hour, ctx.minute, ctx.second).nanos(ctx.nanos);
 
                         if (ctx.timeZone != null) {
-                            try {
-                                return OffsetDateTime.of(dateTime, ZoneOffset.of(ctx.timeZone));
-                            } catch (Exception e) {
-                                throw new ASN1RuntimeException(e.getMessage());
+                            if ("Z".equals(ctx.timeZone)) {
+                                return dateTime.zulu(true);
+                            } else {
+                                return dateTime.offset(ctx.timeZone);
                             }
                         }
 
@@ -203,7 +198,7 @@ public class GeneralizedTimeParser {
         return null;
     }
 
-    private String parseTimeZone(Context ctx) throws IOException {
+    private String parseTimeZone(Context ctx) throws IOException, ASN1RuntimeException {
         StringBuilder sb = new StringBuilder();
         int chr = ctx.read();
 
@@ -243,6 +238,12 @@ public class GeneralizedTimeParser {
             ctx.reset();
 
             return sb.toString();
+        }
+
+        int intMinutes = Integer.parseInt(minute);
+
+        if (Integer.parseInt(hour) * 100 + intMinutes > 1800 || intMinutes > 59) {
+            throw new ASN1RuntimeException("Invalid offset");
         }
 
         sb.append(minute);
