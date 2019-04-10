@@ -32,6 +32,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class UTCTimeParserTest {
@@ -44,12 +45,12 @@ public class UTCTimeParserTest {
 
     @Test
     public void testParseOffsetDateTime() throws ASN1RuntimeException {
-        verifyDateTime(new UTCTimeParser().parse("1912310547+0030"), 19, 12, 31, 05, 47, 0, 30);
-        verifyDateTime(new UTCTimeParser().parse("1912310547Z"), 19, 12, 31, 05, 47, 0, 0);
-        verifyDateTime(new UTCTimeParser().parse("191231054731+0815"), 19, 12, 31, 05, 47, 31, 815);
-        verifyDateTime(new UTCTimeParser().parse("191231231507Z"), 19, 12, 31, 23, 15, 7, 0);
-        verifyDateTime(new UTCTimeParser().parse("191231231507-1800"), 19, 12, 31, 23, 15, 7, -1800);
-        verifyDateTime(new UTCTimeParser().parse("191231231507+1800"), 19, 12, 31, 23, 15, 7, 1800);
+        verifyDateTime(new UTCTimeParser().parse("1912310547+0030"), 19, 12, 31, 05, 47, 0, "+0030", null);
+        verifyDateTime(new UTCTimeParser().parse("1912310547Z"), 19, 12, 31, 05, 47, 0, null, true);
+        verifyDateTime(new UTCTimeParser().parse("191231054731+0815"), 19, 12, 31, 05, 47, 31, "+0815", null);
+        verifyDateTime(new UTCTimeParser().parse("191231231507Z"), 19, 12, 31, 23, 15, 7, null, true);
+        verifyDateTime(new UTCTimeParser().parse("191231231507-1800"), 19, 12, 31, 23, 15, 7, "-1800", null);
+        verifyDateTime(new UTCTimeParser().parse("191231231507+1800"), 19, 12, 31, 23, 15, 7, "+1800", null);
     }
 
     @Test
@@ -83,10 +84,15 @@ public class UTCTimeParserTest {
         assertEquals(second, t.getSecond());
     }
 
-    private void verifyDateTime(DateTime t, int year, int month, int day, int hour, int minute, int second, int offset) {
+    private void verifyDateTime(DateTime t, int year, int month, int day, int hour, int minute, int second, String offset, Boolean isZulu) {
         verifyDateTime(t, year, month, day, hour, minute, second);
-        assertNotNull(t.getOffset());
-        assertEquals(offset, (int) t.getOffset());
+
+        if (isZulu != null) {
+            assertEquals(isZulu, t.isZulu());
+            assertNull(t.getOffset());
+        } else {
+            assertEquals(offset, t.getOffset());
+        }
     }
 
 }
