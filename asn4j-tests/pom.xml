@@ -309,6 +309,20 @@
                             </includePaths>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>X680_46</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>asn4j</goal>
+                        </goals>
+                        <configuration>
+                            <module>X680_46</module>
+                            <pkg>ch.eskaton.asn4jtest.x680_46</pkg>
+                            <includePaths>
+                                <includePath>src/test/resources/asn1/X680_46</includePath>
+                            </includePaths>
+                        </configuration>
+                    </execution>
 
                     <execution>
                         <id>X690_8</id>
