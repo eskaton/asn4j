@@ -89,9 +89,9 @@ public class UTCTimeParser {
 
                         if (ctx.timeZone != null) {
                             if ("Z".equals(ctx.timeZone)) {
-                                dateTime.setOffset(0);
+                                return dateTime.zulu(true);
                             } else{
-                                dateTime.setOffset(Integer.parseInt(ctx.timeZone));
+                                return dateTime.offset(ctx.timeZone);
                             }
                         }
 

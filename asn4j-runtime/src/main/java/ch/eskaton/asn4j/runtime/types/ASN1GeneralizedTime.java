@@ -30,10 +30,12 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.parsing.DateTime;
 import ch.eskaton.asn4j.runtime.parsing.GeneralizedTimeParser;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.Objects;
@@ -57,31 +59,38 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
     }
 
     public static ASN1GeneralizedTime from(LocalDateTime dateTime) throws ASN1RuntimeException {
-        ASN1GeneralizedTime dateTimeObj = new ASN1GeneralizedTime();
+        ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
 
-        dateTimeObj.setTime(dateTime);
+        instance.setTime(dateTime);
 
-        return dateTimeObj;
+        return instance;
     }
 
     public static ASN1GeneralizedTime from(OffsetDateTime dateTime) throws ASN1RuntimeException {
-        ASN1GeneralizedTime dateTimeObj = new ASN1GeneralizedTime();
+        ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
 
-        dateTimeObj.setTime(dateTime);
+        instance.setTime(dateTime);
 
-        return dateTimeObj;
+        return instance;
     }
 
     public static ASN1GeneralizedTime from(String dateTimeString) throws ASN1RuntimeException {
-        ASN1GeneralizedTime dateTimeObj = new ASN1GeneralizedTime();
+        ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
 
-        dateTimeObj.setTime(generalizedTimeParser.parse(dateTimeString));
+        instance.setValue(dateTimeString);
 
-        return dateTimeObj;
+        return instance;
     }
 
     public void setValue(String value) throws ASN1RuntimeException {
-        setTime(generalizedTimeParser.parse(value));
+        DateTime dateTime = generalizedTimeParser.parse(value);
+        LocalDateTime localDateTime = LocalDateTime.of(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay(), dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond(), dateTime.getNanos());
+
+        if (dateTime.hasOffset()) {
+            setTime(OffsetDateTime.of(localDateTime, ZoneOffset.of(dateTime.getOffset().toString())));
+        } else {
+            setTime(localDateTime);
+        }
     }
 
     public String getValue() {

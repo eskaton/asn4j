@@ -30,13 +30,8 @@ package ch.eskaton.asn4j.runtime.parsing;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import org.junit.Test;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.Temporal;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 public class GeneralizedTimeParserTest {
@@ -54,17 +49,17 @@ public class GeneralizedTimeParserTest {
 
     @Test
     public void testParseOffsetDateTime() throws ASN1RuntimeException {
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231Z"), 2019, 12, 31, 0, 0, 0, 0, 0);
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231+0000"), 2019, 12, 31, 0, 0, 0, 0, 0);
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231+1230"), 2019, 12, 31, 0, 0, 0, 0, toOffset(12, 30));
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123105+1100"), 2019, 12, 31, 05, 0, 0, 0, toOffset(11, 0));
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("201912310547+0030"), 2019, 12, 31, 05, 47, 0, 0, toOffset(0, 30));
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231054731+0815"), 2019, 12, 31, 05, 47, 31, 0, toOffset(8, 15));
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123123.123456789Z"), 2019, 12, 31, 23, 7, 24, 444440400, toOffset(0, 0));
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123123.123456789+12"), 2019, 12, 31, 23, 7, 24, 444440400, toOffset(12, 0));
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123123.123456789-1230"), 2019, 12, 31, 23, 7, 24, 444440400, -toOffset(12, 30));
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231231507.123-1800"), 2019, 12, 31, 23, 15, 7, 123000000, -toOffset(18, 0));
-        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231231507.123+1800"), 2019, 12, 31, 23, 15, 7, 123000000, toOffset(18, 0));
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231Z"), 2019, 12, 31, 0, 0, 0, 0, null, true);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231+0000"), 2019, 12, 31, 0, 0, 0, 0, "+0000", null);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231+1230"), 2019, 12, 31, 0, 0, 0, 0, "+1230", null);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123105+1100"), 2019, 12, 31, 05, 0, 0, 0, "+1100", null);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("201912310547+0030"), 2019, 12, 31, 05, 47, 0, 0, "+0030", null);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231054731+0815"), 2019, 12, 31, 05, 47, 31, 0, "+0815", null);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123123.123456789Z"), 2019, 12, 31, 23, 7, 24, 444440400, null, true);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123123.123456789+12"), 2019, 12, 31, 23, 7, 24, 444440400, "+12", null);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("2019123123.123456789-1230"), 2019, 12, 31, 23, 7, 24, 444440400, "-1230", null);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231231507.123-1800"), 2019, 12, 31, 23, 15, 7, 123000000, "-1800", null);
+        verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231231507.123+1800"), 2019, 12, 31, 23, 15, 7, 123000000, "+1800", null);
     }
 
     @Test
@@ -91,30 +86,34 @@ public class GeneralizedTimeParserTest {
     }
 
     private int toOffset(int hour, int minute) {
-        return ((hour * 60) + minute) * 60;
+        return (hour * 60) + minute;
     }
 
-    private void verifyLocalDateTime(Temporal t, int year, int month, int day, int hour, int minute, int second, int nanos) {
-        assertTrue(t instanceof LocalDateTime);
-        assertEquals(year, t.get(ChronoField.YEAR));
-        assertEquals(month, t.get(ChronoField.MONTH_OF_YEAR));
-        assertEquals(day, t.get(ChronoField.DAY_OF_MONTH));
-        assertEquals(hour, t.get(ChronoField.HOUR_OF_DAY));
-        assertEquals(minute, t.get(ChronoField.MINUTE_OF_HOUR));
-        assertEquals(second, t.get(ChronoField.SECOND_OF_MINUTE));
-        assertEquals(nanos, t.get(ChronoField.NANO_OF_SECOND));
+    private void verifyLocalDateTime(DateTime t, int year, int month, int day, int hour, int minute, int second, int nanos) {
+        assertEquals(year, t.getYear());
+        assertEquals(month, t.getMonth());
+        assertEquals(day, t.getDay());
+        assertEquals(hour, t.getHour());
+        assertEquals(minute, t.getMinute());
+        assertEquals(second, t.getSecond());
+        assertEquals(nanos, t.getNanos());
     }
 
-    private void verifyOffsetDateTime(Temporal t, int year, int month, int day, int hour, int minute, int second, int nanos, int offset) {
-        assertTrue(t instanceof OffsetDateTime);
-        assertEquals(year, t.get(ChronoField.YEAR));
-        assertEquals(month, t.get(ChronoField.MONTH_OF_YEAR));
-        assertEquals(day, t.get(ChronoField.DAY_OF_MONTH));
-        assertEquals(hour, t.get(ChronoField.HOUR_OF_DAY));
-        assertEquals(minute, t.get(ChronoField.MINUTE_OF_HOUR));
-        assertEquals(second, t.get(ChronoField.SECOND_OF_MINUTE));
-        assertEquals(nanos, t.get(ChronoField.NANO_OF_SECOND));
-        assertEquals(offset, t.get(ChronoField.OFFSET_SECONDS));
+    private void verifyOffsetDateTime(DateTime t, int year, int month, int day, int hour, int minute, int second, int nanos, String offset, Boolean isZulu) {
+        assertEquals(year, t.getYear());
+        assertEquals(month, t.getMonth());
+        assertEquals(day, t.getDay());
+        assertEquals(hour, t.getHour());
+        assertEquals(minute, t.getMinute());
+        assertEquals(second, t.getSecond());
+        assertEquals(nanos, t.getNanos());
+
+        if (isZulu != null) {
+            assertEquals(isZulu, t.isZulu());
+            assertNull(t.getOffset());
+        } else {
+            assertEquals(offset, t.getOffset());
+        }
     }
 
 }
