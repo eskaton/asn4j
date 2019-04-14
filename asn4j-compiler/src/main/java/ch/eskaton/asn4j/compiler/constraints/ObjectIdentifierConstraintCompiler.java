@@ -37,8 +37,8 @@ import java.util.Collection;
 
 public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompiler<ObjectIdentifier> {
 
-    public ObjectIdentifierConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
+    public ObjectIdentifierConstraintCompiler(TypeResolver typeResolver) {
+        super(typeResolver);
     }
 
     @Override
