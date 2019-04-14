@@ -85,10 +85,6 @@ public class GeneralizedTimeParserTest {
         }
     }
 
-    private int toOffset(int hour, int minute) {
-        return (hour * 60) + minute;
-    }
-
     private void verifyLocalDateTime(DateTime t, int year, int month, int day, int hour, int minute, int second, int nanos) {
         assertEquals(year, t.getYear());
         assertEquals(month, t.getMonth());
