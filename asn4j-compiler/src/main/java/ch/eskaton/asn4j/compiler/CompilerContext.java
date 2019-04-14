@@ -98,6 +98,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -142,6 +143,7 @@ public class CompilerContext {
             put(IRI.class, new IRICompiler());
             put(RelativeIRI.class, new RelativeIRICompiler());
             put(GeneralizedTime.class, new GeneralizedTimeCompiler());
+            put(UTCTime.class, new UTCTimeCompiler());
         }
     };
 
@@ -177,6 +179,7 @@ public class CompilerContext {
             put(Choice.class.getSimpleName(), ASN1Choice.class.getSimpleName());
             put(EnumeratedType.class.getSimpleName(), ASN1EnumeratedType.class.getSimpleName());
             put(GeneralizedTime.class.getSimpleName(), ASN1GeneralizedTime.class.getSimpleName());
+            put(UTCTime.class.getSimpleName(), ASN1UTCTime.class.getSimpleName());
             put(IntegerType.class.getSimpleName(), ASN1Integer.class.getSimpleName());
             put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName());
             put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName());
