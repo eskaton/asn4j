@@ -61,17 +61,17 @@ public class ConstraintCompiler {
 
         compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler<?>>() {
             {
-                put(IntegerType.class, new IntegerConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(BooleanType.class, new BooleanConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(BitString.class, new BitStringConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(VisibleString.class, new VisibleStringConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(OctetString.class, new OctetStringConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(Null.class, new NullConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(SetOfType.class, new SetOfConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(RelativeOID.class, new RelativeOIDConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(IRI.class, new IRIConstraintCompiler(ConstraintCompiler.this, typeResolver));
-                put(RelativeIRI.class, new RelativeIRIConstraintCompiler(ConstraintCompiler.this, typeResolver));
+                put(IntegerType.class, new IntegerConstraintCompiler(typeResolver));
+                put(BooleanType.class, new BooleanConstraintCompiler(typeResolver));
+                put(BitString.class, new BitStringConstraintCompiler(typeResolver));
+                put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver));
+                put(OctetString.class, new OctetStringConstraintCompiler(typeResolver));
+                put(Null.class, new NullConstraintCompiler(typeResolver));
+                put(SetOfType.class, new SetOfConstraintCompiler(typeResolver));
+                put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(typeResolver));
+                put(RelativeOID.class, new RelativeOIDConstraintCompiler(typeResolver));
+                put(IRI.class, new IRIConstraintCompiler(typeResolver));
+                put(RelativeIRI.class, new RelativeIRIConstraintCompiler(typeResolver));
             }
         };
     }
