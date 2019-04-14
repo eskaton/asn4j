@@ -475,7 +475,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
     public void addConstraint(JavaClass clazz, Collection<?> values)
     		throws CompilerException {
         BodyBuilder body = clazz.method().annotation(Override.class).modifier(Protected).returnType(boolean.class)
-                .name("checkConstraint").parameter("BitInteger", "v")
+                .name("checkConstraint").parameter("BigInteger", "v")
                 .exception(ConstraintViolatedException.class).body();
 
     	body.append("if(");
