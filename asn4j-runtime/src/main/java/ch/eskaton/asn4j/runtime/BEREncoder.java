@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -51,7 +51,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
-import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
@@ -83,25 +82,25 @@ public class BEREncoder implements Encoder {
     @SuppressWarnings("serial")
     private Map<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>> encoders =
             new HashMap<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>>() {
-        {
-            put(ASN1BitString.class, new BitStringEncoder());
-            put(ASN1Boolean.class, new BooleanEncoder());
-            put(ASN1Choice.class, new ChoiceEncoder());
-            put(ASN1EnumeratedType.class, new EnumerationTypeEncoder());
-            put(ASN1Integer.class, new IntegerEncoder());
-            put(ASN1Real.class, new RealEncoder());
-            put(ASN1Null.class, new NullEncoder());
-            put(ASN1ObjectIdentifier.class, new ObjectIdentifierEncoder());
-            put(ASN1RelativeOID.class, new RelativeOIDEncoder());
-            put(ASN1IRI.class, new IRIEncoder());
-            put(ASN1RelativeIRI.class, new RelativeIRIEncoder());
-            put(ASN1OctetString.class, new OctetStringEncoder());
-            put(ASN1Sequence.class, new SequenceEncoder());
-            put(ASN1SequenceOf.class, new SequenceOfEncoder());
-            put(ASN1Set.class, new SetEncoder());
-            put(ASN1SetOf.class, new SetOfEncoder());
-        }
-    };
+                {
+                    put(ASN1BitString.class, new BitStringEncoder());
+                    put(ASN1Boolean.class, new BooleanEncoder());
+                    put(ASN1Choice.class, new ChoiceEncoder());
+                    put(ASN1EnumeratedType.class, new EnumerationTypeEncoder());
+                    put(ASN1Integer.class, new IntegerEncoder());
+                    put(ASN1Real.class, new RealEncoder());
+                    put(ASN1Null.class, new NullEncoder());
+                    put(ASN1ObjectIdentifier.class, new ObjectIdentifierEncoder());
+                    put(ASN1RelativeOID.class, new RelativeOIDEncoder());
+                    put(ASN1IRI.class, new IRIEncoder());
+                    put(ASN1RelativeIRI.class, new RelativeIRIEncoder());
+                    put(ASN1OctetString.class, new OctetStringEncoder());
+                    put(ASN1Sequence.class, new SequenceEncoder());
+                    put(ASN1SequenceOf.class, new SequenceOfEncoder());
+                    put(ASN1Set.class, new SetEncoder());
+                    put(ASN1SetOf.class, new SetOfEncoder());
+                }
+            };
 
     public byte[] encode(ASN1Type obj) throws EncodingException, ConstraintViolatedException {
         byte[] encoded = encode(obj, null);
@@ -131,10 +130,10 @@ public class BEREncoder implements Encoder {
         byte[] buf;
 
         if (obj instanceof ASN1Boolean) {
-            buf = this.<ASN1Boolean, BooleanEncoder> getEncoder(
+            buf = this.<ASN1Boolean, BooleanEncoder>getEncoder(
                     ASN1Boolean.class).encode(this, (ASN1Boolean) obj);
         } else if (obj instanceof ASN1Integer) {
-            buf = this.<ASN1Integer, IntegerEncoder> getEncoder(
+            buf = this.<ASN1Integer, IntegerEncoder>getEncoder(
                     ASN1Integer.class).encode(this, (ASN1Integer) obj);
         } else if (obj instanceof ASN1EnumeratedType) {
             buf = this.<ASN1EnumeratedType, EnumerationTypeEncoder>getEncoder(ASN1EnumeratedType.class)
@@ -142,13 +141,11 @@ public class BEREncoder implements Encoder {
         } else if (obj instanceof ASN1Real) {
             buf = this.<ASN1Real, RealEncoder>getEncoder(ASN1Real.class).encode(this, (ASN1Real) obj);
         } else if (obj instanceof ASN1BitString) {
-            buf = this.<ASN1BitString, BitStringEncoder> getEncoder(
+            buf = this.<ASN1BitString, BitStringEncoder>getEncoder(
                     ASN1BitString.class).encode(this, (ASN1BitString) obj);
         } else if (obj instanceof ASN1OctetString) {
             buf = this.<ASN1OctetString, OctetStringEncoder>getEncoder(ASN1OctetString.class)
                     .encode(this, (ASN1OctetString) obj);
-        } else if (obj instanceof ASN1GeneralizedTime) {
-            buf = ((ASN1GeneralizedTime) obj).getValue().getBytes();
         } else if (obj instanceof ASN1VisibleString) {
             buf = ((ASN1VisibleString) obj).getValue().getBytes();
         } else if (obj instanceof ASN1Null) {
@@ -164,12 +161,12 @@ public class BEREncoder implements Encoder {
         } else if (obj instanceof ASN1RelativeIRI) {
             buf = this.<ASN1RelativeIRI, RelativeIRIEncoder>getEncoder(ASN1RelativeIRI.class).encode(this, (ASN1RelativeIRI) obj);
         } else if (obj instanceof ASN1Sequence) {
-            buf = this.<ASN1Sequence, SequenceEncoder> getEncoder(
+            buf = this.<ASN1Sequence, SequenceEncoder>getEncoder(
                     ASN1Sequence.class).encode(this, (ASN1Sequence) obj);
         } else if (obj instanceof ASN1Set) {
-            buf = this.<ASN1Set, SetEncoder> getEncoder(ASN1Set.class).encode(this, (ASN1Set) obj);
+            buf = this.<ASN1Set, SetEncoder>getEncoder(ASN1Set.class).encode(this, (ASN1Set) obj);
         } else if (obj instanceof ASN1SequenceOf) {
-            buf = this.<ASN1SequenceOf, SequenceOfEncoder> getEncoder(ASN1SequenceOf.class)
+            buf = this.<ASN1SequenceOf, SequenceOfEncoder>getEncoder(ASN1SequenceOf.class)
                     .encode(this, (ASN1SequenceOf<?>) obj);
         } else if (obj instanceof ASN1SetOf) {
             buf = this.<ASN1SetOf, SetOfEncoder>getEncoder(ASN1SetOf.class).encode(this, (ASN1SetOf<?>) obj);

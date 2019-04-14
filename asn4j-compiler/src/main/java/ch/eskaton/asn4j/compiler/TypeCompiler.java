@@ -41,8 +41,10 @@ import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
+import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 
 public class TypeCompiler implements NamedCompiler<Type> {
 
@@ -72,6 +74,8 @@ public class TypeCompiler implements NamedCompiler<Type> {
             if (node instanceof UsefulType) {
                 if (((UsefulType) node).getType().equals(ASN1GeneralizedTime.class.getSimpleName())) {
                     ctx.<GeneralizedTime, GeneralizedTimeCompiler>getCompiler(GeneralizedTime.class).compile(ctx, name, (UsefulType) node);
+                } else if (((UsefulType) node).getType().equals(ASN1UTCTime.class.getSimpleName())) {
+                    ctx.<UTCTime, UTCTimeCompiler>getCompiler(UTCTime.class).compile(ctx, name, (UsefulType) node);
                 } else {
                     throw new CompilerException("Unsupported UsefulType: " + ((UsefulType) node).getType());
                 }
