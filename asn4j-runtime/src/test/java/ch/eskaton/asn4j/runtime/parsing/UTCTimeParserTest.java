@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
@@ -62,6 +61,7 @@ public class UTCTimeParserTest {
         assertInvalid("20190531235");
         assertInvalid("2019053123595");
         assertInvalid("20190531+1");
+        assertInvalid("20190531+12");
         assertInvalid("20190531+123");
         assertInvalid("20190531+1801");
         assertInvalid("20190531-1801");

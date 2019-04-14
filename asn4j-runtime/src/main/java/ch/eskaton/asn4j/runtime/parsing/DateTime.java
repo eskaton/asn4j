@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.runtime.parsing;
 
+import java.util.Objects;
+
 public class DateTime {
 
     private int year;
@@ -45,7 +47,7 @@ public class DateTime {
 
     private String offset;
 
-    private Boolean isZulu;
+    private boolean isZulu;
 
     public DateTime(int year, int month, int day, int hour, int minute, int second) {
         this.year = year;
@@ -114,22 +116,50 @@ public class DateTime {
         return this;
     }
 
-    public Boolean isZulu() {
+    public boolean isZulu() {
         return isZulu;
     }
 
-    public void setZulu(Boolean zulu) {
+    public void setZulu(boolean zulu) {
         isZulu = zulu;
     }
 
-    public DateTime zulu(Boolean isZulu) {
+    public DateTime zulu(boolean isZulu) {
         setZulu(isZulu);
 
         return this;
     }
 
     public boolean hasOffset() {
-        return isZulu != null && isZulu || offset != null;
+        return isZulu || offset != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DateTime dateTime = (DateTime) o;
+
+        return year == dateTime.year &&
+                month == dateTime.month &&
+                day == dateTime.day &&
+                hour == dateTime.hour &&
+                minute == dateTime.minute &&
+                second == dateTime.second &&
+                nanos == dateTime.nanos &&
+                Objects.equals(offset, dateTime.offset) &&
+                Objects.equals(isZulu, dateTime.isZulu);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(year, month, day, hour, minute, second, nanos, offset, isZulu);
     }
 
 }
