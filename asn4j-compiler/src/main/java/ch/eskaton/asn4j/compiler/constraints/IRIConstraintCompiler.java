@@ -37,8 +37,8 @@ import java.util.Collection;
 
 public class IRIConstraintCompiler extends AbstractConstraintCompiler<IRI> {
 
-    public IRIConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
+    public IRIConstraintCompiler(TypeResolver typeResolver) {
+        super(typeResolver);
     }
 
     @Override
@@ -55,5 +55,5 @@ public class IRIConstraintCompiler extends AbstractConstraintCompiler<IRI> {
     protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
 
     }
-    
+
 }

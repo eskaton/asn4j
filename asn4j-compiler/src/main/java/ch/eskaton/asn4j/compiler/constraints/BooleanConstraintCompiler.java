@@ -54,8 +54,8 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 public class BooleanConstraintCompiler extends
         AbstractConstraintCompiler<Boolean> {
 
-    public BooleanConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
+    public BooleanConstraintCompiler( TypeResolver typeResolver) {
+        super(typeResolver);
     }
 
     private final static Set<Boolean> ALL = new HashSet<>(Arrays.asList(

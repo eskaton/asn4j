@@ -31,15 +31,14 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 
 import java.util.Collection;
 
 public class RelativeOIDConstraintCompiler extends AbstractConstraintCompiler<RelativeOID> {
 
-    public RelativeOIDConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
+    public RelativeOIDConstraintCompiler(TypeResolver typeResolver) {
+        super(typeResolver);
     }
 
     @Override

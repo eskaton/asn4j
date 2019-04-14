@@ -37,8 +37,8 @@ import java.util.Collection;
 
 public class RelativeIRIConstraintCompiler extends AbstractConstraintCompiler<RelativeIRI> {
 
-    public RelativeIRIConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
+    public RelativeIRIConstraintCompiler(TypeResolver typeResolver) {
+        super(typeResolver);
     }
 
     @Override

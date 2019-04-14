@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -45,117 +45,112 @@ import java.util.Stack;
 
 public abstract class AbstractConstraintCompiler<T> {
 
-    // protected ConstraintCompiler constraintCompiler;
-
     protected TypeResolver typeResolver;
 
-    public AbstractConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-    	// this.constraintCompiler = constraintCompiler;
-    	this.typeResolver = typeResolver;
+    public AbstractConstraintCompiler(TypeResolver typeResolver) {
+        this.typeResolver = typeResolver;
     }
 
     public Collection<T> compileConstraint(SetSpecsNode setSpecs, boolean includeAddition) throws CompilerException {
-    	Collection<T> root = compileConstraint(setSpecs.getRootElements());
+        Collection<T> root = compileConstraint(setSpecs.getRootElements());
 
-    	if (includeAddition) {
-    		ElementSet additionalElements = setSpecs.getAdditionalElements();
+        if (includeAddition) {
+            ElementSet additionalElements = setSpecs.getAdditionalElements();
 
-    		if (additionalElements != null) {
-    			Collection<T> extension = compileConstraint(additionalElements);
-    			root.addAll(extension);
-    		}
-    	}
+            if (additionalElements != null) {
+                Collection<T> extension = compileConstraint(additionalElements);
+                root.addAll(extension);
+            }
+        }
 
-    	return root;
+        return root;
     }
 
     Collection<T> compileConstraints(Type node, Type base) throws CompilerException {
-    	Stack<Collection<T>> cons = new Stack<>();
+        Stack<Collection<T>> cons = new Stack<>();
 
-    	boolean includeAdditions = true;
+        boolean includeAdditions = true;
 
-    	while (true) {
-    		if (node.hasConstraint()) {
-    			cons.push(compileConstraints(node.getConstraints(), includeAdditions));
-    		}
+        while (true) {
+            if (node.hasConstraint()) {
+                cons.push(compileConstraints(node.getConstraints(), includeAdditions));
+            }
 
-    		includeAdditions = false;
+            includeAdditions = false;
 
-    		if (base.equals(node)) {
-    			break;
-    		}
+            if (base.equals(node)) {
+                break;
+            }
 
-    		if (node instanceof UsefulType) {
-    			break;
-    		} else if (node instanceof TypeReference) {
-    			TypeAssignmentNode type = typeResolver.getType((TypeReference) node);
+            if (node instanceof UsefulType) {
+                break;
+            } else if (node instanceof TypeReference) {
+                TypeAssignmentNode type = typeResolver.getType((TypeReference) node);
 
-    			if (type == null) {
-    				throw new CompilerException("Referenced type %s not found", ((TypeReference) node).getType());
-    			}
+                if (type == null) {
+                    throw new CompilerException("Referenced type %s not found", ((TypeReference) node).getType());
+                }
 
-    			node = type.getType();
-    		} else {
-    			throw new CompilerException("not yet supported");
-    		}
+                node = type.getType();
+            } else {
+                throw new CompilerException("not yet supported");
+            }
 
-    	}
+        }
 
-    	if (cons.size() == 1) {
-    		return cons.pop();
-    	} else if (cons.size() > 1) {
-    		Collection<T> op1 = cons.pop();
-    		Collection<T> op2 = cons.pop();
+        if (cons.size() == 1) {
+            return cons.pop();
+        } else if (cons.size() > 1) {
+            Collection<T> op1 = cons.pop();
+            Collection<T> op2 = cons.pop();
 
-    		do {
-    			op1 = calculateIntersection(op1, op2);
+            do {
+                op1 = calculateIntersection(op1, op2);
 
-    			if (cons.isEmpty()) {
-    				break;
-    			}
+                if (cons.isEmpty()) {
+                    break;
+                }
 
-    			op2 = cons.pop();
-    		} while (true);
+                op2 = cons.pop();
+            } while (true);
 
-    		return op1;
-    	}
+            return op1;
+        }
 
-    	return null;
+        return null;
     }
 
-    Collection<T> compileConstraints(List<Constraint> constraints,
-    		boolean includeAdditions) throws CompilerException {
-    	Collection<T> intersection = null;
+    Collection<T> compileConstraints(List<Constraint> constraints, boolean includeAdditions) throws CompilerException {
+        Collection<T> intersection = null;
 
-    	for (Constraint constraint : constraints) {
-    		SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
+        for (Constraint constraint : constraints) {
+            if (constraint instanceof SubtypeConstraint) {
+                SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
-    		if (constraint instanceof SubtypeConstraint) {
-    			if (intersection == null) {
-    				intersection = compileConstraint(setSpecs, includeAdditions);
-    				includeAdditions = false;
-    			} else {
-    				intersection.retainAll(compileConstraint(setSpecs, includeAdditions));
-    				if (intersection.isEmpty()) {
-    					return intersection;
-    				}
-    			}
-    		} else {
+                if (intersection == null) {
+                    intersection = compileConstraint(setSpecs, includeAdditions);
+                    includeAdditions = false;
+                } else {
+                    intersection.retainAll(compileConstraint(setSpecs, includeAdditions));
+
+                    if (intersection.isEmpty()) {
+                        return intersection;
+                    }
+                }
+            } else {
                 throw new CompilerException("Constraints of type %s not yet supported",
                         constraint.getClass().getSimpleName());
-    		}
-    	}
+            }
+        }
 
-    	return intersection;
+        return intersection;
     }
 
-    protected abstract Collection<T> compileConstraint(ElementSet set)
-    		throws CompilerException;
+    protected abstract Collection<T> compileConstraint(ElementSet set) throws CompilerException;
 
-    protected abstract Collection<T> calculateIntersection(Collection<?> op1,
-    		Collection<?> op2) throws CompilerException;
+    protected abstract Collection<T> calculateIntersection(Collection<?> op1, Collection<?> op2)
+            throws CompilerException;
 
-    protected abstract void addConstraint(JavaClass clazz, Collection<?> values)
-    		throws CompilerException;
+    protected abstract void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException;
 
 }
