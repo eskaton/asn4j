@@ -27,30 +27,21 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-
-public class VisibleStringConstraintCompiler extends AbstractConstraintCompiler<VisibleStringConstraintDefinition> {
-
-    public VisibleStringConstraintCompiler(TypeResolver typeResolver) {
-        super(typeResolver);
-    }
+public class ObjectIdentifierConstraintDefinition implements ConstraintDefinition<ObjectIdentifierConstraintDefinition> {
 
     @Override
-    protected VisibleStringConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
+    public ObjectIdentifierConstraintDefinition intersection(ObjectIdentifierConstraintDefinition constraintDef) {
         return null;
     }
 
     @Override
-    protected VisibleStringConstraintDefinition calculateIntersection(VisibleStringConstraintDefinition constraintDef1, VisibleStringConstraintDefinition constraintDef2) throws CompilerException {
+    public ObjectIdentifierConstraintDefinition union(ObjectIdentifierConstraintDefinition constraintDef) {
         return null;
     }
 
     @Override
-    protected void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException {
-
+    public boolean isEmpty() {
+        return false;
     }
 
 }

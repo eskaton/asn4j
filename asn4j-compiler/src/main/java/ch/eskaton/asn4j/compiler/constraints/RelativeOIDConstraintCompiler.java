@@ -35,25 +35,26 @@ import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 
 import java.util.Collection;
 
-public class RelativeOIDConstraintCompiler extends AbstractConstraintCompiler<RelativeOID> {
+public class RelativeOIDConstraintCompiler extends AbstractConstraintCompiler<RelativeOIDConstraintDefinition> {
 
     public RelativeOIDConstraintCompiler(TypeResolver typeResolver) {
         super(typeResolver);
     }
 
     @Override
-    protected Collection<RelativeOID> compileConstraint(ElementSet set) throws CompilerException {
+    protected RelativeOIDConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
         return null;
     }
 
     @Override
-    protected Collection<RelativeOID> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
+    protected RelativeOIDConstraintDefinition calculateIntersection(RelativeOIDConstraintDefinition constraintDef1, RelativeOIDConstraintDefinition constraintDef2) throws CompilerException {
         return null;
     }
 
     @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
+    protected void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException {
 
     }
+
 
 }
