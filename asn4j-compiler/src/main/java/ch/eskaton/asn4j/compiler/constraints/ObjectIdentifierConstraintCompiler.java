@@ -31,28 +31,25 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 
-import java.util.Collection;
-
-public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompiler<ObjectIdentifier> {
+public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompiler<ObjectIdentifierConstraintDefinition> {
 
     public ObjectIdentifierConstraintCompiler(TypeResolver typeResolver) {
         super(typeResolver);
     }
 
     @Override
-    protected Collection<ObjectIdentifier> compileConstraint(ElementSet set) throws CompilerException {
+    protected ObjectIdentifierConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
         return null;
     }
 
     @Override
-    protected Collection<ObjectIdentifier> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
+    protected ObjectIdentifierConstraintDefinition calculateIntersection(ObjectIdentifierConstraintDefinition constraintDef1, ObjectIdentifierConstraintDefinition constraintDef2) throws CompilerException {
         return null;
     }
 
     @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
+    protected void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException {
 
     }
 

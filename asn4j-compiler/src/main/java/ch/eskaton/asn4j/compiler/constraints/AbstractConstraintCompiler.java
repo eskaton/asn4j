@@ -39,11 +39,10 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
-public abstract class AbstractConstraintCompiler<T> {
+public abstract class AbstractConstraintCompiler<T extends ConstraintDefinition> {
 
     protected TypeResolver typeResolver;
 
@@ -51,23 +50,23 @@ public abstract class AbstractConstraintCompiler<T> {
         this.typeResolver = typeResolver;
     }
 
-    public Collection<T> compileConstraint(SetSpecsNode setSpecs, boolean includeAddition) throws CompilerException {
-        Collection<T> root = compileConstraint(setSpecs.getRootElements());
+    public T compileConstraint(SetSpecsNode setSpecs, boolean includeAddition) throws CompilerException {
+        T constraintDef = compileConstraint(setSpecs.getRootElements());
 
         if (includeAddition) {
             ElementSet additionalElements = setSpecs.getAdditionalElements();
 
             if (additionalElements != null) {
-                Collection<T> extension = compileConstraint(additionalElements);
-                root.addAll(extension);
+                T extension = compileConstraint(additionalElements);
+                constraintDef.union(extension);
             }
         }
 
-        return root;
+        return constraintDef;
     }
 
-    Collection<T> compileConstraints(Type node, Type base) throws CompilerException {
-        Stack<Collection<T>> cons = new Stack<>();
+    T compileConstraints(Type node, Type base) throws CompilerException {
+        Stack<T> cons = new Stack<>();
 
         boolean includeAdditions = true;
 
@@ -101,8 +100,8 @@ public abstract class AbstractConstraintCompiler<T> {
         if (cons.size() == 1) {
             return cons.pop();
         } else if (cons.size() > 1) {
-            Collection<T> op1 = cons.pop();
-            Collection<T> op2 = cons.pop();
+            T op1 = cons.pop();
+            T op2 = cons.pop();
 
             do {
                 op1 = calculateIntersection(op1, op2);
@@ -120,21 +119,21 @@ public abstract class AbstractConstraintCompiler<T> {
         return null;
     }
 
-    Collection<T> compileConstraints(List<Constraint> constraints, boolean includeAdditions) throws CompilerException {
-        Collection<T> intersection = null;
+    T compileConstraints(List<Constraint> constraints, boolean includeAdditions) throws CompilerException {
+        T constraintDef = null;
 
         for (Constraint constraint : constraints) {
             if (constraint instanceof SubtypeConstraint) {
                 SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
-                if (intersection == null) {
-                    intersection = compileConstraint(setSpecs, includeAdditions);
+                if (constraintDef == null) {
+                    constraintDef = compileConstraint(setSpecs, includeAdditions);
                     includeAdditions = false;
                 } else {
-                    intersection.retainAll(compileConstraint(setSpecs, includeAdditions));
+                    constraintDef.intersection(compileConstraint(setSpecs, includeAdditions));
 
-                    if (intersection.isEmpty()) {
-                        return intersection;
+                    if (constraintDef.isEmpty()) {
+                        return constraintDef;
                     }
                 }
             } else {
@@ -143,14 +142,13 @@ public abstract class AbstractConstraintCompiler<T> {
             }
         }
 
-        return intersection;
+        return constraintDef;
     }
 
-    protected abstract Collection<T> compileConstraint(ElementSet set) throws CompilerException;
+    protected abstract T compileConstraint(ElementSet set) throws CompilerException;
 
-    protected abstract Collection<T> calculateIntersection(Collection<?> op1, Collection<?> op2)
-            throws CompilerException;
+    protected abstract T calculateIntersection(T constraintDef1, T constraintDef2) throws CompilerException;
 
-    protected abstract void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException;
+    protected abstract void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException;
 
 }

@@ -91,20 +91,20 @@ public class ConstraintCompiler {
 
         AbstractConstraintCompiler<?> compiler = compilers.get(base.getClass());
 
-        Collection<?> cons;
+        ConstraintDefinition constraintDef;
 
         try {
-            cons = compiler.compileConstraints(node, base);
+            constraintDef = compiler.compileConstraints(node, base);
         } catch (CompilerException e) {
             throw new CompilerException("Error in constraints for type %s: %s", e, name, e.getMessage());
         }
 
-        if (cons != null) {
-            if (cons.isEmpty()) {
+        if (constraintDef != null) {
+            if (constraintDef.isEmpty()) {
                 throw new CompilerException("Constraints for type %s excludes all values", name);
             }
 
-            compiler.addConstraint(clazz, cons);
+            compiler.addConstraint(clazz, constraintDef);
         }
 
         clazz.addImport(ConstraintViolatedException.class);

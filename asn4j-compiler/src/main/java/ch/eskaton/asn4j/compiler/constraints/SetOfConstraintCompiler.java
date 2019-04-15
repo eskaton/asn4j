@@ -31,31 +31,27 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 
-import java.util.Collection;
-
-public class SetOfConstraintCompiler extends AbstractConstraintCompiler<SetOfType> {
+public class SetOfConstraintCompiler extends AbstractConstraintCompiler<SetOfConstraintDefinition> {
 
     public SetOfConstraintCompiler(TypeResolver typeResolver) {
         super(typeResolver);
     }
 
     @Override
-    protected Collection<SetOfType> compileConstraint(ElementSet set) throws CompilerException {
-        // TODO Auto-generated method stub
+    protected SetOfConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
         return null;
     }
 
     @Override
-    protected Collection<SetOfType> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
-        // TODO Auto-generated method stub
+    protected SetOfConstraintDefinition calculateIntersection(SetOfConstraintDefinition constraintDef1,
+            SetOfConstraintDefinition constraintDef2) throws CompilerException {
         return null;
     }
 
     @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
-        // TODO Auto-generated method stub
+    protected void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException {
+
     }
 
 }

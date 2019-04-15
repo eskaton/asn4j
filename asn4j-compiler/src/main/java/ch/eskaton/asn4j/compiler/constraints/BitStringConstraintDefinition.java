@@ -27,30 +27,47 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
-public class VisibleStringConstraintCompiler extends AbstractConstraintCompiler<VisibleStringConstraintDefinition> {
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-    public VisibleStringConstraintCompiler(TypeResolver typeResolver) {
-        super(typeResolver);
+public class BitStringConstraintDefinition implements ConstraintDefinition {
+
+    private List<BitStringValue> values = new ArrayList<>();
+
+    private boolean inverted;
+
+    public Collection<BitStringValue> getValues() {
+        return values;
     }
 
+    public void setValues(List<BitStringValue> values) {
+        this.values = values;
+    }
+
+    public boolean isInverted() {
+        return inverted;
+    }
+
+    public void setInverted(boolean inverted) {
+        this.inverted = inverted;
+    }
+
+
     @Override
-    protected VisibleStringConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
+    public ConstraintDefinition intersection(ConstraintDefinition constraintDef) {
         return null;
     }
 
     @Override
-    protected VisibleStringConstraintDefinition calculateIntersection(VisibleStringConstraintDefinition constraintDef1, VisibleStringConstraintDefinition constraintDef2) throws CompilerException {
+    public ConstraintDefinition union(ConstraintDefinition constraintDef) {
         return null;
     }
 
     @Override
-    protected void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException {
-
+    public boolean isEmpty() {
+        return false;
     }
-
 }

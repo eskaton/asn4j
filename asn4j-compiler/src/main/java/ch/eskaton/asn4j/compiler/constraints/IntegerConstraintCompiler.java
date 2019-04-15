@@ -47,20 +47,19 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
-public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeNode> {
+public class IntegerConstraintCompiler extends AbstractConstraintCompiler<IntegerConstraintDefinition> {
 
     public IntegerConstraintCompiler(TypeResolver typeResolver) {
         super(typeResolver);
     }
 
-    protected List<RangeNode> compileConstraint(ElementSet set) throws CompilerException {
+    protected IntegerConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
         List<Elements> operands = set.getOperands();
 
         switch (set.getOperation()) {
@@ -85,10 +84,10 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
                 return calculateUnion(operands);
         }
 
-        return new ArrayList<>();
+        return new IntegerConstraintDefinition();
     }
 
-    private List<RangeNode> calculateElements(Elements elements) throws CompilerException {
+    private IntegerConstraintDefinition calculateElements(Elements elements) throws CompilerException {
         if (elements instanceof ElementSet) {
             return compileConstraint((ElementSet) elements);
         } else {
@@ -99,8 +98,9 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
                         // TODO: resolve
                         throw new CompilerException("not yet supported");
                     } else {
-                        return Arrays.asList(new RangeNode(new EndpointNode(value, true),
-                                new EndpointNode(value, true)));
+                        return new IntegerConstraintDefinition(Arrays.asList(new RangeNode(
+                                new EndpointNode(value, true),
+                                new EndpointNode(value, true))));
                     }
                 } else {
                     throw new CompilerException("Invalid single-value constraint %s for INTEGER type",
@@ -112,7 +112,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
             } else if (elements instanceof RangeNode) {
                 EndpointNode lower = canonicalizeEndpoint(((RangeNode) elements).getLower(), true);
                 EndpointNode upper = canonicalizeEndpoint(((RangeNode) elements).getUpper(), false);
-                return Arrays.asList(new RangeNode(lower, upper));
+                return new IntegerConstraintDefinition(Arrays.asList(new RangeNode(lower, upper)));
             } else {
                 throw new CompilerException("Invalid constraint %s for INTEGER type",
                         elements.getClass().getSimpleName());
@@ -120,36 +120,39 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
         }
     }
 
-    private List<RangeNode> calculateInversion(List<RangeNode> ranges) {
-        List<RangeNode> result = new ArrayList<>();
+    private IntegerConstraintDefinition calculateInversion(IntegerConstraintDefinition constraintDef) {
+        IntegerConstraintDefinition result = new IntegerConstraintDefinition();
+        List<RangeNode> ranges = constraintDef.getRanges();
         RangeNode op1 = ranges.get(0);
         RangeNode op2 = op1;
 
         if (((IntegerValue) op1.getLower().getValue()).getValue().compareTo(
                 BigInteger.valueOf(Long.MIN_VALUE)) > 0) {
-            result.add(new RangeNode(new EndpointNode(new IntegerValue(
+            result.getRanges().add(new RangeNode(new EndpointNode(new IntegerValue(
                     Long.MIN_VALUE), true), decrement(op1.getLower())));
         }
 
         for (int i = 1; i < ranges.size(); i++) {
             op2 = ranges.get(i);
-            result.add(new RangeNode(increment(op1.getUpper()), decrement(op2.getLower())));
+            result.getRanges().add(new RangeNode(increment(op1.getUpper()), decrement(op2.getLower())));
         }
 
         if (((IntegerValue) op2.getUpper().getValue()).getValue().compareTo(
                 BigInteger.valueOf(Long.MAX_VALUE)) < 0) {
-            result.add(new RangeNode(increment(op2.getUpper()),
+            result.getRanges().add(new RangeNode(increment(op2.getUpper()),
                     new EndpointNode(new IntegerValue(Long.MAX_VALUE), true)));
         }
 
         return result;
     }
 
-    private List<RangeNode> calculateExclude(List<RangeNode> r1,
-            List<RangeNode> r2) throws CompilerException {
-        List<RangeNode> result = new ArrayList<>();
+    private IntegerConstraintDefinition calculateExclude(IntegerConstraintDefinition constraintDef1,
+            IntegerConstraintDefinition constraintDef2) throws CompilerException {
+        IntegerConstraintDefinition result = new IntegerConstraintDefinition();
         int excludeInd = 0;
         int rangeInd = 0;
+        List<RangeNode> r1 = constraintDef1.getRanges();
+        List<RangeNode> r2 = constraintDef2.getRanges();
         RangeNode exclude = r2.get(excludeInd++);
         RangeNode range = r1.get(rangeInd++);
         long lower, upper;
@@ -159,7 +162,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
                 throw new CompilerException(((IntegerValue) exclude.getLower().getValue()).getValue()
                         + " doesn't exist in parent type");
             } else if (compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) > 0) {
-                result.add(range);
+                result.getRanges().add(range);
                 range = getRange(r1, rangeInd++);
             } else if ((lower = compareCanonicalEndpoint(exclude.getLower(), range.getLower())) >= 0
                     && compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) <= 0) {
@@ -170,11 +173,11 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
                 }
 
                 if (lower != 0) {
-                    result.add(new RangeNode(range.getLower(), decrement(exclude.getLower())));
+                    result.getRanges().add(new RangeNode(range.getLower(), decrement(exclude.getLower())));
                 }
 
                 if (upper != 0) {
-                    result.add(new RangeNode(increment(exclude.getUpper()), range.getUpper()));
+                    result.getRanges().add(new RangeNode(increment(exclude.getUpper()), range.getUpper()));
                 }
 
                 exclude = getRange(r2, excludeInd++);
@@ -190,7 +193,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
 
             if (exclude == null) {
                 while (range != null) {
-                    result.add(range);
+                    result.getRanges().add(range);
                     range = getRange(r1, rangeInd++);
                 }
                 break;
@@ -225,15 +228,15 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
      * Sorts the ranges in ascending order and joins adjacent or overlapping
      * ranges.
      *
-     * @param ranges A list of {@link RangeNode}s
-     * @return A list of {@link RangeNode}s in canonical form
+     * @param constraintDef A constraint definition
+     * @return A constraint definition containing {@link RangeNode}s in canonical form
      */
-    private List<RangeNode> canonicalizeRanges(List<RangeNode> ranges) {
-        if (ranges.size() <= 1) {
-            return ranges;
+    private IntegerConstraintDefinition canonicalizeRanges(IntegerConstraintDefinition constraintDef) {
+        if (constraintDef.getRanges().size() <= 1) {
+            return constraintDef;
         }
 
-        ranges = new ArrayList<>(ranges);
+        List<RangeNode> ranges = constraintDef.getRanges();
 
         Collections.sort(ranges, new ASN1RangeComparator());
 
@@ -256,17 +259,19 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
 
         result.add(op1);
 
-        return result;
+        constraintDef.setRanges(result);
+
+        return constraintDef;
     }
 
-    private List<RangeNode> calculateContainedSubtype(Type type) throws CompilerException {
-        List<RangeNode> cons = new ArrayList<>();
+    private IntegerConstraintDefinition calculateContainedSubtype(Type type) throws CompilerException {
+        IntegerConstraintDefinition constraintDef = new IntegerConstraintDefinition();
 
         if (type instanceof ASN1Integer) {
             // no restriction
-            return cons;
+            return constraintDef;
         } else if (type instanceof TypeReference) {
-            return (List<RangeNode>) compileConstraints(type, typeResolver.getBase((TypeReference) type));
+            return compileConstraints(type, typeResolver.getBase((TypeReference) type));
         } else {
             throw new CompilerException("Invalid type %s in constraint for INTEGER type", type);
         }
@@ -278,14 +283,14 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
      * @param elements A list of {@link Elements}s.
      * @return A list with the union of {@link RangeNode}s
      */
-    private List<RangeNode> calculateUnion(List<Elements> elements) throws CompilerException {
-        List<RangeNode> union = new ArrayList<>();
+    private IntegerConstraintDefinition calculateUnion(List<Elements> elements) throws CompilerException {
+        IntegerConstraintDefinition constraintDef = new IntegerConstraintDefinition();
 
         for (Elements e : elements) {
-            union.addAll(calculateElements(e));
+            constraintDef.union(calculateElements(e));
         }
 
-        return canonicalizeRanges(union);
+        return canonicalizeRanges(constraintDef);
     }
 
     /**
@@ -295,23 +300,23 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
      * @return A list containing the intersections as {@link RangeNode}s or an
      * empty list, if there is no intersection
      */
-    private List<RangeNode> calculateIntersection(List<Elements> elements) throws CompilerException {
-        List<RangeNode> intersection = new ArrayList<>();
+    private IntegerConstraintDefinition calculateIntersection(List<Elements> elements) throws CompilerException {
+        IntegerConstraintDefinition constraintDef = new IntegerConstraintDefinition();
 
         for (Elements e : elements) {
-            List<RangeNode> values = calculateElements(e);
+            IntegerConstraintDefinition values = calculateElements(e);
 
-            if (intersection.isEmpty()) {
-                intersection.addAll(values);
+            if (constraintDef.getRanges().isEmpty()) {
+                constraintDef.union(values);
             } else {
-                intersection = (List<RangeNode>) calculateIntersection(intersection, values);
-                if (intersection.isEmpty()) {
-                    return intersection;
+                constraintDef = calculateIntersection(constraintDef, values);
+                if (constraintDef.getRanges().isEmpty()) {
+                    return constraintDef;
                 }
             }
         }
 
-        return intersection;
+        return constraintDef;
     }
 
     /**
@@ -320,19 +325,19 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
      * {@link IntegerConstraintCompiler#canonicalizeRanges}.
      *
      * @param op1 Collection of {@link RangeNode}s
-     * @param op2 Collection of {@link RangeNode}s
+     * @param constraintDef2 Collection of {@link RangeNode}s
      * @return A list containing the intersections as {@link RangeNode}s or an
      * empty list, if there is no intersection
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected Collection<RangeNode> calculateIntersection(Collection<?> op1,
-            Collection<?> op2) throws CompilerException {
-        List<RangeNode> result = new ArrayList<>();
+    protected IntegerConstraintDefinition calculateIntersection(IntegerConstraintDefinition op1,
+            IntegerConstraintDefinition constraintDef2) throws CompilerException {
+        IntegerConstraintDefinition result = new IntegerConstraintDefinition();
         int r1Ind = 0;
         int r2Ind = 0;
-        List<RangeNode> l1 = (List<RangeNode>) op1;
-        List<RangeNode> l2 = (List<RangeNode>) op2;
+        List<RangeNode> l1 = op1.getRanges();
+        List<RangeNode> l2 = constraintDef2.getRanges();
         RangeNode r1 = getRange(l1, r1Ind++);
         RangeNode r2 = getRange(l2, r2Ind++);
 
@@ -350,25 +355,25 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
             } else if (compareCanonicalEndpoint(r1.getLower(), r2.getLower()) >= 0
                     && compareCanonicalEndpoint(r1.getUpper(), r2.getUpper()) <= 0) {
                 // r1 included in r2
-                result.add(r1);
+                result.getRanges().add(r1);
                 r2 = new RangeNode(increment(r1.getUpper()), r2.getUpper());
                 r1 = getRange(l1, r1Ind++);
             } else if (compareCanonicalEndpoint(r2.getLower(), r1.getLower()) >= 0
                     && compareCanonicalEndpoint(r2.getUpper(), r1.getUpper()) <= 0) {
                 // r2 included in r1
-                result.add(r2);
+                result.getRanges().add(r2);
                 r1 = new RangeNode(increment(r2.getUpper()), r1.getUpper());
                 r2 = getRange(l2, r2Ind++);
             } else if (compareCanonicalEndpoint(r1.getUpper(), r2.getLower()) >= 0
                     && compareCanonicalEndpoint(r1.getUpper(), r2.getUpper()) <= 0) {
                 // r1 < r2 with intersection
-                result.add(new RangeNode(r2.getLower(), r1.getUpper()));
+                result.getRanges().add(new RangeNode(r2.getLower(), r1.getUpper()));
                 r2 = new RangeNode(increment(r1.getUpper()), r2.getUpper());
                 r1 = getRange(l1, r1Ind++);
             } else if (compareCanonicalEndpoint(r2.getUpper(), r1.getLower()) >= 0
                     && compareCanonicalEndpoint(r2.getUpper(), r1.getUpper()) <= 0) {
                 // r2 < r1 with intersection
-                result.add(new RangeNode(r1.getLower(), r2.getUpper()));
+                result.getRanges().add(new RangeNode(r1.getLower(), r2.getUpper()));
                 r1 = new RangeNode(increment(r2.getUpper()), r1.getUpper());
                 r2 = getRange(l2, r2Ind++);
             } else {
@@ -461,7 +466,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
     }
 
     @Override
-    public void addConstraint(JavaClass clazz, Collection<?> values)
+    public void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef)
             throws CompilerException {
         BodyBuilder body = clazz.method().annotation(Override.class).modifier(Protected).returnType(boolean.class)
                 .name("checkConstraint").parameter("BigInteger", "v")
@@ -471,7 +476,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
 
         boolean first = true;
 
-        for (Object value : values) {
+        for (Object value : ((IntegerConstraintDefinition) constraintDef).getRanges()) {
             if (!(value instanceof RangeNode)) {
                 throw new CompilerException("Invalid type %s in INTEGER constraint", value.getClass());
             }

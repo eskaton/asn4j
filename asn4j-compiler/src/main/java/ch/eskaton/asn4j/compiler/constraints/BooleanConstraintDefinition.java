@@ -27,30 +27,47 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
+import java.util.HashSet;
+import java.util.Set;
 
-public class VisibleStringConstraintCompiler extends AbstractConstraintCompiler<VisibleStringConstraintDefinition> {
+public class BooleanConstraintDefinition implements ConstraintDefinition<BooleanConstraintDefinition> {
 
-    public VisibleStringConstraintCompiler(TypeResolver typeResolver) {
-        super(typeResolver);
+    private Set<Boolean> values;
+
+    public BooleanConstraintDefinition(Set<Boolean> values) {
+        this.values = values;
+    }
+
+    public BooleanConstraintDefinition() {
+        this.values = new HashSet();
+    }
+
+    public Set<Boolean> getValues() {
+        return values;
+    }
+
+    public void setValues(Set values) {
+        this.values = values;
+    }
+
+
+    @Override
+    public BooleanConstraintDefinition intersection(BooleanConstraintDefinition constraintDef) {
+        values.retainAll(constraintDef.getValues());
+
+        return this;
     }
 
     @Override
-    protected VisibleStringConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
-        return null;
+    public BooleanConstraintDefinition union(BooleanConstraintDefinition constraintDef) {
+        values.addAll(constraintDef.getValues());
+
+        return this;
     }
 
     @Override
-    protected VisibleStringConstraintDefinition calculateIntersection(VisibleStringConstraintDefinition constraintDef1, VisibleStringConstraintDefinition constraintDef2) throws CompilerException {
-        return null;
-    }
-
-    @Override
-    protected void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException {
-
+    public boolean isEmpty() {
+        return values.isEmpty();
     }
 
 }

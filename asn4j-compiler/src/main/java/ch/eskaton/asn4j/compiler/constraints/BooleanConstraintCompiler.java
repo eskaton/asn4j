@@ -43,7 +43,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,33 +51,29 @@ import java.util.Set;
 import static ch.eskaton.asn4j.compiler.java.JavaType.BOOLEAN;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
-public class BooleanConstraintCompiler extends
-        AbstractConstraintCompiler<Boolean> {
+public class BooleanConstraintCompiler extends AbstractConstraintCompiler<BooleanConstraintDefinition> {
 
-    public BooleanConstraintCompiler( TypeResolver typeResolver) {
+    public BooleanConstraintCompiler(TypeResolver typeResolver) {
         super(typeResolver);
     }
 
-    private final static Set<Boolean> ALL = new HashSet<>(Arrays.asList(
-            Boolean.TRUE, Boolean.FALSE));
+    private final static Set<Boolean> ALL = new HashSet<>(Arrays.asList(Boolean.TRUE, Boolean.FALSE));
 
-    protected Set<Boolean> compileConstraint(ElementSet set)
-            throws CompilerException {
+    protected BooleanConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
         List<Elements> operands = set.getOperands();
-        Set<Boolean> booleans = new HashSet<Boolean>();
 
         switch (set.getOperation()) {
             case All:
-                booleans.addAll(ALL);
-                booleans.removeAll(compileConstraint((ElementSet) operands.get(0)));
-                return booleans;
+                BooleanConstraintDefinition constraintDef = new BooleanConstraintDefinition(ALL);
+                constraintDef.getValues().removeAll(compileConstraint((ElementSet) operands.get(0)).getValues());
+                return constraintDef;
 
             case Exclude:
                 if (operands.size() == 1) {
                     // ALL EXCEPT
                     return calculateElements(operands.get(0));
                 } else {
-                    return calculateExclude(operands);
+                    return calculateExclude(calculateElements(operands.get(0)), calculateElements(operands.get(1)));
                 }
 
             case Intersection:
@@ -87,33 +83,31 @@ public class BooleanConstraintCompiler extends
                 return calculateUnion(operands);
         }
 
-        return booleans;
+        return new BooleanConstraintDefinition();
     }
 
-    private Set<Boolean> calculateExclude(List<Elements> operands) throws CompilerException {
-        Set<Boolean> bools = calculateElements(operands.get(0));
-        Set<Boolean> excludes = calculateElements(operands.get(1));
-
-        for (Boolean exclude : excludes) {
-            if (bools.contains(exclude)) {
-                bools.remove(exclude);
+    private BooleanConstraintDefinition calculateExclude(BooleanConstraintDefinition constraintDef1,
+            BooleanConstraintDefinition constraintDef2) throws CompilerException {
+        for (Boolean value : constraintDef2.getValues()) {
+            if (constraintDef1.getValues().contains(value)) {
+                constraintDef1.getValues().remove(value);
             } else {
-                throw new CompilerException(exclude + " doesn't exist in parent type");
+                throw new CompilerException(value + " doesn't exist in parent type");
             }
         }
 
-        return bools;
+        return constraintDef1;
     }
 
-    private Set<Boolean> calculateElements(Elements elements)
-            throws CompilerException {
+    private BooleanConstraintDefinition calculateElements(Elements elements) throws CompilerException {
         if (elements instanceof ElementSet) {
             return compileConstraint((ElementSet) elements);
         } else {
             if (elements instanceof SingleValueConstraint) {
                 Value value = ((SingleValueConstraint) elements).getValue();
                 if (value instanceof BooleanValue) {
-                    return new HashSet<>(Arrays.asList(((BooleanValue) value).getValue()));
+                    return new BooleanConstraintDefinition(new HashSet<>(
+                            Collections.singletonList(((BooleanValue) value).getValue())));
                 } else {
                     throw new CompilerException("Invalid single-value constraint %s for BOOLEAN type",
                             value.getClass().getSimpleName());
@@ -128,60 +122,58 @@ public class BooleanConstraintCompiler extends
         }
     }
 
-    private Set<Boolean> calculateUnion(List<Elements> operands)
-            throws CompilerException {
-        Set<Boolean> union = new HashSet<>();
+    private BooleanConstraintDefinition calculateUnion(List<Elements> elements) throws CompilerException {
+        BooleanConstraintDefinition constraintDef = new BooleanConstraintDefinition();
 
-        for (Elements e : operands) {
-            union.addAll(calculateElements(e));
+        for (Elements e : elements) {
+            constraintDef.union(calculateElements(e));
         }
 
-        return union;
+        return constraintDef;
     }
 
-    private Set<Boolean> calculateIntersection(List<Elements> operands) throws CompilerException {
-        Set<Boolean> intersection = new HashSet<>();
+    private BooleanConstraintDefinition calculateIntersection(List<Elements> operands) throws CompilerException {
+        BooleanConstraintDefinition constraintDef = new BooleanConstraintDefinition();
 
         for (Elements e : operands) {
-            Set<Boolean> bools = calculateElements(e);
+            BooleanConstraintDefinition values = calculateElements(e);
 
-            if (intersection.isEmpty()) {
-                intersection.addAll(bools);
+            if (constraintDef.getValues().isEmpty()) {
+                constraintDef.union(values);
             } else {
-                intersection.retainAll(bools);
-                if (intersection.isEmpty()) {
-                    return intersection;
+                constraintDef.intersection(values);
+                if (constraintDef.getValues().isEmpty()) {
+                    return constraintDef;
                 }
             }
         }
 
-        return intersection;
+        return constraintDef;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Collection<Boolean> calculateIntersection(Collection<?> op1,
-            Collection<?> op2) {
-        Set<Boolean> result = new HashSet<>();
-        result.addAll((Collection<? extends Boolean>) op1);
-        result.retainAll(op2);
-        return result;
+    protected BooleanConstraintDefinition calculateIntersection(BooleanConstraintDefinition op1,
+            BooleanConstraintDefinition op2) {
+        op1.intersection(op2);
+
+        return op1;
     }
 
-    private Set<Boolean> calculateContainedSubtype(Type type) throws CompilerException {
+    private BooleanConstraintDefinition calculateContainedSubtype(Type type) throws CompilerException {
         if (type instanceof BooleanType) {
-            Set<Boolean> cons = new HashSet<>();
-            cons.addAll(ALL);
-            return cons;
+            return new BooleanConstraintDefinition(ALL);
         } else if (type instanceof TypeReference) {
-            return (Set<Boolean>) compileConstraints(type, typeResolver.getBase((TypeReference) type));
+            return compileConstraints(type, typeResolver.getBase((TypeReference) type));
         } else {
             throw new CompilerException("Invalid type %s in constraint for BOOLEAN type", type);
         }
     }
 
     @Override
-    public void addConstraint(JavaClass javaClass, Collection<?> values) {
+    public void addConstraint(JavaClass javaClass, ConstraintDefinition constraintDef) {
+        Set values = ((BooleanConstraintDefinition) constraintDef).getValues();
+
         if (values.size() == 2) {
             return;
         }

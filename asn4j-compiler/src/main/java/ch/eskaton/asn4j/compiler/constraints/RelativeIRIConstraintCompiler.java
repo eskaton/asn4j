@@ -31,29 +31,25 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 
-import java.util.Collection;
-
-public class RelativeIRIConstraintCompiler extends AbstractConstraintCompiler<RelativeIRI> {
+public class RelativeIRIConstraintCompiler extends AbstractConstraintCompiler<RelativeIRIConstraintDefinition> {
 
     public RelativeIRIConstraintCompiler(TypeResolver typeResolver) {
         super(typeResolver);
     }
 
     @Override
-    protected Collection<RelativeIRI> compileConstraint(ElementSet set) throws CompilerException {
+    protected RelativeIRIConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
         return null;
     }
 
     @Override
-    protected Collection<RelativeIRI> calculateIntersection(Collection<?> op1, Collection<?> op2)
-            throws CompilerException {
+    protected RelativeIRIConstraintDefinition calculateIntersection(RelativeIRIConstraintDefinition constraintDef1, RelativeIRIConstraintDefinition constraintDef2) throws CompilerException {
         return null;
     }
 
     @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
+    protected void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException {
 
     }
 
