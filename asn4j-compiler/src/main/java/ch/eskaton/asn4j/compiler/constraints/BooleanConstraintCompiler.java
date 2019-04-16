@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,6 +51,7 @@ import java.util.Set;
 
 import static ch.eskaton.asn4j.compiler.java.JavaType.BOOLEAN;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
+import static ch.eskaton.commons.utils.CollectionUtils.asHashSet;
 
 public class BooleanConstraintCompiler extends AbstractConstraintCompiler<BooleanConstraintDefinition> {
 
@@ -57,7 +59,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolea
         super(typeResolver);
     }
 
-    private final static Set<Boolean> ALL = new HashSet<>(Arrays.asList(Boolean.TRUE, Boolean.FALSE));
+    private final static Set<Boolean> ALL = asHashSet(Boolean.TRUE, Boolean.FALSE);
 
     protected BooleanConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
         List<Elements> operands = set.getOperands();
@@ -132,10 +134,10 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolea
         return constraintDef;
     }
 
-    private BooleanConstraintDefinition calculateIntersection(List<Elements> operands) throws CompilerException {
+    private BooleanConstraintDefinition calculateIntersection(List<Elements> elements) throws CompilerException {
         BooleanConstraintDefinition constraintDef = new BooleanConstraintDefinition();
 
-        for (Elements e : operands) {
+        for (Elements e : elements) {
             BooleanConstraintDefinition values = calculateElements(e);
 
             if (constraintDef.getValues().isEmpty()) {
@@ -155,9 +157,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolea
     @Override
     protected BooleanConstraintDefinition calculateIntersection(BooleanConstraintDefinition op1,
             BooleanConstraintDefinition op2) {
-        op1.intersection(op2);
-
-        return op1;
+        return op1.intersection(op2);
     }
 
     private BooleanConstraintDefinition calculateContainedSubtype(Type type) throws CompilerException {
