@@ -27,22 +27,16 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-public class IRIConstraintDefinition implements ConstraintDefinition<IRIConstraintDefinition> {
+import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 
+import java.util.ArrayList;
+import java.util.List;
 
-    @Override
-    public IRIConstraintDefinition intersection(IRIConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public IRIConstraintDefinition union(IRIConstraintDefinition constraintDef) {
-        return null;
-    }
+public class IRIConstraintDefinition extends AbstractConstraintDefinition<IRIValue, List<IRIValue>, IRIConstraintDefinition> {
 
     @Override
-    public boolean isEmpty() {
-        return false;
+    List<IRIValue> createValues() {
+        return new ArrayList<>();
     }
 
 }

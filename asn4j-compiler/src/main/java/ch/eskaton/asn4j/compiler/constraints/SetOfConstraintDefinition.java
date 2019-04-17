@@ -27,21 +27,16 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-public class SetOfConstraintDefinition implements ConstraintDefinition<SetOfConstraintDefinition> {
+import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SetOfConstraintDefinition implements ConstraintDefinition<CollectionOfValue, List<CollectionOfValue>, SetOfConstraintDefinition> {
 
     @Override
-    public SetOfConstraintDefinition intersection(SetOfConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public SetOfConstraintDefinition union(SetOfConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
+    public List<CollectionOfValue> getValues() {
+        return new ArrayList<>();
     }
 
 }

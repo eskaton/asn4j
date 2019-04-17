@@ -27,16 +27,30 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.parser.ast.values.StringValue;
+import java.util.Collection;
 
-import java.util.ArrayList;
-import java.util.List;
+public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T extends ConstraintDefinition> implements ConstraintDefinition<V, C, T> {
 
-public class VisibleStringConstraintDefinition implements ConstraintDefinition<StringValue, List<StringValue>, VisibleStringConstraintDefinition> {
+    protected C values;
 
-    @Override
-    public List<StringValue> getValues() {
-        return new ArrayList<>();
+    public AbstractConstraintDefinition() {
+        this.values = createValues();
     }
+
+    public AbstractConstraintDefinition(Collection<V> values) {
+        this();
+
+        this.values.addAll(values);
+    }
+
+    public C getValues() {
+        return values;
+    }
+
+    public void setValues(C values) {
+        this.values = values;
+    }
+
+    abstract C createValues();
 
 }

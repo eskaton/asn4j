@@ -27,21 +27,16 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-public class ObjectIdentifierConstraintDefinition implements ConstraintDefinition<ObjectIdentifierConstraintDefinition> {
+import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ObjectIdentifierConstraintDefinition implements ConstraintDefinition<ObjectIdentifierValue, List<ObjectIdentifierValue>, ObjectIdentifierConstraintDefinition> {
 
     @Override
-    public ObjectIdentifierConstraintDefinition intersection(ObjectIdentifierConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public ObjectIdentifierConstraintDefinition union(ObjectIdentifierConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
+    public List<ObjectIdentifierValue> getValues() {
+        return new ArrayList<>();
     }
 
 }

@@ -27,12 +27,26 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-public interface ConstraintDefinition<T extends ConstraintDefinition> {
+import java.util.Collection;
 
-    T intersection(T constraintDef);
+public interface ConstraintDefinition<V, C extends Collection<V>, T extends ConstraintDefinition> {
 
-    T union(T constraintDef);
+    C getValues();
 
-    boolean isEmpty();
+    default T intersection(T constraintDef) {
+        getValues().retainAll(constraintDef.getValues());
+
+        return (T) this;
+    }
+
+    default T union(T constraintDef) {
+        getValues().addAll(constraintDef.getValues());
+
+        return (T) this;
+    }
+
+    default boolean isEmpty() {
+        return getValues().isEmpty();
+    }
 
 }
