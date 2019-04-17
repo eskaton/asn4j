@@ -122,24 +122,24 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
 
     private IntegerConstraintDefinition calculateInversion(IntegerConstraintDefinition constraintDef) {
         IntegerConstraintDefinition result = new IntegerConstraintDefinition();
-        List<RangeNode> ranges = constraintDef.getRanges();
+        List<RangeNode> ranges = constraintDef.getValues();
         RangeNode op1 = ranges.get(0);
         RangeNode op2 = op1;
 
         if (((IntegerValue) op1.getLower().getValue()).getValue().compareTo(
                 BigInteger.valueOf(Long.MIN_VALUE)) > 0) {
-            result.getRanges().add(new RangeNode(new EndpointNode(new IntegerValue(
+            result.getValues().add(new RangeNode(new EndpointNode(new IntegerValue(
                     Long.MIN_VALUE), true), decrement(op1.getLower())));
         }
 
         for (int i = 1; i < ranges.size(); i++) {
             op2 = ranges.get(i);
-            result.getRanges().add(new RangeNode(increment(op1.getUpper()), decrement(op2.getLower())));
+            result.getValues().add(new RangeNode(increment(op1.getUpper()), decrement(op2.getLower())));
         }
 
         if (((IntegerValue) op2.getUpper().getValue()).getValue().compareTo(
                 BigInteger.valueOf(Long.MAX_VALUE)) < 0) {
-            result.getRanges().add(new RangeNode(increment(op2.getUpper()),
+            result.getValues().add(new RangeNode(increment(op2.getUpper()),
                     new EndpointNode(new IntegerValue(Long.MAX_VALUE), true)));
         }
 
@@ -151,8 +151,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
         IntegerConstraintDefinition result = new IntegerConstraintDefinition();
         int excludeInd = 0;
         int rangeInd = 0;
-        List<RangeNode> r1 = constraintDef1.getRanges();
-        List<RangeNode> r2 = constraintDef2.getRanges();
+        List<RangeNode> r1 = constraintDef1.getValues();
+        List<RangeNode> r2 = constraintDef2.getValues();
         RangeNode exclude = r2.get(excludeInd++);
         RangeNode range = r1.get(rangeInd++);
         long lower, upper;
@@ -162,7 +162,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
                 throw new CompilerException(((IntegerValue) exclude.getLower().getValue()).getValue()
                         + " doesn't exist in parent type");
             } else if (compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) > 0) {
-                result.getRanges().add(range);
+                result.getValues().add(range);
                 range = getRange(r1, rangeInd++);
             } else if ((lower = compareCanonicalEndpoint(exclude.getLower(), range.getLower())) >= 0
                     && compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) <= 0) {
@@ -173,11 +173,11 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
                 }
 
                 if (lower != 0) {
-                    result.getRanges().add(new RangeNode(range.getLower(), decrement(exclude.getLower())));
+                    result.getValues().add(new RangeNode(range.getLower(), decrement(exclude.getLower())));
                 }
 
                 if (upper != 0) {
-                    result.getRanges().add(new RangeNode(increment(exclude.getUpper()), range.getUpper()));
+                    result.getValues().add(new RangeNode(increment(exclude.getUpper()), range.getUpper()));
                 }
 
                 exclude = getRange(r2, excludeInd++);
@@ -193,7 +193,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
 
             if (exclude == null) {
                 while (range != null) {
-                    result.getRanges().add(range);
+                    result.getValues().add(range);
                     range = getRange(r1, rangeInd++);
                 }
                 break;
@@ -232,11 +232,11 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
      * @return A constraint definition containing {@link RangeNode}s in canonical form
      */
     private IntegerConstraintDefinition canonicalizeRanges(IntegerConstraintDefinition constraintDef) {
-        if (constraintDef.getRanges().size() <= 1) {
+        if (constraintDef.getValues().size() <= 1) {
             return constraintDef;
         }
 
-        List<RangeNode> ranges = constraintDef.getRanges();
+        List<RangeNode> ranges = constraintDef.getValues();
 
         Collections.sort(ranges, new ASN1RangeComparator());
 
@@ -259,7 +259,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
 
         result.add(op1);
 
-        constraintDef.setRanges(result);
+        constraintDef.setValues(result);
 
         return constraintDef;
     }
@@ -306,11 +306,11 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
         for (Elements e : elements) {
             IntegerConstraintDefinition values = calculateElements(e);
 
-            if (constraintDef.getRanges().isEmpty()) {
+            if (constraintDef.getValues().isEmpty()) {
                 constraintDef.union(values);
             } else {
                 constraintDef = calculateIntersection(constraintDef, values);
-                if (constraintDef.getRanges().isEmpty()) {
+                if (constraintDef.getValues().isEmpty()) {
                     return constraintDef;
                 }
             }
@@ -336,8 +336,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
         IntegerConstraintDefinition result = new IntegerConstraintDefinition();
         int r1Ind = 0;
         int r2Ind = 0;
-        List<RangeNode> l1 = op1.getRanges();
-        List<RangeNode> l2 = constraintDef2.getRanges();
+        List<RangeNode> l1 = op1.getValues();
+        List<RangeNode> l2 = constraintDef2.getValues();
         RangeNode r1 = getRange(l1, r1Ind++);
         RangeNode r2 = getRange(l2, r2Ind++);
 
@@ -355,25 +355,25 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
             } else if (compareCanonicalEndpoint(r1.getLower(), r2.getLower()) >= 0
                     && compareCanonicalEndpoint(r1.getUpper(), r2.getUpper()) <= 0) {
                 // r1 included in r2
-                result.getRanges().add(r1);
+                result.getValues().add(r1);
                 r2 = new RangeNode(increment(r1.getUpper()), r2.getUpper());
                 r1 = getRange(l1, r1Ind++);
             } else if (compareCanonicalEndpoint(r2.getLower(), r1.getLower()) >= 0
                     && compareCanonicalEndpoint(r2.getUpper(), r1.getUpper()) <= 0) {
                 // r2 included in r1
-                result.getRanges().add(r2);
+                result.getValues().add(r2);
                 r1 = new RangeNode(increment(r2.getUpper()), r1.getUpper());
                 r2 = getRange(l2, r2Ind++);
             } else if (compareCanonicalEndpoint(r1.getUpper(), r2.getLower()) >= 0
                     && compareCanonicalEndpoint(r1.getUpper(), r2.getUpper()) <= 0) {
                 // r1 < r2 with intersection
-                result.getRanges().add(new RangeNode(r2.getLower(), r1.getUpper()));
+                result.getValues().add(new RangeNode(r2.getLower(), r1.getUpper()));
                 r2 = new RangeNode(increment(r1.getUpper()), r2.getUpper());
                 r1 = getRange(l1, r1Ind++);
             } else if (compareCanonicalEndpoint(r2.getUpper(), r1.getLower()) >= 0
                     && compareCanonicalEndpoint(r2.getUpper(), r1.getUpper()) <= 0) {
                 // r2 < r1 with intersection
-                result.getRanges().add(new RangeNode(r1.getLower(), r2.getUpper()));
+                result.getValues().add(new RangeNode(r1.getLower(), r2.getUpper()));
                 r1 = new RangeNode(increment(r2.getUpper()), r1.getUpper());
                 r2 = getRange(l2, r2Ind++);
             } else {
@@ -476,7 +476,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
 
         boolean first = true;
 
-        for (Object value : ((IntegerConstraintDefinition) constraintDef).getRanges()) {
+        for (Object value : ((IntegerConstraintDefinition) constraintDef).getValues()) {
             if (!(value instanceof RangeNode)) {
                 throw new CompilerException("Invalid type %s in INTEGER constraint", value.getClass());
             }

@@ -27,21 +27,16 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-public class RelativeOIDConstraintDefinition implements ConstraintDefinition<RelativeOIDConstraintDefinition> {
+import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class RelativeOIDConstraintDefinition implements ConstraintDefinition<RelativeOIDValue, List<RelativeOIDValue>, RelativeOIDConstraintDefinition> {
 
     @Override
-    public RelativeOIDConstraintDefinition intersection(RelativeOIDConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public RelativeOIDConstraintDefinition union(RelativeOIDConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
+    public List<RelativeOIDValue> getValues() {
+        return new ArrayList<>();
     }
 
 }

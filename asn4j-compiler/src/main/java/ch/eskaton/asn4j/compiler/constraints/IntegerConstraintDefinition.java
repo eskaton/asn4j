@@ -32,43 +32,19 @@ import ch.eskaton.asn4j.parser.ast.RangeNode;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IntegerConstraintDefinition implements ConstraintDefinition<IntegerConstraintDefinition> {
+public class IntegerConstraintDefinition extends AbstractConstraintDefinition<RangeNode, List<RangeNode>, IntegerConstraintDefinition> {
 
-    private List<RangeNode> ranges;
-
-    public IntegerConstraintDefinition(List<RangeNode> ranges) {
-        this.ranges = ranges;
+    public IntegerConstraintDefinition(List<RangeNode> values) {
+        super(values);
     }
 
     public IntegerConstraintDefinition() {
-        this.ranges = new ArrayList<>();
-    }
-
-    public List<RangeNode> getRanges() {
-        return ranges;
-    }
-
-    public void setRanges(List<RangeNode> ranges) {
-        this.ranges = ranges;
+        super();
     }
 
     @Override
-    public IntegerConstraintDefinition intersection(IntegerConstraintDefinition constraintDef) {
-        ranges.retainAll(constraintDef.getRanges());
-
-        return this;
-    }
-
-    @Override
-    public IntegerConstraintDefinition union(IntegerConstraintDefinition constraintDef) {
-        ranges.addAll(constraintDef.getRanges());
-
-        return this;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
+    List<RangeNode> createValues() {
+        return new ArrayList<>();
     }
 
 }

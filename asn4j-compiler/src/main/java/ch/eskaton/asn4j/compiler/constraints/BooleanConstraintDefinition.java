@@ -30,44 +30,19 @@ package ch.eskaton.asn4j.compiler.constraints;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BooleanConstraintDefinition implements ConstraintDefinition<BooleanConstraintDefinition> {
-
-    private Set<Boolean> values;
-
-    public BooleanConstraintDefinition(Set<Boolean> values) {
-        this.values = values;
-    }
+public class BooleanConstraintDefinition extends AbstractConstraintDefinition<Boolean, Set<Boolean>, BooleanConstraintDefinition> {
 
     public BooleanConstraintDefinition() {
-        this.values = new HashSet();
+        super();
     }
 
-    public Set<Boolean> getValues() {
-        return values;
-    }
-
-    public void setValues(Set values) {
-        this.values = values;
-    }
-
-
-    @Override
-    public BooleanConstraintDefinition intersection(BooleanConstraintDefinition constraintDef) {
-        values.retainAll(constraintDef.getValues());
-
-        return this;
+    public BooleanConstraintDefinition(Set<Boolean> values) {
+        super(values);
     }
 
     @Override
-    public BooleanConstraintDefinition union(BooleanConstraintDefinition constraintDef) {
-        values.addAll(constraintDef.getValues());
-
-        return this;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return values.isEmpty();
+    Set<Boolean> createValues() {
+        return new HashSet<>();
     }
 
 }

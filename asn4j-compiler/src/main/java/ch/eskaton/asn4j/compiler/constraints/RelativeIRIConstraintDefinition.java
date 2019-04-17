@@ -27,21 +27,16 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-public class RelativeIRIConstraintDefinition implements ConstraintDefinition<RelativeIRIConstraintDefinition> {
+import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class RelativeIRIConstraintDefinition implements ConstraintDefinition<RelativeIRIValue, List<RelativeIRIValue>, RelativeIRIConstraintDefinition> {
 
     @Override
-    public RelativeIRIConstraintDefinition intersection(RelativeIRIConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public RelativeIRIConstraintDefinition union(RelativeIRIConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
+    public List<RelativeIRIValue> getValues() {
+        return new ArrayList<>();
     }
 
 }

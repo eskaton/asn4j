@@ -87,7 +87,7 @@ public class IntegerConstraintCompilerTest {
     public List<RangeNode> invokeCanonicalizeRanges(IntegerConstraintCompiler compiler, List<RangeNode> ranges)
             throws InvocationTargetException, IllegalAccessException {
         return ((IntegerConstraintDefinition) ReflectionUtils.invokePrivateMethod(compiler, "canonicalizeRanges",
-                new Object[] { new IntegerConstraintDefinition(ranges) })).getRanges();
+                new Object[] { new IntegerConstraintDefinition(ranges) })).getValues();
     }
 
     @Test
@@ -137,7 +137,7 @@ public class IntegerConstraintCompilerTest {
     private List<RangeNode> invokeCalculateExclude(IntegerConstraintCompiler compiler, List<RangeNode> a,
             List<RangeNode> b) throws InvocationTargetException, IllegalAccessException {
         return ((IntegerConstraintDefinition) ReflectionUtils.invokePrivateMethod(compiler, "calculateExclude",
-                new Object[] { new IntegerConstraintDefinition(a), new IntegerConstraintDefinition(b) })).getRanges();
+                new Object[] { new IntegerConstraintDefinition(a), new IntegerConstraintDefinition(b) })).getValues();
     }
 
     @Test
@@ -207,18 +207,18 @@ public class IntegerConstraintCompilerTest {
 
         assertEquals(asList(createRange(Long.MIN_VALUE, 4L), createRange(6L, Long.MAX_VALUE)),
                 ((IntegerConstraintDefinition) ReflectionUtils.invokePrivateMethod(compiler, "calculateInversion",
-                        new Object[] { new IntegerConstraintDefinition(asList(createRange(5L, 5L))) })).getRanges());
+                        new Object[] { new IntegerConstraintDefinition(asList(createRange(5L, 5L))) })).getValues());
 
         assertEquals(asList(createRange(Long.MIN_VALUE, 4L), createRange(6L, 9L), createRange(21L, Long.MAX_VALUE)),
                 ((IntegerConstraintDefinition) ReflectionUtils.invokePrivateMethod(compiler, "calculateInversion",
                         new Object[] { new IntegerConstraintDefinition(asList(createRange(5L, 5L),
-                                createRange(10L, 20L))) })).getRanges());
+                                createRange(10L, 20L))) })).getValues());
     }
 
     private List<RangeNode> invokeCalculateIntersection(IntegerConstraintCompiler compiler, List<RangeNode> a,
             List<RangeNode> b) throws InvocationTargetException, IllegalAccessException {
         return ((IntegerConstraintDefinition) ReflectionUtils.invokePrivateMethod(compiler, "calculateIntersection",
-                new Object[] { new IntegerConstraintDefinition(a), new IntegerConstraintDefinition(b) })).getRanges();
+                new Object[] { new IntegerConstraintDefinition(a), new IntegerConstraintDefinition(b) })).getValues();
     }
 
     @Test

@@ -27,22 +27,16 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-public class OctetStringConstraintDefinition implements ConstraintDefinition<OctetStringConstraintDefinition> {
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 
+import java.util.ArrayList;
+import java.util.List;
 
-    @Override
-    public OctetStringConstraintDefinition intersection(OctetStringConstraintDefinition constraintDef) {
-        return null;
-    }
-
-    @Override
-    public OctetStringConstraintDefinition union(OctetStringConstraintDefinition constraintDef) {
-        return null;
-    }
+public class OctetStringConstraintDefinition implements ConstraintDefinition<OctetStringValue, List<OctetStringValue>, OctetStringConstraintDefinition> {
 
     @Override
-    public boolean isEmpty() {
-        return false;
+    public List<OctetStringValue> getValues() {
+        return new ArrayList();
     }
 
 }
