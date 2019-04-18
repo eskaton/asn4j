@@ -50,7 +50,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler<SetOfCon
     }
 
     @Override
-    protected void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException {
+    protected void addConstraint(JavaClass javaClass, ConstraintDefinition constraintDef) throws CompilerException {
 
     }
 

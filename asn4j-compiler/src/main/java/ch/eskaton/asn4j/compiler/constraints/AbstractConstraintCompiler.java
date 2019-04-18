@@ -149,6 +149,6 @@ public abstract class AbstractConstraintCompiler<T extends ConstraintDefinition>
 
     protected abstract T calculateIntersection(T constraintDef1, T constraintDef2) throws CompilerException;
 
-    protected abstract void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException;
+    protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition constraintDef) throws CompilerException;
 
 }

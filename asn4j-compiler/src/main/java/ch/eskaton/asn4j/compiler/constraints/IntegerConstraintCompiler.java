@@ -466,9 +466,9 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
     }
 
     @Override
-    public void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef)
+    public void addConstraint(JavaClass javaClass, ConstraintDefinition constraintDef)
             throws CompilerException {
-        BodyBuilder body = clazz.method().annotation(Override.class).modifier(Protected).returnType(boolean.class)
+        BodyBuilder body = javaClass.method().annotation(Override.class).modifier(Protected).returnType(boolean.class)
                 .name("checkConstraint").parameter("BigInteger", "v")
                 .exception(ConstraintViolatedException.class).body();
 
@@ -515,7 +515,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<Intege
 
         body.finish().build();
 
-        clazz.addImport(BigInteger.class);
+        javaClass.addImport(BigInteger.class);
     }
 
     private class ASN1RangeComparator implements Comparator<RangeNode> {

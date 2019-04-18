@@ -529,6 +529,12 @@ public class JavaClass implements JavaStructure {
             return this;
         }
 
+        public BodyBuilder nl() {
+            this.body.add("\n");
+
+            return this;
+        }
+
         public MethodBuilder finish() {
             return methodBuilder.body(body);
         }
