@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.utils.HexDump;
 
 import java.util.Arrays;
@@ -108,6 +109,10 @@ public class ASN1BitString implements ASN1Type {
 
     private int getBit(int bit) {
         return 1 << 7 - (bit % 8);
+    }
+
+    protected boolean checkConstraint(Boolean value) throws ConstraintViolatedException {
+        return true;
     }
 
     @Override

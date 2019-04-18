@@ -76,7 +76,7 @@ public class ConstraintCompiler {
         };
     }
 
-    public void compileConstraint(JavaClass clazz, String name, Type node) throws CompilerException {
+    public void compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
         Type base;
 
         if (node instanceof TypeReference) {
@@ -104,10 +104,10 @@ public class ConstraintCompiler {
                 throw new CompilerException("Constraints for type %s excludes all values", name);
             }
 
-            compiler.addConstraint(clazz, constraintDef);
+            compiler.addConstraint(javaClass, constraintDef);
         }
 
-        clazz.addImport(ConstraintViolatedException.class);
+        javaClass.addImport(ConstraintViolatedException.class);
 
         return;
     }

@@ -52,7 +52,7 @@ public class RelativeOIDConstraintCompiler extends AbstractConstraintCompiler<Re
     }
 
     @Override
-    protected void addConstraint(JavaClass clazz, ConstraintDefinition constraintDef) throws CompilerException {
+    protected void addConstraint(JavaClass javaClass, ConstraintDefinition constraintDef) throws CompilerException {
 
     }
 
