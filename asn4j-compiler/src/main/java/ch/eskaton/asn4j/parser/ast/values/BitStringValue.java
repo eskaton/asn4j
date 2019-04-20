@@ -34,6 +34,8 @@ import java.util.List;
 
 public class BitStringValue extends AbstractValue {
 
+    private int unusedBits;
+
     private Integer intValue;
 
     private byte[] byteValue;
@@ -46,16 +48,18 @@ public class BitStringValue extends AbstractValue {
         super(position);
     }
 
-    public BitStringValue(Position position, Integer intValue) {
+    public BitStringValue(Position position, Integer intValue, int unusedBits) {
         super(position);
 
         this.intValue = intValue;
+        this.unusedBits = unusedBits;
     }
 
-    public BitStringValue(Position position, byte[] byteValue) {
+    public BitStringValue(Position position, byte[] byteValue, int unusedBits) {
         super(position);
 
         this.byteValue = byteValue;
+        this.unusedBits = unusedBits;
     }
 
     public BitStringValue(Position position, List<String> namedValues) {
@@ -88,6 +92,10 @@ public class BitStringValue extends AbstractValue {
 
     public List<String> getNamedValues() {
         return namedValues;
+    }
+
+    public int getUnusedBits() {
+        return unusedBits;
     }
 
     @Override

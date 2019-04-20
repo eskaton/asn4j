@@ -18,12 +18,9 @@ public class AbstractBaseXStringValue extends AbstractValue {
         this.base = base;
     }
 
-    public byte[] getBytes() {
-        return new BigInteger(value, base).toByteArray();
-    }
-
     public BitStringValue toBitString() {
-        return new BitStringValue(getPosition(), Integer.parseInt(value, base));
+        return new BitStringValue(getPosition(), new BigInteger(value, base).toByteArray(),
+                value.length() != 0 ? 8 - value.length() % 8 : 0);
     }
 
     public OctetStringValue toOctetString() {
