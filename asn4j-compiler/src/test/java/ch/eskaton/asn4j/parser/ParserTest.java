@@ -442,6 +442,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -459,457 +460,457 @@ public class ParserTest {
 
     @Test
     public void testModuleDefinitionParser() {
-    	// TODO: implement
+        // TODO: implement
     }
 
     @Test
     public void testModuleIdentifierParser() throws IOException,
-    		ParserException {
-    	ModuleIdentifierParser parser = new Parser(new ByteArrayInputStream(
-    			"Module { test-a test-b (47) 21 }".getBytes())).new ModuleIdentifierParser();
+            ParserException {
+        ModuleIdentifierParser parser = new Parser(new ByteArrayInputStream(
+                "Module { test-a test-b (47) 21 }".getBytes())).new ModuleIdentifierParser();
 
-    	ModuleIdentifierNode result = parser.parse();
+        ModuleIdentifierNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Module", result.getModuleName());
-    	assertNotNull(result.getId());
+        assertNotNull(result);
+        assertEquals("Module", result.getModuleName());
+        assertNotNull(result.getId());
     }
 
     @Test
     public void testDefinitiveIdentificationParser() throws IOException,
-    		ParserException {
-    	DefinitiveIdentificationParser parser = new Parser(
-    			new ByteArrayInputStream("{ test-a test-b (47) 21 }".getBytes())).new DefinitiveIdentificationParser();
+            ParserException {
+        DefinitiveIdentificationParser parser = new Parser(
+                new ByteArrayInputStream("{ test-a test-b (47) 21 }".getBytes())).new DefinitiveIdentificationParser();
 
-    	DefinitiveIdentificationNode result = parser.parse();
+        DefinitiveIdentificationNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getOid());
-    	assertNull(result.getIri());
+        assertNotNull(result);
+        assertNotNull(result.getOid());
+        assertNull(result.getIri());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ test-a test-b (47) 21 } \"/ISO/Registration_Authority/19785.CBEFF\""
-    					.getBytes())).new DefinitiveIdentificationParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{ test-a test-b (47) 21 } \"/ISO/Registration_Authority/19785.CBEFF\""
+                        .getBytes())).new DefinitiveIdentificationParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getOid());
-    	assertNotNull(result.getIri());
+        assertNotNull(result);
+        assertNotNull(result.getOid());
+        assertNotNull(result.getIri());
     }
 
     @Test
     public void testDefinitiveOIDParser() throws IOException, ParserException {
-    	DefinitiveOIDParser parser = new Parser(new ByteArrayInputStream(
-    			"{ test-a test-b (47) 21 }".getBytes())).new DefinitiveOIDParser();
+        DefinitiveOIDParser parser = new Parser(new ByteArrayInputStream(
+                "{ test-a test-b (47) 21 }".getBytes())).new DefinitiveOIDParser();
 
-    	OIDNode result = parser.parse();
+        OIDNode result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testDefinitiveObjIdComponentListParser() throws IOException,
-    		ParserException {
-    	DefinitiveObjIdComponentListParser parser = new Parser(
-    			new ByteArrayInputStream("test-a test-b (47) 21".getBytes())).new DefinitiveObjIdComponentListParser();
+            ParserException {
+        DefinitiveObjIdComponentListParser parser = new Parser(
+                new ByteArrayInputStream("test-a test-b (47) 21".getBytes())).new DefinitiveObjIdComponentListParser();
 
-    	OIDNode result = parser.parse();
+        OIDNode result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals(3, result.getOidComponents().size());
+        assertEquals(3, result.getOidComponents().size());
     }
 
     @Test
     public void testDefinitiveObjIdComponentParser() throws IOException,
-    		ParserException {
-    	DefinitiveObjIdComponentParser parser = new Parser(
-    			new ByteArrayInputStream("test".getBytes())).new DefinitiveObjIdComponentParser();
+            ParserException {
+        DefinitiveObjIdComponentParser parser = new Parser(
+                new ByteArrayInputStream("test".getBytes())).new DefinitiveObjIdComponentParser();
 
-    	OIDComponentNode result = parser.parse();
+        OIDComponentNode result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	parser = new Parser(new ByteArrayInputStream("23".getBytes())).new DefinitiveObjIdComponentParser();
+        parser = new Parser(new ByteArrayInputStream("23".getBytes())).new DefinitiveObjIdComponentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	parser = new Parser(new ByteArrayInputStream("test (23)".getBytes())).new DefinitiveObjIdComponentParser();
+        parser = new Parser(new ByteArrayInputStream("test (23)".getBytes())).new DefinitiveObjIdComponentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testDefinitiveNumberFormParser() throws IOException,
-    		ParserException {
-    	DefinitiveNumberFormParser parser = new Parser(
-    			new ByteArrayInputStream("23".getBytes())).new DefinitiveNumberFormParser();
+            ParserException {
+        DefinitiveNumberFormParser parser = new Parser(
+                new ByteArrayInputStream("23".getBytes())).new DefinitiveNumberFormParser();
 
-    	OIDComponentNode result = parser.parse();
+        OIDComponentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(23, (int) result.getId());
-    	assertNull(result.getName());
+        assertNotNull(result);
+        assertEquals(23, (int) result.getId());
+        assertNull(result.getName());
     }
 
     @Test
     public void testDefinitiveNameAndNumberFormParser() throws IOException,
-    		ParserException {
-    	DefinitiveNameAndNumberFormParser parser = new Parser(
-    			new ByteArrayInputStream("test (23)".getBytes())).new DefinitiveNameAndNumberFormParser();
+            ParserException {
+        DefinitiveNameAndNumberFormParser parser = new Parser(
+                new ByteArrayInputStream("test (23)".getBytes())).new DefinitiveNameAndNumberFormParser();
 
-    	OIDComponentNode result = parser.parse();
+        OIDComponentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(23, (int) result.getId());
-    	assertEquals("test", result.getName());
+        assertNotNull(result);
+        assertEquals(23, (int) result.getId());
+        assertEquals("test", result.getName());
     }
 
     @Test
     public void testEncodingReferenceDefault() throws IOException,
-    		ParserException {
-    	EncodingReferenceDefaultParser parser = new Parser(
-    			new ByteArrayInputStream("XER INSTRUCTIONS".getBytes())).new EncodingReferenceDefaultParser();
-    	assertEquals(Encoding.XER, parser.parse());
+            ParserException {
+        EncodingReferenceDefaultParser parser = new Parser(
+                new ByteArrayInputStream("XER INSTRUCTIONS".getBytes())).new EncodingReferenceDefaultParser();
+        assertEquals(Encoding.XER, parser.parse());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"TAG INSTRUCTIONS".getBytes())).new EncodingReferenceDefaultParser();
-    	assertEquals(Encoding.TAG, parser.parse());
+        parser = new Parser(new ByteArrayInputStream(
+                "TAG INSTRUCTIONS".getBytes())).new EncodingReferenceDefaultParser();
+        assertEquals(Encoding.TAG, parser.parse());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"PER INSTRUCTIONS".getBytes())).new EncodingReferenceDefaultParser();
-    	assertEquals(Encoding.PER, parser.parse());
+        parser = new Parser(new ByteArrayInputStream(
+                "PER INSTRUCTIONS".getBytes())).new EncodingReferenceDefaultParser();
+        assertEquals(Encoding.PER, parser.parse());
     }
 
     @Test
     public void testTagDefaultParser() throws IOException, ParserException {
-    	TagDefaultParser parser = new Parser(new ByteArrayInputStream(
-    			"EXPLICIT TAGS".getBytes())).new TagDefaultParser();
-    	assertEquals(TagMode.Explicit, parser.parse());
+        TagDefaultParser parser = new Parser(new ByteArrayInputStream(
+                "EXPLICIT TAGS".getBytes())).new TagDefaultParser();
+        assertEquals(TagMode.Explicit, parser.parse());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("IMPLICIT TAGS".getBytes())).new TagDefaultParser();
-    	assertEquals(TagMode.Implicit, parser.parse());
+        parser = new Parser(
+                new ByteArrayInputStream("IMPLICIT TAGS".getBytes())).new TagDefaultParser();
+        assertEquals(TagMode.Implicit, parser.parse());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"AUTOMATIC TAGS".getBytes())).new TagDefaultParser();
-    	assertEquals(TagMode.Automatic, parser.parse());
+        parser = new Parser(new ByteArrayInputStream(
+                "AUTOMATIC TAGS".getBytes())).new TagDefaultParser();
+        assertEquals(TagMode.Automatic, parser.parse());
     }
 
     @Test
     public void testExtensionDefault() throws IOException, ParserException {
-    	ExtensionDefaultParser parser = new Parser(new ByteArrayInputStream(
-    			"EXTENSIBILITY IMPLIED".getBytes())).new ExtensionDefaultParser();
-    	assertTrue(parser.parse());
+        ExtensionDefaultParser parser = new Parser(new ByteArrayInputStream(
+                "EXTENSIBILITY IMPLIED".getBytes())).new ExtensionDefaultParser();
+        assertTrue(parser.parse());
 
-    	parser = new Parser(new ByteArrayInputStream("".getBytes())).new ExtensionDefaultParser();
-    	assertFalse(parser.parse());
+        parser = new Parser(new ByteArrayInputStream("".getBytes())).new ExtensionDefaultParser();
+        assertFalse(parser.parse());
     }
 
     @Test
     public void testModuleBodyParser() throws IOException, ParserException {
-    	ModuleBodyParser parser = new Parser(new ByteArrayInputStream(
-    			"EXPORTS ALL;".getBytes())).new ModuleBodyParser();
+        ModuleBodyParser parser = new Parser(new ByteArrayInputStream(
+                "EXPORTS ALL;".getBytes())).new ModuleBodyParser();
 
-    	ModuleBodyNode result = parser.parse();
+        ModuleBodyNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getExports());
-    	assertEquals(0, result.getImports().size());
-    	assertNull(result.getAssignments());
+        assertNotNull(result);
+        assertNotNull(result.getExports());
+        assertEquals(0, result.getImports().size());
+        assertNull(result.getAssignments());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream(
-    					"IMPORTS Type FROM Application-Context { iso standard 8571 application-context (1) };"
-    							.getBytes())).new ModuleBodyParser();
+        parser = new Parser(
+                new ByteArrayInputStream(
+                        "IMPORTS Type FROM Application-Context { iso standard 8571 application-context (1) };"
+                                .getBytes())).new ModuleBodyParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getExports());
-    	assertEquals(Mode.All, result.getExports().getMode());
-    	assertFalse(0 == result.getImports().size());
-    	assertNull(result.getAssignments());
+        assertNotNull(result);
+        assertNotNull(result.getExports());
+        assertEquals(Mode.All, result.getExports().getMode());
+        assertFalse(0 == result.getImports().size());
+        assertNull(result.getAssignments());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"value INTEGER ::= 23".getBytes())).new ModuleBodyParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "value INTEGER ::= 23".getBytes())).new ModuleBodyParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getExports());
-    	assertEquals(Mode.All, result.getExports().getMode());
-    	assertEquals(0, result.getImports().size());
-    	assertNotNull(result.getAssignments());
-    	assertEquals(1, result.getAssignments().size());
+        assertNotNull(result);
+        assertNotNull(result.getExports());
+        assertEquals(Mode.All, result.getExports().getMode());
+        assertEquals(0, result.getImports().size());
+        assertNotNull(result.getAssignments());
+        assertEquals(1, result.getAssignments().size());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream(
-    					"IMPORTS Type FROM Application-Context { iso standard 8571 application-context (1) }; value INTEGER ::= 23"
-    							.getBytes())).new ModuleBodyParser();
+        parser = new Parser(
+                new ByteArrayInputStream(
+                        "IMPORTS Type FROM Application-Context { iso standard 8571 application-context (1) }; value INTEGER ::= 23"
+                                .getBytes())).new ModuleBodyParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getExports());
-    	assertEquals(Mode.All, result.getExports().getMode());
-    	assertFalse(0 == result.getImports().size());
-    	assertNotNull(result.getAssignments());
-    	assertEquals(1, result.getAssignments().size());
+        assertNotNull(result);
+        assertNotNull(result.getExports());
+        assertEquals(Mode.All, result.getExports().getMode());
+        assertFalse(0 == result.getImports().size());
+        assertNotNull(result.getAssignments());
+        assertEquals(1, result.getAssignments().size());
     }
 
     @Test
     public void testExportsParser() throws IOException, ParserException {
-    	ExportsParser parser = new Parser(new ByteArrayInputStream(
-    			"EXPORTS ALL;".getBytes())).new ExportsParser();
+        ExportsParser parser = new Parser(new ByteArrayInputStream(
+                "EXPORTS ALL;".getBytes())).new ExportsParser();
 
-    	ExportsNode result = parser.parse();
+        ExportsNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Mode.All, result.getMode());
+        assertNotNull(result);
+        assertEquals(Mode.All, result.getMode());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"EXPORTS value, Type{};".getBytes())).new ExportsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "EXPORTS value, Type{};".getBytes())).new ExportsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Mode.Specific, result.getMode());
-    	assertEquals(2, result.getSymbols().size());
+        assertNotNull(result);
+        assertEquals(Mode.Specific, result.getMode());
+        assertEquals(2, result.getSymbols().size());
     }
 
     @Test
     public void testImportsParser() throws IOException, ParserException {
-    	ImportsParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"IMPORTS OBJECT-CL FROM Module2 Type, value{} FROM Module1 { iso standard 12 module-1 (1) };"
-    							.getBytes())).new ImportsParser();
+        ImportsParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "IMPORTS OBJECT-CL FROM Module2 Type, value{} FROM Module1 { iso standard 12 module-1 (1) };"
+                                .getBytes())).new ImportsParser();
 
-    	List<ImportNode> result = parser.parse();
+        List<ImportNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
 
-    	parser = new Parser(new ByteArrayInputStream("IMPORTS ;".getBytes())).new ImportsParser();
+        parser = new Parser(new ByteArrayInputStream("IMPORTS ;".getBytes())).new ImportsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(0, result.size());
+        assertNotNull(result);
+        assertEquals(0, result.size());
     }
 
     @Test
     public void testSymbolsFromModuleListParser() throws IOException,
-    		ParserException {
-    	SymbolsFromModuleListParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"Type, value{} FROM Application-Context { iso standard 8571 application-context (1) } value2 FROM Module { iso standard 4711 module }"
-    							.getBytes())).new SymbolsFromModuleListParser();
+            ParserException {
+        SymbolsFromModuleListParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "Type, value{} FROM Application-Context { iso standard 8571 application-context (1) } value2 FROM Module { iso standard 4711 module }"
+                                .getBytes())).new SymbolsFromModuleListParser();
 
-    	List<ImportNode> result = parser.parse();
+        List<ImportNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"value FROM Module1 value2 FROM Module2".getBytes())).new SymbolsFromModuleListParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "value FROM Module1 value2 FROM Module2".getBytes())).new SymbolsFromModuleListParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
     public void testSymbolsFromModuleParser() throws IOException,
-    		ParserException {
-    	SymbolsFromModuleParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"Type, value{} FROM Application-Context { iso standard 8571 application-context (1) }"
-    							.getBytes())).new SymbolsFromModuleParser();
+            ParserException {
+        SymbolsFromModuleParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "Type, value{} FROM Application-Context { iso standard 8571 application-context (1) }"
+                                .getBytes())).new SymbolsFromModuleParser();
 
-    	ImportNode result = parser.parse();
+        ImportNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getSymbols().size());
-    	assertEquals("Application-Context", result.getReference().getName());
+        assertNotNull(result);
+        assertEquals(2, result.getSymbols().size());
+        assertEquals("Application-Context", result.getReference().getName());
     }
 
     @Test
     public void testGlobalModuleReferenceParser() throws IOException,
-    		ParserException {
-    	GlobalModuleReferenceParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"Application-Context { iso standard 8571 application-context (1) }"
-    							.getBytes())).new GlobalModuleReferenceParser();
+            ParserException {
+        GlobalModuleReferenceParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "Application-Context { iso standard 8571 application-context (1) }"
+                                .getBytes())).new GlobalModuleReferenceParser();
 
-    	ModuleRefNode result = parser.parse();
+        ModuleRefNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Application-Context", result.getName());
-    	assertNotNull(result.getValue().getComponents());
+        assertNotNull(result);
+        assertEquals("Application-Context", result.getName());
+        assertNotNull(result.getValue().getComponents());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Application-Context oid-reference".getBytes())).new GlobalModuleReferenceParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Application-Context oid-reference".getBytes())).new GlobalModuleReferenceParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Application-Context", result.getName());
-    	assertNotNull(result.getValue());
-    	assertNotNull(result.getValue().getReference());
+        assertNotNull(result);
+        assertEquals("Application-Context", result.getName());
+        assertNotNull(result.getValue());
+        assertNotNull(result.getValue().getReference());
     }
 
     @Test
     public void testAssignedIdentifierParser() throws IOException, ParserException {
-    	AssignedIdentifierParser parser = new Parser(new ByteArrayInputStream(
-    			"value-reference".getBytes())).new AssignedIdentifierParser();
+        AssignedIdentifierParser parser = new Parser(new ByteArrayInputStream(
+                "value-reference".getBytes())).new AssignedIdentifierParser();
 
-    	ObjectIdentifierValue result = parser.parse();
+        ObjectIdentifierValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getReference());
+        assertNotNull(result);
+        assertNotNull(result.getReference());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ iso standard 8571 application-context (1) }".getBytes())).new AssignedIdentifierParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{ iso standard 8571 application-context (1) }".getBytes())).new AssignedIdentifierParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getComponents());
+        assertNotNull(result);
+        assertNotNull(result.getComponents());
     }
 
     @Test
     public void testSymbolListParser() throws IOException, ParserException {
-    	SymbolListParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference".getBytes())).new SymbolListParser();
+        SymbolListParser parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference".getBytes())).new SymbolListParser();
 
-    	List<ReferenceNode> result = parser.parse();
+        List<ReferenceNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.size());
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference{}, value-reference".getBytes())).new SymbolListParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference{}, value-reference".getBytes())).new SymbolListParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
     public void testSymbolParser() throws IOException, ParserException {
-    	SymbolParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference".getBytes())).new SymbolParser();
+        SymbolParser parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference".getBytes())).new SymbolParser();
 
-    	ReferenceNode result = parser.parse();
+        ReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertFalse(result.isParameterized());
+        assertNotNull(result);
+        assertFalse(result.isParameterized());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference {}".getBytes())).new SymbolParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference {}".getBytes())).new SymbolParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.isParameterized());
+        assertNotNull(result);
+        assertTrue(result.isParameterized());
     }
 
     @Test
     public void testReferenceParser() throws IOException, ParserException {
-    	ReferenceParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference".getBytes())).new ReferenceParser();
+        ReferenceParser parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference".getBytes())).new ReferenceParser();
 
-    	ReferenceNode result = parser.parse();
+        ReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals("Type-Reference", result.getName());
+        assertEquals("Type-Reference", result.getName());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"value-reference".getBytes())).new ReferenceParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "value-reference".getBytes())).new ReferenceParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals("value-reference", result.getName());
+        assertEquals("value-reference", result.getName());
     }
 
     @Test
     public void testAssignmentListParser() throws IOException, ParserException {
-    	AssignmentListParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference ::= VisibleString value-reference VisibleString ::= \"string\""
-    					.getBytes())).new AssignmentListParser();
+        AssignmentListParser parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference ::= VisibleString value-reference VisibleString ::= \"string\""
+                        .getBytes())).new AssignmentListParser();
 
-    	List<AssignmentNode> result = parser.parse();
+        List<AssignmentNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.get(0) instanceof TypeAssignmentNode);
-    	assertTrue(result.get(1) instanceof ValueOrObjectAssignmentNode<?, ?>);
+        assertNotNull(result);
+        assertTrue(result.get(0) instanceof TypeAssignmentNode);
+        assertTrue(result.get(1) instanceof ValueOrObjectAssignmentNode<?, ?>);
     }
 
     @Test
     public void testAssignmentParser() throws IOException, ParserException {
-    	AssignmentParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference ::= VisibleString".getBytes())).new AssignmentParser();
+        AssignmentParser parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference ::= VisibleString".getBytes())).new AssignmentParser();
 
-    	AssignmentNode result = parser.parse();
+        AssignmentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof TypeAssignmentNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"value-reference VisibleString ::= \"string\"".getBytes())).new AssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "value-reference VisibleString ::= \"string\"".getBytes())).new AssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ValueOrObjectAssignmentNode<?, ?>);
+        assertNotNull(result);
+        assertTrue(result instanceof ValueOrObjectAssignmentNode<?, ?>);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference INTEGER ::= { ALL EXCEPT (4..6) }".getBytes())).new AssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference INTEGER ::= { ALL EXCEPT (4..6) }".getBytes())).new AssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ValueSetTypeOrObjectSetAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ValueSetTypeOrObjectSetAssignmentNode);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream(
-    					"OBJECT-CLASS ::= CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
-    							.getBytes())).new AssignmentParser();
+        parser = new Parser(
+                new ByteArrayInputStream(
+                        "OBJECT-CLASS ::= CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
+                                .getBytes())).new AssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeOrObjectClassAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof TypeOrObjectClassAssignmentNode);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream(
-    					"invertMatrix OPERATION ::= { &ArgumentType Matrix, &ResultType Matrix, &Errors {determinantIsZero}, &operationCode 7 }"
-    							.getBytes())).new AssignmentParser();
+        parser = new Parser(
+                new ByteArrayInputStream(
+                        "invertMatrix OPERATION ::= { &ArgumentType Matrix, &ResultType Matrix, &Errors {determinantIsZero}, &operationCode 7 }"
+                                .getBytes())).new AssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ValueOrObjectAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ValueOrObjectAssignmentNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ObjectSet-Ref OBJ-CLASS ::= { (Object1 | Object2) }"
-    					.getBytes())).new AssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ObjectSet-Ref OBJ-CLASS ::= { (Object1 | Object2) }"
+                        .getBytes())).new AssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ValueSetTypeOrObjectSetAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ValueSetTypeOrObjectSetAssignmentNode);
     }
 
     /**
@@ -920,60 +921,60 @@ public class ParserTest {
 
     @Test
     public void testDefinedValueParser() throws IOException, ParserException {
-    	DefinedValueParser parser = new Parser(new ByteArrayInputStream(
-    			"Module.value".getBytes())).new DefinedValueParser();
+        DefinedValueParser parser = new Parser(new ByteArrayInputStream(
+                "Module.value".getBytes())).new DefinedValueParser();
 
-    	DefinedValue result = parser.parse();
+        DefinedValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalValueReference);
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalValueReference);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"value-reference".getBytes())).new DefinedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "value-reference".getBytes())).new DefinedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SimpleDefinedValue);
+        assertNotNull(result);
+        assertTrue(result instanceof SimpleDefinedValue);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Module.value {4711}".getBytes())).new DefinedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Module.value {4711}".getBytes())).new DefinedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalValueReference);
-    	assertEquals(1, ((ExternalValueReference) result).getParameters()
-    			.size());
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalValueReference);
+        assertEquals(1, ((ExternalValueReference) result).getParameters()
+                .size());
     }
 
     @Test
     public void testExternalTypeReferenceParser() throws IOException,
-    		ParserException {
-    	ExternalTypeReferenceParser parser = new Parser(
-    			new ByteArrayInputStream("Module.Type".getBytes())).new ExternalTypeReferenceParser();
+            ParserException {
+        ExternalTypeReferenceParser parser = new Parser(
+                new ByteArrayInputStream("Module.Type".getBytes())).new ExternalTypeReferenceParser();
 
-    	ExternalTypeReference result = parser.parse();
+        ExternalTypeReference result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals("Module", result.getModule());
-    	assertEquals("Type", result.getType());
+        assertEquals("Module", result.getModule());
+        assertEquals("Type", result.getType());
     }
 
     @Test
     public void testExternalValueReferenceParser() throws IOException,
-    		ParserException {
-    	ExternalValueReferenceParser parser = new Parser(
-    			new ByteArrayInputStream("Module.value".getBytes())).new ExternalValueReferenceParser();
+            ParserException {
+        ExternalValueReferenceParser parser = new Parser(
+                new ByteArrayInputStream("Module.value".getBytes())).new ExternalValueReferenceParser();
 
-    	SimpleDefinedValue result = parser.parse();
+        SimpleDefinedValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalValueReference);
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalValueReference);
 
-    	assertEquals("Module", ((ExternalValueReference) result).getModule());
-    	assertEquals("value", result.getValue());
+        assertEquals("Module", ((ExternalValueReference) result).getModule());
+        assertEquals("value", result.getValue());
     }
 
     /**
@@ -984,28 +985,28 @@ public class ParserTest {
 
     @Test
     public void testTypeAssignmentParser() throws IOException, ParserException {
-    	TypeAssignmentParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference ::= [TAG: APPLICATION 23] INTEGER ((0..MAX))"
-    					.getBytes())).new TypeAssignmentParser();
+        TypeAssignmentParser parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference ::= [TAG: APPLICATION 23] INTEGER ((0..MAX))"
+                        .getBytes())).new TypeAssignmentParser();
 
-    	TypeOrObjectClassAssignmentNode<?> result = parser.parse();
+        TypeOrObjectClassAssignmentNode<?> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Type-Reference", result.getReference());
-    	assertTrue(result.getType() instanceof IntegerType);
+        assertNotNull(result);
+        assertEquals("Type-Reference", result.getReference());
+        assertTrue(result.getType() instanceof IntegerType);
     }
 
     @Test
     public void testValueAssignmentParser() throws IOException, ParserException {
-    	ValueAssignmentParser parser = new Parser(new ByteArrayInputStream(
-    			"value-reference INTEGER ::= 4711".getBytes())).new ValueAssignmentParser();
+        ValueAssignmentParser parser = new Parser(new ByteArrayInputStream(
+                "value-reference INTEGER ::= 4711".getBytes())).new ValueAssignmentParser();
 
-    	ValueOrObjectAssignmentNode result = parser.parse();
+        ValueOrObjectAssignmentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-reference", result.getReference());
-    	assertTrue(result.getType() instanceof IntegerType);
-    	assertTrue(result.getValue() instanceof IntegerValue);
+        assertNotNull(result);
+        assertEquals("value-reference", result.getReference());
+        assertTrue(result.getType() instanceof IntegerType);
+        assertTrue(result.getValue() instanceof IntegerValue);
 
         parser = new Parser(new ByteArrayInputStream(
                 "oid OBJECT IDENTIFIER ::= { oid-reference 23 }".getBytes())).new ValueAssignmentParser();
@@ -1020,27 +1021,27 @@ public class ParserTest {
 
     @Test
     public void testValueSetAssignmentParser() throws IOException, ParserException {
-    	ValueSetTypeAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"Type-Reference INTEGER ::= { ALL EXCEPT (4..6) }"
-    							.getBytes())).new ValueSetTypeAssignmentParser();
+        ValueSetTypeAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "Type-Reference INTEGER ::= { ALL EXCEPT (4..6) }"
+                                .getBytes())).new ValueSetTypeAssignmentParser();
 
-    	ValueSetTypeOrObjectSetAssignmentNode result = parser.parse();
+        ValueSetTypeOrObjectSetAssignmentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Type-Reference", result.getReference());
-    	assertTrue(result.getType() instanceof IntegerType);
-    	assertNotNull(result.getValueSet());
+        assertNotNull(result);
+        assertEquals("Type-Reference", result.getReference());
+        assertTrue(result.getType() instanceof IntegerType);
+        assertNotNull(result.getValueSet());
     }
 
     @Test
     public void testValueSetParser() throws IOException, ParserException {
-    	ValueSetParser parser = new Parser(new ByteArrayInputStream(
-    			"{ ALL EXCEPT (4..6) }".getBytes())).new ValueSetParser();
+        ValueSetParser parser = new Parser(new ByteArrayInputStream(
+                "{ ALL EXCEPT (4..6) }".getBytes())).new ValueSetParser();
 
-    	SetSpecsNode result = parser.parse();
+        SetSpecsNode result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     /**
@@ -1051,428 +1052,428 @@ public class ParserTest {
 
     @Test
     public void testBuiltinTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"BIT STRING { fst-bit (1), snd-bit (2), trd-bit (val-ref) }"
-    					.getBytes())).new BuiltinTypeParser();
+        BuiltinTypeParser parser = new Parser(new ByteArrayInputStream(
+                "BIT STRING { fst-bit (1), snd-bit (2), trd-bit (val-ref) }"
+                        .getBytes())).new BuiltinTypeParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BitString);
+        assertNotNull(result);
+        assertTrue(result instanceof BitString);
 
-    	parser = new Parser(new ByteArrayInputStream("BOOLEAN".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("BOOLEAN".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BooleanType);
+        assertNotNull(result);
+        assertTrue(result instanceof BooleanType);
 
-    	parser = new Parser(new ByteArrayInputStream("BMPString".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("BMPString".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BMPString);
+        assertNotNull(result);
+        assertTrue(result instanceof BMPString);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"CHOICE {aNumber INTEGER, aString OCTET STRING }".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "CHOICE {aNumber INTEGER, aString OCTET STRING }".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Choice);
+        assertNotNull(result);
+        assertTrue(result instanceof Choice);
 
-    	parser = new Parser(new ByteArrayInputStream("DATE".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("DATE".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof DateType);
+        assertNotNull(result);
+        assertTrue(result instanceof DateType);
 
-    	parser = new Parser(new ByteArrayInputStream("DATE-TIME".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("DATE-TIME".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof DateTime);
+        assertNotNull(result);
+        assertTrue(result instanceof DateTime);
 
-    	parser = new Parser(new ByteArrayInputStream("DURATION".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("DURATION".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Duration);
+        assertNotNull(result);
+        assertTrue(result instanceof Duration);
 
-    	parser = new Parser(new ByteArrayInputStream("EMBEDDED PDV".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("EMBEDDED PDV".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof EmbeddedPDV);
+        assertNotNull(result);
+        assertTrue(result instanceof EmbeddedPDV);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ENUMERATED {root-enum, ..., additional-enum}".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ENUMERATED {root-enum, ..., additional-enum}".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof EnumeratedType);
+        assertNotNull(result);
+        assertTrue(result instanceof EnumeratedType);
 
-    	parser = new Parser(new ByteArrayInputStream("EXTERNAL".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("EXTERNAL".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof External);
+        assertNotNull(result);
+        assertTrue(result instanceof External);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"INSTANCE OF OBJECT-CLASS".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "INSTANCE OF OBJECT-CLASS".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof InstanceOfType);
+        assertNotNull(result);
+        assertTrue(result instanceof InstanceOfType);
 
-    	parser = new Parser(new ByteArrayInputStream("INTEGER".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("INTEGER".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result instanceof IntegerType);
 
-    	parser = new Parser(new ByteArrayInputStream("OID-IRI".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("OID-IRI".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IRI);
+        assertNotNull(result);
+        assertTrue(result instanceof IRI);
 
-    	parser = new Parser(new ByteArrayInputStream("NULL".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("NULL".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Null);
+        assertNotNull(result);
+        assertTrue(result instanceof Null);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"OBJECT-CLASS.&ObjectSet-Reference".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "OBJECT-CLASS.&ObjectSet-Reference".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectClassFieldTypeNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectClassFieldTypeNode);
 
-    	parser = new Parser(new ByteArrayInputStream("OBJECT IDENTIFIER".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("OBJECT IDENTIFIER".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectIdentifier);
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectIdentifier);
 
-    	parser = new Parser(new ByteArrayInputStream("OCTET STRING".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("OCTET STRING".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OctetString);
+        assertNotNull(result);
+        assertTrue(result instanceof OctetString);
 
-    	parser = new Parser(new ByteArrayInputStream("REAL".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("REAL".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Real);
+        assertNotNull(result);
+        assertTrue(result instanceof Real);
 
-    	parser = new Parser(new ByteArrayInputStream("RELATIVE-OID-IRI".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("RELATIVE-OID-IRI".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RelativeIRI);
+        assertNotNull(result);
+        assertTrue(result instanceof RelativeIRI);
 
-    	parser = new Parser(new ByteArrayInputStream("RELATIVE-OID".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("RELATIVE-OID".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RelativeOID);
+        assertNotNull(result);
+        assertTrue(result instanceof RelativeOID);
 
-    	parser = new Parser(new ByteArrayInputStream("SEQUENCE {}".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("SEQUENCE {}".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceType);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceType);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE OF INTEGER".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE OF INTEGER".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceOfType);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceOfType);
 
-    	parser = new Parser(new ByteArrayInputStream("SET {}".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("SET {}".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetType);
+        assertNotNull(result);
+        assertTrue(result instanceof SetType);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SET OF INTEGER".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SET OF INTEGER".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetOfType);
+        assertNotNull(result);
+        assertTrue(result instanceof SetOfType);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"[TAG: APPLICATION 23] INTEGER".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "[TAG: APPLICATION 23] INTEGER".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IntegerType);
-    	assertEquals(23, (int) result.getTag().getClassNumber().getClazz());
+        assertNotNull(result);
+        assertTrue(result instanceof IntegerType);
+        assertEquals(23, (int) result.getTag().getClassNumber().getClazz());
 
-    	parser = new Parser(new ByteArrayInputStream("TIME".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("TIME".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Time);
+        assertNotNull(result);
+        assertTrue(result instanceof Time);
 
-    	parser = new Parser(new ByteArrayInputStream("TIME-OF-DAY".getBytes())).new BuiltinTypeParser();
+        parser = new Parser(new ByteArrayInputStream("TIME-OF-DAY".getBytes())).new BuiltinTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TimeOfDay);
+        assertNotNull(result);
+        assertTrue(result instanceof TimeOfDay);
     }
 
     @Test
     public void testReferencedTypeParser() throws IOException, ParserException {
-    	ReferencedTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference".getBytes())).new ReferencedTypeParser();
+        ReferencedTypeParser parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference".getBytes())).new ReferencedTypeParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeReference);
+        assertNotNull(result);
+        assertTrue(result instanceof TypeReference);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"GeneralizedTime".getBytes())).new ReferencedTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "GeneralizedTime".getBytes())).new ReferencedTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof GeneralizedTime);
+        assertNotNull(result);
+        assertTrue(result instanceof GeneralizedTime);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"identifier < Type".getBytes())).new ReferencedTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "identifier < Type".getBytes())).new ReferencedTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SelectionType);
+        assertNotNull(result);
+        assertTrue(result instanceof SelectionType);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object-reference {Object}.&Type-Reference1.&Type-Reference2"
-    					.getBytes())).new ReferencedTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object-reference {Object}.&Type-Reference1.&Type-Reference2"
+                        .getBytes())).new ReferencedTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeFromObjects);
+        assertNotNull(result);
+        assertTrue(result instanceof TypeFromObjects);
     }
 
     @Test
     public void testNamedTypeParser() throws IOException, ParserException {
-    	NamedTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"ident INTEGER".getBytes())).new NamedTypeParser();
+        NamedTypeParser parser = new Parser(new ByteArrayInputStream(
+                "ident INTEGER".getBytes())).new NamedTypeParser();
 
-    	NamedType result = parser.parse();
+        NamedType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ident", result.getName());
-    	assertTrue(result.getType() instanceof IntegerType);
+        assertNotNull(result);
+        assertEquals("ident", result.getName());
+        assertTrue(result.getType() instanceof IntegerType);
     }
 
     @Test
     public void testValueParser() throws IOException, ParserException {
-    	ValueParser parser = new Parser(new ByteArrayInputStream(
-    			"'1101'B".getBytes())).new ValueParser();
+        ValueParser parser = new Parser(new ByteArrayInputStream(
+                "'1101'B".getBytes())).new ValueParser();
 
-    	Value result = parser.parse();
-    	assertTrue(result instanceof BinaryStringValue);
+        Value result = parser.parse();
+        assertTrue(result instanceof BinaryStringValue);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"value-reference".getBytes())).new ValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "value-reference".getBytes())).new ValueParser();
 
-    	result = parser.parse();
-    	testAmbiguousValue(result, SimpleDefinedValue.class);
+        result = parser.parse();
+        testAmbiguousValue(result, SimpleDefinedValue.class);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("INTEGER: 4711".getBytes())).new ValueParser();
+        parser = new Parser(
+                new ByteArrayInputStream("INTEGER: 4711".getBytes())).new ValueParser();
 
-    	result = parser.parse();
-    	assertTrue(result instanceof OpenTypeFieldValue);
+        result = parser.parse();
+        assertTrue(result instanceof OpenTypeFieldValue);
     }
 
     @Test
     public void testBuiltinOrReferencedValueParser() throws IOException, ParserException {
-    	BuiltinOrReferencedValueParser parser = new Parser(
-    			new ByteArrayInputStream("'1101'B".getBytes())).new BuiltinOrReferencedValueParser();
+        BuiltinOrReferencedValueParser parser = new Parser(
+                new ByteArrayInputStream("'1101'B".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertTrue(result instanceof BinaryStringValue);
+        assertTrue(result instanceof BinaryStringValue);
 
-    	parser = new Parser(new ByteArrayInputStream("'5AF'H".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("'5AF'H".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertTrue(result instanceof HexStringValue);
+        assertTrue(result instanceof HexStringValue);
 
-    	parser = new Parser(new ByteArrayInputStream("{}".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("{}".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertTrue(result instanceof EmptyValue);
+        assertTrue(result instanceof EmptyValue);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("CONTAINING 23".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(
+                new ByteArrayInputStream("CONTAINING 23".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertTrue(result instanceof ContainingStringValue);
+        assertTrue(result instanceof ContainingStringValue);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{a-value, b-value }".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{a-value, b-value }".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         testAmbiguousValue(result, BitStringValue.class);
 
-    	parser = new Parser(new ByteArrayInputStream("TRUE".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("TRUE".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertTrue(result instanceof BooleanValue);
+        assertTrue(result instanceof BooleanValue);
 
-    	parser = new Parser(new ByteArrayInputStream("\"string\"".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("\"string\"".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         testAmbiguousValue(result, StringValue.class);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"aString: \"string\"".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "aString: \"string\"".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertTrue(result instanceof ChoiceValue);
+        assertTrue(result instanceof ChoiceValue);
 
-    	// TODO: EmbeddedPDVValue
+        // TODO: EmbeddedPDVValue
 
-    	parser = new Parser(new ByteArrayInputStream("enum-value".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("enum-value".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         testAmbiguousValue(result, SimpleDefinedValue.class, value -> assertEquals("enum-value", value.getValue()));
 
         // TODO: ExternalValue
 
-    	parser = new Parser(new ByteArrayInputStream("4711".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("4711".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertTrue(result instanceof IntegerValue);
+        assertTrue(result instanceof IntegerValue);
 
-    	parser = new Parser(new ByteArrayInputStream("NULL".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("NULL".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertTrue(result instanceof NullValue);
+        assertTrue(result instanceof NullValue);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ oid-component1 Module.oid-component 4711 oid-comp (42)}"
-    					.getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{ oid-component1 Module.oid-component 4711 oid-comp (42)}"
+                        .getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         testAmbiguousValue(result, ObjectIdentifierValue.class);
 
-    	parser = new Parser(new ByteArrayInputStream("3.14e2".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("3.14e2".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RealValue);
+        assertNotNull(result);
+        assertTrue(result instanceof RealValue);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{mantissa 23, base 2, exponent -11}".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{mantissa 23, base 2, exponent -11}".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         testAmbiguousValue(result, RealValue.class);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"MINUS-INFINITY".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "MINUS-INFINITY".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RealValue);
+        assertNotNull(result);
+        assertTrue(result instanceof RealValue);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ aString \"string\", anInteger 23 }".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{ aString \"string\", anInteger 23 }".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         testAmbiguousValue(result, CollectionValue.class);
 
-    	parser = new Parser(new ByteArrayInputStream("{ 1, 2 }".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("{ 1, 2 }".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         testAmbiguousValue(result, CollectionOfValue.class);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"\"P0Y29M0DT0H0.00M\"".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "\"P0Y29M0DT0H0.00M\"".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	testAmbiguousValue(result, StringValue.class, value -> assertTrue(value.isTString()));
+        testAmbiguousValue(result, StringValue.class, value -> assertTrue(value.isTString()));
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"value-reference".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "value-reference".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         testAmbiguousValue(result, SimpleDefinedValue.class);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object-reference {Object}.&value-reference1".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object-reference {Object}.&value-reference1".getBytes())).new BuiltinOrReferencedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ValueFromObject);
+        assertNotNull(result);
+        assertTrue(result instanceof ValueFromObject);
     }
 
     @Test
     public void testNamedValueParser() throws IOException, ParserException {
-    	NamedValueParser parser = new Parser(new ByteArrayInputStream(
-    			"name 12".getBytes())).new NamedValueParser();
+        NamedValueParser parser = new Parser(new ByteArrayInputStream(
+                "name 12".getBytes())).new NamedValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof NamedValue);
-    	assertEquals("name", ((NamedValue) result).getName());
-    	assertTrue(((NamedValue) result).getValue() instanceof IntegerValue);
+        assertNotNull(result);
+        assertTrue(result instanceof NamedValue);
+        assertEquals("name", ((NamedValue) result).getName());
+        assertTrue(((NamedValue) result).getValue() instanceof IntegerValue);
     }
 
     /**
@@ -1483,33 +1484,33 @@ public class ParserTest {
 
     @Test
     public void testBooleanTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"BOOLEAN".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "BOOLEAN".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BooleanType);
+        assertNotNull(result);
+        assertTrue(result instanceof BooleanType);
     }
 
     @Test
     public void testBooleanValueParser() throws IOException, ParserException {
-    	BooleanValueParser parser = new Parser(new ByteArrayInputStream(
-    			"FALSE".getBytes())).new BooleanValueParser();
+        BooleanValueParser parser = new Parser(new ByteArrayInputStream(
+                "FALSE".getBytes())).new BooleanValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BooleanValue);
-    	assertFalse(((BooleanValue) result).getValue());
+        assertNotNull(result);
+        assertTrue(result instanceof BooleanValue);
+        assertFalse(((BooleanValue) result).getValue());
 
-    	parser = new Parser(new ByteArrayInputStream("TRUE".getBytes())).new BooleanValueParser();
+        parser = new Parser(new ByteArrayInputStream("TRUE".getBytes())).new BooleanValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BooleanValue);
-    	assertTrue(((BooleanValue) result).getValue());
+        assertNotNull(result);
+        assertTrue(result instanceof BooleanValue);
+        assertTrue(((BooleanValue) result).getValue());
     }
 
     /**
@@ -1520,87 +1521,87 @@ public class ParserTest {
 
     @Test
     public void testIntegerTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"INTEGER".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "INTEGER".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result instanceof IntegerType);
     }
 
     @Test
     public void testNamedNumberListParser() throws IOException, ParserException {
-    	NamedNumberListParser parser = new Parser(new ByteArrayInputStream(
-    			"a-number (-12), another-number (23)".getBytes())).new NamedNumberListParser();
+        NamedNumberListParser parser = new Parser(new ByteArrayInputStream(
+                "a-number (-12), another-number (23)".getBytes())).new NamedNumberListParser();
 
-    	List<NamedNumber> result = parser.parse();
+        List<NamedNumber> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
     public void testNamedNumberParser() throws IOException, ParserException {
-    	NamedNumberParser parser = new Parser(new ByteArrayInputStream(
-    			"a-number (-12)".getBytes())).new NamedNumberParser();
+        NamedNumberParser parser = new Parser(new ByteArrayInputStream(
+                "a-number (-12)".getBytes())).new NamedNumberParser();
 
-    	NamedNumber result = parser.parse();
+        NamedNumber result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("a-number", result.getId());
-    	assertEquals(BigInteger.valueOf(-12), result.getValue().getNumber());
+        assertNotNull(result);
+        assertEquals("a-number", result.getId());
+        assertEquals(BigInteger.valueOf(-12), result.getValue().getNumber());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"a-number (Module.ref-number)".getBytes())).new NamedNumberParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "a-number (Module.ref-number)".getBytes())).new NamedNumberParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertEquals("a-number", result.getId());
-    	assertEquals("Module",
-    			((ExternalValueReference) result.getRef()).getModule());
-    	assertEquals("ref-number",
-    			((ExternalValueReference) result.getRef()).getValue());
+        assertEquals("a-number", result.getId());
+        assertEquals("Module",
+                ((ExternalValueReference) result.getRef()).getModule());
+        assertEquals("ref-number",
+                ((ExternalValueReference) result.getRef()).getValue());
     }
 
     @Test
     public void testSignedNumberParser() throws IOException, ParserException {
-    	SignedNumberParser parser = new Parser(new ByteArrayInputStream(
-    			"18446744073709551615".getBytes())).new SignedNumberParser();
+        SignedNumberParser parser = new Parser(new ByteArrayInputStream(
+                "18446744073709551615".getBytes())).new SignedNumberParser();
 
-    	SignedNumber result = parser.parse();
+        SignedNumber result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(new BigInteger("18446744073709551615"),
-    			((SignedNumber) result).getNumber());
+        assertNotNull(result);
+        assertEquals(new BigInteger("18446744073709551615"),
+                ((SignedNumber) result).getNumber());
 
-    	parser = new Parser(new ByteArrayInputStream("-23".getBytes())).new SignedNumberParser();
+        parser = new Parser(new ByteArrayInputStream("-23".getBytes())).new SignedNumberParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(BigInteger.valueOf(-23),
-    			((SignedNumber) result).getNumber());
+        assertNotNull(result);
+        assertEquals(BigInteger.valueOf(-23),
+                ((SignedNumber) result).getNumber());
     }
 
     @Test
     public void testIntegerValueParser() throws IOException, ParserException {
-    	IntegerValueParser parser = new Parser(new ByteArrayInputStream(
-    			"-12".getBytes())).new IntegerValueParser();
+        IntegerValueParser parser = new Parser(new ByteArrayInputStream(
+                "-12".getBytes())).new IntegerValueParser();
 
-    	IntegerValue result = parser.parse();
+        IntegerValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertFalse(result.isReference());
-    	assertEquals(new BigInteger("-12"), result.getValue());
+        assertNotNull(result);
+        assertFalse(result.isReference());
+        assertEquals(new BigInteger("-12"), result.getValue());
 
-    	parser = new Parser(new ByteArrayInputStream("an-integer".getBytes())).new IntegerValueParser();
+        parser = new Parser(new ByteArrayInputStream("an-integer".getBytes())).new IntegerValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.isReference());
-    	assertEquals("an-integer", result.getRef());
+        assertNotNull(result);
+        assertTrue(result.isReference());
+        assertEquals("an-integer", result.getRef());
     }
 
     /**
@@ -1611,113 +1612,113 @@ public class ParserTest {
 
     @Test
     public void testEnumeratedTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"ENUMERATED {root-enum, ..., additional-enum}".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "ENUMERATED {root-enum, ..., additional-enum}".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof EnumeratedType);
+        assertNotNull(result);
+        assertTrue(result instanceof EnumeratedType);
     }
 
     @Test
     public void testEnumerationsParser() throws IOException, ParserException {
-    	EnumerationsParser parser = new Parser(new ByteArrayInputStream(
-    			"root-enum, root-enum-b".getBytes())).new EnumerationsParser();
+        EnumerationsParser parser = new Parser(new ByteArrayInputStream(
+                "root-enum, root-enum-b".getBytes())).new EnumerationsParser();
 
-    	EnumeratedType result = parser.parse();
+        EnumeratedType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getRootEnum().size());
-    	assertFalse(result.hasExceptionSpec());
-    	assertNull(result.getAdditionalEnum());
+        assertNotNull(result);
+        assertEquals(2, result.getRootEnum().size());
+        assertFalse(result.hasExceptionSpec());
+        assertNull(result.getAdditionalEnum());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"root-enum, root-enum-b, ...".getBytes())).new EnumerationsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "root-enum, root-enum-b, ...".getBytes())).new EnumerationsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getRootEnum().size());
-    	assertFalse(result.hasExceptionSpec());
-    	assertNull(result.getAdditionalEnum());
+        assertNotNull(result);
+        assertEquals(2, result.getRootEnum().size());
+        assertFalse(result.hasExceptionSpec());
+        assertNull(result.getAdditionalEnum());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"root-enum, root-enum-b, ... ! 23".getBytes())).new EnumerationsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "root-enum, root-enum-b, ... ! 23".getBytes())).new EnumerationsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getRootEnum().size());
-    	assertTrue(result.hasExceptionSpec());
-    	assertNull(result.getAdditionalEnum());
+        assertNotNull(result);
+        assertEquals(2, result.getRootEnum().size());
+        assertTrue(result.hasExceptionSpec());
+        assertNull(result.getAdditionalEnum());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"root-enum, root-enum-b, ..., add-enum-a".getBytes())).new EnumerationsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "root-enum, root-enum-b, ..., add-enum-a".getBytes())).new EnumerationsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getRootEnum().size());
-    	assertFalse(result.hasExceptionSpec());
-    	assertEquals(1, result.getAdditionalEnum().size());
+        assertNotNull(result);
+        assertEquals(2, result.getRootEnum().size());
+        assertFalse(result.hasExceptionSpec());
+        assertEquals(1, result.getAdditionalEnum().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"root-enum, root-enum-b, ... ! INTEGER: 12, add-enum-a"
-    					.getBytes())).new EnumerationsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "root-enum, root-enum-b, ... ! INTEGER: 12, add-enum-a"
+                        .getBytes())).new EnumerationsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getRootEnum().size());
-    	assertTrue(result.hasExceptionSpec());
-    	assertEquals(1, result.getAdditionalEnum().size());
+        assertNotNull(result);
+        assertEquals(2, result.getRootEnum().size());
+        assertTrue(result.hasExceptionSpec());
+        assertEquals(1, result.getAdditionalEnum().size());
     }
 
     @Test
     public void testEnumerationParser() throws IOException, ParserException {
-    	EnumerationParser parser = new Parser(new ByteArrayInputStream(
-    			"enum-ident".getBytes())).new EnumerationParser();
+        EnumerationParser parser = new Parser(new ByteArrayInputStream(
+                "enum-ident".getBytes())).new EnumerationParser();
 
-    	List<EnumerationItemNode> result = parser.parse();
+        List<EnumerationItemNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.size());
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"enum-ident, a-name (ref), b-name (4)".getBytes())).new EnumerationParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "enum-ident, a-name (ref), b-name (4)".getBytes())).new EnumerationParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(3, result.size());
+        assertNotNull(result);
+        assertEquals(3, result.size());
     }
 
     @Test
     public void testEnumerationItemParser() throws IOException, ParserException {
-    	EnumerationItemParser parser = new Parser(new ByteArrayInputStream(
-    			"enum-ident".getBytes())).new EnumerationItemParser();
+        EnumerationItemParser parser = new Parser(new ByteArrayInputStream(
+                "enum-ident".getBytes())).new EnumerationItemParser();
 
-    	EnumerationItemNode result = parser.parse();
+        EnumerationItemNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("enum-ident", result.getName());
+        assertNotNull(result);
+        assertEquals("enum-ident", result.getName());
 
-    	parser = new Parser(new ByteArrayInputStream("name (5)".getBytes())).new EnumerationItemParser();
+        parser = new Parser(new ByteArrayInputStream("name (5)".getBytes())).new EnumerationItemParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("name", result.getName());
-    	assertEquals(Integer.valueOf(5), result.getNumber());
+        assertNotNull(result);
+        assertEquals("name", result.getName());
+        assertEquals(Integer.valueOf(5), result.getNumber());
 
-    	parser = new Parser(new ByteArrayInputStream("name (ref)".getBytes())).new EnumerationItemParser();
+        parser = new Parser(new ByteArrayInputStream("name (ref)".getBytes())).new EnumerationItemParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("name", result.getName());
-    	assertEquals("ref", ((SimpleDefinedValue) result.getRef()).getValue());
+        assertNotNull(result);
+        assertEquals("name", result.getName());
+        assertEquals("ref", ((SimpleDefinedValue) result.getRef()).getValue());
     }
 
     /**
@@ -1728,115 +1729,115 @@ public class ParserTest {
 
     @Test
     public void testRealTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"REAL".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "REAL".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Real);
+        assertNotNull(result);
+        assertTrue(result instanceof Real);
     }
 
     @Test
     public void testRealValueParser() throws IOException, ParserException {
-    	RealValueParser parser = new Parser(new ByteArrayInputStream(
-    			"3.14e2".getBytes())).new RealValueParser();
+        RealValueParser parser = new Parser(new ByteArrayInputStream(
+                "3.14e2".getBytes())).new RealValueParser();
 
-    	RealValue result = parser.parse();
+        RealValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(RealValue.Type.Normal, result.getType());
-    	assertEquals(BigDecimal.valueOf(314), result.getValue());
+        assertNotNull(result);
+        assertEquals(RealValue.Type.Normal, result.getType());
+        assertEquals(BigDecimal.valueOf(314), result.getValue());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{mantissa 23, base 2, exponent -11}".getBytes())).new RealValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{mantissa 23, base 2, exponent -11}".getBytes())).new RealValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(RealValue.Type.Special, result.getType());
-    	assertEquals(Long.valueOf(23), result.getMantissa());
-    	assertEquals(Long.valueOf(2), result.getBase());
-    	assertEquals(Long.valueOf(-11), result.getExponent());
+        assertNotNull(result);
+        assertEquals(RealValue.Type.Special, result.getType());
+        assertEquals(Long.valueOf(23), result.getMantissa());
+        assertEquals(Long.valueOf(2), result.getBase());
+        assertEquals(Long.valueOf(-11), result.getExponent());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"MINUS-INFINITY".getBytes())).new RealValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "MINUS-INFINITY".getBytes())).new RealValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(RealValue.Type.NegativeInf, result.getType());
+        assertNotNull(result);
+        assertEquals(RealValue.Type.NegativeInf, result.getType());
     }
 
     @Test
     public void testNumericRealValueParser() throws IOException,
-    		ParserException {
-    	NumericRealValueParser parser = new Parser(new ByteArrayInputStream(
-    			"-1.5".getBytes())).new NumericRealValueParser();
+            ParserException {
+        NumericRealValueParser parser = new Parser(new ByteArrayInputStream(
+                "-1.5".getBytes())).new NumericRealValueParser();
 
-    	RealValue result = parser.parse();
+        RealValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(RealValue.Type.Normal, result.getType());
-    	assertEquals(new BigDecimal("-1.5"), result.getValue());
+        assertNotNull(result);
+        assertEquals(RealValue.Type.Normal, result.getType());
+        assertEquals(new BigDecimal("-1.5"), result.getValue());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{mantissa 3, base 10, exponent 5}".getBytes())).new NumericRealValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{mantissa 3, base 10, exponent 5}".getBytes())).new NumericRealValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(RealValue.Type.Special, result.getType());
-    	assertEquals(Long.valueOf(3), result.getMantissa());
-    	assertEquals(Long.valueOf(10), result.getBase());
-    	assertEquals(Long.valueOf(5), result.getExponent());
+        assertNotNull(result);
+        assertEquals(RealValue.Type.Special, result.getType());
+        assertEquals(Long.valueOf(3), result.getMantissa());
+        assertEquals(Long.valueOf(10), result.getBase());
+        assertEquals(Long.valueOf(5), result.getExponent());
 
-    	try {
-    		// invalid base
-    		parser = new Parser(new ByteArrayInputStream(
-    				"{mantissa 3, base 3, exponent 5}".getBytes())).new NumericRealValueParser();
-    		parser.parse();
-    		fail("ASN1ParserException expected");
-    	} catch (ParserException e) {
+        try {
+            // invalid base
+            parser = new Parser(new ByteArrayInputStream(
+                    "{mantissa 3, base 3, exponent 5}".getBytes())).new NumericRealValueParser();
+            parser.parse();
+            fail("ASN1ParserException expected");
+        } catch (ParserException e) {
 
-    	}
+        }
 
-    	try {
-    		// missing exponent
-    		parser = new Parser(new ByteArrayInputStream(
-    				"{mantissa 3, base 3}".getBytes())).new NumericRealValueParser();
-    		parser.parse();
-    		fail("ASN1ParserException expected");
-    	} catch (ParserException e) {
+        try {
+            // missing exponent
+            parser = new Parser(new ByteArrayInputStream(
+                    "{mantissa 3, base 3}".getBytes())).new NumericRealValueParser();
+            parser.parse();
+            fail("ASN1ParserException expected");
+        } catch (ParserException e) {
 
-    	}
+        }
     }
 
     @Test
     public void testSpecialRealValueParser() throws IOException,
-    		ParserException {
-    	SpecialRealValueParser parser = new Parser(new ByteArrayInputStream(
-    			"PLUS-INFINITY".getBytes())).new SpecialRealValueParser();
+            ParserException {
+        SpecialRealValueParser parser = new Parser(new ByteArrayInputStream(
+                "PLUS-INFINITY".getBytes())).new SpecialRealValueParser();
 
-    	RealValue result = parser.parse();
+        RealValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(RealValue.Type.PositiveInf, result.getType());
+        assertNotNull(result);
+        assertEquals(RealValue.Type.PositiveInf, result.getType());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"MINUS-INFINITY".getBytes())).new SpecialRealValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "MINUS-INFINITY".getBytes())).new SpecialRealValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(RealValue.Type.NegativeInf, result.getType());
+        assertNotNull(result);
+        assertEquals(RealValue.Type.NegativeInf, result.getType());
 
-    	parser = new Parser(new ByteArrayInputStream("NOT-A-NUMBER".getBytes())).new SpecialRealValueParser();
+        parser = new Parser(new ByteArrayInputStream("NOT-A-NUMBER".getBytes())).new SpecialRealValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(RealValue.Type.NaN, result.getType());
+        assertNotNull(result);
+        assertEquals(RealValue.Type.NaN, result.getType());
     }
 
     /**
@@ -1847,105 +1848,105 @@ public class ParserTest {
 
     @Test
     public void testBitStringTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"BIT STRING".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "BIT STRING".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BitString);
+        assertNotNull(result);
+        assertTrue(result instanceof BitString);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"BIT STRING { fst-bit (1), snd-bit (2), trd-bit (val-ref) }"
-    					.getBytes())).new BuiltinTypeParserAux();
+        parser = new Parser(new ByteArrayInputStream(
+                "BIT STRING { fst-bit (1), snd-bit (2), trd-bit (val-ref) }"
+                        .getBytes())).new BuiltinTypeParserAux();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BitString);
+        assertNotNull(result);
+        assertTrue(result instanceof BitString);
     }
 
     @Test
     public void testNamedBitListParser() throws IOException, ParserException {
-    	NamedBitListParser parser = new Parser(new ByteArrayInputStream(
-    			"a-bit (3), another-bit (5)".getBytes())).new NamedBitListParser();
+        NamedBitListParser parser = new Parser(new ByteArrayInputStream(
+                "a-bit (3), another-bit (5)".getBytes())).new NamedBitListParser();
 
-    	List<NamedBitNode> result = parser.parse();
+        List<NamedBitNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
     public void testNamedBitParser() throws IOException, ParserException {
-    	NamedBitParser parser = new Parser(new ByteArrayInputStream(
-    			"a-bit (3)".getBytes())).new NamedBitParser();
+        NamedBitParser parser = new Parser(new ByteArrayInputStream(
+                "a-bit (3)".getBytes())).new NamedBitParser();
 
-    	NamedBitNode result = parser.parse();
+        NamedBitNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("a-bit", result.getId());
-    	assertEquals(3, result.getNum());
-    	assertNull(result.getRef());
+        assertNotNull(result);
+        assertEquals("a-bit", result.getId());
+        assertEquals(3, result.getNum());
+        assertNull(result.getRef());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"a-bit (value-ref)".getBytes())).new NamedBitParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "a-bit (value-ref)".getBytes())).new NamedBitParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("a-bit", result.getId());
-    	assertEquals("value-ref",
-    			((SimpleDefinedValue) result.getRef()).getValue());
+        assertNotNull(result);
+        assertEquals("a-bit", result.getId());
+        assertEquals("value-ref",
+                ((SimpleDefinedValue) result.getRef()).getValue());
     }
 
     @Test
     public void testBitStringValueParser() throws IOException, ParserException {
-    	BitOrOctetStringValueParser parser = new Parser(
-    			new ByteArrayInputStream("'1101'B".getBytes())).new BitOrOctetStringValueParser();
+        BitOrOctetStringValueParser parser = new Parser(
+                new ByteArrayInputStream("'1101'B".getBytes())).new BitOrOctetStringValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
         assertTrue(result instanceof BinaryStringValue);
-        assertEquals(13, (int) (((BinaryStringValue) result).toBitString()).getIntValue());
+        assertArrayEquals(new byte[] { 0x0d }, ((BinaryStringValue) result).toBitString().getByteValue());
 
-    	parser = new Parser(new ByteArrayInputStream("'AF'H".getBytes())).new BitOrOctetStringValueParser();
+        parser = new Parser(new ByteArrayInputStream("'AF'H".getBytes())).new BitOrOctetStringValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         assertTrue(result instanceof HexStringValue);
-        assertEquals(175, (int) (((HexStringValue) result).toBitString()).getIntValue());
+        assertArrayEquals(new byte[] { (byte) 0xaf }, ((HexStringValue) result).toBitString().getByteValue());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{a-value, b-value }".getBytes())).new BitOrOctetStringValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{a-value, b-value }".getBytes())).new BitOrOctetStringValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
         assertTrue(result instanceof BitStringValue);
-        assertNull(((BitStringValue) result).getIntValue());
+        assertNull(((BitStringValue) result).getByteValue());
         assertEquals(Arrays.asList("a-value", "b-value"), ((BitStringValue) result).getNamedValues());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("CONTAINING 23".getBytes())).new BitOrOctetStringValueParser();
+        parser = new Parser(
+                new ByteArrayInputStream("CONTAINING 23".getBytes())).new BitOrOctetStringValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ContainingStringValue);
-    	assertTrue(((ContainingStringValue) result).getValue() instanceof IntegerValue);
+        assertNotNull(result);
+        assertTrue(result instanceof ContainingStringValue);
+        assertTrue(((ContainingStringValue) result).getValue() instanceof IntegerValue);
     }
 
     @Test
     public void testIdentifierListParser() throws IOException, ParserException {
-    	IdentifierListParser parser = new Parser(new ByteArrayInputStream(
-    			"abc, def".getBytes())).new IdentifierListParser();
+        IdentifierListParser parser = new Parser(new ByteArrayInputStream(
+                "abc, def".getBytes())).new IdentifierListParser();
 
-    	List<String> result = parser.parse();
+        List<String> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
-    	assertEquals("abc", result.get(0));
-    	assertEquals("def", result.get(1));
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("abc", result.get(0));
+        assertEquals("def", result.get(1));
     }
 
     /**
@@ -1956,13 +1957,13 @@ public class ParserTest {
 
     @Test
     public void testOctetStringTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"OCTET STRING".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "OCTET STRING".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OctetString);
+        assertNotNull(result);
+        assertTrue(result instanceof OctetString);
     }
 
     @Test
@@ -2001,24 +2002,24 @@ public class ParserTest {
      */
     @Test
     public void testNullTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"NULL".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "NULL".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Null);
+        assertNotNull(result);
+        assertTrue(result instanceof Null);
     }
 
     @Test
     public void testNullValueParser() throws IOException, ParserException {
-    	NullValueParser parser = new Parser(new ByteArrayInputStream(
-    			"NULL".getBytes())).new NullValueParser();
+        NullValueParser parser = new Parser(new ByteArrayInputStream(
+                "NULL".getBytes())).new NullValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof NullValue);
+        assertNotNull(result);
+        assertTrue(result instanceof NullValue);
     }
 
     /**
@@ -2029,381 +2030,381 @@ public class ParserTest {
 
     @Test
     public void testSequenceTypeParser() throws IOException, ParserException {
-    	// SEQUENCE "{" "}"
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE {}".getBytes())).new BuiltinTypeParserAux();
+        // SEQUENCE "{" "}"
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE {}".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceType);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceType);
 
-    	// | SEQUENCE "{" ExtensionAndException OptionalExtensionMarker "}"
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE { ... ! 34, ...}".getBytes())).new BuiltinTypeParserAux();
+        // | SEQUENCE "{" ExtensionAndException OptionalExtensionMarker "}"
+        parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE { ... ! 34, ...}".getBytes())).new BuiltinTypeParserAux();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceType);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceType);
 
-    	SequenceType seq = (SequenceType) result;
+        SequenceType seq = (SequenceType) result;
 
-    	assertNotNull(seq.getExtAndEx());
-    	assertNotNull(seq.getOptExtMarker());
+        assertNotNull(seq.getExtAndEx());
+        assertNotNull(seq.getOptExtMarker());
 
-    	// | SEQUENCE "{" ComponentTypeLists "}"
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE {string VisibleString, ... ! 12, anInt INTEGER DEFAULT 47, ...}"
-    					.getBytes())).new BuiltinTypeParserAux();
+        // | SEQUENCE "{" ComponentTypeLists "}"
+        parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE {string VisibleString, ... ! 12, anInt INTEGER DEFAULT 47, ...}"
+                        .getBytes())).new BuiltinTypeParserAux();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceType);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceType);
     }
 
     @Test
     public void testExtensionAndExceptionParser() throws IOException,
-    		ParserException {
-    	ExtensionAndExceptionParser parser = new Parser(
-    			new ByteArrayInputStream("...".getBytes())).new ExtensionAndExceptionParser();
+            ParserException {
+        ExtensionAndExceptionParser parser = new Parser(
+                new ByteArrayInputStream("...".getBytes())).new ExtensionAndExceptionParser();
 
-    	assertNotNull(parser.parse());
+        assertNotNull(parser.parse());
 
-    	parser = new Parser(new ByteArrayInputStream("... ! 23".getBytes())).new ExtensionAndExceptionParser();
+        parser = new Parser(new ByteArrayInputStream("... ! 23".getBytes())).new ExtensionAndExceptionParser();
 
-    	ExtensionAndExceptionNode result = parser.parse();
+        ExtensionAndExceptionNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getExceptionId());
+        assertNotNull(result);
+        assertNotNull(result.getExceptionId());
     }
 
     @Test
     public void testOptionalExtensionMarkerParser() throws IOException,
-    		ParserException {
-    	OptionalExtensionMarkerParser parser = new Parser(
-    			new ByteArrayInputStream(", ...".getBytes())).new OptionalExtensionMarkerParser();
+            ParserException {
+        OptionalExtensionMarkerParser parser = new Parser(
+                new ByteArrayInputStream(", ...".getBytes())).new OptionalExtensionMarkerParser();
 
-    	assertNotNull(parser.parse());
+        assertNotNull(parser.parse());
     }
 
     @Test
     public void testComponentTypeListsParser() throws IOException,
-    		ParserException {
-    	// RootComponentTypeList
-    	ComponentTypeListsParser parser = new Parser(new ByteArrayInputStream(
-    			"string VisibleString".getBytes())).new ComponentTypeListsParser();
+            ParserException {
+        // RootComponentTypeList
+        ComponentTypeListsParser parser = new Parser(new ByteArrayInputStream(
+                "string VisibleString".getBytes())).new ComponentTypeListsParser();
 
-    	ComponentTypeListsNode result = parser.parse();
+        ComponentTypeListsNode result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertNotNull(result.getRootComponents());
-    	assertEquals(1, result.getRootComponents().size());
+        assertNotNull(result.getRootComponents());
+        assertEquals(1, result.getRootComponents().size());
 
-    	assertNull(result.getExtAndEx());
-    	assertNull(result.getExtAdditions());
-    	assertFalse(result.getExtEndMarker());
-    	assertNull(result.getExtRootComponents());
+        assertNull(result.getExtAndEx());
+        assertNull(result.getExtAdditions());
+        assertFalse(result.getExtEndMarker());
+        assertNull(result.getExtRootComponents());
 
-    	// RootComponentTypeList "," ExtensionAndException ExtensionAdditions
-    	// OptionalExtensionMarker
-    	parser = new Parser(new ByteArrayInputStream(
-    			"string VisibleString, ... ! 12, anInt INTEGER DEFAULT 47, ..."
-    					.getBytes())).new ComponentTypeListsParser();
+        // RootComponentTypeList "," ExtensionAndException ExtensionAdditions
+        // OptionalExtensionMarker
+        parser = new Parser(new ByteArrayInputStream(
+                "string VisibleString, ... ! 12, anInt INTEGER DEFAULT 47, ..."
+                        .getBytes())).new ComponentTypeListsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertNotNull(result.getRootComponents());
-    	assertEquals(1, result.getRootComponents().size());
+        assertNotNull(result.getRootComponents());
+        assertEquals(1, result.getRootComponents().size());
 
-    	assertNotNull(result.getExtAndEx());
-    	assertNotNull(result.getExtAdditions());
-    	assertTrue(result.getExtEndMarker());
-    	assertNull(result.getExtRootComponents());
+        assertNotNull(result.getExtAndEx());
+        assertNotNull(result.getExtAdditions());
+        assertTrue(result.getExtEndMarker());
+        assertNull(result.getExtRootComponents());
 
-    	// RootComponentTypeList "," ExtensionAndException ExtensionAdditions
-    	// OptionalExtensionMarker
-    	parser = new Parser(new ByteArrayInputStream(
-    			"string VisibleString, ... ! 12, anInt INTEGER DEFAULT 47"
-    					.getBytes())).new ComponentTypeListsParser();
+        // RootComponentTypeList "," ExtensionAndException ExtensionAdditions
+        // OptionalExtensionMarker
+        parser = new Parser(new ByteArrayInputStream(
+                "string VisibleString, ... ! 12, anInt INTEGER DEFAULT 47"
+                        .getBytes())).new ComponentTypeListsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertNotNull(result.getRootComponents());
-    	assertEquals(1, result.getRootComponents().size());
+        assertNotNull(result.getRootComponents());
+        assertEquals(1, result.getRootComponents().size());
 
-    	assertNotNull(result.getExtAndEx());
-    	assertNotNull(result.getExtAdditions());
-    	assertFalse(result.getExtEndMarker());
-    	assertNull(result.getExtRootComponents());
+        assertNotNull(result.getExtAndEx());
+        assertNotNull(result.getExtAdditions());
+        assertFalse(result.getExtEndMarker());
+        assertNull(result.getExtRootComponents());
 
-    	// RootComponentTypeList "," ExtensionAndException ExtensionAdditions
-    	// ExtensionEndMarker "," RootComponentTypeList
-    	parser = new Parser(
+        // RootComponentTypeList "," ExtensionAndException ExtensionAdditions
+        // ExtensionEndMarker "," RootComponentTypeList
+        parser = new Parser(
 
-    			new ByteArrayInputStream(
-    					"string VisibleString, ... ! 12, anInt INTEGER OPTIONAL, ..., anotherString OCTET STRING"
-    							.getBytes())).new ComponentTypeListsParser();
+                new ByteArrayInputStream(
+                        "string VisibleString, ... ! 12, anInt INTEGER OPTIONAL, ..., anotherString OCTET STRING"
+                                .getBytes())).new ComponentTypeListsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertNotNull(result.getRootComponents());
-    	assertEquals(1, result.getRootComponents().size());
+        assertNotNull(result.getRootComponents());
+        assertEquals(1, result.getRootComponents().size());
 
-    	assertNotNull(result.getExtAndEx());
-    	assertNotNull(result.getExtAdditions());
-    	assertFalse(result.getExtEndMarker());
-    	assertNotNull(result.getExtRootComponents());
+        assertNotNull(result.getExtAndEx());
+        assertNotNull(result.getExtAdditions());
+        assertFalse(result.getExtEndMarker());
+        assertNotNull(result.getExtRootComponents());
 
-    	// ExtensionAndException ExtensionAdditions OptionalExtensionMarker
-    	parser = new Parser(new ByteArrayInputStream(
-    			"... ! 12, anInt INTEGER OPTIONAL, ...".getBytes())).new ComponentTypeListsParser();
+        // ExtensionAndException ExtensionAdditions OptionalExtensionMarker
+        parser = new Parser(new ByteArrayInputStream(
+                "... ! 12, anInt INTEGER OPTIONAL, ...".getBytes())).new ComponentTypeListsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertNull(result.getRootComponents());
-    	assertNotNull(result.getExtAndEx());
-    	assertNotNull(result.getExtAdditions());
-    	assertTrue(result.getExtEndMarker());
-    	assertNull(result.getExtRootComponents());
+        assertNull(result.getRootComponents());
+        assertNotNull(result.getExtAndEx());
+        assertNotNull(result.getExtAdditions());
+        assertTrue(result.getExtEndMarker());
+        assertNull(result.getExtRootComponents());
 
-    	// ExtensionAndException ExtensionAdditions ExtensionEndMarker ","
-    	// RootComponentTypeList
-    	parser = new Parser(new ByteArrayInputStream(
-    			"... ! 12, anInt INTEGER OPTIONAL, ..., anotherString OCTET STRING"
-    					.getBytes())).new ComponentTypeListsParser();
+        // ExtensionAndException ExtensionAdditions ExtensionEndMarker ","
+        // RootComponentTypeList
+        parser = new Parser(new ByteArrayInputStream(
+                "... ! 12, anInt INTEGER OPTIONAL, ..., anotherString OCTET STRING"
+                        .getBytes())).new ComponentTypeListsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertNull(result.getRootComponents());
-    	assertNotNull(result.getExtAndEx());
-    	assertNotNull(result.getExtAdditions());
-    	assertTrue(result.getExtEndMarker());
-    	assertNotNull(result.getExtRootComponents());
+        assertNull(result.getRootComponents());
+        assertNotNull(result.getExtAndEx());
+        assertNotNull(result.getExtAdditions());
+        assertTrue(result.getExtEndMarker());
+        assertNotNull(result.getExtRootComponents());
     }
 
     @Test
     public void testExtensionEndMarkerParser() throws IOException,
-    		ParserException {
-    	ExtensionEndMarkerParser parser = new Parser(new ByteArrayInputStream(
-    			", ...".getBytes())).new ExtensionEndMarkerParser();
+            ParserException {
+        ExtensionEndMarkerParser parser = new Parser(new ByteArrayInputStream(
+                ", ...".getBytes())).new ExtensionEndMarkerParser();
 
-    	Object result = parser.parse();
+        Object result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testExtensionAdditionsParser() throws IOException,
-    		ParserException {
-    	ExtensionAdditionsParser parser = new Parser(new ByteArrayInputStream(
-    			", [[1: string VisibleString]]".getBytes())).new ExtensionAdditionsParser();
+            ParserException {
+        ExtensionAdditionsParser parser = new Parser(new ByteArrayInputStream(
+                ", [[1: string VisibleString]]".getBytes())).new ExtensionAdditionsParser();
 
-    	List<Object> result = parser.parse();
+        List<Object> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.size());
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-    	assertTrue(result.get(0) instanceof ExtensionAdditionGroup);
+        assertTrue(result.get(0) instanceof ExtensionAdditionGroup);
     }
 
     @Test
     public void testExtensionAdditionListParser() throws IOException,
-    		ParserException {
-    	ExtensionAdditionListParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"[[1: string VisibleString]]".getBytes())).new ExtensionAdditionListParser();
+            ParserException {
+        ExtensionAdditionListParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "[[1: string VisibleString]]".getBytes())).new ExtensionAdditionListParser();
 
-    	List<Object> result = parser.parse();
+        List<Object> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.size());
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"int INTEGER, [[1: string VisibleString]]".getBytes())).new ExtensionAdditionListParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "int INTEGER, [[1: string VisibleString]]".getBytes())).new ExtensionAdditionListParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
     public void testExtensionAdditionParser() throws IOException,
-    		ParserException {
-    	ExtensionAdditionParser parser = new Parser(new ByteArrayInputStream(
-    			"[[1: string VisibleString]]".getBytes())).new ExtensionAdditionParser();
+            ParserException {
+        ExtensionAdditionParser parser = new Parser(new ByteArrayInputStream(
+                "[[1: string VisibleString]]".getBytes())).new ExtensionAdditionParser();
 
-    	Object result = parser.parse();
+        Object result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExtensionAdditionGroup);
+        assertNotNull(result);
+        assertTrue(result instanceof ExtensionAdditionGroup);
 
-    	parser = new Parser(new ByteArrayInputStream("int INTEGER".getBytes())).new ExtensionAdditionParser();
+        parser = new Parser(new ByteArrayInputStream("int INTEGER".getBytes())).new ExtensionAdditionParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ComponentType);
+        assertNotNull(result);
+        assertTrue(result instanceof ComponentType);
     }
 
     @Test
     public void testExtensionAdditionGroupParser() throws IOException,
-    		ParserException {
-    	ExtensionAdditionGroupParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"[[1: string VisibleString, int INTEGER]]".getBytes())).new ExtensionAdditionGroupParser();
+            ParserException {
+        ExtensionAdditionGroupParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "[[1: string VisibleString, int INTEGER]]".getBytes())).new ExtensionAdditionGroupParser();
 
-    	ExtensionAdditionGroup result = parser.parse();
+        ExtensionAdditionGroup result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, (int) result.getVersion());
-    	assertEquals(2, result.getComponents().size());
+        assertNotNull(result);
+        assertEquals(1, (int) result.getVersion());
+        assertEquals(2, result.getComponents().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"[[int INTEGER]]".getBytes())).new ExtensionAdditionGroupParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "[[int INTEGER]]".getBytes())).new ExtensionAdditionGroupParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNull(result.getVersion());
-    	assertEquals(1, result.getComponents().size());
+        assertNotNull(result);
+        assertNull(result.getVersion());
+        assertEquals(1, result.getComponents().size());
     }
 
     @Test
     public void testVersionNumberParser() throws IOException, ParserException {
-    	VersionNumberParser parser = new Parser(new ByteArrayInputStream(
-    			"123:".getBytes())).new VersionNumberParser();
+        VersionNumberParser parser = new Parser(new ByteArrayInputStream(
+                "123:".getBytes())).new VersionNumberParser();
 
-    	Integer result = parser.parse();
+        Integer result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(123, (int) result);
+        assertNotNull(result);
+        assertEquals(123, (int) result);
     }
 
     @Test
     public void testComponentTypeListParser() throws IOException,
-    		ParserException {
-    	ComponentTypeListParser parser = new Parser(new ByteArrayInputStream(
-    			"string VisibleString".getBytes())).new ComponentTypeListParser();
+            ParserException {
+        ComponentTypeListParser parser = new Parser(new ByteArrayInputStream(
+                "string VisibleString".getBytes())).new ComponentTypeListParser();
 
-    	List<ComponentType> result = parser.parse();
+        List<ComponentType> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.size());
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-    	NamedType namedType = result.get(0).getNamedType();
+        NamedType namedType = result.get(0).getNamedType();
 
-    	assertEquals("string", namedType.getName());
-    	assertTrue(namedType.getType() instanceof VisibleString);
+        assertEquals("string", namedType.getName());
+        assertTrue(namedType.getType() instanceof VisibleString);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"string VisibleString, int INTEGER".getBytes())).new ComponentTypeListParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "string VisibleString, int INTEGER".getBytes())).new ComponentTypeListParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
 
-    	namedType = result.get(1).getNamedType();
+        namedType = result.get(1).getNamedType();
 
-    	assertEquals("int", namedType.getName());
-    	assertTrue(namedType.getType() instanceof IntegerType);
+        assertEquals("int", namedType.getName());
+        assertTrue(namedType.getType() instanceof IntegerType);
     }
 
     @Test
     public void testComponentTypeParser() throws IOException, ParserException {
-    	ComponentTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"string VisibleString".getBytes())).new ComponentTypeParser();
+        ComponentTypeParser parser = new Parser(new ByteArrayInputStream(
+                "string VisibleString".getBytes())).new ComponentTypeParser();
 
-    	ComponentType result = parser.parse();
+        ComponentType result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals(ComponentType.CompType.NamedType, result.getCompType());
+        assertEquals(ComponentType.CompType.NamedType, result.getCompType());
 
-    	NamedType namedType = result.getNamedType();
+        NamedType namedType = result.getNamedType();
 
-    	assertEquals("string", namedType.getName());
-    	assertTrue(namedType.getType() instanceof VisibleString);
+        assertEquals("string", namedType.getName());
+        assertTrue(namedType.getType() instanceof VisibleString);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"real REAL OPTIONAL".getBytes())).new ComponentTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "real REAL OPTIONAL".getBytes())).new ComponentTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals(ComponentType.CompType.NamedTypeOpt, result.getCompType());
+        assertEquals(ComponentType.CompType.NamedTypeOpt, result.getCompType());
 
-    	namedType = result.getNamedType();
+        namedType = result.getNamedType();
 
-    	assertEquals("real", namedType.getName());
-    	assertTrue(namedType.getType() instanceof Real);
+        assertEquals("real", namedType.getName());
+        assertTrue(namedType.getType() instanceof Real);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"int INTEGER DEFAULT 12".getBytes())).new ComponentTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "int INTEGER DEFAULT 12".getBytes())).new ComponentTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals(ComponentType.CompType.NamedTypeDef, result.getCompType());
+        assertEquals(ComponentType.CompType.NamedTypeDef, result.getCompType());
 
-    	namedType = result.getNamedType();
+        namedType = result.getNamedType();
 
-    	assertEquals("int", namedType.getName());
-    	assertTrue(namedType.getType() instanceof IntegerType);
-    	assertEquals(new IntegerValue(12), result.getValue());
+        assertEquals("int", namedType.getName());
+        assertTrue(namedType.getType() instanceof IntegerType);
+        assertEquals(new IntegerValue(12), result.getValue());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"COMPONENTS OF AType".getBytes())).new ComponentTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "COMPONENTS OF AType".getBytes())).new ComponentTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals(ComponentType.CompType.Type, result.getCompType());
+        assertEquals(ComponentType.CompType.Type, result.getCompType());
 
-    	Type type = result.getType();
+        Type type = result.getType();
 
-    	assertNotNull(type);
+        assertNotNull(type);
 
-    	assertTrue(type instanceof TypeReference);
+        assertTrue(type instanceof TypeReference);
 
-    	assertEquals("AType", ((TypeReference) type).getType());
+        assertEquals("AType", ((TypeReference) type).getType());
     }
 
     @Test
     public void testSequenceValueParser() throws IOException, ParserException {
-    	CollectionValueParser parser = new Parser(new ByteArrayInputStream(
-    			"{ string '0101'B, int 23 }".getBytes())).new CollectionValueParser();
+        CollectionValueParser parser = new Parser(new ByteArrayInputStream(
+                "{ string '0101'B, int 23 }".getBytes())).new CollectionValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionValue);
-    	assertEquals(2, ((CollectionValue) result).getValues().size());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionValue);
+        assertEquals(2, ((CollectionValue) result).getValues().size());
 
-    	EmptyValueParser emptyParser = new Parser(new ByteArrayInputStream(
-    			"{  }".getBytes())).new EmptyValueParser();
+        EmptyValueParser emptyParser = new Parser(new ByteArrayInputStream(
+                "{  }".getBytes())).new EmptyValueParser();
 
-    	result = emptyParser.parse();
+        result = emptyParser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof EmptyValue);
+        assertNotNull(result);
+        assertTrue(result instanceof EmptyValue);
     }
 
     /**
@@ -2414,70 +2415,70 @@ public class ParserTest {
 
     @Test
     public void testSequenceOfTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE OF INTEGER".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE OF INTEGER".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceOfType);
-    	assertTrue(((SequenceOfType) result).getType() instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceOfType);
+        assertTrue(((SequenceOfType) result).getType() instanceof IntegerType);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE OF IntType".getBytes())).new BuiltinTypeParserAux();
+        parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE OF IntType".getBytes())).new BuiltinTypeParserAux();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceOfType);
-    	assertTrue(((SequenceOfType) result).getType() instanceof TypeReference);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceOfType);
+        assertTrue(((SequenceOfType) result).getType() instanceof TypeReference);
     }
 
     @Test
     public void testSequenceOfValueParser() throws IOException, ParserException {
-    	CollectionValueParser parser = new Parser(new ByteArrayInputStream(
-    			"{ aInt 1, bInt 2 }".getBytes())).new CollectionValueParser();
+        CollectionValueParser parser = new Parser(new ByteArrayInputStream(
+                "{ aInt 1, bInt 2 }".getBytes())).new CollectionValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionValue);
-    	assertEquals(2, ((CollectionValue) result).getValues().size());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionValue);
+        assertEquals(2, ((CollectionValue) result).getValues().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ '0101'B, '1100'B }".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{ '0101'B, '1100'B }".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertEquals(2, ((CollectionValue) result).getValues().size());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertEquals(2, ((CollectionValue) result).getValues().size());
     }
 
     @Test
     public void testValueListParser() throws IOException, ParserException {
-    	ValueListParser parser = new Parser(new ByteArrayInputStream(
-    			"12, '0101'B".getBytes())).new ValueListParser();
+        ValueListParser parser = new Parser(new ByteArrayInputStream(
+                "12, '0101'B".getBytes())).new ValueListParser();
 
-    	List<Value> result = parser.parse();
+        List<Value> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
-    	assertTrue(result.get(0) instanceof IntegerValue);
-    	assertTrue(result.get(1) instanceof BinaryStringValue);
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.get(0) instanceof IntegerValue);
+        assertTrue(result.get(1) instanceof BinaryStringValue);
     }
 
     @Test
     public void testNamedValueListParser() throws IOException, ParserException {
-    	NamedValueListParser parser = new Parser(new ByteArrayInputStream(
-    			"aNumber 12, aString '0101'B".getBytes())).new NamedValueListParser();
+        NamedValueListParser parser = new Parser(new ByteArrayInputStream(
+                "aNumber 12, aString '0101'B".getBytes())).new NamedValueListParser();
 
-    	List<NamedValue> result = parser.parse();
+        List<NamedValue> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
-    	assertTrue(result.get(0).getValue() instanceof IntegerValue);
-    	assertTrue(result.get(1).getValue() instanceof BinaryStringValue);
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.get(0).getValue() instanceof IntegerValue);
+        assertTrue(result.get(1).getValue() instanceof BinaryStringValue);
     }
 
     /**
@@ -2488,38 +2489,38 @@ public class ParserTest {
 
     @Test
     public void testSetTypeParser() throws IOException, ParserException {
-    	// SET "{" "}"
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"SET {}".getBytes())).new BuiltinTypeParserAux();
+        // SET "{" "}"
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "SET {}".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetType);
+        assertNotNull(result);
+        assertTrue(result instanceof SetType);
 
-    	// | SET "{" ExtensionAndException OptionalExtensionMarker "}"
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SET { ... ! 34, ...}".getBytes())).new BuiltinTypeParserAux();
+        // | SET "{" ExtensionAndException OptionalExtensionMarker "}"
+        parser = new Parser(new ByteArrayInputStream(
+                "SET { ... ! 34, ...}".getBytes())).new BuiltinTypeParserAux();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetType);
+        assertNotNull(result);
+        assertTrue(result instanceof SetType);
 
-    	SetType seq = (SetType) result;
+        SetType seq = (SetType) result;
 
-    	assertNotNull(seq.getExtAndEx());
-    	assertNotNull(seq.getOptExtMarker());
+        assertNotNull(seq.getExtAndEx());
+        assertNotNull(seq.getOptExtMarker());
 
-    	// | SET "{" ComponentTypeLists "}"
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SET {anInt INTEGER, ... ! 12, anotherInt INTEGER DEFAULT 47, ...}"
-    					.getBytes())).new BuiltinTypeParserAux();
+        // | SET "{" ComponentTypeLists "}"
+        parser = new Parser(new ByteArrayInputStream(
+                "SET {anInt INTEGER, ... ! 12, anotherInt INTEGER DEFAULT 47, ...}"
+                        .getBytes())).new BuiltinTypeParserAux();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetType);
+        assertNotNull(result);
+        assertTrue(result instanceof SetType);
     }
 
     /**
@@ -2530,23 +2531,23 @@ public class ParserTest {
 
     @Test
     public void testSetOfTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"SET OF INTEGER".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "SET OF INTEGER".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetOfType);
-    	assertTrue(((SetOfType) result).getType() instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result instanceof SetOfType);
+        assertTrue(((SetOfType) result).getType() instanceof IntegerType);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SET OF ident INTEGER".getBytes())).new BuiltinTypeParserAux();
+        parser = new Parser(new ByteArrayInputStream(
+                "SET OF ident INTEGER".getBytes())).new BuiltinTypeParserAux();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetOfType);
-    	assertTrue(((SetOfType) result).getType() instanceof NamedType);
+        assertNotNull(result);
+        assertTrue(result instanceof SetOfType);
+        assertTrue(((SetOfType) result).getType() instanceof NamedType);
     }
 
     /**
@@ -2557,183 +2558,183 @@ public class ParserTest {
 
     @Test
     public void testChoiceTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"CHOICE {aNumber INTEGER, aString OCTET STRING }".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "CHOICE {aNumber INTEGER, aString OCTET STRING }".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Choice);
-    	assertEquals(2, ((Choice) result).getRootTypeList().size());
+        assertNotNull(result);
+        assertTrue(result instanceof Choice);
+        assertEquals(2, ((Choice) result).getRootTypeList().size());
     }
 
     @Test
     public void testAlternativeTypeListsParser() throws IOException,
-    		ParserException {
-    	AlternativeTypeListsParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"aNumber INTEGER, aString OCTET STRING".getBytes())).new AlternativeTypeListsParser();
+            ParserException {
+        AlternativeTypeListsParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "aNumber INTEGER, aString OCTET STRING".getBytes())).new AlternativeTypeListsParser();
 
-    	AlternativeTypeLists result = parser.parse();
+        AlternativeTypeLists result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getRootTypeList().size());
-    	assertEquals("aNumber", result.getRootTypeList().get(0).getName());
-    	assertTrue(result.getRootTypeList().get(0).getType() instanceof IntegerType);
-    	assertEquals("aString", result.getRootTypeList().get(1).getName());
-    	assertTrue(result.getRootTypeList().get(1).getType() instanceof OctetString);
+        assertNotNull(result);
+        assertEquals(2, result.getRootTypeList().size());
+        assertEquals("aNumber", result.getRootTypeList().get(0).getName());
+        assertTrue(result.getRootTypeList().get(0).getType() instanceof IntegerType);
+        assertEquals("aString", result.getRootTypeList().get(1).getName());
+        assertTrue(result.getRootTypeList().get(1).getType() instanceof OctetString);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"aNumber INTEGER, ...".getBytes())).new AlternativeTypeListsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "aNumber INTEGER, ...".getBytes())).new AlternativeTypeListsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.getRootTypeList().size());
-    	assertNotNull(result.getExtensionAndException());
-    	assertNull(result.getExtensionAndException().getExceptionId());
+        assertNotNull(result);
+        assertEquals(1, result.getRootTypeList().size());
+        assertNotNull(result.getExtensionAndException());
+        assertNull(result.getExtensionAndException().getExceptionId());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"aNumber INTEGER, ... ! 23".getBytes())).new AlternativeTypeListsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "aNumber INTEGER, ... ! 23".getBytes())).new AlternativeTypeListsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getExtensionAndException().getExceptionId());
-    	assertNotNull(result.getExtensionAndException().getExceptionId()
-    			.getValue());
+        assertNotNull(result);
+        assertNotNull(result.getExtensionAndException().getExceptionId());
+        assertNotNull(result.getExtensionAndException().getExceptionId()
+                .getValue());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"aNumber INTEGER, ... ! 23, aString OCTET STRING".getBytes())).new AlternativeTypeListsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "aNumber INTEGER, ... ! 23, aString OCTET STRING".getBytes())).new AlternativeTypeListsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getExtAddAlts());
-    	assertEquals(1, result.getExtAddAlts().size());
-    	assertFalse(result.hasOptExtMarker());
+        assertNotNull(result);
+        assertNotNull(result.getExtAddAlts());
+        assertEquals(1, result.getExtAddAlts().size());
+        assertFalse(result.hasOptExtMarker());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"aNumber INTEGER, ... ! 23, aString OCTET STRING, ..."
-    					.getBytes())).new AlternativeTypeListsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "aNumber INTEGER, ... ! 23, aString OCTET STRING, ..."
+                        .getBytes())).new AlternativeTypeListsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.hasOptExtMarker());
+        assertNotNull(result);
+        assertTrue(result.hasOptExtMarker());
     }
 
     @Test
     public void testRootAlternativeTypeListParser() throws IOException,
-    		ParserException {
-    	RootAlternativeTypeListParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"aNumber INTEGER, aString OCTET STRING".getBytes())).new RootAlternativeTypeListParser();
+            ParserException {
+        RootAlternativeTypeListParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "aNumber INTEGER, aString OCTET STRING".getBytes())).new RootAlternativeTypeListParser();
 
-    	List<NamedType> result = parser.parse();
+        List<NamedType> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
-    	assertEquals("aNumber", result.get(0).getName());
-    	assertTrue(result.get(0).getType() instanceof IntegerType);
-    	assertEquals("aString", result.get(1).getName());
-    	assertTrue(result.get(1).getType() instanceof OctetString);
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("aNumber", result.get(0).getName());
+        assertTrue(result.get(0).getType() instanceof IntegerType);
+        assertEquals("aString", result.get(1).getName());
+        assertTrue(result.get(1).getType() instanceof OctetString);
     }
 
     @Test
     public void testExtensionAdditionAlternativesParser() throws IOException,
-    		ParserException {
-    	ExtensionAdditionAlternativesParser parser = new Parser(
-    			new ByteArrayInputStream(", aString OCTET STRING".getBytes())).new ExtensionAdditionAlternativesParser();
+            ParserException {
+        ExtensionAdditionAlternativesParser parser = new Parser(
+                new ByteArrayInputStream(", aString OCTET STRING".getBytes())).new ExtensionAdditionAlternativesParser();
 
-    	List<ExtensionAdditionAlternativeNode> result = parser.parse();
+        List<ExtensionAdditionAlternativeNode> result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals("aString", result.get(0).getNamedType().getName());
+        assertEquals("aString", result.get(0).getNamedType().getName());
     }
 
     @Test
     public void testExtensionAdditionAlternativesListParser()
-    		throws IOException, ParserException {
-    	ExtensionAdditionAlternativesListParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"[[12: aNumber INTEGER]], aString OCTET STRING"
-    							.getBytes())).new ExtensionAdditionAlternativesListParser();
+            throws IOException, ParserException {
+        ExtensionAdditionAlternativesListParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "[[12: aNumber INTEGER]], aString OCTET STRING"
+                                .getBytes())).new ExtensionAdditionAlternativesListParser();
 
-    	List<ExtensionAdditionAlternativeNode> result = parser.parse();
+        List<ExtensionAdditionAlternativeNode> result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals(12, (int) result.get(0).getAltGroups().getVersion());
-    	assertEquals("aNumber", result.get(0).getAltGroups().getAlternatives()
-    			.get(0).getName());
+        assertEquals(12, (int) result.get(0).getAltGroups().getVersion());
+        assertEquals("aNumber", result.get(0).getAltGroups().getAlternatives()
+                .get(0).getName());
 
-    	assertEquals("aString", result.get(1).getNamedType().getName());
+        assertEquals("aString", result.get(1).getNamedType().getName());
     }
 
     @Test
     public void testExtensionAdditionAlternativeParser() throws IOException,
-    		ParserException {
-    	ExtensionAdditionAlternativeParser parser = new Parser(
-    			new ByteArrayInputStream("[[12: aNumber INTEGER]]".getBytes())).new ExtensionAdditionAlternativeParser();
+            ParserException {
+        ExtensionAdditionAlternativeParser parser = new Parser(
+                new ByteArrayInputStream("[[12: aNumber INTEGER]]".getBytes())).new ExtensionAdditionAlternativeParser();
 
-    	ExtensionAdditionAlternativeNode result = parser.parse();
+        ExtensionAdditionAlternativeNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(12, (int) result.getAltGroups().getVersion());
-    	assertEquals("aNumber", result.getAltGroups().getAlternatives().get(0)
-    			.getName());
+        assertNotNull(result);
+        assertEquals(12, (int) result.getAltGroups().getVersion());
+        assertEquals("aNumber", result.getAltGroups().getAlternatives().get(0)
+                .getName());
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"aNumber INTEGER".getBytes())).new ExtensionAdditionAlternativeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "aNumber INTEGER".getBytes())).new ExtensionAdditionAlternativeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertEquals("aNumber", result.getNamedType().getName());
+        assertEquals("aNumber", result.getNamedType().getName());
     }
 
     @Test
     public void testExtensionAdditionAlternativesGroupParser()
-    		throws IOException, ParserException {
-    	ExtensionAdditionAlternativesGroupParser parser = new Parser(
-    			new ByteArrayInputStream("[[12: aNumber INTEGER]]".getBytes())).new ExtensionAdditionAlternativesGroupParser();
+            throws IOException, ParserException {
+        ExtensionAdditionAlternativesGroupParser parser = new Parser(
+                new ByteArrayInputStream("[[12: aNumber INTEGER]]".getBytes())).new ExtensionAdditionAlternativesGroupParser();
 
-    	ExtensionAdditionAlternativesGroup result = parser.parse();
+        ExtensionAdditionAlternativesGroup result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(12, (int) result.getVersion());
-    	assertEquals("aNumber", result.getAlternatives().get(0).getName());
+        assertNotNull(result);
+        assertEquals(12, (int) result.getVersion());
+        assertEquals("aNumber", result.getAlternatives().get(0).getName());
     }
 
     @Test
     public void testAlternativesTypeListParser() throws IOException,
-    		ParserException {
-    	AlternativeTypeListParser parser = new Parser(new ByteArrayInputStream(
-    			"aNumber INTEGER, aString OCTET STRING".getBytes())).new AlternativeTypeListParser();
+            ParserException {
+        AlternativeTypeListParser parser = new Parser(new ByteArrayInputStream(
+                "aNumber INTEGER, aString OCTET STRING".getBytes())).new AlternativeTypeListParser();
 
-    	List<NamedType> result = parser.parse();
+        List<NamedType> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
-    	assertEquals("aNumber", result.get(0).getName());
-    	assertTrue(result.get(0).getType() instanceof IntegerType);
-    	assertEquals("aString", result.get(1).getName());
-    	assertTrue(result.get(1).getType() instanceof OctetString);
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("aNumber", result.get(0).getName());
+        assertTrue(result.get(0).getType() instanceof IntegerType);
+        assertEquals("aString", result.get(1).getName());
+        assertTrue(result.get(1).getType() instanceof OctetString);
     }
 
     @Test
     public void testChoiceValueParser() throws IOException, ParserException {
-    	ChoiceValueParser parser = new Parser(new ByteArrayInputStream(
-    			"aNumber: 12".getBytes())).new ChoiceValueParser();
+        ChoiceValueParser parser = new Parser(new ByteArrayInputStream(
+                "aNumber: 12".getBytes())).new ChoiceValueParser();
 
-    	ChoiceValue result = parser.parse();
+        ChoiceValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("aNumber", result.getId());
-    	assertTrue(result.getValue() instanceof IntegerValue);
+        assertNotNull(result);
+        assertEquals("aNumber", result.getId());
+        assertTrue(result.getValue() instanceof IntegerValue);
     }
 
     /**
@@ -2744,14 +2745,14 @@ public class ParserTest {
 
     @Test
     public void testSelectionTypeParser() throws IOException, ParserException {
-    	SelectionTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"identifier < Type".getBytes())).new SelectionTypeParser();
+        SelectionTypeParser parser = new Parser(new ByteArrayInputStream(
+                "identifier < Type".getBytes())).new SelectionTypeParser();
 
-    	SelectionType result = parser.parse();
+        SelectionType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("identifier", result.getId());
-    	assertTrue(result.getType() instanceof TypeReference);
+        assertNotNull(result);
+        assertEquals("identifier", result.getId());
+        assertTrue(result.getType() instanceof TypeReference);
     }
 
     /**
@@ -2762,24 +2763,24 @@ public class ParserTest {
 
     @Test
     public void testPrefixedTypeParser() throws IOException, ParserException {
-    	PrefixedTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"[TAG: APPLICATION 23] INTEGER".getBytes())).new PrefixedTypeParser();
+        PrefixedTypeParser parser = new Parser(new ByteArrayInputStream(
+                "[TAG: APPLICATION 23] INTEGER".getBytes())).new PrefixedTypeParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IntegerType);
-    	assertEquals("TAG", result.getTag().getEncodingReference());
-        assertEquals(ClassType.APPLICATION,  result.getTag().getClazz());
-    	assertEquals(23, (int) result.getTag().getClassNumber().getClazz());
+        assertNotNull(result);
+        assertTrue(result instanceof IntegerType);
+        assertEquals("TAG", result.getTag().getEncodingReference());
+        assertEquals(ClassType.APPLICATION, result.getTag().getClazz());
+        assertEquals(23, (int) result.getTag().getClassNumber().getClazz());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"[TAG: 4711] INTEGER".getBytes())).new PrefixedTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "[TAG: 4711] INTEGER".getBytes())).new PrefixedTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result instanceof IntegerType);
         assertEquals("TAG", result.getTag().getEncodingReference());
         assertNull(result.getTag().getClazz());
         assertEquals(4711, (int) result.getTag().getClassNumber().getClazz());
@@ -2795,13 +2796,13 @@ public class ParserTest {
         assertNull(result.getTag().getClazz());
         assertEquals(4711, (int) result.getTag().getClassNumber().getClazz());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"[PER: \"encoding instructions\"] INTEGER".getBytes())).new PrefixedTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "[PER: \"encoding instructions\"] INTEGER".getBytes())).new PrefixedTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result instanceof IntegerType);
         assertNotNull(result.getEncodingPrefix());
         assertEquals("PER", result.getEncodingPrefix().getEncodingReference());
         assertNotNull(result.getEncodingPrefix().getEncodingInstruction());
@@ -2809,109 +2810,109 @@ public class ParserTest {
 
     @Test
     public void testTaggedTypeParser() throws IOException, ParserException {
-    	TaggedTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"[TAG: APPLICATION 1] INTEGER".getBytes())).new TaggedTypeParser();
+        TaggedTypeParser parser = new Parser(new ByteArrayInputStream(
+                "[TAG: APPLICATION 1] INTEGER".getBytes())).new TaggedTypeParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IntegerType);
-    	assertEquals(ClassType.APPLICATION, result.getTag().getClazz());
+        assertNotNull(result);
+        assertTrue(result instanceof IntegerType);
+        assertEquals(ClassType.APPLICATION, result.getTag().getClazz());
     }
 
     @Test
     public void testTagParser() throws IOException, ParserException {
-    	TagParser parser = new Parser(new ByteArrayInputStream(
-    			"[TAG: UNIVERSAL 10]".getBytes())).new TagParser();
+        TagParser parser = new Parser(new ByteArrayInputStream(
+                "[TAG: UNIVERSAL 10]".getBytes())).new TagParser();
 
-    	Tag result = parser.parse();
+        Tag result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("TAG", result.getEncodingReference());
-    	assertEquals(ClassType.UNIVERSAL, result.getClazz());
-    	assertEquals(10, (int) result.getClassNumber().getClazz());
+        assertNotNull(result);
+        assertEquals("TAG", result.getEncodingReference());
+        assertEquals(ClassType.UNIVERSAL, result.getClazz());
+        assertEquals(10, (int) result.getClassNumber().getClazz());
     }
 
     @Test
     public void testEncodingReferenceParser() throws IOException,
-    		ParserException {
-    	EncodingReferenceParser parser = new Parser(new ByteArrayInputStream(
-    			"TAG:".getBytes())).new EncodingReferenceParser();
+            ParserException {
+        EncodingReferenceParser parser = new Parser(new ByteArrayInputStream(
+                "TAG:".getBytes())).new EncodingReferenceParser();
 
-    	String result = parser.parse();
+        String result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("TAG", result);
+        assertNotNull(result);
+        assertEquals("TAG", result);
     }
 
     @Test
     public void testClassNumberParser() throws IOException, ParserException {
-    	ClassNumberParser parser = new Parser(new ByteArrayInputStream(
-    			"4711".getBytes())).new ClassNumberParser();
+        ClassNumberParser parser = new Parser(new ByteArrayInputStream(
+                "4711".getBytes())).new ClassNumberParser();
 
-    	ClassNumber result = parser.parse();
+        ClassNumber result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(4711, (int) result.getClazz());
+        assertNotNull(result);
+        assertEquals(4711, (int) result.getClazz());
 
-    	parser = new Parser(new ByteArrayInputStream("value-ref".getBytes())).new ClassNumberParser();
+        parser = new Parser(new ByteArrayInputStream("value-ref".getBytes())).new ClassNumberParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getRef() instanceof SimpleDefinedValue);
-    	assertEquals("value-ref",
-    			((SimpleDefinedValue) result.getRef()).getValue());
+        assertNotNull(result);
+        assertTrue(result.getRef() instanceof SimpleDefinedValue);
+        assertEquals("value-ref",
+                ((SimpleDefinedValue) result.getRef()).getValue());
     }
 
     @Test
     public void testClassParser() throws IOException, ParserException {
-    	ClassParser parser = new Parser(new ByteArrayInputStream(
-    			"UNIVERSAL".getBytes())).new ClassParser();
+        ClassParser parser = new Parser(new ByteArrayInputStream(
+                "UNIVERSAL".getBytes())).new ClassParser();
 
-    	ClassType result = parser.parse();
+        ClassType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(ClassType.UNIVERSAL, result);
+        assertNotNull(result);
+        assertEquals(ClassType.UNIVERSAL, result);
 
-    	parser = new Parser(new ByteArrayInputStream("APPLICATION".getBytes())).new ClassParser();
+        parser = new Parser(new ByteArrayInputStream("APPLICATION".getBytes())).new ClassParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(ClassType.APPLICATION, result);
+        assertNotNull(result);
+        assertEquals(ClassType.APPLICATION, result);
 
-    	parser = new Parser(new ByteArrayInputStream("PRIVATE".getBytes())).new ClassParser();
+        parser = new Parser(new ByteArrayInputStream("PRIVATE".getBytes())).new ClassParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(ClassType.PRIVATE, result);
+        assertNotNull(result);
+        assertEquals(ClassType.PRIVATE, result);
     }
 
     @Test
     public void testEncodingPrefixedTypeParser() throws IOException,
-    		ParserException {
-    	EncodingPrefixedTypeParser parser = new Parser(
-    			new ByteArrayInputStream("[TAG: 21] VisibleString".getBytes())).new EncodingPrefixedTypeParser();
+            ParserException {
+        EncodingPrefixedTypeParser parser = new Parser(
+                new ByteArrayInputStream("[TAG: 21] VisibleString".getBytes())).new EncodingPrefixedTypeParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof VisibleString);
-    	assertNotNull(result.getEncodingPrefix());
+        assertNotNull(result);
+        assertTrue(result instanceof VisibleString);
+        assertNotNull(result.getEncodingPrefix());
     }
 
     @Test
     public void testEncodingPrefixParser() throws IOException, ParserException {
-    	EncodingPrefixParser parser = new Parser(new ByteArrayInputStream(
-    			"[TAG: \"encoding instruction\"]".getBytes())).new EncodingPrefixParser();
+        EncodingPrefixParser parser = new Parser(new ByteArrayInputStream(
+                "[TAG: \"encoding instruction\"]".getBytes())).new EncodingPrefixParser();
 
-    	EncodingPrefixNode result = parser.parse();
+        EncodingPrefixNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("TAG", result.getEncodingReference());
-    	assertEquals(1, result.getEncodingInstruction().size());
+        assertNotNull(result);
+        assertEquals("TAG", result.getEncodingReference());
+        assertEquals(1, result.getEncodingInstruction().size());
 
         parser = new Parser(new ByteArrayInputStream(
                 "[\"encoding instruction\"]".getBytes())).new EncodingPrefixParser();
@@ -2931,150 +2932,150 @@ public class ParserTest {
 
     @Test
     public void testObjectIdentifierTypeParser() throws IOException,
-    		ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"OBJECT IDENTIFIER".getBytes())).new BuiltinTypeParserAux();
+            ParserException {
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "OBJECT IDENTIFIER".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectIdentifier);
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectIdentifier);
     }
 
     @Test
     public void testObjectIdentifierValueParser() throws IOException, ParserException {
-    	ObjectIdentifierValueParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"{ oid-component1 Module.oid-component 4711 oid-comp (42)}"
-    							.getBytes())).new ObjectIdentifierValueParser();
+        ObjectIdentifierValueParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "{ oid-component1 Module.oid-component 4711 oid-comp (42)}"
+                                .getBytes())).new ObjectIdentifierValueParser();
 
-    	ObjectIdentifierValue result = parser.parse();
+        ObjectIdentifierValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(4, result.getComponents().size());
+        assertNotNull(result);
+        assertEquals(4, result.getComponents().size());
     }
 
     @Test
     public void testObjectIdComponentListParser() throws IOException, ParserException {
-    	ObjIdComponentsListParser parser = new Parser(new ByteArrayInputStream(
-    			"oid-component1 Module.oid-component 4711 oid-comp (42)"
-    					.getBytes())).new ObjIdComponentsListParser();
+        ObjIdComponentsListParser parser = new Parser(new ByteArrayInputStream(
+                "oid-component1 Module.oid-component 4711 oid-comp (42)"
+                        .getBytes())).new ObjIdComponentsListParser();
 
-    	List<OIDComponentNode> result = parser.parse();
+        List<OIDComponentNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(4, result.size());
+        assertNotNull(result);
+        assertEquals(4, result.size());
     }
 
     @Test
     public void testObjectIdComponentsParser() throws IOException,
-    		ParserException {
-    	ObjIdComponentsParser parser = new Parser(new ByteArrayInputStream(
-    			"oid-component".getBytes())).new ObjIdComponentsParser();
+            ParserException {
+        ObjIdComponentsParser parser = new Parser(new ByteArrayInputStream(
+                "oid-component".getBytes())).new ObjIdComponentsParser();
 
-    	OIDComponentNode result = parser.parse();
+        OIDComponentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNull(result.getId());
-    	assertEquals("oid-component", result.getName());
+        assertNotNull(result);
+        assertNull(result.getId());
+        assertEquals("oid-component", result.getName());
 
-    	parser = new Parser(new ByteArrayInputStream("4711".getBytes())).new ObjIdComponentsParser();
+        parser = new Parser(new ByteArrayInputStream("4711".getBytes())).new ObjIdComponentsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(4711, (int) result.getId());
+        assertNotNull(result);
+        assertEquals(4711, (int) result.getId());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Module.oid-component".getBytes())).new ObjIdComponentsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Module.oid-component".getBytes())).new ObjIdComponentsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getDefinedValue());
-    	assertTrue(result.getDefinedValue() instanceof ExternalValueReference);
-    	assertEquals("Module",
-    			((ExternalValueReference) result.getDefinedValue()).getModule());
-    	assertEquals("oid-component",
-    			((ExternalValueReference) result.getDefinedValue()).getValue());
+        assertNotNull(result);
+        assertNotNull(result.getDefinedValue());
+        assertTrue(result.getDefinedValue() instanceof ExternalValueReference);
+        assertEquals("Module",
+                ((ExternalValueReference) result.getDefinedValue()).getModule());
+        assertEquals("oid-component",
+                ((ExternalValueReference) result.getDefinedValue()).getValue());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"oid-component (Module.value)".getBytes())).new ObjIdComponentsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "oid-component (Module.value)".getBytes())).new ObjIdComponentsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("oid-component", result.getName());
-    	assertNotNull(result.getDefinedValue());
-    	assertTrue(result.getDefinedValue() instanceof ExternalValueReference);
-    	assertEquals("Module",
-    			((ExternalValueReference) result.getDefinedValue()).getModule());
-    	assertEquals("value",
-    			((ExternalValueReference) result.getDefinedValue()).getValue());
+        assertNotNull(result);
+        assertEquals("oid-component", result.getName());
+        assertNotNull(result.getDefinedValue());
+        assertTrue(result.getDefinedValue() instanceof ExternalValueReference);
+        assertEquals("Module",
+                ((ExternalValueReference) result.getDefinedValue()).getModule());
+        assertEquals("value",
+                ((ExternalValueReference) result.getDefinedValue()).getValue());
     }
 
     @Test
     public void testNameFormParser() throws IOException, ParserException {
-    	NameFormParser parser = new Parser(new ByteArrayInputStream(
-    			"oid-component".getBytes())).new NameFormParser();
+        NameFormParser parser = new Parser(new ByteArrayInputStream(
+                "oid-component".getBytes())).new NameFormParser();
 
-    	OIDComponentNode result = parser.parse();
+        OIDComponentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNull(result.getId());
-    	assertEquals("oid-component", result.getName());
+        assertNotNull(result);
+        assertNull(result.getId());
+        assertEquals("oid-component", result.getName());
     }
 
     @Test
     public void testNumberFormParser() throws IOException, ParserException {
-    	NumberFormParser parser = new Parser(new ByteArrayInputStream(
-    			"4711".getBytes())).new NumberFormParser();
+        NumberFormParser parser = new Parser(new ByteArrayInputStream(
+                "4711".getBytes())).new NumberFormParser();
 
-    	OIDComponentNode result = parser.parse();
+        OIDComponentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(4711, (int) result.getId());
+        assertNotNull(result);
+        assertEquals(4711, (int) result.getId());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Module.oid-component".getBytes())).new NumberFormParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Module.oid-component".getBytes())).new NumberFormParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getDefinedValue());
-    	assertTrue(result.getDefinedValue() instanceof ExternalValueReference);
-    	assertEquals("Module",
-    			((ExternalValueReference) result.getDefinedValue()).getModule());
-    	assertEquals("oid-component",
-    			((ExternalValueReference) result.getDefinedValue()).getValue());
+        assertNotNull(result);
+        assertNotNull(result.getDefinedValue());
+        assertTrue(result.getDefinedValue() instanceof ExternalValueReference);
+        assertEquals("Module",
+                ((ExternalValueReference) result.getDefinedValue()).getModule());
+        assertEquals("oid-component",
+                ((ExternalValueReference) result.getDefinedValue()).getValue());
     }
 
     @Test
     public void testNameAndNumberFormParser() throws IOException,
-    		ParserException {
-    	NameAndNumberFormParser parser = new Parser(new ByteArrayInputStream(
-    			"oid-component (Module.value)".getBytes())).new NameAndNumberFormParser();
+            ParserException {
+        NameAndNumberFormParser parser = new Parser(new ByteArrayInputStream(
+                "oid-component (Module.value)".getBytes())).new NameAndNumberFormParser();
 
-    	OIDComponentNode result = parser.parse();
+        OIDComponentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("oid-component", result.getName());
-    	assertNotNull(result.getDefinedValue());
-    	assertTrue(result.getDefinedValue() instanceof ExternalValueReference);
-    	assertEquals("Module",
-    			((ExternalValueReference) result.getDefinedValue()).getModule());
-    	assertEquals("value",
-    			((ExternalValueReference) result.getDefinedValue()).getValue());
+        assertNotNull(result);
+        assertEquals("oid-component", result.getName());
+        assertNotNull(result.getDefinedValue());
+        assertTrue(result.getDefinedValue() instanceof ExternalValueReference);
+        assertEquals("Module",
+                ((ExternalValueReference) result.getDefinedValue()).getModule());
+        assertEquals("value",
+                ((ExternalValueReference) result.getDefinedValue()).getValue());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"oid-component (4711)".getBytes())).new NameAndNumberFormParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "oid-component (4711)".getBytes())).new NameAndNumberFormParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("oid-component", result.getName());
-    	assertNotNull(result.getId());
-    	assertEquals(4711, (int) result.getId());
+        assertNotNull(result);
+        assertEquals("oid-component", result.getName());
+        assertNotNull(result.getId());
+        assertEquals(4711, (int) result.getId());
     }
 
     /**
@@ -3085,64 +3086,64 @@ public class ParserTest {
 
     @Test
     public void testRelativeOIDTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"RELATIVE-OID".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "RELATIVE-OID".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RelativeOID);
+        assertNotNull(result);
+        assertTrue(result instanceof RelativeOID);
     }
 
     @Test
     public void testRelativeOIDValueParser() throws IOException,
-    		ParserException {
-    	RelativeOIDValueParser parser = new Parser(new ByteArrayInputStream(
-    			"{ 4711 test (4712) }".getBytes())).new RelativeOIDValueParser();
+            ParserException {
+        RelativeOIDValueParser parser = new Parser(new ByteArrayInputStream(
+                "{ 4711 test (4712) }".getBytes())).new RelativeOIDValueParser();
 
-    	RelativeOIDValue result = parser.parse();
+        RelativeOIDValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getComponents().size());
+        assertNotNull(result);
+        assertEquals(2, result.getComponents().size());
     }
 
     @Test
     public void testRelativeOIDComponentsListParser() throws IOException,
-    		ParserException {
-    	RelativeOIDComponentsListParser parser = new Parser(
-    			new ByteArrayInputStream("4711 test (4712)".getBytes())).new RelativeOIDComponentsListParser();
+            ParserException {
+        RelativeOIDComponentsListParser parser = new Parser(
+                new ByteArrayInputStream("4711 test (4712)".getBytes())).new RelativeOIDComponentsListParser();
 
-    	List<OIDComponentNode> result = parser.parse();
+        List<OIDComponentNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
     public void testRelativeOIDComponentsParser() throws IOException,
-    		ParserException {
-    	RelativeOIDComponentsParser parser = new Parser(
-    			new ByteArrayInputStream("4711".getBytes())).new RelativeOIDComponentsParser();
+            ParserException {
+        RelativeOIDComponentsParser parser = new Parser(
+                new ByteArrayInputStream("4711".getBytes())).new RelativeOIDComponentsParser();
 
-    	Node result = parser.parse();
+        Node result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OIDComponentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof OIDComponentNode);
 
-    	parser = new Parser(new ByteArrayInputStream("test (4711)".getBytes())).new RelativeOIDComponentsParser();
+        parser = new Parser(new ByteArrayInputStream("test (4711)".getBytes())).new RelativeOIDComponentsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OIDComponentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof OIDComponentNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"value-reference".getBytes())).new RelativeOIDComponentsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "value-reference".getBytes())).new RelativeOIDComponentsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OIDComponentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof OIDComponentNode);
     }
 
     /**
@@ -3153,48 +3154,48 @@ public class ParserTest {
 
     @Test
     public void testIRITypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"OID-IRI".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "OID-IRI".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IRI);
+        assertNotNull(result);
+        assertTrue(result instanceof IRI);
     }
 
     @Test
     public void testIRIValueParser() throws IOException, ParserException {
-    	IRIValueParser parser = new Parser(new ByteArrayInputStream(
-    			"\"/ISO/Registration_Authority/19785.CBEFF\"".getBytes())).new IRIValueParser();
+        IRIValueParser parser = new Parser(new ByteArrayInputStream(
+                "\"/ISO/Registration_Authority/19785.CBEFF\"".getBytes())).new IRIValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IRIValue);
-    	assertEquals(3, ((IRIValue) result).getArcIdentifiers().size());
+        assertNotNull(result);
+        assertTrue(result instanceof IRIValue);
+        assertEquals(3, ((IRIValue) result).getArcIdentifiers().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"\"/0/Registration_Authority/19785.CBEFF\"".getBytes())).new IRIValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "\"/0/Registration_Authority/19785.CBEFF\"".getBytes())).new IRIValueParser();
 
-    	result = parser.parse();
-    	assertTrue(result instanceof IRIValue);
-    	assertEquals(3, ((IRIValue) result).getArcIdentifiers().size());
+        result = parser.parse();
+        assertTrue(result instanceof IRIValue);
+        assertEquals(3, ((IRIValue) result).getArcIdentifiers().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"\"/0/0/19785.CBEFF\"".getBytes())).new IRIValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "\"/0/0/19785.CBEFF\"".getBytes())).new IRIValueParser();
 
-    	result = parser.parse();
-    	assertTrue(result instanceof IRIValue);
-    	assertEquals(3, ((IRIValue) result).getArcIdentifiers().size());
+        result = parser.parse();
+        assertTrue(result instanceof IRIValue);
+        assertEquals(3, ((IRIValue) result).getArcIdentifiers().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"\"/0/01/19785.CBEFF\"".getBytes())).new IRIValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "\"/0/01/19785.CBEFF\"".getBytes())).new IRIValueParser();
 
-    	try {
-    		result = parser.parse();
-    		fail("ASN1ParserException expected");
-    	} catch (ParserException e) {
-    	}
+        try {
+            result = parser.parse();
+            fail("ASN1ParserException expected");
+        } catch (ParserException e) {
+        }
     }
 
     /**
@@ -3205,51 +3206,51 @@ public class ParserTest {
 
     @Test
     public void testRelativeIRITypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"RELATIVE-OID-IRI".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "RELATIVE-OID-IRI".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RelativeIRI);
+        assertNotNull(result);
+        assertTrue(result instanceof RelativeIRI);
     }
 
     @Test
     public void testRelativeIRIValueParser() throws IOException,
-    		ParserException {
-    	RelativeIRIValueParser parser = new Parser(
+            ParserException {
+        RelativeIRIValueParser parser = new Parser(
 
-    	new ByteArrayInputStream(
-    			"\"ISO/Registration_Authority/19785.CBEFF\"".getBytes())).new RelativeIRIValueParser();
+                new ByteArrayInputStream(
+                        "\"ISO/Registration_Authority/19785.CBEFF\"".getBytes())).new RelativeIRIValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RelativeIRIValue);
-    	assertEquals(3, ((RelativeIRIValue) result).getArcIdentifiers().size());
+        assertNotNull(result);
+        assertTrue(result instanceof RelativeIRIValue);
+        assertEquals(3, ((RelativeIRIValue) result).getArcIdentifiers().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"\"0/Registration_Authority/19785.CBEFF\"".getBytes())).new RelativeIRIValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "\"0/Registration_Authority/19785.CBEFF\"".getBytes())).new RelativeIRIValueParser();
 
-    	result = parser.parse();
-    	assertTrue(result instanceof RelativeIRIValue);
-    	assertEquals(3, ((RelativeIRIValue) result).getArcIdentifiers().size());
+        result = parser.parse();
+        assertTrue(result instanceof RelativeIRIValue);
+        assertEquals(3, ((RelativeIRIValue) result).getArcIdentifiers().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"\"0/0/19785.CBEFF\"".getBytes())).new RelativeIRIValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "\"0/0/19785.CBEFF\"".getBytes())).new RelativeIRIValueParser();
 
-    	result = parser.parse();
-    	assertTrue(result instanceof RelativeIRIValue);
-    	assertEquals(3, ((RelativeIRIValue) result).getArcIdentifiers().size());
+        result = parser.parse();
+        assertTrue(result instanceof RelativeIRIValue);
+        assertEquals(3, ((RelativeIRIValue) result).getArcIdentifiers().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"\"0/01/19785.CBEFF\"".getBytes())).new RelativeIRIValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "\"0/01/19785.CBEFF\"".getBytes())).new RelativeIRIValueParser();
 
-    	try {
-    		result = parser.parse();
-    		fail("ASN1ParserException expected");
-    	} catch (ParserException e) {
-    	}
+        try {
+            result = parser.parse();
+            fail("ASN1ParserException expected");
+        } catch (ParserException e) {
+        }
     }
 
     /**
@@ -3260,19 +3261,19 @@ public class ParserTest {
 
     @Test
     public void testEmbeddedPDVTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"EMBEDDED PDV".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "EMBEDDED PDV".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof EmbeddedPDV);
+        assertNotNull(result);
+        assertTrue(result instanceof EmbeddedPDV);
     }
 
     @Test
     public void testEmbeddedPDVValueParser() throws IOException,
-    		ParserException {
-    	// TODO: implement
+            ParserException {
+        // TODO: implement
     }
 
     /**
@@ -3283,18 +3284,18 @@ public class ParserTest {
 
     @Test
     public void testExternalTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"EXTERNAL".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "EXTERNAL".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof External);
+        assertNotNull(result);
+        assertTrue(result instanceof External);
     }
 
     @Test
     public void testExternalValueParser() {
-    	// TODO: Test sequence content
+        // TODO: Test sequence content
     }
 
     /**
@@ -3305,70 +3306,70 @@ public class ParserTest {
 
     @Test
     public void testTimeTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"TIME".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "TIME".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Time);
+        assertNotNull(result);
+        assertTrue(result instanceof Time);
     }
 
     @Test
     public void testTimeValueParser() throws IOException, ParserException {
-    	RestrictedCharacterStringValueParser parser = new Parser(
-    			new ByteArrayInputStream("\"P0Y29M0DT0H0.00M\"".getBytes())).new RestrictedCharacterStringValueParser();
+        RestrictedCharacterStringValueParser parser = new Parser(
+                new ByteArrayInputStream("\"P0Y29M0DT0H0.00M\"".getBytes())).new RestrictedCharacterStringValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof StringValue);
-    	assertTrue(((StringValue) result).isTString());
-    	assertNotNull(((StringValue) result).getTimeValue());
+        assertNotNull(result);
+        assertTrue(result instanceof StringValue);
+        assertTrue(((StringValue) result).isTString());
+        assertNotNull(((StringValue) result).getTimeValue());
     }
 
     @Test
     public void testDateTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"DATE".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "DATE".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof DateType);
+        assertNotNull(result);
+        assertTrue(result instanceof DateType);
     }
 
     @Test
     public void testTimeOfDayTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"TIME-OF-DAY".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "TIME-OF-DAY".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TimeOfDay);
+        assertNotNull(result);
+        assertTrue(result instanceof TimeOfDay);
     }
 
     @Test
     public void testDateTimeTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"DATE-TIME".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "DATE-TIME".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof DateTime);
+        assertNotNull(result);
+        assertTrue(result instanceof DateTime);
     }
 
     @Test
     public void testDurationTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"DURATION".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "DURATION".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Duration);
+        assertNotNull(result);
+        assertTrue(result instanceof Duration);
     }
 
     /**
@@ -3379,36 +3380,36 @@ public class ParserTest {
 
     @Test
     public void testCharacterStringTypeParser() throws IOException,
-    		ParserException {
-    	CharacterStringTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"BMPString".getBytes())).new CharacterStringTypeParser();
+            ParserException {
+        CharacterStringTypeParser parser = new Parser(new ByteArrayInputStream(
+                "BMPString".getBytes())).new CharacterStringTypeParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BMPString);
+        assertNotNull(result);
+        assertTrue(result instanceof BMPString);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"CHARACTER STRING".getBytes())).new CharacterStringTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "CHARACTER STRING".getBytes())).new CharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CharacterString);
+        assertNotNull(result);
+        assertTrue(result instanceof CharacterString);
     }
 
     @Test
     public void testCharacterStringValueParser() throws IOException,
-    		ParserException {
-    	CharacterStringValueParser parser = new Parser(
-    			new ByteArrayInputStream("\"abc\"".getBytes())).new CharacterStringValueParser();
+            ParserException {
+        CharacterStringValueParser parser = new Parser(
+                new ByteArrayInputStream("\"abc\"".getBytes())).new CharacterStringValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof StringValue);
+        assertNotNull(result);
+        assertTrue(result instanceof StringValue);
 
-    	// TODO: UnrestrictedCharacterStringValue
+        // TODO: UnrestrictedCharacterStringValue
     }
 
     /**
@@ -3419,359 +3420,359 @@ public class ParserTest {
 
     @Test
     public void testRestrictedCharacterStringTypeParser() throws IOException,
-    		ParserException {
-    	RestrictedCharacterStringTypeParser parser = new Parser(
-    			new ByteArrayInputStream("BMPString".getBytes())).new RestrictedCharacterStringTypeParser();
+            ParserException {
+        RestrictedCharacterStringTypeParser parser = new Parser(
+                new ByteArrayInputStream("BMPString".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof BMPString);
+        assertNotNull(result);
+        assertTrue(result instanceof BMPString);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("GeneralString".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(
+                new ByteArrayInputStream("GeneralString".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof GeneralString);
+        assertNotNull(result);
+        assertTrue(result instanceof GeneralString);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("GraphicString".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(
+                new ByteArrayInputStream("GraphicString".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof GraphicString);
+        assertNotNull(result);
+        assertTrue(result instanceof GraphicString);
 
-    	parser = new Parser(new ByteArrayInputStream("IA5String".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(new ByteArrayInputStream("IA5String".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IA5String);
+        assertNotNull(result);
+        assertTrue(result instanceof IA5String);
 
-    	parser = new Parser(new ByteArrayInputStream("ISO646String".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(new ByteArrayInputStream("ISO646String".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ISO646String);
+        assertNotNull(result);
+        assertTrue(result instanceof ISO646String);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("NumericString".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(
+                new ByteArrayInputStream("NumericString".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof NumericString);
+        assertNotNull(result);
+        assertTrue(result instanceof NumericString);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"PrintableString".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "PrintableString".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof PrintableString);
+        assertNotNull(result);
+        assertTrue(result instanceof PrintableString);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("TeletexString".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(
+                new ByteArrayInputStream("TeletexString".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TeletexString);
+        assertNotNull(result);
+        assertTrue(result instanceof TeletexString);
 
-    	parser = new Parser(new ByteArrayInputStream("T61String".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(new ByteArrayInputStream("T61String".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof T61String);
+        assertNotNull(result);
+        assertTrue(result instanceof T61String);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"UniversalString".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "UniversalString".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof UniversalString);
+        assertNotNull(result);
+        assertTrue(result instanceof UniversalString);
 
-    	parser = new Parser(new ByteArrayInputStream("UTF8String".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(new ByteArrayInputStream("UTF8String".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof UTF8String);
+        assertNotNull(result);
+        assertTrue(result instanceof UTF8String);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"VideotexString".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "VideotexString".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof VideotexString);
+        assertNotNull(result);
+        assertTrue(result instanceof VideotexString);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("VisibleString".getBytes())).new RestrictedCharacterStringTypeParser();
+        parser = new Parser(
+                new ByteArrayInputStream("VisibleString".getBytes())).new RestrictedCharacterStringTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof VisibleString);
+        assertNotNull(result);
+        assertTrue(result instanceof VisibleString);
     }
 
     @Test
     public void testRestrictedCharacterStringValueParser() throws IOException,
-    		ParserException {
-    	RestrictedCharacterStringValueParser parser = new Parser(
-    			new ByteArrayInputStream("\"abc\"".getBytes())).new RestrictedCharacterStringValueParser();
+            ParserException {
+        RestrictedCharacterStringValueParser parser = new Parser(
+                new ByteArrayInputStream("\"abc\"".getBytes())).new RestrictedCharacterStringValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof StringValue);
-    	assertEquals("abc", ((StringValue) result).getCString());
+        assertNotNull(result);
+        assertTrue(result instanceof StringValue);
+        assertEquals("abc", ((StringValue) result).getCString());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{\"abc\", {1, 2, 3, 4}}".getBytes())).new RestrictedCharacterStringValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{\"abc\", {1, 2, 3, 4}}".getBytes())).new RestrictedCharacterStringValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CharacterStringList);
-    	assertEquals(2, ((CharacterStringList) result).getValues().size());
+        assertNotNull(result);
+        assertTrue(result instanceof CharacterStringList);
+        assertEquals(2, ((CharacterStringList) result).getValues().size());
 
-    	parser = new Parser(new ByteArrayInputStream("{1, 2, 3, 4}".getBytes())).new RestrictedCharacterStringValueParser();
+        parser = new Parser(new ByteArrayInputStream("{1, 2, 3, 4}".getBytes())).new RestrictedCharacterStringValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertTrue(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertTrue(((CollectionOfValue) result).isQuadruple());
 
-    	parser = new Parser(new ByteArrayInputStream("{1, 2}".getBytes())).new RestrictedCharacterStringValueParser();
+        parser = new Parser(new ByteArrayInputStream("{1, 2}".getBytes())).new RestrictedCharacterStringValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertTrue(((CollectionOfValue) result).isTuple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertTrue(((CollectionOfValue) result).isTuple());
     }
 
     @Test
     public void testCharacterStringListParser() throws IOException,
-    		ParserException {
-    	CharacterStringListParser parser = new Parser(new ByteArrayInputStream(
-    			"{\"abc\", {1, 2, 3, 4}, value-ref, {1, 2}}".getBytes())).new CharacterStringListParser();
+            ParserException {
+        CharacterStringListParser parser = new Parser(new ByteArrayInputStream(
+                "{\"abc\", {1, 2, 3, 4}, value-ref, {1, 2}}".getBytes())).new CharacterStringListParser();
 
-    	CharacterStringList result = parser.parse();
+        CharacterStringList result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(4, result.getValues().size());
+        assertNotNull(result);
+        assertEquals(4, result.getValues().size());
     }
 
     @Test
     public void testCharSymsParser() throws IOException, ParserException {
-    	CharSymsParser parser = new Parser(new ByteArrayInputStream(
-    			"\"abc\", {1, 2, 3, 4}, value-ref, {1, 2}".getBytes())).new CharSymsParser();
+        CharSymsParser parser = new Parser(new ByteArrayInputStream(
+                "\"abc\", {1, 2, 3, 4}, value-ref, {1, 2}".getBytes())).new CharSymsParser();
 
-    	List<Value> result = parser.parse();
+        List<Value> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(4, result.size());
+        assertNotNull(result);
+        assertEquals(4, result.size());
     }
 
     @Test
     public void testCharsDefnParser() throws IOException, ParserException {
-    	CharsDefnParser parser = new Parser(new ByteArrayInputStream(
-    			"\"abc\"".getBytes())).new CharsDefnParser();
+        CharsDefnParser parser = new Parser(new ByteArrayInputStream(
+                "\"abc\"".getBytes())).new CharsDefnParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof StringValue);
-    	assertEquals("abc", ((StringValue) result).getCString());
+        assertNotNull(result);
+        assertTrue(result instanceof StringValue);
+        assertEquals("abc", ((StringValue) result).getCString());
 
-    	parser = new Parser(new ByteArrayInputStream("{1, 2, 3, 4}".getBytes())).new CharsDefnParser();
+        parser = new Parser(new ByteArrayInputStream("{1, 2, 3, 4}".getBytes())).new CharsDefnParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertTrue(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertTrue(((CollectionOfValue) result).isQuadruple());
 
-    	parser = new Parser(new ByteArrayInputStream("{1, 2}".getBytes())).new CharsDefnParser();
+        parser = new Parser(new ByteArrayInputStream("{1, 2}".getBytes())).new CharsDefnParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertTrue(((CollectionOfValue) result).isTuple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertTrue(((CollectionOfValue) result).isTuple());
 
-    	parser = new Parser(new ByteArrayInputStream("value-ref".getBytes())).new CharsDefnParser();
+        parser = new Parser(new ByteArrayInputStream("value-ref".getBytes())).new CharsDefnParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SimpleDefinedValue);
+        assertNotNull(result);
+        assertTrue(result instanceof SimpleDefinedValue);
     }
 
     @Test
     public void testQuadrupleParser() throws IOException, ParserException {
-    	CollectionValueParser parser = new Parser(new ByteArrayInputStream(
-    			"{0, 0, 0, 0}".getBytes())).new CollectionValueParser();
+        CollectionValueParser parser = new Parser(new ByteArrayInputStream(
+                "{0, 0, 0, 0}".getBytes())).new CollectionValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertTrue(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertTrue(((CollectionOfValue) result).isQuadruple());
 
-    	QuadrupleNode quadrupel = ((CollectionOfValue) result).toQuadruple();
+        QuadrupleNode quadrupel = ((CollectionOfValue) result).toQuadruple();
 
-    	assertEquals(0, quadrupel.getGroup());
-    	assertEquals(0, quadrupel.getPlane());
-    	assertEquals(0, quadrupel.getRow());
-    	assertEquals(0, quadrupel.getCell());
+        assertEquals(0, quadrupel.getGroup());
+        assertEquals(0, quadrupel.getPlane());
+        assertEquals(0, quadrupel.getRow());
+        assertEquals(0, quadrupel.getCell());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{127, 255, 255, 255}".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{127, 255, 255, 255}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertTrue(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertTrue(((CollectionOfValue) result).isQuadruple());
 
-    	quadrupel = ((CollectionOfValue) result).toQuadruple();
+        quadrupel = ((CollectionOfValue) result).toQuadruple();
 
-    	assertEquals(127, quadrupel.getGroup());
-    	assertEquals(255, quadrupel.getPlane());
-    	assertEquals(255, quadrupel.getRow());
-    	assertEquals(255, quadrupel.getCell());
+        assertEquals(127, quadrupel.getGroup());
+        assertEquals(255, quadrupel.getPlane());
+        assertEquals(255, quadrupel.getRow());
+        assertEquals(255, quadrupel.getCell());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{127, 255, 255, 256}".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{127, 255, 255, 256}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isQuadruple());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{127, 255, 256, 255}".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{127, 255, 256, 255}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isQuadruple());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{127, 256, 255, 255}".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{127, 256, 255, 255}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isQuadruple());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{128, 255, 252, 255}".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{128, 255, 252, 255}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isQuadruple());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("{-1, 0, 0, 0}".getBytes())).new CollectionValueParser();
+        parser = new Parser(
+                new ByteArrayInputStream("{-1, 0, 0, 0}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isQuadruple());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("{0, -1, 0, 0}".getBytes())).new CollectionValueParser();
+        parser = new Parser(
+                new ByteArrayInputStream("{0, -1, 0, 0}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isQuadruple());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("{0, 0, -1, 0}".getBytes())).new CollectionValueParser();
+        parser = new Parser(
+                new ByteArrayInputStream("{0, 0, -1, 0}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isQuadruple());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("{0, 0, 0, -1}".getBytes())).new CollectionValueParser();
+        parser = new Parser(
+                new ByteArrayInputStream("{0, 0, 0, -1}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isQuadruple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isQuadruple());
     }
 
     @Test
     public void testTupleParser() throws IOException, ParserException {
-    	CollectionValueParser parser = new Parser(new ByteArrayInputStream(
-    			"{7, 15}".getBytes())).new CollectionValueParser();
+        CollectionValueParser parser = new Parser(new ByteArrayInputStream(
+                "{7, 15}".getBytes())).new CollectionValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertTrue(((CollectionOfValue) result).isTuple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertTrue(((CollectionOfValue) result).isTuple());
 
-    	TupleNode tuple = ((CollectionOfValue) result).toTuple();
+        TupleNode tuple = ((CollectionOfValue) result).toTuple();
 
-    	assertNotNull(result);
-    	assertEquals(7, tuple.getColumn());
-    	assertEquals(15, tuple.getRow());
+        assertNotNull(result);
+        assertEquals(7, tuple.getColumn());
+        assertEquals(15, tuple.getRow());
 
-    	parser = new Parser(new ByteArrayInputStream("{7, -1}".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream("{7, -1}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isTuple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isTuple());
 
-    	parser = new Parser(new ByteArrayInputStream("{7, 16}".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream("{7, 16}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isTuple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isTuple());
 
-    	parser = new Parser(new ByteArrayInputStream("{-1, 15}".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream("{-1, 15}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isTuple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isTuple());
 
-    	parser = new Parser(new ByteArrayInputStream("{8, 15}".getBytes())).new CollectionValueParser();
+        parser = new Parser(new ByteArrayInputStream("{8, 15}".getBytes())).new CollectionValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CollectionOfValue);
-    	assertFalse(((CollectionOfValue) result).isTuple());
+        assertNotNull(result);
+        assertTrue(result instanceof CollectionOfValue);
+        assertFalse(((CollectionOfValue) result).isTuple());
     }
 
     /**
@@ -3782,20 +3783,20 @@ public class ParserTest {
 
     @Test
     public void testUnrestrinctedCharacterStringTypeParser()
-    		throws IOException, ParserException {
-    	UnrestrictedCharacterStringTypeParser parser = new Parser(
-    			new ByteArrayInputStream("CHARACTER STRING".getBytes())).new UnrestrictedCharacterStringTypeParser();
+            throws IOException, ParserException {
+        UnrestrictedCharacterStringTypeParser parser = new Parser(
+                new ByteArrayInputStream("CHARACTER STRING".getBytes())).new UnrestrictedCharacterStringTypeParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof CharacterString);
+        assertNotNull(result);
+        assertTrue(result instanceof CharacterString);
     }
 
     @Test
     public void testUnrestrinctedCharacterStringValueParser()
-    		throws IOException, ParserException {
-    	// TODO: implement
+            throws IOException, ParserException {
+        // TODO: implement
     }
 
     /**
@@ -3806,13 +3807,13 @@ public class ParserTest {
 
     @Test
     public void testGeneralizedTimeParser() throws IOException, ParserException {
-    	UsefulTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"GeneralizedTime".getBytes())).new UsefulTypeParser();
+        UsefulTypeParser parser = new Parser(new ByteArrayInputStream(
+                "GeneralizedTime".getBytes())).new UsefulTypeParser();
 
-    	UsefulType result = parser.parse();
+        UsefulType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof GeneralizedTime);
+        assertNotNull(result);
+        assertTrue(result instanceof GeneralizedTime);
     }
 
     /**
@@ -3823,13 +3824,13 @@ public class ParserTest {
 
     @Test
     public void testUTCTimeParser() throws IOException, ParserException {
-    	UsefulTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"UTCTime".getBytes())).new UsefulTypeParser();
+        UsefulTypeParser parser = new Parser(new ByteArrayInputStream(
+                "UTCTime".getBytes())).new UsefulTypeParser();
 
-    	UsefulType result = parser.parse();
+        UsefulType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof UTCTime);
+        assertNotNull(result);
+        assertTrue(result instanceof UTCTime);
     }
 
     /**
@@ -3840,14 +3841,14 @@ public class ParserTest {
 
     @Test
     public void testObjectDescriptorParser() throws IOException,
-    		ParserException {
-    	UsefulTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"ObjectDescriptor".getBytes())).new UsefulTypeParser();
+            ParserException {
+        UsefulTypeParser parser = new Parser(new ByteArrayInputStream(
+                "ObjectDescriptor".getBytes())).new UsefulTypeParser();
 
-    	UsefulType result = parser.parse();
+        UsefulType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectDescriptor);
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectDescriptor);
     }
 
     /**
@@ -3858,188 +3859,188 @@ public class ParserTest {
 
     @Test
     public void testConstrainedTypeParser() throws IOException, ParserException {
-    	TypeParser parser = new Parser(new ByteArrayInputStream(
-    			"VisibleString (ENCODED BY value)".getBytes())).new TypeParser();
+        TypeParser parser = new Parser(new ByteArrayInputStream(
+                "VisibleString (ENCODED BY value)".getBytes())).new TypeParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertTrue(result instanceof VisibleString);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof ContentsConstraint);
+        assertTrue(result instanceof VisibleString);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof ContentsConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"VisibleString (SIZE (1..10)) (\"abc\" | \"def\")".getBytes())).new TypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "VisibleString (SIZE (1..10)) (\"abc\" | \"def\")".getBytes())).new TypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertTrue(result instanceof VisibleString);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
-    	assertTrue(result.getConstraints().get(1) instanceof SubtypeConstraint);
+        assertTrue(result instanceof VisibleString);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
+        assertTrue(result.getConstraints().get(1) instanceof SubtypeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"OCTET STRING ('3AC49E70'H)".getBytes())).new TypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "OCTET STRING ('3AC49E70'H)".getBytes())).new TypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertTrue(result instanceof OctetString);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
+        assertTrue(result instanceof OctetString);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SET SIZE (0 .. 2) OF VisibleString".getBytes())).new TypeParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SET SIZE (0 .. 2) OF VisibleString".getBytes())).new TypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetOfType);
-    	assertTrue(((SetOfType) result).getType() instanceof VisibleString);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SetOfType);
+        assertTrue(((SetOfType) result).getType() instanceof VisibleString);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
     }
 
     @Test
     public void testTypeWithConstraintParser() throws IOException,
-    		ParserException {
-    	TypeWithConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"SET SIZE (0 .. 2) OF VisibleString".getBytes())).new TypeWithConstraintParser();
+            ParserException {
+        TypeWithConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "SET SIZE (0 .. 2) OF VisibleString".getBytes())).new TypeWithConstraintParser();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetOfType);
-    	assertTrue(((SetOfType) result).getType() instanceof VisibleString);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SetOfType);
+        assertTrue(((SetOfType) result).getType() instanceof VisibleString);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SET SIZE (0 .. 2) OF aString VisibleString".getBytes())).new TypeWithConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SET SIZE (0 .. 2) OF aString VisibleString".getBytes())).new TypeWithConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetOfType);
-    	assertTrue(((SetOfType) result).getType() instanceof NamedType);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SetOfType);
+        assertTrue(((SetOfType) result).getType() instanceof NamedType);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE SIZE (0 .. 2) OF VisibleString".getBytes())).new TypeWithConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE SIZE (0 .. 2) OF VisibleString".getBytes())).new TypeWithConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceOfType);
-    	assertTrue(((SequenceOfType) result).getType() instanceof VisibleString);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceOfType);
+        assertTrue(((SequenceOfType) result).getType() instanceof VisibleString);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE SIZE (0 .. 2) OF aString VisibleString".getBytes())).new TypeWithConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE SIZE (0 .. 2) OF aString VisibleString".getBytes())).new TypeWithConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceOfType);
-    	assertTrue(((SequenceOfType) result).getType() instanceof NamedType);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceOfType);
+        assertTrue(((SequenceOfType) result).getType() instanceof NamedType);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SizeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SET (\"true\" | \"false\") OF VisibleString".getBytes())).new TypeWithConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SET (\"true\" | \"false\") OF VisibleString".getBytes())).new TypeWithConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetOfType);
-    	assertTrue(((SetOfType) result).getType() instanceof VisibleString);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SetOfType);
+        assertTrue(((SetOfType) result).getType() instanceof VisibleString);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SET (\"true\" | \"false\") OF aString VisibleString"
-    					.getBytes())).new TypeWithConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SET (\"true\" | \"false\") OF aString VisibleString"
+                        .getBytes())).new TypeWithConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetOfType);
-    	assertTrue(((SetOfType) result).getType() instanceof NamedType);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SetOfType);
+        assertTrue(((SetOfType) result).getType() instanceof NamedType);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE (\"true\" | \"false\") OF VisibleString".getBytes())).new TypeWithConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE (\"true\" | \"false\") OF VisibleString".getBytes())).new TypeWithConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceOfType);
-    	assertTrue(((SequenceOfType) result).getType() instanceof VisibleString);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceOfType);
+        assertTrue(((SequenceOfType) result).getType() instanceof VisibleString);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SEQUENCE (\"true\" | \"false\") OF aString VisibleString"
-    					.getBytes())).new TypeWithConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SEQUENCE (\"true\" | \"false\") OF aString VisibleString"
+                        .getBytes())).new TypeWithConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SequenceOfType);
-    	assertTrue(((SequenceOfType) result).getType() instanceof NamedType);
-    	assertTrue(result.hasConstraint());
-    	assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SequenceOfType);
+        assertTrue(((SequenceOfType) result).getType() instanceof NamedType);
+        assertTrue(result.hasConstraint());
+        assertTrue(result.getConstraints().get(0) instanceof SubtypeConstraint);
     }
 
     @Test
     public void testConstraintParser() throws IOException, ParserException {
-    	ConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"((1..10) EXCEPT (4..6))".getBytes())).new ConstraintParser();
+        ConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "((1..10) EXCEPT (4..6))".getBytes())).new ConstraintParser();
 
-    	Constraint result = parser.parse();
+        Constraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNull(result.getExceptionSpec());
+        assertNotNull(result);
+        assertNull(result.getExceptionSpec());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"((1..10) EXCEPT (4..6) ! INTEGER: 21)".getBytes())).new ConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "((1..10) EXCEPT (4..6) ! INTEGER: 21)".getBytes())).new ConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getExceptionSpec());
+        assertNotNull(result);
+        assertNotNull(result.getExceptionSpec());
     }
 
     @Test
     public void testConstraintSpecParser() throws IOException, ParserException {
-    	ConstraintSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"(1..10) EXCEPT (4..6)".getBytes())).new ConstraintSpecParser();
+        ConstraintSpecParser parser = new Parser(new ByteArrayInputStream(
+                "(1..10) EXCEPT (4..6)".getBytes())).new ConstraintSpecParser();
 
-    	Constraint result = parser.parse();
+        Constraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SubtypeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SubtypeConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"CONSTRAINED BY {}".getBytes())).new ConstraintSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "CONSTRAINED BY {}".getBytes())).new ConstraintSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof UserDefinedConstraintNode);
+        assertNotNull(result);
+        assertTrue(result instanceof UserDefinedConstraintNode);
     }
 
     @Test
     public void testSubtypeConstraintParser() throws IOException,
-    		ParserException {
-    	SubtypeConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"(1..10) EXCEPT (4..6)".getBytes())).new SubtypeConstraintParser();
+            ParserException {
+        SubtypeConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "(1..10) EXCEPT (4..6)".getBytes())).new SubtypeConstraintParser();
 
-    	SubtypeConstraint result = parser.parse();
+        SubtypeConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getElementSetSpecs());
+        assertNotNull(result);
+        assertNotNull(result.getElementSetSpecs());
     }
 
     /**
@@ -4050,141 +4051,141 @@ public class ParserTest {
 
     @Test
     public void testElementSetSpecsParser() throws IOException, ParserException {
-    	SetSpecsParser parser = new Parser(new ByteArrayInputStream(
-    			"(1..10) EXCEPT (4..6)".getBytes())).new SetSpecsParser();
+        SetSpecsParser parser = new Parser(new ByteArrayInputStream(
+                "(1..10) EXCEPT (4..6)".getBytes())).new SetSpecsParser();
 
-    	SetSpecsNode result = parser.parse();
+        SetSpecsNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getRootElements());
-    	assertNull(result.getAdditionalElements());
-    	assertFalse(result.hasExtensionMarker());
+        assertNotNull(result);
+        assertNotNull(result.getRootElements());
+        assertNull(result.getAdditionalElements());
+        assertFalse(result.hasExtensionMarker());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ALL EXCEPT (4..6), ...".getBytes())).new SetSpecsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ALL EXCEPT (4..6), ...".getBytes())).new SetSpecsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getRootElements());
-    	assertNull(result.getAdditionalElements());
-    	assertTrue(result.hasExtensionMarker());
+        assertNotNull(result);
+        assertNotNull(result.getRootElements());
+        assertNull(result.getAdditionalElements());
+        assertTrue(result.hasExtensionMarker());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"(1..5) | (12<..<17), ..., ALL EXCEPT (7..77)".getBytes())).new SetSpecsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "(1..5) | (12<..<17), ..., ALL EXCEPT (7..77)".getBytes())).new SetSpecsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getRootElements());
-    	assertNotNull(result.getAdditionalElements());
-    	assertTrue(result.hasExtensionMarker());
+        assertNotNull(result);
+        assertNotNull(result.getRootElements());
+        assertNotNull(result.getAdditionalElements());
+        assertTrue(result.hasExtensionMarker());
     }
 
     @Test
     public void testElementSetSpecParser() throws IOException, ParserException {
-    	ElementSetSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"ALL EXCEPT 1".getBytes())).new ElementSetSpecParser();
+        ElementSetSpecParser parser = new Parser(new ByteArrayInputStream(
+                "ALL EXCEPT 1".getBytes())).new ElementSetSpecParser();
 
-    	ElementSet result = parser.parse();
+        ElementSet result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(OpType.All, result.getOperation());
+        assertNotNull(result);
+        assertEquals(OpType.All, result.getOperation());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"true UNION false".getBytes())).new ElementSetSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "true UNION false".getBytes())).new ElementSetSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testUnionsParser() throws IOException, ParserException {
-    	UnionsParser parser = new Parser(new ByteArrayInputStream(
-    			"(1 .. 10) | (20..30)".getBytes())).new UnionsParser();
+        UnionsParser parser = new Parser(new ByteArrayInputStream(
+                "(1 .. 10) | (20..30)".getBytes())).new UnionsParser();
 
-    	Elements result = parser.parse();
+        Elements result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ElementSet);
-    	assertEquals(OpType.Union, ((ElementSet) result).getOperation());
+        assertNotNull(result);
+        assertTrue(result instanceof ElementSet);
+        assertEquals(OpType.Union, ((ElementSet) result).getOperation());
     }
 
     @Test
     public void testIntersectionsParser() throws IOException, ParserException {
-    	IntersectionsParser parser = new Parser(new ByteArrayInputStream(
-    			"(1 .. 40) ^ (20..30)".getBytes())).new IntersectionsParser();
+        IntersectionsParser parser = new Parser(new ByteArrayInputStream(
+                "(1 .. 40) ^ (20..30)".getBytes())).new IntersectionsParser();
 
-    	Elements result = parser.parse();
+        Elements result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ElementSet);
-    	assertEquals(OpType.Intersection, ((ElementSet) result).getOperation());
+        assertNotNull(result);
+        assertTrue(result instanceof ElementSet);
+        assertEquals(OpType.Intersection, ((ElementSet) result).getOperation());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"(1 .. 40) INTERSECTION (ALL EXCEPT (20..50))".getBytes())).new IntersectionsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "(1 .. 40) INTERSECTION (ALL EXCEPT (20..50))".getBytes())).new IntersectionsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ElementSet);
-    	assertEquals(OpType.Intersection, ((ElementSet) result).getOperation());
+        assertNotNull(result);
+        assertTrue(result instanceof ElementSet);
+        assertEquals(OpType.Intersection, ((ElementSet) result).getOperation());
     }
 
     @Test
     public void testIntersectionElementsParser() throws IOException,
-    		ParserException {
-    	IntersectionElementsParser parser = new Parser(
-    			new ByteArrayInputStream("(1 .. 40)".getBytes())).new IntersectionElementsParser();
+            ParserException {
+        IntersectionElementsParser parser = new Parser(
+                new ByteArrayInputStream("(1 .. 40)".getBytes())).new IntersectionElementsParser();
 
-    	Elements result = parser.parse();
+        Elements result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"(1 .. 40) EXCEPT 5".getBytes())).new IntersectionElementsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "(1 .. 40) EXCEPT 5".getBytes())).new IntersectionElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ElementSet);
-    	assertEquals(OpType.Exclude, ((ElementSet) result).getOperation());
+        assertNotNull(result);
+        assertTrue(result instanceof ElementSet);
+        assertEquals(OpType.Exclude, ((ElementSet) result).getOperation());
     }
 
     @Test
     public void testExclusionsParser() throws IOException, ParserException {
-    	ExclusionsParser parser = new Parser(new ByteArrayInputStream(
-    			"EXCEPT 1".getBytes())).new ExclusionsParser();
+        ExclusionsParser parser = new Parser(new ByteArrayInputStream(
+                "EXCEPT 1".getBytes())).new ExclusionsParser();
 
-    	Elements result = parser.parse();
+        Elements result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testElementsParser() throws IOException, ParserException {
-    	ElementsParser parser = new Parser(new ByteArrayInputStream(
-    			"12 .. 15".getBytes())).new ElementsParser();
+        ElementsParser parser = new Parser(new ByteArrayInputStream(
+                "12 .. 15".getBytes())).new ElementsParser();
 
-    	Elements result = parser.parse();
+        Elements result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"(ALL EXCEPT 1)".getBytes())).new ElementsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "(ALL EXCEPT 1)".getBytes())).new ElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new ElementsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new ElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectSetElementsNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectSetElementsNode);
     }
 
     /**
@@ -4195,508 +4196,508 @@ public class ParserTest {
 
     @Test
     public void testSubtypeElementsParser() throws IOException, ParserException {
-    	// SingleValue
-    	SubtypeElementsParser parser = new Parser(new ByteArrayInputStream(
-    			"4711".getBytes())).new SubtypeElementsParser();
+        // SingleValue
+        SubtypeElementsParser parser = new Parser(new ByteArrayInputStream(
+                "4711".getBytes())).new SubtypeElementsParser();
 
-    	Constraint result = parser.parse();
+        Constraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SingleValueConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SingleValueConstraint);
 
-    	// ContainedSubtype
-    	parser = new Parser(new ByteArrayInputStream(
-    			"INCLUDES VisibleString (SIZE (1..255))".getBytes())).new SubtypeElementsParser();
+        // ContainedSubtype
+        parser = new Parser(new ByteArrayInputStream(
+                "INCLUDES VisibleString (SIZE (1..255))".getBytes())).new SubtypeElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ContainedSubtype);
+        assertNotNull(result);
+        assertTrue(result instanceof ContainedSubtype);
 
-    	// ValueRange
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{5, 65} .. {7, 120}".getBytes())).new SubtypeElementsParser();
+        // ValueRange
+        parser = new Parser(new ByteArrayInputStream(
+                "{5, 65} .. {7, 120}".getBytes())).new SubtypeElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RangeNode);
+        assertNotNull(result);
+        assertTrue(result instanceof RangeNode);
 
-    	// SizeConstraint
-    	parser = new Parser(new ByteArrayInputStream("SIZE (16)".getBytes())).new SubtypeElementsParser();
+        // SizeConstraint
+        parser = new Parser(new ByteArrayInputStream("SIZE (16)".getBytes())).new SubtypeElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SizeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SizeConstraint);
 
-    	// TypeConstraint TODO: ambiguous, returns ASN1ContainedSubtype
-    	parser = new Parser(new ByteArrayInputStream("INTEGER".getBytes())).new SubtypeElementsParser();
+        // TypeConstraint TODO: ambiguous, returns ASN1ContainedSubtype
+        parser = new Parser(new ByteArrayInputStream("INTEGER".getBytes())).new SubtypeElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ContainedSubtype);
+        assertNotNull(result);
+        assertTrue(result instanceof ContainedSubtype);
 
-    	// PermittedAlphabet
-    	parser = new Parser(new ByteArrayInputStream(
-    			"FROM (\"a\"..\"z\")".getBytes())).new SubtypeElementsParser();
+        // PermittedAlphabet
+        parser = new Parser(new ByteArrayInputStream(
+                "FROM (\"a\"..\"z\")".getBytes())).new SubtypeElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result instanceof PermittedAlphabetConstraint);
+        assertNotNull(result);
+        assertNotNull(result instanceof PermittedAlphabetConstraint);
 
-    	// InnerTypeConstraints
-    	parser = new Parser(new ByteArrayInputStream(
-    			"WITH COMPONENTS { identifier-1 (SIZE (1..10)) }".getBytes())).new SubtypeElementsParser();
+        // InnerTypeConstraints
+        parser = new Parser(new ByteArrayInputStream(
+                "WITH COMPONENTS { identifier-1 (SIZE (1..10)) }".getBytes())).new SubtypeElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof MultipleTypeConstraints);
+        assertNotNull(result);
+        assertTrue(result instanceof MultipleTypeConstraints);
 
-    	// PatternConstraint
-    	parser = new Parser(new ByteArrayInputStream(
-    			"PATTERN aPattern".getBytes())).new SubtypeElementsParser();
+        // PatternConstraint
+        parser = new Parser(new ByteArrayInputStream(
+                "PATTERN aPattern".getBytes())).new SubtypeElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof PatternConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof PatternConstraint);
 
-    	// PropertySettings
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SETTINGS \"Midnight=Start\"".getBytes())).new SubtypeElementsParser();
+        // PropertySettings
+        parser = new Parser(new ByteArrayInputStream(
+                "SETTINGS \"Midnight=Start\"".getBytes())).new SubtypeElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof PropertySettingsConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof PropertySettingsConstraint);
 
-    	// TODO: DurationRange
+        // TODO: DurationRange
 
-    	// TODO: TimePointRange
+        // TODO: TimePointRange
 
-    	// TODO: RecurrenceRange
+        // TODO: RecurrenceRange
     }
 
     @Test
     public void testSingleValueParser() throws IOException, ParserException {
-    	SingleValueParser parser = new Parser(new ByteArrayInputStream(
-    			"4711".getBytes())).new SingleValueParser();
+        SingleValueParser parser = new Parser(new ByteArrayInputStream(
+                "4711".getBytes())).new SingleValueParser();
 
-    	SingleValueConstraint result = parser.parse();
+        SingleValueConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getValue() instanceof IntegerValue);
+        assertNotNull(result);
+        assertTrue(result.getValue() instanceof IntegerValue);
     }
 
     @Test
     public void testContainedSubtypeParser() throws IOException,
-    		ParserException {
-    	ContainedSubtypeParser parser = new Parser(new ByteArrayInputStream(
-    			"INCLUDES INTEGER".getBytes())).new ContainedSubtypeParser();
+            ParserException {
+        ContainedSubtypeParser parser = new Parser(new ByteArrayInputStream(
+                "INCLUDES INTEGER".getBytes())).new ContainedSubtypeParser();
 
-    	ContainedSubtype result = parser.parse();
+        ContainedSubtype result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.hasIncludes());
-    	assertTrue(result.getType() instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result.hasIncludes());
+        assertTrue(result.getType() instanceof IntegerType);
 
-    	parser = new Parser(new ByteArrayInputStream("INTEGER".getBytes())).new ContainedSubtypeParser();
+        parser = new Parser(new ByteArrayInputStream("INTEGER".getBytes())).new ContainedSubtypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertFalse(result.hasIncludes());
-    	assertTrue(result.getType() instanceof IntegerType);
+        assertNotNull(result);
+        assertFalse(result.hasIncludes());
+        assertTrue(result.getType() instanceof IntegerType);
     }
 
     @Test
     public void testValueRangeParser() throws IOException, ParserException {
-    	ValueRangeParser parser = new Parser(new ByteArrayInputStream(
-    			"12 .. < MAX".getBytes())).new ValueRangeParser();
+        ValueRangeParser parser = new Parser(new ByteArrayInputStream(
+                "12 .. < MAX".getBytes())).new ValueRangeParser();
 
-    	RangeNode result = parser.parse();
+        RangeNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getLower().getValue() instanceof IntegerValue);
-    	assertTrue(result.getLower().isInclusive());
-    	assertEquals(Value.MAX, result.getUpper().getValue());
-    	assertFalse(result.getUpper().isInclusive());
+        assertNotNull(result);
+        assertTrue(result.getLower().getValue() instanceof IntegerValue);
+        assertTrue(result.getLower().isInclusive());
+        assertEquals(Value.MAX, result.getUpper().getValue());
+        assertFalse(result.getUpper().isInclusive());
 
-    	parser = new Parser(new ByteArrayInputStream("12 .. 15".getBytes())).new ValueRangeParser();
+        parser = new Parser(new ByteArrayInputStream("12 .. 15".getBytes())).new ValueRangeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getLower().getValue() instanceof IntegerValue);
-    	assertTrue(result.getLower().isInclusive());
-    	assertTrue(result.getUpper().getValue() instanceof IntegerValue);
-    	assertTrue(result.getUpper().isInclusive());
+        assertNotNull(result);
+        assertTrue(result.getLower().getValue() instanceof IntegerValue);
+        assertTrue(result.getLower().isInclusive());
+        assertTrue(result.getUpper().getValue() instanceof IntegerValue);
+        assertTrue(result.getUpper().isInclusive());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("MIN < .. < 15".getBytes())).new ValueRangeParser();
+        parser = new Parser(
+                new ByteArrayInputStream("MIN < .. < 15".getBytes())).new ValueRangeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Value.MIN, result.getLower().getValue());
-    	assertFalse(result.getLower().isInclusive());
-    	assertTrue(result.getUpper().getValue() instanceof IntegerValue);
-    	assertFalse(result.getUpper().isInclusive());
+        assertNotNull(result);
+        assertEquals(Value.MIN, result.getLower().getValue());
+        assertFalse(result.getLower().isInclusive());
+        assertTrue(result.getUpper().getValue() instanceof IntegerValue);
+        assertFalse(result.getUpper().isInclusive());
 
-    	parser = new Parser(new ByteArrayInputStream("MIN < .. 15".getBytes())).new ValueRangeParser();
+        parser = new Parser(new ByteArrayInputStream("MIN < .. 15".getBytes())).new ValueRangeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Value.MIN, result.getLower().getValue());
-    	assertFalse(result.getLower().isInclusive());
-    	assertTrue(result.getUpper().getValue() instanceof IntegerValue);
-    	assertTrue(result.getUpper().isInclusive());
+        assertNotNull(result);
+        assertEquals(Value.MIN, result.getLower().getValue());
+        assertFalse(result.getLower().isInclusive());
+        assertTrue(result.getUpper().getValue() instanceof IntegerValue);
+        assertTrue(result.getUpper().isInclusive());
 
-    	parser = new Parser(new ByteArrayInputStream("12 .. 15".getBytes())).new ValueRangeParser();
+        parser = new Parser(new ByteArrayInputStream("12 .. 15".getBytes())).new ValueRangeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getLower().getValue() instanceof IntegerValue);
-    	assertTrue(result.getLower().isInclusive());
-    	assertTrue(result.getUpper().getValue() instanceof IntegerValue);
-    	assertTrue(result.getUpper().isInclusive());
+        assertNotNull(result);
+        assertTrue(result.getLower().getValue() instanceof IntegerValue);
+        assertTrue(result.getLower().isInclusive());
+        assertTrue(result.getUpper().getValue() instanceof IntegerValue);
+        assertTrue(result.getUpper().isInclusive());
     }
 
     @Test
     public void testLowerEndpointParser() throws IOException, ParserException {
-    	LowerEndpointParser parser = new Parser(new ByteArrayInputStream(
-    			"MIN".getBytes())).new LowerEndpointParser();
+        LowerEndpointParser parser = new Parser(new ByteArrayInputStream(
+                "MIN".getBytes())).new LowerEndpointParser();
 
-    	LowerEndpointNode result = parser.parse();
+        LowerEndpointNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Value.MIN, result.getValue());
-    	assertTrue(result.isInclusive());
+        assertNotNull(result);
+        assertEquals(Value.MIN, result.getValue());
+        assertTrue(result.isInclusive());
 
-    	parser = new Parser(new ByteArrayInputStream("MIN <".getBytes())).new LowerEndpointParser();
+        parser = new Parser(new ByteArrayInputStream("MIN <".getBytes())).new LowerEndpointParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Value.MIN, result.getValue());
-    	assertFalse(result.isInclusive());
+        assertNotNull(result);
+        assertEquals(Value.MIN, result.getValue());
+        assertFalse(result.isInclusive());
     }
 
     @Test
     public void testUpperEndpointParser() throws IOException, ParserException {
-    	UpperEndpointParser parser = new Parser(new ByteArrayInputStream(
-    			"MAX".getBytes())).new UpperEndpointParser();
+        UpperEndpointParser parser = new Parser(new ByteArrayInputStream(
+                "MAX".getBytes())).new UpperEndpointParser();
 
-    	UpperEndpointNode result = parser.parse();
+        UpperEndpointNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Value.MAX, result.getValue());
-    	assertTrue(result.isInclusive());
+        assertNotNull(result);
+        assertEquals(Value.MAX, result.getValue());
+        assertTrue(result.isInclusive());
 
-    	parser = new Parser(new ByteArrayInputStream("< MAX".getBytes())).new UpperEndpointParser();
+        parser = new Parser(new ByteArrayInputStream("< MAX".getBytes())).new UpperEndpointParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Value.MAX, result.getValue());
-    	assertFalse(result.isInclusive());
+        assertNotNull(result);
+        assertEquals(Value.MAX, result.getValue());
+        assertFalse(result.isInclusive());
     }
 
     @Test
     public void testLowerValueParser() throws IOException, ParserException {
-    	LowerEndValueParser parser = new Parser(new ByteArrayInputStream(
-    			"MIN".getBytes())).new LowerEndValueParser();
+        LowerEndValueParser parser = new Parser(new ByteArrayInputStream(
+                "MIN".getBytes())).new LowerEndValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Value.MIN, result);
+        assertNotNull(result);
+        assertEquals(Value.MIN, result);
     }
 
     @Test
     public void testUpperValueParser() throws IOException, ParserException {
-    	UpperEndValueParser parser = new Parser(new ByteArrayInputStream(
-    			"MAX".getBytes())).new UpperEndValueParser();
+        UpperEndValueParser parser = new Parser(new ByteArrayInputStream(
+                "MAX".getBytes())).new UpperEndValueParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Value.MAX, result);
+        assertNotNull(result);
+        assertEquals(Value.MAX, result);
     }
 
     @Test
     public void testSizeConstraintParser() throws IOException, ParserException {
-    	SizeConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"SIZE (0..5)".getBytes())).new SizeConstraintParser();
+        SizeConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "SIZE (0..5)".getBytes())).new SizeConstraintParser();
 
-    	SizeConstraint result = parser.parse();
+        SizeConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getConstraint());
+        assertNotNull(result);
+        assertNotNull(result.getConstraint());
     }
 
     @Test
     public void testTypeConstraintParser() throws IOException, ParserException {
-    	TypeConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"INTEGER".getBytes())).new TypeConstraintParser();
+        TypeConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "INTEGER".getBytes())).new TypeConstraintParser();
 
-    	TypeConstraint result = parser.parse();
+        TypeConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getType() instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result.getType() instanceof IntegerType);
     }
 
     @Test
     public void testPermittedAlphabetParser() throws IOException,
-    		ParserException {
-    	PermittedAlphabetParser parser = new Parser(new ByteArrayInputStream(
-    			"FROM (\"a\"..\"z\")".getBytes())).new PermittedAlphabetParser();
+            ParserException {
+        PermittedAlphabetParser parser = new Parser(new ByteArrayInputStream(
+                "FROM (\"a\"..\"z\")".getBytes())).new PermittedAlphabetParser();
 
-    	PermittedAlphabetConstraint result = parser.parse();
+        PermittedAlphabetConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getConstraint());
+        assertNotNull(result);
+        assertNotNull(result.getConstraint());
     }
 
     @Test
     public void testInnerTypeConstraintsParser() throws IOException,
-    		ParserException {
-    	InnerTypeConstraintsParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"WITH COMPONENTS { identifier-1 (SIZE (1..10)) }"
-    							.getBytes())).new InnerTypeConstraintsParser();
+            ParserException {
+        InnerTypeConstraintsParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "WITH COMPONENTS { identifier-1 (SIZE (1..10)) }"
+                                .getBytes())).new InnerTypeConstraintsParser();
 
-    	Constraint result = parser.parse();
+        Constraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof MultipleTypeConstraints);
+        assertNotNull(result);
+        assertTrue(result instanceof MultipleTypeConstraints);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"WITH COMPONENT (SIZE (23))".getBytes())).new InnerTypeConstraintsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "WITH COMPONENT (SIZE (23))".getBytes())).new InnerTypeConstraintsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SubtypeConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof SubtypeConstraint);
     }
 
     @Test
     public void testMultipleTypeConstraintsParser() throws IOException,
-    		ParserException {
-    	MultipleTypeConstraintsParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"{ identifier-1 (SIZE (1..10)) }".getBytes())).new MultipleTypeConstraintsParser();
+            ParserException {
+        MultipleTypeConstraintsParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "{ identifier-1 (SIZE (1..10)) }".getBytes())).new MultipleTypeConstraintsParser();
 
-    	MultipleTypeConstraints result = parser.parse();
+        MultipleTypeConstraints result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getConstraints());
-    	assertEquals(1, result.getConstraints().size());
-    	assertFalse(result.isPartial());
+        assertNotNull(result);
+        assertNotNull(result.getConstraints());
+        assertEquals(1, result.getConstraints().size());
+        assertFalse(result.isPartial());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{..., identifier-1 (SIZE (1..10)) }".getBytes())).new MultipleTypeConstraintsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{..., identifier-1 (SIZE (1..10)) }".getBytes())).new MultipleTypeConstraintsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getConstraints());
-    	assertEquals(1, result.getConstraints().size());
-    	assertTrue(result.isPartial());
+        assertNotNull(result);
+        assertNotNull(result.getConstraints());
+        assertEquals(1, result.getConstraints().size());
+        assertTrue(result.isPartial());
     }
 
     @Test
     public void testFullSpecificationParser() throws IOException,
-    		ParserException {
-    	FullSpecificationParser parser = new Parser(new ByteArrayInputStream(
-    			"{ identifier-1 (SIZE (1..10)) }".getBytes())).new FullSpecificationParser();
+            ParserException {
+        FullSpecificationParser parser = new Parser(new ByteArrayInputStream(
+                "{ identifier-1 (SIZE (1..10)) }".getBytes())).new FullSpecificationParser();
 
-    	MultipleTypeConstraints result = parser.parse();
+        MultipleTypeConstraints result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getConstraints());
-    	assertEquals(1, result.getConstraints().size());
-    	assertFalse(result.isPartial());
+        assertNotNull(result);
+        assertNotNull(result.getConstraints());
+        assertEquals(1, result.getConstraints().size());
+        assertFalse(result.isPartial());
     }
 
     @Test
     public void testPartialSpecificationParser() throws IOException,
-    		ParserException {
-    	PartialSpecificationParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"{..., identifier-1 (SIZE (1..10)) }".getBytes())).new PartialSpecificationParser();
+            ParserException {
+        PartialSpecificationParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "{..., identifier-1 (SIZE (1..10)) }".getBytes())).new PartialSpecificationParser();
 
-    	MultipleTypeConstraints result = parser.parse();
+        MultipleTypeConstraints result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getConstraints());
-    	assertEquals(1, result.getConstraints().size());
-    	assertTrue(result.isPartial());
+        assertNotNull(result);
+        assertNotNull(result.getConstraints());
+        assertEquals(1, result.getConstraints().size());
+        assertTrue(result.isPartial());
     }
 
     @Test
     public void testTypeConstraintsParser() throws IOException, ParserException {
-    	TypeConstraintsParser parser = new Parser(new ByteArrayInputStream(
-    			"identifier-1 (4711 | 4712) OPTIONAL, identifier-2 (SIZE (1..10)) DEFAULT 5"
-    					.getBytes())).new TypeConstraintsParser();
+        TypeConstraintsParser parser = new Parser(new ByteArrayInputStream(
+                "identifier-1 (4711 | 4712) OPTIONAL, identifier-2 (SIZE (1..10)) DEFAULT 5"
+                        .getBytes())).new TypeConstraintsParser();
 
-    	List<NamedConstraint> result = parser.parse();
+        List<NamedConstraint> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
-    	assertEquals("identifier-1", result.get(0).getName());
-    	assertNotNull(result.get(0).getConstraint());
-    	assertEquals("identifier-2", result.get(1).getName());
-    	assertNotNull(result.get(1).getConstraint());
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertEquals("identifier-1", result.get(0).getName());
+        assertNotNull(result.get(0).getConstraint());
+        assertEquals("identifier-2", result.get(1).getName());
+        assertNotNull(result.get(1).getConstraint());
     }
 
     @Test
     public void testNamedConstraintParser() throws IOException, ParserException {
-    	NamedConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"identifier (4711 | 4712) OPTIONAL".getBytes())).new NamedConstraintParser();
+        NamedConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "identifier (4711 | 4712) OPTIONAL".getBytes())).new NamedConstraintParser();
 
-    	NamedConstraint result = parser.parse();
+        NamedConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("identifier", result.getName());
-    	assertNotNull(result.getConstraint());
+        assertNotNull(result);
+        assertEquals("identifier", result.getName());
+        assertNotNull(result.getConstraint());
     }
 
     @Test
     public void testComponentConstraintParser() throws IOException,
-    		ParserException {
-    	ComponentConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"(4711 | 4712) OPTIONAL".getBytes())).new ComponentConstraintParser();
+            ParserException {
+        ComponentConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "(4711 | 4712) OPTIONAL".getBytes())).new ComponentConstraintParser();
 
-    	ComponentConstraint result = parser.parse();
+        ComponentConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getValue());
-    	assertEquals(PresenceConstraint.Type.Optional, result.getPresence()
-    			.getType());
+        assertNotNull(result);
+        assertNotNull(result.getValue());
+        assertEquals(PresenceConstraint.Type.Optional, result.getPresence()
+                .getType());
     }
 
     @Test
     public void testValueConstraintParser() throws IOException, ParserException {
-    	ValueConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"(4711 | 4712)".getBytes())).new ValueConstraintParser();
+        ValueConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "(4711 | 4712)".getBytes())).new ValueConstraintParser();
 
-    	Constraint result = parser.parse();
+        Constraint result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testPresenceConstraintParser() throws IOException,
-    		ParserException {
-    	PresenceConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"PRESENT".getBytes())).new PresenceConstraintParser();
+            ParserException {
+        PresenceConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "PRESENT".getBytes())).new PresenceConstraintParser();
 
-    	PresenceConstraint result = parser.parse();
+        PresenceConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(PresenceConstraint.Type.Present, result.getType());
+        assertNotNull(result);
+        assertEquals(PresenceConstraint.Type.Present, result.getType());
 
-    	parser = new Parser(new ByteArrayInputStream("ABSENT".getBytes())).new PresenceConstraintParser();
+        parser = new Parser(new ByteArrayInputStream("ABSENT".getBytes())).new PresenceConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(PresenceConstraint.Type.Absent, result.getType());
+        assertNotNull(result);
+        assertEquals(PresenceConstraint.Type.Absent, result.getType());
 
-    	parser = new Parser(new ByteArrayInputStream("OPTIONAL".getBytes())).new PresenceConstraintParser();
+        parser = new Parser(new ByteArrayInputStream("OPTIONAL".getBytes())).new PresenceConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(PresenceConstraint.Type.Optional, result.getType());
+        assertNotNull(result);
+        assertEquals(PresenceConstraint.Type.Optional, result.getType());
     }
 
     @Test
     public void testPatternConstraintParser() throws IOException,
-    		ParserException {
-    	// TODO: check pattern
-    	PatternConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"PATTERN aPattern".getBytes())).new PatternConstraintParser();
+            ParserException {
+        // TODO: check pattern
+        PatternConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "PATTERN aPattern".getBytes())).new PatternConstraintParser();
 
-    	PatternConstraint result = parser.parse();
+        PatternConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getPattern() instanceof DefinedValue);
+        assertNotNull(result);
+        assertTrue(result.getPattern() instanceof DefinedValue);
     }
 
     @Test
     public void testPropertySettingsParser() throws IOException,
-    		ParserException {
-    	PropertySettingsParser parser = new Parser(new ByteArrayInputStream(
-    			"SETTINGS \"Midnight=Start\"".getBytes())).new PropertySettingsParser();
+            ParserException {
+        PropertySettingsParser parser = new Parser(new ByteArrayInputStream(
+                "SETTINGS \"Midnight=Start\"".getBytes())).new PropertySettingsParser();
 
-    	PropertySettingsConstraint result = parser.parse();
+        PropertySettingsConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.getSettings().size());
+        assertNotNull(result);
+        assertEquals(1, result.getSettings().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"SETTINGS \"Midnight=Start Date=YMD\"".getBytes())).new PropertySettingsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "SETTINGS \"Midnight=Start Date=YMD\"".getBytes())).new PropertySettingsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getSettings().size());
+        assertNotNull(result);
+        assertEquals(2, result.getSettings().size());
     }
 
     @Test
     public void testPropertyAndSettingPairParser() throws IOException,
-    		ParserException {
-    	PropertyAndSettingPairParser parser = new Parser(
-    			new ByteArrayInputStream("Midnight=Start".getBytes())).new PropertyAndSettingPairParser();
+            ParserException {
+        PropertyAndSettingPairParser parser = new Parser(
+                new ByteArrayInputStream("Midnight=Start".getBytes())).new PropertyAndSettingPairParser();
 
-    	PropertyAndSettingNode result = parser.parse();
+        PropertyAndSettingNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Midnight", result.getProperty());
-    	assertEquals("Start", result.getSetting());
+        assertNotNull(result);
+        assertEquals("Midnight", result.getProperty());
+        assertEquals("Start", result.getSetting());
 
-    	parser = new Parser(new ByteArrayInputStream("Time=HMF27".getBytes())).new PropertyAndSettingPairParser();
+        parser = new Parser(new ByteArrayInputStream("Time=HMF27".getBytes())).new PropertyAndSettingPairParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Time", result.getProperty());
-    	assertEquals("HMF27", result.getSetting());
+        assertNotNull(result);
+        assertEquals("Time", result.getProperty());
+        assertEquals("HMF27", result.getSetting());
 
-    	parser = new Parser(new ByteArrayInputStream("Time=HF0".getBytes())).new PropertyAndSettingPairParser();
+        parser = new Parser(new ByteArrayInputStream("Time=HF0".getBytes())).new PropertyAndSettingPairParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNull(result);
+        assertNull(result);
     }
 
     @Test
     public void testDurationRangeParser() throws IOException, ParserException {
-    	// TODO: implement
-    	DurationRangeParser parser = new Parser(new ByteArrayInputStream(
-    			"\"PT2M0.000S\"..\"PT2M59.000S\"".getBytes())).new DurationRangeParser();
+        // TODO: implement
+        DurationRangeParser parser = new Parser(new ByteArrayInputStream(
+                "\"PT2M0.000S\"..\"PT2M59.000S\"".getBytes())).new DurationRangeParser();
 
-    	RangeNode result = parser.parse();
+        RangeNode result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testTimePointRangeParser() {
-    	// TODO: implement
+        // TODO: implement
     }
 
     @Test
     public void testReccurrenceRangeParser() {
-    	// TODO: implement
+        // TODO: implement
     }
 
     /**
@@ -4707,42 +4708,42 @@ public class ParserTest {
 
     @Test
     public void testExceptionSpecParser() throws IOException, ParserException {
-    	ExceptionSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"! 23".getBytes())).new ExceptionSpecParser();
+        ExceptionSpecParser parser = new Parser(new ByteArrayInputStream(
+                "! 23".getBytes())).new ExceptionSpecParser();
 
-    	ExceptionIdentificationNode result = parser.parse();
+        ExceptionIdentificationNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getValue() instanceof SignedNumber);
+        assertNotNull(result);
+        assertTrue(result.getValue() instanceof SignedNumber);
     }
 
     @Test
     public void testExceptionIdentificationParser() throws IOException,
-    		ParserException {
-    	ExceptionIdentificationParser parser = new Parser(
-    			new ByteArrayInputStream("-4711".getBytes())).new ExceptionIdentificationParser();
+            ParserException {
+        ExceptionIdentificationParser parser = new Parser(
+                new ByteArrayInputStream("-4711".getBytes())).new ExceptionIdentificationParser();
 
-    	ExceptionIdentificationNode result = parser.parse();
+        ExceptionIdentificationNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getValue() instanceof SignedNumber);
-    	assertNull(result.getType());
+        assertNotNull(result);
+        assertTrue(result.getValue() instanceof SignedNumber);
+        assertNull(result.getType());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Module.valueref".getBytes())).new ExceptionIdentificationParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Module.valueref".getBytes())).new ExceptionIdentificationParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getValue() instanceof SimpleDefinedValue);
-    	assertNull(result.getType());
+        assertNotNull(result);
+        assertTrue(result.getValue() instanceof SimpleDefinedValue);
+        assertNull(result.getType());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"VisibleString: \"test\"".getBytes())).new ExceptionIdentificationParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "VisibleString: \"test\"".getBytes())).new ExceptionIdentificationParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
         assertTrue(result.getType() instanceof VisibleString);
         testAmbiguousValue(result.getValue(), StringValue.class);
     }
@@ -4755,39 +4756,39 @@ public class ParserTest {
 
     @Test
     public void testEncodingControlSectionsParser() throws IOException,
-    		ParserException {
-    	EncodingControlSectionsParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"ENCODING-CONTROL XER ENCODING-CONTROL XER [NULL]"
-    							.getBytes())).new EncodingControlSectionsParser();
+            ParserException {
+        EncodingControlSectionsParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "ENCODING-CONTROL XER ENCODING-CONTROL XER [NULL]"
+                                .getBytes())).new EncodingControlSectionsParser();
 
-    	List<EncodingControlSectionNode> result = parser.parse();
+        List<EncodingControlSectionNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
     public void testEncodingControlSectionParser() throws IOException,
-    		ParserException {
-    	EncodingControlSectionParser parser = new Parser(
-    			new ByteArrayInputStream("ENCODING-CONTROL PER".getBytes())).new EncodingControlSectionParser();
+            ParserException {
+        EncodingControlSectionParser parser = new Parser(
+                new ByteArrayInputStream("ENCODING-CONTROL PER".getBytes())).new EncodingControlSectionParser();
 
-    	EncodingControlSectionNode result = parser.parse();
+        EncodingControlSectionNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("PER", result.getEncodingReference());
-    	assertEquals(0, result.getEncodingInstruction().size());
+        assertNotNull(result);
+        assertEquals("PER", result.getEncodingReference());
+        assertEquals(0, result.getEncodingInstruction().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ENCODING-CONTROL PER [NULL] IA5String [SIZE 8] Body"
-    					.getBytes())).new EncodingControlSectionParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ENCODING-CONTROL PER [NULL] IA5String [SIZE 8] Body"
+                        .getBytes())).new EncodingControlSectionParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("PER", result.getEncodingReference());
-    	assertEquals(9, result.getEncodingInstruction().size());
+        assertNotNull(result);
+        assertEquals("PER", result.getEncodingReference());
+        assertEquals(9, result.getEncodingInstruction().size());
     }
 
     /**
@@ -4798,137 +4799,137 @@ public class ParserTest {
 
     @Test
     public void testDefinedObjectClassParser() throws IOException,
-    		ParserException {
-    	DefinedObjectClassParser parser = new Parser(new ByteArrayInputStream(
-    			"OBJECT-CLASS".getBytes())).new DefinedObjectClassParser();
+            ParserException {
+        DefinedObjectClassParser parser = new Parser(new ByteArrayInputStream(
+                "OBJECT-CLASS".getBytes())).new DefinedObjectClassParser();
 
-    	ObjectClassReferenceNode result = parser.parse();
+        ObjectClassReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("OBJECT-CLASS", result.getReference());
+        assertNotNull(result);
+        assertEquals("OBJECT-CLASS", result.getReference());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Module.OBJECT-CLASS".getBytes())).new DefinedObjectClassParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Module.OBJECT-CLASS".getBytes())).new DefinedObjectClassParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalObjectClassReferenceNode);
-    	assertEquals("Module",
-    			((ExternalObjectClassReferenceNode) result).getModule());
-    	assertEquals("OBJECT-CLASS", result.getReference());
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalObjectClassReferenceNode);
+        assertEquals("Module",
+                ((ExternalObjectClassReferenceNode) result).getModule());
+        assertEquals("OBJECT-CLASS", result.getReference());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"TYPE-IDENTIFIER".getBytes())).new DefinedObjectClassParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "TYPE-IDENTIFIER".getBytes())).new DefinedObjectClassParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeIdentifierObjectClassReferenceNode);
+        assertNotNull(result);
+        assertTrue(result instanceof TypeIdentifierObjectClassReferenceNode);
     }
 
     @Test
     public void testDefinedObjectParser() throws IOException, ParserException {
-    	DefinedObjectParser parser = new Parser(new ByteArrayInputStream(
-    			"object".getBytes())).new DefinedObjectParser();
+        DefinedObjectParser parser = new Parser(new ByteArrayInputStream(
+                "object".getBytes())).new DefinedObjectParser();
 
-    	ObjectReferenceNode result = parser.parse();
+        ObjectReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("object", result.getReference());
+        assertNotNull(result);
+        assertEquals("object", result.getReference());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("Module.object".getBytes())).new DefinedObjectParser();
+        parser = new Parser(
+                new ByteArrayInputStream("Module.object".getBytes())).new DefinedObjectParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalObjectReferenceNode);
-    	assertEquals("Module",
-    			((ExternalObjectReferenceNode) result).getModule());
-    	assertEquals("object", result.getReference());
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalObjectReferenceNode);
+        assertEquals("Module",
+                ((ExternalObjectReferenceNode) result).getModule());
+        assertEquals("object", result.getReference());
     }
 
     @Test
     public void testDefinedObjectSetParser() throws IOException,
-    		ParserException {
-    	DefinedObjectSetParser parser = new Parser(new ByteArrayInputStream(
-    			"Object-Set".getBytes())).new DefinedObjectSetParser();
+            ParserException {
+        DefinedObjectSetParser parser = new Parser(new ByteArrayInputStream(
+                "Object-Set".getBytes())).new DefinedObjectSetParser();
 
-    	ObjectSetReferenceNode result = parser.parse();
+        ObjectSetReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Object-Set", result.getReference());
+        assertNotNull(result);
+        assertEquals("Object-Set", result.getReference());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Module.Object-Set".getBytes())).new DefinedObjectSetParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Module.Object-Set".getBytes())).new DefinedObjectSetParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalObjectSetReferenceNode);
-    	assertEquals("Module",
-    			((ExternalObjectSetReferenceNode) result).getModule());
-    	assertEquals("Object-Set", result.getReference());
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalObjectSetReferenceNode);
+        assertEquals("Module",
+                ((ExternalObjectSetReferenceNode) result).getModule());
+        assertEquals("Object-Set", result.getReference());
     }
 
     @Test
     public void testExternalObjectClassReferenceParser() throws IOException,
-    		ParserException {
-    	ExternalObjectClassReferenceParser parser = new Parser(
-    			new ByteArrayInputStream("Module.OBJECT-CLASS".getBytes())).new ExternalObjectClassReferenceParser();
+            ParserException {
+        ExternalObjectClassReferenceParser parser = new Parser(
+                new ByteArrayInputStream("Module.OBJECT-CLASS".getBytes())).new ExternalObjectClassReferenceParser();
 
-    	ExternalObjectClassReferenceNode result = parser.parse();
+        ExternalObjectClassReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Module", result.getModule());
-    	assertEquals("OBJECT-CLASS", result.getReference());
+        assertNotNull(result);
+        assertEquals("Module", result.getModule());
+        assertEquals("OBJECT-CLASS", result.getReference());
     }
 
     @Test
     public void testExternalObjectReferenceParser() throws IOException,
-    		ParserException {
-    	ExternalObjectReferenceParser parser = new Parser(
-    			new ByteArrayInputStream("Module.object".getBytes())).new ExternalObjectReferenceParser();
+            ParserException {
+        ExternalObjectReferenceParser parser = new Parser(
+                new ByteArrayInputStream("Module.object".getBytes())).new ExternalObjectReferenceParser();
 
-    	ExternalObjectReferenceNode result = parser.parse();
+        ExternalObjectReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Module", result.getModule());
-    	assertEquals("object", result.getReference());
+        assertNotNull(result);
+        assertEquals("Module", result.getModule());
+        assertEquals("object", result.getReference());
     }
 
     @Test
     public void testExternalObjectSetReferenceParser() throws IOException,
-    		ParserException {
-    	ExternalObjectSetReferenceParser parser = new Parser(
-    			new ByteArrayInputStream("Module.ObjectSet".getBytes())).new ExternalObjectSetReferenceParser();
+            ParserException {
+        ExternalObjectSetReferenceParser parser = new Parser(
+                new ByteArrayInputStream("Module.ObjectSet".getBytes())).new ExternalObjectSetReferenceParser();
 
-    	ExternalObjectSetReferenceNode result = parser.parse();
+        ExternalObjectSetReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Module", result.getModule());
-    	assertEquals("ObjectSet", result.getReference());
+        assertNotNull(result);
+        assertEquals("Module", result.getModule());
+        assertEquals("ObjectSet", result.getReference());
     }
 
     @Test
     public void testUsefulObjectClassReferenceParser() throws IOException,
-    		ParserException {
-    	UsefulObjectClassReferenceParser parser = new Parser(
-    			new ByteArrayInputStream("TYPE-IDENTIFIER".getBytes())).new UsefulObjectClassReferenceParser();
+            ParserException {
+        UsefulObjectClassReferenceParser parser = new Parser(
+                new ByteArrayInputStream("TYPE-IDENTIFIER".getBytes())).new UsefulObjectClassReferenceParser();
 
-    	ObjectClassReferenceNode result = parser.parse();
+        ObjectClassReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeIdentifierObjectClassReferenceNode);
+        assertNotNull(result);
+        assertTrue(result instanceof TypeIdentifierObjectClassReferenceNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ABSTRACT-SYNTAX".getBytes())).new UsefulObjectClassReferenceParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ABSTRACT-SYNTAX".getBytes())).new UsefulObjectClassReferenceParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof AbstractSyntaxObjectClassReferenceNode);
+        assertNotNull(result);
+        assertTrue(result instanceof AbstractSyntaxObjectClassReferenceNode);
     }
 
     /**
@@ -4939,566 +4940,566 @@ public class ParserTest {
 
     @Test
     public void testObjectClassAssignmentParser() throws IOException,
-    		ParserException {
-    	TypeAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"OBJECT-CLASS ::= CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
-    							.getBytes())).new TypeAssignmentParser();
+            ParserException {
+        TypeAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "OBJECT-CLASS ::= CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
+                                .getBytes())).new TypeAssignmentParser();
 
-    	TypeOrObjectClassAssignmentNode<?> result = parser.parse();
+        TypeOrObjectClassAssignmentNode<?> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("OBJECT-CLASS", result.getReference());
-    	assertTrue(result.getType() instanceof ObjectClassDefn);
+        assertNotNull(result);
+        assertEquals("OBJECT-CLASS", result.getReference());
+        assertTrue(result.getType() instanceof ObjectClassDefn);
 
     }
 
     @Test
     public void testObjectClassParser() throws IOException, ParserException {
-    	ObjectClassParser parser = new Parser(new ByteArrayInputStream(
-    			"CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
-    					.getBytes())).new ObjectClassParser();
+        ObjectClassParser parser = new Parser(new ByteArrayInputStream(
+                "CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
+                        .getBytes())).new ObjectClassParser();
 
-    	ObjectClassNode result = parser.parse();
+        ObjectClassNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectClassDefn);
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectClassDefn);
 
-    	parser = new Parser(new ByteArrayInputStream("OBJECT-CLASS".getBytes())).new ObjectClassParser();
+        parser = new Parser(new ByteArrayInputStream("OBJECT-CLASS".getBytes())).new ObjectClassParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectClassReferenceNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectClassReferenceNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"OBJECT-CLASS {VisibleString}".getBytes())).new ObjectClassParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "OBJECT-CLASS {VisibleString}".getBytes())).new ObjectClassParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectClassReferenceNode);
-    	assertNotNull(((ObjectClassReferenceNode) result).getParameters());
-    	assertEquals(1, ((ObjectClassReferenceNode) result).getParameters()
-    			.size());
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectClassReferenceNode);
+        assertNotNull(((ObjectClassReferenceNode) result).getParameters());
+        assertEquals(1, ((ObjectClassReferenceNode) result).getParameters()
+                .size());
     }
 
     @Test
     public void testObjectClassDefnParser() throws IOException, ParserException {
-    	ObjectClassDefnParser parser = new Parser(new ByteArrayInputStream(
-    			"CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
-    					.getBytes())).new ObjectClassDefnParser();
+        ObjectClassDefnParser parser = new Parser(new ByteArrayInputStream(
+                "CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
+                        .getBytes())).new ObjectClassDefnParser();
 
-    	ObjectClassDefn result = parser.parse();
+        ObjectClassDefn result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.getFieldSpec().size());
-    	assertEquals(1, result.getSyntaxSpec().size());
+        assertNotNull(result);
+        assertEquals(1, result.getFieldSpec().size());
+        assertEquals(1, result.getSyntaxSpec().size());
     }
 
     @Test
     public void testWithSyntaxSpecParser() throws IOException, ParserException {
-    	WithSyntaxSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"WITH SYNTAX { [ARGUMENT &ArgumentType] }".getBytes())).new WithSyntaxSpecParser();
+        WithSyntaxSpecParser parser = new Parser(new ByteArrayInputStream(
+                "WITH SYNTAX { [ARGUMENT &ArgumentType] }".getBytes())).new WithSyntaxSpecParser();
 
-    	List<TokenOrGroup> result = parser.parse();
+        List<TokenOrGroup> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.size());
+        assertNotNull(result);
+        assertEquals(1, result.size());
     }
 
     @Test
     public void testFieldSpecParser() throws IOException, ParserException {
-    	// TypeFieldSpec
-    	FieldSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"&Type-Reference OPTIONAL".getBytes())).new FieldSpecParser();
+        // TypeFieldSpec
+        FieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&Type-Reference OPTIONAL".getBytes())).new FieldSpecParser();
 
-    	AbstractASN1FieldSpecNode result = parser.parse();
+        AbstractASN1FieldSpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeFieldSpecNode);
-    	assertNotNull(result.getOptionalitySpec());
-    	assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof TypeFieldSpecNode);
+        assertNotNull(result.getOptionalitySpec());
+        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
-    	// FixedTypeValueFieldSpec
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&value-reference INTEGER OPTIONAL".getBytes())).new FieldSpecParser();
+        // FixedTypeValueFieldSpec
+        parser = new Parser(new ByteArrayInputStream(
+                "&value-reference INTEGER OPTIONAL".getBytes())).new FieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof FieldSpecNode);
-    	assertNotNull(((FieldSpecNode) result).toFixedTypeValueFieldSpec());
-    	assertTrue(((FieldSpecNode) result).getOptionalitySpec() instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof FieldSpecNode);
+        assertNotNull(((FieldSpecNode) result).toFixedTypeValueFieldSpec());
+        assertTrue(((FieldSpecNode) result).getOptionalitySpec() instanceof OptionalSpecNode);
 
-    	// VariableTypeValueFieldSpec
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&value-reference &ObjectSet-Reference OPTIONAL".getBytes())).new FieldSpecParser();
+        // VariableTypeValueFieldSpec
+        parser = new Parser(new ByteArrayInputStream(
+                "&value-reference &ObjectSet-Reference OPTIONAL".getBytes())).new FieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof VariableTypeValueFieldSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof VariableTypeValueFieldSpecNode);
 
-    	// FixedTypeValueSetFieldSpec
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&ValueSet-Reference INTEGER OPTIONAL".getBytes())).new FieldSpecParser();
+        // FixedTypeValueSetFieldSpec
+        parser = new Parser(new ByteArrayInputStream(
+                "&ValueSet-Reference INTEGER OPTIONAL".getBytes())).new FieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetFieldSpecNode);
-    	assertNotNull(((SetFieldSpecNode) result)
-    			.toFixedTypeValueSetFieldSpec());
+        assertNotNull(result);
+        assertTrue(result instanceof SetFieldSpecNode);
+        assertNotNull(((SetFieldSpecNode) result)
+                .toFixedTypeValueSetFieldSpec());
 
-    	// VariableTypeValueSetFieldSpec
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&ValueSet-Field &Type-Reference1 OPTIONAL".getBytes())).new FieldSpecParser();
+        // VariableTypeValueSetFieldSpec
+        parser = new Parser(new ByteArrayInputStream(
+                "&ValueSet-Field &Type-Reference1 OPTIONAL".getBytes())).new FieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof VariableTypeValueSetFieldSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof VariableTypeValueSetFieldSpecNode);
 
-    	// ObjectFieldSpec
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&object-field ABSTRACT-SYNTAX".getBytes())).new FieldSpecParser();
+        // ObjectFieldSpec
+        parser = new Parser(new ByteArrayInputStream(
+                "&object-field ABSTRACT-SYNTAX".getBytes())).new FieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(((FieldSpecNode) result).toObjectFieldSpec());
+        assertNotNull(result);
+        assertNotNull(((FieldSpecNode) result).toObjectFieldSpec());
 
-    	// ObjectSetFieldSpec
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&ObjectSet-Field Module.OBJECT-CLASS DEFAULT {(Object1 | Object2)}"
-    					.getBytes())).new FieldSpecParser();
+        // ObjectSetFieldSpec
+        parser = new Parser(new ByteArrayInputStream(
+                "&ObjectSet-Field Module.OBJECT-CLASS DEFAULT {(Object1 | Object2)}"
+                        .getBytes())).new FieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetFieldSpecNode);
-    	assertNotNull(((SetFieldSpecNode) result).toObjectSetFieldSpec());
+        assertNotNull(result);
+        assertTrue(result instanceof SetFieldSpecNode);
+        assertNotNull(((SetFieldSpecNode) result).toObjectSetFieldSpec());
     }
 
     @Test
     public void testTypeFieldSpecParser() throws IOException, ParserException {
-    	TypeFieldSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"&Type-Reference".getBytes())).new TypeFieldSpecParser();
+        TypeFieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&Type-Reference".getBytes())).new TypeFieldSpecParser();
 
-    	TypeFieldSpecNode result = parser.parse();
+        TypeFieldSpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Type-Reference", result.getReference());
-    	assertNull(result.getOptionalitySpec());
+        assertNotNull(result);
+        assertEquals("Type-Reference", result.getReference());
+        assertNull(result.getOptionalitySpec());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&Type-Reference DEFAULT INTEGER".getBytes())).new TypeFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&Type-Reference DEFAULT INTEGER".getBytes())).new TypeFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Type-Reference", result.getReference());
-    	assertNotNull(result.getOptionalitySpec());
+        assertNotNull(result);
+        assertEquals("Type-Reference", result.getReference());
+        assertNotNull(result.getOptionalitySpec());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&Type-Reference OPTIONAL".getBytes())).new TypeFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&Type-Reference OPTIONAL".getBytes())).new TypeFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Type-Reference", result.getReference());
-    	assertNotNull(result.getOptionalitySpec());
+        assertNotNull(result);
+        assertEquals("Type-Reference", result.getReference());
+        assertNotNull(result.getOptionalitySpec());
     }
 
     @Test
     public void testTypeOptionalitySpecParser() throws IOException,
-    		ParserException {
-    	TypeOptionalitySpecParser parser = new Parser(new ByteArrayInputStream(
-    			"OPTIONAL".getBytes())).new TypeOptionalitySpecParser();
+            ParserException {
+        TypeOptionalitySpecParser parser = new Parser(new ByteArrayInputStream(
+                "OPTIONAL".getBytes())).new TypeOptionalitySpecParser();
 
-    	OptionalitySpecNode result = parser.parse();
+        OptionalitySpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"DEFAULT INTEGER".getBytes())).new TypeOptionalitySpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "DEFAULT INTEGER".getBytes())).new TypeOptionalitySpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof DefaultTypeSpecNode);
-    	assertTrue(((DefaultTypeSpecNode) result).getSpec() instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result instanceof DefaultTypeSpecNode);
+        assertTrue(((DefaultTypeSpecNode) result).getSpec() instanceof IntegerType);
     }
 
     @Test
     public void testFixedTypeValueFieldSpecParser() throws IOException,
-    		ParserException {
-    	FixedTypeValueOrObjectFieldSpecParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"&value-reference INTEGER UNIQUE OPTIONAL".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
+            ParserException {
+        FixedTypeValueOrObjectFieldSpecParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "&value-reference INTEGER UNIQUE OPTIONAL".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
 
-    	FieldSpecNode result = parser.parse();
+        FieldSpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-reference", result.getReference());
-    	assertNotNull(result.toFixedTypeValueFieldSpec());
-    	assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-    	assertTrue(result.toFixedTypeValueFieldSpec().isUnique());
-    	assertNotNull(result.getOptionalitySpec());
-    	assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertEquals("value-reference", result.getReference());
+        assertNotNull(result.toFixedTypeValueFieldSpec());
+        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
+        assertTrue(result.toFixedTypeValueFieldSpec().isUnique());
+        assertNotNull(result.getOptionalitySpec());
+        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&value-reference INTEGER UNIQUE".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&value-reference INTEGER UNIQUE".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-reference", result.getReference());
-    	assertNotNull(result.toFixedTypeValueFieldSpec());
-    	assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-    	assertTrue(result.toFixedTypeValueFieldSpec().isUnique());
-    	assertNull(result.getOptionalitySpec());
+        assertNotNull(result);
+        assertEquals("value-reference", result.getReference());
+        assertNotNull(result.toFixedTypeValueFieldSpec());
+        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
+        assertTrue(result.toFixedTypeValueFieldSpec().isUnique());
+        assertNull(result.getOptionalitySpec());
 
-    	// Not allowed
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&value-reference INTEGER UNIQUE DEFAULT 10".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
+        // Not allowed
+        parser = new Parser(new ByteArrayInputStream(
+                "&value-reference INTEGER UNIQUE DEFAULT 10".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNull(result);
+        assertNull(result);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&value-reference INTEGER DEFAULT 10".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&value-reference INTEGER DEFAULT 10".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-reference", result.getReference());
-    	assertNotNull(result.toFixedTypeValueFieldSpec());
-    	assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-    	assertFalse(result.toFixedTypeValueFieldSpec().isUnique());
-    	assertNotNull(result.getOptionalitySpec());
-    	assertTrue(result.getOptionalitySpec() instanceof DefaultSpecNode);
-    	assertNotNull(((DefaultSpecNode) result.getOptionalitySpec())
-    			.toDefaultValueSpec());
+        assertNotNull(result);
+        assertEquals("value-reference", result.getReference());
+        assertNotNull(result.toFixedTypeValueFieldSpec());
+        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
+        assertFalse(result.toFixedTypeValueFieldSpec().isUnique());
+        assertNotNull(result.getOptionalitySpec());
+        assertTrue(result.getOptionalitySpec() instanceof DefaultSpecNode);
+        assertNotNull(((DefaultSpecNode) result.getOptionalitySpec())
+                .toDefaultValueSpec());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&value-reference INTEGER OPTIONAL".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&value-reference INTEGER OPTIONAL".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-reference", result.getReference());
-    	assertNotNull(result.toFixedTypeValueFieldSpec());
-    	assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-    	assertFalse(result.toFixedTypeValueFieldSpec().isUnique());
-    	assertNotNull(result.getOptionalitySpec());
-    	assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertEquals("value-reference", result.getReference());
+        assertNotNull(result.toFixedTypeValueFieldSpec());
+        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
+        assertFalse(result.toFixedTypeValueFieldSpec().isUnique());
+        assertNotNull(result.getOptionalitySpec());
+        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&value-reference INTEGER".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&value-reference INTEGER".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-reference", result.getReference());
-    	assertNotNull(result.toFixedTypeValueFieldSpec());
-    	assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-    	assertFalse(result.toFixedTypeValueFieldSpec().isUnique());
-    	assertNull(result.getOptionalitySpec());
+        assertNotNull(result);
+        assertEquals("value-reference", result.getReference());
+        assertNotNull(result.toFixedTypeValueFieldSpec());
+        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
+        assertFalse(result.toFixedTypeValueFieldSpec().isUnique());
+        assertNull(result.getOptionalitySpec());
     }
 
     @Test
     public void testValueOptionalitySpecParser() throws IOException,
-    		ParserException {
-    	ValueOptionalitySpecParser parser = new Parser(
-    			new ByteArrayInputStream("OPTIONAL".getBytes())).new ValueOptionalitySpecParser();
+            ParserException {
+        ValueOptionalitySpecParser parser = new Parser(
+                new ByteArrayInputStream("OPTIONAL".getBytes())).new ValueOptionalitySpecParser();
 
-    	OptionalitySpecNode result = parser.parse();
+        OptionalitySpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream("DEFAULT 10".getBytes())).new ValueOptionalitySpecParser();
+        parser = new Parser(new ByteArrayInputStream("DEFAULT 10".getBytes())).new ValueOptionalitySpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof DefaultValueSpecNode);
-    	assertTrue(((DefaultValueSpecNode) result).getSpec() instanceof IntegerValue);
+        assertNotNull(result);
+        assertTrue(result instanceof DefaultValueSpecNode);
+        assertTrue(((DefaultValueSpecNode) result).getSpec() instanceof IntegerValue);
     }
 
     @Test
     public void testVariableTypeValueFieldSpecParser() throws IOException,
-    		ParserException {
-    	VariableTypeValueFieldSpecParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"&value-reference &TypeReference OPTIONAL".getBytes())).new VariableTypeValueFieldSpecParser();
+            ParserException {
+        VariableTypeValueFieldSpecParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "&value-reference &TypeReference OPTIONAL".getBytes())).new VariableTypeValueFieldSpecParser();
 
-    	VariableTypeValueFieldSpecNode result = parser.parse();
+        VariableTypeValueFieldSpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-reference", result.getReference());
-    	assertTrue(result.getFieldName() instanceof FieldNameNode);
-    	assertNotNull(result.getOptionalitySpec());
+        assertNotNull(result);
+        assertEquals("value-reference", result.getReference());
+        assertTrue(result.getFieldName() instanceof FieldNameNode);
+        assertNotNull(result.getOptionalitySpec());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&value-reference &TypeReference DEFAULT 23".getBytes())).new VariableTypeValueFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&value-reference &TypeReference DEFAULT 23".getBytes())).new VariableTypeValueFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-reference", result.getReference());
-    	assertTrue(result.getFieldName() instanceof FieldNameNode);
-    	assertNotNull(result.getOptionalitySpec());
-    	assertTrue(result.getOptionalitySpec() instanceof DefaultValueSpecNode);
+        assertNotNull(result);
+        assertEquals("value-reference", result.getReference());
+        assertTrue(result.getFieldName() instanceof FieldNameNode);
+        assertNotNull(result.getOptionalitySpec());
+        assertTrue(result.getOptionalitySpec() instanceof DefaultValueSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&value-reference &TypeReference".getBytes())).new VariableTypeValueFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&value-reference &TypeReference".getBytes())).new VariableTypeValueFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-reference", result.getReference());
-    	assertTrue(result.getFieldName() instanceof FieldNameNode);
-    	assertNull(result.getOptionalitySpec());
+        assertNotNull(result);
+        assertEquals("value-reference", result.getReference());
+        assertTrue(result.getFieldName() instanceof FieldNameNode);
+        assertNull(result.getOptionalitySpec());
     }
 
     @Test
     public void testFixedTypeValueSetFieldSpecParser() throws IOException,
-    		ParserException {
-    	SetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"&ValueSet-Reference INTEGER OPTIONAL".getBytes())).new SetFieldSpecParser();
+            ParserException {
+        SetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&ValueSet-Reference INTEGER OPTIONAL".getBytes())).new SetFieldSpecParser();
 
-    	SetFieldSpecNode result = parser.parse();
+        SetFieldSpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ValueSet-Reference", result.getReference());
-    	assertTrue(result.getType() instanceof IntegerType);
-    	assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertEquals("ValueSet-Reference", result.getReference());
+        assertTrue(result.getType() instanceof IntegerType);
+        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&ValueSet-Reference INTEGER DEFAULT {4711}".getBytes())).new SetFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&ValueSet-Reference INTEGER DEFAULT {4711}".getBytes())).new SetFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ValueSet-Reference", result.getReference());
-    	assertTrue(result.getType() instanceof IntegerType);
-    	assertTrue(result.getOptionalitySpec() instanceof DefaultSetSpecNode);
-    	assertNotNull(((DefaultSetSpecNode) result.getOptionalitySpec())
-    			.toDefaultValueSetOptionalitySpec());
+        assertNotNull(result);
+        assertEquals("ValueSet-Reference", result.getReference());
+        assertTrue(result.getType() instanceof IntegerType);
+        assertTrue(result.getOptionalitySpec() instanceof DefaultSetSpecNode);
+        assertNotNull(((DefaultSetSpecNode) result.getOptionalitySpec())
+                .toDefaultValueSetOptionalitySpec());
     }
 
     @Test
     public void testValueSetOptionalitySpecParser() throws IOException,
-    		ParserException {
-    	ValueSetOptionalitySpecParser parser = new Parser(
-    			new ByteArrayInputStream("OPTIONAL".getBytes())).new ValueSetOptionalitySpecParser();
+            ParserException {
+        ValueSetOptionalitySpecParser parser = new Parser(
+                new ByteArrayInputStream("OPTIONAL".getBytes())).new ValueSetOptionalitySpecParser();
 
-    	OptionalitySpecNode result = parser.parse();
+        OptionalitySpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"DEFAULT { (1..10) }".getBytes())).new ValueSetOptionalitySpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "DEFAULT { (1..10) }".getBytes())).new ValueSetOptionalitySpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof DefaultValueSetSpecNode);
-    	assertTrue(((DefaultValueSetSpecNode) result).getSpec() instanceof SetSpecsNode);
+        assertNotNull(result);
+        assertTrue(result instanceof DefaultValueSetSpecNode);
+        assertTrue(((DefaultValueSetSpecNode) result).getSpec() instanceof SetSpecsNode);
     }
 
     @Test
     public void testVariableTypeValueSetFieldSpecParser() throws IOException,
-    		ParserException {
-    	VariableTypeValueSetFieldSpecParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"&ValueSet-Field &Type-Reference1.&Type-Reference2 OPTIONAL"
-    							.getBytes())).new VariableTypeValueSetFieldSpecParser();
+            ParserException {
+        VariableTypeValueSetFieldSpecParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "&ValueSet-Field &Type-Reference1.&Type-Reference2 OPTIONAL"
+                                .getBytes())).new VariableTypeValueSetFieldSpecParser();
 
-    	VariableTypeValueSetFieldSpecNode result = parser.parse();
+        VariableTypeValueSetFieldSpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ValueSet-Field", result.getReference());
-    	assertEquals(2, result.getFieldName().getPrimitiveFieldNames().size());
-    	assertEquals("Type-Reference1", result.getFieldName()
-    			.getPrimitiveFieldNames().get(0).getReference());
-    	assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertEquals("ValueSet-Field", result.getReference());
+        assertEquals(2, result.getFieldName().getPrimitiveFieldNames().size());
+        assertEquals("Type-Reference1", result.getFieldName()
+                .getPrimitiveFieldNames().get(0).getReference());
+        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&ValueSet-Field &Type-Reference1.&Type-Reference2 DEFAULT {(23 | 42)}"
-    					.getBytes())).new VariableTypeValueSetFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&ValueSet-Field &Type-Reference1.&Type-Reference2 DEFAULT {(23 | 42)}"
+                        .getBytes())).new VariableTypeValueSetFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ValueSet-Field", result.getReference());
-    	assertEquals(2, result.getFieldName().getPrimitiveFieldNames().size());
-    	assertEquals("Type-Reference1", result.getFieldName()
-    			.getPrimitiveFieldNames().get(0).getReference());
-    	assertTrue(result.getOptionalitySpec() instanceof DefaultValueSetSpecNode);
+        assertNotNull(result);
+        assertEquals("ValueSet-Field", result.getReference());
+        assertEquals(2, result.getFieldName().getPrimitiveFieldNames().size());
+        assertEquals("Type-Reference1", result.getFieldName()
+                .getPrimitiveFieldNames().get(0).getReference());
+        assertTrue(result.getOptionalitySpec() instanceof DefaultValueSetSpecNode);
     }
 
     @Test
     public void testObjectFieldSpecParser() throws IOException, ParserException {
-    	FieldSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"&object-field OBJECT-CLASS OPTIONAL".getBytes())).new FieldSpecParser();
+        FieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&object-field OBJECT-CLASS OPTIONAL".getBytes())).new FieldSpecParser();
 
-    	AbstractASN1FieldSpecNode result = parser.parse();
+        AbstractASN1FieldSpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof FieldSpecNode);
-    	assertEquals("object-field", result.getReference());
-    	assertNotNull(((FieldSpecNode) result).toObjectFieldSpec());
-    	assertEquals("OBJECT-CLASS", ((FieldSpecNode) result)
-    			.toObjectFieldSpec().getObjectClass().getReference());
-    	assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof FieldSpecNode);
+        assertEquals("object-field", result.getReference());
+        assertNotNull(((FieldSpecNode) result).toObjectFieldSpec());
+        assertEquals("OBJECT-CLASS", ((FieldSpecNode) result)
+                .toObjectFieldSpec().getObjectClass().getReference());
+        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&object-field OBJECT-CLASS DEFAULT object-ref".getBytes())).new FieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&object-field OBJECT-CLASS DEFAULT object-ref".getBytes())).new FieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof FieldSpecNode);
-    	assertEquals("object-field", result.getReference());
-    	assertNotNull(((FieldSpecNode) result).toObjectFieldSpec());
-    	assertEquals("OBJECT-CLASS", ((FieldSpecNode) result)
-    			.toObjectFieldSpec().getObjectClass().getReference());
-    	assertTrue(result.getOptionalitySpec() instanceof DefaultSpecNode);
-    	assertNotNull(((DefaultSpecNode) result.getOptionalitySpec())
-    			.toDefaultObjectSpec());
+        assertNotNull(result);
+        assertTrue(result instanceof FieldSpecNode);
+        assertEquals("object-field", result.getReference());
+        assertNotNull(((FieldSpecNode) result).toObjectFieldSpec());
+        assertEquals("OBJECT-CLASS", ((FieldSpecNode) result)
+                .toObjectFieldSpec().getObjectClass().getReference());
+        assertTrue(result.getOptionalitySpec() instanceof DefaultSpecNode);
+        assertNotNull(((DefaultSpecNode) result.getOptionalitySpec())
+                .toDefaultObjectSpec());
     }
 
     @Test
     public void testObjectOptionalitySpecParser() throws IOException,
-    		ParserException {
-    	OptionalitySpecParser parser = new Parser(new ByteArrayInputStream(
-    			"OPTIONAL".getBytes())).new OptionalitySpecParser();
+            ParserException {
+        OptionalitySpecParser parser = new Parser(new ByteArrayInputStream(
+                "OPTIONAL".getBytes())).new OptionalitySpecParser();
 
-    	OptionalitySpecNode result = parser.parse();
+        OptionalitySpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"DEFAULT object-ref".getBytes())).new OptionalitySpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "DEFAULT object-ref".getBytes())).new OptionalitySpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof DefaultSpecNode);
-    	assertNotNull(((DefaultSpecNode) result).toDefaultObjectSpec());
-    	assertTrue((((DefaultSpecNode) result).toDefaultObjectSpec()).getSpec() instanceof ObjectReferenceNode);
+        assertNotNull(result);
+        assertTrue(result instanceof DefaultSpecNode);
+        assertNotNull(((DefaultSpecNode) result).toDefaultObjectSpec());
+        assertTrue((((DefaultSpecNode) result).toDefaultObjectSpec()).getSpec() instanceof ObjectReferenceNode);
     }
 
     @Test
     public void testObjectSetFieldSpecParser() throws IOException,
-    		ParserException {
-    	SetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"&ObjectSet-Field OBJECT-CLASS OPTIONAL".getBytes())).new SetFieldSpecParser();
+            ParserException {
+        SetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&ObjectSet-Field OBJECT-CLASS OPTIONAL".getBytes())).new SetFieldSpecParser();
 
-    	SetFieldSpecNode result = parser.parse();
+        SetFieldSpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ObjectSet-Field", result.getReference());
-    	assertTrue(result.getType() instanceof TypeReference);
-    	assertEquals("OBJECT-CLASS",
-    			((TypeReference) result.getType()).getType());
-    	assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertEquals("ObjectSet-Field", result.getReference());
+        assertTrue(result.getType() instanceof TypeReference);
+        assertEquals("OBJECT-CLASS",
+                ((TypeReference) result.getType()).getType());
+        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&ObjectSet-Field OBJECT-CLASS DEFAULT {Object1}".getBytes())).new SetFieldSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&ObjectSet-Field OBJECT-CLASS DEFAULT {Object1}".getBytes())).new SetFieldSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ObjectSet-Field", result.getReference());
-    	assertTrue(result.getType() instanceof TypeReference);
-    	assertEquals("OBJECT-CLASS",
-    			((TypeReference) result.getType()).getType());
-    	assertTrue(result.getOptionalitySpec() instanceof DefaultSetSpecNode);
-    	assertNotNull(((DefaultSetSpecNode) result.getOptionalitySpec())
-    			.toDefaultObjectSetOptionalitySpec());
+        assertNotNull(result);
+        assertEquals("ObjectSet-Field", result.getReference());
+        assertTrue(result.getType() instanceof TypeReference);
+        assertEquals("OBJECT-CLASS",
+                ((TypeReference) result.getType()).getType());
+        assertTrue(result.getOptionalitySpec() instanceof DefaultSetSpecNode);
+        assertNotNull(((DefaultSetSpecNode) result.getOptionalitySpec())
+                .toDefaultObjectSetOptionalitySpec());
     }
 
     @Test
     public void testObjectSetOptionalitySpecParser() throws IOException,
-    		ParserException {
-    	ObjectSetOptionalitySpecParser parser = new Parser(
-    			new ByteArrayInputStream("OPTIONAL".getBytes())).new ObjectSetOptionalitySpecParser();
+            ParserException {
+        ObjectSetOptionalitySpecParser parser = new Parser(
+                new ByteArrayInputStream("OPTIONAL".getBytes())).new ObjectSetOptionalitySpecParser();
 
-    	OptionalitySpecNode result = parser.parse();
+        OptionalitySpecNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof OptionalSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof OptionalSpecNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"DEFAULT { (Object1 | Object2) }".getBytes())).new ObjectSetOptionalitySpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "DEFAULT { (Object1 | Object2) }".getBytes())).new ObjectSetOptionalitySpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof DefaultObjectSetSpecNode);
+        assertNotNull(result);
+        assertTrue(result instanceof DefaultObjectSetSpecNode);
     }
 
     @Test
     public void testPrimitiveFieldNameParser() throws IOException,
-    		ParserException {
-    	PrimitiveFieldNameParser parser = new Parser(new ByteArrayInputStream(
-    			"&Type-Reference".getBytes())).new PrimitiveFieldNameParser();
+            ParserException {
+        PrimitiveFieldNameParser parser = new Parser(new ByteArrayInputStream(
+                "&Type-Reference".getBytes())).new PrimitiveFieldNameParser();
 
-    	PrimitiveFieldNameNode result = parser.parse();
+        PrimitiveFieldNameNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.isTypeFieldReference());
+        assertNotNull(result);
+        assertTrue(result.isTypeFieldReference());
 
-    	parser = new Parser(new ByteArrayInputStream("&value-field".getBytes())).new PrimitiveFieldNameParser();
+        parser = new Parser(new ByteArrayInputStream("&value-field".getBytes())).new PrimitiveFieldNameParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.isValueFieldReference());
+        assertNotNull(result);
+        assertTrue(result.isValueFieldReference());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&Value-Set-Reference".getBytes())).new PrimitiveFieldNameParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&Value-Set-Reference".getBytes())).new PrimitiveFieldNameParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.isValueSetFieldReference());
+        assertNotNull(result);
+        assertTrue(result.isValueSetFieldReference());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&object-Reference".getBytes())).new PrimitiveFieldNameParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&object-Reference".getBytes())).new PrimitiveFieldNameParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.isObjectFieldReference());
+        assertNotNull(result);
+        assertTrue(result.isObjectFieldReference());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"&ObjectSet-Reference".getBytes())).new PrimitiveFieldNameParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "&ObjectSet-Reference".getBytes())).new PrimitiveFieldNameParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.isObjectSetFieldReference());
+        assertNotNull(result);
+        assertTrue(result.isObjectSetFieldReference());
     }
 
     @Test
     public void testFieldNameParser() throws IOException, ParserException {
-    	FieldNameParser parser = new Parser(new ByteArrayInputStream(
-    			"&Type-Reference.&ObjectSet-Reference".getBytes())).new FieldNameParser();
+        FieldNameParser parser = new Parser(new ByteArrayInputStream(
+                "&Type-Reference.&ObjectSet-Reference".getBytes())).new FieldNameParser();
 
-    	FieldNameNode result = parser.parse();
+        FieldNameNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getPrimitiveFieldNames().size());
+        assertNotNull(result);
+        assertEquals(2, result.getPrimitiveFieldNames().size());
     }
 
     /**
@@ -5509,157 +5510,157 @@ public class ParserTest {
 
     @Test
     public void testSyntaxListParser() throws IOException, ParserException {
-    	SyntaxListParser parser = new Parser(new ByteArrayInputStream(
-    			"{ [RETURN RESULT &resultReturned] [ARGUMENT &ArgumentType] }"
-    					.getBytes())).new SyntaxListParser();
+        SyntaxListParser parser = new Parser(new ByteArrayInputStream(
+                "{ [RETURN RESULT &resultReturned] [ARGUMENT &ArgumentType] }"
+                        .getBytes())).new SyntaxListParser();
 
-    	List<TokenOrGroup> result = parser.parse();
+        List<TokenOrGroup> result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals(2, result.size());
-    	assertTrue(result.get(1) instanceof Group);
-    	assertEquals(2, ((Group) result.get(1)).getGroup().size());
-    	assertTrue(((Group) result.get(1)).getGroup().get(0) instanceof RequiredToken);
-    	assertTrue(((Group) result.get(1)).getGroup().get(1) instanceof RequiredToken);
+        assertEquals(2, result.size());
+        assertTrue(result.get(1) instanceof Group);
+        assertEquals(2, ((Group) result.get(1)).getGroup().size());
+        assertTrue(((Group) result.get(1)).getGroup().get(0) instanceof RequiredToken);
+        assertTrue(((Group) result.get(1)).getGroup().get(1) instanceof RequiredToken);
     }
 
     @Test
     public void testTokenOrGroupSpecParser() throws IOException,
-    		ParserException {
-    	TokenOrGroupSpecParser parser = new Parser(new ByteArrayInputStream(
-    			"A-WORD".getBytes())).new TokenOrGroupSpecParser();
+            ParserException {
+        TokenOrGroupSpecParser parser = new Parser(new ByteArrayInputStream(
+                "A-WORD".getBytes())).new TokenOrGroupSpecParser();
 
-    	TokenOrGroup result = parser.parse();
+        TokenOrGroup result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RequiredToken);
-    	assertTrue(((RequiredToken) result).getToken() instanceof LiteralNode);
-    	assertEquals("A-WORD",
-    			((LiteralNode) ((RequiredToken) result).getToken()).getText());
+        assertNotNull(result);
+        assertTrue(result instanceof RequiredToken);
+        assertTrue(((RequiredToken) result).getToken() instanceof LiteralNode);
+        assertEquals("A-WORD",
+                ((LiteralNode) ((RequiredToken) result).getToken()).getText());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"[ARGUMENT &ArgumentType]".getBytes())).new TokenOrGroupSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "[ARGUMENT &ArgumentType]".getBytes())).new TokenOrGroupSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Group);
-    	assertEquals(2, ((Group) result).getGroup().size());
-    	assertTrue(((Group) result).getGroup().get(0) instanceof RequiredToken);
-    	assertTrue(((RequiredToken) ((Group) result).getGroup().get(0))
-    			.getToken() instanceof LiteralNode);
-    	assertTrue(((Group) result).getGroup().get(1) instanceof RequiredToken);
-    	assertTrue(((RequiredToken) ((Group) result).getGroup().get(1))
-    			.getToken() instanceof PrimitiveFieldNameNode);
+        assertNotNull(result);
+        assertTrue(result instanceof Group);
+        assertEquals(2, ((Group) result).getGroup().size());
+        assertTrue(((Group) result).getGroup().get(0) instanceof RequiredToken);
+        assertTrue(((RequiredToken) ((Group) result).getGroup().get(0))
+                .getToken() instanceof LiteralNode);
+        assertTrue(((Group) result).getGroup().get(1) instanceof RequiredToken);
+        assertTrue(((RequiredToken) ((Group) result).getGroup().get(1))
+                .getToken() instanceof PrimitiveFieldNameNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"[LITERAL [A &field] [B &field]]".getBytes())).new TokenOrGroupSpecParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "[LITERAL [A &field] [B &field]]".getBytes())).new TokenOrGroupSpecParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Group);
-    	assertEquals(3, ((Group) result).getGroup().size());
-    	assertTrue(((Group) result).getGroup().get(0) instanceof RequiredToken);
-    	assertTrue(((RequiredToken) ((Group) result).getGroup().get(0))
-    			.getToken() instanceof LiteralNode);
-    	assertTrue(((Group) result).getGroup().get(1) instanceof Group);
-    	assertEquals(2, ((Group) ((Group) result).getGroup().get(1)).getGroup()
-    			.size());
-    	assertTrue(((Group) result).getGroup().get(2) instanceof Group);
-    	assertEquals(2, ((Group) ((Group) result).getGroup().get(2)).getGroup()
-    			.size());
+        assertNotNull(result);
+        assertTrue(result instanceof Group);
+        assertEquals(3, ((Group) result).getGroup().size());
+        assertTrue(((Group) result).getGroup().get(0) instanceof RequiredToken);
+        assertTrue(((RequiredToken) ((Group) result).getGroup().get(0))
+                .getToken() instanceof LiteralNode);
+        assertTrue(((Group) result).getGroup().get(1) instanceof Group);
+        assertEquals(2, ((Group) ((Group) result).getGroup().get(1)).getGroup()
+                .size());
+        assertTrue(((Group) result).getGroup().get(2) instanceof Group);
+        assertEquals(2, ((Group) ((Group) result).getGroup().get(2)).getGroup()
+                .size());
     }
 
     @Test
     public void testOptionalGroupParser() throws IOException, ParserException {
-    	OptionalGroupParser parser = new Parser(new ByteArrayInputStream(
-    			"[ARGUMENT &ArgumentType]".getBytes())).new OptionalGroupParser();
+        OptionalGroupParser parser = new Parser(new ByteArrayInputStream(
+                "[ARGUMENT &ArgumentType]".getBytes())).new OptionalGroupParser();
 
-    	Group result = parser.parse();
+        Group result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getGroup().size());
-    	assertTrue(result.getGroup().get(0) instanceof RequiredToken);
-    	assertTrue(((RequiredToken) result.getGroup().get(0)).getToken() instanceof LiteralNode);
-    	assertEquals("ARGUMENT", ((LiteralNode) ((RequiredToken) result
-    			.getGroup().get(0)).getToken()).getText());
-    	assertTrue(result.getGroup().get(1) instanceof RequiredToken);
-    	assertTrue(((RequiredToken) result.getGroup().get(1)).getToken() instanceof PrimitiveFieldNameNode);
-    	assertEquals("ArgumentType",
-    			((PrimitiveFieldNameNode) ((RequiredToken) result.getGroup()
-    					.get(1)).getToken()).getReference());
+        assertNotNull(result);
+        assertEquals(2, result.getGroup().size());
+        assertTrue(result.getGroup().get(0) instanceof RequiredToken);
+        assertTrue(((RequiredToken) result.getGroup().get(0)).getToken() instanceof LiteralNode);
+        assertEquals("ARGUMENT", ((LiteralNode) ((RequiredToken) result
+                .getGroup().get(0)).getToken()).getText());
+        assertTrue(result.getGroup().get(1) instanceof RequiredToken);
+        assertTrue(((RequiredToken) result.getGroup().get(1)).getToken() instanceof PrimitiveFieldNameNode);
+        assertEquals("ArgumentType",
+                ((PrimitiveFieldNameNode) ((RequiredToken) result.getGroup()
+                        .get(1)).getToken()).getReference());
     }
 
     @Test
     public void testRequiredTokenParser() throws IOException, ParserException {
-    	RequiredTokenParser parser = new Parser(new ByteArrayInputStream(
-    			"&ObjectSet-Reference".getBytes())).new RequiredTokenParser();
+        RequiredTokenParser parser = new Parser(new ByteArrayInputStream(
+                "&ObjectSet-Reference".getBytes())).new RequiredTokenParser();
 
-    	RequiredToken result = parser.parse();
+        RequiredToken result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getToken() instanceof PrimitiveFieldNameNode);
-    	assertTrue(((PrimitiveFieldNameNode) result.getToken())
-    			.isObjectSetFieldReference());
+        assertNotNull(result);
+        assertTrue(result.getToken() instanceof PrimitiveFieldNameNode);
+        assertTrue(((PrimitiveFieldNameNode) result.getToken())
+                .isObjectSetFieldReference());
 
-    	parser = new Parser(new ByteArrayInputStream(",".getBytes())).new RequiredTokenParser();
+        parser = new Parser(new ByteArrayInputStream(",".getBytes())).new RequiredTokenParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getToken() instanceof LiteralNode);
-    	assertEquals(",", ((LiteralNode) result.getToken()).getText());
+        assertNotNull(result);
+        assertTrue(result.getToken() instanceof LiteralNode);
+        assertEquals(",", ((LiteralNode) result.getToken()).getText());
     }
 
     @Test
     public void testLiteralParser() throws IOException, ParserException {
-    	assertEquals(",", getLiteral(","));
-    	assertEquals("A-WORD", getLiteral("A-WORD"));
+        assertEquals(",", getLiteral(","));
+        assertEquals("A-WORD", getLiteral("A-WORD"));
 
-    	assertNull(getLiteral("BIT"));
-    	assertNull(getLiteral("BOOLEAN"));
-    	assertNull(getLiteral("CHARACTER"));
-    	assertNull(getLiteral("CHOICE"));
-    	assertNull(getLiteral("DATE"));
-    	assertNull(getLiteral("DATE-TIME"));
-    	assertNull(getLiteral("DURATION"));
-    	assertNull(getLiteral("EMBEDDED"));
-    	assertNull(getLiteral("END"));
-    	assertNull(getLiteral("ENUMERATED"));
-    	assertNull(getLiteral("EXTERNAL"));
-    	assertNull(getLiteral("FALSE"));
-    	assertNull(getLiteral("INSTANCE"));
-    	assertNull(getLiteral("INTEGER"));
-    	assertNull(getLiteral("INTERSECTION"));
-    	assertNull(getLiteral("MINUS-INFINITY"));
-    	assertNull(getLiteral("NULL"));
-    	assertNull(getLiteral("OBJECT"));
-    	assertNull(getLiteral("OCTET"));
-    	assertNull(getLiteral("PLUS-INFINITY"));
-    	assertNull(getLiteral("REAL"));
-    	assertNull(getLiteral("RELATIVE-OID"));
-    	assertNull(getLiteral("SEQUENCE"));
-    	assertNull(getLiteral("SET"));
-    	assertNull(getLiteral("TIME"));
-    	assertNull(getLiteral("TIME-OF-DAY"));
-    	assertNull(getLiteral("TRUE"));
-    	assertNull(getLiteral("UNION"));
+        assertNull(getLiteral("BIT"));
+        assertNull(getLiteral("BOOLEAN"));
+        assertNull(getLiteral("CHARACTER"));
+        assertNull(getLiteral("CHOICE"));
+        assertNull(getLiteral("DATE"));
+        assertNull(getLiteral("DATE-TIME"));
+        assertNull(getLiteral("DURATION"));
+        assertNull(getLiteral("EMBEDDED"));
+        assertNull(getLiteral("END"));
+        assertNull(getLiteral("ENUMERATED"));
+        assertNull(getLiteral("EXTERNAL"));
+        assertNull(getLiteral("FALSE"));
+        assertNull(getLiteral("INSTANCE"));
+        assertNull(getLiteral("INTEGER"));
+        assertNull(getLiteral("INTERSECTION"));
+        assertNull(getLiteral("MINUS-INFINITY"));
+        assertNull(getLiteral("NULL"));
+        assertNull(getLiteral("OBJECT"));
+        assertNull(getLiteral("OCTET"));
+        assertNull(getLiteral("PLUS-INFINITY"));
+        assertNull(getLiteral("REAL"));
+        assertNull(getLiteral("RELATIVE-OID"));
+        assertNull(getLiteral("SEQUENCE"));
+        assertNull(getLiteral("SET"));
+        assertNull(getLiteral("TIME"));
+        assertNull(getLiteral("TIME-OF-DAY"));
+        assertNull(getLiteral("TRUE"));
+        assertNull(getLiteral("UNION"));
     }
 
     private String getLiteral(String literal) throws ParserException,
-    		IOException {
-    	LiteralParser parser = new Parser(new ByteArrayInputStream(
-    			literal.getBytes())).new LiteralParser();
+            IOException {
+        LiteralParser parser = new Parser(new ByteArrayInputStream(
+                literal.getBytes())).new LiteralParser();
 
-    	LiteralNode result = parser.parse();
+        LiteralNode result = parser.parse();
 
-    	if (result != null) {
-    		return result.getText();
-    	}
+        if (result != null) {
+            return result.getText();
+        }
 
-    	return null;
+        return null;
     }
 
     /**
@@ -5670,190 +5671,190 @@ public class ParserTest {
 
     @Test
     public void testObjectAssignmentParser() throws IOException,
-    		ParserException {
-    	ValueAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"invertMatrix OPERATION ::= { &ArgumentType Matrix, &ResultType Matrix, &Errors {determinantIsZero}, &operationCode 7 }"
-    							.getBytes())).new ValueAssignmentParser();
+            ParserException {
+        ValueAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "invertMatrix OPERATION ::= { &ArgumentType Matrix, &ResultType Matrix, &Errors {determinantIsZero}, &operationCode 7 }"
+                                .getBytes())).new ValueAssignmentParser();
 
-    	ValueOrObjectAssignmentNode result = parser.parse();
+        ValueOrObjectAssignmentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("invertMatrix", result.getReference());
-    	assertTrue(result.getType() instanceof TypeReference);
-    	assertEquals("OPERATION", ((TypeReference) result.getType()).getType());
-    	assertTrue(result.getValue() instanceof ObjectDefnNode);
+        assertNotNull(result);
+        assertEquals("invertMatrix", result.getReference());
+        assertTrue(result.getType() instanceof TypeReference);
+        assertEquals("OPERATION", ((TypeReference) result.getType()).getType());
+        assertTrue(result.getValue() instanceof ObjectDefnNode);
     }
 
     @Test
     public void testObjectParser() throws IOException, ParserException {
-    	ObjectParser parser = new Parser(new ByteArrayInputStream(
-    			"Module.object".getBytes())).new ObjectParser();
+        ObjectParser parser = new Parser(new ByteArrayInputStream(
+                "Module.object".getBytes())).new ObjectParser();
 
-    	Node result = parser.parse();
+        Node result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalObjectReferenceNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalObjectReferenceNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ A-STRING VisibleString }".getBytes())).new ObjectParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{ A-STRING VisibleString }".getBytes())).new ObjectParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectDefnNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectDefnNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object.&Type-Reference".getBytes())).new ObjectParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object.&Type-Reference".getBytes())).new ObjectParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectFromObjectNode);
-    	assertNotNull(((ObjectFromObjectNode) result).getObject());
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectFromObjectNode);
+        assertNotNull(((ObjectFromObjectNode) result).getObject());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object {Parameter}".getBytes())).new ObjectParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object {Parameter}".getBytes())).new ObjectParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectReferenceNode);
-    	assertNotNull(((ObjectReferenceNode) result).getParameters());
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectReferenceNode);
+        assertNotNull(((ObjectReferenceNode) result).getParameters());
     }
 
     @Test
     public void testObjectDefnParser() throws IOException, ParserException {
-    	ObjectDefnParser parser = new Parser(new ByteArrayInputStream(
-    			"{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new ObjectDefnParser();
+        ObjectDefnParser parser = new Parser(new ByteArrayInputStream(
+                "{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new ObjectDefnParser();
 
-    	ObjectDefnNode result = parser.parse();
+        ObjectDefnNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getSyntax() instanceof DefaultSyntaxNode);
+        assertNotNull(result);
+        assertTrue(result.getSyntax() instanceof DefaultSyntaxNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ A-STRING VisibleString A-NUMBER INTEGER }".getBytes())).new ObjectDefnParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{ A-STRING VisibleString A-NUMBER INTEGER }".getBytes())).new ObjectDefnParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getSyntax() instanceof DefinedSyntaxNode);
+        assertNotNull(result);
+        assertTrue(result.getSyntax() instanceof DefinedSyntaxNode);
     }
 
     @Test
     public void testDefaultSyntaxParser() throws IOException, ParserException {
-    	DefaultSyntaxParser parser = new Parser(new ByteArrayInputStream(
-    			"{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new DefaultSyntaxParser();
+        DefaultSyntaxParser parser = new Parser(new ByteArrayInputStream(
+                "{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new DefaultSyntaxParser();
 
-    	DefaultSyntaxNode result = parser.parse();
+        DefaultSyntaxNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getFieldSetting().size());
+        assertNotNull(result);
+        assertEquals(2, result.getFieldSetting().size());
 
-    	parser = new Parser(new ByteArrayInputStream("{}".getBytes())).new DefaultSyntaxParser();
+        parser = new Parser(new ByteArrayInputStream("{}".getBytes())).new DefaultSyntaxParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(0, result.getFieldSetting().size());
+        assertNotNull(result);
+        assertEquals(0, result.getFieldSetting().size());
     }
 
     @Test
     public void testFieldSettingParser() throws IOException, ParserException {
-    	FieldSettingParser parser = new Parser(new ByteArrayInputStream(
-    			"&value-field 4711".getBytes())).new FieldSettingParser();
+        FieldSettingParser parser = new Parser(new ByteArrayInputStream(
+                "&value-field 4711".getBytes())).new FieldSettingParser();
 
-    	FieldSettingNode result = parser.parse();
+        FieldSettingNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("value-field", result.getFieldName().getReference());
-    	assertTrue(result.getSetting() instanceof IntegerValue);
+        assertNotNull(result);
+        assertEquals("value-field", result.getFieldName().getReference());
+        assertTrue(result.getSetting() instanceof IntegerValue);
     }
 
     @Test
     public void testDefinedSyntaxParser() throws IOException, ParserException {
-    	DefinedSyntaxParser parser = new Parser(new ByteArrayInputStream(
-    			"{ A-STRING VisibleString A-NUMBER INTEGER }".getBytes())).new DefinedSyntaxParser();
+        DefinedSyntaxParser parser = new Parser(new ByteArrayInputStream(
+                "{ A-STRING VisibleString A-NUMBER INTEGER }".getBytes())).new DefinedSyntaxParser();
 
-    	DefinedSyntaxNode result = parser.parse();
-    	assertNotNull(result);
-    	assertEquals(4, result.getNodes().size());
+        DefinedSyntaxNode result = parser.parse();
+        assertNotNull(result);
+        assertEquals(4, result.getNodes().size());
 
-    	parser = new Parser(new ByteArrayInputStream("{ }".getBytes())).new DefinedSyntaxParser();
+        parser = new Parser(new ByteArrayInputStream("{ }".getBytes())).new DefinedSyntaxParser();
 
-    	result = parser.parse();
-    	assertNotNull(result);
-    	assertEquals(0, result.getNodes().size());
+        result = parser.parse();
+        assertNotNull(result);
+        assertEquals(0, result.getNodes().size());
     }
 
     @Test
     public void testDefinedSyntaxTokenParser() throws IOException,
-    		ParserException {
-    	DefinedSyntaxTokenParser parser = new Parser(new ByteArrayInputStream(
-    			"A-LITERAL".getBytes())).new DefinedSyntaxTokenParser();
+            ParserException {
+        DefinedSyntaxTokenParser parser = new Parser(new ByteArrayInputStream(
+                "A-LITERAL".getBytes())).new DefinedSyntaxTokenParser();
 
-    	Node result = parser.parse();
+        Node result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof LiteralNode);
+        assertNotNull(result);
+        assertTrue(result instanceof LiteralNode);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("VisibleString".getBytes())).new DefinedSyntaxTokenParser();
+        parser = new Parser(
+                new ByteArrayInputStream("VisibleString".getBytes())).new DefinedSyntaxTokenParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof VisibleString);
+        assertNotNull(result);
+        assertTrue(result instanceof VisibleString);
     }
 
     @Test
     public void testSettingParser() throws IOException, ParserException {
-    	// Type
-    	SettingParser parser = new Parser(new ByteArrayInputStream(
-    			"INTEGER".getBytes())).new SettingParser();
+        // Type
+        SettingParser parser = new Parser(new ByteArrayInputStream(
+                "INTEGER".getBytes())).new SettingParser();
 
-    	Node result = parser.parse();
+        Node result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result instanceof IntegerType);
 
-    	// Value
-    	parser = new Parser(new ByteArrayInputStream("12.5".getBytes())).new SettingParser();
+        // Value
+        parser = new Parser(new ByteArrayInputStream("12.5".getBytes())).new SettingParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof RealValue);
+        assertNotNull(result);
+        assertTrue(result instanceof RealValue);
 
-    	// ValueSet
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ (12..24) ^ (30..42) }".getBytes())).new SettingParser();
+        // ValueSet
+        parser = new Parser(new ByteArrayInputStream(
+                "{ (12..24) ^ (30..42) }".getBytes())).new SettingParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetSpecsNode);
-    	assertNotNull(((SetSpecsNode) result).toElementSetSpecs());
+        assertNotNull(result);
+        assertTrue(result instanceof SetSpecsNode);
+        assertNotNull(((SetSpecsNode) result).toElementSetSpecs());
 
-    	// Object
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ A-STRING VisibleString }".getBytes())).new SettingParser();
+        // Object
+        parser = new Parser(new ByteArrayInputStream(
+                "{ A-STRING VisibleString }".getBytes())).new SettingParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectDefnNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectDefnNode);
 
-    	// ObjectSet
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ ..., (Object1 | Object2) }".getBytes())).new SettingParser();
+        // ObjectSet
+        parser = new Parser(new ByteArrayInputStream(
+                "{ ..., (Object1 | Object2) }".getBytes())).new SettingParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SetSpecsNode);
-    	assertNotNull(((SetSpecsNode) result).toObjectSetSpec());
+        assertNotNull(result);
+        assertTrue(result instanceof SetSpecsNode);
+        assertNotNull(((SetSpecsNode) result).toObjectSetSpec());
     }
 
     /**
@@ -5864,113 +5865,113 @@ public class ParserTest {
 
     @Test
     public void testObjectSetAssignmentParser() throws IOException,
-    		ParserException {
-    	ValueSetTypeAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"ObjectSet-Ref OBJ-CLASS ::= { (Object1 | Object2) }"
-    							.getBytes())).new ValueSetTypeAssignmentParser();
+            ParserException {
+        ValueSetTypeAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "ObjectSet-Ref OBJ-CLASS ::= { (Object1 | Object2) }"
+                                .getBytes())).new ValueSetTypeAssignmentParser();
 
-    	ValueSetTypeOrObjectSetAssignmentNode result = parser.parse();
+        ValueSetTypeOrObjectSetAssignmentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ObjectSet-Ref", result.getReference());
-    	assertTrue(result.getType() instanceof TypeReference);
-    	assertEquals("OBJ-CLASS", ((TypeReference) result.getType()).getType());
-    	assertNotNull(result.getValueSet());
+        assertNotNull(result);
+        assertEquals("ObjectSet-Ref", result.getReference());
+        assertTrue(result.getType() instanceof TypeReference);
+        assertEquals("OBJ-CLASS", ((TypeReference) result.getType()).getType());
+        assertNotNull(result.getValueSet());
     }
 
     @Test
     public void testObjectSetParser() throws IOException, ParserException {
-    	ObjectSetParser parser = new Parser(new ByteArrayInputStream(
-    			"{ (Object1 | Object2) }".getBytes())).new ObjectSetParser();
+        ObjectSetParser parser = new Parser(new ByteArrayInputStream(
+                "{ (Object1 | Object2) }".getBytes())).new ObjectSetParser();
 
-    	SetSpecsNode result = parser.parse();
+        SetSpecsNode result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testObjectSetSpecParser() throws IOException, ParserException {
-    	SetSpecsParser parser = new Parser(new ByteArrayInputStream(
-    			"(Object1 | Object2)".getBytes())).new SetSpecsParser();
+        SetSpecsParser parser = new Parser(new ByteArrayInputStream(
+                "(Object1 | Object2)".getBytes())).new SetSpecsParser();
 
-    	SetSpecsNode result = parser.parse();
+        SetSpecsNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getRootElements());
-    	assertNull(result.getAdditionalElements());
-    	assertFalse(result.hasExtensionMarker());
+        assertNotNull(result);
+        assertNotNull(result.getRootElements());
+        assertNull(result.getAdditionalElements());
+        assertFalse(result.hasExtensionMarker());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"(Object1 | Object2), ...".getBytes())).new SetSpecsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "(Object1 | Object2), ...".getBytes())).new SetSpecsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getRootElements());
-    	assertNull(result.getAdditionalElements());
-    	assertTrue(result.hasExtensionMarker());
+        assertNotNull(result);
+        assertNotNull(result.getRootElements());
+        assertNull(result.getAdditionalElements());
+        assertTrue(result.hasExtensionMarker());
 
-    	parser = new Parser(new ByteArrayInputStream("...".getBytes())).new SetSpecsParser();
+        parser = new Parser(new ByteArrayInputStream("...".getBytes())).new SetSpecsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNull(result.getRootElements());
-    	assertNull(result.getAdditionalElements());
-    	assertTrue(result.hasExtensionMarker());
+        assertNotNull(result);
+        assertNull(result.getRootElements());
+        assertNull(result.getAdditionalElements());
+        assertTrue(result.hasExtensionMarker());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"..., (Object1 | Object2)".getBytes())).new SetSpecsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "..., (Object1 | Object2)".getBytes())).new SetSpecsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNull(result.getRootElements());
-    	assertNotNull(result.getAdditionalElements());
-    	assertTrue(result.hasExtensionMarker());
+        assertNotNull(result);
+        assertNull(result.getRootElements());
+        assertNotNull(result.getAdditionalElements());
+        assertTrue(result.hasExtensionMarker());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"(Object1 | Object2), ..., (Object3 | Object4)".getBytes())).new SetSpecsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "(Object1 | Object2), ..., (Object3 | Object4)".getBytes())).new SetSpecsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getRootElements());
-    	assertNotNull(result.getAdditionalElements());
-    	assertTrue(result.hasExtensionMarker());
+        assertNotNull(result);
+        assertNotNull(result.getRootElements());
+        assertNotNull(result.getAdditionalElements());
+        assertTrue(result.hasExtensionMarker());
     }
 
     @Test
     public void testObjectSetElementsParser() throws IOException,
-    		ParserException {
-    	ObjectSetElementsParser parser = new Parser(new ByteArrayInputStream(
-    			"object-reference".getBytes())).new ObjectSetElementsParser();
+            ParserException {
+        ObjectSetElementsParser parser = new Parser(new ByteArrayInputStream(
+                "object-reference".getBytes())).new ObjectSetElementsParser();
 
-    	ObjectSetElementsNode result = parser.parse();
+        ObjectSetElementsNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getElement() instanceof ObjectNode);
+        assertNotNull(result);
+        assertTrue(result.getElement() instanceof ObjectNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Module.Object-Set".getBytes())).new ObjectSetElementsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Module.Object-Set".getBytes())).new ObjectSetElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getElement() instanceof ExternalObjectSetReferenceNode);
+        assertNotNull(result);
+        assertTrue(result.getElement() instanceof ExternalObjectSetReferenceNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object-reference.&Type-Reference1".getBytes())).new ObjectSetElementsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object-reference.&Type-Reference1".getBytes())).new ObjectSetElementsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getElement() instanceof TypeFromObjects);
+        assertNotNull(result);
+        assertTrue(result.getElement() instanceof TypeFromObjects);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ObjectSet-Reference {parameter}".getBytes())).new ObjectSetElementsParser();
-    	assertNotNull(result);
+        parser = new Parser(new ByteArrayInputStream(
+                "ObjectSet-Reference {parameter}".getBytes())).new ObjectSetElementsParser();
+        assertNotNull(result);
     }
 
     /**
@@ -5981,78 +5982,78 @@ public class ParserTest {
 
     @Test
     public void testObjectClassFieldTypeParser() throws IOException,
-    		ParserException {
-    	ObjectClassFieldTypeParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"OBJECT-CLASS.&ObjectSet-Reference".getBytes())).new ObjectClassFieldTypeParser();
+            ParserException {
+        ObjectClassFieldTypeParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "OBJECT-CLASS.&ObjectSet-Reference".getBytes())).new ObjectClassFieldTypeParser();
 
-    	ObjectClassFieldTypeNode result = parser.parse();
+        ObjectClassFieldTypeNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("OBJECT-CLASS", result.getObjectclass().getReference());
-    	assertEquals("ObjectSet-Reference", result.getField()
-    			.getPrimitiveFieldNames().get(0).getReference());
+        assertNotNull(result);
+        assertEquals("OBJECT-CLASS", result.getObjectclass().getReference());
+        assertEquals("ObjectSet-Reference", result.getField()
+                .getPrimitiveFieldNames().get(0).getReference());
     }
 
     @Test
     public void testObjectClassFieldValueParser() throws IOException, ParserException {
-    	ObjectClassFieldValueParser parser = new Parser(
-    			new ByteArrayInputStream("INTEGER: 4711".getBytes())).new ObjectClassFieldValueParser();
+        ObjectClassFieldValueParser parser = new Parser(
+                new ByteArrayInputStream("INTEGER: 4711".getBytes())).new ObjectClassFieldValueParser();
 
-    	Value result = parser.parse();
-    	assertTrue(result instanceof OpenTypeFieldValue);
+        Value result = parser.parse();
+        assertTrue(result instanceof OpenTypeFieldValue);
 
-    	parser = new Parser(new ByteArrayInputStream("NULL:NULL".getBytes())).new ObjectClassFieldValueParser();
+        parser = new Parser(new ByteArrayInputStream("NULL:NULL".getBytes())).new ObjectClassFieldValueParser();
 
-    	result = parser.parse();
-    	assertTrue(result instanceof OpenTypeFieldValue);
+        result = parser.parse();
+        assertTrue(result instanceof OpenTypeFieldValue);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object-reference.&value-reference".getBytes())).new ObjectClassFieldValueParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object-reference.&value-reference".getBytes())).new ObjectClassFieldValueParser();
 
-    	result = parser.parse();
-    	assertTrue(result instanceof ValueFromObject);
+        result = parser.parse();
+        assertTrue(result instanceof ValueFromObject);
     }
 
     @Test
     public void testOpenTypeFieldValParser() throws IOException,
-    		ParserException {
-    	OpenTypeFieldValParser parser = new Parser(new ByteArrayInputStream(
-    			"INTEGER: 4711".getBytes())).new OpenTypeFieldValParser();
+            ParserException {
+        OpenTypeFieldValParser parser = new Parser(new ByteArrayInputStream(
+                "INTEGER: 4711".getBytes())).new OpenTypeFieldValParser();
 
-    	OpenTypeFieldValue result = parser.parse();
+        OpenTypeFieldValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getType() instanceof IntegerType);
-    	assertTrue(result.getValue() instanceof IntegerValue);
+        assertNotNull(result);
+        assertTrue(result.getType() instanceof IntegerType);
+        assertTrue(result.getValue() instanceof IntegerValue);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"VisibleString: value-ref".getBytes())).new OpenTypeFieldValParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "VisibleString: value-ref".getBytes())).new OpenTypeFieldValParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getType() instanceof VisibleString);
-    	assertTrue(result.getValue() instanceof AmbiguousValue);
-    	testAmbiguousValue(result.getValue(), DefinedValue.class);
+        assertNotNull(result);
+        assertTrue(result.getType() instanceof VisibleString);
+        assertTrue(result.getValue() instanceof AmbiguousValue);
+        testAmbiguousValue(result.getValue(), DefinedValue.class);
     }
 
     @Test
     public void testFixedTypeFieldValParser() throws IOException,
-    		ParserException {
-    	FixedTypeFieldValParser parser = new Parser(new ByteArrayInputStream(
-    			"object-reference {Object}.&value-reference".getBytes())).new FixedTypeFieldValParser();
+            ParserException {
+        FixedTypeFieldValParser parser = new Parser(new ByteArrayInputStream(
+                "object-reference {Object}.&value-reference".getBytes())).new FixedTypeFieldValParser();
 
-    	Value result = parser.parse();
+        Value result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ValueFromObject);
+        assertNotNull(result);
+        assertTrue(result instanceof ValueFromObject);
 
-    	parser = new Parser(new ByteArrayInputStream("\"string\"".getBytes())).new FixedTypeFieldValParser();
+        parser = new Parser(new ByteArrayInputStream("\"string\"".getBytes())).new FixedTypeFieldValParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	testAmbiguousValue(result, StringValue.class);
+        testAmbiguousValue(result, StringValue.class);
     }
 
     /**
@@ -6063,95 +6064,95 @@ public class ParserTest {
 
     @Test
     public void testInformationFromObjectsParser() throws IOException,
-    		ParserException {
-    	InformationFromObjectsParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"object-reference {Object}.&Type-Reference1.&Type-Reference2"
-    							.getBytes())).new InformationFromObjectsParser();
+            ParserException {
+        InformationFromObjectsParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "object-reference {Object}.&Type-Reference1.&Type-Reference2"
+                                .getBytes())).new InformationFromObjectsParser();
 
-    	InformationFromObjects result = parser.parse();
+        InformationFromObjects result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeFromObjects);
-    	assertNotNull(result.getReference());
-    	assertNotNull(result.getField());
+        assertNotNull(result);
+        assertTrue(result instanceof TypeFromObjects);
+        assertNotNull(result.getReference());
+        assertNotNull(result.getField());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object-reference {Object}.&value-reference1.&value-reference2"
-    					.getBytes())).new InformationFromObjectsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object-reference {Object}.&value-reference1.&value-reference2"
+                        .getBytes())).new InformationFromObjectsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ValueFromObject);
-    	assertNotNull(result.getReference());
-    	assertNotNull(result.getField());
+        assertNotNull(result);
+        assertTrue(result instanceof ValueFromObject);
+        assertNotNull(result.getReference());
+        assertNotNull(result.getField());
     }
 
     @Test
     public void testValueFromObjectParser() throws IOException, ParserException {
-    	ValueFromObjectParser parser = new Parser(new ByteArrayInputStream(
-    			"object-reference {Object}.&value-reference1.&value-reference2"
-    					.getBytes())).new ValueFromObjectParser();
+        ValueFromObjectParser parser = new Parser(new ByteArrayInputStream(
+                "object-reference {Object}.&value-reference1.&value-reference2"
+                        .getBytes())).new ValueFromObjectParser();
 
-    	ValueFromObject result = parser.parse();
+        ValueFromObject result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getReference());
-    	assertNotNull(result.getField());
+        assertNotNull(result);
+        assertNotNull(result.getReference());
+        assertNotNull(result.getField());
     }
 
     @Test
     public void testTypeFromObjectsParser() throws IOException, ParserException {
-    	TypeFromObjectsParser parser = new Parser(new ByteArrayInputStream(
-    			"object-reference {Object}.&Type-Reference1.&Type-Reference2"
-    					.getBytes())).new TypeFromObjectsParser();
+        TypeFromObjectsParser parser = new Parser(new ByteArrayInputStream(
+                "object-reference {Object}.&Type-Reference1.&Type-Reference2"
+                        .getBytes())).new TypeFromObjectsParser();
 
-    	TypeFromObjects result = parser.parse();
+        TypeFromObjects result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getReference());
-    	assertNotNull(result.getField());
+        assertNotNull(result);
+        assertNotNull(result.getReference());
+        assertNotNull(result.getField());
     }
 
     @Test
     public void testReferencedObjectsParser() throws IOException,
-    		ParserException {
-    	ReferencedObjectsParser parser = new Parser(new ByteArrayInputStream(
-    			"object-reference".getBytes())).new ReferencedObjectsParser();
+            ParserException {
+        ReferencedObjectsParser parser = new Parser(new ByteArrayInputStream(
+                "object-reference".getBytes())).new ReferencedObjectsParser();
 
-    	Node result = parser.parse();
+        Node result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectReferenceNode);
-    	assertNull(((ObjectReferenceNode) result).getParameters());
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectReferenceNode);
+        assertNull(((ObjectReferenceNode) result).getParameters());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object-reference {Object}".getBytes())).new ReferencedObjectsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object-reference {Object}".getBytes())).new ReferencedObjectsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectReferenceNode);
-    	assertNotNull(((ObjectReferenceNode) result).getParameters());
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectReferenceNode);
+        assertNotNull(((ObjectReferenceNode) result).getParameters());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ObjectSet-Reference".getBytes())).new ReferencedObjectsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ObjectSet-Reference".getBytes())).new ReferencedObjectsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectSetReferenceNode);
-    	assertNull(((ObjectSetReferenceNode) result).getParameters());
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectSetReferenceNode);
+        assertNull(((ObjectSetReferenceNode) result).getParameters());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ObjectSet-Reference {Object}".getBytes())).new ReferencedObjectsParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ObjectSet-Reference {Object}".getBytes())).new ReferencedObjectsParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ObjectSetReferenceNode);
-    	assertNotNull(((ObjectSetReferenceNode) result).getParameters());
+        assertNotNull(result);
+        assertTrue(result instanceof ObjectSetReferenceNode);
+        assertNotNull(((ObjectSetReferenceNode) result).getParameters());
     }
 
     /**
@@ -6162,13 +6163,13 @@ public class ParserTest {
 
     @Test
     public void testInstanceOfTypeParser() throws IOException, ParserException {
-    	BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
-    			"INSTANCE OF OBJECT-CLASS".getBytes())).new BuiltinTypeParserAux();
+        BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
+                "INSTANCE OF OBJECT-CLASS".getBytes())).new BuiltinTypeParserAux();
 
-    	Type result = parser.parse();
+        Type result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof InstanceOfType);
+        assertNotNull(result);
+        assertTrue(result instanceof InstanceOfType);
     }
 
     /**
@@ -6179,29 +6180,29 @@ public class ParserTest {
 
     @Test
     public void testGeneralConstraintParser() throws IOException,
-    		ParserException {
-    	GeneralConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"CONSTRAINED BY {}".getBytes())).new GeneralConstraintParser();
+            ParserException {
+        GeneralConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "CONSTRAINED BY {}".getBytes())).new GeneralConstraintParser();
 
-    	Constraint result = parser.parse();
+        Constraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof UserDefinedConstraintNode);
+        assertNotNull(result);
+        assertTrue(result instanceof UserDefinedConstraintNode);
 
-    	parser = new Parser(new ByteArrayInputStream("{ErrorSet}".getBytes())).new GeneralConstraintParser();
+        parser = new Parser(new ByteArrayInputStream("{ErrorSet}".getBytes())).new GeneralConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TableConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof TableConstraint);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ENCODED BY {0 1 4711 2}".getBytes())).new GeneralConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ENCODED BY {0 1 4711 2}".getBytes())).new GeneralConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ContentsConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof ContentsConstraint);
     }
 
     /**
@@ -6212,62 +6213,62 @@ public class ParserTest {
 
     @Test
     public void testUserDefinedConstraintParser() throws IOException,
-    		ParserException {
-    	UserDefinedConstraintParser parser = new Parser(
-    			new ByteArrayInputStream("CONSTRAINED BY {}".getBytes())).new UserDefinedConstraintParser();
+            ParserException {
+        UserDefinedConstraintParser parser = new Parser(
+                new ByteArrayInputStream("CONSTRAINED BY {}".getBytes())).new UserDefinedConstraintParser();
 
-    	UserDefinedConstraintNode result = parser.parse();
+        UserDefinedConstraintNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(0, result.getParams().size());
+        assertNotNull(result);
+        assertEquals(0, result.getParams().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"CONSTRAINED BY { INTEGER: 4711 }".getBytes())).new UserDefinedConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "CONSTRAINED BY { INTEGER: 4711 }".getBytes())).new UserDefinedConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.getParams().size());
+        assertNotNull(result);
+        assertEquals(1, result.getParams().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"CONSTRAINED BY { INTEGER: 4711, VisibleString: \"string\" }"
-    					.getBytes())).new UserDefinedConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "CONSTRAINED BY { INTEGER: 4711, VisibleString: \"string\" }"
+                        .getBytes())).new UserDefinedConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getParams().size());
+        assertNotNull(result);
+        assertEquals(2, result.getParams().size());
     }
 
     @Test
     public void testUserDefinedConstraintParameterParser() throws IOException,
-    		ParserException {
-    	UserDefinedConstraintParameterParser parser = new Parser(
-    			new ByteArrayInputStream("INTEGER: 4711".getBytes())).new UserDefinedConstraintParameterParser();
+            ParserException {
+        UserDefinedConstraintParameterParser parser = new Parser(
+                new ByteArrayInputStream("INTEGER: 4711".getBytes())).new UserDefinedConstraintParameterParser();
 
-    	UserDefinedConstraintParamNode result = parser.parse();
+        UserDefinedConstraintParamNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getGovernor());
-    	assertTrue(result.getValue() instanceof IntegerValue);
+        assertNotNull(result);
+        assertNotNull(result.getGovernor());
+        assertTrue(result.getValue() instanceof IntegerValue);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"OBJECT-CLASS : { &int-field 4711, &Type-Field VisibleString }"
-    					.getBytes())).new UserDefinedConstraintParameterParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "OBJECT-CLASS : { &int-field 4711, &Type-Field VisibleString }"
+                        .getBytes())).new UserDefinedConstraintParameterParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getGovernor());
-    	assertTrue(result.getValue() instanceof ObjectDefnNode);
+        assertNotNull(result);
+        assertNotNull(result.getGovernor());
+        assertTrue(result.getValue() instanceof ObjectDefnNode);
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("VisibleString".getBytes())).new UserDefinedConstraintParameterParser();
+        parser = new Parser(
+                new ByteArrayInputStream("VisibleString".getBytes())).new UserDefinedConstraintParameterParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getValue() instanceof VisibleString);
+        assertNotNull(result);
+        assertTrue(result.getValue() instanceof VisibleString);
     }
 
     /**
@@ -6278,135 +6279,135 @@ public class ParserTest {
 
     @Test
     public void testTableConstraintParser() throws IOException, ParserException {
-    	TableConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"{ErrorSet}".getBytes())).new TableConstraintParser();
+        TableConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "{ErrorSet}".getBytes())).new TableConstraintParser();
 
-    	TableConstraint result = parser.parse();
+        TableConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof SimpleTableConstraintNode);
+        assertNotNull(result);
+        assertTrue(result instanceof SimpleTableConstraintNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{ErrorSet} {@errorCategory, @.errorCode}".getBytes())).new TableConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{ErrorSet} {@errorCategory, @.errorCode}".getBytes())).new TableConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ComponentRelationConstraint);
+        assertNotNull(result);
+        assertTrue(result instanceof ComponentRelationConstraint);
     }
 
     @Test
     public void testSimpleTableConstraintParser() throws IOException,
-    		ParserException {
-    	SimpleTableConstraintParser parser = new Parser(
-    			new ByteArrayInputStream("{ErrorSet} ".getBytes())).new SimpleTableConstraintParser();
+            ParserException {
+        SimpleTableConstraintParser parser = new Parser(
+                new ByteArrayInputStream("{ErrorSet} ".getBytes())).new SimpleTableConstraintParser();
 
-    	SimpleTableConstraintNode result = parser.parse();
+        SimpleTableConstraintNode result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     @Test
     public void testComponentRelationConstraintParser() throws IOException,
-    		ParserException {
-    	ComponentRelationConstraintParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"{ErrorSet} {@errorCategory, @.errorCode}".getBytes())).new ComponentRelationConstraintParser();
+            ParserException {
+        ComponentRelationConstraintParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "{ErrorSet} {@errorCategory, @.errorCode}".getBytes())).new ComponentRelationConstraintParser();
 
-    	ComponentRelationConstraint result = parser.parse();
+        ComponentRelationConstraint result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ErrorSet", result.getReference().getReference());
-    	assertEquals(2, result.getComponents().size());
+        assertNotNull(result);
+        assertEquals("ErrorSet", result.getReference().getReference());
+        assertEquals(2, result.getComponents().size());
     }
 
     @Test
     public void testAtNotationParser() throws IOException, ParserException {
-    	AtNotationParser parser = new Parser(new ByteArrayInputStream(
-    			"@identifier-1".getBytes())).new AtNotationParser();
+        AtNotationParser parser = new Parser(new ByteArrayInputStream(
+                "@identifier-1".getBytes())).new AtNotationParser();
 
-    	AtNotationNode result = parser.parse();
+        AtNotationNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.getComponentIds().getIdentifiers().size());
-    	assertEquals("identifier-1", result.getComponentIds().getIdentifiers()
-    			.get(0));
-    	assertEquals(0, result.getLevel());
+        assertNotNull(result);
+        assertEquals(1, result.getComponentIds().getIdentifiers().size());
+        assertEquals("identifier-1", result.getComponentIds().getIdentifiers()
+                .get(0));
+        assertEquals(0, result.getLevel());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"@identifier-1.identifier-2.identifier-3".getBytes())).new AtNotationParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "@identifier-1.identifier-2.identifier-3".getBytes())).new AtNotationParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(3, result.getComponentIds().getIdentifiers().size());
-    	assertEquals("identifier-1", result.getComponentIds().getIdentifiers()
-    			.get(0));
-    	assertEquals("identifier-2", result.getComponentIds().getIdentifiers()
-    			.get(1));
-    	assertEquals("identifier-3", result.getComponentIds().getIdentifiers()
-    			.get(2));
-    	assertEquals(0, result.getLevel());
+        assertNotNull(result);
+        assertEquals(3, result.getComponentIds().getIdentifiers().size());
+        assertEquals("identifier-1", result.getComponentIds().getIdentifiers()
+                .get(0));
+        assertEquals("identifier-2", result.getComponentIds().getIdentifiers()
+                .get(1));
+        assertEquals("identifier-3", result.getComponentIds().getIdentifiers()
+                .get(2));
+        assertEquals(0, result.getLevel());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"@.identifier-1".getBytes())).new AtNotationParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "@.identifier-1".getBytes())).new AtNotationParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.getComponentIds().getIdentifiers().size());
-    	assertEquals("identifier-1", result.getComponentIds().getIdentifiers()
-    			.get(0));
-    	assertEquals(1, result.getLevel());
+        assertNotNull(result);
+        assertEquals(1, result.getComponentIds().getIdentifiers().size());
+        assertEquals("identifier-1", result.getComponentIds().getIdentifiers()
+                .get(0));
+        assertEquals(1, result.getLevel());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"@...identifier-1.identifier-2".getBytes())).new AtNotationParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "@...identifier-1.identifier-2".getBytes())).new AtNotationParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.getComponentIds().getIdentifiers().size());
-    	assertEquals("identifier-1", result.getComponentIds().getIdentifiers()
-    			.get(0));
-    	assertEquals("identifier-2", result.getComponentIds().getIdentifiers()
-    			.get(1));
-    	assertEquals(3, result.getLevel());
+        assertNotNull(result);
+        assertEquals(2, result.getComponentIds().getIdentifiers().size());
+        assertEquals("identifier-1", result.getComponentIds().getIdentifiers()
+                .get(0));
+        assertEquals("identifier-2", result.getComponentIds().getIdentifiers()
+                .get(1));
+        assertEquals(3, result.getLevel());
     }
 
     @Test
     public void testLevelParser() throws IOException, ParserException {
-    	assertEquals(0, (int) new Parser(
-    			new ByteArrayInputStream("".getBytes())).new LevelParser()
-    			.parse());
-    	assertEquals(
-    			1,
-    			(int) new Parser(new ByteArrayInputStream(".".getBytes())).new LevelParser()
-    					.parse());
-    	assertEquals(
-    			5,
-    			(int) new Parser(new ByteArrayInputStream(".....".getBytes())).new LevelParser()
-    					.parse());
+        assertEquals(0, (int) new Parser(
+                new ByteArrayInputStream("".getBytes())).new LevelParser()
+                .parse());
+        assertEquals(
+                1,
+                (int) new Parser(new ByteArrayInputStream(".".getBytes())).new LevelParser()
+                        .parse());
+        assertEquals(
+                5,
+                (int) new Parser(new ByteArrayInputStream(".....".getBytes())).new LevelParser()
+                        .parse());
     }
 
     @Test
     public void testComponentIdListParser() throws IOException, ParserException {
-    	ComponentIdListParser parser = new Parser(new ByteArrayInputStream(
-    			"identifier-1".getBytes())).new ComponentIdListParser();
+        ComponentIdListParser parser = new Parser(new ByteArrayInputStream(
+                "identifier-1".getBytes())).new ComponentIdListParser();
 
-    	ComponentIdListNode result = parser.parse();
+        ComponentIdListNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(Arrays.asList("identifier-1"), result.getIdentifiers());
+        assertNotNull(result);
+        assertEquals(Arrays.asList("identifier-1"), result.getIdentifiers());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"identifier-1.identifier-2.identifier-3".getBytes())).new ComponentIdListParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "identifier-1.identifier-2.identifier-3".getBytes())).new ComponentIdListParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(
-    			Arrays.asList("identifier-1", "identifier-2", "identifier-3"),
-    			result.getIdentifiers());
+        assertNotNull(result);
+        assertEquals(
+                Arrays.asList("identifier-1", "identifier-2", "identifier-3"),
+                result.getIdentifiers());
     }
 
     /**
@@ -6417,27 +6418,27 @@ public class ParserTest {
 
     @Test
     public void testContentsConstraintParser() throws IOException,
-    		ParserException {
-    	ContentsConstraintParser parser = new Parser(new ByteArrayInputStream(
-    			"CONTAINING VisibleString".getBytes())).new ContentsConstraintParser();
+            ParserException {
+        ContentsConstraintParser parser = new Parser(new ByteArrayInputStream(
+                "CONTAINING VisibleString".getBytes())).new ContentsConstraintParser();
 
-    	ContentsConstraint result = parser.parse();
+        ContentsConstraint result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ENCODED BY {0 1 4711 2}".getBytes())).new ContentsConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ENCODED BY {0 1 4711 2}".getBytes())).new ContentsConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"CONTAINING VisibleString ENCODED BY {0 1 4711 2}".getBytes())).new ContentsConstraintParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "CONTAINING VisibleString ENCODED BY {0 1 4711 2}".getBytes())).new ContentsConstraintParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
     }
 
     /**
@@ -6448,280 +6449,280 @@ public class ParserTest {
 
     @Test
     public void testParameterizedAssignmentParser() throws IOException,
-    		ParserException {
-    	ParameterizedAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"TypeReference {VisibleString: String} ::= SEQUENCE { attribute String }"
-    							.getBytes())).new ParameterizedAssignmentParser();
+            ParserException {
+        ParameterizedAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "TypeReference {VisibleString: String} ::= SEQUENCE { attribute String }"
+                                .getBytes())).new ParameterizedAssignmentParser();
 
-    	ParameterizedAssignmentNode result = parser.parse();
+        ParameterizedAssignmentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ParameterizedTypeAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ParameterizedTypeAssignmentNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"valueReference {aValue} TypeReference ::= {attribute aValue}"
-    					.getBytes())).new ParameterizedAssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "valueReference {aValue} TypeReference ::= {attribute aValue}"
+                        .getBytes())).new ParameterizedAssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ParameterizedValueAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ParameterizedValueAssignmentNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"TypeReference {aValue} INTEGER ::= {(4711 ^ aValue)}"
-    					.getBytes())).new ParameterizedAssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "TypeReference {aValue} INTEGER ::= {(4711 ^ aValue)}"
+                        .getBytes())).new ParameterizedAssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ParameterizedValueSetTypeAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ParameterizedValueSetTypeAssignmentNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ObjClassReference {aValue} ::= ABSTRACT-SYNTAX".getBytes())).new ParameterizedAssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ObjClassReference {aValue} ::= ABSTRACT-SYNTAX".getBytes())).new ParameterizedAssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ParameterizedObjectClassAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ParameterizedObjectClassAssignmentNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"objectReference {aValue} ABSTRACT-SYNTAX ::= object"
-    					.getBytes())).new ParameterizedAssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "objectReference {aValue} ABSTRACT-SYNTAX ::= object"
+                        .getBytes())).new ParameterizedAssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ParameterizedObjectAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ParameterizedObjectAssignmentNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"ObjSetReference {aValue} ABSTRACT-SYNTAX ::= { object | { TYPE INTEGER } }"
-    					.getBytes())).new ParameterizedAssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "ObjSetReference {aValue} ABSTRACT-SYNTAX ::= { object | { TYPE INTEGER } }"
+                        .getBytes())).new ParameterizedAssignmentParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ParameterizedObjectSetAssignmentNode);
+        assertNotNull(result);
+        assertTrue(result instanceof ParameterizedObjectSetAssignmentNode);
     }
 
     @Test
     public void testParameterizedTypeAssignmentParser() throws IOException,
-    		ParserException {
-    	ParameterizedTypeAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"TypeReference {VisibleString: String} ::= SEQUENCE { attribute String }"
-    							.getBytes())).new ParameterizedTypeAssignmentParser();
+            ParserException {
+        ParameterizedTypeAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "TypeReference {VisibleString: String} ::= SEQUENCE { attribute String }"
+                                .getBytes())).new ParameterizedTypeAssignmentParser();
 
-    	ParameterizedTypeOrObjectClassAssignmentNode<? extends Node> result = parser
-    			.parse();
+        ParameterizedTypeOrObjectClassAssignmentNode<? extends Node> result = parser
+                .parse();
 
-    	assertNotNull(result);
-    	assertEquals("TypeReference", result.getReference());
-    	assertEquals(1, result.getParameters().size());
-    	assertTrue(result instanceof ParameterizedTypeAssignmentNode);
-    	assertTrue(((ParameterizedTypeAssignmentNode) result).getType() instanceof SequenceType);
+        assertNotNull(result);
+        assertEquals("TypeReference", result.getReference());
+        assertEquals(1, result.getParameters().size());
+        assertTrue(result instanceof ParameterizedTypeAssignmentNode);
+        assertTrue(((ParameterizedTypeAssignmentNode) result).getType() instanceof SequenceType);
     }
 
     @Test
     public void testParameterizedValueAssignmentParser() throws IOException,
-    		ParserException {
-    	ParameterizedValueAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"valueReference {aValue} TypeReference ::= {attribute aValue}"
-    							.getBytes())).new ParameterizedValueAssignmentParser();
+            ParserException {
+        ParameterizedValueAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "valueReference {aValue} TypeReference ::= {attribute aValue}"
+                                .getBytes())).new ParameterizedValueAssignmentParser();
 
-    	ParameterizedValueOrObjectAssignmentNode<?, ?> result = parser.parse();
+        ParameterizedValueOrObjectAssignmentNode<?, ?> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("valueReference", result.getReference());
-    	assertTrue(result instanceof ParameterizedValueAssignmentNode);
-    	assertTrue(((ParameterizedValueAssignmentNode) result).getType() instanceof TypeReference);
-    	assertEquals(1, result.getParameters().size());
-    	assertTrue(((ParameterizedValueAssignmentNode) result).getValue() instanceof CollectionValue);
+        assertNotNull(result);
+        assertEquals("valueReference", result.getReference());
+        assertTrue(result instanceof ParameterizedValueAssignmentNode);
+        assertTrue(((ParameterizedValueAssignmentNode) result).getType() instanceof TypeReference);
+        assertEquals(1, result.getParameters().size());
+        assertTrue(((ParameterizedValueAssignmentNode) result).getValue() instanceof CollectionValue);
     }
 
     @Test
     public void testParameterizedValueSetTypeAssignmentParser()
-    		throws IOException, ParserException {
-    	ParameterizedValueSetTypeAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"TypeReference {aValue} INTEGER ::= {(4711 ^ aValue)}"
-    							.getBytes())).new ParameterizedValueSetTypeAssignmentParser();
+            throws IOException, ParserException {
+        ParameterizedValueSetTypeAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "TypeReference {aValue} INTEGER ::= {(4711 ^ aValue)}"
+                                .getBytes())).new ParameterizedValueSetTypeAssignmentParser();
 
-    	ParameterizedValueSetTypeAssignmentNode result = parser.parse();
+        ParameterizedValueSetTypeAssignmentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("TypeReference", result.getReference());
-    	assertTrue(result.getTypeClass() instanceof IntegerType);
-    	assertEquals(1, result.getParameters().size());
+        assertNotNull(result);
+        assertEquals("TypeReference", result.getReference());
+        assertTrue(result.getTypeClass() instanceof IntegerType);
+        assertEquals(1, result.getParameters().size());
     }
 
     @Test
     public void testParameterizedObjectClassAssignmentParser()
-    		throws IOException, ParserException {
-    	ParameterizedTypeAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"ObjClassReference {aValue} ::= ABSTRACT-SYNTAX"
-    							.getBytes())).new ParameterizedTypeAssignmentParser();
+            throws IOException, ParserException {
+        ParameterizedTypeAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "ObjClassReference {aValue} ::= ABSTRACT-SYNTAX"
+                                .getBytes())).new ParameterizedTypeAssignmentParser();
 
-    	ParameterizedTypeOrObjectClassAssignmentNode<? extends Node> result = parser
-    			.parse();
+        ParameterizedTypeOrObjectClassAssignmentNode<? extends Node> result = parser
+                .parse();
 
-    	assertNotNull(result);
-    	assertEquals("ObjClassReference", result.getReference());
-    	assertEquals(1, result.getParameters().size());
-    	assertTrue(result instanceof ParameterizedObjectClassAssignmentNode);
-    	assertTrue(((ParameterizedObjectClassAssignmentNode) result).getType() instanceof ObjectClassReferenceNode);
+        assertNotNull(result);
+        assertEquals("ObjClassReference", result.getReference());
+        assertEquals(1, result.getParameters().size());
+        assertTrue(result instanceof ParameterizedObjectClassAssignmentNode);
+        assertTrue(((ParameterizedObjectClassAssignmentNode) result).getType() instanceof ObjectClassReferenceNode);
     }
 
     @Test
     public void testParameterizedObjectAssignmentParser() throws IOException,
-    		ParserException {
-    	ParameterizedValueAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"objectReference {aValue} ABSTRACT-SYNTAX ::= object"
-    							.getBytes())).new ParameterizedValueAssignmentParser();
+            ParserException {
+        ParameterizedValueAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "objectReference {aValue} ABSTRACT-SYNTAX ::= object"
+                                .getBytes())).new ParameterizedValueAssignmentParser();
 
-    	ParameterizedValueOrObjectAssignmentNode<?, ?> result = parser.parse();
+        ParameterizedValueOrObjectAssignmentNode<?, ?> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("objectReference", result.getReference());
-    	assertTrue(result instanceof ParameterizedObjectAssignmentNode);
-    	assertTrue(((ParameterizedObjectAssignmentNode) result).getType() instanceof ObjectClassReferenceNode);
-    	assertEquals(1, result.getParameters().size());
-    	assertTrue(((ParameterizedObjectAssignmentNode) result).getValue() instanceof ObjectReferenceNode);
+        assertNotNull(result);
+        assertEquals("objectReference", result.getReference());
+        assertTrue(result instanceof ParameterizedObjectAssignmentNode);
+        assertTrue(((ParameterizedObjectAssignmentNode) result).getType() instanceof ObjectClassReferenceNode);
+        assertEquals(1, result.getParameters().size());
+        assertTrue(((ParameterizedObjectAssignmentNode) result).getValue() instanceof ObjectReferenceNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object{A-CLASS:class} A-CLASS ::= {ARGUMENT value.&Type}"
-    					.getBytes())).new ParameterizedValueAssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object{A-CLASS:class} A-CLASS ::= {ARGUMENT value.&Type}"
+                        .getBytes())).new ParameterizedValueAssignmentParser();
 
-    	result = parser.parse();
-    	assertNotNull(result);
-    	assertTrue(result.getValue() instanceof ObjectDefnNode);
+        result = parser.parse();
+        assertNotNull(result);
+        assertTrue(result.getValue() instanceof ObjectDefnNode);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"object{A-CLASS:class} A-CLASS ::= object.&object-reference"
-    					.getBytes())).new ParameterizedValueAssignmentParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "object{A-CLASS:class} A-CLASS ::= object.&object-reference"
+                        .getBytes())).new ParameterizedValueAssignmentParser();
 
-    	result = parser.parse();
-    	assertNotNull(result);
-    	assertTrue(result.getValue() instanceof ValueFromObject);
+        result = parser.parse();
+        assertNotNull(result);
+        assertTrue(result.getValue() instanceof ValueFromObject);
     }
 
     @Test
     public void testParameterizedObjectSetAssignmentParser()
-    		throws IOException, ParserException {
-    	ParameterizedObjectSetAssignmentParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"ObjSetReference {aValue} OBJECT-CLASS ::= { object | { TYPE INTEGER } }"
-    							.getBytes())).new ParameterizedObjectSetAssignmentParser();
+            throws IOException, ParserException {
+        ParameterizedObjectSetAssignmentParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "ObjSetReference {aValue} OBJECT-CLASS ::= { object | { TYPE INTEGER } }"
+                                .getBytes())).new ParameterizedObjectSetAssignmentParser();
 
-    	ParameterizedObjectSetAssignmentNode result = parser.parse();
+        ParameterizedObjectSetAssignmentNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ObjSetReference", result.getReference());
-    	assertTrue(result.getObjectClass() instanceof ObjectClassReferenceNode);
-    	assertEquals(1, result.getParameters().size());
+        assertNotNull(result);
+        assertEquals("ObjSetReference", result.getReference());
+        assertTrue(result.getObjectClass() instanceof ObjectClassReferenceNode);
+        assertEquals(1, result.getParameters().size());
     }
 
     @Test
     public void testParameterListParser() throws IOException, ParserException {
-    	ParameterListParser parser = new Parser(new ByteArrayInputStream(
-    			"{VisibleString: aString, INTEGER: anInteger}".getBytes())).new ParameterListParser();
+        ParameterListParser parser = new Parser(new ByteArrayInputStream(
+                "{VisibleString: aString, INTEGER: anInteger}".getBytes())).new ParameterListParser();
 
-    	List<ParameterNode> result = parser.parse();
+        List<ParameterNode> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{VisibleString: aString}".getBytes())).new ParameterListParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{VisibleString: aString}".getBytes())).new ParameterListParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(1, result.size());
+        assertNotNull(result);
+        assertEquals(1, result.size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"{aString, anInteger}".getBytes())).new ParameterListParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "{aString, anInteger}".getBytes())).new ParameterListParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(2, result.size());
+        assertNotNull(result);
+        assertEquals(2, result.size());
     }
 
     @Test
     public void testParameterParser() throws IOException, ParserException {
-    	ParameterParser parser = new Parser(new ByteArrayInputStream(
-    			"VisibleString: aString".getBytes())).new ParameterParser();
+        ParameterParser parser = new Parser(new ByteArrayInputStream(
+                "VisibleString: aString".getBytes())).new ParameterParser();
 
-    	ParameterNode result = parser.parse();
+        ParameterNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNotNull(result.getGovernor());
-    	assertEquals("aString", result.getReference().getName());
+        assertNotNull(result);
+        assertNotNull(result.getGovernor());
+        assertEquals("aString", result.getReference().getName());
 
-    	parser = new Parser(new ByteArrayInputStream("aString".getBytes())).new ParameterParser();
+        parser = new Parser(new ByteArrayInputStream("aString".getBytes())).new ParameterParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertNull(result.getGovernor());
-    	assertEquals("aString", result.getReference().getName());
+        assertNotNull(result);
+        assertNull(result.getGovernor());
+        assertEquals("aString", result.getReference().getName());
     }
 
     @Test
     public void testParamGovernorParser() throws IOException, ParserException {
-    	ParamGovernorParser parser = new Parser(new ByteArrayInputStream(
-    			"INTEGER".getBytes())).new ParamGovernorParser();
+        ParamGovernorParser parser = new Parser(new ByteArrayInputStream(
+                "INTEGER".getBytes())).new ParamGovernorParser();
 
-    	ParamGovernorNode result = parser.parse();
+        ParamGovernorNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof Governor);
-    	assertTrue(((Governor) result).getType() instanceof IntegerType);
+        assertNotNull(result);
+        assertTrue(result instanceof Governor);
+        assertTrue(((Governor) result).getType() instanceof IntegerType);
     }
 
     @Test
     public void testGovernorParser() throws IOException, ParserException {
-    	GovernorParser parser = new Parser(new ByteArrayInputStream(
-    			"INTEGER".getBytes())).new GovernorParser();
+        GovernorParser parser = new Parser(new ByteArrayInputStream(
+                "INTEGER".getBytes())).new GovernorParser();
 
-    	Governor result = parser.parse();
+        Governor result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getType() instanceof Type);
+        assertNotNull(result);
+        assertTrue(result.getType() instanceof Type);
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Module.OBJECT-CLASS".getBytes())).new GovernorParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Module.OBJECT-CLASS".getBytes())).new GovernorParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result.getType() instanceof ExternalTypeReference);
+        assertNotNull(result);
+        assertTrue(result.getType() instanceof ExternalTypeReference);
     }
 
     @Test
     public void testDummyGovernorParser() throws IOException, ParserException {
-    	DummyGovernorParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference".getBytes())).new DummyGovernorParser();
+        DummyGovernorParser parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference".getBytes())).new DummyGovernorParser();
 
-    	DummyGovernor result = parser.parse();
+        DummyGovernor result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Type-Reference", result.getReference().getName());
+        assertNotNull(result);
+        assertEquals("Type-Reference", result.getReference().getName());
     }
 
     @Test
     public void testDummyReferenceParser() throws IOException, ParserException {
-    	DummyReferenceParser parser = new Parser(new ByteArrayInputStream(
-    			"Type-Reference".getBytes())).new DummyReferenceParser();
+        DummyReferenceParser parser = new Parser(new ByteArrayInputStream(
+                "Type-Reference".getBytes())).new DummyReferenceParser();
 
-    	ReferenceNode result = parser.parse();
+        ReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("Type-Reference", result.getName());
+        assertNotNull(result);
+        assertEquals("Type-Reference", result.getName());
     }
 
     /**
@@ -6732,177 +6733,178 @@ public class ParserTest {
 
     @Test
     public void testParameterizedTypeParser() throws IOException,
-    		ParserException {
-    	ParameterizedTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"Module.Type {INTEGER}".getBytes())).new ParameterizedTypeParser();
+            ParserException {
+        ParameterizedTypeParser parser = new Parser(new ByteArrayInputStream(
+                "Module.Type {INTEGER}".getBytes())).new ParameterizedTypeParser();
 
-    	SimpleDefinedType result = parser.parse();
+        SimpleDefinedType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalTypeReference);
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalTypeReference);
 
-    	assertEquals("Module", ((ExternalTypeReference) result).getModule());
-    	assertEquals("Type", result.getType());
-    	assertEquals(1, result.getParameters().size());
+        assertEquals("Module", ((ExternalTypeReference) result).getModule());
+        assertEquals("Type", result.getType());
+        assertEquals(1, result.getParameters().size());
     }
 
     @Test
     public void testSimpleDefinedTypeParser() throws IOException,
-    		ParserException {
-    	SimpleDefinedTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"Module.TypeReference".getBytes())).new SimpleDefinedTypeParser();
+            ParserException {
+        SimpleDefinedTypeParser parser = new Parser(new ByteArrayInputStream(
+                "Module.TypeReference".getBytes())).new SimpleDefinedTypeParser();
 
-    	SimpleDefinedType result = parser.parse();
+        SimpleDefinedType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalTypeReference);
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalTypeReference);
 
-    	assertEquals("Module", ((ExternalTypeReference) result).getModule());
-    	assertEquals("TypeReference", result.getType());
+        assertEquals("Module", ((ExternalTypeReference) result).getModule());
+        assertEquals("TypeReference", result.getType());
 
-    	parser = new Parser(
-    			new ByteArrayInputStream("TypeReference".getBytes())).new SimpleDefinedTypeParser();
+        parser = new Parser(
+                new ByteArrayInputStream("TypeReference".getBytes())).new SimpleDefinedTypeParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals("TypeReference", result.getType());
+        assertEquals("TypeReference", result.getType());
     }
 
     @Test
     public void testParameterizedValueParser() throws IOException,
-    		ParserException {
-    	ParameterizedValueParser parser = new Parser(new ByteArrayInputStream(
-    			"Module.value {4711}".getBytes())).new ParameterizedValueParser();
+            ParserException {
+        ParameterizedValueParser parser = new Parser(new ByteArrayInputStream(
+                "Module.value {4711}".getBytes())).new ParameterizedValueParser();
 
-    	SimpleDefinedValue result = parser.parse();
+        SimpleDefinedValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalValueReference);
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalValueReference);
 
-    	assertEquals("Module", ((ExternalValueReference) result).getModule());
-    	assertEquals("value", result.getValue());
-    	assertEquals(1, result.getParameters().size());
+        assertEquals("Module", ((ExternalValueReference) result).getModule());
+        assertEquals("value", result.getValue());
+        assertEquals(1, result.getParameters().size());
     }
 
     @Test
     public void testSimpleDefinedValueParser() throws IOException,
-    		ParserException {
-    	SimpleDefinedValueParser parser = new Parser(new ByteArrayInputStream(
-    			"Module.value".getBytes())).new SimpleDefinedValueParser();
+            ParserException {
+        SimpleDefinedValueParser parser = new Parser(new ByteArrayInputStream(
+                "Module.value".getBytes())).new SimpleDefinedValueParser();
 
-    	SimpleDefinedValue result = parser.parse();
+        SimpleDefinedValue result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof ExternalValueReference);
+        assertNotNull(result);
+        assertTrue(result instanceof ExternalValueReference);
 
-    	assertEquals("Module", ((ExternalValueReference) result).getModule());
-    	assertEquals("value", result.getValue());
+        assertEquals("Module", ((ExternalValueReference) result).getModule());
+        assertEquals("value", result.getValue());
 
-    	parser = new Parser(new ByteArrayInputStream("valueref".getBytes())).new SimpleDefinedValueParser();
+        parser = new Parser(new ByteArrayInputStream("valueref".getBytes())).new SimpleDefinedValueParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
+        assertNotNull(result);
 
-    	assertEquals("valueref", result.getValue());
+        assertEquals("valueref", result.getValue());
     }
 
     @Test
     public void testParameterizedValueSetTypeParser() throws IOException,
-    		ParserException {
-    	ParameterizedTypeParser parser = new Parser(new ByteArrayInputStream(
-    			"ValueSet {VisibleString}".getBytes())).new ParameterizedTypeParser();
+            ParserException {
+        ParameterizedTypeParser parser = new Parser(new ByteArrayInputStream(
+                "ValueSet {VisibleString}".getBytes())).new ParameterizedTypeParser();
 
-    	SimpleDefinedType result = parser.parse();
+        SimpleDefinedType result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ValueSet", result.getType());
-    	assertEquals(1, result.getParameters().size());
+        assertNotNull(result);
+        assertEquals("ValueSet", result.getType());
+        assertEquals(1, result.getParameters().size());
     }
 
     @Test
     public void testParameterizedObjectClassParser() throws IOException,
-    		ParserException {
-    	ParameterizedObjectClassParser parser = new Parser(
-    			new ByteArrayInputStream(
-    					"OBJECT-CLASS {VisibleString}".getBytes())).new ParameterizedObjectClassParser();
+            ParserException {
+        ParameterizedObjectClassParser parser = new Parser(
+                new ByteArrayInputStream(
+                        "OBJECT-CLASS {VisibleString}".getBytes())).new ParameterizedObjectClassParser();
 
-    	ObjectClassReferenceNode result = parser.parse();
+        ObjectClassReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("OBJECT-CLASS", result.getReference());
-    	assertEquals(1, result.getParameters().size());
+        assertNotNull(result);
+        assertEquals("OBJECT-CLASS", result.getReference());
+        assertEquals(1, result.getParameters().size());
     }
 
     @Test
     public void testParameterizedObjectSetParser() throws IOException,
-    		ParserException {
-    	ParameterizedObjectSetParser parser = new Parser(
-    			new ByteArrayInputStream("ObjectSet {INTEGER}".getBytes())).new ParameterizedObjectSetParser();
+            ParserException {
+        ParameterizedObjectSetParser parser = new Parser(
+                new ByteArrayInputStream("ObjectSet {INTEGER}".getBytes())).new ParameterizedObjectSetParser();
 
-    	ObjectSetReferenceNode result = parser.parse();
+        ObjectSetReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("ObjectSet", result.getReference());
-    	assertEquals(1, result.getParameters().size());
+        assertNotNull(result);
+        assertEquals("ObjectSet", result.getReference());
+        assertEquals(1, result.getParameters().size());
     }
 
     @Test
     public void testParameterizedObjectParser() throws IOException,
-    		ParserException {
-    	ParameterizedObjectParser parser = new Parser(new ByteArrayInputStream(
-    			"object {INTEGER}".getBytes())).new ParameterizedObjectParser();
+            ParserException {
+        ParameterizedObjectParser parser = new Parser(new ByteArrayInputStream(
+                "object {INTEGER}".getBytes())).new ParameterizedObjectParser();
 
-    	ObjectReferenceNode result = parser.parse();
+        ObjectReferenceNode result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals("object", result.getReference());
-    	assertEquals(1, result.getParameters().size());
+        assertNotNull(result);
+        assertEquals("object", result.getReference());
+        assertEquals(1, result.getParameters().size());
     }
 
     @Test
     public void testActualParameterListParser() throws IOException,
-    		ParserException {
-    	ActualParameterListParser parser = new Parser(new ByteArrayInputStream(
-    			"{CustomString {VisibleString}, INTEGER, object-reference}"
-    					.getBytes())).new ActualParameterListParser();
+            ParserException {
+        ActualParameterListParser parser = new Parser(new ByteArrayInputStream(
+                "{CustomString {VisibleString}, INTEGER, object-reference}"
+                        .getBytes())).new ActualParameterListParser();
 
-    	List<Node> result = parser.parse();
+        List<Node> result = parser.parse();
 
-    	assertNotNull(result);
-    	assertEquals(3, result.size());
+        assertNotNull(result);
+        assertEquals(3, result.size());
     }
 
     @Test
     public void testActualParameterParser() throws IOException, ParserException {
-    	ActualParameterParser parser = new Parser(new ByteArrayInputStream(
-    			"CustomString {VisibleString}".getBytes())).new ActualParameterParser();
+        ActualParameterParser parser = new Parser(new ByteArrayInputStream(
+                "CustomString {VisibleString}".getBytes())).new ActualParameterParser();
 
-    	Node result = parser.parse();
+        Node result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeReference);
-    	assertNotNull(((TypeReference) result).getParameters());
-    	assertEquals(1, ((TypeReference) result).getParameters().size());
+        assertNotNull(result);
+        assertTrue(result instanceof TypeReference);
+        assertNotNull(((TypeReference) result).getParameters());
+        assertEquals(1, ((TypeReference) result).getParameters().size());
 
-    	parser = new Parser(new ByteArrayInputStream(
-    			"Object {OBJECT-CLASS.&Type({ObjectSet})}".getBytes())).new ActualParameterParser();
+        parser = new Parser(new ByteArrayInputStream(
+                "Object {OBJECT-CLASS.&Type({ObjectSet})}".getBytes())).new ActualParameterParser();
 
-    	result = parser.parse();
+        result = parser.parse();
 
-    	assertNotNull(result);
-    	assertTrue(result instanceof TypeReference);
-    	assertNotNull(((TypeReference) result).getParameters());
-    	assertEquals(1, ((TypeReference) result).getParameters().size());
-    	assertTrue(((TypeReference) result).getParameters().get(0) instanceof ObjectClassFieldTypeNode);
-    	assertTrue(((ObjectClassFieldTypeNode) ((TypeReference) result)
-    			.getParameters().get(0)).hasConstraint());
+        assertNotNull(result);
+        assertTrue(result instanceof TypeReference);
+        assertNotNull(((TypeReference) result).getParameters());
+        assertEquals(1, ((TypeReference) result).getParameters().size());
+        assertTrue(((TypeReference) result).getParameters().get(0) instanceof ObjectClassFieldTypeNode);
+        assertTrue(((ObjectClassFieldTypeNode) ((TypeReference) result)
+                .getParameters().get(0)).hasConstraint());
     }
 
     private <T extends Value> void testAmbiguousValue(Object value, Class<T> valueClass) {
-        testAmbiguousValue(value, valueClass, v -> {});
+        testAmbiguousValue(value, valueClass, v -> {
+        });
     }
 
     private <T extends Value> void testAmbiguousValue(Object value, Class<T> valueClass, Consumer<T> valueTest) {
