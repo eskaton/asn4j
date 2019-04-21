@@ -30,13 +30,12 @@ package ch.eskaton.asn4j.parser.ast.values;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public class BitStringValue extends AbstractValue {
 
     private int unusedBits;
-
-    private Integer intValue;
 
     private byte[] byteValue;
 
@@ -46,13 +45,6 @@ public class BitStringValue extends AbstractValue {
 
     public BitStringValue(Position position) {
         super(position);
-    }
-
-    public BitStringValue(Position position, Integer intValue, int unusedBits) {
-        super(position);
-
-        this.intValue = intValue;
-        this.unusedBits = unusedBits;
     }
 
     public BitStringValue(Position position, byte[] byteValue, int unusedBits) {
@@ -72,10 +64,6 @@ public class BitStringValue extends AbstractValue {
         super(position);
 
         this.value = value;
-    }
-
-    public Integer getIntValue() {
-        return intValue;
     }
 
     public byte[] getByteValue() {
@@ -101,7 +89,7 @@ public class BitStringValue extends AbstractValue {
     @Override
     public String toString() {
         return StringUtils.concat(BitStringValue.class.getSimpleName() + "[",
-                intValue != null ? Integer.toBinaryString(intValue) :
+                byteValue != null ? "0x" + new BigInteger(byteValue).toString(16) :
                         (namedValues != null ? StringUtils.join(namedValues, ", ") : value), "]");
     }
 
