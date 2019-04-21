@@ -4,6 +4,7 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 public class AbstractBaseXStringValue extends AbstractValue {
 
@@ -19,16 +20,24 @@ public class AbstractBaseXStringValue extends AbstractValue {
     }
 
     public BitStringValue toBitString() {
-        return new BitStringValue(getPosition(), new BigInteger(value, base).toByteArray(),
-                value.length() != 0 ? 8 - value.length() % 8 : 0);
+        byte[] bytes = new BigInteger(value, base).toByteArray();
+        int unitLength = getUnitLength();
+        int length = (int) Math.ceil((float) value.length() / unitLength);
+
+        if (bytes.length > length) {
+            bytes = Arrays.copyOfRange(bytes, 1, bytes.length);
+        }
+
+        return new BitStringValue(getPosition(), bytes,
+                value.length() % unitLength != 0 ? 8 - (value.length() * 8 / unitLength % 8) : 0);
     }
 
     public OctetStringValue toOctetString() {
-        int unitLength = (int) (Math.log(256) / Math.log(base));
-        int trailor = unitLength - value.length() % unitLength;
+        int unitLength = getUnitLength();
+        int trailer = unitLength - value.length() % unitLength;
 
-        if (trailor != 0) {
-            value += StringUtils.repeat("0", trailor);
+        if (trailer != 0) {
+            value += StringUtils.repeat("0", trailer);
         }
 
         char[] buf = new char[value.length() / unitLength];
@@ -38,6 +47,10 @@ public class AbstractBaseXStringValue extends AbstractValue {
         }
 
         return new OctetStringValue(getPosition(), buf);
+    }
+
+    private int getUnitLength() {
+        return (int) (Math.log(256) / Math.log(base));
     }
 
 }
