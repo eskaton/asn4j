@@ -31,7 +31,9 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class BitStringValue extends AbstractValue {
 
@@ -87,8 +89,33 @@ public class BitStringValue extends AbstractValue {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        BitStringValue that = (BitStringValue) o;
+
+        return unusedBits == that.unusedBits &&
+                Arrays.equals(byteValue, that.byteValue) &&
+                Objects.equals(namedValues, that.namedValues) &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(unusedBits, namedValues, value);
+        result = 31 * result + Arrays.hashCode(byteValue);
+        return result;
+    }
+
+    @Override
     public String toString() {
-        return StringUtils.concat(BitStringValue.class.getSimpleName() + "[",
+        return StringUtils.concat(getClass().getSimpleName() + "[",
                 byteValue != null ? "0x" + new BigInteger(byteValue).toString(16) :
                         (namedValues != null ? StringUtils.join(namedValues, ", ") : value), "]");
     }

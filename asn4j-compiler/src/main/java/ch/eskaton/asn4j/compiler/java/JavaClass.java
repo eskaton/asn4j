@@ -530,7 +530,7 @@ public class JavaClass implements JavaStructure {
         }
 
         public BodyBuilder nl() {
-            this.body.add("\n");
+            this.body.add("");
 
             return this;
         }

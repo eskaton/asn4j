@@ -29,22 +29,25 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class BitStringConstraintDefinition implements ConstraintDefinition {
-
-    private List<BitStringValue> values = new ArrayList<>();
+public class BitStringConstraintDefinition extends AbstractConstraintDefinition<BitStringValue, Set<BitStringValue>, BitStringConstraintDefinition> {
 
     private boolean inverted;
 
-    public Collection<BitStringValue> getValues() {
-        return values;
+    public BitStringConstraintDefinition() {
+        super();
     }
 
-    public void setValues(List<BitStringValue> values) {
-        this.values = values;
+    public BitStringConstraintDefinition(List<BitStringValue> values) {
+        super(values);
+    }
+
+    @Override
+    Set<BitStringValue> createValues() {
+        return new HashSet<>();
     }
 
     public boolean isInverted() {
@@ -55,19 +58,40 @@ public class BitStringConstraintDefinition implements ConstraintDefinition {
         this.inverted = inverted;
     }
 
+    public BitStringConstraintDefinition inverted(boolean inverted) {
+        setInverted(inverted);
 
-    @Override
-    public ConstraintDefinition intersection(ConstraintDefinition constraintDef) {
-        return null;
+        return this;
     }
 
-    @Override
-    public ConstraintDefinition union(ConstraintDefinition constraintDef) {
-        return null;
+    public BitStringConstraintDefinition intersection(BitStringConstraintDefinition constraintDef) {
+        if (inverted && constraintDef.isInverted()) {
+            getValues().addAll(constraintDef.getValues());
+        } else if (!inverted && !constraintDef.isInverted()) {
+            getValues().retainAll(constraintDef.getValues());
+        } else if (inverted) {
+            constraintDef.getValues().removeAll(getValues());
+            return constraintDef;
+        } else {
+            getValues().removeAll(constraintDef.getValues());
+        }
+
+        return this;
     }
 
-    @Override
-    public boolean isEmpty() {
-        return false;
+    public BitStringConstraintDefinition union(BitStringConstraintDefinition constraintDef) {
+        if (inverted && constraintDef.isInverted()) {
+            getValues().retainAll(constraintDef.getValues());
+        } else if (!inverted && !constraintDef.isInverted()) {
+            getValues().addAll(constraintDef.getValues());
+        } else if (inverted) {
+            getValues().removeAll(constraintDef.getValues());
+        } else {
+            constraintDef.getValues().removeAll(getValues());
+            return constraintDef;
+        }
+
+        return this;
     }
+
 }

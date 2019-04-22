@@ -31,17 +31,19 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.utils.StreamsUtils;
 import ch.eskaton.commons.utils.HexDump;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @ASN1Tag(clazz = Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
 public class ASN1BitString implements ASN1Type {
 
     protected byte[] value = new byte[0];
 
-    private int unusedBits;
+    protected int unusedBits;
 
     public static ASN1BitString of(byte[] value) {
         return of(value, 0);
@@ -60,8 +62,16 @@ public class ASN1BitString implements ASN1Type {
     }
 
     public void setValue(byte[] value, int unusedBits) {
+        if (!checkConstraint(value, unusedBits)) {
+            throw new ConstraintViolatedException(String.format("'%s'B (%d unused bits) doesn't satisfy a constraint",
+                    StreamsUtils.toIntStream(value)
+                            .mapToObj(b -> Integer.toBinaryString((b & 0xFF) + 0x100).substring(1))
+                            .collect(Collectors.joining()), unusedBits));
+        }
+
         this.unusedBits = unusedBits;
         this.value = new byte[value.length];
+
         System.arraycopy(value, 0, this.value, 0, value.length);
     }
 
@@ -111,7 +121,7 @@ public class ASN1BitString implements ASN1Type {
         return 1 << 7 - (bit % 8);
     }
 
-    protected boolean checkConstraint(Boolean value) throws ConstraintViolatedException {
+    protected boolean checkConstraint(byte[] value, int unusedBits) throws ConstraintViolatedException {
         return true;
     }
 
@@ -137,7 +147,7 @@ public class ASN1BitString implements ASN1Type {
 
     @Override
     public String toString() {
-        return "ASN1BitString[value=0x" + HexDump.toHexString(value) + ", unusedBits=" + unusedBits + "]";
+        return getClass().getSimpleName() + "[value=0x" + HexDump.toHexString(value) + ", unusedBits=" + unusedBits + "]";
     }
 
 }

@@ -25,20 +25,18 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.utils;
 
-public enum JavaType {
-    BYTE("byte"), BYTE_ARRAY("byte[]"), SHORT("short"), INT("int"), LONG("long"), BOOLEAN("boolean");
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-    private final String type;
+public class BitStringUtils {
 
-    JavaType(String type) {
-        this.type = type;
-    }
+    public static String getInitializerString(byte[] bytes) {
+        String bytesStr = IntStream.range(0, bytes.length).boxed().map(
+                i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
 
-    @Override
-    public String toString() {
-        return type;
+        return "new byte[] { " + bytesStr + " }";
     }
 
 }
