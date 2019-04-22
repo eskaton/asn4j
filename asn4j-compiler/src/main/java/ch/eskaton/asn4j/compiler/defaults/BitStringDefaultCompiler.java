@@ -31,15 +31,13 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
@@ -71,16 +69,11 @@ public class BitStringDefaultCompiler implements DefaultCompiler {
             unusedBits = bitStringValue.getUnusedBits();
         }
 
-        String bytesStr = IntStream.range(0, bytes.length).boxed().map(
-                i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
-
-        String strValue = "new byte[] { " + bytesStr + " }";
-
+        String strValue = BitStringUtils.getInitializerString(bytes);
         String defaultField = addDefaultField(clazz, typeName, field);
 
         clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName +
                 "();\n\t\t" + defaultField + ".setValue(" + strValue + ", " + unusedBits + ");"));
-
     }
 
 }

@@ -27,6 +27,7 @@
 package ch.eskaton.asn4j.runtime.utils;
 
 import java.util.Iterator;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -38,6 +39,10 @@ public class StreamsUtils {
     public static <T> Stream<T> of(Iterator<T> iterator) {
         Iterable<T> iterable = () -> iterator;
         return StreamSupport.stream(iterable.spliterator(), false);
+    }
+
+    public static IntStream toIntStream(byte[] bytes) {
+        return IntStream.range(0, bytes.length).map(i -> bytes[i]);
     }
 
 }
