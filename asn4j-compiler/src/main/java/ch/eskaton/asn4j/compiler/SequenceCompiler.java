@@ -27,12 +27,13 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 
-public class SequenceCompiler implements NamedCompiler<SequenceType> {
+public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledType> {
 
-    public void compile(CompilerContext ctx, String name, SequenceType node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, SequenceType node) throws CompilerException {
         ctx.createClass(name, node, true);
 
         for (ComponentType component : node.getAllComponents()) {
@@ -49,6 +50,8 @@ public class SequenceCompiler implements NamedCompiler<SequenceType> {
         }
 
         ctx.finishClass();
+
+        return new CompiledType(node);
     }
 
 }

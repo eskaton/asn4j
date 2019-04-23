@@ -27,11 +27,13 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaConstructor;
 import ch.eskaton.asn4j.compiler.java.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.JavaStaticInitializer;
 import ch.eskaton.asn4j.compiler.java.JavaVisibility;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -47,11 +49,10 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
     @Override
-    public void compile(CompilerContext ctx, String name, IntegerType node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, IntegerType node) throws CompilerException {
         JavaClass javaClass = ctx.createClass(name, node, false);
         Collection<NamedNumber> namedNumbers = node.getNamedNumbers();
-        IdentifierUniquenessChecker<BigInteger> iuc = new IdentifierUniquenessChecker<>(
-                name);
+        IdentifierUniquenessChecker<BigInteger> iuc = new IdentifierUniquenessChecker<>(name);
 
         if (namedNumbers != null && !namedNumbers.isEmpty()) {
             StringBuilder staticBody = new StringBuilder();
@@ -103,11 +104,15 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
                 "\t\tsuper.setValue(BigInteger.valueOf(value));", Arrays
                 .asList(ConstraintViolatedException.class.getName())));
 
+        ConstraintDefinition constraintDef = null;
+
         if (node.hasConstraint()) {
-            ctx.compileConstraint(javaClass, name, node);
+            constraintDef = ctx.compileConstraint(javaClass, name, node);
         }
 
         ctx.finishClass();
+
+        return new CompiledType(node, constraintDef);
     }
 
 }

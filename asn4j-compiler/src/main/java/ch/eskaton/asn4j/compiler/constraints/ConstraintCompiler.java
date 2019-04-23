@@ -45,7 +45,6 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,7 +75,7 @@ public class ConstraintCompiler {
         };
     }
 
-    public void compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
+    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
         Type base;
 
         if (node instanceof TypeReference) {
@@ -109,7 +108,7 @@ public class ConstraintCompiler {
 
         javaClass.addImport(ConstraintViolatedException.class);
 
-        return;
+        return constraintDef;
     }
 
 }
