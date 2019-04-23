@@ -25,28 +25,32 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.results;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.UTCTime;
-import ch.eskaton.asn4j.parser.ast.types.UsefulType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
-public class UTCTimeCompiler extends BuiltinTypeCompiler<UTCTime> {
+public class CompiledType implements CompilationResult {
 
-    public CompiledType compile(CompilerContext ctx, String name, UsefulType node) {
-        JavaClass javaClass = ctx.createClass(name, node, false);
+    private Type type;
 
-        ConstraintDefinition constraintDef = null;
+    private ConstraintDefinition constraintDefinition;
 
-        if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, node);
-        }
+    public CompiledType(Type type) {
+        this.type = type;
+    }
 
-        ctx.finishClass();
+    public CompiledType(Type type, ConstraintDefinition constraintDefinition) {
+        this.type = type;
+        this.constraintDefinition = constraintDefinition;
+    }
 
-        return new CompiledType(node, constraintDef);
+    public Type getType() {
+        return type;
+    }
+
+    public ConstraintDefinition getConstraintDefinition() {
+        return constraintDefinition;
     }
 
 }

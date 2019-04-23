@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
@@ -35,9 +36,9 @@ import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
-public class SelectionTypeCompiler implements NamedCompiler<SelectionType> {
+public class SelectionTypeCompiler implements NamedCompiler<SelectionType, CompiledType> {
 
-    public void compile(CompilerContext ctx, String name, SelectionType node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, SelectionType node) throws CompilerException {
         AssignmentNode assignment;
 
         String selectedId = node.getId();
@@ -53,12 +54,14 @@ public class SelectionTypeCompiler implements NamedCompiler<SelectionType> {
                     NamedType foundType = ((Choice) collectionType).getRootTypeList().stream()
                             .filter(t -> t.getName().equals(selectedId))
                             .findFirst().orElseThrow(() -> new CompilerException("Selected type not found"));
-                    ctx.<Type, TypeCompiler>getCompiler(Type.class).compile(ctx, name, foundType.getType());
+                    return ctx.<Type, TypeCompiler>getCompiler(Type.class).compile(ctx, name, foundType.getType());
                 }
             } else {
                 throw new CompilerException("Selected type not found");
             }
         }
+
+        return new CompiledType(node);
     }
 
 }

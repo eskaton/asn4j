@@ -31,9 +31,11 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
+import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -142,6 +144,11 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
                     throw new CompilerException("Invalid single-value constraint %s for BIT STRING type",
                             value.getClass().getSimpleName());
                 }
+            } else if (elements instanceof ContainedSubtype) {
+                Type type = ((ContainedSubtype) elements).getType();
+
+                throw new CompilerException("Invalid constraint %s for BIT STRING type",
+                        elements.getClass().getSimpleName());
             } else {
                 throw new CompilerException("Invalid constraint %s for BIT STRING type",
                         elements.getClass().getSimpleName());

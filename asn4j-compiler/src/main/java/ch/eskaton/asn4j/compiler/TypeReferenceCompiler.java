@@ -27,19 +27,21 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-public class TypeReferenceCompiler implements NamedCompiler<TypeReference> {
+public class TypeReferenceCompiler implements NamedCompiler<TypeReference, CompiledType> {
 
-    public void compile(CompilerContext ctx, String name, TypeReference node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, TypeReference node) throws CompilerException {
         JavaClass javaClass = ctx.createClass(name, node, isConstructed(ctx, name));
 
-        ctx.compileConstraint(javaClass, name, node);
+        ConstraintDefinition constraintDef = ctx.compileConstraint(javaClass, name, node);
         ctx.finishClass();
 
         if (node instanceof UsefulType) {
@@ -49,6 +51,8 @@ public class TypeReferenceCompiler implements NamedCompiler<TypeReference> {
         } else {
             ctx.addReferencedType(node.getType());
         }
+
+        return new CompiledType(node, constraintDef);
     }
 
     private boolean isConstructed(CompilerContext ctx, String type) {

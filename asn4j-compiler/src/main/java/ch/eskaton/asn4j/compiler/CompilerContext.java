@@ -29,6 +29,7 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaModifier;
@@ -38,6 +39,7 @@ import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
@@ -545,8 +547,8 @@ public class CompilerContext {
         new JavaWriter().write(structs, outputDir);
     }
 
-    public void compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
-        constraintCompiler.compileConstraint(javaClass, name, node);
+    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
+        return constraintCompiler.compileConstraint(javaClass, name, node);
     }
 
     public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value)
@@ -581,7 +583,12 @@ public class CompilerContext {
         if (type instanceof TypeReference) {
             HashMap<String, Type> moduleTypes = getTypesOfCurrentModule();
 
-            Type referencedType = moduleTypes.computeIfAbsent(((TypeReference) type).getType(), compiler::compileType);
+            Type referencedType = moduleTypes.computeIfAbsent(((TypeReference) type).getType(), missingType -> {
+                CompiledType compiledType = compiler.compileType(missingType);
+                // TODO: save compiledType
+                return compiledType.getType();
+            });
+
             Tag tag = referencedType.getTag();
 
             if (tag != null) {

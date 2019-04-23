@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
@@ -46,51 +47,52 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 
-public class TypeCompiler implements NamedCompiler<Type> {
+public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
 
     @SuppressWarnings("unchecked")
-    public void compile(CompilerContext ctx, String name, Type node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, Type node) throws CompilerException {
         if (node instanceof SequenceType) {
-            ctx.<SequenceType, SequenceCompiler>getCompiler(SequenceType.class).compile(ctx, name, (SequenceType) node);
+            return ctx.<SequenceType, SequenceCompiler>getCompiler(SequenceType.class).compile(ctx, name, (SequenceType) node);
         } else if (node instanceof SequenceOfType) {
-            ctx.<SequenceOfType, SequenceOfCompiler>getCompiler(SequenceOfType.class).compile(ctx, name, (SequenceOfType) node);
+            return ctx.<SequenceOfType, SequenceOfCompiler>getCompiler(SequenceOfType.class).compile(ctx, name, (SequenceOfType) node);
         } else if (node instanceof SetType) {
-            ctx.<SetType, SetCompiler>getCompiler(SetType.class).compile(ctx, name, (SetType) node);
+            return ctx.<SetType, SetCompiler>getCompiler(SetType.class).compile(ctx, name, (SetType) node);
         } else if (node instanceof SetOfType) {
-            ctx.<SetOfType, SetOfCompiler>getCompiler(SetOfType.class).compile(ctx, name, (SetOfType) node);
+            return ctx.<SetOfType, SetOfCompiler>getCompiler(SetOfType.class).compile(ctx, name, (SetOfType) node);
         } else if (node instanceof Choice) {
-            ctx.<Choice, ChoiceCompiler>getCompiler(Choice.class).compile(ctx, name, (Choice) node);
+            return ctx.<Choice, ChoiceCompiler>getCompiler(Choice.class).compile(ctx, name, (Choice) node);
         } else if (node instanceof ObjectIdentifier) {
-            ctx.<ObjectIdentifier, ObjectIdentifierCompiler>getCompiler(ObjectIdentifier.class)
+            return ctx.<ObjectIdentifier, ObjectIdentifierCompiler>getCompiler(ObjectIdentifier.class)
                     .compile(ctx, name, (ObjectIdentifier) node);
         } else if (node instanceof RelativeOID) {
-            ctx.<RelativeOID, RelativeOIDCompiler>getCompiler(RelativeOID.class)
+            return ctx.<RelativeOID, RelativeOIDCompiler>getCompiler(RelativeOID.class)
                     .compile(ctx, name, (RelativeOID) node);
         } else if (node instanceof IRI) {
-            ctx.<IRI, IRICompiler>getCompiler(IRI.class).compile(ctx, name, (IRI) node);
+            return ctx.<IRI, IRICompiler>getCompiler(IRI.class).compile(ctx, name, (IRI) node);
         } else if (node instanceof RelativeIRI) {
-            ctx.<RelativeIRI, RelativeIRICompiler>getCompiler(RelativeIRI.class).compile(ctx, name, (RelativeIRI) node);
+            return ctx.<RelativeIRI, RelativeIRICompiler>getCompiler(RelativeIRI.class).compile(ctx, name, (RelativeIRI) node);
         } else if (node instanceof TypeReference) {
             if (node instanceof UsefulType) {
                 if (((UsefulType) node).getType().equals(ASN1GeneralizedTime.class.getSimpleName())) {
-                    ctx.<GeneralizedTime, GeneralizedTimeCompiler>getCompiler(GeneralizedTime.class).compile(ctx, name, (UsefulType) node);
+                    return ctx.<GeneralizedTime, GeneralizedTimeCompiler>getCompiler(GeneralizedTime.class)
+                            .compile(ctx, name, (UsefulType) node);
                 } else if (((UsefulType) node).getType().equals(ASN1UTCTime.class.getSimpleName())) {
-                    ctx.<UTCTime, UTCTimeCompiler>getCompiler(UTCTime.class).compile(ctx, name, (UsefulType) node);
+                    return ctx.<UTCTime, UTCTimeCompiler>getCompiler(UTCTime.class).compile(ctx, name, (UsefulType) node);
                 } else {
                     throw new CompilerException("Unsupported UsefulType: " + ((UsefulType) node).getType());
                 }
             } else {
-                ctx.<TypeReference, TypeReferenceCompiler>getCompiler(TypeReference.class).compile(ctx, name, (TypeReference) node);
+                return ctx.<TypeReference, TypeReferenceCompiler>getCompiler(TypeReference.class).compile(ctx, name, (TypeReference) node);
             }
         } else if (node instanceof SelectionType) {
-            ctx.<SelectionType, SelectionTypeCompiler>getCompiler(SelectionType.class)
+            return ctx.<SelectionType, SelectionTypeCompiler>getCompiler(SelectionType.class)
                     .compile(ctx, name, (SelectionType) node);
         } else if (node instanceof EnumeratedType) {
-            ctx.<EnumeratedType, EnumeratedTypeCompiler>getCompiler(EnumeratedType.class)
+            return ctx.<EnumeratedType, EnumeratedTypeCompiler>getCompiler(EnumeratedType.class)
                     .compile(ctx, name, (EnumeratedType) node);
         } else {
             if (ctx.isBuiltin(node.getClass().getSimpleName())) {
-                ctx.<Type, BuiltinTypeCompiler<Type>>getCompiler((Class<Type>) node.getClass()).compile(ctx, name, node);
+                return ctx.<Type, BuiltinTypeCompiler<Type>>getCompiler((Class<Type>) node.getClass()).compile(ctx, name, node);
             } else {
                 throw new CompilerException("Unsupported Type: " + node.getClass());
             }

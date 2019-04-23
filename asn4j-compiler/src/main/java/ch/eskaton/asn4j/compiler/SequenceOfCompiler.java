@@ -28,15 +28,18 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 
-public class SequenceOfCompiler implements NamedCompiler<SequenceOfType> {
+public class SequenceOfCompiler implements NamedCompiler<SequenceOfType, CompiledType> {
 
-    public void compile(CompilerContext ctx, String name, SequenceOfType node)
+    public CompiledType compile(CompilerContext ctx, String name, SequenceOfType node)
     		throws CompilerException {
     	JavaClass javaClass = ctx.createClass(name, node, true);
     	javaClass.setTypeParam(ctx.getTypeName(node.getType()));
     	ctx.finishClass();
+
+        return new CompiledType(node);
     }
 
 }

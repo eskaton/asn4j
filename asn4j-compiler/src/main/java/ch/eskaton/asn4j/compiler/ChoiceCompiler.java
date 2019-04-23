@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.java.JavaEnum;
 import ch.eskaton.asn4j.compiler.java.JavaGetter;
 import ch.eskaton.asn4j.compiler.java.JavaTypedSetter;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
@@ -48,7 +49,7 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Private;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 
-public class ChoiceCompiler implements NamedCompiler<Choice> {
+public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
     public static final String CLEAR_FIELDS = "clearFields";
 
@@ -56,7 +57,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
 
     private static final String CHOICE_FIELD = "choice";
 
-    public void compile(CompilerContext ctx, String name, Choice node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, Choice node) throws CompilerException {
         JavaClass javaClass = ctx.createClass(name, node, true);
         List<String> fieldNames = new ArrayList<>();
         JavaEnum typeEnum = new JavaEnum(CHOICE_ENUM);
@@ -86,6 +87,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice> {
         addClearFieldsMethod(javaClass, fieldNames);
 
         ctx.finishClass();
+
+        return new CompiledType(node);
     }
 
     private String compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,
