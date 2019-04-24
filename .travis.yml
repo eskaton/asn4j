@@ -1,13 +1,3 @@
 language: java
 
-script:
-    - echo "Cloning commons"
-    - git clone --branch=master https://github.com/eskaton/commons.git eskaton/commons
-    - cd eskaton/commons
-    - mvn -B install
-    - cd ../..
-    - git clone --depth=50 --branch=feature/travis-ci https://github.com/eskaton/asn4j.git eskaton/asn4j
-    - cd eskaton/asn4j
-    - git checkout -qf $TRAVIS_COMMIT
-    - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-    - mvn test -B
+script: echo "Executing script"
