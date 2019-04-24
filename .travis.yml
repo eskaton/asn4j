@@ -1,6 +1,7 @@
 language: java
 
 before_script:
-   - git clone --branch=master https://github.com/eskaton/commons.git eskaton/commons
-   - cd eskaton/commons
-   - mvn -B install
+    - echo "Cloning commons"
+    - git clone --branch=master https://github.com/eskaton/commons.git eskaton/commons
+    - cd eskaton/commons
+    - mvn -B install
