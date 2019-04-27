@@ -29,69 +29,19 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-public class BitStringConstraintDefinition extends AbstractConstraintDefinition<BitStringValue, Set<BitStringValue>, BitStringConstraintDefinition> {
+public class BitStringConstraintDefinition extends AbstractConstraintDefinition<BitStringValue, Set<BitStringValue>,
+        BitStringConstraintValues, BitStringConstraintDefinition> {
 
-    private boolean inverted;
-
-    public BitStringConstraintDefinition() {
-        super();
-    }
-
-    public BitStringConstraintDefinition(List<BitStringValue> values) {
-        super(values);
+    public BitStringConstraintDefinition(BitStringConstraintValues rootValues,
+            BitStringConstraintValues extensionValues) {
+        super(rootValues, extensionValues);
     }
 
     @Override
-    Set<BitStringValue> createValues() {
-        return new HashSet<>();
-    }
-
-    public boolean isInverted() {
-        return inverted;
-    }
-
-    public void setInverted(boolean inverted) {
-        this.inverted = inverted;
-    }
-
-    public BitStringConstraintDefinition inverted(boolean inverted) {
-        setInverted(inverted);
-
-        return this;
-    }
-
-    public BitStringConstraintDefinition intersection(BitStringConstraintDefinition constraintDef) {
-        if (inverted && constraintDef.isInverted()) {
-            getValues().addAll(constraintDef.getValues());
-        } else if (!inverted && !constraintDef.isInverted()) {
-            getValues().retainAll(constraintDef.getValues());
-        } else if (inverted) {
-            constraintDef.getValues().removeAll(getValues());
-            return constraintDef;
-        } else {
-            getValues().removeAll(constraintDef.getValues());
-        }
-
-        return this;
-    }
-
-    public BitStringConstraintDefinition union(BitStringConstraintDefinition constraintDef) {
-        if (inverted && constraintDef.isInverted()) {
-            getValues().retainAll(constraintDef.getValues());
-        } else if (!inverted && !constraintDef.isInverted()) {
-            getValues().addAll(constraintDef.getValues());
-        } else if (inverted) {
-            getValues().removeAll(constraintDef.getValues());
-        } else {
-            constraintDef.getValues().removeAll(getValues());
-            return constraintDef;
-        }
-
-        return this;
+    public BitStringConstraintValues createValues() {
+        return new BitStringConstraintValues();
     }
 
 }

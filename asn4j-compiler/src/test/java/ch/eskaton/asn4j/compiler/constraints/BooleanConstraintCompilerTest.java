@@ -34,7 +34,6 @@ import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -46,8 +45,7 @@ import static org.junit.Assert.assertEquals;
 public class BooleanConstraintCompilerTest {
 
     @Test
-    public void testCalculateUnion() throws IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException {
+    public void testCalculateUnion() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         BooleanConstraintCompiler compiler = new BooleanConstraintCompiler(null);
 
         assertEquals(emptySet(), invokeCalculateUnion(compiler));
@@ -84,8 +82,8 @@ public class BooleanConstraintCompilerTest {
 
     private Set<Boolean> invokeCalculateExclude(BooleanConstraintCompiler compiler, Set<Boolean> a, Set<Boolean> b)
             throws InvocationTargetException, IllegalAccessException {
-        return ((BooleanConstraintDefinition) ReflectionUtils.invokePrivateMethod(compiler, "calculateExclude",
-                new Object[]{new BooleanConstraintDefinition(a), new BooleanConstraintDefinition(b)})).getValues();
+        return ((BooleanConstraintValues) ReflectionUtils.invokePrivateMethod(compiler, "calculateExclude",
+                new Object[]{new BooleanConstraintValues(a), new BooleanConstraintValues(b)})).getValues();
     }
 
     private Set<Boolean> invokeCalculate(BooleanConstraintCompiler compiler, String method, boolean... values)
@@ -96,7 +94,7 @@ public class BooleanConstraintCompilerTest {
             elements.add(new SingleValueConstraint(NO_POSITION, new BooleanValue(NO_POSITION, value)));
         }
 
-        return ((BooleanConstraintDefinition) ReflectionUtils.invokePrivateMethod(compiler, method,
+        return ((BooleanConstraintValues) ReflectionUtils.invokePrivateMethod(compiler, method,
                 new Object[]{elements})).getValues();
     }
 

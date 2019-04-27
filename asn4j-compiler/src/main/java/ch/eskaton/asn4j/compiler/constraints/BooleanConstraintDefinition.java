@@ -27,22 +27,17 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.HashSet;
 import java.util.Set;
 
-public class BooleanConstraintDefinition extends AbstractConstraintDefinition<Boolean, Set<Boolean>, BooleanConstraintDefinition> {
+public class BooleanConstraintDefinition extends AbstractConstraintDefinition<Boolean, Set<Boolean>, BooleanConstraintValues, BooleanConstraintDefinition> {
 
-    public BooleanConstraintDefinition() {
-        super();
-    }
-
-    public BooleanConstraintDefinition(Set<Boolean> values) {
-        super(values);
+    public BooleanConstraintDefinition(BooleanConstraintValues rootValues, BooleanConstraintValues extensionValues) {
+       super(rootValues, extensionValues);
     }
 
     @Override
-    Set<Boolean> createValues() {
-        return new HashSet<>();
+    public BooleanConstraintValues createValues() {
+        return new BooleanConstraintValues();
     }
 
 }

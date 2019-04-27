@@ -29,24 +29,45 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import java.util.Collection;
 
-public interface ConstraintDefinition<V, C extends Collection<V>, T extends ConstraintDefinition> {
+public interface ConstraintDefinition<V, C extends  Collection<V>, T extends ConstraintValues<V, C, T>, D extends ConstraintDefinition<V, C, T, D>> {
 
-    C getValues();
+    T createValues();
 
-    default T intersection(T constraintDef) {
-        getValues().retainAll(constraintDef.getValues());
+    T getRootValues();
 
-        return (T) this;
+    void setRootValues(T values);
+
+    T getExtensionValues();
+
+    void setExtensionValues(T values);
+
+    default D intersection(D other) {
+        setRootValues(getRootValues().intersection(other.getRootValues()));
+
+        if (isExtensionEmpty()) {
+            setExtensionValues(other.getExtensionValues());
+        } else if (other.isExtensionEmpty()) {
+            // ignore
+        } else {
+            setExtensionValues(getExtensionValues().intersection(other.getExtensionValues()));
+        }
+
+        return (D) this;
     }
 
-    default T union(T constraintDef) {
-        getValues().addAll(constraintDef.getValues());
+    default D union(D other) {
+        setRootValues(getRootValues().union(other.getRootValues()));
+        setExtensionValues(getExtensionValues().union(other.getExtensionValues()));
 
-        return (T) this;
+        return (D) this;
     }
 
-    default boolean isEmpty() {
-        return getValues().isEmpty();
+    default boolean isRootEmpty() {
+        return getRootValues().getValues().isEmpty();
+    }
+
+    default boolean isExtensionEmpty() {
+        return getExtensionValues().getValues().isEmpty();
     }
 
 }

@@ -27,16 +27,34 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.parser.ast.values.StringValue;
+import java.util.Set;
 
-import java.util.ArrayList;
-import java.util.List;
+import static ch.eskaton.commons.utils.CollectionUtils.asHashSet;
 
-public class VisibleStringConstraintDefinition implements ConstraintDefinition<StringValue, List<StringValue>, VisibleStringConstraintDefinition> {
+public class BooleanConstraintValues extends SetConstraintValues<Boolean, BooleanConstraintValues> {
+
+    static final BooleanConstraintValues ALL = new BooleanConstraintValues(asHashSet(Boolean.TRUE, Boolean.FALSE));
+
+    public BooleanConstraintValues() {
+        super();
+    }
+
+    public BooleanConstraintValues(Set<Boolean> values) {
+        super(values);
+    }
 
     @Override
-    public List<StringValue> getValues() {
-        return new ArrayList<>();
+    public BooleanConstraintValues invert() {
+        BooleanConstraintValues all = ALL.copy();
+
+        all.getValues().removeAll(getValues());
+
+        return all;
+    }
+
+    @Override
+    public BooleanConstraintValues copy() {
+        return new BooleanConstraintValues(getValues());
     }
 
 }

@@ -582,7 +582,6 @@ public class CompilerContext {
     public TagId getTagId(Type type) {
         if (type instanceof TypeReference) {
             HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
-
             CompiledType compiledType = moduleTypes.get(((TypeReference) type).getType());
 
             if (compiledType == null) {

@@ -40,9 +40,9 @@ import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,65 +50,43 @@ import static ch.eskaton.asn4j.compiler.java.JavaType.BYTE_ARRAY;
 import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
-public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitStringConstraintDefinition> {
+public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitStringValue, Set<BitStringValue>, BitStringConstraintValues, BitStringConstraintDefinition> {
 
     public BitStringConstraintCompiler(TypeResolver typeResolver) {
         super(typeResolver);
     }
 
     @Override
-    protected BitStringConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
-        List<Elements> operands = set.getOperands();
-
-        switch (set.getOperation()) {
-            case All:
-                return compileConstraint((ElementSet) operands.get(0)).inverted(true);
-
-            case Exclude:
-                if (operands.size() == 1) {
-                    // ALL EXCEPT
-                    return calculateElements(operands.get(0));
-                } else {
-                    return calculateExclude(calculateElements(operands.get(0)), calculateElements(operands.get(1)));
-                }
-
-            case Intersection:
-                if (operands.size() == 1) {
-                    return calculateElements(operands.get(0));
-                }
-
-                return calculateIntersection(operands);
-            case Union:
-                return calculateUnion(operands);
-        }
-
-        return new BitStringConstraintDefinition();
+    protected BitStringConstraintDefinition createDefinition(BitStringConstraintValues root, BitStringConstraintValues extension) {
+        return new BitStringConstraintDefinition(root, extension);
     }
 
-    private BitStringConstraintDefinition calculateExclude(BitStringConstraintDefinition constraintDef1,
-            BitStringConstraintDefinition constraintDef2) {
-        for (BitStringValue value : constraintDef2.getValues()) {
-            if (constraintDef1.getValues().contains(value)) {
-                constraintDef1.getValues().remove(value);
+    @Override
+    protected BitStringConstraintValues createValues() {
+        return new BitStringConstraintValues();
+    }
+
+    @Override
+    protected BitStringConstraintValues calculateExclude(BitStringConstraintValues values1,
+            BitStringConstraintValues values2) {
+        for (BitStringValue value : values2.getValues()) {
+            if (values1.getValues().contains(value)) {
+                values1.getValues().remove(value);
             } else {
                 throw new CompilerException(value + " doesn't exist in parent type");
             }
         }
 
-        return constraintDef1;
+        return values1;
     }
 
     @Override
-    protected BitStringConstraintDefinition calculateIntersection(BitStringConstraintDefinition constraintDef1,
-            BitStringConstraintDefinition constraintDef2) throws CompilerException {
-        return constraintDef1.intersection(constraintDef2);
-    }
-
-    @Override
-    protected void addConstraint(JavaClass javaClass, ConstraintDefinition constraintDef) throws CompilerException {
-        BitStringConstraintDefinition bitStringConstraintDef = (BitStringConstraintDefinition) constraintDef;
-        Set<BitStringValue> values = bitStringConstraintDef.getValues();
-        boolean inverted = bitStringConstraintDef.isInverted();
+    protected void addConstraint(JavaClass javaClass, ConstraintDefinition definition) throws CompilerException {
+        BitStringConstraintValues rootValues = ((BitStringConstraintDefinition) definition).getRootValues();
+        BitStringConstraintValues extensionValues = ((BitStringConstraintDefinition) definition).getExtensionValues();
+        BitStringConstraintValues union = rootValues.union(extensionValues);
+        Set<BitStringValue> values = union.getValues();
+        boolean inverted = union.isInverted();
 
         javaClass.addImport(Arrays.class);
 
@@ -131,7 +109,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
         builder.finish().build();
     }
 
-    private BitStringConstraintDefinition calculateElements(Elements elements) throws CompilerException {
+    protected BitStringConstraintValues calculateElements(Elements elements) throws CompilerException {
         if (elements instanceof ElementSet) {
             return compileConstraint((ElementSet) elements);
         } else {
@@ -139,7 +117,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
                 Value value = ((SingleValueConstraint) elements).getValue();
 
                 if (value instanceof AbstractBaseXStringValue) {
-                    return new BitStringConstraintDefinition(Arrays.asList(((AbstractBaseXStringValue) value).toBitString()));
+                    return new BitStringConstraintValues(CollectionUtils.asHashSet(((AbstractBaseXStringValue) value).toBitString()));
                 } else {
                     throw new CompilerException("Invalid single-value constraint %s for BIT STRING type",
                             value.getClass().getSimpleName());
@@ -154,37 +132,6 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
                         elements.getClass().getSimpleName());
             }
         }
-    }
-
-
-    private BitStringConstraintDefinition calculateIntersection(List<Elements> elements) {
-        BitStringConstraintDefinition constraintDef = new BitStringConstraintDefinition();
-
-        for (Elements e : elements) {
-            BitStringConstraintDefinition values = calculateElements(e);
-
-            if (constraintDef.getValues().isEmpty()) {
-                constraintDef.union(values);
-            } else {
-                constraintDef = calculateIntersection(constraintDef, values);
-
-                if (constraintDef.getValues().isEmpty()) {
-                    return constraintDef;
-                }
-            }
-        }
-
-        return constraintDef;
-    }
-
-    private BitStringConstraintDefinition calculateUnion(List<Elements> elements) throws CompilerException {
-        BitStringConstraintDefinition constraintDef = new BitStringConstraintDefinition();
-
-        for (Elements e : elements) {
-            constraintDef = constraintDef.union(calculateElements(e));
-        }
-
-        return constraintDef;
     }
 
 }

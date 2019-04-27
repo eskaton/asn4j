@@ -34,15 +34,18 @@ import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
+import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
-public abstract class AbstractConstraintCompiler<T extends ConstraintDefinition> {
+public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>,
+        D extends ConstraintDefinition<V, C, T, D>> {
 
     protected TypeResolver typeResolver;
 
@@ -50,32 +53,24 @@ public abstract class AbstractConstraintCompiler<T extends ConstraintDefinition>
         this.typeResolver = typeResolver;
     }
 
-    public T compileConstraint(SetSpecsNode setSpecs, boolean includeAddition) throws CompilerException {
-        T constraintDef = compileConstraint(setSpecs.getRootElements());
+    public D compileConstraint(SetSpecsNode setSpecs) throws CompilerException {
+        T root = compileConstraint(setSpecs.getRootElements());
+        T extension = null;
 
-        if (includeAddition) {
-            ElementSet additionalElements = setSpecs.getAdditionalElements();
-
-            if (additionalElements != null) {
-                T extension = compileConstraint(additionalElements);
-                constraintDef.union(extension);
-            }
+        if (setSpecs.hasExtensionElements()) {
+            extension = compileConstraint(setSpecs.getExtensionElements());
         }
 
-        return constraintDef;
+        return createDefinition(root, extension);
     }
 
-    T compileConstraints(Type node, Type base) throws CompilerException {
-        Stack<T> cons = new Stack<>();
-
-        boolean includeAdditions = true;
+    D compileConstraints(Type node, Type base) throws CompilerException {
+        Stack<D> cons = new Stack<>();
 
         while (true) {
             if (node.hasConstraint()) {
-                cons.push(compileConstraints(node.getConstraints(), includeAdditions));
+                cons.push(compileConstraints(node.getConstraints()));
             }
-
-            includeAdditions = false;
 
             if (base.equals(node)) {
                 break;
@@ -94,17 +89,16 @@ public abstract class AbstractConstraintCompiler<T extends ConstraintDefinition>
             } else {
                 throw new CompilerException("not yet supported");
             }
-
         }
 
         if (cons.size() == 1) {
             return cons.pop();
         } else if (cons.size() > 1) {
-            T op1 = cons.pop();
-            T op2 = cons.pop();
+            D op1 = cons.pop();
+            D op2 = cons.pop();
 
             do {
-                op1 = calculateIntersection(op1, op2);
+                op1 = op1.intersection(op2);
 
                 if (cons.isEmpty()) {
                     break;
@@ -119,36 +113,102 @@ public abstract class AbstractConstraintCompiler<T extends ConstraintDefinition>
         return null;
     }
 
-    T compileConstraints(List<Constraint> constraints, boolean includeAdditions) throws CompilerException {
-        T constraintDef = null;
+    D compileConstraints(List<Constraint> constraints) throws CompilerException {
+        D constraintDef = null;
 
         for (Constraint constraint : constraints) {
             if (constraint instanceof SubtypeConstraint) {
                 SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
                 if (constraintDef == null) {
-                    constraintDef = compileConstraint(setSpecs, includeAdditions);
-                    includeAdditions = false;
+                    constraintDef = compileConstraint(setSpecs);
                 } else {
-                    constraintDef.intersection(compileConstraint(setSpecs, includeAdditions));
+                    constraintDef.intersection(compileConstraint(setSpecs));
 
-                    if (constraintDef.isEmpty()) {
+                    if (constraintDef.isRootEmpty()) {
                         return constraintDef;
                     }
                 }
             } else {
                 throw new CompilerException("Constraints of type %s not yet supported",
-                        constraint.getClass().getSimpleName());
+                                            constraint.getClass().getSimpleName());
             }
         }
 
         return constraintDef;
     }
 
-    protected abstract T compileConstraint(ElementSet set) throws CompilerException;
+    protected T compileConstraint(ElementSet set) throws CompilerException {
+        List<Elements> operands = set.getOperands();
 
-    protected abstract T calculateIntersection(T constraintDef1, T constraintDef2) throws CompilerException;
+        switch (set.getOperation()) {
+            case All:
+                return calculateInversion(compileConstraint((ElementSet) operands.get(0)));
 
-    protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition constraintDef) throws CompilerException;
+            case Exclude:
+                if (operands.size() == 1) {
+                    // ALL EXCEPT
+                    return calculateElements(operands.get(0));
+                } else {
+                    return calculateExclude(calculateElements(operands.get(0)), calculateElements(operands.get(1)));
+                }
+
+            case Intersection:
+                return calculateIntersection(operands);
+
+            case Union:
+                return calculateUnion(operands);
+        }
+
+        return createValues();
+    }
+
+    protected T calculateIntersection(List<Elements> elements) throws CompilerException {
+        T values1 = createValues();
+
+        for (Elements e : elements) {
+            T values2 = calculateElements(e);
+
+            if (values1.isEmpty()) {
+                values1 = values1.union(values2);
+            } else {
+                values1 = calculateIntersection(values1, values2);
+
+                if (values1.isEmpty()) {
+                    return values1;
+                }
+            }
+        }
+
+        return values1;
+    }
+
+    protected T calculateUnion(List<Elements> elements) throws CompilerException {
+        T values = createValues();
+
+        for (Elements e : elements) {
+            values = values.union(calculateElements(e));
+        }
+
+        return values;
+    }
+
+    protected T calculateInversion(T values) {
+        return values.invert();
+    }
+
+    protected abstract D createDefinition(T root, T extension);
+
+    protected abstract T createValues();
+
+    protected abstract T calculateElements(Elements elements) throws CompilerException;
+
+    protected T calculateIntersection(T values1, T values2) throws CompilerException {
+        return values1.intersection(values2);
+    }
+
+    protected abstract T calculateExclude(T values1, T values2);
+
+    protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition) throws CompilerException;
 
 }

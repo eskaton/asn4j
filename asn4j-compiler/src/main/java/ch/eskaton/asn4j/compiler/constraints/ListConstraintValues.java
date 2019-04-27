@@ -27,16 +27,28 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class OctetStringConstraintDefinition implements ConstraintDefinition<OctetStringValue, List<OctetStringValue>, OctetStringConstraintDefinition> {
+public abstract class ListConstraintValues<V, T extends ListConstraintValues<V, T>> implements ConstraintValues<V, List<V>, T> {
+
+    private List<V> values;
+
+    public ListConstraintValues() {
+        this.values =  new ArrayList<>();
+    }
+
+    public ListConstraintValues(List<V> values) {
+        this();
+
+        this.values.addAll(values);
+    }
 
     @Override
-    public List<OctetStringValue> getValues() {
-        return new ArrayList();
+    public List<V> getValues() {
+        return values;
     }
 
 }

@@ -27,30 +27,41 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
+import java.util.Collection;
 
-public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompiler<ObjectIdentifierConstraintDefinition> {
+public interface ConstraintValues<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>> {
 
-    public ObjectIdentifierConstraintCompiler(TypeResolver typeResolver) {
-        super(typeResolver);
+    C getValues();
+
+    default T intersection(T values) {
+        T copy = copy();
+
+        copy.getValues().retainAll(values.getValues());
+
+        return copy;
     }
 
-    @Override
-    protected ObjectIdentifierConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
-        return null;
+    default T union(T values) {
+        T copy = copy();
+
+        copy.getValues().addAll(values.getValues());
+
+        return copy;
     }
 
-    @Override
-    protected ObjectIdentifierConstraintDefinition calculateIntersection(ObjectIdentifierConstraintDefinition constraintDef1, ObjectIdentifierConstraintDefinition constraintDef2) throws CompilerException {
-        return null;
+    default T init(C values) {
+        getValues().clear();
+        getValues().addAll(values);
+
+        return (T) this;
     }
 
-    @Override
-    protected void addConstraint(JavaClass javaClass, ConstraintDefinition constraintDef) throws CompilerException {
-
+    default boolean isEmpty() {
+        return getValues().isEmpty();
     }
+
+    T invert();
+
+    T copy();
 
 }

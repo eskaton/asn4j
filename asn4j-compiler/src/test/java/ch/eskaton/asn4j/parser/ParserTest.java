@@ -4058,7 +4058,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getRootElements());
-        assertNull(result.getAdditionalElements());
+        assertNull(result.getExtensionElements());
         assertFalse(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -4068,7 +4068,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getRootElements());
-        assertNull(result.getAdditionalElements());
+        assertNull(result.getExtensionElements());
         assertTrue(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -4078,7 +4078,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getRootElements());
-        assertNotNull(result.getAdditionalElements());
+        assertNotNull(result.getExtensionElements());
         assertTrue(result.hasExtensionMarker());
     }
 
@@ -5899,7 +5899,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getRootElements());
-        assertNull(result.getAdditionalElements());
+        assertNull(result.getExtensionElements());
         assertFalse(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -5909,7 +5909,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getRootElements());
-        assertNull(result.getAdditionalElements());
+        assertNull(result.getExtensionElements());
         assertTrue(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream("...".getBytes())).new SetSpecsParser();
@@ -5918,7 +5918,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNull(result.getRootElements());
-        assertNull(result.getAdditionalElements());
+        assertNull(result.getExtensionElements());
         assertTrue(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -5928,7 +5928,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNull(result.getRootElements());
-        assertNotNull(result.getAdditionalElements());
+        assertNotNull(result.getExtensionElements());
         assertTrue(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -5938,7 +5938,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getRootElements());
-        assertNotNull(result.getAdditionalElements());
+        assertNotNull(result.getExtensionElements());
         assertTrue(result.hasExtensionMarker());
     }
 
