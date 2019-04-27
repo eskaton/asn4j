@@ -30,11 +30,14 @@ package ch.eskaton.asn4j.parser.ast.values;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StringUtils;
 
+import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class BitStringValue extends AbstractValue {
 
-    private Integer intValue;
+    private int unusedBits;
 
     private byte[] byteValue;
 
@@ -46,16 +49,11 @@ public class BitStringValue extends AbstractValue {
         super(position);
     }
 
-    public BitStringValue(Position position, Integer intValue) {
-        super(position);
-
-        this.intValue = intValue;
-    }
-
-    public BitStringValue(Position position, byte[] byteValue) {
+    public BitStringValue(Position position, byte[] byteValue, int unusedBits) {
         super(position);
 
         this.byteValue = byteValue;
+        this.unusedBits = unusedBits;
     }
 
     public BitStringValue(Position position, List<String> namedValues) {
@@ -68,10 +66,6 @@ public class BitStringValue extends AbstractValue {
         super(position);
 
         this.value = value;
-    }
-
-    public Integer getIntValue() {
-        return intValue;
     }
 
     public byte[] getByteValue() {
@@ -90,10 +84,40 @@ public class BitStringValue extends AbstractValue {
         return namedValues;
     }
 
+    public int getUnusedBits() {
+        return unusedBits;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        BitStringValue that = (BitStringValue) o;
+
+        return unusedBits == that.unusedBits &&
+                Arrays.equals(byteValue, that.byteValue) &&
+                Objects.equals(namedValues, that.namedValues) &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(unusedBits, namedValues, value);
+        result = 31 * result + Arrays.hashCode(byteValue);
+        return result;
+    }
+
     @Override
     public String toString() {
-        return StringUtils.concat("BitStringValue[", intValue != null ? Integer.toBinaryString(intValue)
-                : (namedValues != null ? StringUtils.join(namedValues, ", ") : value), "]");
+        return StringUtils.concat(getClass().getSimpleName() + "[",
+                byteValue != null ? "0x" + new BigInteger(byteValue).toString(16) :
+                        (namedValues != null ? StringUtils.join(namedValues, ", ") : value), "]");
     }
 
 }

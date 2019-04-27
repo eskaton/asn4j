@@ -1,0 +1,6 @@
+X680-46 DEFINITIONS ::=
+BEGIN
+
+TestGeneralizedTime ::= GeneralizedTime
+
+END

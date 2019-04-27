@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,40 +27,20 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.Collection;
+import ch.eskaton.asn4j.parser.ast.RangeNode;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
+import java.util.List;
 
-public class OctetStringConstraintCompiler extends
-    	AbstractConstraintCompiler<String> {
+public class IntegerConstraintDefinition extends AbstractConstraintDefinition<RangeNode, List<RangeNode>,
+        IntegerConstraintValues, IntegerConstraintDefinition> {
 
-    public OctetStringConstraintCompiler(ConstraintCompiler constraintCompiler,
-    		TypeResolver typeResolver) {
-    	super(constraintCompiler, typeResolver);
+    public IntegerConstraintDefinition(IntegerConstraintValues rootValues, IntegerConstraintValues extensionValues) {
+        super(rootValues, extensionValues);
     }
 
     @Override
-    protected Collection<String> compileConstraint(ElementSet set)
-    		throws CompilerException {
-    	// TODO Auto-generated method stub
-    	return null;
-    }
-
-    @Override
-    protected Collection<String> calculateIntersection(Collection<?> op1,
-    		Collection<?> op2) throws CompilerException {
-    	// TODO Auto-generated method stub
-    	return null;
-    }
-
-    @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values)
-    		throws CompilerException {
-    	// TODO Auto-generated method stub
-
+    public IntegerConstraintValues createValues() {
+        return new IntegerConstraintValues();
     }
 
 }

@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.test.x680_31;
 
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4jtest.x680_30.TestSelectionSetType;
@@ -47,7 +48,7 @@ import static org.junit.Assert.assertEquals;
 
 public class TestX680_31 {
 
-    private <T extends  ASN1VisibleString> void testPrefixedType(Supplier<T> prefixedType, String value) {
+    private <T extends  ASN1VisibleString> void testPrefixedType(Supplier<T> prefixedType, String value) throws ASN1RuntimeException {
         T a = prefixedType.get();
         a.setValue(value);
 
@@ -60,32 +61,32 @@ public class TestX680_31 {
     }
 
     @Test
-    public void testTestPrefixedType1() {
+    public void testTestPrefixedType1() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType1(), "test1");
     }
 
     @Test
-    public void testTestPrefixedType2() {
+    public void testTestPrefixedType2() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType2(), "test2");
     }
 
     @Test
-    public void testTestPrefixedType3() {
+    public void testTestPrefixedType3() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType3(), "test3");
     }
 
     @Test
-    public void testTestPrefixedType4() {
+    public void testTestPrefixedType4() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType4(), "test4");
     }
 
     @Test
-    public void testTestPrefixedType5() {
+    public void testTestPrefixedType5() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType5(), "test5");
     }
 
     @Test
-    public void testTestPrefixedType6() {
+    public void testTestPrefixedType6() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType6(), "test6");
     }
 

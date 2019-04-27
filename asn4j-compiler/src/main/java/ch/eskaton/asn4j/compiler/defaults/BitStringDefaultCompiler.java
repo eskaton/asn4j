@@ -31,15 +31,13 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
@@ -48,34 +46,34 @@ public class BitStringDefaultCompiler implements DefaultCompiler {
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
             Value value) throws CompilerException {
         byte[] bytes;
+        int unusedBits = 0;
 
-        if (value instanceof AbstractBaseXStringValue) {
-            bytes = ((AbstractBaseXStringValue) value).getBytes();
-        } else if (value instanceof EmptyValue) {
+        if (value instanceof EmptyValue) {
             bytes = new byte[0];
         } else {
             BitStringValue bitStringValue = null;
 
-            if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-                bitStringValue = ctx.resolveValue(BitStringValue.class,
-                        resolveAmbiguousValue(value, SimpleDefinedValue.class));
-            } else if (resolveAmbiguousValue(value, BitStringValue.class) != null) {
-                bitStringValue = ctx.resolveValue(BitStringValue.class, type,
-                        resolveAmbiguousValue(value, BitStringValue.class));
+            if (value instanceof AbstractBaseXStringValue) {
+                bitStringValue = ((AbstractBaseXStringValue) value).toBitString();
+            } else {
+                if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
+                    bitStringValue = ctx.resolveValue(BitStringValue.class,
+                            resolveAmbiguousValue(value, SimpleDefinedValue.class));
+                } else if (resolveAmbiguousValue(value, BitStringValue.class) != null) {
+                    bitStringValue = ctx.resolveValue(BitStringValue.class, type,
+                            resolveAmbiguousValue(value, BitStringValue.class));
+                }
             }
 
             bytes = bitStringValue.getByteValue();
+            unusedBits = bitStringValue.getUnusedBits();
         }
 
-        String bytesStr = IntStream.range(0, bytes.length).boxed().map(
-                i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
-
-        String strValue = "new byte[] { " + bytesStr + " }";
-
+        String strValue = BitStringUtils.getInitializerString(bytes);
         String defaultField = addDefaultField(clazz, typeName, field);
 
         clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName +
-                "();\n\t\t" + defaultField + ".setValue(" + strValue + ");"));
+                "();\n\t\t" + defaultField + ".setValue(" + strValue + ", " + unusedBits + ");"));
     }
 
 }

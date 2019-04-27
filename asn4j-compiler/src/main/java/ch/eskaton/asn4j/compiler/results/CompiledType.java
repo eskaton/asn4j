@@ -25,36 +25,32 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
-import java.util.Collection;
+public class CompiledType implements CompilationResult {
 
-public class RelativeIRIConstraintCompiler extends AbstractConstraintCompiler<RelativeIRI> {
+    private Type type;
 
-    public RelativeIRIConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
+    private ConstraintDefinition constraintDefinition;
+
+    public CompiledType(Type type) {
+        this.type = type;
     }
 
-    @Override
-    protected Collection<RelativeIRI> compileConstraint(ElementSet set) throws CompilerException {
-        return null;
+    public CompiledType(Type type, ConstraintDefinition constraintDefinition) {
+        this.type = type;
+        this.constraintDefinition = constraintDefinition;
     }
 
-    @Override
-    protected Collection<RelativeIRI> calculateIntersection(Collection<?> op1, Collection<?> op2)
-            throws CompilerException {
-        return null;
+    public Type getType() {
+        return type;
     }
 
-    @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
-
+    public ConstraintDefinition getConstraintDefinition() {
+        return constraintDefinition;
     }
 
 }

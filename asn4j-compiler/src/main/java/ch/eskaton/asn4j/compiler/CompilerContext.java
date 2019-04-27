@@ -1,4 +1,5 @@
 /*
+/*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
  *
@@ -28,6 +29,7 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaModifier;
@@ -37,6 +39,7 @@ import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
@@ -97,6 +100,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -113,7 +117,7 @@ import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class CompilerContext {
 
-    private HashMap<String, HashMap<String, Type>> definedTypes = new HashMap<>();
+    private HashMap<String, HashMap<String, CompiledType>> definedTypes = new HashMap<>();
 
     @SuppressWarnings("serial")
     private Map<Class<?>, Compiler<?>> compilers = new HashMap<Class<?>, Compiler<?>>() {
@@ -140,6 +144,8 @@ public class CompilerContext {
             put(RelativeOID.class, new RelativeOIDCompiler());
             put(IRI.class, new IRICompiler());
             put(RelativeIRI.class, new RelativeIRICompiler());
+            put(GeneralizedTime.class, new GeneralizedTimeCompiler());
+            put(UTCTime.class, new UTCTimeCompiler());
         }
     };
 
@@ -175,6 +181,7 @@ public class CompilerContext {
             put(Choice.class.getSimpleName(), ASN1Choice.class.getSimpleName());
             put(EnumeratedType.class.getSimpleName(), ASN1EnumeratedType.class.getSimpleName());
             put(GeneralizedTime.class.getSimpleName(), ASN1GeneralizedTime.class.getSimpleName());
+            put(UTCTime.class.getSimpleName(), ASN1UTCTime.class.getSimpleName());
             put(IntegerType.class.getSimpleName(), ASN1Integer.class.getSimpleName());
             put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName());
             put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName());
@@ -227,10 +234,9 @@ public class CompilerContext {
         this.outputDir = outputDir;
     }
 
-    public void addType(String typeName, Type typeDef) {
-        String moduleName = currentModule.peek().getModuleId().getModuleName();
-        HashMap<String, Type> moduleTypes = definedTypes.computeIfAbsent(moduleName, key -> new HashMap<>());
-        moduleTypes.put(typeName, typeDef);
+    public void addType(String typeName, CompiledType compiledType) {
+        HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
+        moduleTypes.put(typeName, compiledType);
     }
 
     @SuppressWarnings("unchecked")
@@ -425,8 +431,9 @@ public class CompilerContext {
     }
 
     private void compileType(Type type, String typeName, String name) {
-        this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
-        addType(name, type);
+        CompiledType compiledType = this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
+
+        addType(name, compiledType);
     }
 
     public void addReferencedType(String typeName) {
@@ -540,8 +547,8 @@ public class CompilerContext {
         new JavaWriter().write(structs, outputDir);
     }
 
-    public void compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
-        constraintCompiler.compileConstraint(javaClass, name, node);
+    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
+        return constraintCompiler.compileConstraint(javaClass, name, node);
     }
 
     public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value)
@@ -574,9 +581,14 @@ public class CompilerContext {
 
     public TagId getTagId(Type type) {
         if (type instanceof TypeReference) {
-            HashMap<String, Type> moduleTypes = getTypesOfCurrentModule();
+            HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
+            CompiledType compiledType = moduleTypes.get(((TypeReference) type).getType());
 
-            Type referencedType = moduleTypes.computeIfAbsent(((TypeReference) type).getType(), compiler::compileType);
+            if (compiledType == null) {
+                compiledType = compiler.compileType(((TypeReference) type).getType());
+            }
+
+            Type referencedType = compiledType.getType();
             Tag tag = referencedType.getTag();
 
             if (tag != null) {
@@ -597,7 +609,7 @@ public class CompilerContext {
         }
     }
 
-    private HashMap<String, Type> getTypesOfCurrentModule() {
+    private HashMap<String, CompiledType> getTypesOfCurrentModule() {
         return definedTypes.computeIfAbsent(currentModule.peek().getModuleId().getModuleName(), key -> new HashMap<>());
     }
 

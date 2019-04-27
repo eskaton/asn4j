@@ -1,0 +1,6 @@
+X680-47 DEFINITIONS ::=
+BEGIN
+
+TestUTCTime ::= UTCTime
+
+END

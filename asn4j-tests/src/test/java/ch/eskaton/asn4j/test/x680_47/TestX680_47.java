@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,37 +25,58 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.test.x680_47;
 
-import java.util.Collection;
+import ch.eskaton.asn4j.runtime.BERDecoder;
+import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4jtest.x680_47.TestUTCTime;
+import org.junit.Test;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.Null;
+import static org.junit.Assert.assertEquals;
 
-public class NullConstraintCompiler extends AbstractConstraintCompiler<Null> {
+public class TestX680_47 {
 
-    public NullConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-    	super(constraintCompiler, typeResolver);
+    @Test
+    public void testUTCTimeLocal() throws ASN1RuntimeException {
+        TestUTCTime a = new TestUTCTime();
+
+        a.setValue("1812311507");
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        TestUTCTime b = decoder.decode(TestUTCTime.class, encoder.encode(a));
+
+        assertEquals(a, b);
     }
 
-    @Override
-    protected Collection<Null> compileConstraint(ElementSet set) throws CompilerException {
-    	// TODO Auto-generated method stub
-    	return null;
+    @Test
+    public void testUTCTimeZulu() throws ASN1RuntimeException {
+        TestUTCTime a = new TestUTCTime();
+
+        a.setValue("181231150703Z");
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        TestUTCTime b = decoder.decode(TestUTCTime.class, encoder.encode(a));
+
+        assertEquals(a, b);
     }
 
-    @Override
-    protected Collection<Null> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
-    	// TODO Auto-generated method stub
-    	return null;
-    }
+    @Test
+    public void testUTCTimeOffset() throws ASN1RuntimeException {
+        TestUTCTime a = new TestUTCTime();
 
-    @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
-    	// TODO Auto-generated method stub
+        a.setValue("181231150703-1230");
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        TestUTCTime b = decoder.decode(TestUTCTime.class, encoder.encode(a));
+
+        assertEquals(a, b);
     }
 
 }

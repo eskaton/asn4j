@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.test.x690_8;
 
 import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4jtest.X690_8.SetType1;
 import ch.eskaton.asn4jtest.X690_8.SetType2;
@@ -44,7 +45,7 @@ import static org.junit.Assert.assertArrayEquals;
 public class TestX690_8_14 {
 
     @Test
-    public void testEncodeVisibleString() {
+    public void testEncodeVisibleString() throws ASN1RuntimeException {
         BEREncoder encoder = new BEREncoder();
 
         Type2 type2 = new Type2();
@@ -80,7 +81,7 @@ public class TestX690_8_14 {
     }
 
     @Test
-    public void testEncodeSetOf() {
+    public void testEncodeSetOf() throws ASN1RuntimeException {
         BEREncoder encoder = new BEREncoder();
 
         SetType1 type1 = new SetType1();

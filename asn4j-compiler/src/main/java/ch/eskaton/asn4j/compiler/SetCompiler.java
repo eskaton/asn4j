@@ -27,22 +27,19 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.types.ClassType;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
-import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 import java.util.HashMap;
 import java.util.function.Function;
 
-public class SetCompiler implements NamedCompiler<SetType> {
+public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
 
-    public void compile(CompilerContext ctx, String name, SetType node)
-            throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, SetType node) throws CompilerException {
         HashMap<TagId, ComponentType> seenTags = new HashMap<>();
 
         ctx.createClass(name, node, true);
@@ -62,6 +59,8 @@ public class SetCompiler implements NamedCompiler<SetType> {
         }
 
         ctx.finishClass();
+
+        return new CompiledType(node);
     }
 
     private TagId getTagId(CompilerContext ctx, ComponentType component) {

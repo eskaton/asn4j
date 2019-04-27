@@ -27,7 +27,9 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 
@@ -39,7 +41,7 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
     @Override
-    public void compile(CompilerContext ctx, String name, BitString node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, BitString node) throws CompilerException {
         JavaClass javaClass = ctx.createClass(name, node, false);
         Collection<NamedBitNode> namedBits = node.getNamedBits();
         IdentifierUniquenessChecker<Long> iuc = new IdentifierUniquenessChecker<>(name);
@@ -75,11 +77,15 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
         javaClass.method().modifier(Public).name(name).build();
 
+        ConstraintDefinition constraintDef = null;
+
         if (node.hasConstraint()) {
-            ctx.compileConstraint(javaClass, name, node);
+            constraintDef = ctx.compileConstraint(javaClass, name, node);
         }
 
         ctx.finishClass(false);
+
+        return new CompiledType(node, constraintDef);
     }
 
 }

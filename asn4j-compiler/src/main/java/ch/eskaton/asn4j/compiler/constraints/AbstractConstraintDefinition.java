@@ -27,33 +27,49 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
-
 import java.util.Collection;
 
-public class IRIConstraintCompiler extends AbstractConstraintCompiler<IRI> {
+public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>,
+        D extends ConstraintDefinition<V, C, T, D>> implements ConstraintDefinition<V, C, T, D> {
 
-    public IRIConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
+    protected T rootValues;
+
+    protected T extensionValues;
+
+    public AbstractConstraintDefinition() {
+        this.rootValues = createValues();
+        this.extensionValues = createValues();
     }
 
-    @Override
-    protected Collection<IRI> compileConstraint(ElementSet set) throws CompilerException {
-        return null;
+    public AbstractConstraintDefinition(T rootValues, T extensionValues) {
+        this();
+
+        setRootValues(rootValues);
+        setExtensionValues(extensionValues);
     }
 
-    @Override
-    protected Collection<IRI> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
-        return null;
+    public T getRootValues() {
+        return rootValues;
     }
 
-    @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
-
+    public void setRootValues(T rootValues) {
+        if (rootValues == null) {
+            this.rootValues = createValues();
+        } else {
+            this.rootValues = rootValues;
+        }
     }
-    
+
+    public T getExtensionValues() {
+        return extensionValues;
+    }
+
+    public void setExtensionValues(T extensionValues) {
+        if (extensionValues == null) {
+            this.extensionValues = createValues();
+        } else {
+            this.extensionValues = extensionValues;
+        }
+    }
+
 }
