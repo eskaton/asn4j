@@ -66,20 +66,6 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolea
         return new BooleanConstraintValues();
     }
 
-    @Override
-    protected BooleanConstraintValues calculateExclude(BooleanConstraintValues value1,
-            BooleanConstraintValues value2) throws CompilerException {
-        for (Boolean value : value2.getValues()) {
-            if (value1.getValues().contains(value)) {
-                value1.getValues().remove(value);
-            } else {
-                throw new CompilerException(value + " doesn't exist in parent type");
-            }
-        }
-
-        return value1;
-    }
-
     protected BooleanConstraintValues calculateElements(Elements elements) throws CompilerException {
         if (elements instanceof ElementSet) {
             return compileConstraint((ElementSet) elements);

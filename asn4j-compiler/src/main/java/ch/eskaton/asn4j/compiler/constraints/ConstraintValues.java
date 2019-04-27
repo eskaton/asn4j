@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.CompilerException;
+
 import java.util.Collection;
 
 public interface ConstraintValues<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>> {
@@ -45,6 +47,20 @@ public interface ConstraintValues<V, C extends Collection<V>, T extends Constrai
         T copy = copy();
 
         copy.getValues().addAll(values.getValues());
+
+        return copy;
+    }
+
+    default T exclude(T values) throws CompilerException {
+        T copy = copy();
+
+        for (V value : values.getValues()) {
+            if (copy.getValues().contains(value)) {
+                copy.getValues().remove(value);
+            } else {
+                throw new CompilerException(value + " doesn't exist in parent type");
+            }
+        }
 
         return copy;
     }
