@@ -30,10 +30,8 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.commons.utils.ReflectionUtils;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -43,30 +41,18 @@ import static org.junit.Assert.assertEquals;
 public class IntegerConstraintCompilerTest {
 
     @Test
-    public void testCalculateInversion() throws IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException {
+    public void testCalculateInversion() {
         IntegerConstraintCompiler compiler = new IntegerConstraintCompiler(null);
 
         assertEquals(asList(createRange(Long.MIN_VALUE, 4L), createRange(6L, Long.MAX_VALUE)),
-                ((IntegerConstraintValues) ReflectionUtils.invokePrivateMethod(compiler, "calculateInversion",
-                        new Object[] { new IntegerConstraintValues(asList(createRange(5L, 5L))) })).getValues());
+                invokeCalculateInversion(compiler, createRange(5L, 5L)));
 
         assertEquals(asList(createRange(Long.MIN_VALUE, 4L), createRange(6L, 9L), createRange(21L, Long.MAX_VALUE)),
-                ((IntegerConstraintValues) ReflectionUtils.invokePrivateMethod(compiler, "calculateInversion",
-                        new Object[] { new IntegerConstraintValues(asList(createRange(5L, 5L),
-                                createRange(10L, 20L))) })).getValues());
-    }
-
-    private List<RangeNode> invokeCalculateIntersection(IntegerConstraintCompiler compiler, List<RangeNode> a,
-            List<RangeNode> b) throws InvocationTargetException, IllegalAccessException {
-        return ((IntegerConstraintValues) ReflectionUtils.invokePrivateMethod(compiler,
-                "calculateIntersection", new Object[] { new IntegerConstraintValues(a),
-                        new IntegerConstraintValues(b) })).getValues();
+                invokeCalculateInversion(compiler, createRange(5L, 5L), createRange(10L, 20L)));
     }
 
     @Test
-    public void testCalculateIntersection() throws IllegalArgumentException,
-            IllegalAccessException, InvocationTargetException {
+    public void testCalculateIntersection() {
         IntegerConstraintCompiler compiler = new IntegerConstraintCompiler(null);
 
         assertEquals(emptyList(), invokeCalculateIntersection(compiler, emptyList(), emptyList()));
@@ -90,12 +76,20 @@ public class IntegerConstraintCompilerTest {
         assertEquals(asList(createRange(3L, 5L)), invokeCalculateIntersection(compiler, asList(createRange(0L, 5L)),
                 asList(createRange(3L, 7L))));
 
-
         assertEquals(asList(createRange(5L, 10L), createRange(20L, 25L), createRange(40L, 40L), createRange(45L, 50L),
                 createRange(60L, 70L)),
                 invokeCalculateIntersection(compiler,
                         asList(createRange(0L, 10L), createRange(20L, 50L), createRange(60L, 70L)),
                         asList(createRange(5L, 25L), createRange(40L, 40L), createRange(45L, 70L))));
+    }
+
+    private List<RangeNode> invokeCalculateInversion(IntegerConstraintCompiler compiler, RangeNode... rangeNodes) {
+        return compiler.calculateInversion(new IntegerConstraintValues(asList(rangeNodes))).getValues();
+    }
+
+    private List<RangeNode> invokeCalculateIntersection(IntegerConstraintCompiler compiler, List<RangeNode> a,
+            List<RangeNode> b) {
+        return compiler.calculateIntersection(new IntegerConstraintValues(a), new IntegerConstraintValues(b)).getValues();
     }
 
     private RangeNode createRange(Long l1, Long l2) {

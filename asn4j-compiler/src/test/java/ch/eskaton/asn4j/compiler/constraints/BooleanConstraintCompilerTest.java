@@ -27,12 +27,11 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import ch.eskaton.commons.utils.ReflectionUtils;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 public class BooleanConstraintCompilerTest {
 
     @Test
-    public void testCalculateUnion() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    public void testCalculateUnion() {
         BooleanConstraintCompiler compiler = new BooleanConstraintCompiler(null);
 
         assertEquals(emptySet(), invokeCalculateUnion(compiler));
@@ -56,8 +55,7 @@ public class BooleanConstraintCompilerTest {
     }
 
     @Test
-    public void testCalculateIntersection() throws IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException {
+    public void testCalculateIntersection() {
         BooleanConstraintCompiler compiler = new BooleanConstraintCompiler(null);
 
         assertEquals(emptySet(), invokeCalculateIntersection(compiler));
@@ -70,8 +68,7 @@ public class BooleanConstraintCompilerTest {
     }
 
     @Test
-    public void testCalculateExclude() throws IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException {
+    public void testCalculateExclude() {
         BooleanConstraintCompiler compiler = new BooleanConstraintCompiler(null);
 
         assertEquals(asHashSet(true, false), invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet()));
@@ -80,32 +77,26 @@ public class BooleanConstraintCompilerTest {
         assertEquals(emptySet(), invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet(false, true)));
     }
 
-    private Set<Boolean> invokeCalculateExclude(BooleanConstraintCompiler compiler, Set<Boolean> a, Set<Boolean> b)
-            throws InvocationTargetException, IllegalAccessException {
-        return ((BooleanConstraintValues) ReflectionUtils.invokePrivateMethod(compiler, "calculateExclude",
-                new Object[]{new BooleanConstraintValues(a), new BooleanConstraintValues(b)})).getValues();
+    private Set<Boolean> invokeCalculateExclude(BooleanConstraintCompiler compiler, Set<Boolean> a, Set<Boolean> b) {
+        return compiler.calculateExclude(new BooleanConstraintValues(a), new BooleanConstraintValues(b)).getValues();
     }
 
-    private Set<Boolean> invokeCalculate(BooleanConstraintCompiler compiler, String method, boolean... values)
-            throws InvocationTargetException, IllegalAccessException {
-        List<SingleValueConstraint> elements = new ArrayList<>();
+    private Set<Boolean> invokeCalculateUnion(BooleanConstraintCompiler compiler, boolean... values) {
+        return compiler.calculateUnion(toElements(values)).getValues();
+    }
+
+    private Set<Boolean> invokeCalculateIntersection(BooleanConstraintCompiler compiler, boolean... values) {
+        return compiler.calculateIntersection(toElements(values)).getValues();
+    }
+
+    private List<Elements> toElements(boolean[] values) {
+        List<Elements> elements = new ArrayList<>();
 
         for (boolean value : values) {
             elements.add(new SingleValueConstraint(NO_POSITION, new BooleanValue(NO_POSITION, value)));
         }
 
-        return ((BooleanConstraintValues) ReflectionUtils.invokePrivateMethod(compiler, method,
-                new Object[]{elements})).getValues();
-    }
-
-    private Set<Boolean> invokeCalculateUnion(BooleanConstraintCompiler compiler, boolean... values)
-            throws InvocationTargetException, IllegalAccessException {
-        return invokeCalculate(compiler, "calculateUnion", values);
-    }
-
-    private Set<Boolean> invokeCalculateIntersection(BooleanConstraintCompiler compiler, boolean... values)
-            throws InvocationTargetException, IllegalAccessException {
-        return invokeCalculate(compiler, "calculateIntersection", values);
+        return elements;
     }
 
 }

@@ -31,33 +31,21 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.commons.utils.ReflectionUtils;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class IntegerConstraintValuesTest {
 
-    private int invokeCompareCanonicalEndpoint(long a, long b) throws InvocationTargetException,
-            IllegalAccessException {
-        return (int) ReflectionUtils.invokeStaticPrivateMethod(
-                IntegerConstraintValues.class, "compareCanonicalEndpoint",
-                new EndpointNode[] {
-                        new EndpointNode(new IntegerValue(a), true),
-                        new EndpointNode(new IntegerValue(b), true) });
-    }
-
-    @org.junit.Test
-    public void testCompareCanonicalEndpoint() throws IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException {
+    @Test
+    public void testCompareCanonicalEndpoint() {
         assertEquals(-1, invokeCompareCanonicalEndpoint(-2, -1));
         assertEquals(-2, invokeCompareCanonicalEndpoint(-5, -1));
         assertEquals(0, invokeCompareCanonicalEndpoint(5, 5));
@@ -68,15 +56,8 @@ public class IntegerConstraintValuesTest {
         assertEquals(-1, invokeCompareCanonicalEndpoint(Long.MIN_VALUE, Long.MIN_VALUE + 1));
     }
 
-    private int invokeCompareCanonicalRange(long a1, long a2, long b1, long b2) throws InvocationTargetException,
-            IllegalAccessException {
-        return (int) ReflectionUtils.invokeStaticPrivateMethod(IntegerConstraintValues.class, "compareCanonicalRange",
-                new RangeNode[] { createRange(a1, a2), createRange(b1, b2) });
-    }
-
-    @org.junit.Test
-    public void testCompareCanonicalRange() throws IllegalArgumentException,
-            IllegalAccessException, InvocationTargetException {
+    @Test
+    public void testCompareCanonicalRange() {
         assertTrue(-1 >= invokeCompareCanonicalRange(-2L, -1L, -1L, 0L));
         assertTrue(-1 >= invokeCompareCanonicalRange(-2L, -1L, -2L, 0L));
         assertEquals(0, invokeCompareCanonicalRange(-2L, -1L, -2L, -1L));
@@ -84,16 +65,8 @@ public class IntegerConstraintValuesTest {
         assertTrue(1 <= invokeCompareCanonicalRange(0L, 5L, 0L, 4L));
     }
 
-    public List<RangeNode> invokeCanonicalizeRanges(List<RangeNode> ranges) throws InvocationTargetException,
-            IllegalAccessException {
-        return ((IntegerConstraintValues) ReflectionUtils.invokeStaticPrivateMethod(IntegerConstraintValues.class,
-                "canonicalizeRanges", new Object[] { new IntegerConstraintValues(ranges) })).getValues();
-    }
-
-    @org.junit.Test
-    public void testCanonicalizeRanges() throws IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException {
-
+    @Test
+    public void testCanonicalizeRanges() {
         assertEquals(new ArrayList<RangeNode>(), invokeCanonicalizeRanges(emptyList()));
 
         // 2 ranges
@@ -129,44 +102,21 @@ public class IntegerConstraintValuesTest {
                 invokeCanonicalizeRanges(asList(createRange(0L, 6L), createRange(7L, 13L), createRange(15L, 20L))));
     }
 
-    private List<RangeNode> invokeCalculateExclude(IntegerConstraintCompiler compiler, List<RangeNode> a,
-            List<RangeNode> b) throws InvocationTargetException, IllegalAccessException {
-        return ((IntegerConstraintValues) ReflectionUtils.invokePrivateMethod(compiler, "calculateExclude",
-                new Object[] { new IntegerConstraintValues(a), new IntegerConstraintValues(b) })).getValues();
-    }
-
     @Test
-    public void testCalculateExclude() throws IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException {
+    public void testCalculateExclude() {
         IntegerConstraintCompiler compiler = new IntegerConstraintCompiler(null);
 
-        try {
-            invokeCalculateExclude(compiler, asList(createRange(5L, 10L)), asList(createRange(3L, 4L)));
-            fail("ASN1CompilerException expected");
-        } catch (InvocationTargetException e) {
-            assertTrue(e.getCause() instanceof CompilerException);
-        }
+        assertThrows(() -> invokeCalculateExclude(compiler, asList(createRange(5L, 10L)), asList(createRange(3L, 4L))),
+                CompilerException.class);
 
-        try {
-            invokeCalculateExclude(compiler, asList(createRange(5L, 10L)), asList(createRange(3L, 6L)));
-            fail("ASN1CompilerException expected");
-        } catch (InvocationTargetException e) {
-            assertTrue(e.getCause() instanceof CompilerException);
-        }
+        assertThrows(() -> invokeCalculateExclude(compiler, asList(createRange(5L, 10L)), asList(createRange(3L, 6L))),
+                CompilerException.class);
 
-        try {
-            invokeCalculateExclude(compiler, asList(createRange(5L, 10L)), asList(createRange(8L, 12L)));
-            fail("ASN1CompilerException expected");
-        } catch (InvocationTargetException e) {
-            assertTrue(e.getCause() instanceof CompilerException);
-        }
+        assertThrows(() -> invokeCalculateExclude(compiler, asList(createRange(5L, 10L)), asList(createRange(8L, 12L))),
+                CompilerException.class);
 
-        try {
-            invokeCalculateExclude(compiler, asList(createRange(5L, 10L)), asList(createRange(11L, 12L)));
-            fail("ASN1CompilerException expected");
-        } catch (InvocationTargetException e) {
-            assertTrue(e.getCause() instanceof CompilerException);
-        }
+        assertThrows(() -> invokeCalculateExclude(compiler, asList(createRange(5L, 10L)), asList(createRange(11L, 12L))),
+                CompilerException.class);
 
         assertEquals(asList(),
                 invokeCalculateExclude(compiler, asList(createRange(0L, 10L)), asList(createRange(0L, 10L))));
@@ -193,6 +143,24 @@ public class IntegerConstraintValuesTest {
                         asList(createRange(0L, 10L), createRange(20L, 30L), createRange(40L, 50L),
                                 createRange(60L, 70L), createRange(80L, 90L)),
                         asList(createRange(20L, 30L), createRange(60L, 70L))));
+    }
+
+    private int invokeCompareCanonicalEndpoint(long a, long b) {
+        return IntegerConstraintValues.compareCanonicalEndpoint(new EndpointNode(new IntegerValue(a), true),
+                new EndpointNode(new IntegerValue(b), true));
+    }
+
+    private int invokeCompareCanonicalRange(long a1, long a2, long b1, long b2) {
+        return IntegerConstraintValues.compareCanonicalRange(createRange(a1, a2), createRange(b1, b2));
+    }
+
+    private List<RangeNode> invokeCalculateExclude(IntegerConstraintCompiler compiler, List<RangeNode> a,
+            List<RangeNode> b) {
+        return compiler.calculateExclude(new IntegerConstraintValues(a), new IntegerConstraintValues(b)).getValues();
+    }
+
+    public List<RangeNode> invokeCanonicalizeRanges(List<RangeNode> ranges) {
+        return IntegerConstraintValues.canonicalizeRanges(new IntegerConstraintValues(ranges)).getValues();
     }
 
     private RangeNode createRange(Long l1, Long l2) {
