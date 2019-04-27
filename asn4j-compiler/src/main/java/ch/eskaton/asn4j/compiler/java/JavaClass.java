@@ -335,11 +335,11 @@ public class JavaClass implements JavaStructure {
         }
 
         public T annotation(Class<? extends Annotation> annotation) {
-            if (!"java.lang".equals(annotation.getPackage().toString())) {
+            if (!"java.lang".equals(annotation.getPackage().getName())) {
                 javaClass.addImport(annotation);
             }
 
-            annotations.add("@" + annotation.getClass().getSimpleName());
+            annotations.add("@" + annotation.getSimpleName());
             return (T) this;
         }
 
@@ -390,7 +390,7 @@ public class JavaClass implements JavaStructure {
         }
 
         public MethodBuilder returnType(Class<?> returnType) {
-            return returnType(returnType.getClass().getSimpleName());
+            return returnType(returnType.getSimpleName());
         }
 
         public MethodBuilder parameter(JavaParameter parameter) {
@@ -525,6 +525,12 @@ public class JavaClass implements JavaStructure {
             this.body = new ArrayList<>(body.size());
 
             this.body.addAll(body);
+
+            return this;
+        }
+
+        public BodyBuilder nl() {
+            this.body.add("");
 
             return this;
         }

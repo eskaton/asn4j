@@ -1,0 +1,130 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ch.eskaton</groupId>
+        <artifactId>asn4j</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>asn4j-reporting</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>ch.eskaton</groupId>
+            <artifactId>asn4j-compiler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.eskaton</groupId>
+            <artifactId>asn4j-runtime</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.eskaton</groupId>
+            <artifactId>asn4j-maven-plugin</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.eskaton</groupId>
+            <artifactId>asn4j-tests</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>..\asn4j-compiler\src\main\java</source>
+                                <source>..\asn4j-compiler\src\test\java</source>
+                                <source>..\asn4j-runtime\src\main\java</source>
+                                <source>..\asn4j-runtime\src\test\java</source>
+                                <source>..\asn4j-maven-plugin\src\test\java</source>
+                                <source>..\asn4j-tests\src\test\java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <!-- Graphviz must be installed to run this doclet -->
+                    <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
+                    <docletArtifact>
+                        <groupId>org.umlgraph</groupId>
+                        <artifactId>umlgraph</artifactId>
+                        <version>5.6.6</version>
+                    </docletArtifact>
+                    <additionalOptions>
+                        <additionalOption>-inferrel</additionalOption>
+                        <additionalOption>-inferdep</additionalOption>
+                        <additionalOption>-quiet</additionalOption>
+                        <additionalOption>-hide java.*</additionalOption>
+                        <additionalOption>-collpackages java.util.*</additionalOption>
+                        <additionalOption>-qualify</additionalOption>
+                        <additionalOption>-postfixpackage</additionalOption>
+                        <additionalOption>-nodefontsize 9</additionalOption>
+                        <additionalOption>-nodefontpackagesize 7</additionalOption>
+                    </additionalOptions>
+                    <tags>
+                        <tag>
+                            <name>goal</name>
+                            <placement>a</placement>
+                            <head>Goal:</head>
+                        </tag>
+                        <tag>
+                            <name>requiresProject</name>
+                            <placement>a</placement>
+                            <head>Requires Project:</head>
+                        </tag>
+                        <tag>
+                            <name>readonly</name>
+                            <placement>a</placement>
+                            <head>Read only:</head>
+                        </tag>
+                        <tag>
+                            <name>required</name>
+                            <placement>a</placement>
+                            <head>Requires Parameter:</head>
+                        </tag>
+                        <tag>
+                            <name>parameter</name>
+                            <placement>a</placement>
+                            <head>Parameter:</head>
+                        </tag>
+                    </tags>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>3.0.5</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </reporting>
+</project>

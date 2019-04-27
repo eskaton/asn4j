@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.test.x680_30;
 
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
@@ -43,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 public class TestX680_30 {
 
     @Test
-    public void testTestSelectionSetType() {
+    public void testTestSelectionSetType() throws ASN1RuntimeException {
         TestSelectionSetType a = new TestSelectionSetType();
         a.setA(ASN1Integer.valueOf(4711));
         a.setB(ASN1VisibleString.fromString("test"));

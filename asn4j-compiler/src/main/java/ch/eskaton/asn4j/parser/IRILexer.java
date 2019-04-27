@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.IRIToken.Type;
+import ch.eskaton.asn4j.runtime.parsing.LexerInputStream;
 
 import java.io.IOException;
 

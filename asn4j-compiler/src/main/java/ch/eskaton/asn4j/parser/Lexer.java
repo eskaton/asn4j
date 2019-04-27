@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.Token.TokenType;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
+import ch.eskaton.asn4j.runtime.parsing.LexerInputStream;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;

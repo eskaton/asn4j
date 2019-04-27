@@ -27,22 +27,23 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class TypeAssignmentCompiler implements Compiler<TypeAssignmentNode> {
 
-    public Type compile(CompilerContext ctx, TypeAssignmentNode node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, TypeAssignmentNode node) throws CompilerException {
     	String typeName = node.getReference();
 
     	System.out.println("Compiling type " + typeName);
 
-    	Type typeDef = node.getType();
     	TypeCompiler compiler = ctx.getCompiler(Type.class);
-    	compiler.compile(ctx, typeName, typeDef);
-    	ctx.addType(node.getReference(), typeDef);
+    	CompiledType compiledType = compiler.compile(ctx, typeName, node.getType());
 
-    	return typeDef;
+    	ctx.addType(node.getReference(), compiledType);
+
+    	return compiledType;
     }
 
 }

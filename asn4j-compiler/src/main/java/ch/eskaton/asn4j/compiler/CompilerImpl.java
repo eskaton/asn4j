@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
@@ -40,11 +41,9 @@ import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -144,7 +143,7 @@ public class CompilerImpl {
         }
     }
 
-    private Type compileTypeAssignment(TypeAssignmentNode assignment) {
+    private CompiledType compileTypeAssignment(TypeAssignmentNode assignment) {
         return compilerContext.<TypeAssignmentNode, TypeAssignmentCompiler>getCompiler(TypeAssignmentNode.class).compile(compilerContext, assignment);
     }
 
@@ -212,7 +211,7 @@ public class CompilerImpl {
         return module;
     }
 
-    public Type compileType(String name) {
+    public CompiledType compileType(String name) {
         Optional<AssignmentNode> maybeTypeAssignment = assignments.stream().filter(
                 obj -> obj instanceof TypeAssignmentNode && name.equals(obj.getReference())).findFirst();
 

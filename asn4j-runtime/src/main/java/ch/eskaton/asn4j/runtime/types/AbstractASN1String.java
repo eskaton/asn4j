@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+
 import java.util.Objects;
 
 public class AbstractASN1String implements ASN1Type {
@@ -37,7 +39,7 @@ public class AbstractASN1String implements ASN1Type {
     	return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(String value) throws ASN1RuntimeException {
     	this.value = value;
     }
 

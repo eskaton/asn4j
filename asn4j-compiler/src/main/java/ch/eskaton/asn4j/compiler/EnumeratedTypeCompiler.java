@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.java.JavaConstructor;
 import ch.eskaton.asn4j.compiler.java.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.JavaVisibility;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
@@ -47,9 +48,9 @@ import java.util.Map.Entry;
 import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 
-public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
+public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, CompiledType> {
 
-    public void compile(CompilerContext ctx, String name, EnumeratedType node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, EnumeratedType node) throws CompilerException {
         JavaClass javaClass = ctx.createClass(name, node, true);
         List<String> names = new ArrayList<>();
         List<Integer> numbers = new ArrayList<>();
@@ -120,6 +121,8 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType> {
         javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
 
         ctx.finishClass();
+
+        return new CompiledType(node);
     }
 
     private void addEnumerationItems(CompilerContext ctx, String name, List<String> names, List<Integer> numbers,

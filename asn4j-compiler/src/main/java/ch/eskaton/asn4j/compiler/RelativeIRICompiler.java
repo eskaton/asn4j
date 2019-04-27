@@ -27,14 +27,17 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 
-public class RelativeIRICompiler implements NamedCompiler<RelativeIRI> {
+public class RelativeIRICompiler implements NamedCompiler<RelativeIRI, CompiledType> {
 
     @Override
-    public void compile(CompilerContext ctx, String name, RelativeIRI node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, RelativeIRI node) throws CompilerException {
         ctx.createClass(name, node, false);
         ctx.finishClass();
+
+        return new CompiledType(node);
     }
 
 }

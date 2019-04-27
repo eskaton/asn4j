@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -46,49 +46,47 @@ public class ASN1Boolean implements ASN1Type {
     }
 
     private ASN1Boolean(boolean value) {
-    	this.value = value;
+        this.value = value;
     }
 
     public Boolean getValue() {
-    	return value;
+        return value;
     }
 
     public void setValue(Boolean value) throws ConstraintViolatedException {
-    	if (!checkConstraint(value)) {
-    		throw new ConstraintViolatedException(String.format(
-    				"%b doesn't satisfy a constraint", value));
-    	}
-    	this.value = value;
+        if (!checkConstraint(value)) {
+            throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
+        }
+        this.value = value;
     }
 
-    protected boolean checkConstraint(Boolean value)
-    		throws ConstraintViolatedException {
-    	return true;
+    protected boolean checkConstraint(Boolean value) throws ConstraintViolatedException {
+        return true;
     }
 
     @Override
     public String toString() {
-    	return String.valueOf(value);
+        return String.valueOf(value);
     }
 
     @Override
     public int hashCode() {
-    	return Objects.hash(value);
+        return Objects.hash(value);
     }
 
     @Override
     public boolean equals(Object obj) {
-    	if (this == obj) {
+        if (this == obj) {
             return true;
         }
 
-    	if (obj == null || getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
 
-    	ASN1Boolean other = (ASN1Boolean) obj;
+        ASN1Boolean other = (ASN1Boolean) obj;
 
-    	return Objects.equals(value, other.value);
+        return Objects.equals(value, other.value);
     }
 
 }

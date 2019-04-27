@@ -25,36 +25,28 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
-import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.types.UTCTime;
+import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
-import java.util.Collection;
+public class UTCTimeCompiler extends BuiltinTypeCompiler<UTCTime> {
 
-public class RelativeOIDConstraintCompiler extends AbstractConstraintCompiler<RelativeOID> {
+    public CompiledType compile(CompilerContext ctx, String name, UsefulType node) {
+        JavaClass javaClass = ctx.createClass(name, node, false);
 
-    public RelativeOIDConstraintCompiler(ConstraintCompiler constraintCompiler, TypeResolver typeResolver) {
-        super(constraintCompiler, typeResolver);
-    }
+        ConstraintDefinition constraintDef = null;
 
-    @Override
-    protected Collection<RelativeOID> compileConstraint(ElementSet set) throws CompilerException {
-        return null;
-    }
+        if (node.hasConstraint()) {
+            constraintDef = ctx.compileConstraint(javaClass, name, node);
+        }
 
-    @Override
-    protected Collection<RelativeOID> calculateIntersection(Collection<?> op1, Collection<?> op2) throws CompilerException {
-        return null;
-    }
+        ctx.finishClass();
 
-    @Override
-    protected void addConstraint(JavaClass clazz, Collection<?> values) throws CompilerException {
-
+        return new CompiledType(node, constraintDef);
     }
 
 }
