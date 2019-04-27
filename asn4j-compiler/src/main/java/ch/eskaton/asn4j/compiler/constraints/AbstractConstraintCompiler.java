@@ -197,6 +197,10 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         return values.invert();
     }
 
+    protected T calculateExclude(T values1, T values2) throws CompilerException {
+        return values1.exclude(values2);
+    }
+
     protected abstract D createDefinition(T root, T extension);
 
     protected abstract T createValues();
@@ -206,8 +210,6 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
     protected T calculateIntersection(T values1, T values2) throws CompilerException {
         return values1.intersection(values2);
     }
-
-    protected abstract T calculateExclude(T values1, T values2);
 
     protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition) throws CompilerException;
 

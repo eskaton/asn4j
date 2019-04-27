@@ -127,20 +127,76 @@ public class IntegerConstraintValues extends ListConstraintValues<RangeNode, Int
         if (((IntegerValue) op1.getLower().getValue()).getValue().compareTo(
                 BigInteger.valueOf(Long.MIN_VALUE)) > 0) {
             result.getValues().add(new RangeNode(new EndpointNode(new IntegerValue(
-                    Long.MIN_VALUE), true), IntegerConstraintValues.decrement(op1.getLower())));
+                    Long.MIN_VALUE), true), decrement(op1.getLower())));
         }
 
         for (int i = 1; i < ranges.size(); i++) {
             op2 = ranges.get(i);
-            result.getValues().add(new RangeNode(IntegerConstraintValues
-                    .increment(op1.getUpper()), IntegerConstraintValues
-                    .decrement(op2.getLower())));
+            result.getValues().add(new RangeNode(increment(op1.getUpper()), decrement(op2.getLower())));
         }
 
         if (((IntegerValue) op2.getUpper().getValue()).getValue().compareTo(
                 BigInteger.valueOf(Long.MAX_VALUE)) < 0) {
-            result.getValues().add(new RangeNode(IntegerConstraintValues.increment(op2.getUpper()),
+            result.getValues().add(new RangeNode(increment(op2.getUpper()),
                     new EndpointNode(new IntegerValue(Long.MAX_VALUE), true)));
+        }
+
+        return result;
+    }
+
+    @Override
+    public IntegerConstraintValues exclude(IntegerConstraintValues values2) throws CompilerException {
+        IntegerConstraintValues result = new IntegerConstraintValues();
+        int excludeInd = 0;
+        int rangeInd = 0;
+        List<RangeNode> r1 = getValues();
+        List<RangeNode> r2 = values2.getValues();
+        RangeNode exclude = r2.get(excludeInd++);
+        RangeNode range = r1.get(rangeInd++);
+        long lower, upper;
+
+        while (true) {
+            if (compareCanonicalEndpoint(exclude.getLower(), range.getLower()) < 0) {
+                throw new CompilerException(((IntegerValue) exclude.getLower().getValue()).getValue()
+                        + " doesn't exist in parent type");
+            } else if (compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) > 0) {
+                result.getValues().add(range);
+                range = getRange(r1, rangeInd++);
+            } else if ((lower = compareCanonicalEndpoint(exclude.getLower(), range.getLower())) >= 0
+                    && compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) <= 0) {
+
+                if ((upper = compareCanonicalEndpoint(exclude.getUpper(), range.getUpper())) > 0) {
+                    throw new CompilerException(((IntegerValue) exclude.getUpper().getValue()).getValue()
+                            + " doesn't exist in parent type");
+                }
+
+                if (lower != 0) {
+                    result.getValues().add(new RangeNode(range.getLower(), decrement(exclude.getLower())));
+                }
+
+                if (upper != 0) {
+                    result.getValues().add(new RangeNode(increment(exclude.getUpper()), range.getUpper()));
+                }
+
+                exclude = getRange(r2, excludeInd++);
+                range = getRange(r1, rangeInd++);
+            } else {
+                throw new IllegalStateException();
+            }
+
+            if (range == null && exclude != null) {
+                throw new CompilerException(((IntegerValue) exclude.getLower().getValue()).getValue()
+                        + " doesn't exist in parent type");
+            }
+
+            if (exclude == null) {
+                while (range != null) {
+                    result.getValues().add(range);
+                    range = getRange(r1, rangeInd++);
+                }
+                break;
+            }
+
         }
 
         return result;
@@ -288,7 +344,7 @@ public class IntegerConstraintValues extends ListConstraintValues<RangeNode, Int
     private static class RangeNodeComparator implements Comparator<RangeNode> {
 
         public int compare(RangeNode r1, RangeNode r2) {
-            return IntegerConstraintValues.compareCanonicalRange(r1, r2);
+            return compareCanonicalRange(r1, r2);
         }
 
     }

@@ -102,65 +102,6 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
         }
     }
 
-    @Override
-    protected IntegerConstraintValues calculateExclude(IntegerConstraintValues values1,
-            IntegerConstraintValues values2) throws CompilerException {
-        IntegerConstraintValues result = new IntegerConstraintValues();
-        int excludeInd = 0;
-        int rangeInd = 0;
-        List<RangeNode> r1 = values1.getValues();
-        List<RangeNode> r2 = values2.getValues();
-        RangeNode exclude = r2.get(excludeInd++);
-        RangeNode range = r1.get(rangeInd++);
-        long lower, upper;
-
-        while (true) {
-            if (IntegerConstraintValues.compareCanonicalEndpoint(exclude.getLower(), range.getLower()) < 0) {
-                throw new CompilerException(((IntegerValue) exclude.getLower().getValue()).getValue()
-                        + " doesn't exist in parent type");
-            } else if (IntegerConstraintValues.compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) > 0) {
-                result.getValues().add(range);
-                range = IntegerConstraintValues.getRange(r1, rangeInd++);
-            } else if ((lower = IntegerConstraintValues.compareCanonicalEndpoint(exclude.getLower(), range.getLower())) >= 0
-                    && IntegerConstraintValues.compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) <= 0) {
-
-                if ((upper = IntegerConstraintValues.compareCanonicalEndpoint(exclude.getUpper(), range.getUpper())) > 0) {
-                    throw new CompilerException(((IntegerValue) exclude.getUpper().getValue()).getValue()
-                            + " doesn't exist in parent type");
-                }
-
-                if (lower != 0) {
-                    result.getValues().add(new RangeNode(range.getLower(), IntegerConstraintValues.decrement(exclude.getLower())));
-                }
-
-                if (upper != 0) {
-                    result.getValues().add(new RangeNode(IntegerConstraintValues.increment(exclude.getUpper()), range.getUpper()));
-                }
-
-                exclude = IntegerConstraintValues.getRange(r2, excludeInd++);
-                range = IntegerConstraintValues.getRange(r1, rangeInd++);
-            } else {
-                throw new IllegalStateException();
-            }
-
-            if (range == null && exclude != null) {
-                throw new CompilerException(((IntegerValue) exclude.getLower().getValue()).getValue()
-                        + " doesn't exist in parent type");
-            }
-
-            if (exclude == null) {
-                while (range != null) {
-                    result.getValues().add(range);
-                    range = IntegerConstraintValues.getRange(r1, rangeInd++);
-                }
-                break;
-            }
-
-        }
-
-        return result;
-    }
-
     private IntegerConstraintValues calculateContainedSubtype(Type type) throws CompilerException {
         IntegerConstraintValues values = new IntegerConstraintValues();
 
