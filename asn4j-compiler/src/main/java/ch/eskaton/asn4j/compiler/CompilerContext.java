@@ -117,7 +117,7 @@ import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class CompilerContext {
 
-    private HashMap<String, HashMap<String, Type>> definedTypes = new HashMap<>();
+    private HashMap<String, HashMap<String, CompiledType>> definedTypes = new HashMap<>();
 
     @SuppressWarnings("serial")
     private Map<Class<?>, Compiler<?>> compilers = new HashMap<Class<?>, Compiler<?>>() {
@@ -234,10 +234,9 @@ public class CompilerContext {
         this.outputDir = outputDir;
     }
 
-    public void addType(String typeName, Type typeDef) {
-        String moduleName = currentModule.peek().getModuleId().getModuleName();
-        HashMap<String, Type> moduleTypes = definedTypes.computeIfAbsent(moduleName, key -> new HashMap<>());
-        moduleTypes.put(typeName, typeDef);
+    public void addType(String typeName, CompiledType compiledType) {
+        HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
+        moduleTypes.put(typeName, compiledType);
     }
 
     @SuppressWarnings("unchecked")
@@ -432,8 +431,9 @@ public class CompilerContext {
     }
 
     private void compileType(Type type, String typeName, String name) {
-        this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
-        addType(name, type);
+        CompiledType compiledType = this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
+
+        addType(name, compiledType);
     }
 
     public void addReferencedType(String typeName) {
@@ -581,16 +581,15 @@ public class CompilerContext {
 
     public TagId getTagId(Type type) {
         if (type instanceof TypeReference) {
-            HashMap<String, Type> moduleTypes = getTypesOfCurrentModule();
+            HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
 
-            Type referencedType = moduleTypes.get(((TypeReference) type).getType());
+            CompiledType compiledType = moduleTypes.get(((TypeReference) type).getType());
 
-            if (referencedType == null) {
-                CompiledType compiledType = compiler.compileType(((TypeReference) type).getType());
-                // TODO: save compiledType
-                referencedType =  compiledType.getType();
+            if (compiledType == null) {
+                compiledType = compiler.compileType(((TypeReference) type).getType());
             }
 
+            Type referencedType = compiledType.getType();
             Tag tag = referencedType.getTag();
 
             if (tag != null) {
@@ -611,7 +610,7 @@ public class CompilerContext {
         }
     }
 
-    private HashMap<String, Type> getTypesOfCurrentModule() {
+    private HashMap<String, CompiledType> getTypesOfCurrentModule() {
         return definedTypes.computeIfAbsent(currentModule.peek().getModuleId().getModuleName(), key -> new HashMap<>());
     }
 
