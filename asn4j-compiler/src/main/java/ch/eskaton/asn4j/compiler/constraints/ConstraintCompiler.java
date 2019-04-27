@@ -32,17 +32,9 @@ import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
-import ch.eskaton.asn4j.parser.ast.types.Null;
-import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
-import ch.eskaton.asn4j.parser.ast.types.OctetString;
-import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
-import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
-import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.HashMap;
@@ -50,7 +42,7 @@ import java.util.Map;
 
 public class ConstraintCompiler {
 
-    private Map<Class<? extends Type>, AbstractConstraintCompiler<?>> compilers;
+    private Map<Class<? extends Type>, AbstractConstraintCompiler> compilers;
 
     private TypeResolver typeResolver;
 
@@ -58,19 +50,19 @@ public class ConstraintCompiler {
     public ConstraintCompiler(TypeResolver typeResolver) {
         this.typeResolver = typeResolver;
 
-        compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler<?>>() {
+        compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler>() {
             {
                 put(IntegerType.class, new IntegerConstraintCompiler(typeResolver));
                 put(BooleanType.class, new BooleanConstraintCompiler(typeResolver));
                 put(BitString.class, new BitStringConstraintCompiler(typeResolver));
-                put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver));
-                put(OctetString.class, new OctetStringConstraintCompiler(typeResolver));
-                put(Null.class, new NullConstraintCompiler(typeResolver));
-                put(SetOfType.class, new SetOfConstraintCompiler(typeResolver));
-                put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(typeResolver));
-                put(RelativeOID.class, new RelativeOIDConstraintCompiler(typeResolver));
-                put(IRI.class, new IRIConstraintCompiler(typeResolver));
-                put(RelativeIRI.class, new RelativeIRIConstraintCompiler(typeResolver));
+//                put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver));
+//                put(OctetString.class, new OctetStringConstraintCompiler(typeResolver));
+//                put(Null.class, new NullConstraintCompiler(typeResolver));
+//                put(SetOfType.class, new SetOfConstraintCompiler(typeResolver));
+//                put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(typeResolver));
+//                put(RelativeOID.class, new RelativeOIDConstraintCompiler(typeResolver));
+//                put(IRI.class, new IRIConstraintCompiler(typeResolver));
+//                put(RelativeIRI.class, new RelativeIRIConstraintCompiler(typeResolver));
             }
         };
     }
@@ -85,10 +77,11 @@ public class ConstraintCompiler {
         }
 
         if (!compilers.containsKey(base.getClass())) {
-            throw new CompilerException("Constraints for type %s not yet supported", base.getClass().getSimpleName());
+            //throw new CompilerException("Constraints for type %s not yet supported", base.getClass().getSimpleName());
+            return null;
         }
 
-        AbstractConstraintCompiler<?> compiler = compilers.get(base.getClass());
+        AbstractConstraintCompiler compiler = compilers.get(base.getClass());
 
         ConstraintDefinition constraintDef;
 
@@ -99,7 +92,7 @@ public class ConstraintCompiler {
         }
 
         if (constraintDef != null) {
-            if (constraintDef.isEmpty()) {
+            if (constraintDef.isRootEmpty()) {
                 throw new CompilerException("Constraints for type %s excludes all values", name);
             }
 

@@ -29,22 +29,18 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class IntegerConstraintDefinition extends AbstractConstraintDefinition<RangeNode, List<RangeNode>, IntegerConstraintDefinition> {
+public class IntegerConstraintDefinition extends AbstractConstraintDefinition<RangeNode, List<RangeNode>,
+        IntegerConstraintValues, IntegerConstraintDefinition> {
 
-    public IntegerConstraintDefinition(List<RangeNode> values) {
-        super(values);
-    }
-
-    public IntegerConstraintDefinition() {
-        super();
+    public IntegerConstraintDefinition(IntegerConstraintValues rootValues, IntegerConstraintValues extensionValues) {
+        super(rootValues, extensionValues);
     }
 
     @Override
-    List<RangeNode> createValues() {
-        return new ArrayList<>();
+    public IntegerConstraintValues createValues() {
+        return new IntegerConstraintValues();
     }
 
 }

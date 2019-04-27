@@ -29,28 +29,47 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import java.util.Collection;
 
-public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T extends ConstraintDefinition> implements ConstraintDefinition<V, C, T> {
+public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>,
+        D extends ConstraintDefinition<V, C, T, D>> implements ConstraintDefinition<V, C, T, D> {
 
-    protected C values;
+    protected T rootValues;
+
+    protected T extensionValues;
 
     public AbstractConstraintDefinition() {
-        this.values = createValues();
+        this.rootValues = createValues();
+        this.extensionValues = createValues();
     }
 
-    public AbstractConstraintDefinition(Collection<V> values) {
+    public AbstractConstraintDefinition(T rootValues, T extensionValues) {
         this();
 
-        this.values.addAll(values);
+        setRootValues(rootValues);
+        setExtensionValues(extensionValues);
     }
 
-    public C getValues() {
-        return values;
+    public T getRootValues() {
+        return rootValues;
     }
 
-    public void setValues(C values) {
-        this.values = values;
+    public void setRootValues(T rootValues) {
+        if (rootValues == null) {
+            this.rootValues = createValues();
+        } else {
+            this.rootValues = rootValues;
+        }
     }
 
-    abstract C createValues();
+    public T getExtensionValues() {
+        return extensionValues;
+    }
+
+    public void setExtensionValues(T extensionValues) {
+        if (extensionValues == null) {
+            this.extensionValues = createValues();
+        } else {
+            this.extensionValues = extensionValues;
+        }
+    }
 
 }

@@ -27,30 +27,26 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
+import java.util.HashSet;
+import java.util.Set;
 
-public class NullConstraintCompiler extends AbstractConstraintCompiler<ConstraintDefinition> {
+public abstract class SetConstraintValues<V, T extends SetConstraintValues<V, T>> implements ConstraintValues<V, Set<V>, T> {
 
-    public NullConstraintCompiler(TypeResolver typeResolver) {
-        super(typeResolver);
+    private Set<V> values;
+
+    public SetConstraintValues() {
+        this.values =  new HashSet<>();
+    }
+
+    public SetConstraintValues(Set<V> values) {
+        this();
+
+        this.values.addAll(values);
     }
 
     @Override
-    protected ConstraintDefinition compileConstraint(ElementSet set) throws CompilerException {
-        return null;
-    }
-
-    @Override
-    protected ConstraintDefinition calculateIntersection(ConstraintDefinition constraintDef1,
-            ConstraintDefinition constraintDef2) throws CompilerException {
-        return null;
-    }
-
-    @Override
-    protected void addConstraint(JavaClass javaClass, ConstraintDefinition constraintDef) throws CompilerException {
+    public Set<V> getValues() {
+        return values;
     }
 
 }

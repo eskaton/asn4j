@@ -35,7 +35,7 @@ public class SetSpecsNode extends AbstractNode {
 
     private ElementSet rootElements;
 
-    private ElementSet additionalElements;
+    private ElementSet extensionElements;
 
     private boolean extensionMarker;
 
@@ -52,20 +52,24 @@ public class SetSpecsNode extends AbstractNode {
     }
 
     public SetSpecsNode(Position position, ElementSet rootElements, boolean extensionMarker,
-            ElementSet additionalElements) {
+            ElementSet extensionElements) {
         super(position);
 
         this.rootElements = rootElements;
         this.extensionMarker = extensionMarker;
-        this.additionalElements = additionalElements;
+        this.extensionElements = extensionElements;
     }
 
     public ElementSet getRootElements() {
         return rootElements;
     }
 
-    public ElementSet getAdditionalElements() {
-        return additionalElements;
+    public ElementSet getExtensionElements() {
+        return extensionElements;
+    }
+
+    public boolean hasExtensionElements() {
+        return extensionElements != null;
     }
 
     public boolean hasExtensionMarker() {
@@ -74,16 +78,16 @@ public class SetSpecsNode extends AbstractNode {
 
     public ElementSetSpecsNode toElementSetSpecs() {
         if (rootElements != null) {
-            return new ElementSetSpecsNode(rootElements.getPosition(), rootElements, extensionMarker, additionalElements);
+            return new ElementSetSpecsNode(rootElements.getPosition(), rootElements, extensionMarker, extensionElements);
         }
 
         return null;
     }
 
     public ObjectSetSpecNode toObjectSetSpec() {
-        Position position = Position.of(rootElements, additionalElements);
+        Position position = Position.of(rootElements, extensionElements);
 
-        return new ObjectSetSpecNode(position, rootElements, extensionMarker, additionalElements);
+        return new ObjectSetSpecNode(position, rootElements, extensionMarker, extensionElements);
     }
 
     @Override
@@ -91,9 +95,9 @@ public class SetSpecsNode extends AbstractNode {
         return StringUtils.concat("SetSpecs[",
                 (rootElements != null ? String.valueOf(rootElements) : ""),
                 (extensionMarker ? (rootElements != null ? ", " : "") + "..."
-                        : ""), (additionalElements != null ? (extensionMarker
+                        : ""), (extensionElements != null ? (extensionMarker
                         || rootElements != null ? ", " : "")
-                        + String.valueOf(additionalElements) : ""), "]");
+                        + extensionElements : ""), "]");
     }
 
 }
