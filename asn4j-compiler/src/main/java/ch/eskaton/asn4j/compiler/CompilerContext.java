@@ -583,11 +583,13 @@ public class CompilerContext {
         if (type instanceof TypeReference) {
             HashMap<String, Type> moduleTypes = getTypesOfCurrentModule();
 
-            Type referencedType = moduleTypes.computeIfAbsent(((TypeReference) type).getType(), missingType -> {
-                CompiledType compiledType = compiler.compileType(missingType);
+            Type referencedType = moduleTypes.get(((TypeReference) type).getType());
+
+            if (referencedType == null) {
+                CompiledType compiledType = compiler.compileType(((TypeReference) type).getType());
                 // TODO: save compiledType
-                return compiledType.getType();
-            });
+                referencedType =  compiledType.getType();
+            }
 
             Tag tag = referencedType.getTag();
 
