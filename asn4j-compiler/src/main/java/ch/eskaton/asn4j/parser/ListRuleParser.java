@@ -42,20 +42,28 @@ public abstract class ListRuleParser<T> implements RuleParser<T> {
     }
 
     protected T parse(Parser.SequenceParser parser, ParserFunction<SequenceListAccessor, T> consumer) throws ParserException {
+        return parse(parser, consumer, null);
+    }
+
+    protected T parse(Parser.SequenceParser parser, ParserFunction<SequenceListAccessor, T> consumer, T dflt) throws ParserException {
         SequenceListAccessor A = new SequenceListAccessor(parser.parse());
 
         if (!A.matched()) {
-            return null;
+            return dflt;
         }
 
         return consumer.apply(A);
     }
 
     protected <T, U> T parse(Parser.RepetitionParser<U> parser, ParserFunction<RepetitionListAccessor, T> consumer) throws ParserException {
-        RepetitionListAccessor A = new RepetitionListAccessor<U>(parser.parse());
+        return parse(parser, consumer, null);
+    }
+
+    protected <T, U> T parse(Parser.RepetitionParser<U> parser, ParserFunction<RepetitionListAccessor, T> consumer, T dflt) throws ParserException {
+        RepetitionListAccessor A = new RepetitionListAccessor<>(parser.parse());
 
         if (!A.matched()) {
-            return null;
+            return dflt;
         }
 
         return consumer.apply(A);

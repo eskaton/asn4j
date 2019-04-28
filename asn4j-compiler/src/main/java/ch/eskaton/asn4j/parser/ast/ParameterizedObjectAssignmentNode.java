@@ -31,8 +31,7 @@ import ch.eskaton.asn4j.parser.Position;
 
 import java.util.List;
 
-public class ParameterizedObjectAssignmentNode
-        extends
+public class ParameterizedObjectAssignmentNode extends
         ParameterizedValueOrObjectAssignmentNode<ObjectClassReferenceNode, ObjectNode> {
 
     public ParameterizedObjectAssignmentNode(Position position, String reference, List<ParameterNode> parameters,
