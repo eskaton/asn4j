@@ -1,17 +1,20 @@
 language: java
 
 addons:
-    sonarcloud:
-        organization: eskaton-github
+   sonarcloud:
+      organization: eskaton-github
 
 before_install:
-    - |
-      echo "Cloning commons"
-      git clone --branch=master https://github.com/eskaton/commons.git eskaton/commons
-      cd eskaton/commons
-      mvn -B install
-      cd -
+   - |
+     git clone --branch=master https://github.com/eskaton/commons.git eskaton/commons
+     cd eskaton/commons
+     mvn -B install
+     cd -
 
 script:
-    - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
-    - mvn -e -B org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.login=$SONAR_TOKEN
+   - mvn -e -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.login=$SONAR_TOKEN -dsonar.projectKey=eskaton_asn4j
+
+cache:
+   directories:
+      - '$HOME/.m2/repository'
+      - '$HOME/.sonar/cache'
