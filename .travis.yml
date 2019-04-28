@@ -1,5 +1,11 @@
 language: java
 
+addons:
+  sonarcloud:
+    organization: "eskaton-github"
+    token:
+      secure: $SONAR_TOKEN
+
 before_install:
     - |
       echo "Cloning commons"
