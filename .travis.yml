@@ -1,5 +1,9 @@
 language: java
 
+addons:
+    sonarcloud:
+        organization: eskaton-github
+
 before_install:
     - |
       echo "Cloning commons"
@@ -7,3 +11,7 @@ before_install:
       cd eskaton/commons
       mvn -B install
       cd -
+
+script:
+    - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+    - mvn -e -B org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.login=$SONAR_TOKEN
