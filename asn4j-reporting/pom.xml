@@ -9,6 +9,10 @@
 
     <artifactId>asn4j-reporting</artifactId>
 
+    <properties>
+        <sonar.skip>true</sonar.skip>
+    </properties>
+    
     <dependencies>
         <dependency>
             <groupId>ch.eskaton</groupId>
