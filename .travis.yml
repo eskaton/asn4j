@@ -12,7 +12,7 @@ before_install:
      cd -
 
 script:
-   - mvn -e -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.login=$SONAR_TOKEN -dsonar.projectKey=eskaton_asn4j
+   - mvn -e -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=eskaton_asn4j
 
 cache:
    directories:
