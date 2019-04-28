@@ -88,10 +88,6 @@ public class ListAccessor<S> implements Accessor<List<S>> {
         return t1().getType();
     }
 
-    public TokenType $2() {
-        return t2().getType();
-    }
-
     public <T> T n(int i) {
         return (T) rule.get(i);
     }

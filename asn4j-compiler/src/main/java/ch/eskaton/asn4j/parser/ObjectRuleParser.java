@@ -47,22 +47,12 @@ public abstract class ObjectRuleParser<T> implements RuleParser<T> {
         return consumer.apply(A);
     }
 
-    protected <U> boolean match(RuleParser<U> parser) throws ParserException {
-        A = new ObjectAccessor(parser.parse());
-
-        return A.matched();
-    }
-
     protected boolean matched() {
         return A.matched();
     }
 
     protected Object p() {
         return A.p();
-    }
-
-    protected <T> T n() {
-        return (T) A.n();
     }
 
     protected Token t() {

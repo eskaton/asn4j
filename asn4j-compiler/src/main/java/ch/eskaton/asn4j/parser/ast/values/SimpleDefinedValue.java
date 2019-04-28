@@ -61,6 +61,12 @@ public class SimpleDefinedValue extends DefinedValue implements	ParameterizedNod
     	return parameters;
     }
 
+    public SimpleDefinedValue parameters(List<Node> parameters) {
+        setParameters(parameters);
+
+        return this;
+    }
+
     @Override
     public ObjectNode toObjectValue() {
     	ObjectReferenceNode ref = new ObjectReferenceNode(getPosition(), value);
