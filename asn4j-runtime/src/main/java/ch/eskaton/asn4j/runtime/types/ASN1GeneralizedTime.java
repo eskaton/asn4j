@@ -87,7 +87,11 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
         LocalDateTime localDateTime = LocalDateTime.of(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay(), dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond(), dateTime.getNanos());
 
         if (dateTime.hasOffset()) {
-            setTime(OffsetDateTime.of(localDateTime, ZoneOffset.of(dateTime.getOffset())));
+            if (dateTime.isZulu()) {
+                setTime(OffsetDateTime.of(localDateTime, ZoneOffset.UTC));
+            } else {
+                setTime(OffsetDateTime.of(localDateTime, ZoneOffset.of(dateTime.getOffset())));
+            }
         } else {
             setTime(localDateTime);
         }
