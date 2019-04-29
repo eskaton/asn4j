@@ -41,6 +41,10 @@ public interface ConstraintDefinition<V, C extends  Collection<V>, T extends Con
 
     void setExtensionValues(T values);
 
+    void setExtensible(boolean extensible);
+
+    boolean isExtensible();
+
     default D intersection(D other) {
         setRootValues(getRootValues().intersection(other.getRootValues()));
 

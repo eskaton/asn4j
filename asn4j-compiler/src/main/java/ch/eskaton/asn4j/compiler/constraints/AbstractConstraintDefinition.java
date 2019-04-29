@@ -36,6 +36,8 @@ public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T
 
     protected T extensionValues;
 
+    boolean extensible;
+
     public AbstractConstraintDefinition() {
         this.rootValues = createValues();
         this.extensionValues = createValues();
@@ -70,6 +72,16 @@ public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T
         } else {
             this.extensionValues = extensionValues;
         }
+    }
+
+    @Override
+    public void setExtensible(boolean extensible) {
+        this.extensible = extensible;
+    }
+
+    @Override
+    public boolean isExtensible() {
+        return extensible;
     }
 
 }
