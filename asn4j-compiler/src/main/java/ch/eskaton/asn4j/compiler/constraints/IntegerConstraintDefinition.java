@@ -34,6 +34,10 @@ import java.util.List;
 public class IntegerConstraintDefinition extends AbstractConstraintDefinition<RangeNode, List<RangeNode>,
         IntegerConstraintValues, IntegerConstraintDefinition> {
 
+    public IntegerConstraintDefinition() {
+        super();
+    }
+
     public IntegerConstraintDefinition(IntegerConstraintValues rootValues, IntegerConstraintValues extensionValues) {
         super(rootValues, extensionValues);
     }
@@ -41,6 +45,11 @@ public class IntegerConstraintDefinition extends AbstractConstraintDefinition<Ra
     @Override
     public IntegerConstraintValues createValues() {
         return new IntegerConstraintValues();
+    }
+
+    @Override
+    public IntegerConstraintDefinition createDefinition() {
+        return new IntegerConstraintDefinition();
     }
 
 }

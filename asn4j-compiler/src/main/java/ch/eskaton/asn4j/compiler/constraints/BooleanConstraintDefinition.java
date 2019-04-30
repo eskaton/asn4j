@@ -31,6 +31,10 @@ import java.util.Set;
 
 public class BooleanConstraintDefinition extends AbstractConstraintDefinition<Boolean, Set<Boolean>, BooleanConstraintValues, BooleanConstraintDefinition> {
 
+    public BooleanConstraintDefinition() {
+        super();
+    }
+
     public BooleanConstraintDefinition(BooleanConstraintValues rootValues, BooleanConstraintValues extensionValues) {
        super(rootValues, extensionValues);
     }
@@ -38,6 +42,11 @@ public class BooleanConstraintDefinition extends AbstractConstraintDefinition<Bo
     @Override
     public BooleanConstraintValues createValues() {
         return new BooleanConstraintValues();
+    }
+
+    @Override
+    public BooleanConstraintDefinition createDefinition() {
+        return new BooleanConstraintDefinition();
     }
 
 }

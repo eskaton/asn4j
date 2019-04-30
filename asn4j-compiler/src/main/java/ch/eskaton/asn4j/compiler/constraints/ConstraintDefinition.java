@@ -29,41 +29,64 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import java.util.Collection;
 
-public interface ConstraintDefinition<V, C extends  Collection<V>, T extends ConstraintValues<V, C, T>, D extends ConstraintDefinition<V, C, T, D>> {
+public interface ConstraintDefinition<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>, D extends ConstraintDefinition<V, C, T, D>> {
 
     T createValues();
+
+    D createDefinition();
 
     T getRootValues();
 
     void setRootValues(T values);
 
+    D rootValues(T values);
+
     T getExtensionValues();
 
     void setExtensionValues(T values);
+
+    D extensionValues(T values);
 
     void setExtensible(boolean extensible);
 
     boolean isExtensible();
 
-    default D intersection(D other) {
-        setRootValues(getRootValues().intersection(other.getRootValues()));
+    D extensible(boolean extensible);
 
-        if (isExtensionEmpty()) {
-            setExtensionValues(other.getExtensionValues());
+    default D intersection(D other) {
+        T roots = getRootValues().intersection(other.getRootValues());
+        T extensions = null;
+        boolean extensible = false;
+
+        if (!isExtensionEmpty() && !other.isExtensionEmpty()) {
+            extensions = getRootValues().union(getExtensionValues())
+                    .intersection(other.getRootValues().union(other.getExtensionValues()))
+                    .exclude(roots);
+            extensible = true;
+        } else if (isExtensionEmpty()) {
+            extensions = getRootValues().intersection(other.getExtensionValues());
+            extensible = true;
         } else if (other.isExtensionEmpty()) {
-            // ignore
-        } else {
-            setExtensionValues(getExtensionValues().intersection(other.getExtensionValues()));
+            extensions = other.getRootValues().intersection(getExtensionValues());
+            extensible = true;
         }
 
-        return (D) this;
+        return createDefinition().rootValues(roots).extensionValues(extensions).extensible(extensible);
     }
 
     default D union(D other) {
-        setRootValues(getRootValues().union(other.getRootValues()));
-        setExtensionValues(getExtensionValues().union(other.getExtensionValues()));
+        T roots = getRootValues().union(other.getRootValues());
+        T extensions = getExtensionValues().union(other.getExtensionValues());
+        boolean extensible = false;
 
-        return (D) this;
+        if (isExtensionEmpty() || other.isExtensionEmpty()) {
+            extensible = true;
+        } else if (!isExtensionEmpty() && !other.isExtensionEmpty()) {
+            extensions = roots.union(extensions).exclude(roots);
+            extensible = true;
+        }
+
+        return createDefinition().rootValues(roots).extensionValues(extensions).extensible(extensible);
     }
 
     default boolean isRootEmpty() {
