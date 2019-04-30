@@ -27,47 +27,31 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.HashSet;
-import java.util.Objects;
+import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+
 import java.util.Set;
+import java.util.stream.Collectors;
 
-public abstract class SetConstraintValues<V, T extends SetConstraintValues<V, T>> implements ConstraintValues<V, Set<V>, T> {
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+import static java.util.Arrays.asList;
 
-    private Set<V> values;
+public class BitStrintTestUtils {
 
-    public SetConstraintValues() {
-        this.values =  new HashSet<>();
+    public static BinaryStringValue toBString(String value) {
+        return new BinaryStringValue(NO_POSITION, value);
     }
 
-    public SetConstraintValues(Set<V> values) {
-        this();
-
-        this.values.addAll(values);
+    public static BitStringValue toBitString(String value) {
+        return toBString(value).toBitString();
     }
 
-    @Override
-    public Set<V> getValues() {
-        return values;
+    public static Set<BitStringValue> toBitStringSet(String... values) {
+        return asList(values).stream().map(BitStrintTestUtils::toBitString).collect(Collectors.toSet());
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        SetConstraintValues<?, ?> that = (SetConstraintValues<?, ?>) o;
-
-        return Objects.equals(values, that.values);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(values);
+    public static BitStringConstraintValues toBitStringValues(String... values) {
+        return new BitStringConstraintValues(toBitStringSet(values));
     }
 
 }

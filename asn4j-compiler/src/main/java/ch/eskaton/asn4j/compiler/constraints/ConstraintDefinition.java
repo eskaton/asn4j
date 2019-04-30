@@ -79,10 +79,10 @@ public interface ConstraintDefinition<V, C extends Collection<V>, T extends Cons
         T extensions = getExtensionValues().union(other.getExtensionValues());
         boolean extensible = false;
 
-        if (isExtensionEmpty() || other.isExtensionEmpty()) {
-            extensible = true;
-        } else if (!isExtensionEmpty() && !other.isExtensionEmpty()) {
+        if (!isExtensionEmpty() && !other.isExtensionEmpty()) {
             extensions = roots.union(extensions).exclude(roots);
+            extensible = true;
+        } else if (!isExtensionEmpty() || !other.isExtensionEmpty()) {
             extensible = true;
         }
 

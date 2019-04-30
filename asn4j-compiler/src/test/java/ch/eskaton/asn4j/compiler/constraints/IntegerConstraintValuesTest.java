@@ -36,6 +36,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ch.eskaton.asn4j.compiler.constraints.IntegerTestUtils.createRange;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -161,11 +162,6 @@ public class IntegerConstraintValuesTest {
 
     public List<RangeNode> invokeCanonicalizeRanges(List<RangeNode> ranges) {
         return IntegerConstraintValues.canonicalizeRanges(new IntegerConstraintValues(ranges)).getValues();
-    }
-
-    private RangeNode createRange(Long l1, Long l2) {
-        return new RangeNode(new EndpointNode(new IntegerValue(l1), true),
-                new EndpointNode(new IntegerValue(l2), true));
     }
 
 }
