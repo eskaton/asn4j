@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class BitStringConstraintValues extends SetConstraintValues<BitStringValue, BitStringConstraintValues> {
@@ -58,43 +59,73 @@ public class BitStringConstraintValues extends SetConstraintValues<BitStringValu
     }
 
     public BitStringConstraintValues intersection(BitStringConstraintValues values) {
+        BitStringConstraintValues copy;
+
         if (inverted && values.isInverted()) {
-            getValues().addAll(values.getValues());
+            copy = copy();
+            copy.getValues().addAll(values.getValues());
         } else if (!inverted && !values.isInverted()) {
-            getValues().retainAll(values.getValues());
+            copy = copy();
+            copy.getValues().retainAll(values.getValues());
         } else if (inverted) {
-            values.getValues().removeAll(getValues());
-            return values;
+            copy = values.copy();
+            copy.getValues().removeAll(getValues());
         } else {
-            getValues().removeAll(values.getValues());
+            copy = copy();
+            copy.getValues().removeAll(values.getValues());
         }
 
-        return this;
+        return copy;
     }
 
     public BitStringConstraintValues union(BitStringConstraintValues values) {
+        BitStringConstraintValues copy = copy();
+
         if (inverted && values.isInverted()) {
-            getValues().retainAll(values.getValues());
+            copy.getValues().retainAll(values.getValues());
         } else if (!inverted && !values.isInverted()) {
-            getValues().addAll(values.getValues());
+            copy.getValues().addAll(values.getValues());
         } else if (inverted) {
-            getValues().removeAll(values.getValues());
+            copy.getValues().removeAll(values.getValues());
         } else {
-            values.getValues().removeAll(getValues());
-            return values;
+            copy.getValues().removeAll(getValues());
         }
 
-        return this;
+        return copy;
     }
 
     @Override
     public BitStringConstraintValues invert() {
-        return inverted(true);
+        return copy().inverted(true);
     }
 
     @Override
     public BitStringConstraintValues copy() {
         return new BitStringConstraintValues(getValues());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(other)) {
+            return false;
+        }
+
+        BitStringConstraintValues that = (BitStringConstraintValues) other;
+
+        return inverted == that.inverted;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), inverted);
     }
 
 }

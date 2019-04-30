@@ -32,11 +32,11 @@ import java.util.Collection;
 public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>,
         D extends ConstraintDefinition<V, C, T, D>> implements ConstraintDefinition<V, C, T, D> {
 
-    protected T rootValues;
+    private T rootValues;
 
-    protected T extensionValues;
+    private T extensionValues;
 
-    boolean extensible;
+    private boolean extensible;
 
     public AbstractConstraintDefinition() {
         this.rootValues = createValues();
