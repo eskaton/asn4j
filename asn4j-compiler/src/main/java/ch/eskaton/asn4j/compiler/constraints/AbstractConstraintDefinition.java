@@ -50,10 +50,12 @@ public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T
         setExtensionValues(extensionValues);
     }
 
+    @Override
     public T getRootValues() {
         return rootValues;
     }
 
+    @Override
     public void setRootValues(T rootValues) {
         if (rootValues == null) {
             this.rootValues = createValues();
@@ -62,16 +64,32 @@ public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T
         }
     }
 
+    @Override
+    public D rootValues(T values) {
+        setRootValues(values);
+
+        return (D) this;
+    }
+
+    @Override
     public T getExtensionValues() {
         return extensionValues;
     }
 
+    @Override
     public void setExtensionValues(T extensionValues) {
         if (extensionValues == null) {
             this.extensionValues = createValues();
         } else {
             this.extensionValues = extensionValues;
         }
+    }
+
+    @Override
+    public D extensionValues(T values) {
+        setExtensionValues(values);
+
+        return (D) this;
     }
 
     @Override
@@ -82,6 +100,13 @@ public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T
     @Override
     public boolean isExtensible() {
         return extensible;
+    }
+
+    @Override
+    public D extensible(boolean extensible) {
+        setExtensible(extensible);
+
+        return (D) this;
     }
 
 }

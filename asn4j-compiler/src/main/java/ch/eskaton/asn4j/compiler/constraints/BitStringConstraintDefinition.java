@@ -34,6 +34,10 @@ import java.util.Set;
 public class BitStringConstraintDefinition extends AbstractConstraintDefinition<BitStringValue, Set<BitStringValue>,
         BitStringConstraintValues, BitStringConstraintDefinition> {
 
+    public BitStringConstraintDefinition() {
+        super();
+    }
+
     public BitStringConstraintDefinition(BitStringConstraintValues rootValues,
             BitStringConstraintValues extensionValues) {
         super(rootValues, extensionValues);
@@ -42,6 +46,11 @@ public class BitStringConstraintDefinition extends AbstractConstraintDefinition<
     @Override
     public BitStringConstraintValues createValues() {
         return new BitStringConstraintValues();
+    }
+
+    @Override
+    public BitStringConstraintDefinition createDefinition() {
+        return new BitStringConstraintDefinition();
     }
 
 }
