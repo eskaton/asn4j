@@ -33,13 +33,9 @@ import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class BitStringDefaultCompiler implements DefaultCompiler {
 
@@ -51,19 +47,7 @@ public class BitStringDefaultCompiler implements DefaultCompiler {
         if (value instanceof EmptyValue) {
             bytes = new byte[0];
         } else {
-            BitStringValue bitStringValue = null;
-
-            if (value instanceof AbstractBaseXStringValue) {
-                bitStringValue = ((AbstractBaseXStringValue) value).toBitString();
-            } else {
-                if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-                    bitStringValue = ctx.resolveValue(BitStringValue.class,
-                            resolveAmbiguousValue(value, SimpleDefinedValue.class));
-                } else if (resolveAmbiguousValue(value, BitStringValue.class) != null) {
-                    bitStringValue = ctx.resolveValue(BitStringValue.class, type,
-                            resolveAmbiguousValue(value, BitStringValue.class));
-                }
-            }
+            BitStringValue bitStringValue = ctx.resolveGenericValue(BitStringValue.class, type, value);
 
             bytes = bitStringValue.getByteValue();
             unusedBits = bitStringValue.getUnusedBits();

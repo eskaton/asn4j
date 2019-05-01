@@ -33,9 +33,15 @@ import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
 
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+
 public class BitString extends AbstractType {
 
     private List<NamedBitNode> namedBits;
+
+    public BitString() {
+        super(NO_POSITION);
+    }
 
     public BitString(Position position) {
         super(position);

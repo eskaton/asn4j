@@ -1,0 +1,10 @@
+X680-51-2 DEFINITIONS ::=
+BEGIN
+
+bitString BIT STRING ::= '100'B
+
+BitString1 ::= BIT STRING (ALL EXCEPT bitString)
+BitString2 ::= BIT STRING (('000'B | '001'B | '010'B | '011'B | bitString | '101'B | '110'B | '111'B) EXCEPT '010'B)
+BitString3 ::= BIT STRING ((('000'B | '001'B | '010'B) ^ ('000'B | '010'B)) EXCEPT '010'B)
+
+END

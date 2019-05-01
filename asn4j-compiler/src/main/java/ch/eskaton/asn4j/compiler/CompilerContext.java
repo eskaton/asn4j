@@ -198,19 +198,9 @@ public class CompilerContext {
         }
     };
 
-    private TypeResolver typeResolver = new TypeResolver() {
-        public TypeAssignmentNode getType(TypeReference type) {
-            return CompilerContext.this.getTypeName(type);
-        }
+    private ConstraintCompiler constraintCompiler = new ConstraintCompiler(this);
 
-        public Type getBase(TypeReference type) {
-            return CompilerContext.this.getBase(type);
-        }
-    };
-
-    private ConstraintCompiler constraintCompiler = new ConstraintCompiler(typeResolver);
-
-    private DefaultsCompiler defaultsCompiler = new DefaultsCompiler(this, typeResolver);
+    private DefaultsCompiler defaultsCompiler = new DefaultsCompiler(this);
 
     private Stack<JavaClass> currentClass = new Stack<>();
 
@@ -309,7 +299,7 @@ public class CompilerContext {
         currentModule.push(getModule());
     }
 
-    public TypeAssignmentNode getTypeName(TypeReference type) {
+    public TypeAssignmentNode getTypeAssignment(TypeReference type) {
         // TODO: what to do if the type isn't known in the current module
         return (TypeAssignmentNode) getModule().getBody().getAssignments(type.getType());
     }
@@ -484,6 +474,10 @@ public class CompilerContext {
 
     public <T> T resolveValue(Class<T> valueClass, String ref) {
         return getValueResolver(valueClass).resolve(ref);
+    }
+
+    public <T> T resolveGenericValue(Class<T> valueClass, Type type, Value value) {
+        return getValueResolver(valueClass).resolveGeneric(type, value);
     }
 
     private <T> ValueResolver<T> getValueResolver(Class<T> valueClass) {

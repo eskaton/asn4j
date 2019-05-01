@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public interface ValueResolver<V> {
 
@@ -38,5 +39,7 @@ public interface ValueResolver<V> {
     V resolve(String ref) throws CompilerException;
 
     V resolve(Type type, V value) throws CompilerException;
+
+    V resolveGeneric(Type type, Value value) throws CompilerException;
 
 }

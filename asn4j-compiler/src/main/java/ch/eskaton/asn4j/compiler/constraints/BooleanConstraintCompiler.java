@@ -27,8 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -48,12 +48,11 @@ import java.util.Set;
 
 import static ch.eskaton.asn4j.compiler.java.JavaType.BOOLEAN;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
-import static ch.eskaton.commons.utils.CollectionUtils.asHashSet;
 
 public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolean, Set<Boolean>, BooleanConstraintValues, BooleanConstraintDefinition> {
 
-    public BooleanConstraintCompiler(TypeResolver typeResolver) {
-        super(typeResolver);
+    public BooleanConstraintCompiler(CompilerContext ctx) {
+        super(ctx);
     }
 
     @Override
@@ -66,9 +65,9 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolea
         return new BooleanConstraintValues();
     }
 
-    protected BooleanConstraintValues calculateElements(Elements elements) throws CompilerException {
+    protected BooleanConstraintValues calculateElements(Type base, Elements elements) throws CompilerException {
         if (elements instanceof ElementSet) {
-            return compileConstraint((ElementSet) elements);
+            return compileConstraint(base, (ElementSet) elements);
         } else {
             if (elements instanceof SingleValueConstraint) {
                 Value value = ((SingleValueConstraint) elements).getValue();
@@ -93,7 +92,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolea
         if (type instanceof BooleanType) {
             return BooleanConstraintValues.ALL.copy();
         } else if (type instanceof TypeReference) {
-            return compileConstraints(type, typeResolver.getBase((TypeReference) type)).getRootValues();
+            return compileConstraints(type, ctx.getBase((TypeReference) type)).getRootValues();
         } else {
             throw new CompilerException("Invalid type %s in constraint for BOOLEAN type", type);
         }
