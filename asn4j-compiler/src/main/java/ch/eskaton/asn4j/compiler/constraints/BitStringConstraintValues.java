@@ -59,35 +59,27 @@ public class BitStringConstraintValues extends SetConstraintValues<BitStringValu
     }
 
     public BitStringConstraintValues intersection(BitStringConstraintValues values) {
-        BitStringConstraintValues copy;
-
-        if (inverted && values.isInverted()) {
-            copy = copy();
-            copy.getValues().addAll(values.getValues());
-        } else if (!inverted && !values.isInverted()) {
-            copy = copy();
-            copy.getValues().retainAll(values.getValues());
-        } else if (inverted) {
-            copy = values.copy();
-            copy.getValues().removeAll(getValues());
-        } else {
-            copy = copy();
-            copy.getValues().removeAll(values.getValues());
-        }
-
-        return copy;
+        return combineSets(values, !inverted, !values.isInverted());
     }
 
     public BitStringConstraintValues union(BitStringConstraintValues values) {
-        BitStringConstraintValues copy = copy();
+        return combineSets(values, inverted, values.isInverted());
+    }
 
-        if (inverted && values.isInverted()) {
+    private BitStringConstraintValues combineSets(BitStringConstraintValues values, boolean inverted, boolean valuesInverted) {
+        BitStringConstraintValues copy;
+
+        if (inverted && valuesInverted) {
+            copy = copy();
             copy.getValues().retainAll(values.getValues());
-        } else if (!inverted && !values.isInverted()) {
+        } else if (!inverted && !valuesInverted) {
+            copy = copy();
             copy.getValues().addAll(values.getValues());
         } else if (inverted) {
+            copy = copy();
             copy.getValues().removeAll(values.getValues());
         } else {
+            copy = values.copy();
             copy.getValues().removeAll(getValues());
         }
 
@@ -96,12 +88,12 @@ public class BitStringConstraintValues extends SetConstraintValues<BitStringValu
 
     @Override
     public BitStringConstraintValues invert() {
-        return copy().inverted(true);
+        return copy().inverted(!isInverted());
     }
 
     @Override
     public BitStringConstraintValues copy() {
-        return new BitStringConstraintValues(getValues());
+        return new BitStringConstraintValues(getValues()).inverted(isInverted());
     }
 
     @Override
