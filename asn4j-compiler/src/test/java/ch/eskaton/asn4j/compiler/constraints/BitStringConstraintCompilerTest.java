@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.constraints.BitStrintTestUtils.toBString;
-import static ch.eskaton.asn4j.compiler.constraints.BitStrintTestUtils.toBitString;
-import static ch.eskaton.asn4j.compiler.constraints.BitStrintTestUtils.toBitStringSet;
+import static ch.eskaton.asn4j.compiler.constraints.BitStringTestUtils.toBString;
+import static ch.eskaton.asn4j.compiler.constraints.BitStringTestUtils.toBitString;
+import static ch.eskaton.asn4j.compiler.constraints.BitStringTestUtils.toBitStringSet;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static ch.eskaton.commons.utils.CollectionUtils.asHashSet;
 import static java.util.Arrays.asList;
@@ -99,7 +99,7 @@ public class BitStringConstraintCompilerTest {
 
         for (List<String> value : values) {
             elements.add(new ElementSet(NO_POSITION, ElementSet.OpType.Union, value.stream()
-                    .map(BitStrintTestUtils::toBString).map(
+                    .map(BitStringTestUtils::toBString).map(
                             v -> new SingleValueConstraint(NO_POSITION, v)).collect(Collectors.toList())));
         }
 

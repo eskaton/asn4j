@@ -29,8 +29,8 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import org.junit.Test;
 
-import static ch.eskaton.asn4j.compiler.constraints.BitStrintTestUtils.toBitStringSet;
-import static ch.eskaton.asn4j.compiler.constraints.BitStrintTestUtils.toBitStringValues;
+import static ch.eskaton.asn4j.compiler.constraints.BitStringTestUtils.toBitStringSet;
+import static ch.eskaton.asn4j.compiler.constraints.BitStringTestUtils.toBitStringValues;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -105,6 +105,57 @@ public class BitStringConstraintDefinitionTest {
         assertTrue(union.isExtensible());
         assertEquals(toBitStringValues("1000", "1100", "1110"), union.getRootValues());
         assertEquals(toBitStringValues("0000"), union.getExtensionValues());
+    }
+
+    @Test
+    public void testIntersectionOnlyRoots() {
+        BitStringConstraintDefinition a = new BitStringConstraintDefinition()
+                .rootValues(toBitStringValues("1000", "1100"))
+                .extensible(false);
+        BitStringConstraintDefinition b = new BitStringConstraintDefinition()
+                .rootValues(toBitStringValues("1100", "1110"))
+                .extensible(false);
+
+        BitStringConstraintDefinition intersection = a.intersection(b);
+
+        assertTrue(intersection.getExtensionValues().isEmpty());
+        assertEquals(new BitStringConstraintValues(toBitStringSet("1100")),
+                intersection.getRootValues());
+    }
+
+    @Test
+    public void testIntersectionOneExtension() {
+        BitStringConstraintDefinition a = new BitStringConstraintDefinition()
+                .rootValues(toBitStringValues("1000", "1100"))
+                .extensionValues(toBitStringValues("0000", "1111"))
+                .extensible(false);
+        BitStringConstraintDefinition b = new BitStringConstraintDefinition()
+                .rootValues(toBitStringValues("1100", "1111"))
+                .extensible(false);
+
+        BitStringConstraintDefinition intersection = a.intersection(b);
+
+        assertTrue(intersection.isExtensible());
+        assertEquals(toBitStringValues("1100"), intersection.getRootValues());
+        assertEquals(toBitStringValues("1111"), intersection.getExtensionValues());
+    }
+
+    @Test
+    public void testIntersectionTwoExtension() {
+        BitStringConstraintDefinition a = new BitStringConstraintDefinition()
+                .rootValues(toBitStringValues("1000", "1100"))
+                .extensionValues(toBitStringValues("0000", "1111"))
+                .extensible(false);
+        BitStringConstraintDefinition b = new BitStringConstraintDefinition()
+                .rootValues(toBitStringValues("1100", "1110"))
+                .extensionValues(toBitStringValues("1000", "1111"))
+                .extensible(false);
+
+        BitStringConstraintDefinition intersection = a.intersection(b);
+
+        assertTrue(intersection.isExtensible());
+        assertEquals(toBitStringValues("1100"), intersection.getRootValues());
+        assertEquals(toBitStringValues("1000", "1111"), intersection.getExtensionValues());
     }
 
 }

@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static java.util.Arrays.asList;
 
-public class BitStrintTestUtils {
+public class BitStringTestUtils {
 
     public static BinaryStringValue toBString(String value) {
         return new BinaryStringValue(NO_POSITION, value);
@@ -47,7 +47,7 @@ public class BitStrintTestUtils {
     }
 
     public static Set<BitStringValue> toBitStringSet(String... values) {
-        return asList(values).stream().map(BitStrintTestUtils::toBitString).collect(Collectors.toSet());
+        return asList(values).stream().map(BitStringTestUtils::toBitString).collect(Collectors.toSet());
     }
 
     public static BitStringConstraintValues toBitStringValues(String... values) {
