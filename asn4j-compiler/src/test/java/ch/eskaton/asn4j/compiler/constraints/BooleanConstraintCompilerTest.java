@@ -80,16 +80,16 @@ public class BooleanConstraintCompilerTest {
         assertEquals(emptySet(), invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet(false, true)));
     }
 
-    private Set<Boolean> invokeCalculateExclude(BooleanConstraintCompiler compiler, Set<Boolean> a, Set<Boolean> b) {
-        return compiler.calculateExclude(new BooleanConstraintValues(a), new BooleanConstraintValues(b)).getValues();
-    }
-
     private Set<Boolean> invokeCalculateUnion(BooleanConstraintCompiler compiler, boolean... values) {
         return compiler.calculateUnion(new BooleanType(), toElements(values)).getValues();
     }
 
     private Set<Boolean> invokeCalculateIntersection(BooleanConstraintCompiler compiler, boolean... values) {
         return compiler.calculateIntersection(new BooleanType(), toElements(values)).getValues();
+    }
+
+    private Set<Boolean> invokeCalculateExclude(BooleanConstraintCompiler compiler, Set<Boolean> a, Set<Boolean> b) {
+        return compiler.calculateExclude(new BooleanConstraintValues(a), new BooleanConstraintValues(b)).getValues();
     }
 
     private List<Elements> toElements(boolean[] values) {

@@ -65,7 +65,7 @@ public class ASN1BitString implements ASN1Type {
         if (!checkConstraint(value, unusedBits)) {
             throw new ConstraintViolatedException(String.format("'%s'B (%d unused bits) doesn't satisfy a constraint",
                     StreamsUtils.toIntStream(value)
-                            .mapToObj(b -> Integer.toBinaryString((b & 0xFF) + 0x100).substring(1))
+                            .mapToObj(b -> Integer.toBinaryString((b & 0xFF) + 0x100).substring(1 + unusedBits))
                             .collect(Collectors.joining()), unusedBits));
         }
 

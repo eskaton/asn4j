@@ -50,6 +50,10 @@ public class BitStringTestUtils {
         return asList(values).stream().map(BitStringTestUtils::toBitString).collect(Collectors.toSet());
     }
 
+    public static Set<BitStringValue> toBitStringSet(Set<String> values) {
+        return values.stream().map(BitStringTestUtils::toBitString).collect(Collectors.toSet());
+    }
+
     public static BitStringConstraintValues toBitStringValues(String... values) {
         return new BitStringConstraintValues(toBitStringSet(values));
     }

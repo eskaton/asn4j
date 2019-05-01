@@ -66,44 +66,34 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
     }
 
     @Override
-    protected BitStringConstraintValues calculateExclude(BitStringConstraintValues values1,
-            BitStringConstraintValues values2) {
-        for (BitStringValue value : values2.getValues()) {
-            if (values1.getValues().contains(value)) {
-                values1.getValues().remove(value);
-            } else {
-                throw new CompilerException(value + " doesn't exist in parent type");
-            }
-        }
-
-        return values1;
-    }
-
-    @Override
     protected void addConstraint(JavaClass javaClass, ConstraintDefinition definition) throws CompilerException {
-        BitStringConstraintValues rootValues = ((BitStringConstraintDefinition) definition).getRootValues();
-        BitStringConstraintValues extensionValues = ((BitStringConstraintDefinition) definition).getExtensionValues();
-        BitStringConstraintValues union = rootValues.union(extensionValues);
-        Set<BitStringValue> values = union.getValues();
-        boolean inverted = union.isInverted();
-
-        javaClass.addImport(Arrays.class);
+        BitStringConstraintDefinition bitStringConstraintDefinition = (BitStringConstraintDefinition) definition;
 
         JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
                 .returnType(boolean.class).name("checkConstraint").parameter(BYTE_ARRAY, "value")
                 .parameter(INT, "unusedBits")
                 .exception(ConstraintViolatedException.class).body();
 
-        if (!values.isEmpty()) {
-            builder.append("if (" + values.stream().map(value ->
-                    "Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", value) && " +
-                            value.getUnusedBits() + " == unusedBits").collect(Collectors.joining(" || "))
-                    + ") {");
-            builder.append("\treturn " + (inverted ? "false" : "true") + ";");
-            builder.append("}").nl();
-        }
+        if (bitStringConstraintDefinition.isExtensible()) {
+            builder.append("return true;");
+        } else {
+            BitStringConstraintValues rootValues = bitStringConstraintDefinition.getRootValues();
+            Set<BitStringValue> values = rootValues.getValues();
+            boolean inverted = rootValues.isInverted();
 
-        builder.append("return " + (inverted ? "true" : "false") + ";");
+            javaClass.addImport(Arrays.class);
+
+            if (!values.isEmpty()) {
+                builder.append("if (" + values.stream().map(value ->
+                        "Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", value) && " +
+                                value.getUnusedBits() + " == unusedBits").collect(Collectors.joining(" || "))
+                        + ") {");
+                builder.append("\treturn " + (inverted ? "false" : "true") + ";");
+                builder.append("}").nl();
+            }
+
+            builder.append("return " + (inverted ? "true" : "false") + ";");
+        }
 
         builder.finish().build();
     }
@@ -116,8 +106,9 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
                 Value value = ((SingleValueConstraint) elements).getValue();
 
                 try {
-                    BitStringValue bitStringValue = ctx
-                            .resolveGenericValue(BitStringValue.class, base, value);
+                    // TODO: implement a more convenient resolver
+                    BitStringValue bitStringValue = ctx.resolveGenericValue(BitStringValue.class, base, value);
+
                     return new BitStringConstraintValues(CollectionUtils.asHashSet(bitStringValue));
                 } catch (Exception e) {
                     throw new CompilerException("Invalid single-value constraint %s for BIT STRING type", e,
