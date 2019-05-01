@@ -94,12 +94,29 @@ public class BitStringConstraintCompilerTest {
                 asList("0001", "0010", "0100"), asList("0010", "0011", "0100")));
     }
 
+    @Test
+    public void testCalculateExclude() {
+        CompilerContext ctx = Mockito.mock(CompilerContext.class);
+
+        BitStringConstraintCompiler compiler = new BitStringConstraintCompiler(ctx);
+
+        assertEquals(emptySet(), invokeCalculateExclude(compiler, asHashSet("0001", "0010"),
+                asHashSet("0001", "0010")));
+        assertEquals(toBitStringSet("0010"), invokeCalculateExclude(compiler, asHashSet("0001", "0010"),
+                asHashSet("0001")));
+    }
+
     private Set<BitStringValue> invokeCalculateUnion(BitStringConstraintCompiler compiler, String... elements) {
         return compiler.calculateUnion(new BitString(), toElements(elements)).getValues();
     }
 
     private Set<BitStringValue> invokeCalculateIntersection(BitStringConstraintCompiler compiler, List<String>... elements) {
         return compiler.calculateIntersection(new BitString(), toElements(elements)).getValues();
+    }
+
+    private Set<BitStringValue> invokeCalculateExclude(BitStringConstraintCompiler compiler, Set<String> a, Set<String> b) {
+        return compiler.calculateExclude(new BitStringConstraintValues(toBitStringSet(a)),
+                new BitStringConstraintValues(toBitStringSet(b))).getValues();
     }
 
     private List<Elements> toElements(String... values) {

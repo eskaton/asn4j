@@ -61,7 +61,7 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
             extension = compileConstraint(base, setSpecs.getExtensionElements());
         }
 
-        return createDefinition(root, extension);
+        return createDefinition(root, extension).extensible(setSpecs.hasExtensionMarker());
     }
 
     D compileConstraints(Type node, Type base) throws CompilerException {
