@@ -28,11 +28,17 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.commons.utils.StringUtils;
 
 public class BinaryStringValue extends AbstractBaseXStringValue {
 
     public BinaryStringValue(Position position, String value) {
         super(position, value, 2);
+    }
+
+    @Override
+    public String toString() {
+        return StringUtils.concat(getClass().getSimpleName() + "["+value+"]" );
     }
 
 }

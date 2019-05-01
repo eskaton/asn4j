@@ -59,18 +59,18 @@ public class IntegerConstraintValues extends ListConstraintValues<RangeNode, Int
      * The lists must have been prepared with
      * {@link IntegerConstraintValues#canonicalizeRanges}.
      *
-     * @param values2 Collection of {@link RangeNode}s
+     * @param values Collection of {@link RangeNode}s
      * @return A list containing the intersections as {@link RangeNode}s or an
      * empty list, if there is no intersection
      */
     @SuppressWarnings("unchecked")
     @Override
-    public IntegerConstraintValues intersection(IntegerConstraintValues values2) throws CompilerException {
+    public IntegerConstraintValues intersection(IntegerConstraintValues values) throws CompilerException {
         IntegerConstraintValues result = new IntegerConstraintValues();
         int r1Ind = 0;
         int r2Ind = 0;
         List<RangeNode> l1 = this.getValues();
-        List<RangeNode> l2 = values2.getValues();
+        List<RangeNode> l2 = values.getValues();
         RangeNode r1 = getRange(l1, r1Ind++);
         RangeNode r2 = getRange(l2, r2Ind++);
 
@@ -145,12 +145,12 @@ public class IntegerConstraintValues extends ListConstraintValues<RangeNode, Int
     }
 
     @Override
-    public IntegerConstraintValues exclude(IntegerConstraintValues values2) throws CompilerException {
+    public IntegerConstraintValues exclude(IntegerConstraintValues values) throws CompilerException {
         IntegerConstraintValues result = new IntegerConstraintValues();
         int excludeInd = 0;
         int rangeInd = 0;
         List<RangeNode> r1 = getValues();
-        List<RangeNode> r2 = values2.getValues();
+        List<RangeNode> r2 = values.getValues();
         RangeNode exclude = r2.get(excludeInd++);
         RangeNode range = r1.get(rangeInd++);
         long lower, upper;
