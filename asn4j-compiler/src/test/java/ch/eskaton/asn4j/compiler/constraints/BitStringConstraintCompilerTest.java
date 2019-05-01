@@ -27,11 +27,15 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.types.BitString;
+import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +50,20 @@ import static ch.eskaton.commons.utils.CollectionUtils.asHashSet;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 
 public class BitStringConstraintCompilerTest {
 
     @Test
     public void testCalculateUnion() {
-        BitStringConstraintCompiler compiler = new BitStringConstraintCompiler(null);
+        CompilerContext ctx = Mockito.mock(CompilerContext.class);
+
+        BitStringConstraintCompiler compiler = new BitStringConstraintCompiler(ctx);
+
+        Mockito.when(ctx.resolveGenericValue(eq(BitStringValue.class), any(BitString.class),
+                any(AbstractBaseXStringValue.class)))
+                .thenAnswer(i -> ((AbstractBaseXStringValue)i.getArguments()[2]).toBitString());
 
         assertEquals(emptySet(), invokeCalculateUnion(compiler));
         assertEquals(asHashSet(toBitString("0001")), invokeCalculateUnion(compiler, "0001"));
@@ -63,7 +75,13 @@ public class BitStringConstraintCompilerTest {
 
     @Test
     public void testCalculateIntersection() {
-        BitStringConstraintCompiler compiler = new BitStringConstraintCompiler(null);
+        CompilerContext ctx = Mockito.mock(CompilerContext.class);
+
+        BitStringConstraintCompiler compiler = new BitStringConstraintCompiler(ctx);
+
+        Mockito.when(ctx.resolveGenericValue(eq(BitStringValue.class), any(BitString.class),
+                any(AbstractBaseXStringValue.class)))
+                .thenAnswer(i -> ((AbstractBaseXStringValue)i.getArguments()[2]).toBitString());
 
         assertEquals(emptySet(), invokeCalculateIntersection(compiler));
         assertEquals(emptySet(), invokeCalculateIntersection(compiler, asList("0001"), asList()));
@@ -77,11 +95,11 @@ public class BitStringConstraintCompilerTest {
     }
 
     private Set<BitStringValue> invokeCalculateUnion(BitStringConstraintCompiler compiler, String... elements) {
-        return compiler.calculateUnion(toElements(elements)).getValues();
+        return compiler.calculateUnion(new BitString(), toElements(elements)).getValues();
     }
 
     private Set<BitStringValue> invokeCalculateIntersection(BitStringConstraintCompiler compiler, List<String>... elements) {
-        return compiler.calculateIntersection(toElements(elements)).getValues();
+        return compiler.calculateIntersection(new BitString(), toElements(elements)).getValues();
     }
 
     private List<Elements> toElements(String... values) {

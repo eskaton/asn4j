@@ -29,11 +29,8 @@ package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
-import ch.eskaton.asn4j.parser.ast.types.ComponentType;
-import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -67,12 +64,10 @@ public class DefaultsCompiler {
 
     private CompilerContext ctx;
 
-    private TypeResolver typeResolver;
 
     @SuppressWarnings("serial")
-    public DefaultsCompiler(CompilerContext ctx, TypeResolver typeResolver) {
+    public DefaultsCompiler(CompilerContext ctx) {
         this.ctx = ctx;
-        this.typeResolver = typeResolver;
     }
 
     public void compileDefault(JavaClass clazz, String field, String typeName, Type type, Value value)
@@ -80,7 +75,7 @@ public class DefaultsCompiler {
         Type base;
 
         if (type instanceof TypeReference) {
-            base = typeResolver.getBase((TypeReference) type);
+            base = ctx.getBase((TypeReference) type);
         } else {
             base = type;
         }
@@ -101,7 +96,5 @@ public class DefaultsCompiler {
 
         return;
     }
-
-
 
 }

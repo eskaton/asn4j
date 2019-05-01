@@ -27,8 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -36,7 +36,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -52,8 +51,8 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
 public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitStringValue, Set<BitStringValue>, BitStringConstraintValues, BitStringConstraintDefinition> {
 
-    public BitStringConstraintCompiler(TypeResolver typeResolver) {
-        super(typeResolver);
+    public BitStringConstraintCompiler(CompilerContext ctx) {
+        super(ctx);
     }
 
     @Override
@@ -109,17 +108,19 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
         builder.finish().build();
     }
 
-    protected BitStringConstraintValues calculateElements(Elements elements) throws CompilerException {
+    protected BitStringConstraintValues calculateElements(Type base, Elements elements) throws CompilerException {
         if (elements instanceof ElementSet) {
-            return compileConstraint((ElementSet) elements);
+            return compileConstraint(base, (ElementSet) elements);
         } else {
             if (elements instanceof SingleValueConstraint) {
                 Value value = ((SingleValueConstraint) elements).getValue();
 
-                if (value instanceof AbstractBaseXStringValue) {
-                    return new BitStringConstraintValues(CollectionUtils.asHashSet(((AbstractBaseXStringValue) value).toBitString()));
-                } else {
-                    throw new CompilerException("Invalid single-value constraint %s for BIT STRING type",
+                try {
+                    BitStringValue bitStringValue = ctx
+                            .resolveGenericValue(BitStringValue.class, base, value);
+                    return new BitStringConstraintValues(CollectionUtils.asHashSet(bitStringValue));
+                } catch (Exception e) {
+                    throw new CompilerException("Invalid single-value constraint %s for BIT STRING type", e,
                             value.getClass().getSimpleName());
                 }
             } else if (elements instanceof ContainedSubtype) {

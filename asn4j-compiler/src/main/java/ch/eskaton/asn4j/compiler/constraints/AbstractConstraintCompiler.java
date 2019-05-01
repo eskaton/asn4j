@@ -27,8 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
@@ -47,18 +47,18 @@ import java.util.Stack;
 public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>,
         D extends ConstraintDefinition<V, C, T, D>> {
 
-    protected TypeResolver typeResolver;
+    protected CompilerContext ctx;
 
-    public AbstractConstraintCompiler(TypeResolver typeResolver) {
-        this.typeResolver = typeResolver;
+    public AbstractConstraintCompiler(CompilerContext ctx) {
+        this.ctx = ctx;
     }
 
-    public D compileConstraint(SetSpecsNode setSpecs) throws CompilerException {
-        T root = compileConstraint(setSpecs.getRootElements());
+    public D compileConstraint(Type base, SetSpecsNode setSpecs) throws CompilerException {
+        T root = compileConstraint(base, setSpecs.getRootElements());
         T extension = null;
 
         if (setSpecs.hasExtensionElements()) {
-            extension = compileConstraint(setSpecs.getExtensionElements());
+            extension = compileConstraint(base, setSpecs.getExtensionElements());
         }
 
         return createDefinition(root, extension);
@@ -69,7 +69,7 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
 
         while (true) {
             if (node.hasConstraint()) {
-                cons.push(compileConstraints(node.getConstraints()));
+                cons.push(compileConstraints(base, node.getConstraints()));
             }
 
             if (base.equals(node)) {
@@ -79,7 +79,7 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
             if (node instanceof UsefulType) {
                 break;
             } else if (node instanceof TypeReference) {
-                TypeAssignmentNode type = typeResolver.getType((TypeReference) node);
+                TypeAssignmentNode type = ctx.getTypeAssignment((TypeReference) node);
 
                 if (type == null) {
                     throw new CompilerException("Referenced type %s not found", ((TypeReference) node).getType());
@@ -113,7 +113,7 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         return null;
     }
 
-    D compileConstraints(List<Constraint> constraints) throws CompilerException {
+    D compileConstraints(Type base, List<Constraint> constraints) throws CompilerException {
         D constraintDef = null;
 
         for (Constraint constraint : constraints) {
@@ -121,9 +121,9 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
                 SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
                 if (constraintDef == null) {
-                    constraintDef = compileConstraint(setSpecs);
+                    constraintDef = compileConstraint(base, setSpecs);
                 } else {
-                    constraintDef.intersection(compileConstraint(setSpecs));
+                    constraintDef.intersection(compileConstraint(base, setSpecs));
 
                     if (constraintDef.isRootEmpty()) {
                         return constraintDef;
@@ -138,36 +138,37 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         return constraintDef;
     }
 
-    protected T compileConstraint(ElementSet set) throws CompilerException {
+    protected T compileConstraint(Type base, ElementSet set) throws CompilerException {
         List<Elements> operands = set.getOperands();
 
         switch (set.getOperation()) {
             case All:
-                return calculateInversion(compileConstraint((ElementSet) operands.get(0)));
+                return calculateInversion(compileConstraint(base, (ElementSet) operands.get(0)));
 
             case Exclude:
                 if (operands.size() == 1) {
                     // ALL EXCEPT
-                    return calculateElements(operands.get(0));
+                    return calculateElements(base, operands.get(0));
                 } else {
-                    return calculateExclude(calculateElements(operands.get(0)), calculateElements(operands.get(1)));
+                    return calculateExclude(calculateElements(base, operands.get(0)),
+                            calculateElements(base, operands.get(1)));
                 }
 
             case Intersection:
-                return calculateIntersection(operands);
+                return calculateIntersection(base, operands);
 
             case Union:
-                return calculateUnion(operands);
+                return calculateUnion(base, operands);
         }
 
         return createValues();
     }
 
-    protected T calculateIntersection(List<Elements> elements) throws CompilerException {
+    protected T calculateIntersection(Type base, List<Elements> elements) throws CompilerException {
         T values1 = createValues();
 
         for (Elements e : elements) {
-            T values2 = calculateElements(e);
+            T values2 = calculateElements(base, e);
 
             if (values1.isEmpty()) {
                 values1 = values1.union(values2);
@@ -183,11 +184,11 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         return values1;
     }
 
-    protected T calculateUnion(List<Elements> elements) throws CompilerException {
+    protected T calculateUnion(Type base, List<Elements> elements) throws CompilerException {
         T values = createValues();
 
         for (Elements e : elements) {
-            values = values.union(calculateElements(e));
+            values = values.union(calculateElements(base, e));
         }
 
         return values;
@@ -205,7 +206,7 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
 
     protected abstract T createValues();
 
-    protected abstract T calculateElements(Elements elements) throws CompilerException;
+    protected abstract T calculateElements(Type base, Elements elements) throws CompilerException;
 
     protected T calculateIntersection(T values1, T values2) throws CompilerException {
         return values1.intersection(values2);

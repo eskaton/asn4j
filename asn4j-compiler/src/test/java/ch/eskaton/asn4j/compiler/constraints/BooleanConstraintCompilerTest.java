@@ -29,7 +29,10 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.types.BitString;
+import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -82,11 +85,11 @@ public class BooleanConstraintCompilerTest {
     }
 
     private Set<Boolean> invokeCalculateUnion(BooleanConstraintCompiler compiler, boolean... values) {
-        return compiler.calculateUnion(toElements(values)).getValues();
+        return compiler.calculateUnion(new BooleanType(), toElements(values)).getValues();
     }
 
     private Set<Boolean> invokeCalculateIntersection(BooleanConstraintCompiler compiler, boolean... values) {
-        return compiler.calculateIntersection(toElements(values)).getValues();
+        return compiler.calculateIntersection(new BooleanType(), toElements(values)).getValues();
     }
 
     private List<Elements> toElements(boolean[] values) {

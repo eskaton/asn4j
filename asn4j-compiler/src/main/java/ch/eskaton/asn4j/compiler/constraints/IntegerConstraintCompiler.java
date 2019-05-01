@@ -27,8 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
@@ -52,8 +52,8 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
 public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeNode, List<RangeNode>, IntegerConstraintValues, IntegerConstraintDefinition> {
 
-    public IntegerConstraintCompiler(TypeResolver typeResolver) {
-        super(typeResolver);
+    public IntegerConstraintCompiler(CompilerContext ctx) {
+        super(ctx);
     }
 
     @Override
@@ -67,9 +67,9 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
     }
 
     @Override
-    protected IntegerConstraintValues calculateElements(Elements elements) throws CompilerException {
+    protected IntegerConstraintValues calculateElements(Type base, Elements elements) throws CompilerException {
         if (elements instanceof ElementSet) {
-            return compileConstraint((ElementSet) elements);
+            return compileConstraint(base, (ElementSet) elements);
         } else {
             if (elements instanceof SingleValueConstraint) {
                 Value value = ((SingleValueConstraint) elements).getValue();
@@ -109,7 +109,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
             // no restriction
             return values;
         } else if (type instanceof TypeReference) {
-            return compileConstraints(type, typeResolver.getBase((TypeReference) type)).getRootValues();
+            return compileConstraints(type, ctx.getBase((TypeReference) type)).getRootValues();
         } else {
             throw new CompilerException("Invalid type %s in constraint for INTEGER type", type);
         }
@@ -118,11 +118,12 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
     /**
      * Calculates the union of a list of {@link Elements}.
      *
+     * @param base Base type
      * @param elements A list of {@link Elements}s.
      * @return A list with the union of {@link RangeNode}s
      */
-    protected IntegerConstraintValues calculateUnion(List<Elements> elements) throws CompilerException {
-        return IntegerConstraintValues.canonicalizeRanges(super.calculateUnion(elements));
+    protected IntegerConstraintValues calculateUnion(Type base, List<Elements> elements) throws CompilerException {
+        return IntegerConstraintValues.canonicalizeRanges(super.calculateUnion(base, elements));
     }
 
     @Override

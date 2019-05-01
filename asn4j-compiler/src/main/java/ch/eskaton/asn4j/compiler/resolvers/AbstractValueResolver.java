@@ -41,20 +41,21 @@ public abstract class AbstractValueResolver<V> implements ValueResolver<V> {
         this.ctx = ctx;
     }
 
+    @Override
     public V resolve(DefinedValue ref) throws CompilerException {
         return resolve(ctx.resolveDefinedValue(ref));
     }
 
+    @Override
     public V resolve(String ref) throws CompilerException {
         return resolve(ctx.resolveReference(ref));
     }
-
-    protected abstract V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException;
-
 
     @Override
     public V resolve(Type type, V value) throws CompilerException {
         return value;
     }
+
+    protected abstract V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException;
 
 }

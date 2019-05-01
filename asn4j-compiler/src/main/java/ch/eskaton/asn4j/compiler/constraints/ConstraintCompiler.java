@@ -27,8 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.TypeResolver;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
@@ -44,17 +44,17 @@ public class ConstraintCompiler {
 
     private Map<Class<? extends Type>, AbstractConstraintCompiler> compilers;
 
-    private TypeResolver typeResolver;
+    private CompilerContext ctx;
 
     @SuppressWarnings("serial")
-    public ConstraintCompiler(TypeResolver typeResolver) {
-        this.typeResolver = typeResolver;
+    public ConstraintCompiler(CompilerContext ctx) {
+        this.ctx = ctx;
 
         compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler>() {
             {
-                put(IntegerType.class, new IntegerConstraintCompiler(typeResolver));
-                put(BooleanType.class, new BooleanConstraintCompiler(typeResolver));
-                put(BitString.class, new BitStringConstraintCompiler(typeResolver));
+                put(IntegerType.class, new IntegerConstraintCompiler(ctx));
+                put(BooleanType.class, new BooleanConstraintCompiler(ctx));
+                put(BitString.class, new BitStringConstraintCompiler(ctx));
 //                put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver));
 //                put(OctetString.class, new OctetStringConstraintCompiler(typeResolver));
 //                put(Null.class, new NullConstraintCompiler(typeResolver));
@@ -71,7 +71,7 @@ public class ConstraintCompiler {
         Type base;
 
         if (node instanceof TypeReference) {
-            base = typeResolver.getBase((TypeReference) node);
+            base = ctx.getBase((TypeReference) node);
         } else {
             base = node;
         }

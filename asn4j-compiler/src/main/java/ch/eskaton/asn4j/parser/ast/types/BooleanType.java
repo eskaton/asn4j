@@ -29,7 +29,13 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+
 public class BooleanType extends AbstractType {
+
+    public BooleanType() {
+        this(NO_POSITION);
+    }
 
     public BooleanType(Position position) {
         super(position);
