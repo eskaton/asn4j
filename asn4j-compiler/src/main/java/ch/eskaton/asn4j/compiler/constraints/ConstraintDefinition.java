@@ -53,6 +53,14 @@ public interface ConstraintDefinition<V, C extends Collection<V>, T extends Cons
 
     D extensible(boolean extensible);
 
+    default D serialApplication(D other) {
+        T roots = getRootValues().intersection(other.getRootValues());
+        T extensions = other.getExtensionValues();
+        boolean extensible = other.isExtensible();
+
+        return createDefinition().rootValues(roots).extensionValues(extensions).extensible(extensible);
+    }
+
     default D intersection(D other) {
         T roots = getRootValues().intersection(other.getRootValues());
         T extensions = null;
@@ -96,5 +104,4 @@ public interface ConstraintDefinition<V, C extends Collection<V>, T extends Cons
     default boolean isExtensionEmpty() {
         return getExtensionValues().getValues().isEmpty();
     }
-
 }

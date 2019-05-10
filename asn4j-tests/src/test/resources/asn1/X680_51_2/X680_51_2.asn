@@ -7,5 +7,9 @@ TestBitString1 ::= BIT STRING (ALL EXCEPT bitStringValue)
 TestBitString2 ::= BIT STRING (('000'B | '001'B | '010'B | '011'B | bitStringValue | '101'B | '110'B | '111'B) EXCEPT '010'B)
 TestBitString3 ::= BIT STRING ((('000'B | '001'B | '010'B | '011'B) ^ ('001'B | '010'B | '011'B)) EXCEPT '010'B)
 TestBitString4 ::= BIT STRING (('000'B | '001'B | '010'B) ^ ('001'B | '010'B), ...)
+-- TestBitString5 must be extensible
+TestBitString5 ::= TestBitString4
+-- TestBitString6 must not be extensible
+TestBitString6 ::= TestBitString4 (ALL EXCEPT '001'B)
 
 END

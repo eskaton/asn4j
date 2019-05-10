@@ -31,8 +31,8 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.utils.StreamsUtils;
 import ch.eskaton.commons.utils.HexDump;
+import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.Arrays;
 import java.util.Objects;

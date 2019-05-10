@@ -39,6 +39,8 @@ import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
+import ch.eskaton.commons.MutableReference;
+import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -98,7 +100,7 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
             D op2 = cons.pop();
 
             do {
-                op1 = op1.intersection(op2);
+                op1 = op1.serialApplication(op2);
 
                 if (cons.isEmpty()) {
                     break;
@@ -124,14 +126,10 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
                     constraintDef = compileConstraint(base, setSpecs);
                 } else {
                     constraintDef.intersection(compileConstraint(base, setSpecs));
-
-                    if (constraintDef.isRootEmpty()) {
-                        return constraintDef;
-                    }
                 }
             } else {
                 throw new CompilerException("Constraints of type %s not yet supported",
-                                            constraint.getClass().getSimpleName());
+                        constraint.getClass().getSimpleName());
             }
         }
 
