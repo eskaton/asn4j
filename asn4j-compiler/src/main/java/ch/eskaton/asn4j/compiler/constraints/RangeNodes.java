@@ -43,7 +43,6 @@ public class RangeNodes {
 
     /**
      * Calculates the intersections of two collections of {@link RangeNode}s.
-     * The lists must have been prepared with {@link RangeNodes#canonicalizeRanges}.
      *
      * @param l1 Collection of {@link RangeNode}s
      * @param l2 Collection of {@link RangeNode}s
@@ -51,7 +50,10 @@ public class RangeNodes {
      * empty list, if there is no intersection
      */
     @SuppressWarnings("unchecked")
-    public static List<RangeNode> rangeIntersection(List<RangeNode> l1, List<RangeNode> l2) {
+    public static List<RangeNode> intersect(List<RangeNode> l1, List<RangeNode> l2) {
+        l1 = canonicalizeRanges(l1);
+        l2 = canonicalizeRanges(l2);
+
         int r1Ind = 0;
         int r2Ind = 0;
         RangeNode r1 = getRange(l1, r1Ind++);
@@ -101,7 +103,9 @@ public class RangeNodes {
         return result;
     }
 
-    public static List<RangeNode> rangeInversion(List<RangeNode> ranges) {
+    public static List<RangeNode> invert(List<RangeNode> ranges) {
+        ranges = canonicalizeRanges(ranges);
+
         List<RangeNode> result = new ArrayList<>();
         RangeNode op1 = ranges.get(0);
         RangeNode op2 = op1;
@@ -126,7 +130,10 @@ public class RangeNodes {
         return result;
     }
 
-    public static List<RangeNode> rangeExclusion(List<RangeNode> r1, List<RangeNode> r2) {
+    public static List<RangeNode> exclude(List<RangeNode> r1, List<RangeNode> r2) {
+        r1 = canonicalizeRanges(r1);
+        r2 = canonicalizeRanges(r2);
+
         int excludeInd = 0;
         int rangeInd = 0;
         RangeNode exclude = r2.get(excludeInd++);
