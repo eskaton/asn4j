@@ -109,6 +109,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 
@@ -574,15 +575,10 @@ public class CompilerContext {
     }
 
     public TagId getTagId(Type type) {
-        if (type instanceof TypeReference) {
-            HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
-            CompiledType compiledType = moduleTypes.get(((TypeReference) type).getType());
+        Optional<CompiledType> maybeReferencedType = getCompiledType(type);
 
-            if (compiledType == null) {
-                compiledType = compiler.compileType(((TypeReference) type).getType());
-            }
-
-            Type referencedType = compiledType.getType();
+        if (maybeReferencedType.isPresent()) {
+            Type referencedType = maybeReferencedType.get().getType();
             Tag tag = referencedType.getTag();
 
             if (tag != null) {
@@ -601,6 +597,21 @@ public class CompilerContext {
         } catch (ClassNotFoundException e) {
             throw new CompilerException("Unknown type: " + type);
         }
+    }
+
+    public Optional<CompiledType> getCompiledType(Type type) {
+        if (type instanceof TypeReference) {
+            HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
+            CompiledType compiledType = moduleTypes.get(((TypeReference) type).getType());
+
+            if (compiledType == null) {
+                compiledType = compiler.compileType(((TypeReference) type).getType());
+            }
+
+            return Optional.ofNullable(compiledType);
+        }
+
+        return Optional.empty();
     }
 
     private HashMap<String, CompiledType> getTypesOfCurrentModule() {

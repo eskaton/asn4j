@@ -25,65 +25,36 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.test;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.runtime.BERDecoder;
+import ch.eskaton.asn4j.runtime.BEREncoder;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 
-import java.util.Collection;
+import static org.junit.Assert.assertEquals;
 
-public interface ConstraintValues<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>> {
+public class TestHelper {
 
-    C getValues();
-
-    default T intersection(T values) {
-        T copy = copy();
-
-        copy.getValues().retainAll(values.getValues());
-
-        return copy;
+    private TestHelper() {
     }
 
-    default T union(T values) {
-        T copy = copy();
 
-        copy.getValues().addAll(values.getValues());
+    public static <T extends ASN1BitString> void testBitStringSuccess(Class<? extends T> clazz, T bitString, int value,
+            int unusedBits) {
+        bitString.setValue(new byte[] { (byte) value }, unusedBits);
 
-        return copy;
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        T result = decoder.decode(clazz, encoder.encode(bitString));
+
+        assertEquals(bitString, result);
     }
 
-    default T exclude(T values) throws CompilerException {
-        T copy = copy();
-
-        for (V value : values.getValues()) {
-            if (!copy.isInverted() && copy.getValues().contains(value)) {
-                copy.getValues().remove(value);
-            } else if (copy.isInverted() && !copy.getValues().contains(value)) {
-                copy.getValues().add(value);
-            } else {
-                throw new CompilerException(value + " doesn't exist in parent type");
-            }
-        }
-
-        return copy;
+    public static <T extends ASN1BitString> void testBitStringFailure(final T bitString, int value, int unusedBits) {
+        TestUtils.assertThrows(() -> bitString.setValue(new byte[] { (byte) value }, unusedBits),
+                ConstraintViolatedException.class);
     }
-
-    default T init(C values) {
-        getValues().clear();
-        getValues().addAll(values);
-
-        return (T) this;
-    }
-
-    default boolean isEmpty() {
-        return getValues().isEmpty();
-    }
-
-    default boolean isInverted() {
-        return false;
-    }
-
-    T invert();
-
-    T copy();
 
 }

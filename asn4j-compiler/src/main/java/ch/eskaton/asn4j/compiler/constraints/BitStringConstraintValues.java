@@ -44,7 +44,7 @@ public class BitStringConstraintValues extends SetConstraintValues<BitStringValu
         super(values);
     }
 
-    boolean isInverted() {
+    public boolean isInverted() {
         return inverted;
     }
 

@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -42,6 +43,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -116,9 +118,19 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
                 }
             } else if (elements instanceof ContainedSubtype) {
                 Type type = ((ContainedSubtype) elements).getType();
+                Optional<CompiledType> maybeCompiledType = ctx.getCompiledType(type);
 
-                throw new CompilerException("Invalid constraint %s for BIT STRING type",
-                        elements.getClass().getSimpleName());
+                if (maybeCompiledType.isPresent()) {
+                    CompiledType compiledType = maybeCompiledType.get();
+                    BitStringConstraintDefinition constraintDefinition =
+                            (BitStringConstraintDefinition) compiledType.getConstraintDefinition();
+
+                    return constraintDefinition.getRootValues();
+                } else if (type.equals(base)) {
+                    return new BitStringConstraintValues().invert();
+                }
+
+                throw new CompilerException("Failed to resolve contained subtype %s", type);
             } else {
                 throw new CompilerException("Invalid constraint %s for BIT STRING type",
                         elements.getClass().getSimpleName());

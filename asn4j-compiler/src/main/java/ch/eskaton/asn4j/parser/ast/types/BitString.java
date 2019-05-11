@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
@@ -55,6 +56,26 @@ public class BitString extends AbstractType {
 
     public List<NamedBitNode> getNamedBits() {
         return namedBits;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        BitString bitString = (BitString) other;
+
+        return Objects.equals(namedBits, bitString.namedBits);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(namedBits);
     }
 
     @Override
