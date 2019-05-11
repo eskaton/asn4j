@@ -43,6 +43,7 @@ import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeRange
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalEndpoint;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalRange;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.invert;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.union;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -128,6 +129,21 @@ public class RangeNodesTest {
 
         assertEquals(asList(createRange(0L, 13L), createRange(15L, 20L)),
                 canonicalizeRanges(asList(createRange(0L, 6L), createRange(7L, 13L), createRange(15L, 20L))));
+    }
+
+    @Test
+    public void testUnion() {
+        assertEquals(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
+                union(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
+                        asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE))));
+
+        assertEquals(asList(createRange(5L, 30L)), union(asList(createRange(5L, 20L)), asList(createRange(18L, 30L))));
+
+        assertEquals(asList(createRange(5L, 40L)),
+                union(asList(createRange(5L, 20L)), asList(createRange(18L, 30L), createRange(29L, 40L))));
+
+        assertEquals(asList(createRange(5L, 40L)),
+                union(asList(createRange(5L, 20L), createRange(18L, 30L)), asList(createRange(29L, 40L))));
     }
 
     @Test
