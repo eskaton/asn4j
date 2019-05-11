@@ -32,9 +32,7 @@ import ch.eskaton.asn4j.parser.ast.RangeNode;
 
 import java.util.List;
 
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.rangeExclusion;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.rangeIntersection;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.rangeInversion;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.intersect;
 
 public class IntegerConstraintValues extends ListConstraintValues<RangeNode, IntegerConstraintValues> {
 
@@ -53,17 +51,17 @@ public class IntegerConstraintValues extends ListConstraintValues<RangeNode, Int
 
     @Override
     public IntegerConstraintValues intersection(IntegerConstraintValues values) throws CompilerException {
-        return new IntegerConstraintValues(rangeIntersection(this.getValues(), values.getValues()));
+        return new IntegerConstraintValues(intersect(this.getValues(), values.getValues()));
     }
 
     @Override
     public IntegerConstraintValues invert() {
-        return new IntegerConstraintValues(rangeInversion(getValues()));
+        return new IntegerConstraintValues(RangeNodes.invert(getValues()));
     }
 
     @Override
     public IntegerConstraintValues exclude(IntegerConstraintValues values) throws CompilerException {
-        return new IntegerConstraintValues(rangeExclusion(this.getValues(), values.getValues()));
+        return new IntegerConstraintValues(RangeNodes.exclude(this.getValues(), values.getValues()));
     }
 
 }
