@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -48,16 +48,16 @@ public class RangeNode extends AbstractConstraint {
     public RangeNode(Position position, EndpointNode lower, EndpointNode upper) {
         super(position);
 
-    	this.lower = lower;
-    	this.upper = upper;
+        this.lower = lower;
+        this.upper = upper;
     }
 
     public EndpointNode getLower() {
-    	return lower;
+        return lower;
     }
 
     public EndpointNode getUpper() {
-    	return upper;
+        return upper;
     }
 
     @Override
@@ -66,32 +66,25 @@ public class RangeNode extends AbstractConstraint {
     }
 
     @Override
-    public boolean equals(Object obj) {
-    	if (this == obj)
-    		return true;
-    	if (obj == null)
-    		return false;
-    	if (getClass() != obj.getClass())
-    		return false;
-    	RangeNode other = (RangeNode) obj;
-    	if (lower == null) {
-    		if (other.lower != null)
-    			return false;
-    	} else if (!lower.equals(other.lower))
-    		return false;
-    	if (upper == null) {
-    		if (other.upper != null)
-    			return false;
-    	} else if (!upper.equals(other.upper))
-    		return false;
-    	return true;
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        RangeNode rangeNode = (RangeNode) other;
+
+        return Objects.equals(lower, rangeNode.lower) && Objects.equals(upper, rangeNode.upper);
     }
 
     @Override
     public String toString() {
-    	return StringUtils.concat("Range[", lower.isInclusive() ? "[" : "(",
-    			lower.getValue(), "..", upper.getValue(),
-    			upper.isInclusive() ? "]" : ")", "]");
+        return StringUtils.concat("Range[", lower.isInclusive() ? "[" : "(",
+                lower.getValue(), "..", upper.getValue(),
+                upper.isInclusive() ? "]" : ")", "]");
     }
 
 }
