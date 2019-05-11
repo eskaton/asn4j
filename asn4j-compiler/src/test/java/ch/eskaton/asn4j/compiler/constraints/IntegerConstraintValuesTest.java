@@ -28,80 +28,17 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static ch.eskaton.asn4j.compiler.constraints.IntegerTestUtils.createRange;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class IntegerConstraintValuesTest {
-
-    @Test
-    public void testCompareCanonicalEndpoint() {
-        assertEquals(-1, invokeCompareCanonicalEndpoint(-2, -1));
-        assertEquals(-2, invokeCompareCanonicalEndpoint(-5, -1));
-        assertEquals(0, invokeCompareCanonicalEndpoint(5, 5));
-        assertEquals(1, invokeCompareCanonicalEndpoint(5, 4));
-        assertEquals(2, invokeCompareCanonicalEndpoint(5, -5));
-        assertEquals(2, invokeCompareCanonicalEndpoint(Long.MAX_VALUE, Long.MIN_VALUE));
-        assertEquals(-2, invokeCompareCanonicalEndpoint(Long.MIN_VALUE, Long.MAX_VALUE));
-        assertEquals(-1, invokeCompareCanonicalEndpoint(Long.MIN_VALUE, Long.MIN_VALUE + 1));
-    }
-
-    @Test
-    public void testCompareCanonicalRange() {
-        assertTrue(-1 >= invokeCompareCanonicalRange(-2L, -1L, -1L, 0L));
-        assertTrue(-1 >= invokeCompareCanonicalRange(-2L, -1L, -2L, 0L));
-        assertEquals(0, invokeCompareCanonicalRange(-2L, -1L, -2L, -1L));
-        assertTrue(1 <= invokeCompareCanonicalRange(0L, 5L, -5L, 5L));
-        assertTrue(1 <= invokeCompareCanonicalRange(0L, 5L, 0L, 4L));
-    }
-
-    @Test
-    public void testCanonicalizeRanges() {
-        assertEquals(new ArrayList<RangeNode>(), invokeCanonicalizeRanges(emptyList()));
-
-        // 2 ranges
-        assertEquals(asList(createRange(0L, 5L), createRange(7L, 10L)), invokeCanonicalizeRanges(
-                asList(createRange(0L, 5L), createRange(7L, 10L))));
-
-        assertEquals(asList(createRange(0L, 10L)), invokeCanonicalizeRanges(
-                asList(createRange(0L, 5L), createRange(6L, 10L))));
-
-        assertEquals(asList(createRange(0L, 10L)), invokeCanonicalizeRanges(
-                asList(createRange(0L, 5L), createRange(5L, 10L))));
-
-        assertEquals(asList(createRange(0L, 10L)), invokeCanonicalizeRanges(
-                asList(createRange(0L, 5L), createRange(3L, 10L))));
-
-        assertEquals(asList(createRange(0L, 5L)), invokeCanonicalizeRanges(
-                asList(createRange(0L, 5L), createRange(3L, 5L))));
-
-        assertEquals(asList(createRange(0L, 5L)), invokeCanonicalizeRanges(
-                asList(createRange(0L, 5L), createRange(3L, 4L))));
-
-        // 3 ranges
-        assertEquals(asList(createRange(0L, 5L), createRange(7L, 10L), createRange(15L, 20L)),
-                invokeCanonicalizeRanges(asList(createRange(0L, 5L), createRange(7L, 10L), createRange(15L, 20L))));
-
-        assertEquals(asList(createRange(0L, 5L), createRange(7L, 20L)),
-                invokeCanonicalizeRanges(asList(createRange(0L, 5L), createRange(7L, 16L), createRange(15L, 20L))));
-
-        assertEquals(asList(createRange(0L, 20L)),
-                invokeCanonicalizeRanges(asList(createRange(0L, 6L), createRange(7L, 16L), createRange(15L, 20L))));
-
-        assertEquals(asList(createRange(0L, 13L), createRange(15L, 20L)),
-                invokeCanonicalizeRanges(asList(createRange(0L, 6L), createRange(7L, 13L), createRange(15L, 20L))));
-    }
 
     @Test
     public void testCalculateExclude() {
@@ -146,22 +83,11 @@ public class IntegerConstraintValuesTest {
                         asList(createRange(20L, 30L), createRange(60L, 70L))));
     }
 
-    private int invokeCompareCanonicalEndpoint(long a, long b) {
-        return IntegerConstraintValues.compareCanonicalEndpoint(new EndpointNode(new IntegerValue(a), true),
-                new EndpointNode(new IntegerValue(b), true));
-    }
 
-    private int invokeCompareCanonicalRange(long a1, long a2, long b1, long b2) {
-        return IntegerConstraintValues.compareCanonicalRange(createRange(a1, a2), createRange(b1, b2));
-    }
 
     private List<RangeNode> invokeCalculateExclude(IntegerConstraintCompiler compiler, List<RangeNode> a,
             List<RangeNode> b) {
         return compiler.calculateExclude(new IntegerConstraintValues(a), new IntegerConstraintValues(b)).getValues();
-    }
-
-    public List<RangeNode> invokeCanonicalizeRanges(List<RangeNode> ranges) {
-        return IntegerConstraintValues.canonicalizeRanges(new IntegerConstraintValues(ranges)).getValues();
     }
 
 }
