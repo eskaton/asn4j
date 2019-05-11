@@ -48,6 +48,7 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeRanges;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
 public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeNode, List<RangeNode>, IntegerConstraintValues, IntegerConstraintDefinition> {
@@ -90,9 +91,9 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
                 Type type = ((ContainedSubtype) elements).getType();
                 return calculateContainedSubtype(type);
             } else if (elements instanceof RangeNode) {
-                EndpointNode lower = IntegerConstraintValues
+                EndpointNode lower = RangeNodes
                         .canonicalizeEndpoint(((RangeNode) elements).getLower(), true);
-                EndpointNode upper = IntegerConstraintValues
+                EndpointNode upper = RangeNodes
                         .canonicalizeEndpoint(((RangeNode) elements).getUpper(), false);
                 return new IntegerConstraintValues(Arrays.asList(new RangeNode(lower, upper)));
             } else {
@@ -123,7 +124,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
      * @return A list with the union of {@link RangeNode}s
      */
     protected IntegerConstraintValues calculateUnion(Type base, List<Elements> elements) throws CompilerException {
-        return IntegerConstraintValues.canonicalizeRanges(super.calculateUnion(base, elements));
+        return new IntegerConstraintValues(canonicalizeRanges(super.calculateUnion(base, elements).getValues()));
     }
 
     @Override
@@ -139,7 +140,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
 
         IntegerConstraintValues rootValues = ((IntegerConstraintDefinition) definition).getRootValues();
         IntegerConstraintValues extensionValues = ((IntegerConstraintDefinition) definition).getExtensionValues();
-        IntegerConstraintValues union = IntegerConstraintValues.canonicalizeRanges(rootValues.union(extensionValues));
+        IntegerConstraintValues union = new IntegerConstraintValues(canonicalizeRanges(rootValues
+                .union(extensionValues).getValues()));
 
         for (RangeNode value : union.getValues()) {
             RangeNode range = value;
