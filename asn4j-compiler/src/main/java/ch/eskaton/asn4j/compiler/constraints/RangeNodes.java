@@ -42,6 +42,22 @@ import java.util.List;
 public class RangeNodes {
 
     /**
+     * Calculates the union of two collections of {@link RangeNode}s.
+     *
+     * @param l1 Collection of {@link RangeNode}s
+     * @param l2 Collection of {@link RangeNode}s
+     * @return A list containing the union as {@link RangeNode}s
+     */
+    @SuppressWarnings("unchecked")
+    public static List<RangeNode> union(List<RangeNode> l1, List<RangeNode> l2) {
+        List<RangeNode> result = new ArrayList<>(l1);
+
+        result.addAll(l2);
+
+        return canonicalizeRanges(result);
+    }
+
+    /**
      * Calculates the intersections of two collections of {@link RangeNode}s.
      *
      * @param l1 Collection of {@link RangeNode}s
@@ -245,7 +261,7 @@ public class RangeNodes {
      * Canonicalizes an {@link EndpointNode}, i.e. resolves MIN and MAX values
      * and converts the value to inclusive.
      *
-     * @param node       An {@link EndpointNode}
+     * @param node    An {@link EndpointNode}
      * @param isLower true, if it's a lower {@link EndpointNode}
      * @return a canonical {@link EndpointNode}
      */
@@ -307,7 +323,7 @@ public class RangeNodes {
         return result;
     }
 
-    static RangeNode getRange(List<RangeNode> ranges, int ind) {
+    private static RangeNode getRange(List<RangeNode> ranges, int ind) {
         if (ranges.size() > ind) {
             return ranges.get(ind);
         }
@@ -315,17 +331,17 @@ public class RangeNodes {
         return null;
     }
 
-    static EndpointNode increment(EndpointNode endpoint) {
+    private static EndpointNode increment(EndpointNode endpoint) {
         return new EndpointNode(new IntegerValue(((IntegerValue) endpoint.getValue()).getValue().add(
                 BigInteger.ONE)), true);
     }
 
-    static EndpointNode decrement(EndpointNode endpoint) {
+    private static EndpointNode decrement(EndpointNode endpoint) {
         return new EndpointNode(new IntegerValue(((IntegerValue) endpoint.getValue()).getValue().subtract(
                 BigInteger.ONE)), true);
     }
 
-    static class RangeNodeComparator implements Comparator<RangeNode> {
+    private static class RangeNodeComparator implements Comparator<RangeNode> {
 
         public int compare(RangeNode r1, RangeNode r2) {
             return compareCanonicalRange(r1, r2);
