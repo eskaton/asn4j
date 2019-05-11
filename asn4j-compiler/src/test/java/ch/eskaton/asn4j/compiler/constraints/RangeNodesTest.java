@@ -27,17 +27,20 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static ch.eskaton.asn4j.compiler.constraints.IntegerTestUtils.createRange;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeRanges;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalEndpoint;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalRange;
+import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
@@ -95,6 +98,51 @@ public class RangeNodesTest {
 
         assertEquals(asList(createRange(0L, 13L), createRange(15L, 20L)),
                 canonicalizeRanges(asList(createRange(0L, 6L), createRange(7L, 13L), createRange(15L, 20L))));
+    }
+
+    @Test
+    public void testCalculateExclude() {
+        assertThrows(() -> invokeCalculateExclude(asList(createRange(5L, 10L)), asList(createRange(3L, 4L))),
+                CompilerException.class);
+
+        assertThrows(() -> invokeCalculateExclude(asList(createRange(5L, 10L)), asList(createRange(3L, 6L))),
+                CompilerException.class);
+
+        assertThrows(() -> invokeCalculateExclude(asList(createRange(5L, 10L)), asList(createRange(8L, 12L))),
+                CompilerException.class);
+
+        assertThrows(() -> invokeCalculateExclude(asList(createRange(5L, 10L)), asList(createRange(11L, 12L))),
+                CompilerException.class);
+
+        assertEquals(asList(),
+                invokeCalculateExclude(asList(createRange(0L, 10L)), asList(createRange(0L, 10L))));
+
+        assertEquals(asList(createRange(6L, 10L)),
+                invokeCalculateExclude(asList(createRange(0L, 10L)), asList(createRange(0L, 5L))));
+
+        assertEquals(asList(createRange(0L, 2L), createRange(9L, 10L)),
+                invokeCalculateExclude(asList(createRange(0L, 10L)), asList(createRange(3L, 8L))));
+
+        assertEquals(asList(createRange(0L, 5L)),
+                invokeCalculateExclude(asList(createRange(0L, 10L)), asList(createRange(6L, 10L))));
+
+        assertEquals(asList(createRange(0L, 5L), createRange(7L, 10L), createRange(20L, 30L)),
+                invokeCalculateExclude(asList(createRange(0L, 10L), createRange(20L, 30L)),
+                        asList(createRange(6L, 6L))));
+
+        assertEquals(asList(createRange(0L, 10L), createRange(20L, 21L), createRange(23L, 30L)),
+                invokeCalculateExclude(asList(createRange(0L, 10L), createRange(20L, 30L)),
+                        asList(createRange(22L, 22L))));
+
+        assertEquals(asList(createRange(0L, 10L), createRange(40L, 50L), createRange(80L, 90L)),
+                invokeCalculateExclude(
+                        asList(createRange(0L, 10L), createRange(20L, 30L), createRange(40L, 50L),
+                                createRange(60L, 70L), createRange(80L, 90L)),
+                        asList(createRange(20L, 30L), createRange(60L, 70L))));
+    }
+    
+    private List<RangeNode> invokeCalculateExclude(List<RangeNode> a, List<RangeNode> b) {
+        return RangeNodes.rangeExclusion(a, b);
     }
 
     private int invokeCompareCanonicalEndpoint(long a, long b) {
