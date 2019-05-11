@@ -39,8 +39,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
-import ch.eskaton.commons.MutableReference;
-import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.Collection;
 import java.util.List;

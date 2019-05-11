@@ -98,10 +98,11 @@ public interface ConstraintDefinition<V, C extends Collection<V>, T extends Cons
     }
 
     default boolean isRootEmpty() {
-        return getRootValues().getValues().isEmpty();
+        return getRootValues().getValues().isEmpty() && !getRootValues().isInverted();
     }
 
     default boolean isExtensionEmpty() {
-        return getExtensionValues().getValues().isEmpty();
+        return getExtensionValues().getValues().isEmpty() && !getExtensionValues().isInverted();
     }
+
 }

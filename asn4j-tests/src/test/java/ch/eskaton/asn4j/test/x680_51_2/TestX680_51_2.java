@@ -27,11 +27,6 @@
 
 package ch.eskaton.asn4j.test.x680_51_2;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.types.ASN1BitString;
-import ch.eskaton.asn4j.test.TestUtils;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString1;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString3;
@@ -40,7 +35,8 @@ import ch.eskaton.asn4jtest.x680_51_2.TestBitString5;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString6;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 
 public class TestX680_51_2 {
 
@@ -106,23 +102,6 @@ public class TestX680_51_2 {
 
         testBitStringFailure(new TestBitString6(), 0x01, 5);
         testBitStringFailure(new TestBitString6(), 0x03, 5);
-    }
-
-    private <T extends ASN1BitString> void testBitStringSuccess(Class<? extends T> clazz, T bitString, int value,
-            int unusedBits) {
-        bitString.setValue(new byte[] { (byte) value }, unusedBits);
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        T result = decoder.decode(clazz, encoder.encode(bitString));
-
-        assertEquals(bitString, result);
-    }
-
-    private <T extends ASN1BitString> void testBitStringFailure(final T bitString, int value, int unusedBits) {
-        TestUtils.assertThrows(() -> bitString.setValue(new byte[] { (byte) value }, unusedBits),
-                ConstraintViolatedException.class);
     }
 
 }
