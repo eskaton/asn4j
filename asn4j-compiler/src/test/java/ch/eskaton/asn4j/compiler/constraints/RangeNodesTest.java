@@ -42,6 +42,7 @@ import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeEndpo
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeRanges;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalEndpoint;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalRange;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.intersect;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.invert;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.union;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
@@ -144,6 +145,34 @@ public class RangeNodesTest {
 
         assertEquals(asList(createRange(5L, 40L)),
                 union(asList(createRange(5L, 20L), createRange(18L, 30L)), asList(createRange(29L, 40L))));
+    }
+
+    @Test
+    public void testIntersect() {
+        assertEquals(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
+                union(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
+                        asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE))));
+        assertEquals(emptyList(), intersect(asList(createRange(5L, 20L)), emptyList()));
+        assertEquals(emptyList(), intersect(emptyList(), asList(createRange(5L, 20L))));
+
+        assertEquals(emptyList(), intersect(asList(createRange(7L, 12L)), asList(createRange(15L, 30L))));
+
+        assertEquals(emptyList(), intersect(asList(createRange(15L, 30L)), asList(createRange(7L, 12L))));
+
+        assertEquals(asList(createRange(20L, 25L)),
+                intersect(asList(createRange(15L, 30L)), asList(createRange(20L, 25L))));
+
+        assertEquals(asList(createRange(20L, 25L)),
+                intersect(asList(createRange(20L, 25L)), asList(createRange(15L, 30L))));
+
+        assertEquals(asList(createRange(7L, 20L)),
+                intersect(asList(createRange(5L, 20L)), asList(createRange(7L, 25L))));
+
+        assertEquals(asList(createRange(7L, 15L), createRange(22L, 25L)),
+                intersect(asList(createRange(5L, 15L), createRange(22L, 30L)), asList(createRange(7L, 25L))));
+
+        assertEquals(asList(createRange(7L, 15L)),
+                intersect(asList(createRange(5L, 15L)), asList(createRange(7L, 25L), createRange(22L, 30L))));
     }
 
     @Test
