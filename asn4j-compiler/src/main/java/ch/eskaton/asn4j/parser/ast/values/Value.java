@@ -27,12 +27,35 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.Node;
+
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public interface Value extends Node {
 
-    Value MIN = () -> null;
+    Value MIN = new Bound("MIN");
 
-    Value MAX = () -> null;
+    Value MAX = new Bound("MAX");
+
+    class Bound implements Value {
+
+        private String name;
+
+        private Bound(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public Position getPosition() {
+            return NO_POSITION;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+    }
 
 }
