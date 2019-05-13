@@ -27,47 +27,87 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.HashSet;
+import ch.eskaton.asn4j.parser.ast.RangeNode;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
-public abstract class SetConstraintValues<V, T extends SetConstraintValues<V, T>> implements ConstraintValues<V, Set<V>, T> {
+public class BitStringSizeConstraint implements SizeConstraint<BitStringSizeConstraint> {
 
-    private Set<V> values;
+    private List<RangeNode> sizes;
 
-    public SetConstraintValues() {
-        this.values =  new HashSet<>();
+    public BitStringSizeConstraint() {
+        this.sizes = new ArrayList<>();
     }
 
-    public SetConstraintValues(Set<V> values) {
-        this();
-
-        this.values.addAll(values);
+    public BitStringSizeConstraint(RangeNode size) {
+        this.sizes = new ArrayList<>();
+        this.sizes.add(size);
     }
 
-    @Override
-    public Set<V> getValues() {
-        return values;
+    public BitStringSizeConstraint(List<RangeNode> sizes) {
+        this.sizes = sizes;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public List<RangeNode> getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(List<RangeNode> sizes) {
+        this.sizes = sizes;
+    }
+
+    public BitStringSizeConstraint sizes(List<RangeNode> sizes) {
+        setSizes(sizes);
+
+        return this;
+    }
+
+    @Override
+    public BitStringSizeConstraint createSizeConstraint(List<RangeNode> sizes) {
+        return new BitStringSizeConstraint(sizes);
+    }
+
+    @Override
+    public BitStringSizeConstraint intersection(BitStringSizeConstraint constraint) {
+        return copy().sizes(RangeNodes.intersection(getSizes(), constraint.getSizes()));
+    }
+
+    @Override
+    public BitStringSizeConstraint union(BitStringSizeConstraint constraint) {
+        return copy().sizes(RangeNodes.union(getSizes(), constraint.getSizes()));
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return sizes.isEmpty();
+    }
+
+    @Override
+    public boolean isInverted() {
+        return false;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (other == null || getClass() != other.getClass()) {
             return false;
         }
 
-        SetConstraintValues<?, ?> that = (SetConstraintValues<?, ?>) o;
+        BitStringSizeConstraint that = (BitStringSizeConstraint) other;
 
-        return Objects.equals(values, that.values);
+        return Objects.equals(sizes, that.sizes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(values);
+        return Objects.hash(sizes);
     }
 
 }

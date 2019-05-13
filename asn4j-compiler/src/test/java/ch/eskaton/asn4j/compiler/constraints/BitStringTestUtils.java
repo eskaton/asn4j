@@ -54,8 +54,8 @@ public class BitStringTestUtils {
         return values.stream().map(BitStringTestUtils::toBitString).collect(Collectors.toSet());
     }
 
-    public static BitStringConstraintValues toBitStringValues(String... values) {
-        return new BitStringConstraintValues(toBitStringSet(values));
+    public static BitStringConstraint toBitStringValues(String... values) {
+        return new BitStringConstraint(new BitStringValueConstraint(toBitStringSet(values)));
     }
 
 }

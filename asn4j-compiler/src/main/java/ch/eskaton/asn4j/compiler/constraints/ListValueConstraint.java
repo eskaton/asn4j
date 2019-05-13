@@ -27,26 +27,27 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.List;
 
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodeTestUtils.createRange;
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+public abstract class ListValueConstraint<V, T extends ListValueConstraint<V, T>>
+        implements ValueConstraint<V, List<V>, T> {
 
-public class IntegerConstraintDefinitionTest {
+    private List<V> values;
 
-    @Test
-    public void testUnion() {
-        IntegerConstraintDefinition a = new IntegerConstraintDefinition()
-                .roots(new IntegerValueConstraint(asList(createRange(1L, 5L)))).extensible(false);
-        IntegerConstraintDefinition b = new IntegerConstraintDefinition()
-                .roots(new IntegerValueConstraint(asList(createRange(4L, 7L)))).extensible(false);
+    public ListValueConstraint() {
+        this.values =  new ArrayList<>();
+    }
 
-        IntegerConstraintDefinition union = a.union(b);
+    public ListValueConstraint(List<V> values) {
+        this();
 
-        assertFalse(union.isExtensible());
-        assertTrue(union.getExtensions().isEmpty());
+        this.values.addAll(values);
+    }
+
+    @Override
+    public List<V> getValues() {
+        return values;
     }
 
 }

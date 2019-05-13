@@ -27,34 +27,20 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.Set;
+public interface GenericConstraint<T extends GenericConstraint> {
 
-import static ch.eskaton.commons.utils.CollectionUtils.asHashSet;
+    T intersection(T values);
 
-public class BooleanConstraintValues extends SetConstraintValues<Boolean, BooleanConstraintValues> {
+    T union(T values);
 
-    static final BooleanConstraintValues ALL = new BooleanConstraintValues(asHashSet(Boolean.TRUE, Boolean.FALSE));
+    T exclude(T values);
 
-    public BooleanConstraintValues() {
-        super();
-    }
+    T invert();
 
-    public BooleanConstraintValues(Set<Boolean> values) {
-        super(values);
-    }
+    T copy();
 
-    @Override
-    public BooleanConstraintValues invert() {
-        BooleanConstraintValues all = ALL.copy();
+    boolean isEmpty();
 
-        all.getValues().removeAll(getValues());
-
-        return all;
-    }
-
-    @Override
-    public BooleanConstraintValues copy() {
-        return new BooleanConstraintValues(getValues());
-    }
+    boolean isInverted();
 
 }

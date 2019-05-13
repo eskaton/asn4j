@@ -42,9 +42,10 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 
-public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>,
+public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T extends GenericConstraint<T>,
         D extends ConstraintDefinition<V, C, T, D>> {
 
     protected CompilerContext ctx;
@@ -53,12 +54,12 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         this.ctx = ctx;
     }
 
-    public D compileConstraint(Type base, SetSpecsNode setSpecs) throws CompilerException {
-        T root = compileConstraint(base, setSpecs.getRootElements());
+    public D compileConstraint(Type base, SetSpecsNode setSpecs, Optional<Bounds> bounds) throws CompilerException {
+        T root = compileConstraint(base, setSpecs.getRootElements(), bounds);
         T extension = null;
 
         if (setSpecs.hasExtensionElements()) {
-            extension = compileConstraint(base, setSpecs.getExtensionElements());
+            extension = compileConstraint(base, setSpecs.getExtensionElements(), bounds);
         }
 
         return createDefinition(root, extension).extensible(setSpecs.hasExtensionMarker());
@@ -113,6 +114,8 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         return null;
     }
 
+    abstract Optional<Bounds> getBounds(Optional<D> constraint);
+
     D compileConstraints(Type base, List<Constraint> constraints) throws CompilerException {
         D constraintDef = null;
 
@@ -121,9 +124,10 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
                 SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
                 if (constraintDef == null) {
-                    constraintDef = compileConstraint(base, setSpecs);
+                    constraintDef = compileConstraint(base, setSpecs, getBounds(Optional.empty()));
                 } else {
-                    constraintDef.intersection(compileConstraint(base, setSpecs));
+                    constraintDef.serialApplication(compileConstraint(base, setSpecs,
+                            getBounds(Optional.of(constraintDef))));
                 }
             } else {
                 throw new CompilerException("Constraints of type %s not yet supported",
@@ -134,37 +138,38 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         return constraintDef;
     }
 
-    protected T compileConstraint(Type base, ElementSet set) throws CompilerException {
+    protected T compileConstraint(Type base, ElementSet set, Optional<Bounds> bounds) throws CompilerException {
         List<Elements> operands = set.getOperands();
 
         switch (set.getOperation()) {
             case All:
-                return calculateInversion(compileConstraint(base, (ElementSet) operands.get(0)));
+                return calculateInversion(compileConstraint(base, (ElementSet) operands.get(0), bounds));
 
             case Exclude:
                 if (operands.size() == 1) {
                     // ALL EXCEPT
-                    return calculateElements(base, operands.get(0));
+                    return calculateElements(base, operands.get(0), bounds);
                 } else {
-                    return calculateExclude(calculateElements(base, operands.get(0)),
-                            calculateElements(base, operands.get(1)));
+                    return calculateExclude(calculateElements(base, operands.get(0), bounds),
+                            calculateElements(base, operands.get(1), bounds));
                 }
 
             case Intersection:
-                return calculateIntersection(base, operands);
+                return calculateIntersection(base, operands, bounds);
 
             case Union:
-                return calculateUnion(base, operands);
+                return calculateUnion(base, operands, bounds);
         }
 
-        return createValues();
+        return createConstraint();
     }
 
-    protected T calculateIntersection(Type base, List<Elements> elements) throws CompilerException {
-        T values1 = createValues();
+    protected T calculateIntersection(Type base, List<Elements> elements, Optional<Bounds> bounds)
+            throws CompilerException {
+        T values1 = createConstraint();
 
         for (Elements e : elements) {
-            T values2 = calculateElements(base, e);
+            T values2 = calculateElements(base, e, bounds);
 
             if (values1.isEmpty()) {
                 values1 = values1.union(values2);
@@ -180,11 +185,11 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         return values1;
     }
 
-    protected T calculateUnion(Type base, List<Elements> elements) throws CompilerException {
-        T values = createValues();
+    protected T calculateUnion(Type base, List<Elements> elements, Optional<Bounds> bounds) throws CompilerException {
+        T values = createConstraint();
 
         for (Elements e : elements) {
-            values = values.union(calculateElements(base, e));
+            values = values.union(calculateElements(base, e, bounds));
         }
 
         return values;
@@ -200,14 +205,16 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
 
     protected abstract D createDefinition(T root, T extension);
 
-    protected abstract T createValues();
+    protected abstract T createConstraint();
 
-    protected abstract T calculateElements(Type base, Elements elements) throws CompilerException;
+    protected abstract T calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
+            throws CompilerException;
 
     protected T calculateIntersection(T values1, T values2) throws CompilerException {
         return values1.intersection(values2);
     }
 
-    protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition) throws CompilerException;
+    protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition)
+            throws CompilerException;
 
 }

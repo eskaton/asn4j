@@ -29,77 +29,77 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import java.util.Collection;
 
-public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>,
+public abstract class AbstractConstraintDefinition<V, C extends Collection<V>, T extends GenericConstraint<T>,
         D extends ConstraintDefinition<V, C, T, D>> implements ConstraintDefinition<V, C, T, D> {
 
-    private T rootValues;
+    private T roots;
 
-    private T extensionValues;
+    private T extensions;
 
     private boolean extensible;
 
     public AbstractConstraintDefinition() {
-        this.rootValues = createValues();
-        this.extensionValues = createValues();
+        this.roots = createConstraint();
+        this.extensions = createConstraint();
     }
 
-    public AbstractConstraintDefinition(T rootValues, T extensionValues) {
+    public AbstractConstraintDefinition(T roots, T extensions) {
         this();
 
-        setRootValues(rootValues);
-        setExtensionValues(extensionValues);
+        setRoots(roots);
+        setExtensions(extensions);
     }
 
     @Override
-    public T getRootValues() {
-        return rootValues;
+    public T getRoots() {
+        return roots;
     }
 
     @Override
-    public void setRootValues(T rootValues) {
-        if (rootValues == null) {
-            this.rootValues = createValues();
+    public void setRoots(T roots) {
+        if (roots == null) {
+            this.roots = createConstraint();
         } else {
-            this.rootValues = rootValues;
+            this.roots = roots;
         }
     }
 
     @Override
-    public D rootValues(T values) {
-        setRootValues(values);
+    public D roots(T roots) {
+        setRoots(roots);
 
         return (D) this;
     }
 
     @Override
-    public T getExtensionValues() {
-        return extensionValues;
+    public T getExtensions() {
+        return extensions;
     }
 
     @Override
-    public void setExtensionValues(T extensionValues) {
-        if (extensionValues == null) {
-            this.extensionValues = createValues();
+    public void setExtensions(T extensions) {
+        if (extensions == null) {
+            this.extensions = createConstraint();
         } else {
-            this.extensionValues = extensionValues;
+            this.extensions = extensions;
         }
     }
 
     @Override
-    public D extensionValues(T values) {
-        setExtensionValues(values);
+    public D extensions(T extensions) {
+        setExtensions(extensions);
 
         return (D) this;
-    }
-
-    @Override
-    public void setExtensible(boolean extensible) {
-        this.extensible = extensible;
     }
 
     @Override
     public boolean isExtensible() {
         return extensible;
+    }
+
+    @Override
+    public void setExtensible(boolean extensible) {
+        this.extensible = extensible;
     }
 
     @Override

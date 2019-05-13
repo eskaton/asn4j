@@ -39,6 +39,7 @@ import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -63,7 +64,7 @@ public class BitStringConstraintCompilerTest {
 
         Mockito.when(ctx.resolveGenericValue(eq(BitStringValue.class), any(BitString.class),
                 any(AbstractBaseXStringValue.class)))
-                .thenAnswer(i -> ((AbstractBaseXStringValue)i.getArguments()[2]).toBitString());
+                .thenAnswer(i -> ((AbstractBaseXStringValue) i.getArguments()[2]).toBitString());
 
         assertEquals(emptySet(), invokeCalculateUnion(compiler));
         assertEquals(asHashSet(toBitString("0001")), invokeCalculateUnion(compiler, "0001"));
@@ -81,7 +82,7 @@ public class BitStringConstraintCompilerTest {
 
         Mockito.when(ctx.resolveGenericValue(eq(BitStringValue.class), any(BitString.class),
                 any(AbstractBaseXStringValue.class)))
-                .thenAnswer(i -> ((AbstractBaseXStringValue)i.getArguments()[2]).toBitString());
+                .thenAnswer(i -> ((AbstractBaseXStringValue) i.getArguments()[2]).toBitString());
 
         assertEquals(emptySet(), invokeCalculateIntersection(compiler));
         assertEquals(emptySet(), invokeCalculateIntersection(compiler, asList("0001"), asList()));
@@ -107,16 +108,19 @@ public class BitStringConstraintCompilerTest {
     }
 
     private Set<BitStringValue> invokeCalculateUnion(BitStringConstraintCompiler compiler, String... elements) {
-        return compiler.calculateUnion(new BitString(), toElements(elements)).getValues();
+        return compiler.calculateUnion(new BitString(), toElements(elements), Optional.empty()).getValues().getValues();
     }
 
-    private Set<BitStringValue> invokeCalculateIntersection(BitStringConstraintCompiler compiler, List<String>... elements) {
-        return compiler.calculateIntersection(new BitString(), toElements(elements)).getValues();
+    private Set<BitStringValue> invokeCalculateIntersection(BitStringConstraintCompiler compiler,
+            List<String>... elements) {
+        return compiler.calculateIntersection(new BitString(), toElements(elements), Optional.empty()).getValues()
+                .getValues();
     }
 
-    private Set<BitStringValue> invokeCalculateExclude(BitStringConstraintCompiler compiler, Set<String> a, Set<String> b) {
-        return compiler.calculateExclude(new BitStringConstraintValues(toBitStringSet(a)),
-                new BitStringConstraintValues(toBitStringSet(b))).getValues();
+    private Set<BitStringValue> invokeCalculateExclude(BitStringConstraintCompiler compiler, Set<String> a,
+            Set<String> b) {
+        return compiler.calculateExclude(new BitStringConstraint(new BitStringValueConstraint(toBitStringSet(a))),
+                new BitStringConstraint(new BitStringValueConstraint(toBitStringSet(b)))).getValues().getValues();
     }
 
     private List<Elements> toElements(String... values) {

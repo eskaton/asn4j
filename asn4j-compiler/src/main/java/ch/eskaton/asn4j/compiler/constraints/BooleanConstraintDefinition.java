@@ -29,19 +29,20 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import java.util.Set;
 
-public class BooleanConstraintDefinition extends AbstractConstraintDefinition<Boolean, Set<Boolean>, BooleanConstraintValues, BooleanConstraintDefinition> {
+public class BooleanConstraintDefinition extends AbstractConstraintDefinition<Boolean, Set<Boolean>,
+        BooleanValueConstraint, BooleanConstraintDefinition> {
 
     public BooleanConstraintDefinition() {
         super();
     }
 
-    public BooleanConstraintDefinition(BooleanConstraintValues rootValues, BooleanConstraintValues extensionValues) {
-       super(rootValues, extensionValues);
+    public BooleanConstraintDefinition(BooleanValueConstraint roots, BooleanValueConstraint extensions) {
+       super(roots, extensions);
     }
 
     @Override
-    public BooleanConstraintValues createValues() {
-        return new BooleanConstraintValues();
+    public BooleanValueConstraint createConstraint() {
+        return new BooleanValueConstraint();
     }
 
     @Override

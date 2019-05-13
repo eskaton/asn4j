@@ -47,84 +47,90 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeRanges;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getLowerBound;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getUpperBound;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
-public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeNode, List<RangeNode>, IntegerConstraintValues, IntegerConstraintDefinition> {
+public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeNode, List<RangeNode>,
+        IntegerValueConstraint, IntegerConstraintDefinition> {
 
     public IntegerConstraintCompiler(CompilerContext ctx) {
         super(ctx);
     }
 
     @Override
-    protected IntegerConstraintDefinition createDefinition(IntegerConstraintValues root, IntegerConstraintValues extension) {
-        return new IntegerConstraintDefinition(root, extension);
+    Optional<Bounds> getBounds(Optional<IntegerConstraintDefinition> constraint) {
+        return constraint.map(c ->
+                new IntegerBounds(getLowerBound(c.getRoots().getValues()), getUpperBound(c.getRoots().getValues())));
     }
 
     @Override
-    protected IntegerConstraintValues createValues() {
-        return new IntegerConstraintValues();
+    protected IntegerConstraintDefinition createDefinition(IntegerValueConstraint roots,
+            IntegerValueConstraint extensions) {
+        return new IntegerConstraintDefinition(roots, extensions);
     }
 
     @Override
-    protected IntegerConstraintValues calculateElements(Type base, Elements elements) throws CompilerException {
+    protected IntegerValueConstraint createConstraint() {
+        return new IntegerValueConstraint();
+    }
+
+    @Override
+    protected IntegerValueConstraint calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
+            throws CompilerException {
         if (elements instanceof ElementSet) {
-            return compileConstraint(base, (ElementSet) elements);
-        } else {
-            if (elements instanceof SingleValueConstraint) {
-                Value value = ((SingleValueConstraint) elements).getValue();
-                if (value instanceof IntegerValue) {
-                    if (((IntegerValue) value).isReference()) {
-                        // TODO: resolve
-                        throw new CompilerException("not yet supported");
-                    } else {
-                        return new IntegerConstraintValues(Arrays.asList(new RangeNode(
-                                new EndpointNode(value, true),
-                                new EndpointNode(value, true))));
-                    }
+            return compileConstraint(base, (ElementSet) elements, bounds);
+        } else if (elements instanceof SingleValueConstraint) {
+            Value value = ((SingleValueConstraint) elements).getValue();
+            if (value instanceof IntegerValue) {
+                if (((IntegerValue) value).isReference()) {
+                    // TODO: resolve
+                    throw new CompilerException("not yet supported");
                 } else {
-                    throw new CompilerException("Invalid single-value constraint %s for INTEGER type",
-                            value.getClass().getSimpleName());
+                    return new IntegerValueConstraint(Arrays.asList(new RangeNode(
+                            new EndpointNode(value, true),
+                            new EndpointNode(value, true))));
                 }
-            } else if (elements instanceof ContainedSubtype) {
-                Type type = ((ContainedSubtype) elements).getType();
-                return calculateContainedSubtype(type);
-            } else if (elements instanceof RangeNode) {
-                EndpointNode lower = RangeNodes
-                        .canonicalizeEndpoint(((RangeNode) elements).getLower(), true);
-                EndpointNode upper = RangeNodes
-                        .canonicalizeEndpoint(((RangeNode) elements).getUpper(), false);
-                return new IntegerConstraintValues(Arrays.asList(new RangeNode(lower, upper)));
             } else {
-                throw new CompilerException("Invalid constraint %s for INTEGER type",
-                        elements.getClass().getSimpleName());
+                throw new CompilerException("Invalid single-value constraint %s for INTEGER type",
+                        value.getClass().getSimpleName());
             }
+        } else if (elements instanceof ContainedSubtype) {
+            Type type = ((ContainedSubtype) elements).getType();
+            return calculateContainedSubtype(type);
+        } else if (elements instanceof RangeNode) {
+            long min = bounds.map(b -> ((IntegerBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
+            long max = bounds.map(b -> ((IntegerBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
+
+            EndpointNode lower = RangeNodes.canonicalizeLowerEndpoint(((RangeNode) elements).getLower(), min);
+            EndpointNode upper = RangeNodes.canonicalizeUpperEndpoint(((RangeNode) elements).getUpper(), max);
+
+            return new IntegerValueConstraint(Arrays.asList(new RangeNode(lower, upper)));
+        } else {
+            throw new CompilerException("Invalid constraint %s for INTEGER type",
+                    elements.getClass().getSimpleName());
         }
     }
 
-    private IntegerConstraintValues calculateContainedSubtype(Type type) throws CompilerException {
-        IntegerConstraintValues values = new IntegerConstraintValues();
+    private IntegerValueConstraint calculateContainedSubtype(Type type) throws CompilerException {
+        IntegerValueConstraint values = new IntegerValueConstraint();
 
         if (type instanceof ASN1Integer) {
             // no restriction
             return values;
         } else if (type instanceof TypeReference) {
-            return compileConstraints(type, ctx.getBase((TypeReference) type)).getRootValues();
+            return compileConstraints(type, ctx.getBase((TypeReference) type)).getRoots();
         } else {
             throw new CompilerException("Invalid type %s in constraint for INTEGER type", type);
         }
     }
 
-    /**
-     * Calculates the union of a list of {@link Elements}.
-     *
-     * @param base Base type
-     * @param elements A list of {@link Elements}s.
-     * @return A list with the union of {@link RangeNode}s
-     */
-    protected IntegerConstraintValues calculateUnion(Type base, List<Elements> elements) throws CompilerException {
-        return new IntegerConstraintValues(canonicalizeRanges(super.calculateUnion(base, elements).getValues()));
+    protected IntegerValueConstraint calculateUnion(Type base, List<Elements> elements, Optional<Bounds> bounds)
+            throws CompilerException {
+        return new IntegerValueConstraint(canonicalizeRanges(super.calculateUnion(base, elements, bounds).getValues()));
     }
 
     @Override
@@ -138,13 +144,12 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler<RangeN
 
         boolean first = true;
 
-        IntegerConstraintValues rootValues = ((IntegerConstraintDefinition) definition).getRootValues();
-        IntegerConstraintValues extensionValues = ((IntegerConstraintDefinition) definition).getExtensionValues();
-        IntegerConstraintValues union = new IntegerConstraintValues(canonicalizeRanges(rootValues
+        IntegerValueConstraint rootValues = ((IntegerConstraintDefinition) definition).getRoots();
+        IntegerValueConstraint extensionValues = ((IntegerConstraintDefinition) definition).getExtensions();
+        IntegerValueConstraint union = new IntegerValueConstraint(canonicalizeRanges(rootValues
                 .union(extensionValues).getValues()));
 
-        for (RangeNode value : union.getValues()) {
-            RangeNode range = value;
+        for (RangeNode range : union.getValues()) {
             BigInteger lower = ((IntegerValue) range.getLower().getValue()).getValue();
             BigInteger upper = ((IntegerValue) range.getUpper().getValue()).getValue();
 

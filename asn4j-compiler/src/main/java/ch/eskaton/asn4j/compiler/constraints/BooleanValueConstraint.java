@@ -27,26 +27,34 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import org.junit.Test;
+import java.util.Set;
 
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodeTestUtils.createRange;
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static ch.eskaton.commons.utils.CollectionUtils.asHashSet;
 
-public class IntegerConstraintDefinitionTest {
+public class BooleanValueConstraint extends SetValueConstraint<Boolean, BooleanValueConstraint> {
 
-    @Test
-    public void testUnion() {
-        IntegerConstraintDefinition a = new IntegerConstraintDefinition()
-                .roots(new IntegerValueConstraint(asList(createRange(1L, 5L)))).extensible(false);
-        IntegerConstraintDefinition b = new IntegerConstraintDefinition()
-                .roots(new IntegerValueConstraint(asList(createRange(4L, 7L)))).extensible(false);
+    static final BooleanValueConstraint ALL = new BooleanValueConstraint(asHashSet(Boolean.TRUE, Boolean.FALSE));
 
-        IntegerConstraintDefinition union = a.union(b);
+    public BooleanValueConstraint() {
+        super();
+    }
 
-        assertFalse(union.isExtensible());
-        assertTrue(union.getExtensions().isEmpty());
+    public BooleanValueConstraint(Set<Boolean> values) {
+        super(values);
+    }
+
+    @Override
+    public BooleanValueConstraint invert() {
+        BooleanValueConstraint all = ALL.copy();
+
+        all.getValues().removeAll(getValues());
+
+        return all;
+    }
+
+    @Override
+    public BooleanValueConstraint copy() {
+        return new BooleanValueConstraint(getValues());
     }
 
 }

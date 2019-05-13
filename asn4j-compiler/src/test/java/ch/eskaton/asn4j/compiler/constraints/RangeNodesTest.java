@@ -37,12 +37,13 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ch.eskaton.asn4j.compiler.constraints.IntegerTestUtils.createRange;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeEndpoint;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodeTestUtils.createRange;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeLowerEndpoint;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeRanges;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeUpperEndpoint;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalEndpoint;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalRange;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.intersect;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.invert;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.union;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
@@ -77,28 +78,40 @@ public class RangeNodesTest {
     @Test
     public void testCanonicalizeEndpoints() {
         assertEquals(new EndpointNode(new IntegerValue(Long.MIN_VALUE), true),
-                canonicalizeEndpoint(new EndpointNode(Value.MIN, true), true));
+                canonicalizeLowerEndpoint(new EndpointNode(Value.MIN, true), Long.MIN_VALUE));
 
         assertEquals(new EndpointNode(new IntegerValue(Long.MIN_VALUE + 1), true),
-                canonicalizeEndpoint(new EndpointNode(Value.MIN, false), true));
+                canonicalizeLowerEndpoint(new EndpointNode(Value.MIN, false), Long.MIN_VALUE));
+
+        assertEquals(new EndpointNode(new IntegerValue(-12), true),
+                canonicalizeLowerEndpoint(new EndpointNode(Value.MIN, true), -12));
+
+        assertEquals(new EndpointNode(new IntegerValue(-11), true),
+                canonicalizeLowerEndpoint(new EndpointNode(Value.MIN, false), -12));
 
         assertEquals(new EndpointNode(new IntegerValue(Long.MAX_VALUE), true),
-                canonicalizeEndpoint(new EndpointNode(Value.MAX, true), true));
+                canonicalizeUpperEndpoint(new EndpointNode(Value.MAX, true), Long.MAX_VALUE));
 
         assertEquals(new EndpointNode(new IntegerValue(Long.MAX_VALUE - 1), true),
-                canonicalizeEndpoint(new EndpointNode(Value.MAX, false), true));
+                canonicalizeUpperEndpoint(new EndpointNode(Value.MAX, false), Long.MAX_VALUE));
+
+        assertEquals(new EndpointNode(new IntegerValue(23), true),
+                canonicalizeUpperEndpoint(new EndpointNode(Value.MAX, true), 23));
+
+        assertEquals(new EndpointNode(new IntegerValue(22), true),
+                canonicalizeUpperEndpoint(new EndpointNode(Value.MAX, false), 23));
 
         assertEquals(new EndpointNode(new IntegerValue(-15), true),
-                canonicalizeEndpoint(new EndpointNode(new IntegerValue(-15), true), true));
+                canonicalizeLowerEndpoint(new EndpointNode(new IntegerValue(-15), true), Long.MIN_VALUE));
 
         assertEquals(new EndpointNode(new IntegerValue(-14), true),
-                canonicalizeEndpoint(new EndpointNode(new IntegerValue(-15), false), true));
+                canonicalizeLowerEndpoint(new EndpointNode(new IntegerValue(-15), false), Long.MIN_VALUE));
 
         assertEquals(new EndpointNode(new IntegerValue(15), true),
-                canonicalizeEndpoint(new EndpointNode(new IntegerValue(15), true), false));
+                canonicalizeUpperEndpoint(new EndpointNode(new IntegerValue(15), true), Long.MAX_VALUE));
 
         assertEquals(new EndpointNode(new IntegerValue(14), true),
-                canonicalizeEndpoint(new EndpointNode(new IntegerValue(15), false), false));
+                canonicalizeUpperEndpoint(new EndpointNode(new IntegerValue(15), false), Long.MAX_VALUE));
     }
 
     @Test
@@ -106,13 +119,17 @@ public class RangeNodesTest {
         assertEquals(new ArrayList<RangeNode>(), canonicalizeRanges(emptyList()));
 
         // 2 ranges
-        assertEquals(asList(createRange(0L, 5L), createRange(7L, 10L)), canonicalizeRanges(asList(createRange(0L, 5L), createRange(7L, 10L))));
+        assertEquals(asList(createRange(0L, 5L), createRange(7L, 10L)), canonicalizeRanges(asList(createRange(0L, 5L),
+                createRange(7L, 10L))));
 
-        assertEquals(asList(createRange(0L, 10L)), canonicalizeRanges(asList(createRange(0L, 5L), createRange(6L, 10L))));
+        assertEquals(asList(createRange(0L, 10L)), canonicalizeRanges(asList(createRange(0L, 5L),
+                createRange(6L, 10L))));
 
-        assertEquals(asList(createRange(0L, 10L)), canonicalizeRanges(asList(createRange(0L, 5L), createRange(5L, 10L))));
+        assertEquals(asList(createRange(0L, 10L)), canonicalizeRanges(asList(createRange(0L, 5L),
+                createRange(5L, 10L))));
 
-        assertEquals(asList(createRange(0L, 10L)), canonicalizeRanges(asList(createRange(0L, 5L), createRange(3L, 10L))));
+        assertEquals(asList(createRange(0L, 10L)), canonicalizeRanges(asList(createRange(0L, 5L),
+                createRange(3L, 10L))));
 
         assertEquals(asList(createRange(0L, 5L)), canonicalizeRanges(asList(createRange(0L, 5L), createRange(3L, 5L))));
 
@@ -152,27 +169,27 @@ public class RangeNodesTest {
         assertEquals(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
                 union(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
                         asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE))));
-        assertEquals(emptyList(), intersect(asList(createRange(5L, 20L)), emptyList()));
-        assertEquals(emptyList(), intersect(emptyList(), asList(createRange(5L, 20L))));
+        assertEquals(emptyList(), intersection(asList(createRange(5L, 20L)), emptyList()));
+        assertEquals(emptyList(), intersection(emptyList(), asList(createRange(5L, 20L))));
 
-        assertEquals(emptyList(), intersect(asList(createRange(7L, 12L)), asList(createRange(15L, 30L))));
+        assertEquals(emptyList(), intersection(asList(createRange(7L, 12L)), asList(createRange(15L, 30L))));
 
-        assertEquals(emptyList(), intersect(asList(createRange(15L, 30L)), asList(createRange(7L, 12L))));
-
-        assertEquals(asList(createRange(20L, 25L)),
-                intersect(asList(createRange(15L, 30L)), asList(createRange(20L, 25L))));
+        assertEquals(emptyList(), intersection(asList(createRange(15L, 30L)), asList(createRange(7L, 12L))));
 
         assertEquals(asList(createRange(20L, 25L)),
-                intersect(asList(createRange(20L, 25L)), asList(createRange(15L, 30L))));
+                intersection(asList(createRange(15L, 30L)), asList(createRange(20L, 25L))));
+
+        assertEquals(asList(createRange(20L, 25L)),
+                intersection(asList(createRange(20L, 25L)), asList(createRange(15L, 30L))));
 
         assertEquals(asList(createRange(7L, 20L)),
-                intersect(asList(createRange(5L, 20L)), asList(createRange(7L, 25L))));
+                intersection(asList(createRange(5L, 20L)), asList(createRange(7L, 25L))));
 
         assertEquals(asList(createRange(7L, 15L), createRange(22L, 25L)),
-                intersect(asList(createRange(5L, 15L), createRange(22L, 30L)), asList(createRange(7L, 25L))));
+                intersection(asList(createRange(5L, 15L), createRange(22L, 30L)), asList(createRange(7L, 25L))));
 
         assertEquals(asList(createRange(7L, 15L)),
-                intersect(asList(createRange(5L, 15L)), asList(createRange(7L, 25L), createRange(22L, 30L))));
+                intersection(asList(createRange(5L, 15L)), asList(createRange(7L, 25L), createRange(22L, 30L))));
     }
 
     @Test

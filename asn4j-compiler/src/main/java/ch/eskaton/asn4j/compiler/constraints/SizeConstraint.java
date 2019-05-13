@@ -27,63 +27,36 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.RangeNode;
 
-import java.util.Collection;
+import java.util.List;
 
-public interface ConstraintValues<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>> {
+public interface SizeConstraint<S extends SizeConstraint<S>> extends GenericConstraint<S> {
 
-    C getValues();
+    List<RangeNode> getSizes();
 
-    default T intersection(T values) {
-        T copy = copy();
+    S sizes(List<RangeNode> sizes);
 
-        copy.getValues().retainAll(values.getValues());
+    S createSizeConstraint(List<RangeNode> sizes);
 
-        return copy;
+    default S union(S constraint) {
+       return copy().sizes(RangeNodes.union(getSizes(), constraint.getSizes()));
     }
 
-    default T union(T values) {
-        T copy = copy();
-
-        copy.getValues().addAll(values.getValues());
-
-        return copy;
+    default S intersection(S values) {
+        return copy().sizes(RangeNodes.intersection(getSizes(), values.getSizes()));
     }
 
-    default T exclude(T values) throws CompilerException {
-        T copy = copy();
-
-        for (V value : values.getValues()) {
-            if (!copy.isInverted() && copy.getValues().contains(value)) {
-                copy.getValues().remove(value);
-            } else if (copy.isInverted() && !copy.getValues().contains(value)) {
-                copy.getValues().add(value);
-            } else {
-                throw new CompilerException(value + " doesn't exist in parent type");
-            }
-        }
-
-        return copy;
+    default S exclude(S values) {
+        return copy().sizes(RangeNodes.exclude(getSizes(), values.getSizes()));
     }
 
-    default T init(C values) {
-        getValues().clear();
-        getValues().addAll(values);
-
-        return (T) this;
+    default S invert() {
+        return copy().sizes(RangeNodes.invert(getSizes()));
     }
 
-    default boolean isEmpty() {
-        return getValues().isEmpty();
+    default S copy() {
+        return createSizeConstraint(getSizes());
     }
-
-    default boolean isInverted() {
-        return false;
-    }
-
-    T invert();
-
-    T copy();
 
 }

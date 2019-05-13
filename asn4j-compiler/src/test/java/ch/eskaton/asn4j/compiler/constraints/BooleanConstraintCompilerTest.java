@@ -29,14 +29,13 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
@@ -74,22 +73,26 @@ public class BooleanConstraintCompilerTest {
     public void testCalculateExclude() {
         BooleanConstraintCompiler compiler = new BooleanConstraintCompiler(null);
 
-        assertEquals(asHashSet(true, false), invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet()));
-        assertEquals(asHashSet(false), invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet(true)));
-        assertEquals(asHashSet(true), invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet(false)));
-        assertEquals(emptySet(), invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet(false, true)));
+        assertEquals(asHashSet(true, false),
+                invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet()));
+        assertEquals(asHashSet(false),
+                invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet(true)));
+        assertEquals(asHashSet(true),
+                invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet(false)));
+        assertEquals(emptySet(),
+                invokeCalculateExclude(compiler, asHashSet(true, false), asHashSet(false, true)));
     }
 
     private Set<Boolean> invokeCalculateUnion(BooleanConstraintCompiler compiler, boolean... values) {
-        return compiler.calculateUnion(new BooleanType(), toElements(values)).getValues();
+        return compiler.calculateUnion(new BooleanType(), toElements(values), Optional.empty()).getValues();
     }
 
     private Set<Boolean> invokeCalculateIntersection(BooleanConstraintCompiler compiler, boolean... values) {
-        return compiler.calculateIntersection(new BooleanType(), toElements(values)).getValues();
+        return compiler.calculateIntersection(new BooleanType(), toElements(values), Optional.empty()).getValues();
     }
 
     private Set<Boolean> invokeCalculateExclude(BooleanConstraintCompiler compiler, Set<Boolean> a, Set<Boolean> b) {
-        return compiler.calculateExclude(new BooleanConstraintValues(a), new BooleanConstraintValues(b)).getValues();
+        return compiler.calculateExclude(new BooleanValueConstraint(a), new BooleanValueConstraint(b)).getValues();
     }
 
     private List<Elements> toElements(boolean[] values) {
