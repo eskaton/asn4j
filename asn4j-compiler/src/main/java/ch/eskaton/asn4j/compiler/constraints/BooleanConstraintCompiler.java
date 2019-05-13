@@ -44,55 +44,62 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static ch.eskaton.asn4j.compiler.java.JavaType.BOOLEAN;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
-public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolean, Set<Boolean>, BooleanConstraintValues, BooleanConstraintDefinition> {
+public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolean, Set<Boolean>, BooleanValueConstraint,
+        BooleanConstraintDefinition> {
 
     public BooleanConstraintCompiler(CompilerContext ctx) {
         super(ctx);
     }
 
     @Override
-    protected BooleanConstraintDefinition createDefinition(BooleanConstraintValues root, BooleanConstraintValues extension) {
-        return new BooleanConstraintDefinition(root, extension);
+    Optional<Bounds> getBounds(Optional<BooleanConstraintDefinition> constraint) {
+        return Optional.empty();
     }
 
     @Override
-    protected BooleanConstraintValues createValues() {
-        return new BooleanConstraintValues();
+    protected BooleanConstraintDefinition createDefinition(BooleanValueConstraint roots,
+            BooleanValueConstraint extensions) {
+        return new BooleanConstraintDefinition(roots, extensions);
     }
 
-    protected BooleanConstraintValues calculateElements(Type base, Elements elements) throws CompilerException {
+    @Override
+    protected BooleanValueConstraint createConstraint() {
+        return new BooleanValueConstraint();
+    }
+
+    protected BooleanValueConstraint calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
+            throws CompilerException {
         if (elements instanceof ElementSet) {
-            return compileConstraint(base, (ElementSet) elements);
-        } else {
-            if (elements instanceof SingleValueConstraint) {
-                Value value = ((SingleValueConstraint) elements).getValue();
-                if (value instanceof BooleanValue) {
-                    return new BooleanConstraintValues(new HashSet<>(
-                            Collections.singletonList(((BooleanValue) value).getValue())));
-                } else {
-                    throw new CompilerException("Invalid single-value constraint %s for BOOLEAN type",
-                                                value.getClass().getSimpleName());
-                }
-            } else if (elements instanceof ContainedSubtype) {
-                Type type = ((ContainedSubtype) elements).getType();
-                return calculateContainedSubtype(type);
+            return compileConstraint(base, (ElementSet) elements, bounds);
+        } else if (elements instanceof SingleValueConstraint) {
+            Value value = ((SingleValueConstraint) elements).getValue();
+            if (value instanceof BooleanValue) {
+                return new BooleanValueConstraint(new HashSet<>(
+                        Collections.singletonList(((BooleanValue) value).getValue())));
             } else {
-                throw new CompilerException("Invalid constraint %s for BOOLEAN type",
-                                            elements.getClass().getSimpleName());
+                throw new CompilerException("Invalid single-value constraint %s for BOOLEAN type",
+                        value.getClass().getSimpleName());
             }
+        } else if (elements instanceof ContainedSubtype) {
+            Type type = ((ContainedSubtype) elements).getType();
+            return calculateContainedSubtype(type);
+        } else {
+            throw new CompilerException("Invalid constraint %s for BOOLEAN type",
+                    elements.getClass().getSimpleName());
         }
     }
 
-    private BooleanConstraintValues calculateContainedSubtype(Type type) throws CompilerException {
+    private BooleanValueConstraint calculateContainedSubtype(Type type) throws CompilerException {
         if (type instanceof BooleanType) {
-            return BooleanConstraintValues.ALL.copy();
+            return BooleanValueConstraint.ALL.copy();
         } else if (type instanceof TypeReference) {
-            return compileConstraints(type, ctx.getBase((TypeReference) type)).getRootValues();
+            return compileConstraints(type, ctx.getBase((TypeReference) type)).getRoots();
         } else {
             throw new CompilerException("Invalid type %s in constraint for BOOLEAN type", type);
         }
@@ -100,8 +107,8 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolea
 
     @Override
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
-        BooleanConstraintValues rootValues = ((BooleanConstraintDefinition) definition).getRootValues();
-        BooleanConstraintValues extensionValues = ((BooleanConstraintDefinition) definition).getExtensionValues();
+        BooleanValueConstraint rootValues = ((BooleanConstraintDefinition) definition).getRoots();
+        BooleanValueConstraint extensionValues = ((BooleanConstraintDefinition) definition).getExtensions();
         Set<Boolean> values = rootValues.union(extensionValues).getValues();
 
         if (values.size() == 2) {

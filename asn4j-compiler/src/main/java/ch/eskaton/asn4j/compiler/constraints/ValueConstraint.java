@@ -28,40 +28,52 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.RangeNode;
 
-import java.util.List;
+import java.util.Collection;
 
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.intersect;
+public interface ValueConstraint<V, C extends Collection<V>, T extends ValueConstraint<V, C, T>>
+        extends GenericConstraint<T> {
 
-public class IntegerConstraintValues extends ListConstraintValues<RangeNode, IntegerConstraintValues> {
+    C getValues();
 
-    public IntegerConstraintValues() {
-        super();
+    default T intersection(T values) {
+        T copy = copy();
+
+        copy.getValues().retainAll(values.getValues());
+
+        return copy;
     }
 
-    public IntegerConstraintValues(List<RangeNode> values) {
-        super(values);
+    default T union(T values) {
+        T copy = copy();
+
+        copy.getValues().addAll(values.getValues());
+
+        return copy;
     }
 
-    @Override
-    public IntegerConstraintValues copy() {
-        return new IntegerConstraintValues(getValues());
+    default T exclude(T values) throws CompilerException {
+        T copy = copy();
+
+        for (V value : values.getValues()) {
+            if (!copy.isInverted() && copy.getValues().contains(value)) {
+                copy.getValues().remove(value);
+            } else if (copy.isInverted() && !copy.getValues().contains(value)) {
+                copy.getValues().add(value);
+            } else {
+                throw new CompilerException(value + " doesn't exist in parent type");
+            }
+        }
+
+        return copy;
     }
 
-    @Override
-    public IntegerConstraintValues intersection(IntegerConstraintValues values) throws CompilerException {
-        return new IntegerConstraintValues(intersect(this.getValues(), values.getValues()));
+    default boolean isEmpty() {
+        return getValues().isEmpty();
     }
 
-    @Override
-    public IntegerConstraintValues invert() {
-        return new IntegerConstraintValues(RangeNodes.invert(getValues()));
-    }
-
-    @Override
-    public IntegerConstraintValues exclude(IntegerConstraintValues values) throws CompilerException {
-        return new IntegerConstraintValues(RangeNodes.exclude(this.getValues(), values.getValues()));
+    default boolean isInverted() {
+        return false;
     }
 
 }

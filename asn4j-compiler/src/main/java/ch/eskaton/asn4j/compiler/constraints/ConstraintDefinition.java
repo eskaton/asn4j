@@ -29,23 +29,24 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import java.util.Collection;
 
-public interface ConstraintDefinition<V, C extends Collection<V>, T extends ConstraintValues<V, C, T>, D extends ConstraintDefinition<V, C, T, D>> {
+public interface ConstraintDefinition<V, C extends Collection<V>, T extends GenericConstraint<T>,
+        D extends ConstraintDefinition<V, C, T, D>> {
 
-    T createValues();
+    T createConstraint();
 
     D createDefinition();
 
-    T getRootValues();
+    T getRoots();
 
-    void setRootValues(T values);
+    void setRoots(T roots);
 
-    D rootValues(T values);
+    D roots(T roots);
 
-    T getExtensionValues();
+    T getExtensions();
 
-    void setExtensionValues(T values);
+    void setExtensions(T extensions);
 
-    D extensionValues(T values);
+    D extensions(T extensions);
 
     void setExtensible(boolean extensible);
 
@@ -54,37 +55,37 @@ public interface ConstraintDefinition<V, C extends Collection<V>, T extends Cons
     D extensible(boolean extensible);
 
     default D serialApplication(D other) {
-        T roots = getRootValues().intersection(other.getRootValues());
-        T extensions = other.getExtensionValues();
+        T roots = getRoots().intersection(other.getRoots());
+        T extensions = other.getExtensions();
         boolean extensible = other.isExtensible();
 
-        return createDefinition().rootValues(roots).extensionValues(extensions).extensible(extensible);
+        return createDefinition().roots(roots).extensions(extensions).extensible(extensible);
     }
 
     default D intersection(D other) {
-        T roots = getRootValues().intersection(other.getRootValues());
+        T roots = getRoots().intersection(other.getRoots());
         T extensions = null;
         boolean extensible = false;
 
         if (!isExtensionEmpty() && !other.isExtensionEmpty()) {
-            extensions = getRootValues().union(getExtensionValues())
-                    .intersection(other.getRootValues().union(other.getExtensionValues()))
+            extensions = getRoots().union(getExtensions())
+                    .intersection(other.getRoots().union(other.getExtensions()))
                     .exclude(roots);
             extensible = true;
         } else if (isExtensionEmpty()) {
-            extensions = getRootValues().intersection(other.getExtensionValues());
+            extensions = getRoots().intersection(other.getExtensions());
             extensible = true;
         } else if (other.isExtensionEmpty()) {
-            extensions = other.getRootValues().intersection(getExtensionValues());
+            extensions = other.getRoots().intersection(getExtensions());
             extensible = true;
         }
 
-        return createDefinition().rootValues(roots).extensionValues(extensions).extensible(extensible);
+        return createDefinition().roots(roots).extensions(extensions).extensible(extensible);
     }
 
     default D union(D other) {
-        T roots = getRootValues().union(other.getRootValues());
-        T extensions = getExtensionValues().union(other.getExtensionValues());
+        T roots = getRoots().union(other.getRoots());
+        T extensions = getExtensions().union(other.getExtensions());
         boolean extensible = false;
 
         if (!isExtensionEmpty() && !other.isExtensionEmpty()) {
@@ -94,15 +95,15 @@ public interface ConstraintDefinition<V, C extends Collection<V>, T extends Cons
             extensible = true;
         }
 
-        return createDefinition().rootValues(roots).extensionValues(extensions).extensible(extensible);
+        return createDefinition().roots(roots).extensions(extensions).extensible(extensible);
     }
 
     default boolean isRootEmpty() {
-        return getRootValues().getValues().isEmpty() && !getRootValues().isInverted();
+        return getRoots().isEmpty() && !getRoots().isInverted();
     }
 
     default boolean isExtensionEmpty() {
-        return getExtensionValues().getValues().isEmpty() && !getExtensionValues().isInverted();
+        return getExtensions().isEmpty() && !getExtensions().isInverted();
     }
 
 }

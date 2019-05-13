@@ -27,26 +27,18 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import org.junit.Test;
+import ch.eskaton.asn4j.parser.ast.EndpointNode;
+import ch.eskaton.asn4j.parser.ast.RangeNode;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodeTestUtils.createRange;
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+public class RangeNodeTestUtils {
 
-public class IntegerConstraintDefinitionTest {
+    private RangeNodeTestUtils() {
+    }
 
-    @Test
-    public void testUnion() {
-        IntegerConstraintDefinition a = new IntegerConstraintDefinition()
-                .roots(new IntegerValueConstraint(asList(createRange(1L, 5L)))).extensible(false);
-        IntegerConstraintDefinition b = new IntegerConstraintDefinition()
-                .roots(new IntegerValueConstraint(asList(createRange(4L, 7L)))).extensible(false);
-
-        IntegerConstraintDefinition union = a.union(b);
-
-        assertFalse(union.isExtensible());
-        assertTrue(union.getExtensions().isEmpty());
+    public static RangeNode createRange(Long l1, Long l2) {
+        return new RangeNode(new EndpointNode(new IntegerValue(l1), true),
+                new EndpointNode(new IntegerValue(l2), true));
     }
 
 }

@@ -27,13 +27,12 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import org.junit.Test;
 
 import java.util.List;
 
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodeTestUtils.createRange;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
@@ -84,17 +83,12 @@ public class IntegerConstraintCompilerTest {
     }
 
     private List<RangeNode> invokeCalculateInversion(IntegerConstraintCompiler compiler, RangeNode... rangeNodes) {
-        return compiler.calculateInversion(new IntegerConstraintValues(asList(rangeNodes))).getValues();
+        return compiler.calculateInversion(new IntegerValueConstraint(asList(rangeNodes))).getValues();
     }
 
     private List<RangeNode> invokeCalculateIntersection(IntegerConstraintCompiler compiler, List<RangeNode> a,
             List<RangeNode> b) {
-        return compiler.calculateIntersection(new IntegerConstraintValues(a), new IntegerConstraintValues(b)).getValues();
-    }
-
-    private RangeNode createRange(Long l1, Long l2) {
-        return new RangeNode(new EndpointNode(new IntegerValue(l1), true),
-                new EndpointNode(new IntegerValue(l2), true));
+        return compiler.calculateIntersection(new IntegerValueConstraint(a), new IntegerValueConstraint(b)).getValues();
     }
 
 }

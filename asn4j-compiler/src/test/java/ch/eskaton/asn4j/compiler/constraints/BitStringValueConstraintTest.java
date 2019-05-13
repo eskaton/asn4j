@@ -36,18 +36,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BitStringConstraintValuesTest {
+public class BitStringValueConstraintTest {
 
     @Test
     public void testCopy() {
-        BitStringConstraintValues values = toBitStringValues("001", "010").inverted(true);
+        BitStringConstraint values = toBitStringValues("001", "010").invert();
 
         assertEquals(values, values.copy());
     }
 
     @Test
     public void testInvert() {
-        BitStringConstraintValues values = toBitStringValues("001", "010");
+        BitStringConstraint values = toBitStringValues("001", "010");
 
         assertEquals(false, values.isInverted());
         assertEquals(true, values.invert().isInverted());
@@ -56,19 +56,19 @@ public class BitStringConstraintValuesTest {
 
     @Test
     public void testUnion() {
-        BitStringConstraintValues values1 =  toBitStringValues("001", "010");
-        BitStringConstraintValues values2 =  toBitStringValues("011", "100");
+        BitStringConstraint values1 =  toBitStringValues("001", "010");
+        BitStringConstraint values2 =  toBitStringValues("011", "100");
 
-        BitStringConstraintValues union = values1.union(values2);
+        BitStringConstraint union = values1.union(values2);
 
-        assertEquals(toBitStringSet("001", "010", "011", "100"), union.getValues());
+        assertEquals(toBitStringSet("001", "010", "011", "100"), union.getValues().getValues());
 
         values1 =  toBitStringValues("001", "010").invert();
         values2 =  toBitStringValues("011", "100").invert();
 
         union = values1.union(values2);
 
-        assertEquals(emptySet(), union.getValues());
+        assertEquals(emptySet(), union.getValues().getValues());
         assertTrue(union.isInverted());
 
         values1 =  toBitStringValues("001", "010", "011").invert();
@@ -76,7 +76,7 @@ public class BitStringConstraintValuesTest {
 
         union = values1.union(values2);
 
-        assertEquals(toBitStringSet("010", "011"), union.getValues());
+        assertEquals(toBitStringSet("010", "011"), union.getValues().getValues());
         assertTrue(union.isInverted());
 
         values1 =  toBitStringValues("001", "010", "011").invert();
@@ -84,7 +84,7 @@ public class BitStringConstraintValuesTest {
 
         union = values1.union(values2);
 
-        assertEquals(toBitStringSet("001"), union.getValues());
+        assertEquals(toBitStringSet("001"), union.getValues().getValues());
         assertTrue(union.isInverted());
 
         values1 =  toBitStringValues("001", "010", "011");
@@ -92,32 +92,32 @@ public class BitStringConstraintValuesTest {
 
         union = values1.union(values2);
 
-        assertEquals(toBitStringSet("100"), union.getValues());
+        assertEquals(toBitStringSet("100"), union.getValues().getValues());
         assertTrue(union.isInverted());
     }
 
     @Test
     public void testIntersection() {
-        BitStringConstraintValues values1 = toBitStringValues("001", "010", "011");
-        BitStringConstraintValues values2 = toBitStringValues("011", "100", "110");
+        BitStringConstraint values1 = toBitStringValues("001", "010", "011");
+        BitStringConstraint values2 = toBitStringValues("011", "100", "110");
 
-        BitStringConstraintValues intersection = values1.intersection(values2);
+        BitStringConstraint intersection = values1.intersection(values2);
 
-        assertEquals(toBitStringSet("011"), intersection.getValues());
+        assertEquals(toBitStringSet("011"), intersection.getValues().getValues());
 
         values1 =  toBitStringValues("001", "010").invert();
         values2 =  toBitStringValues("011", "100").invert();
 
         intersection = values1.intersection(values2);
 
-        assertEquals(toBitStringSet("001", "010", "011", "100"), intersection.getValues());
+        assertEquals(toBitStringSet("001", "010", "011", "100"), intersection.getValues().getValues());
 
         values1 =  toBitStringValues("001", "010").invert();
         values2 =  toBitStringValues("001", "010").invert();
 
         intersection = values1.intersection(values2);
 
-        assertEquals(toBitStringSet("001", "010"), intersection.getValues());
+        assertEquals(toBitStringSet("001", "010"), intersection.getValues().getValues());
         assertTrue(intersection.isInverted());
 
         values1 =  toBitStringValues("001", "010").invert();
@@ -125,7 +125,7 @@ public class BitStringConstraintValuesTest {
 
         intersection = values1.intersection(values2);
 
-        assertEquals(emptySet(), intersection.getValues());
+        assertEquals(emptySet(), intersection.getValues().getValues());
         assertFalse(intersection.isInverted());
 
         values1 =  toBitStringValues("001", "010", "011").invert();
@@ -133,7 +133,7 @@ public class BitStringConstraintValuesTest {
 
         intersection = values1.intersection(values2);
 
-        assertEquals(toBitStringSet("100", "110"), intersection.getValues());
+        assertEquals(toBitStringSet("100", "110"), intersection.getValues().getValues());
         assertFalse(intersection.isInverted());
 
         values1 =  toBitStringValues("001", "010");
@@ -141,7 +141,7 @@ public class BitStringConstraintValuesTest {
 
         intersection = values1.intersection(values2);
 
-        assertEquals(emptySet(), intersection.getValues());
+        assertEquals(emptySet(), intersection.getValues().getValues());
         assertFalse(intersection.isInverted());
 
         values1 =  toBitStringValues("001", "010", "011");
@@ -149,7 +149,7 @@ public class BitStringConstraintValuesTest {
 
         intersection = values1.intersection(values2);
 
-        assertEquals(toBitStringSet("001", "010"), intersection.getValues());
+        assertEquals(toBitStringSet("001", "010"), intersection.getValues().getValues());
         assertFalse(intersection.isInverted());
 
     }

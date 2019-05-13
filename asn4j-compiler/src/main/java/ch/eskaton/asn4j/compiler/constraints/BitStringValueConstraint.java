@@ -32,15 +32,15 @@ import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import java.util.Objects;
 import java.util.Set;
 
-public class BitStringConstraintValues extends SetConstraintValues<BitStringValue, BitStringConstraintValues> {
+public class BitStringValueConstraint extends SetValueConstraint<BitStringValue, BitStringValueConstraint> {
 
     private boolean inverted;
 
-    public BitStringConstraintValues() {
+    public BitStringValueConstraint() {
         super();
     }
 
-    public BitStringConstraintValues(Set<BitStringValue> values) {
+    public BitStringValueConstraint(Set<BitStringValue> values) {
         super(values);
     }
 
@@ -48,26 +48,27 @@ public class BitStringConstraintValues extends SetConstraintValues<BitStringValu
         return inverted;
     }
 
-    void setInverted(boolean inverted) {
+    public void setInverted(boolean inverted) {
         this.inverted = inverted;
     }
 
-    BitStringConstraintValues inverted(boolean inverted) {
+    public BitStringValueConstraint inverted(boolean inverted) {
         setInverted(inverted);
 
         return this;
     }
 
-    public BitStringConstraintValues intersection(BitStringConstraintValues values) {
+    public BitStringValueConstraint intersection(BitStringValueConstraint values) {
         return combineSets(values, !inverted, !values.isInverted());
     }
 
-    public BitStringConstraintValues union(BitStringConstraintValues values) {
+    public BitStringValueConstraint union(BitStringValueConstraint values) {
         return combineSets(values, inverted, values.isInverted());
     }
 
-    private BitStringConstraintValues combineSets(BitStringConstraintValues values, boolean inverted, boolean valuesInverted) {
-        BitStringConstraintValues copy;
+    private BitStringValueConstraint combineSets(BitStringValueConstraint values, boolean inverted,
+            boolean valuesInverted) {
+        BitStringValueConstraint copy;
 
         if (inverted && valuesInverted) {
             copy = copy();
@@ -87,13 +88,13 @@ public class BitStringConstraintValues extends SetConstraintValues<BitStringValu
     }
 
     @Override
-    public BitStringConstraintValues invert() {
+    public BitStringValueConstraint invert() {
         return copy().inverted(!isInverted());
     }
 
     @Override
-    public BitStringConstraintValues copy() {
-        return new BitStringConstraintValues(getValues()).inverted(isInverted());
+    public BitStringValueConstraint copy() {
+        return new BitStringValueConstraint(getValues()).inverted(isInverted());
     }
 
     @Override
@@ -110,7 +111,7 @@ public class BitStringConstraintValues extends SetConstraintValues<BitStringValu
             return false;
         }
 
-        BitStringConstraintValues that = (BitStringConstraintValues) other;
+        BitStringValueConstraint that = (BitStringValueConstraint) other;
 
         return inverted == that.inverted;
     }

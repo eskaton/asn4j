@@ -32,20 +32,19 @@ import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import java.util.Set;
 
 public class BitStringConstraintDefinition extends AbstractConstraintDefinition<BitStringValue, Set<BitStringValue>,
-        BitStringConstraintValues, BitStringConstraintDefinition> {
+        BitStringConstraint, BitStringConstraintDefinition> {
 
     public BitStringConstraintDefinition() {
         super();
     }
 
-    public BitStringConstraintDefinition(BitStringConstraintValues rootValues,
-            BitStringConstraintValues extensionValues) {
-        super(rootValues, extensionValues);
+    public BitStringConstraintDefinition(BitStringConstraint roots, BitStringConstraint extensions) {
+        super(roots, extensions);
     }
 
     @Override
-    public BitStringConstraintValues createValues() {
-        return new BitStringConstraintValues();
+    public BitStringConstraint createConstraint() {
+        return new BitStringConstraint();
     }
 
     @Override

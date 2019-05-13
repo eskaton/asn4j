@@ -27,18 +27,48 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.parser.ast.EndpointNode;
-import ch.eskaton.asn4j.parser.ast.RangeNode;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
-public class IntegerTestUtils {
+public abstract class SetValueConstraint<V, T extends SetValueConstraint<V, T>>
+        implements ValueConstraint<V, Set<V>, T> {
 
-    private IntegerTestUtils() {
+    private Set<V> values;
+
+    public SetValueConstraint() {
+        this.values =  new HashSet<>();
     }
 
-    public static RangeNode createRange(Long l1, Long l2) {
-        return new RangeNode(new EndpointNode(new IntegerValue(l1), true),
-                new EndpointNode(new IntegerValue(l2), true));
+    public SetValueConstraint(Set<V> values) {
+        this();
+
+        this.values.addAll(values);
+    }
+
+    @Override
+    public Set<V> getValues() {
+        return values;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        SetValueConstraint<?, ?> that = (SetValueConstraint<?, ?>) other;
+
+        return Objects.equals(values, that.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(values);
     }
 
 }

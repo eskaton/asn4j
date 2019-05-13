@@ -66,7 +66,7 @@ public class RangeNodes {
      * empty list, if there is no intersection
      */
     @SuppressWarnings("unchecked")
-    public static List<RangeNode> intersect(List<RangeNode> l1, List<RangeNode> l2) {
+    public static List<RangeNode> intersection(List<RangeNode> l1, List<RangeNode> l2) {
         l1 = canonicalizeRanges(l1);
         l2 = canonicalizeRanges(l2);
 
@@ -120,16 +120,20 @@ public class RangeNodes {
     }
 
     public static List<RangeNode> invert(List<RangeNode> ranges) {
+        if (ranges.isEmpty()) {
+            return ranges;
+        }
+
         ranges = canonicalizeRanges(ranges);
 
         List<RangeNode> result = new ArrayList<>();
         RangeNode op1 = ranges.get(0);
         RangeNode op2 = op1;
 
-        if (((IntegerValue) op1.getLower().getValue()).getValue().compareTo(
-                BigInteger.valueOf(Long.MIN_VALUE)) > 0) {
-            result.add(new RangeNode(new EndpointNode(new IntegerValue(
-                    Long.MIN_VALUE), true), decrement(op1.getLower())));
+        if (((IntegerValue) op1.getLower().getValue()).getValue()
+                .compareTo(BigInteger.valueOf(Long.MIN_VALUE)) > 0) {
+            result.add(new RangeNode(new EndpointNode(new IntegerValue(Long.MIN_VALUE), true),
+                    decrement(op1.getLower())));
         }
 
         for (int i = 1; i < ranges.size(); i++) {
@@ -137,8 +141,8 @@ public class RangeNodes {
             result.add(new RangeNode(increment(op1.getUpper()), decrement(op2.getLower())));
         }
 
-        if (((IntegerValue) op2.getUpper().getValue()).getValue().compareTo(
-                BigInteger.valueOf(Long.MAX_VALUE)) < 0) {
+        if (((IntegerValue) op2.getUpper().getValue()).getValue()
+                .compareTo(BigInteger.valueOf(Long.MAX_VALUE)) < 0) {
             result.add(new RangeNode(increment(op2.getUpper()),
                     new EndpointNode(new IntegerValue(Long.MAX_VALUE), true)));
         }
@@ -149,6 +153,10 @@ public class RangeNodes {
     public static List<RangeNode> exclude(List<RangeNode> r1, List<RangeNode> r2) {
         r1 = canonicalizeRanges(r1);
         r2 = canonicalizeRanges(r2);
+
+        if (r2.isEmpty()) {
+            return r1;
+        }
 
         int excludeInd = 0;
         int rangeInd = 0;
@@ -257,6 +265,14 @@ public class RangeNodes {
         return compareCanonicalEndpoint(r1.getUpper(), r2.getUpper());
     }
 
+    public static EndpointNode canonicalizeLowerEndpoint(EndpointNode node, long bound) {
+        return canonicalizeEndpoint(node, true, bound);
+    }
+
+    public static EndpointNode canonicalizeUpperEndpoint(EndpointNode node, long bound) {
+        return canonicalizeEndpoint(node, false, bound);
+    }
+
     /**
      * Canonicalizes an {@link EndpointNode}, i.e. resolves MIN and MAX values
      * and converts the value to inclusive.
@@ -265,16 +281,14 @@ public class RangeNodes {
      * @param isLower true, if it's a lower {@link EndpointNode}
      * @return a canonical {@link EndpointNode}
      */
-    public static EndpointNode canonicalizeEndpoint(EndpointNode node, boolean isLower) {
+    private static EndpointNode canonicalizeEndpoint(EndpointNode node, boolean isLower, long bound) {
         Value v = node.getValue();
         boolean inclusive = node.isInclusive();
 
         if (Value.MAX.equals(v)) {
-            return new EndpointNode(new IntegerValue(inclusive ? Long.MAX_VALUE
-                    : Long.MAX_VALUE - 1), true);
+            return new EndpointNode(new IntegerValue(inclusive ? bound : bound - 1), true);
         } else if (Value.MIN.equals(v)) {
-            return new EndpointNode(new IntegerValue(inclusive ? Long.MIN_VALUE
-                    : Long.MIN_VALUE + 1), true);
+            return new EndpointNode(new IntegerValue(inclusive ? bound : bound + 1), true);
         } else {
             if (inclusive) {
                 return new EndpointNode(v, true);
@@ -282,8 +296,7 @@ public class RangeNodes {
 
             return new EndpointNode(new IntegerValue(
                     isLower ? ((IntegerValue) v).getValue().add(BigInteger.ONE)
-                            : ((IntegerValue) v).getValue().subtract(
-                            BigInteger.ONE)), true);
+                            : ((IntegerValue) v).getValue().subtract(BigInteger.ONE)), true);
         }
     }
 
@@ -332,13 +345,47 @@ public class RangeNodes {
     }
 
     private static EndpointNode increment(EndpointNode endpoint) {
-        return new EndpointNode(new IntegerValue(((IntegerValue) endpoint.getValue()).getValue().add(
-                BigInteger.ONE)), true);
+        return new EndpointNode(new IntegerValue(((IntegerValue) endpoint.getValue()).getValue()
+                .add(BigInteger.ONE)), true);
     }
 
     private static EndpointNode decrement(EndpointNode endpoint) {
-        return new EndpointNode(new IntegerValue(((IntegerValue) endpoint.getValue()).getValue().subtract(
-                BigInteger.ONE)), true);
+        return new EndpointNode(new IntegerValue(((IntegerValue) endpoint.getValue()).getValue()
+                .subtract(BigInteger.ONE)), true);
+    }
+
+    public static Long getLowerBound(List<RangeNode> ranges) {
+        long min = Long.MAX_VALUE;
+
+        for (RangeNode range : ranges) {
+            min = Math.min(min, toLong(range.getLower().getValue()));
+        }
+
+        return min;
+    }
+
+    public static Long getUpperBound(List<RangeNode> ranges) {
+        long max = Long.MIN_VALUE;
+
+        for (RangeNode range : ranges) {
+            max = Math.max(max, toLong(range.getUpper().getValue()));
+        }
+
+        return max;
+    }
+
+    private static long toLong(Value value) {
+        long num;
+
+        if (Value.MAX.equals(value)) {
+            num = Long.MAX_VALUE;
+        } else if (Value.MIN.equals(value)) {
+            num = Long.MIN_VALUE;
+        } else {
+            num = ((IntegerValue) value).getValue().longValue();
+        }
+
+        return num;
     }
 
     private static class RangeNodeComparator implements Comparator<RangeNode> {

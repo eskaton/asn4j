@@ -27,28 +27,39 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.RangeNode;
+
 import java.util.List;
-import java.util.Set;
 
-public abstract class ListConstraintValues<V, T extends ListConstraintValues<V, T>> implements ConstraintValues<V, List<V>, T> {
+public class IntegerValueConstraint extends ListValueConstraint<RangeNode, IntegerValueConstraint> {
 
-    private List<V> values;
-
-    public ListConstraintValues() {
-        this.values =  new ArrayList<>();
+    public IntegerValueConstraint() {
+        super();
     }
 
-    public ListConstraintValues(List<V> values) {
-        this();
-
-        this.values.addAll(values);
+    public IntegerValueConstraint(List<RangeNode> values) {
+        super(values);
     }
 
     @Override
-    public List<V> getValues() {
-        return values;
+    public IntegerValueConstraint copy() {
+        return new IntegerValueConstraint(getValues());
+    }
+
+    @Override
+    public IntegerValueConstraint intersection(IntegerValueConstraint values) throws CompilerException {
+        return new IntegerValueConstraint(RangeNodes.intersection(this.getValues(), values.getValues()));
+    }
+
+    @Override
+    public IntegerValueConstraint invert() {
+        return new IntegerValueConstraint(RangeNodes.invert(getValues()));
+    }
+
+    @Override
+    public IntegerValueConstraint exclude(IntegerValueConstraint values) throws CompilerException {
+        return new IntegerValueConstraint(RangeNodes.exclude(this.getValues(), values.getValues()));
     }
 
 }
