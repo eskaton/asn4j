@@ -168,8 +168,7 @@ public class RangeNodes {
 
         while (true) {
             if (compareCanonicalEndpoint(exclude.getLower(), range.getLower()) < 0) {
-                throw new CompilerException(((IntegerValue) exclude.getLower().getValue()).getValue()
-                        + " doesn't exist in parent type");
+                throwParentTypeException(exclude.getLower());
             } else if (compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) > 0) {
                 result.add(range);
                 range = getRange(r1, rangeInd++);
@@ -177,8 +176,7 @@ public class RangeNodes {
                     && compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) <= 0) {
 
                 if ((upper = compareCanonicalEndpoint(exclude.getUpper(), range.getUpper())) > 0) {
-                    throw new CompilerException(((IntegerValue) exclude.getUpper().getValue()).getValue()
-                            + " doesn't exist in parent type");
+                    throwParentTypeException(exclude.getUpper());
                 }
 
                 if (lower != 0) {
@@ -196,8 +194,7 @@ public class RangeNodes {
             }
 
             if (range == null && exclude != null) {
-                throw new CompilerException(((IntegerValue) exclude.getLower().getValue()).getValue()
-                        + " doesn't exist in parent type");
+                throwParentTypeException(exclude.getLower());
             }
 
             if (exclude == null) {
@@ -207,7 +204,6 @@ public class RangeNodes {
                 }
                 break;
             }
-
         }
 
         return result;
@@ -230,7 +226,7 @@ public class RangeNodes {
 
         if (ret == 0) {
             return ret;
-        } else if (ret == -1) {
+        } else if (ret < 0) {
             if (v1.compareTo(v2.subtract(BigInteger.ONE)) == 0) {
                 return -1;
             } else {
@@ -386,6 +382,11 @@ public class RangeNodes {
         }
 
         return num;
+    }
+
+    private static void throwParentTypeException(EndpointNode endpointNode) {
+        throw new CompilerException(((IntegerValue)endpointNode.getValue()).getValue()
+                + " doesn't exist in parent type");
     }
 
     private static class RangeNodeComparator implements Comparator<RangeNode> {
