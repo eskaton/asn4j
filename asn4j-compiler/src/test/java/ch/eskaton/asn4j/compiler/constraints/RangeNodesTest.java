@@ -35,7 +35,6 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodeTestUtils.createRange;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeLowerEndpoint;
@@ -43,6 +42,9 @@ import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeRange
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeUpperEndpoint;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalEndpoint;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalRange;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.exclude;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getLowerBound;
+import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getUpperBound;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.invert;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.union;
@@ -194,6 +196,8 @@ public class RangeNodesTest {
 
     @Test
     public void testInvert() {
+        assertEquals(emptyList(), invert(emptyList()));
+
         assertEquals(asList(createRange(Long.MIN_VALUE, 4L), createRange(11L, Long.MAX_VALUE)),
                 invert(asList(createRange(5L, 10L))));
 
@@ -211,47 +215,69 @@ public class RangeNodesTest {
 
     @Test
     public void testExclude() {
-        assertThrows(() -> invokeCalculateExclude(asList(createRange(5L, 10L)), asList(createRange(3L, 4L))),
+        assertThrows(() -> exclude(asList(createRange(5L, 10L)), asList(createRange(3L, 4L))),
                 CompilerException.class);
 
-        assertThrows(() -> invokeCalculateExclude(asList(createRange(5L, 10L)), asList(createRange(3L, 6L))),
+        assertThrows(() -> exclude(asList(createRange(5L, 10L)), asList(createRange(3L, 6L))),
                 CompilerException.class);
 
-        assertThrows(() -> invokeCalculateExclude(asList(createRange(5L, 10L)), asList(createRange(8L, 12L))),
+        assertThrows(() -> exclude(asList(createRange(5L, 10L)), asList(createRange(8L, 12L))),
                 CompilerException.class);
 
-        assertThrows(() -> invokeCalculateExclude(asList(createRange(5L, 10L)), asList(createRange(11L, 12L))),
+        assertThrows(() -> exclude(asList(createRange(5L, 10L)), asList(createRange(11L, 12L))),
                 CompilerException.class);
 
-        assertEquals(asList(),
-                invokeCalculateExclude(asList(createRange(0L, 10L)), asList(createRange(0L, 10L))));
+        assertEquals(emptyList(), exclude(emptyList(), emptyList()));
 
-        assertEquals(asList(createRange(6L, 10L)),
-                invokeCalculateExclude(asList(createRange(0L, 10L)), asList(createRange(0L, 5L))));
+        assertEquals(emptyList(), exclude(emptyList(), asList(createRange(0L, 10L))));
+
+        assertEquals(asList(createRange(0L, 10L)), exclude(asList(createRange(0L, 10L)), emptyList()));
+
+        assertEquals(emptyList(), exclude(asList(createRange(0L, 10L)), asList(createRange(0L, 10L))));
+
+        assertEquals(asList(createRange(6L, 10L)), exclude(asList(createRange(0L, 10L)), asList(createRange(0L, 5L))));
 
         assertEquals(asList(createRange(0L, 2L), createRange(9L, 10L)),
-                invokeCalculateExclude(asList(createRange(0L, 10L)), asList(createRange(3L, 8L))));
+                exclude(asList(createRange(0L, 10L)), asList(createRange(3L, 8L))));
 
-        assertEquals(asList(createRange(0L, 5L)),
-                invokeCalculateExclude(asList(createRange(0L, 10L)), asList(createRange(6L, 10L))));
+        assertEquals(asList(createRange(0L, 5L)), exclude(asList(createRange(0L, 10L)), asList(createRange(6L, 10L))));
 
         assertEquals(asList(createRange(0L, 5L), createRange(7L, 10L), createRange(20L, 30L)),
-                invokeCalculateExclude(asList(createRange(0L, 10L), createRange(20L, 30L)),
-                        asList(createRange(6L, 6L))));
+                exclude(asList(createRange(0L, 10L), createRange(20L, 30L)), asList(createRange(6L, 6L))));
 
         assertEquals(asList(createRange(0L, 10L), createRange(20L, 21L), createRange(23L, 30L)),
-                invokeCalculateExclude(asList(createRange(0L, 10L), createRange(20L, 30L)),
-                        asList(createRange(22L, 22L))));
+                exclude(asList(createRange(0L, 10L), createRange(20L, 30L)), asList(createRange(22L, 22L))));
 
         assertEquals(asList(createRange(0L, 10L), createRange(40L, 50L), createRange(80L, 90L)),
-                invokeCalculateExclude(
-                        asList(createRange(0L, 10L), createRange(20L, 30L), createRange(40L, 50L),
-                                createRange(60L, 70L), createRange(80L, 90L)),
-                        asList(createRange(20L, 30L), createRange(60L, 70L))));
+                exclude(asList(createRange(0L, 10L), createRange(20L, 30L), createRange(40L, 50L),
+                        createRange(60L, 70L), createRange(80L, 90L)), asList(createRange(20L, 30L),
+                        createRange(60L, 70L))));
     }
 
-    private List<RangeNode> invokeCalculateExclude(List<RangeNode> a, List<RangeNode> b) {
-        return RangeNodes.exclude(a, b);
+    @Test
+    public void testGetLowerBound() {
+        assertEquals(Long.MIN_VALUE, getLowerBound(emptyList()));
+
+        assertEquals(Long.MIN_VALUE, getLowerBound(asList(createRange(Long.MIN_VALUE, 10L))));
+
+        assertEquals(-10L, getLowerBound(asList(createRange(-10L, 10L))));
+
+        assertEquals(-20L, getLowerBound(asList(createRange(-10L, 10L), createRange(-20L, 10L))));
+
+        assertEquals(-20L, getLowerBound(asList(createRange(-20L, 10L), createRange(-10L, 10L))));
+    }
+
+    @Test
+    public void testGetUpperBound() {
+        assertEquals(Long.MAX_VALUE, getUpperBound(emptyList()));
+
+        assertEquals(Long.MAX_VALUE, getUpperBound(asList(createRange(-10L, Long.MAX_VALUE))));
+
+        assertEquals(10L, getUpperBound(asList(createRange(-10L, 10L))));
+
+        assertEquals(20L, getUpperBound(asList(createRange(-10L, 20L), createRange(-20L, 10L))));
+
+        assertEquals(20L, getUpperBound(asList(createRange(-20L, 10L), createRange(-10L, 20L))));
     }
 
     private int invokeCompareCanonicalEndpoint(long a, long b) {
