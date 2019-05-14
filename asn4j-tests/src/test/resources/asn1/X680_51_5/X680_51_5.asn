@@ -1,0 +1,14 @@
+X680-51-5 DEFINITIONS ::=
+BEGIN
+
+TestBitString1 ::= BIT STRING (SIZE(MIN..MAX))
+TestBitString2 ::= BIT STRING (SIZE(4..MAX))
+TestBitString3 ::= BIT STRING (SIZE(MIN..4))
+TestBitString4 ::= BIT STRING (SIZE(2..6))
+TestBitString5 ::= BIT STRING (SIZE(4..MAX) | SIZE(2..8))
+TestBitString6 ::= BIT STRING (SIZE(4..MAX) ^ SIZE(2..8))
+TestBitString7 ::= BIT STRING (SIZE(4..MAX) EXCEPT SIZE(8..16))
+TestBitString8 ::= BIT STRING (SIZE(4..MAX)) (SIZE(MIN..8))
+TestBitString9 ::= BIT STRING (SIZE(4..12), ..., SIZE(13..16))
+
+END
