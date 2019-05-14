@@ -117,7 +117,11 @@ public class ASN1BitString implements ASN1Type {
         return unusedBits;
     }
 
-    public int getSize() {
+    public long getSize() {
+        return getSize(value, unusedBits);
+    }
+
+    protected static long getSize(byte[] value, int unusedBits) {
         return value.length * 8 - unusedBits;
     }
 

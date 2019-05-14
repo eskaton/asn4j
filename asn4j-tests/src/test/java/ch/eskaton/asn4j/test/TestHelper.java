@@ -32,6 +32,8 @@ import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 
+import java.math.BigInteger;
+
 import static org.junit.Assert.assertEquals;
 
 public class TestHelper {
@@ -40,9 +42,18 @@ public class TestHelper {
     }
 
 
-    public static <T extends ASN1BitString> void testBitStringSuccess(Class<? extends T> clazz, T bitString, int value,
+    public static <T extends ASN1BitString> void testBitStringSuccess(Class<? extends T> clazz, T bitString, long value,
             int unusedBits) {
-        bitString.setValue(new byte[] { (byte) value }, unusedBits);
+        BigInteger intValue = BigInteger.valueOf(value);
+        byte[] bytes = intValue.toByteArray();
+
+        if (value > 0 && intValue.bitLength() % 8 == 0) {
+            byte[] unsignedBytes = new byte[bytes.length-1];
+            System.arraycopy(bytes, 0, unsignedBytes,0, unsignedBytes.length);
+            bytes = unsignedBytes;
+        }
+
+        bitString.setValue(bytes, unusedBits);
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
@@ -52,7 +63,7 @@ public class TestHelper {
         assertEquals(bitString, result);
     }
 
-    public static <T extends ASN1BitString> void testBitStringFailure(final T bitString, int value, int unusedBits) {
+    public static <T extends ASN1BitString> void testBitStringFailure(final T bitString, long value, int unusedBits) {
         TestUtils.assertThrows(() -> bitString.setValue(new byte[] { (byte) value }, unusedBits),
                 ConstraintViolatedException.class);
     }
