@@ -154,7 +154,7 @@ public class RangeNodes {
         r1 = canonicalizeRanges(r1);
         r2 = canonicalizeRanges(r2);
 
-        if (r2.isEmpty()) {
+        if (r1.isEmpty() || r2.isEmpty()) {
             return r1;
         }
 
@@ -350,7 +350,11 @@ public class RangeNodes {
                 .subtract(BigInteger.ONE)), true);
     }
 
-    public static Long getLowerBound(List<RangeNode> ranges) {
+    public static long getLowerBound(List<RangeNode> ranges) {
+        if (ranges.isEmpty()) {
+            return Long.MIN_VALUE;
+        }
+
         long min = Long.MAX_VALUE;
 
         for (RangeNode range : ranges) {
@@ -360,7 +364,11 @@ public class RangeNodes {
         return min;
     }
 
-    public static Long getUpperBound(List<RangeNode> ranges) {
+    public static long getUpperBound(List<RangeNode> ranges) {
+        if (ranges.isEmpty()) {
+            return Long.MAX_VALUE;
+        }
+
         long max = Long.MIN_VALUE;
 
         for (RangeNode range : ranges) {
