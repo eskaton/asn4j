@@ -192,7 +192,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
                         constraint.getClass().getSimpleName());
             }
         } else if (elements instanceof RangeNode) {
-            long min = bounds.map(b -> ((BitStringBounds) b).getMinSize()).orElse(Long.MIN_VALUE);
+            long min = bounds.map(b -> ((BitStringBounds) b).getMinSize()).orElse(0L);
             long max = bounds.map(b -> ((BitStringBounds) b).getMaxSize()).orElse(Long.MAX_VALUE);
 
             EndpointNode lower = RangeNodes.canonicalizeLowerEndpoint(((RangeNode) elements).getLower(), min);
