@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
@@ -43,11 +44,13 @@ import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -86,7 +89,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
     protected void addConstraint(JavaClass javaClass, ConstraintDefinition definition) throws CompilerException {
         BitStringConstraintDefinition bitStringConstraintDefinition = (BitStringConstraintDefinition) definition;
 
-        JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
+        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
                 .returnType(boolean.class).name("checkConstraint").parameter(BYTE_ARRAY, "value")
                 .parameter(INT, "unusedBits")
                 .exception(ConstraintViolatedException.class).body();
@@ -95,24 +98,52 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
             builder.append("return true;");
         } else {
             BitStringConstraint roots = bitStringConstraintDefinition.getRoots();
-            Set<BitStringValue> values = roots.getValues().getValues();
-            boolean inverted = roots.getValues().isInverted();
 
-            javaClass.addImport(Arrays.class);
+            addValueConstraint(javaClass, builder, roots.getValues());
+            addSizeConstraint(builder, roots.getSizes());
 
-            if (!values.isEmpty()) {
-                builder.append("if (" + values.stream().map(value ->
-                        "Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", value) && " +
-                                value.getUnusedBits() + " == unusedBits").collect(Collectors.joining(" || "))
-                        + ") {");
-                builder.append("\treturn " + (inverted ? "false" : "true") + ";");
-                builder.append("}").nl();
-            }
-
-            builder.append("return " + (inverted ? "true" : "false") + ";");
+            builder.append("return true;");
         }
 
         builder.finish().build();
+    }
+
+    private void addValueConstraint(JavaClass javaClass, BodyBuilder builder, BitStringValueConstraint constraint) {
+        Set<BitStringValue> values = constraint.getValues();
+        boolean inverted = constraint.isInverted();
+
+        javaClass.addImport(Arrays.class);
+
+        if (!values.isEmpty()) {
+            builder.append("if (" + (inverted ? "" : "!") + "(" + values.stream().map(value ->
+                    "Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", value) && " +
+                            value.getUnusedBits() + " == unusedBits").collect(Collectors.joining(" || "))
+                    + ")) {");
+            builder.append("\treturn false;");
+            builder.append("}").nl();
+        }
+    }
+
+    private void addSizeConstraint(BodyBuilder builder, BitStringSizeConstraint constraint) {
+        List<RangeNode> sizes = constraint.getSizes();
+        boolean inverted = constraint.isInverted();
+
+        if (!sizes.isEmpty()) {
+            builder.append("if (" + (inverted ? "" : "!") + "(" + sizes.stream().map(size ->
+                    toLong(size.getLower().getValue()) + "L <= getSize() && " +
+                            toLong(size.getUpper().getValue()) + "L >= getSize()")
+                    .collect(Collectors.joining(" || ")) + ")) {");
+            builder.append("\treturn false;");
+            builder.append("}").nl();
+        }
+    }
+
+    private long toLong(Value value) {
+        if (value instanceof IntegerValue) {
+            return ((IntegerValue) value).getValue().longValue();
+        }
+
+        throw new IllegalStateException("Unresolved");
     }
 
     @Override
