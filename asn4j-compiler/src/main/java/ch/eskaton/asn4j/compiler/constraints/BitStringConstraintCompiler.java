@@ -117,7 +117,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
         if (!values.isEmpty()) {
             builder.append("if (" + (inverted ? "" : "!") + "(" + values.stream().map(value ->
                     "Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", value) && " +
-                            value.getUnusedBits() + " == unusedBits").collect(Collectors.joining(" || "))
+                            value.getUnusedBits() + " == unusedBits").collect(Collectors.joining("\n\t\t|| "))
                     + ")) {");
             builder.append("\treturn false;");
             builder.append("}").nl();
@@ -132,7 +132,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
             builder.append("if (" + (inverted ? "" : "!") + "(" + sizes.stream().map(size ->
                     toLong(size.getLower().getValue()) + "L <= getSize() && " +
                             toLong(size.getUpper().getValue()) + "L >= getSize()")
-                    .collect(Collectors.joining(" || ")) + ")) {");
+                    .collect(Collectors.joining("\n\t\t|| ")) + ")) {");
             builder.append("\treturn false;");
             builder.append("}").nl();
         }
