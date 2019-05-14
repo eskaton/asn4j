@@ -130,8 +130,8 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
 
         if (!sizes.isEmpty()) {
             builder.append("if (" + (inverted ? "" : "!") + "(" + sizes.stream().map(size ->
-                    toLong(size.getLower().getValue()) + "L <= getSize() && " +
-                            toLong(size.getUpper().getValue()) + "L >= getSize()")
+                    toLong(size.getLower().getValue()) + "L <= ASN1BitString.getSize(value, unusedBits) && " +
+                            toLong(size.getUpper().getValue()) + "L >= ASN1BitString.getSize(value, unusedBits)")
                     .collect(Collectors.joining("\n\t\t|| ")) + ")) {");
             builder.append("\treturn false;");
             builder.append("}").nl();
