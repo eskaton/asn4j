@@ -206,8 +206,8 @@ public class JavaClass implements JavaStructure {
     public void save(String dir) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(
                 new FileOutputStream(dir + File.separator
-                                             + pkg.replace('.', File.separatorChar) + File.separator
-                                             + name + ".java")));
+                        + pkg.replace('.', File.separatorChar) + File.separator
+                        + name + ".java")));
         write(writer, "");
         writer.close();
     }
@@ -263,12 +263,26 @@ public class JavaClass implements JavaStructure {
             CompilerUtils.getTagAnnotation(tag, mode.toString(), constructed).write(writer, "");
         }
 
-        writer.write(StringUtils.concat(prefix, "public ",
-                                        StringUtils.join(CollectionUtils.map(modifiers, value -> value.toString()
-                                                .toLowerCase()), " "),
-                                        " class ", name, (parent != null ? " extends " + parent +
-                        (typeParam != null ? "<" + typeParam + ">" : "") : ""),
-                                        (interf != null ? " implements " + interf : ""), " {\n\n"));
+        List<String> clazzDeclaration = new ArrayList<>();
+
+        if (!StringUtils.isEmpty(prefix)) {
+            clazzDeclaration.add(prefix);
+        }
+
+        clazzDeclaration.add("public");
+
+        if (!modifiers.isEmpty()) {
+            clazzDeclaration.add(StringUtils.join(CollectionUtils.map(modifiers,
+                    value -> value.toString().toLowerCase()), " "));
+        }
+
+        clazzDeclaration.add("class");
+        clazzDeclaration.add(name);
+        clazzDeclaration.add(parent != null ? "extends " + parent +
+                (typeParam != null ? "<" + typeParam + ">" : "") : "");
+
+        writer.write(StringUtils.concat(StringUtils.join(clazzDeclaration, " "),
+                (interf != null ? " implements " + interf : ""), " {\n\n"));
     }
 
     private void writeFileHeader(BufferedWriter writer) throws IOException {
@@ -516,7 +530,7 @@ public class JavaClass implements JavaStructure {
                 this.body = new ArrayList<>();
             }
 
-            this.body.add(body);
+            this.body.addAll(Arrays.asList(body.split("\\n")));
 
             return this;
         }
