@@ -11,7 +11,7 @@ before_install:
    - |
      git clone --branch=master https://github.com/eskaton/commons.git eskaton/commons
      cd eskaton/commons
-     mvn -B install
+     mvn -B clean install
      cd -
 
 install: true
