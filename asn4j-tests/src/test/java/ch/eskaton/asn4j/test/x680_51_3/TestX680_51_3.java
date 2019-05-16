@@ -27,61 +27,78 @@
 
 package ch.eskaton.asn4j.test.x680_51_3;
 
-import ch.eskaton.asn4j.test.TestHelper;
-
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString4;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString5;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString6;
+import ch.eskaton.asn4jtest.x680_51_3.TestBoolean3;
+import ch.eskaton.asn4jtest.x680_51_3.TestBoolean4;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testBooleanSuccess;
 
 public class TestX680_51_3 {
 
     @Test
     public void testBitString2() {
-        TestHelper.testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x00, 5);
-        TestHelper.testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x01, 5);
-        TestHelper.testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x02, 5);
+        testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x00, 5);
+        testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x01, 5);
+        testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x02, 5);
 
-        TestHelper.testBitStringFailure(new TestBitString2(), 0x03, 5);
-        TestHelper.testBitStringFailure(new TestBitString2(), 0x00, 4);
-        TestHelper.testBitStringFailure(new TestBitString2(), 0x00, 6);
+        testBitStringFailure(new TestBitString2(), 0x03, 5);
+        testBitStringFailure(new TestBitString2(), 0x00, 4);
+        testBitStringFailure(new TestBitString2(), 0x00, 6);
     }
 
     @Test
     public void testBitString3() {
-        TestHelper.testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x00, 5);
-        TestHelper.testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x01, 5);
+        testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x00, 5);
+        testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x01, 5);
 
-        TestHelper.testBitStringFailure(new TestBitString3(), 0x02, 5);
+        testBitStringFailure(new TestBitString3(), 0x02, 5);
     }
 
     @Test
     public void testBitString4() {
-        TestHelper.testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x00, 5);
-        TestHelper.testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x01, 5);
-        TestHelper.testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x02, 5);
-        TestHelper.testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x03, 6);
-        TestHelper.testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x03, 4);
+        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x00, 5);
+        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x01, 5);
+        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x02, 5);
+        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x03, 6);
+        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x03, 4);
     }
 
     @Test
     public void testBitString5() {
-        TestHelper.testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0x00, 0);
-        TestHelper.testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0xffee, 1);
+        testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0x00, 0);
+        testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0xffee, 1);
     }
 
     @Test
     public void testBitString6() {
-        TestHelper.testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x01, 0);
-        TestHelper.testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x02, 4);
-        TestHelper.testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x02, 6);
-        TestHelper.testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0xffee, 1);
+        testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x01, 0);
+        testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x02, 4);
+        testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x02, 6);
+        testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0xffee, 1);
 
-        TestHelper.testBitStringFailure(new TestBitString6(), 0x02, 5);
+        testBitStringFailure(new TestBitString6(), 0x02, 5);
+    }
+
+    @Test
+    public void testBoolean3() {
+        testBooleanSuccess(TestBoolean3.class, new TestBoolean3(), true);
+
+        testBooleanFailure(new TestBoolean3(), false);
+    }
+
+    @Test
+    public void testBoolean4() {
+        testBooleanSuccess(TestBoolean4.class, new TestBoolean4(), false);
+
+        testBooleanFailure(new TestBoolean4(), true);
     }
 
 }

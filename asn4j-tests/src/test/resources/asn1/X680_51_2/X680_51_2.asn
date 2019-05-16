@@ -12,4 +12,11 @@ TestBitString5 ::= TestBitString4
 -- TestBitString6 must not be extensible
 TestBitString6 ::= TestBitString4 (ALL EXCEPT '001'B)
 
+TestBoolean1 ::= BOOLEAN (ALL EXCEPT TRUE)
+TestBoolean2 ::= BOOLEAN (TRUE)
+TestBoolean3 ::= BOOLEAN (FALSE)
+TestBoolean4 ::= BOOLEAN (TRUE | FALSE)
+TestBoolean5 ::= BOOLEAN ((TRUE | FALSE) ^ TRUE)
+TestBoolean6 ::= TestBoolean4 (ALL EXCEPT FALSE)
+
 END

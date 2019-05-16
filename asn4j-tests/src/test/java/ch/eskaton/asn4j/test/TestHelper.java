@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
+import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 
 import java.math.BigInteger;
 
@@ -48,8 +49,8 @@ public class TestHelper {
         byte[] bytes = intValue.toByteArray();
 
         if (value > 0 && intValue.bitLength() % 8 == 0) {
-            byte[] unsignedBytes = new byte[bytes.length-1];
-            System.arraycopy(bytes, 0, unsignedBytes,0, unsignedBytes.length);
+            byte[] unsignedBytes = new byte[bytes.length - 1];
+            System.arraycopy(bytes, 0, unsignedBytes, 0, unsignedBytes.length);
             bytes = unsignedBytes;
         }
 
@@ -63,9 +64,26 @@ public class TestHelper {
         assertEquals(bitString, result);
     }
 
-    public static <T extends ASN1BitString> void testBitStringFailure(final T bitString, long value, int unusedBits) {
+    public static <T extends ASN1BitString> void testBitStringFailure(T bitString, long value, int unusedBits) {
         TestUtils.assertThrows(() -> bitString.setValue(new byte[] { (byte) value }, unusedBits),
                 ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1Boolean> void testBooleanSuccess(Class<? extends T> clazz, T booleanValue,
+            boolean value) {
+        booleanValue.setValue(value);
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        T result = decoder.decode(clazz, encoder.encode(booleanValue));
+
+        assertEquals(booleanValue, result);
+        assertEquals(booleanValue, result);
+    }
+
+    public static <T extends ASN1Boolean> void testBooleanFailure(T booleanValue, boolean value) {
+        TestUtils.assertThrows(() -> booleanValue.setValue(value), ConstraintViolatedException.class);
     }
 
 }

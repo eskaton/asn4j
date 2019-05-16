@@ -33,10 +33,18 @@ import ch.eskaton.asn4jtest.x680_51_2.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString4;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString5;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString6;
+import ch.eskaton.asn4jtest.x680_51_2.TestBoolean1;
+import ch.eskaton.asn4jtest.x680_51_2.TestBoolean2;
+import ch.eskaton.asn4jtest.x680_51_2.TestBoolean3;
+import ch.eskaton.asn4jtest.x680_51_2.TestBoolean4;
+import ch.eskaton.asn4jtest.x680_51_2.TestBoolean5;
+import ch.eskaton.asn4jtest.x680_51_2.TestBoolean6;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testBooleanSuccess;
 
 public class TestX680_51_2 {
 
@@ -102,6 +110,44 @@ public class TestX680_51_2 {
 
         testBitStringFailure(new TestBitString6(), 0x01, 5);
         testBitStringFailure(new TestBitString6(), 0x03, 5);
+    }
+
+    @Test
+    public void testBoolean1() {
+        testBooleanSuccess(TestBoolean1.class, new TestBoolean1(), false);
+        testBooleanFailure(new TestBoolean1(), true);
+    }
+
+    @Test
+    public void testBoolean2() {
+        testBooleanSuccess(TestBoolean2.class, new TestBoolean2(), true);
+        testBooleanFailure(new TestBoolean2(), false);
+    }
+
+    @Test
+    public void testBoolean3() {
+        testBooleanSuccess(TestBoolean3.class, new TestBoolean3(), false);
+        testBooleanFailure(new TestBoolean3(), true);
+    }
+
+    @Test
+    public void testBoolean4() {
+        testBooleanSuccess(TestBoolean4.class, new TestBoolean4(), true);
+        testBooleanSuccess(TestBoolean4.class, new TestBoolean4(), false);
+    }
+
+    @Test
+    public void testBoolean5() {
+        testBooleanSuccess(TestBoolean5.class, new TestBoolean5(), true);
+
+        testBooleanFailure(new TestBoolean5(), false);
+    }
+
+    @Test
+    public void testBoolean6() {
+        testBooleanSuccess(TestBoolean6.class, new TestBoolean6(), true);
+
+        testBooleanFailure(new TestBoolean6(), false);
     }
 
 }
