@@ -47,7 +47,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static ch.eskaton.asn4j.compiler.java.JavaType.BOOLEAN;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
 public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolean, Set<Boolean>, BooleanValueConstraint,
@@ -116,15 +115,13 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler<Boolea
         }
 
         BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter(BOOLEAN, "v")
+                .returnType(boolean.class).name("checkConstraint").parameter("Boolean", "value")
                 .exception(ConstraintViolatedException.class).body();
 
         if (values.isEmpty()) {
             builder.append("return false;");
         } else {
-            builder.append("if(v == ")
-                    .append(values.iterator().next())
-                    .append(") {")
+            builder.append("if(value == " + values.iterator().next() + ") {")
                     .append("\treturn true;")
                     .append("} else {")
                     .append("\treturn false;")

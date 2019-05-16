@@ -8,4 +8,9 @@ TestBitString4 ::= BIT STRING (INCLUDES TestBitString1, ...)
 TestBitString5 ::= BIT STRING (INCLUDES BIT STRING)
 TestBitString6 ::= BIT STRING (INCLUDES BIT STRING EXCEPT '010'B)
 
+TestBoolean1 ::= BOOLEAN (TRUE)
+TestBoolean2 ::= BOOLEAN (TRUE | FALSE)
+TestBoolean3 ::= BOOLEAN (INCLUDES TestBoolean1)
+TestBoolean4 ::= BOOLEAN (INCLUDES TestBoolean2 EXCEPT TRUE)
+
 END
