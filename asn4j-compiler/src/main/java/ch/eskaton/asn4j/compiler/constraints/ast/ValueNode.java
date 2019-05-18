@@ -25,29 +25,20 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import java.util.Set;
+public class ValueNode<T> extends AbstractNode {
 
-public class BooleanConstraintDefinition extends AbstractConstraintDefinition<Boolean, Set<Boolean>,
-        BooleanValueConstraint, BooleanConstraintDefinition> {
+    private T value;
 
-    public BooleanConstraintDefinition() {
-        super();
+    public ValueNode(T value) {
+        super(NodeType.VALUE);
+
+        this.value = value;
     }
 
-    public BooleanConstraintDefinition(BooleanValueConstraint roots, BooleanValueConstraint extensions) {
-       super(roots, extensions);
-    }
-
-    @Override
-    public BooleanValueConstraint createConstraint() {
-        return new BooleanValueConstraint();
-    }
-
-    @Override
-    public BooleanConstraintDefinition createDefinition() {
-        return new BooleanConstraintDefinition();
+    public T getValue() {
+        return value;
     }
 
 }

@@ -27,83 +27,77 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.Collection;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 
-public interface ConstraintDefinition<V, C extends Collection<V>, T extends GenericConstraint<T>,
-        D extends ConstraintDefinition<V, C, T, D>> {
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 
-    T createConstraint();
+public class ConstraintDefinition {
 
-    D createDefinition();
+    private Node roots;
 
-    T getRoots();
+    private Node extensions;
 
-    void setRoots(T roots);
+    private boolean extensible;
 
-    D roots(T roots);
+    public ConstraintDefinition(Node roots, Node extensions) {
+        this(roots, extensions, false);
+    }
 
-    T getExtensions();
+    public ConstraintDefinition(Node roots, Node extensions, boolean extensible) {
+        this.roots = roots;
+        this.extensions = extensions;
+        this.extensible = extensible;
+    }
 
-    void setExtensions(T extensions);
+    public Node getRoots() {
+        return roots;
+    }
 
-    D extensions(T extensions);
+    public void setRoots(Node roots) {
+        this.roots = roots;
+    }
 
-    void setExtensible(boolean extensible);
+    public ConstraintDefinition roots(Node roots) {
+        setRoots(roots);
 
-    boolean isExtensible();
+        return this;
+    }
 
-    D extensible(boolean extensible);
+    public Node getExtensions() {
+        return extensions;
+    }
 
-    default D serialApplication(D other) {
-        T roots = getRoots().intersection(other.getRoots());
-        T extensions = other.getExtensions();
+    public void setExtensions(Node extensions) {
+        this.extensions = extensions;
+    }
+
+    public ConstraintDefinition extensions(Node extensions) {
+        setExtensions(extensions);
+
+        return this;
+    }
+
+    public void setExtensible(boolean extensible) {
+        this.extensible = extensible;
+    }
+
+    public boolean isExtensible() {
+        return extensible;
+    }
+
+    public ConstraintDefinition extensible(boolean extensible) {
+        setExtensible(extensible);
+
+        return this;
+    }
+
+    public ConstraintDefinition serialApplication(ConstraintDefinition other) {
+        Node roots = new BinOpNode(INTERSECTION, getRoots(), other.getRoots());
+        Node extensions = other.getExtensions();
         boolean extensible = other.isExtensible();
 
-        return createDefinition().roots(roots).extensions(extensions).extensible(extensible);
-    }
-
-    default D intersection(D other) {
-        T roots = getRoots().intersection(other.getRoots());
-        T extensions = null;
-        boolean extensible = false;
-
-        if (!isExtensionEmpty() && !other.isExtensionEmpty()) {
-            extensions = getRoots().union(getExtensions())
-                    .intersection(other.getRoots().union(other.getExtensions()))
-                    .exclude(roots);
-            extensible = true;
-        } else if (isExtensionEmpty()) {
-            extensions = getRoots().intersection(other.getExtensions());
-            extensible = true;
-        } else if (other.isExtensionEmpty()) {
-            extensions = other.getRoots().intersection(getExtensions());
-            extensible = true;
-        }
-
-        return createDefinition().roots(roots).extensions(extensions).extensible(extensible);
-    }
-
-    default D union(D other) {
-        T roots = getRoots().union(other.getRoots());
-        T extensions = getExtensions().union(other.getExtensions());
-        boolean extensible = false;
-
-        if (!isExtensionEmpty() && !other.isExtensionEmpty()) {
-            extensions = roots.union(extensions).exclude(roots);
-            extensible = true;
-        } else if (!isExtensionEmpty() || !other.isExtensionEmpty()) {
-            extensible = true;
-        }
-
-        return createDefinition().roots(roots).extensions(extensions).extensible(extensible);
-    }
-
-    default boolean isRootEmpty() {
-        return getRoots().isEmpty() && !getRoots().isInverted();
-    }
-
-    default boolean isExtensionEmpty() {
-        return getExtensions().isEmpty() && !getExtensions().isInverted();
+        return new ConstraintDefinition(roots, extensions, extensible);
     }
 
 }

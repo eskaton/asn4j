@@ -25,31 +25,37 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.parser.ast.RangeNode;
+public interface Visitor<T> {
 
-import java.util.List;
-
-public class IntegerConstraintDefinition extends AbstractConstraintDefinition<RangeNode, List<RangeNode>,
-        IntegerValueConstraint, IntegerConstraintDefinition> {
-
-    public IntegerConstraintDefinition() {
-        super();
+    default T visit(Node node) {
+        switch (node.getType()) {
+            case UNION:
+            case INTERSECTION:
+            case COMPLEMENT:
+                return visit((BinOpNode) node);
+            case NEGATION:
+                return visit((OpNode) node);
+            case VALUE:
+                return visit((ValueNode) node);
+            case SIZE:
+                return visit((SizeNode) node);
+            case ALL_VALUES:
+                return visit((AllValuesNode) node);
+            default:
+                throw new IllegalStateException("Unimplemented node type: " + node.getType());
+        }
     }
 
-    public IntegerConstraintDefinition(IntegerValueConstraint roots, IntegerValueConstraint extensions) {
-        super(roots, extensions);
-    }
+    T visit(AllValuesNode node);
 
-    @Override
-    public IntegerValueConstraint createConstraint() {
-        return new IntegerValueConstraint();
-    }
+    T visit(BinOpNode node);
 
-    @Override
-    public IntegerConstraintDefinition createDefinition() {
-        return new IntegerConstraintDefinition();
-    }
+    T visit(OpNode node);
+
+    T visit(SizeNode node);
+
+    T visit(ValueNode node);
 
 }

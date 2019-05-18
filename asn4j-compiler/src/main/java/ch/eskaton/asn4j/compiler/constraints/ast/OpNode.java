@@ -25,50 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+public class OpNode extends AbstractNode {
 
-public abstract class SetValueConstraint<V, T extends SetValueConstraint<V, T>>
-        implements ValueConstraint<V, Set<V>, T> {
+    private Node node;
 
-    private Set<V> values;
+    public OpNode(NodeType type, Node node) {
+        super(type);
 
-    public SetValueConstraint() {
-        this.values =  new HashSet<>();
+        this.node = node;
     }
 
-    public SetValueConstraint(Set<V> values) {
-        this();
-
-        this.values.addAll(values);
+    public Node getNode() {
+        return node;
     }
 
-    @Override
-    public Set<V> getValues() {
-        return values;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-
-        if (other == null || getClass() != other.getClass()) {
-            return false;
-        }
-
-        SetValueConstraint<?, ?> that = (SetValueConstraint<?, ?>) other;
-
-        return Objects.equals(values, that.values);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(values);
+    public void setNode(Node node) {
+        this.node = node;
     }
 
 }

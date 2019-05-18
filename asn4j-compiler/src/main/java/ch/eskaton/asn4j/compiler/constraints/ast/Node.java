@@ -25,38 +25,14 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.parser.ast.RangeNode;
+public interface Node {
 
-import java.util.List;
-
-public interface SizeConstraint<S extends SizeConstraint<S>> extends GenericConstraint<S> {
-
-    List<RangeNode> getSizes();
-
-    S sizes(List<RangeNode> sizes);
-
-    S createSizeConstraint(List<RangeNode> sizes);
-
-    default S union(S constraint) {
-       return copy().sizes(RangeNodes.union(getSizes(), constraint.getSizes()));
-    }
-
-    default S intersection(S values) {
-        return copy().sizes(RangeNodes.intersection(getSizes(), values.getSizes()));
-    }
-
-    default S exclude(S values) {
-        return copy().sizes(RangeNodes.exclude(getSizes(), values.getSizes()));
-    }
-
-    default S invert() {
-        return copy().sizes(RangeNodes.invert(getSizes()));
-    }
-
-    default S copy() {
-        return createSizeConstraint(getSizes());
+    NodeType getType();
+    
+    default <T> T accept(Visitor<T> visitor) {
+        return visitor.visit(this);
     }
 
 }
