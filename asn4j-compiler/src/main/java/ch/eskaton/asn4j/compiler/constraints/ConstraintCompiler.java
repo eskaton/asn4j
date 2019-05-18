@@ -32,7 +32,6 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
-import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -52,9 +51,9 @@ public class ConstraintCompiler {
 
         compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler>() {
             {
-                put(IntegerType.class, new IntegerConstraintCompiler(ctx));
-                put(BooleanType.class, new BooleanConstraintCompiler(ctx));
                 put(BitString.class, new BitStringConstraintCompiler(ctx));
+                put(BooleanType.class, new BooleanConstraintCompiler(ctx));
+//                put(IntegerType.class, new IntegerConstraintCompiler(ctx));
 //                put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver));
 //                put(OctetString.class, new OctetStringConstraintCompiler(typeResolver));
 //                put(Null.class, new NullConstraintCompiler(typeResolver));
@@ -92,10 +91,6 @@ public class ConstraintCompiler {
         }
 
         if (constraintDef != null) {
-            if (constraintDef.isRootEmpty()) {
-                throw new CompilerException("Constraints for type %s excludes all values", name);
-            }
-
             compiler.addConstraint(javaClass, constraintDef);
         }
 

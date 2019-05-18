@@ -25,22 +25,6 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-public interface GenericConstraint<T extends GenericConstraint> {
-
-    T intersection(T values);
-
-    T union(T values);
-
-    T exclude(T values);
-
-    T invert();
-
-    T copy();
-
-    boolean isEmpty();
-
-    boolean isInverted();
-
-}
+public enum NodeType { UNION, INTERSECTION, COMPLEMENT, NEGATION, VALUE, ALL_VALUES, SIZE }

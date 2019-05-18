@@ -25,32 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-public class IntegerBounds implements ValueBounds {
+public abstract class AbstractNode implements Node {
 
-    private long minValue;
+    private NodeType type;
 
-    private long maxValue;
-
-    public IntegerBounds(long minValue, long maxValue) {
-        this.minValue = minValue;
-        this.maxValue = maxValue;
+    public AbstractNode(NodeType type) {
+        this.type = type;
     }
 
     @Override
-    public long getMinValue() {
-        return minValue;
+    public NodeType getType() {
+        return type;
     }
 
-    @Override
-    public long getMaxValue() {
-        return maxValue;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + '[' + "minValue=" + minValue + ", maxValue=" + maxValue + ']';
+    public void setType(NodeType type) {
+        this.type = type;
     }
 
 }

@@ -25,55 +25,21 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.RangeNode;
 
-import java.util.Collection;
+public class SizeNode extends AbstractNode {
 
-public interface ValueConstraint<V, C extends Collection<V>, T extends ValueConstraint<V, C, T>>
-        extends GenericConstraint<T> {
+    private RangeNode size;
 
-    C getValues();
+    public SizeNode(RangeNode size) {
+        super(NodeType.SIZE);
 
-    default T intersection(T values) {
-        T copy = copy();
-
-        copy.getValues().retainAll(values.getValues());
-
-        return copy;
+        this.size = size;
     }
 
-    default T union(T values) {
-        T copy = copy();
-
-        copy.getValues().addAll(values.getValues());
-
-        return copy;
+    public RangeNode getSize() {
+        return size;
     }
-
-    default T exclude(T values) throws CompilerException {
-        T copy = copy();
-
-        for (V value : values.getValues()) {
-            if (!copy.isInverted() && copy.getValues().contains(value)) {
-                copy.getValues().remove(value);
-            } else if (copy.isInverted() && !copy.getValues().contains(value)) {
-                copy.getValues().add(value);
-            } else {
-                throw new CompilerException(value + " doesn't exist in parent type");
-            }
-        }
-
-        return copy;
-    }
-
-    default boolean isEmpty() {
-        return getValues().isEmpty();
-    }
-
-    default boolean isInverted() {
-        return false;
-    }
-
 }

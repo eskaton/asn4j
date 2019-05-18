@@ -29,6 +29,10 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -41,101 +45,38 @@ import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getUpperBound;
 import static ch.eskaton.asn4j.compiler.java.JavaType.BYTE_ARRAY;
 import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
+import static java.util.Collections.emptyList;
 
-public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitStringValue, Set<BitStringValue>,
-        BitStringConstraint, BitStringConstraintDefinition> {
+public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
+
+    private static final BoundsVisitor BOUNDS_VISITOR = new BoundsVisitor();
 
     public BitStringConstraintCompiler(CompilerContext ctx) {
         super(ctx);
     }
 
     @Override
-    Optional<Bounds> getBounds(Optional<BitStringConstraintDefinition> constraint) {
+    Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
         return constraint.map(c ->
-                new BitStringBounds(getLowerBound(c.getRoots().getSizes().getSizes()),
-                        getUpperBound(c.getRoots().getSizes().getSizes())));
-    }
-
-    @Override
-    protected BitStringConstraintDefinition createDefinition(BitStringConstraint root, BitStringConstraint extension) {
-        return new BitStringConstraintDefinition(root, extension);
-    }
-
-    @Override
-    protected BitStringConstraint createConstraint() {
-        return new BitStringConstraint();
-    }
-
-    @Override
-    protected void addConstraint(JavaClass javaClass, ConstraintDefinition definition) throws CompilerException {
-        BitStringConstraintDefinition bitStringConstraintDefinition = (BitStringConstraintDefinition) definition;
-
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter(BYTE_ARRAY, "value")
-                .parameter(INT, "unusedBits")
-                .exception(ConstraintViolatedException.class).body();
-
-        if (bitStringConstraintDefinition.isExtensible()) {
-            builder.append("return true;");
-        } else {
-            BitStringConstraint roots = bitStringConstraintDefinition.getRoots();
-
-            addValueConstraint(javaClass, builder, roots.getValues());
-            addSizeConstraint(builder, roots.getSizes());
-
-            builder.append("return true;");
-        }
-
-        builder.finish().build();
-    }
-
-    private void addValueConstraint(JavaClass javaClass, BodyBuilder builder, BitStringValueConstraint constraint) {
-        Set<BitStringValue> values = constraint.getValues();
-        boolean inverted = constraint.isInverted();
-
-        javaClass.addImport(Arrays.class);
-
-        if (!values.isEmpty()) {
-            builder.append("if (" + (inverted ? "" : "!") + "(" + values.stream().map(value ->
-                    "Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", value) && " +
-                            value.getUnusedBits() + " == unusedBits").collect(Collectors.joining("\n\t\t|| "))
-                    + ")) {");
-            builder.append("\treturn false;");
-            builder.append("}").nl();
-        }
-    }
-
-    private void addSizeConstraint(BodyBuilder builder, BitStringSizeConstraint constraint) {
-        List<RangeNode> sizes = constraint.getSizes();
-        boolean inverted = constraint.isInverted();
-
-        if (!sizes.isEmpty()) {
-            builder.append("if (" + (inverted ? "" : "!") + "(" + sizes.stream().map(size ->
-                    toLong(size.getLower().getValue()) + "L <= ASN1BitString.getSize(value, unusedBits) && " +
-                            toLong(size.getUpper().getValue()) + "L >= ASN1BitString.getSize(value, unusedBits)")
-                    .collect(Collectors.joining("\n\t\t|| ")) + ")) {");
-            builder.append("\treturn false;");
-            builder.append("}").nl();
-        }
+                new BitStringBounds(getLowerBound(BOUNDS_VISITOR.visit(c.getRoots()).orElse(emptyList())),
+                        getUpperBound(BOUNDS_VISITOR.visit(c.getRoots()).orElse(emptyList()))));
     }
 
     private long toLong(Value value) {
@@ -147,7 +88,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
     }
 
     @Override
-    protected BitStringConstraint calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
+    protected Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
             throws CompilerException {
         if (elements instanceof ElementSet) {
             return compileConstraint(base, (ElementSet) elements, bounds);
@@ -158,30 +99,15 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
                 // TODO: implement a more convenient resolver
                 BitStringValue bitStringValue = ctx.resolveGenericValue(BitStringValue.class, base, value);
 
-                return new BitStringConstraint(new BitStringValueConstraint(CollectionUtils
-                        .asHashSet(bitStringValue)));
+                return new ValueNode<>(bitStringValue);
             } catch (Exception e) {
                 throw new CompilerException("Invalid single-value constraint %s for BIT STRING type", e,
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
-            Type type = ((ContainedSubtype) elements).getType();
-            Optional<CompiledType> maybeCompiledType = ctx.getCompiledType(type);
-
-            if (maybeCompiledType.isPresent()) {
-                CompiledType compiledType = maybeCompiledType.get();
-                BitStringConstraintDefinition constraintDefinition =
-                        (BitStringConstraintDefinition) compiledType.getConstraintDefinition();
-
-                return constraintDefinition.getRoots();
-            } else if (type.equals(base)) {
-                return new BitStringConstraint(new BitStringValueConstraint().invert());
-            }
-
-            throw new CompilerException("Failed to resolve contained subtype %s", type);
-        } else if (elements instanceof ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint) {
-            Constraint constraint = ((ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint) elements)
-                    .getConstraint();
+            return calculateContainedSubtype(base, ((ContainedSubtype) elements).getType());
+        } else if (elements instanceof SizeConstraint) {
+            Constraint constraint = ((SizeConstraint) elements).getConstraint();
 
             if (constraint instanceof SubtypeConstraint) {
                 SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
@@ -198,10 +124,66 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler<BitS
             EndpointNode lower = RangeNodes.canonicalizeLowerEndpoint(((RangeNode) elements).getLower(), min);
             EndpointNode upper = RangeNodes.canonicalizeUpperEndpoint(((RangeNode) elements).getUpper(), max);
 
-            return new BitStringConstraint(new BitStringSizeConstraint(new RangeNode(lower, upper)));
+            return new SizeNode(new RangeNode(lower, upper));
         } else {
             throw new CompilerException("Invalid constraint %s for BIT STRING type",
                     elements.getClass().getSimpleName());
+        }
+    }
+
+    private Node calculateContainedSubtype(Type base, Type type) throws CompilerException {
+        Optional<CompiledType> maybeCompiledType = ctx.getCompiledType(type);
+
+        if (maybeCompiledType.isPresent()) {
+            CompiledType compiledType = maybeCompiledType.get();
+            ConstraintDefinition constraintDefinition = compiledType.getConstraintDefinition();
+
+            return constraintDefinition == null ? new AllValuesNode() : constraintDefinition.getRoots();
+        } else if (type.equals(base)) {
+            return new AllValuesNode();
+        }
+
+        throw new CompilerException("Failed to resolve contained subtype %s", type);
+    }
+
+    @Override
+    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
+        Node roots = definition.getRoots();
+
+        javaClass.addImport(Arrays.class);
+
+        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
+                .returnType(boolean.class).name("checkConstraint").parameter(BYTE_ARRAY, "value")
+                .parameter(INT, "unusedBits")
+                .exception(ConstraintViolatedException.class).body();
+
+        if (definition.isExtensible()) {
+            builder.append("return true;");
+        } else {
+            builder.append("if( " + buildExpression(roots) + ") {")
+                    .append("\treturn true;")
+                    .append("} else {")
+                    .append("\treturn false;")
+                    .append("}");
+        }
+
+        builder.finish().build();
+    }
+
+    protected String buildExpression(Node node) {
+        switch (node.getType()) {
+            case VALUE:
+                BitStringValue value = (BitStringValue) ((ValueNode) node).getValue();
+                return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", value) && " +
+                        value.getUnusedBits() + " == unusedBits)";
+            case ALL_VALUES:
+                return "true";
+            case SIZE:
+                RangeNode size = ((SizeNode) node).getSize();
+                return "(" + toLong(size.getLower().getValue()) + "L <= ASN1BitString.getSize(value, unusedBits) && " +
+                        toLong(size.getUpper().getValue()) + "L >= ASN1BitString.getSize(value, unusedBits))";
+            default:
+                return super.buildExpression(node);
         }
     }
 

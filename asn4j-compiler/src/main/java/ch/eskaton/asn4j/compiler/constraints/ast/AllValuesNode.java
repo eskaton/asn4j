@@ -25,28 +25,12 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import org.junit.Test;
+public class AllValuesNode extends AbstractNode {
 
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodeTestUtils.createRange;
-import static java.util.Arrays.asList;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-public class IntegerConstraintDefinitionTest {
-
-    @Test
-    public void testUnion() {
-        IntegerConstraintDefinition a = new IntegerConstraintDefinition()
-                .roots(new IntegerValueConstraint(asList(createRange(1L, 5L)))).extensible(false);
-        IntegerConstraintDefinition b = new IntegerConstraintDefinition()
-                .roots(new IntegerValueConstraint(asList(createRange(4L, 7L)))).extensible(false);
-
-        IntegerConstraintDefinition union = a.union(b);
-
-        assertFalse(union.isExtensible());
-        assertTrue(union.getExtensions().isEmpty());
+    public AllValuesNode() {
+        super(NodeType.ALL_VALUES);
     }
 
 }

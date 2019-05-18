@@ -29,6 +29,11 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
+import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
@@ -40,13 +45,16 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 
-public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T extends GenericConstraint<T>,
-        D extends ConstraintDefinition<V, C, T, D>> {
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
+
+public abstract class AbstractConstraintCompiler {
 
     protected CompilerContext ctx;
 
@@ -54,19 +62,19 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         this.ctx = ctx;
     }
 
-    public D compileConstraint(Type base, SetSpecsNode setSpecs, Optional<Bounds> bounds) throws CompilerException {
-        T root = compileConstraint(base, setSpecs.getRootElements(), bounds);
-        T extension = null;
+    public ConstraintDefinition compileConstraint(Type base, SetSpecsNode setSpecs, Optional<Bounds> bounds) throws CompilerException {
+        Node root = compileConstraint(base, setSpecs.getRootElements(), bounds);
+        Node extension = null;
 
         if (setSpecs.hasExtensionElements()) {
             extension = compileConstraint(base, setSpecs.getExtensionElements(), bounds);
         }
 
-        return createDefinition(root, extension).extensible(setSpecs.hasExtensionMarker());
+        return new ConstraintDefinition(root, extension).extensible(setSpecs.hasExtensionMarker());
     }
 
-    D compileConstraints(Type node, Type base) throws CompilerException {
-        Stack<D> cons = new Stack<>();
+    ConstraintDefinition compileConstraints(Type node, Type base) throws CompilerException {
+        Stack<ConstraintDefinition> cons = new Stack<>();
 
         while (true) {
             if (node.hasConstraint()) {
@@ -95,8 +103,8 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         if (cons.size() == 1) {
             return cons.pop();
         } else if (cons.size() > 1) {
-            D op1 = cons.pop();
-            D op2 = cons.pop();
+            ConstraintDefinition op1 = cons.pop();
+            ConstraintDefinition op2 = cons.pop();
 
             do {
                 op1 = op1.serialApplication(op2);
@@ -114,10 +122,10 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         return null;
     }
 
-    abstract Optional<Bounds> getBounds(Optional<D> constraint);
+    abstract Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint);
 
-    D compileConstraints(Type base, List<Constraint> constraints) throws CompilerException {
-        D constraintDef = null;
+    ConstraintDefinition compileConstraints(Type base, List<Constraint> constraints) throws CompilerException {
+        ConstraintDefinition constraintDef = null;
 
         for (Constraint constraint : constraints) {
             if (constraint instanceof SubtypeConstraint) {
@@ -126,7 +134,7 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
                 if (constraintDef == null) {
                     constraintDef = compileConstraint(base, setSpecs, getBounds(Optional.empty()));
                 } else {
-                    constraintDef.serialApplication(compileConstraint(base, setSpecs,
+                    constraintDef = constraintDef.serialApplication(compileConstraint(base, setSpecs,
                             getBounds(Optional.of(constraintDef))));
                 }
             } else {
@@ -138,7 +146,7 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
         return constraintDef;
     }
 
-    protected T compileConstraint(Type base, ElementSet set, Optional<Bounds> bounds) throws CompilerException {
+    protected Node compileConstraint(Type base, ElementSet set, Optional<Bounds> bounds) throws CompilerException {
         List<Elements> operands = set.getOperands();
 
         switch (set.getOperation()) {
@@ -159,62 +167,69 @@ public abstract class AbstractConstraintCompiler<V, C extends Collection<V>, T e
 
             case Union:
                 return calculateUnion(base, operands, bounds);
-        }
 
-        return createConstraint();
+            default:
+                throw new IllegalStateException("Unimplemented node type " + set.getOperation());
+        }
     }
 
-    protected T calculateIntersection(Type base, List<Elements> elements, Optional<Bounds> bounds)
+    protected Node calculateIntersection(Type base, List<Elements> elements, Optional<Bounds> bounds)
             throws CompilerException {
-        T values1 = createConstraint();
+        return calculateBinOp(base, elements, bounds, INTERSECTION);
+    }
 
-        for (Elements e : elements) {
-            T values2 = calculateElements(base, e, bounds);
+    protected Node calculateUnion(Type base, List<Elements> elements, Optional<Bounds> bounds) {
+        return calculateBinOp(base, elements, bounds, UNION);
+    }
 
-            if (values1.isEmpty()) {
-                values1 = values1.union(values2);
+    protected Node calculateBinOp(Type base, List<Elements> elements, Optional<Bounds> bounds, NodeType type) {
+        Node node = null;
+
+        for (Elements element : elements) {
+            Node tmpNode = calculateElements(base, element, bounds);
+
+            if (node == null) {
+                node = tmpNode;
             } else {
-                values1 = calculateIntersection(values1, values2);
-
-                if (values1.isEmpty()) {
-                    return values1;
-                }
+                node = new BinOpNode(type, node, tmpNode);
             }
         }
 
-        return values1;
+        return node;
     }
 
-    protected T calculateUnion(Type base, List<Elements> elements, Optional<Bounds> bounds) throws CompilerException {
-        T values = createConstraint();
-
-        for (Elements e : elements) {
-            values = values.union(calculateElements(base, e, bounds));
-        }
-
-        return values;
+    protected Node calculateInversion(Node node) {
+        return new OpNode(NEGATION, node);
     }
 
-    protected T calculateInversion(T values) {
-        return values.invert();
+    protected Node calculateExclude(Node values1, Node values2) throws CompilerException {
+        return new BinOpNode(COMPLEMENT, values1, values2);
     }
 
-    protected T calculateExclude(T values1, T values2) throws CompilerException {
-        return values1.exclude(values2);
-    }
-
-    protected abstract D createDefinition(T root, T extension);
-
-    protected abstract T createConstraint();
-
-    protected abstract T calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
+    protected abstract Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
             throws CompilerException;
-
-    protected T calculateIntersection(T values1, T values2) throws CompilerException {
-        return values1.intersection(values2);
-    }
 
     protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition)
             throws CompilerException;
+
+    protected String buildExpression(Node node) {
+        switch (node.getType()) {
+            case ALL_VALUES:
+                return "true";
+            case UNION:
+                return "(" + buildExpression(((BinOpNode) node).getLeft()) + " || " +
+                        buildExpression(((BinOpNode) node).getRight()) + ")";
+            case INTERSECTION:
+                return "(" + buildExpression(((BinOpNode) node).getLeft()) + " && " +
+                        buildExpression(((BinOpNode) node).getRight()) + ")";
+            case COMPLEMENT:
+                return "(" + buildExpression(((BinOpNode) node).getLeft()) + " && (!" +
+                        buildExpression(((BinOpNode) node).getRight()) + "))";
+            case NEGATION:
+                return "(!" + buildExpression(((OpNode) node).getNode()) + ")";
+            default:
+                throw new IllegalStateException("Unimplemented node type: " + node.getType());
+        }
+    }
 
 }

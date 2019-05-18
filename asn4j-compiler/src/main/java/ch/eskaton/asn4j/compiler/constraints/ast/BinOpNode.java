@@ -25,31 +25,27 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+public class BinOpNode extends AbstractNode {
 
-import java.util.Set;
+    private Node left;
 
-public class BitStringConstraintDefinition extends AbstractConstraintDefinition<BitStringValue, Set<BitStringValue>,
-        BitStringConstraint, BitStringConstraintDefinition> {
+    private Node right;
 
-    public BitStringConstraintDefinition() {
-        super();
+    public BinOpNode(NodeType type, Node left, Node right) {
+        super(type);
+
+        this.left = left;
+        this.right = right;
     }
 
-    public BitStringConstraintDefinition(BitStringConstraint roots, BitStringConstraint extensions) {
-        super(roots, extensions);
+    public Node getLeft() {
+        return left;
     }
 
-    @Override
-    public BitStringConstraint createConstraint() {
-        return new BitStringConstraint();
-    }
-
-    @Override
-    public BitStringConstraintDefinition createDefinition() {
-        return new BitStringConstraintDefinition();
+    public Node getRight() {
+        return right;
     }
 
 }
