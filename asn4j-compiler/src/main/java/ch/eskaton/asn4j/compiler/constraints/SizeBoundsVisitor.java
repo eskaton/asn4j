@@ -36,11 +36,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.singletonList;
+
 public class SizeBoundsVisitor implements BoundsVisitor<BitStringValue> {
 
     @Override
     public Optional<List<RangeNode>> visit(SizeNode node) {
-        return Optional.of(Collections.singletonList(node.getSize()));
+        return Optional.of(singletonList(node.getSize()));
     }
 
     @Override

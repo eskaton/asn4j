@@ -3,10 +3,13 @@ BEGIN
 
 TestBitString1 ::= BIT STRING ('000'B | '001'B | '010'B, ...)
 TestBitString2 ::= BIT STRING (INCLUDES TestBitString1)
-TestBitString4 ::= BIT STRING (INCLUDES TestBitString1, ...)
-TestBitString5 ::= BIT STRING (INCLUDES BIT STRING)
+TestBitString3 ::= BIT STRING (INCLUDES TestBitString1, ...)
+TestBitString4 ::= BIT STRING (INCLUDES BIT STRING)
 
 TestBoolean1 ::= BOOLEAN (TRUE)
-TestBoolean3 ::= BOOLEAN (INCLUDES TestBoolean1)
+TestBoolean2 ::= BOOLEAN (INCLUDES TestBoolean1)
+
+TestInteger1 ::= INTEGER (1 | 2 | 4)
+TestInteger2 ::= INTEGER (INCLUDES TestInteger1)
 
 END

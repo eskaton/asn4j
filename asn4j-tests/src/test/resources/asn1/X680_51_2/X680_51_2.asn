@@ -19,4 +19,8 @@ TestBoolean4 ::= BOOLEAN (TRUE | FALSE)
 TestBoolean5 ::= BOOLEAN ((TRUE | FALSE) ^ TRUE)
 TestBoolean6 ::= TestBoolean4 (ALL EXCEPT FALSE)
 
+TestInteger1 ::= INTEGER (1 | 2)
+TestInteger2 ::= INTEGER (ALL EXCEPT 0)
+TestInteger3 ::= INTEGER (((1 | 2 | 3) ^ (2 | 3)) EXCEPT 3)
+
 END

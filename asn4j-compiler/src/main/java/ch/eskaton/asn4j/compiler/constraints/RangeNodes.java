@@ -130,10 +130,8 @@ public class RangeNodes {
         RangeNode op1 = ranges.get(0);
         RangeNode op2 = op1;
 
-        if (((IntegerValue) op1.getLower().getValue()).getValue()
-                .compareTo(BigInteger.valueOf(Long.MIN_VALUE)) > 0) {
-            result.add(new RangeNode(new EndpointNode(new IntegerValue(Long.MIN_VALUE), true),
-                    decrement(op1.getLower())));
+        if (((IntegerValue) op1.getLower().getValue()).getValue().compareTo(BigInteger.valueOf(Long.MIN_VALUE)) > 0) {
+            result.add(new RangeNode(new EndpointNode(new IntegerValue(Long.MIN_VALUE)), decrement(op1.getLower())));
         }
 
         for (int i = 1; i < ranges.size(); i++) {
@@ -141,10 +139,8 @@ public class RangeNodes {
             result.add(new RangeNode(increment(op1.getUpper()), decrement(op2.getLower())));
         }
 
-        if (((IntegerValue) op2.getUpper().getValue()).getValue()
-                .compareTo(BigInteger.valueOf(Long.MAX_VALUE)) < 0) {
-            result.add(new RangeNode(increment(op2.getUpper()),
-                    new EndpointNode(new IntegerValue(Long.MAX_VALUE), true)));
+        if (((IntegerValue) op2.getUpper().getValue()).getValue().compareTo(BigInteger.valueOf(Long.MAX_VALUE)) < 0) {
+            result.add(new RangeNode(increment(op2.getUpper()), new EndpointNode(new IntegerValue(Long.MAX_VALUE))));
         }
 
         return result;
@@ -278,21 +274,21 @@ public class RangeNodes {
      * @return a canonical {@link EndpointNode}
      */
     private static EndpointNode canonicalizeEndpoint(EndpointNode node, boolean isLower, long bound) {
-        Value v = node.getValue();
+        Value value = node.getValue();
         boolean inclusive = node.isInclusive();
 
-        if (Value.MAX.equals(v)) {
-            return new EndpointNode(new IntegerValue(inclusive ? bound : bound - 1), true);
-        } else if (Value.MIN.equals(v)) {
-            return new EndpointNode(new IntegerValue(inclusive ? bound : bound + 1), true);
+        if (Value.MAX.equals(value)) {
+            return new EndpointNode(new IntegerValue(inclusive ? bound : bound - 1));
+        } else if (Value.MIN.equals(value)) {
+            return new EndpointNode(new IntegerValue(inclusive ? bound : bound + 1));
         } else {
             if (inclusive) {
-                return new EndpointNode(v, true);
+                return new EndpointNode(value);
             }
 
             return new EndpointNode(new IntegerValue(
-                    isLower ? ((IntegerValue) v).getValue().add(BigInteger.ONE)
-                            : ((IntegerValue) v).getValue().subtract(BigInteger.ONE)), true);
+                    isLower ? ((IntegerValue) value).getValue().add(BigInteger.ONE)
+                            : ((IntegerValue) value).getValue().subtract(BigInteger.ONE)));
         }
     }
 
@@ -341,13 +337,12 @@ public class RangeNodes {
     }
 
     private static EndpointNode increment(EndpointNode endpoint) {
-        return new EndpointNode(new IntegerValue(((IntegerValue) endpoint.getValue()).getValue()
-                .add(BigInteger.ONE)), true);
+        return new EndpointNode(new IntegerValue(((IntegerValue) endpoint.getValue()).getValue().add(BigInteger.ONE)));
     }
 
     private static EndpointNode decrement(EndpointNode endpoint) {
         return new EndpointNode(new IntegerValue(((IntegerValue) endpoint.getValue()).getValue()
-                .subtract(BigInteger.ONE)), true);
+                .subtract(BigInteger.ONE)));
     }
 
     public static long getLowerBound(List<RangeNode> ranges) {
@@ -393,7 +388,7 @@ public class RangeNodes {
     }
 
     private static void throwParentTypeException(EndpointNode endpointNode) {
-        throw new CompilerException(((IntegerValue)endpointNode.getValue()).getValue()
+        throw new CompilerException(((IntegerValue) endpointNode.getValue()).getValue()
                 + " doesn't exist in parent type");
     }
 

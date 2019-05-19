@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.test.x680_51_2;
 
+import ch.eskaton.asn4j.test.TestHelper;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString1;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString3;
@@ -39,12 +40,17 @@ import ch.eskaton.asn4jtest.x680_51_2.TestBoolean3;
 import ch.eskaton.asn4jtest.x680_51_2.TestBoolean4;
 import ch.eskaton.asn4jtest.x680_51_2.TestBoolean5;
 import ch.eskaton.asn4jtest.x680_51_2.TestBoolean6;
+import ch.eskaton.asn4jtest.x680_51_2.TestInteger1;
+import ch.eskaton.asn4jtest.x680_51_2.TestInteger2;
+import ch.eskaton.asn4jtest.x680_51_2.TestInteger3;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
 
 public class TestX680_51_2 {
 
@@ -148,6 +154,31 @@ public class TestX680_51_2 {
         testBooleanSuccess(TestBoolean6.class, new TestBoolean6(), true);
 
         testBooleanFailure(new TestBoolean6(), false);
+    }
+
+    @Test
+    public void testInteger1() {
+        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 1);
+        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 2);
+
+        testIntegerFailure(new TestInteger1(), 0);
+        testIntegerFailure(new TestInteger1(), 3);
+    }
+
+    @Test
+    public void testInteger2() {
+        testIntegerSuccess(TestInteger2.class, new TestInteger2(), -1);
+        testIntegerSuccess(TestInteger2.class, new TestInteger2(), 1);
+
+        testIntegerFailure(new TestInteger2(), 0);
+    }
+
+    @Test
+    public void testInteger3() {
+        testIntegerSuccess(TestInteger3.class, new TestInteger3(), 2);
+
+        testIntegerFailure(new TestInteger3(), 1);
+        testIntegerFailure(new TestInteger3(), 3);
     }
 
 }
