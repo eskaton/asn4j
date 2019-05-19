@@ -34,7 +34,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
@@ -46,10 +45,12 @@ import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
+import ch.eskaton.commons.utils.OptionalUtils;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
+import java.util.function.BiFunction;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
@@ -232,24 +233,52 @@ public abstract class AbstractConstraintCompiler {
     protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition)
             throws CompilerException;
 
-    protected String buildExpression(Node node) {
+    protected void addConstraintCondition(ConstraintDefinition definition, JavaClass.BodyBuilder builder) {
+        if (definition.isExtensible()) {
+            builder.append("return true;");
+        } else {
+            Node roots = definition.getRoots();
+            Optional<String> expression = buildExpression(roots);
+
+            if (expression.isPresent()) {
+                builder.append("if (" + expression.get() + ") {")
+                        .append("\treturn true;")
+                        .append("} else {")
+                        .append("\treturn false;")
+                        .append("}");
+            } else {
+                builder.append("return true;");
+            }
+        }
+    }
+
+    protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case ALL_VALUES:
-                return "true";
+                return Optional.empty();
             case UNION:
-                return "(" + buildExpression(((BinOpNode) node).getLeft()) + " || " +
-                        buildExpression(((BinOpNode) node).getRight()) + ")";
+                return OptionalUtils.combine(buildExpression(((BinOpNode) node).getLeft()),
+                        buildExpression(((BinOpNode) node).getRight()), getBinOperation("||"));
             case INTERSECTION:
-                return "(" + buildExpression(((BinOpNode) node).getLeft()) + " && " +
-                        buildExpression(((BinOpNode) node).getRight()) + ")";
+                return OptionalUtils.combine(buildExpression(((BinOpNode) node).getLeft()),
+                        buildExpression(((BinOpNode) node).getRight()), getBinOperation("&&"));
             case COMPLEMENT:
-                return "(" + buildExpression(((BinOpNode) node).getLeft()) + " && (!" +
-                        buildExpression(((BinOpNode) node).getRight()) + "))";
+                return OptionalUtils.combine(buildExpression(((BinOpNode) node).getLeft()),
+                        buildExpression(((BinOpNode) node).getRight()).map(this::negate),
+                        getBinOperation("&&"));
             case NEGATION:
-                return "(!" + buildExpression(((OpNode) node).getNode()) + ")";
+                return buildExpression(((OpNode) node).getNode()).map(this::negate);
             default:
                 throw new IllegalStateException("Unimplemented node type: " + node.getType());
         }
+    }
+
+    private String negate(String expr) {
+        return "(!" + expr + ")";
+    }
+
+    private BiFunction<String, String, String> getBinOperation(String operator) {
+        return (String a, String b) -> "(" + a + " " + operator + " " + b + ")";
     }
 
 }

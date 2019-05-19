@@ -29,13 +29,11 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
@@ -54,7 +52,6 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getLowerBound;
@@ -133,8 +130,6 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
-        Node roots = definition.getRoots();
-
         javaClass.addImport(Arrays.class);
 
         BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
@@ -142,31 +137,24 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                 .parameter(INT, "unusedBits")
                 .exception(ConstraintViolatedException.class).body();
 
-        if (definition.isExtensible()) {
-            builder.append("return true;");
-        } else {
-            builder.append("if( " + buildExpression(roots) + ") {")
-                    .append("\treturn true;")
-                    .append("} else {")
-                    .append("\treturn false;")
-                    .append("}");
-        }
+        addConstraintCondition(definition, builder);
 
         builder.finish().build();
     }
 
-    protected String buildExpression(Node node) {
+    protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
                 BitStringValue value = (BitStringValue) ((ValueNode) node).getValue();
-                return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", value) && " +
-                        value.getUnusedBits() + " == unusedBits)";
+                return Optional.of("(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) +
+                        ", value) && " + value.getUnusedBits() + " == unusedBits)");
             case ALL_VALUES:
-                return "true";
+                return Optional.empty();
             case SIZE:
                 RangeNode size = ((SizeNode) node).getSize();
-                return "(" + toLong(size.getLower().getValue()) + "L <= ASN1BitString.getSize(value, unusedBits) && " +
-                        toLong(size.getUpper().getValue()) + "L >= ASN1BitString.getSize(value, unusedBits))";
+                return Optional.of("(" + toLong(size.getLower().getValue()) +
+                        "L <= ASN1BitString.getSize(value, unusedBits) && " +
+                        toLong(size.getUpper().getValue()) + "L >= ASN1BitString.getSize(value, unusedBits))");
             default:
                 return super.buildExpression(node);
         }
