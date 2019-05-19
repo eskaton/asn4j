@@ -82,16 +82,6 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
-    private Node calculateContainedSubtype(Type base, Type type) throws CompilerException {
-        if (type.equals(base)) {
-            return new AllValuesNode();
-        } else if (type instanceof TypeReference) {
-            return compileConstraints(type, ctx.getBase((TypeReference) type)).getRoots();
-        } else {
-            throw new CompilerException("Invalid type %s in constraint for BOOLEAN type", type);
-        }
-    }
-
     @Override
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
         Node roots = definition.getRoots();

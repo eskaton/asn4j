@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -35,14 +36,15 @@ public abstract class BuiltinTypeCompiler<T extends Type> implements NamedCompil
 
     public CompiledType compile(CompilerContext ctx, String name, T node) throws CompilerException {
         JavaClass javaClass = ctx.createClass(name, node, false);
+        ConstraintDefinition constraintDef = null;
 
         if (node.hasConstraint()) {
-            ctx.compileConstraint(javaClass, name, node);
+            constraintDef = ctx.compileConstraint(javaClass, name, node);
         }
 
         ctx.finishClass();
 
-        return new CompiledType(node);
+        return new CompiledType(node, constraintDef);
     }
 
 }

@@ -131,21 +131,6 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
-    private Node calculateContainedSubtype(Type base, Type type) throws CompilerException {
-        Optional<CompiledType> maybeCompiledType = ctx.getCompiledType(type);
-
-        if (maybeCompiledType.isPresent()) {
-            CompiledType compiledType = maybeCompiledType.get();
-            ConstraintDefinition constraintDefinition = compiledType.getConstraintDefinition();
-
-            return constraintDefinition == null ? new AllValuesNode() : constraintDefinition.getRoots();
-        } else if (type.equals(base)) {
-            return new AllValuesNode();
-        }
-
-        throw new CompilerException("Failed to resolve contained subtype %s", type);
-    }
-
     @Override
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
         Node roots = definition.getRoots();
