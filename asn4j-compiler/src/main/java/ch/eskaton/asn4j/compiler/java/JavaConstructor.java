@@ -90,7 +90,7 @@ public class JavaConstructor extends JavaMethod {
     			(visibility == PackagePrivate ? "" : visibility.toString().toLowerCase()), " ", clazz, "("));
 
     	for (JavaParameter parameter : parameters) {
-    		if (paramCount != 0) {
+    		if (paramCount++ > 0) {
     			writer.write(", ");
     		}
     		parameter.write(writer, "");

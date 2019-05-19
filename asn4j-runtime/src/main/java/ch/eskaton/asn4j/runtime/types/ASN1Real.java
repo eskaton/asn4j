@@ -73,8 +73,7 @@ public class ASN1Real implements ASN1Type {
 
     public void setValue(BigDecimal value) throws ConstraintViolatedException {
         if (!checkConstraint(value)) {
-            throw new ConstraintViolatedException(String.format(
-                    "%d doesn't satisfy a constraint", value));
+            throw new ConstraintViolatedException(String.format("%d doesn't satisfy a constraint", value));
         }
 
         this.type = Type.NORMAL;

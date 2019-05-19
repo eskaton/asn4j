@@ -28,6 +28,7 @@ package ch.eskaton.asn4j.runtime.utils;
 
 import java.lang.reflect.Field;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class FieldIterator implements Iterator<Field> {
 
@@ -58,7 +59,7 @@ public class FieldIterator implements Iterator<Field> {
             clazz = clazz.getSuperclass();
 
             if (clazz == null) {
-                return null;
+                throw new NoSuchElementException();
             }
 
             fields = clazz.getDeclaredFields();

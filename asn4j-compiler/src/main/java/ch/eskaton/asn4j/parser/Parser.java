@@ -1627,13 +1627,13 @@ public class Parser {
             mark();
 
             Token token = getToken();
-            Position position = token.getPosition();
 
             if (token == null) {
                 resetToMark();
                 return null;
             }
 
+            Position position = token.getPosition();
             Type type = null;
 
             switch (token.getType()) {

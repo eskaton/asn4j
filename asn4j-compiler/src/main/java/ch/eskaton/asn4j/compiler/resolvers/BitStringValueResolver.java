@@ -125,9 +125,9 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
         }
 
         bits.sort(Comparator.reverseOrder());
-        long length = bits.get(0).intValue() / 8 + 1;
-
-        byte[] byteValue = new byte[(int) length];
+        
+        int length = bits.get(0).intValue() / 8 + 1;
+        byte[] byteValue = new byte[length];
 
         for (BigInteger bit : bits) {
             int pos = bit.intValue() / 8;
