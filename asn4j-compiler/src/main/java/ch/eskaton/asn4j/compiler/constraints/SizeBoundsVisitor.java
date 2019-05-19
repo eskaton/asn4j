@@ -25,14 +25,27 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints.ast;
+package ch.eskaton.asn4j.compiler.constraints;
 
-public interface Node {
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.parser.ast.RangeNode;
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
-    NodeType getType();
-    
-    default <T, V> T accept(Visitor<T, V> visitor) {
-        return visitor.visit(this);
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+public class SizeBoundsVisitor implements BoundsVisitor<BitStringValue> {
+
+    @Override
+    public Optional<List<RangeNode>> visit(SizeNode node) {
+        return Optional.of(Collections.singletonList(node.getSize()));
+    }
+
+    @Override
+    public Optional<List<RangeNode>> visit(ValueNode<BitStringValue> node) {
+        return Optional.empty();
     }
 
 }

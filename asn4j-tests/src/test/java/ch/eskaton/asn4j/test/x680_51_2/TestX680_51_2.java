@@ -52,10 +52,10 @@ public class TestX680_51_2 {
     public void testBitString1() {
         testBitStringSuccess(TestBitString1.class, new TestBitString1(), 0x03, 5);
         testBitStringSuccess(TestBitString1.class, new TestBitString1(), 0x05, 5);
+        testBitStringSuccess(TestBitString1.class, new TestBitString1(), 0x03, 4);
+        testBitStringSuccess(TestBitString1.class, new TestBitString1(), 0x06, 6);
 
         testBitStringFailure(new TestBitString1(), 0x04, 5);
-        testBitStringFailure(new TestBitString2(), 0x03, 4);
-        testBitStringFailure(new TestBitString2(), 0x06, 6);
     }
 
     @Test
@@ -69,7 +69,7 @@ public class TestX680_51_2 {
         testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x07, 5);
 
         testBitStringFailure(new TestBitString2(), 0x02, 5);
-        testBitStringFailure(new TestBitString2(), 0x08, 5);
+        testBitStringFailure(new TestBitString2(), 0x08, 4);
         testBitStringFailure(new TestBitString2(), 0x00, 4);
         testBitStringFailure(new TestBitString2(), 0x00, 6);
     }

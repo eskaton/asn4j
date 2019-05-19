@@ -63,7 +63,7 @@ import static java.util.Collections.emptyList;
 
 public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
-    private static final BoundsVisitor BOUNDS_VISITOR = new BoundsVisitor();
+    private static final SizeBoundsVisitor BOUNDS_VISITOR = new SizeBoundsVisitor();
 
     public BitStringConstraintCompiler(CompilerContext ctx) {
         super(ctx);

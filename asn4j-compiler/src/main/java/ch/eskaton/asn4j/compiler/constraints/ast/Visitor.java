@@ -27,7 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
-public interface Visitor<T> {
+public interface Visitor<T, V> {
 
     default T visit(Node node) {
         switch (node.getType()) {
@@ -38,7 +38,7 @@ public interface Visitor<T> {
             case NEGATION:
                 return visit((OpNode) node);
             case VALUE:
-                return visit((ValueNode) node);
+                return visit((ValueNode<V>) node);
             case SIZE:
                 return visit((SizeNode) node);
             case ALL_VALUES:
@@ -56,6 +56,6 @@ public interface Visitor<T> {
 
     T visit(SizeNode node);
 
-    T visit(ValueNode node);
+    T visit(ValueNode<V> node);
 
 }

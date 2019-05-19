@@ -107,7 +107,7 @@ public class TestX680_51_1 {
 
         testBitStringFailure(new TestBitString6(), 0x02, 5);
     }
-    
+
     @Test
     public void testBoolean2() {
         testBooleanSuccess(TestBoolean2.class, new TestBoolean2(), false);
