@@ -413,7 +413,7 @@ public class Lexer {
     							return new Token(ctx, TokenType.Ampersand, offset, position(line, pos));
     					}
     				case '^':
-    					return new Token(ctx, TokenType.Circumflex, offset,position(line, pos));
+    					return new Token(ctx, TokenType.Circumflex, offset, position(line, pos));
     				case '@':
     					return new Token(ctx, TokenType.AT, offset, position(line, pos));
     				case '<':

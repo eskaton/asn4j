@@ -103,7 +103,7 @@ public class TLVUtils {
         byte[] buf;
 
         if (contentLen > 127) {
-            int len = (int) Math.ceil(Math.log10(contentLen + 1) / LOG10_2_DIV_8);
+            int len = (int) Math.ceil(Math.log10(contentLen + 1.0d) / LOG10_2_DIV_8);
             buf = new byte[len + 1];
             buf[0] = (byte) (len & 0x7f | 0x80);
 
@@ -123,7 +123,7 @@ public class TLVUtils {
         int tagNum = tag.tag();
 
         if (tagNum > 30) {
-            int len = (int) Math.ceil(Math.log10(tagNum + 1) / Math.log10(2) / 7);
+            int len = (int) Math.ceil(Math.log10(tagNum + 1.0d) / Math.log10(2) / 7.0d);
             buf = new byte[len + 1];
             buf[0] |= 0x1f;
 

@@ -59,12 +59,11 @@ public class ChoiceDecoder {
 
         result = decoder.decode(states, tagsToTypes);
 
-        String typeName = result.getClass().getSimpleName();
-
         if (result == null) {
-            throw new DecodingException("Empty choice " + typeName);
+            throw new DecodingException("Empty choice");
         }
 
+        String typeName = result.getClass().getSimpleName();
         Field altField = tagsToFields.get(result.getTags());
 
         if (altField == null) {
