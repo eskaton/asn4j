@@ -30,16 +30,17 @@ package ch.eskaton.asn4j.test.x680_51_3;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString4;
-import ch.eskaton.asn4jtest.x680_51_3.TestBitString5;
-import ch.eskaton.asn4jtest.x680_51_3.TestBitString6;
 import ch.eskaton.asn4jtest.x680_51_3.TestBoolean3;
-import ch.eskaton.asn4jtest.x680_51_3.TestBoolean4;
+import ch.eskaton.asn4jtest.x680_51_3.TestInteger1;
+import ch.eskaton.asn4jtest.x680_51_3.TestInteger2;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
 
 public class TestX680_51_3 {
 
@@ -55,18 +56,18 @@ public class TestX680_51_3 {
     }
 
     @Test
-    public void testBitString4() {
-        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x00, 5);
-        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x01, 5);
-        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x02, 5);
-        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x03, 6);
-        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x03, 4);
+    public void testBitString3() {
+        testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x00, 5);
+        testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x01, 5);
+        testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x02, 5);
+        testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x03, 6);
+        testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x03, 4);
     }
 
     @Test
-    public void testBitString5() {
-        testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0x00, 0);
-        testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0xffee, 1);
+    public void testBitString4() {
+        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x00, 0);
+        testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0xffee, 1);
     }
 
     @Test
@@ -74,6 +75,28 @@ public class TestX680_51_3 {
         testBooleanSuccess(TestBoolean3.class, new TestBoolean3(), true);
 
         testBooleanFailure(new TestBoolean3(), false);
+    }
+
+    @Test
+    public void testInteger1() {
+        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 1);
+        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 2);
+        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 4);
+
+        testIntegerFailure(new TestInteger1(), 0);
+        testIntegerFailure(new TestInteger1(), 3);
+        testIntegerFailure(new TestInteger1(), 5);
+    }
+
+    @Test
+    public void testInteger2() {
+        testIntegerSuccess(TestInteger2.class, new TestInteger2(), 1);
+        testIntegerSuccess(TestInteger2.class, new TestInteger2(), 2);
+        testIntegerSuccess(TestInteger2.class, new TestInteger2(), 4);
+
+        testIntegerFailure(new TestInteger2(), 0);
+        testIntegerFailure(new TestInteger2(), 3);
+        testIntegerFailure(new TestInteger2(), 5);
     }
 
 }

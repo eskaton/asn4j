@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
 import java.math.BigInteger;
 
@@ -84,6 +85,22 @@ public class TestHelper {
 
     public static <T extends ASN1Boolean> void testBooleanFailure(T booleanValue, boolean value) {
         TestUtils.assertThrows(() -> booleanValue.setValue(value), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1Integer> void testIntegerSuccess(Class<? extends T> clazz, T intValue, long value) {
+        intValue.setValue(BigInteger.valueOf(value));
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        T result = decoder.decode(clazz, encoder.encode(intValue));
+
+        assertEquals(intValue, result);
+        assertEquals(intValue, result);
+    }
+
+    public static <T extends ASN1Integer> void testIntegerFailure(T intValue, long value) {
+        TestUtils.assertThrows(() -> intValue.setValue(BigInteger.valueOf(value)), ConstraintViolatedException.class);
     }
 
 }

@@ -27,13 +27,13 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-public class BitStringBounds implements SizeBounds {
+public class BitStringSizeBounds implements SizeBounds {
 
     private long minSize;
 
     private long maxSize;
 
-    public BitStringBounds(long minSize, long maxSize) {
+    public BitStringSizeBounds(long minSize, long maxSize) {
         this.minSize = minSize;
         this.maxSize = maxSize;
     }

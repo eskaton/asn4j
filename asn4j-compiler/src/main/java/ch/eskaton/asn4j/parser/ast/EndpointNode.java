@@ -42,6 +42,10 @@ public class EndpointNode {
         this.inclusive = inclusive;
     }
 
+    public EndpointNode(Value value) {
+        this(value, true);
+    }
+
     public Value getValue() {
         return value;
     }

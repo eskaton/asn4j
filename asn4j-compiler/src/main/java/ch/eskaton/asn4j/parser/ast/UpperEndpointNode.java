@@ -31,10 +31,6 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class UpperEndpointNode extends EndpointNode {
 
-    public UpperEndpointNode(Value value) {
-    	super(value, true);
-    }
-
     public UpperEndpointNode(Value value, boolean inclusive) {
     	super(value, inclusive);
     }
