@@ -575,7 +575,7 @@ public class CompilerContext {
     }
 
     public TagId getTagId(Type type) {
-        Optional<CompiledType> maybeReferencedType = getCompiledType(type);
+        Optional<CompiledType> maybeReferencedType = getCompiledType(type, true);
 
         if (maybeReferencedType.isPresent()) {
             Type referencedType = maybeReferencedType.get().getType();
@@ -599,19 +599,32 @@ public class CompilerContext {
         }
     }
 
-    public Optional<CompiledType> getCompiledType(Type type) {
+    public Optional<CompiledType> getCompiledType(Type type, boolean isSubType) {
         if (type instanceof TypeReference) {
             HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
             CompiledType compiledType = moduleTypes.get(((TypeReference) type).getType());
 
             if (compiledType == null) {
-                compiledType = compiler.compileType(((TypeReference) type).getType());
+                if (!isSubType) {
+                    Stack<JavaClass> oldClass = currentClass;
+                    currentClass = new Stack<>();
+
+                    compiledType = compiler.compileType(((TypeReference) type).getType());
+
+                    currentClass = oldClass;
+                } else {
+                    compiledType = compiler.compileType(((TypeReference) type).getType());
+                }
             }
 
             return Optional.ofNullable(compiledType);
         }
 
         return Optional.empty();
+    }
+
+    public Optional<CompiledType> getCompiledType(Type type) {
+        return getCompiledType(type, false);
     }
 
     private HashMap<String, CompiledType> getTypesOfCurrentModule() {

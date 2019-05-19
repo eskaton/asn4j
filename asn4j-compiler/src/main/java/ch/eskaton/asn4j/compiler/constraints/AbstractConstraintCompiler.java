@@ -29,12 +29,14 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
@@ -62,7 +64,8 @@ public abstract class AbstractConstraintCompiler {
         this.ctx = ctx;
     }
 
-    public ConstraintDefinition compileConstraint(Type base, SetSpecsNode setSpecs, Optional<Bounds> bounds) throws CompilerException {
+    public ConstraintDefinition compileConstraint(Type base, SetSpecsNode setSpecs, Optional<Bounds> bounds)
+            throws CompilerException {
         Node root = compileConstraint(base, setSpecs.getRootElements(), bounds);
         Node extension = null;
 
@@ -208,6 +211,23 @@ public abstract class AbstractConstraintCompiler {
 
     protected abstract Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
             throws CompilerException;
+
+    protected Node calculateContainedSubtype(Type base, Type type) throws CompilerException {
+        if (type.equals(base)) {
+            return new AllValuesNode();
+        } else {
+            Optional<CompiledType> maybeCompiledType = ctx.getCompiledType(type);
+
+            if (maybeCompiledType.isPresent()) {
+                CompiledType compiledType = maybeCompiledType.get();
+                ConstraintDefinition constraintDefinition = compiledType.getConstraintDefinition();
+
+                return constraintDefinition == null ? new AllValuesNode() : constraintDefinition.getRoots();
+            }
+        }
+
+        throw new CompilerException("Failed to resolve contained subtype %s", type);
+    }
 
     protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition)
             throws CompilerException;
