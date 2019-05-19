@@ -30,27 +30,24 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.commons.utils.OptionalUtils.combine;
 
-public class BoundsVisitor implements Visitor<Optional<List<RangeNode>>> {
+public interface BoundsVisitor<V> extends Visitor<Optional<List<RangeNode>>, V> {
 
     @Override
-    public Optional<List<RangeNode>> visit(AllValuesNode node) {
+    default Optional<List<RangeNode>> visit(AllValuesNode node) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<List<RangeNode>> visit(BinOpNode node) {
+    default Optional<List<RangeNode>> visit(BinOpNode node) {
         Optional<List<RangeNode>> left = node.getLeft().accept(this);
         Optional<List<RangeNode>> right = node.getRight().accept(this);
 
@@ -67,22 +64,12 @@ public class BoundsVisitor implements Visitor<Optional<List<RangeNode>>> {
     }
 
     @Override
-    public Optional<List<RangeNode>> visit(OpNode node) {
+    default Optional<List<RangeNode>> visit(OpNode node) {
         if (node.getType() == NEGATION) {
             return node.getNode().accept(this).map(range -> RangeNodes.invert(range));
         } else {
             throw new IllegalStateException("Unimplemented node type: " + node.getType());
         }
-    }
-
-    @Override
-    public Optional<List<RangeNode>> visit(SizeNode node) {
-        return Optional.of(Collections.singletonList(node.getSize()));
-    }
-
-    @Override
-    public Optional<List<RangeNode>> visit(ValueNode node) {
-        return Optional.empty();
     }
 
 }

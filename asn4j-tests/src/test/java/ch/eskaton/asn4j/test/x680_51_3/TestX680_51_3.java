@@ -55,14 +55,6 @@ public class TestX680_51_3 {
     }
 
     @Test
-    public void testBitString3() {
-        testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x00, 5);
-        testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x01, 5);
-
-        testBitStringFailure(new TestBitString3(), 0x02, 5);
-    }
-
-    @Test
     public void testBitString4() {
         testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x00, 5);
         testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x01, 5);
@@ -78,27 +70,10 @@ public class TestX680_51_3 {
     }
 
     @Test
-    public void testBitString6() {
-        testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x01, 0);
-        testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x02, 4);
-        testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x02, 6);
-        testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0xffee, 1);
-
-        testBitStringFailure(new TestBitString6(), 0x02, 5);
-    }
-
-    @Test
     public void testBoolean3() {
         testBooleanSuccess(TestBoolean3.class, new TestBoolean3(), true);
 
         testBooleanFailure(new TestBoolean3(), false);
-    }
-
-    @Test
-    public void testBoolean4() {
-        testBooleanSuccess(TestBoolean4.class, new TestBoolean4(), false);
-
-        testBooleanFailure(new TestBoolean4(), true);
     }
 
 }
