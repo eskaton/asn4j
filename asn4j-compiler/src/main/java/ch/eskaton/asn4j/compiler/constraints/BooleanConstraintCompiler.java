@@ -29,20 +29,15 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -84,29 +79,19 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
-        Node roots = definition.getRoots();
-
         BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
                 .returnType(boolean.class).name("checkConstraint").parameter("Boolean", "value")
                 .exception(ConstraintViolatedException.class).body();
 
-        if (definition.isExtensible()) {
-            builder.append("return true;");
-        } else {
-            builder.append("if( " + buildExpression(roots) + ") {")
-                    .append("\treturn true;")
-                    .append("} else {")
-                    .append("\treturn false;")
-                    .append("}");
-        }
+        addConstraintCondition(definition, builder);
 
         builder.finish().build();
     }
 
-    protected String buildExpression(Node node) {
+    protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                return "(value == " + ((ValueNode) node).getValue() + ")";
+                return Optional.of("(value == " + ((ValueNode) node).getValue() + ")");
             default:
                 return super.buildExpression(node);
         }
