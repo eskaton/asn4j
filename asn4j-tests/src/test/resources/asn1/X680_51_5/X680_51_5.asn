@@ -10,5 +10,9 @@ TestBitString6 ::= BIT STRING (SIZE(4..MAX) ^ SIZE(2..8))
 TestBitString7 ::= BIT STRING (SIZE(4..MAX) EXCEPT SIZE(8..16))
 TestBitString8 ::= BIT STRING (SIZE(4..MAX)) (SIZE(MIN..8))
 TestBitString9 ::= BIT STRING (SIZE(4..12), ..., SIZE(13..16))
+TestBitString10 ::= BIT STRING (SIZE (2))
+TestBitStringSize ::= INTEGER (ALL EXCEPT 1)
+TestBitString11 ::= BIT STRING (SIZE (INCLUDES TestBitStringSize))
+TestBitString12 ::= BIT STRING (SIZE (INTEGER EXCEPT 2))
 
 END

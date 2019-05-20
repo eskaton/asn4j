@@ -32,17 +32,14 @@ import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import static java.util.Collections.singletonList;
 
 public class SizeBoundsVisitor implements BoundsVisitor<BitStringValue> {
 
     @Override
     public Optional<List<RangeNode>> visit(SizeNode node) {
-        return Optional.of(singletonList(node.getSize()));
+        return Optional.of(node.getSize());
     }
 
     @Override

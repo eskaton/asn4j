@@ -28,6 +28,9 @@
 package ch.eskaton.asn4j.test.x680_51_5;
 
 import ch.eskaton.asn4jtest.x680_51_5.TestBitString1;
+import ch.eskaton.asn4jtest.x680_51_5.TestBitString10;
+import ch.eskaton.asn4jtest.x680_51_5.TestBitString11;
+import ch.eskaton.asn4jtest.x680_51_5.TestBitString12;
 import ch.eskaton.asn4jtest.x680_51_5.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_5.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_5.TestBitString4;
@@ -115,6 +118,39 @@ public class TestX680_51_5 {
         testBitStringSuccess(TestBitString9.class, new TestBitString9(), 0x0F, 4);
         testBitStringSuccess(TestBitString9.class, new TestBitString9(), 0xFFF, 4);
         testBitStringSuccess(TestBitString9.class, new TestBitString9(), 0x1FFF, 3);
+    }
+    
+    @Test
+    public void testBitString10() {
+        testBitStringSuccess(TestBitString10.class, new TestBitString10(), 0x00, 6);
+        testBitStringSuccess(TestBitString10.class, new TestBitString10(), 0x01, 6);
+        testBitStringSuccess(TestBitString10.class, new TestBitString10(), 0x02, 6);
+        testBitStringSuccess(TestBitString10.class, new TestBitString10(), 0x03, 6);
+
+        testBitStringFailure(new TestBitString10(), 0x01, 7);
+        testBitStringFailure(new TestBitString10(), 0x04, 5);
+    }
+    
+    @Test
+    public void testBitString11() {
+        testBitStringFailure(new TestBitString11(), 0x00, 7);
+        testBitStringFailure(new TestBitString11(), 0x01, 7);
+
+        testBitStringSuccess(TestBitString11.class, new TestBitString11(), 0x00, 8);
+        testBitStringSuccess(TestBitString11.class, new TestBitString11(), 0x00, 6);
+        testBitStringSuccess(TestBitString11.class, new TestBitString11(), 0x02, 6);
+    }
+    
+    @Test
+    public void testBitString12() {
+        testBitStringFailure(new TestBitString12(), 0x00, 6);
+        testBitStringFailure(new TestBitString12(), 0x01, 6);
+        testBitStringFailure(new TestBitString12(), 0x02, 6);
+        testBitStringFailure(new TestBitString12(), 0x03, 6);
+
+        testBitStringSuccess(TestBitString12.class, new TestBitString12(), 0x00, 8);
+        testBitStringSuccess(TestBitString12.class, new TestBitString12(), 0x00, 7);
+        testBitStringSuccess(TestBitString12.class, new TestBitString12(), 0x02, 5);
     }
 
 }

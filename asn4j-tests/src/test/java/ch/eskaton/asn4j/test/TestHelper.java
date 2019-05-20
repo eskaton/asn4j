@@ -53,6 +53,9 @@ public class TestHelper {
             byte[] unsignedBytes = new byte[bytes.length - 1];
             System.arraycopy(bytes, 0, unsignedBytes, 0, unsignedBytes.length);
             bytes = unsignedBytes;
+        } else if (value == 0 && unusedBits == 8) {
+            bytes = new byte[] {};
+            unusedBits = 0;
         }
 
         bitString.setValue(bytes, unusedBits);
