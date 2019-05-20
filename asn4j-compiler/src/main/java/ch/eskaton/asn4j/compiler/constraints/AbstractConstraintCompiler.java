@@ -34,14 +34,17 @@ import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
@@ -56,6 +59,7 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public abstract class AbstractConstraintCompiler {
 
@@ -228,6 +232,28 @@ public abstract class AbstractConstraintCompiler {
         }
 
         throw new CompilerException("Failed to resolve contained subtype %s", type);
+    }
+
+    protected SizeNode calculateSize(Constraint constraint, Optional<Bounds> bounds) {
+        if (constraint instanceof SubtypeConstraint) {
+            SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
+
+            Node node = new IntegerConstraintCompiler(ctx).calculateElements(new IntegerType(NO_POSITION),
+                    setSpecs.getRootElements(), Optional.of(bounds.map(b ->
+                            new IntegerValueBounds(((SizeBounds) b).getMinSize(), ((SizeBounds) b).getMaxSize()))
+                            .orElse(new IntegerValueBounds(0L, Long.MAX_VALUE))));
+
+            Optional<SizeNode> maybeSizes = new SizeVisitor().visit(node);
+
+            if (!maybeSizes.isPresent() || maybeSizes.get().getSize().isEmpty()) {
+                throw new CompilerException(setSpecs.getPosition(), "Invalid SIZE constraint. It contains no restrications.");
+            }
+
+            return maybeSizes.get();
+        } else {
+            throw new CompilerException("Constraints of type %s not yet supported",
+                    constraint.getClass().getSimpleName());
+        }
     }
 
     protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition)
