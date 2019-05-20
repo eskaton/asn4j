@@ -66,7 +66,7 @@ public interface BoundsVisitor<V> extends Visitor<Optional<List<IntegerRange>>, 
     @Override
     default Optional<List<IntegerRange>> visit(OpNode node) {
         if (node.getType() == NEGATION) {
-            return node.getNode().accept(this).map(range -> IntegerRange.invert(range));
+            return node.getNode().accept(this).map(IntegerRange::invert);
         } else {
             throw new IllegalStateException("Unimplemented node type: " + node.getType());
         }
