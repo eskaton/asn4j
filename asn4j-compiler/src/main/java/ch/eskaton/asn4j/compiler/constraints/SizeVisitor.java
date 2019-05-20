@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
-import ch.eskaton.asn4j.parser.ast.RangeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.Optional;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.commons.utils.OptionalUtils.combine;
 
-public class SizeVisitor implements Visitor<Optional<SizeNode>, RangeNode> {
+public class SizeVisitor implements Visitor<Optional<SizeNode>, IntegerRange> {
 
     @Override
     public Optional<SizeNode> visit(AllValuesNode node) {
@@ -51,21 +51,21 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, RangeNode> {
 
     @Override
     public Optional<SizeNode> visit(BinOpNode node) {
-        Optional<List<RangeNode>> left = node.getLeft().accept(this).map(SizeNode::getSize);
-        Optional<List<RangeNode>> right = node.getRight().accept(this).map(SizeNode::getSize);
+        Optional<List<IntegerRange>> left = node.getLeft().accept(this).map(SizeNode::getSize);
+        Optional<List<IntegerRange>> right = node.getRight().accept(this).map(SizeNode::getSize);
 
         switch (node.getType()) {
             case UNION:
-                return combine(left, right, RangeNodes::union).map(SizeNode::new);
+                return combine(left, right, IntegerRange::union).map(SizeNode::new);
             case INTERSECTION:
-                return combine(left, right, RangeNodes::intersection).map(SizeNode::new);
+                return combine(left, right, IntegerRange::intersection).map(SizeNode::new);
             case COMPLEMENT:
                 if (left.isPresent() && right.isPresent()) {
-                    return combine(left, right, RangeNodes::exclude).map(SizeNode::new);
+                    return combine(left, right, IntegerRange::exclude).map(SizeNode::new);
                 } else if (left.isPresent()) {
                     return left.map(SizeNode::new);
                 } else if (right.isPresent()) {
-                    return right.map(RangeNodes::invert).map(SizeNode::new);
+                    return right.map(IntegerRange::invert).map(SizeNode::new);
                 }
             default:
                 throw new IllegalStateException("Unimplemented node type: " + node.getType());
@@ -75,7 +75,7 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, RangeNode> {
     @Override
     public Optional<SizeNode> visit(OpNode node) {
         if (node.getType() == NEGATION) {
-            return node.getNode().accept(this).map(range -> RangeNodes.invert(range.getSize())).map(SizeNode::new);
+            return node.getNode().accept(this).map(range -> IntegerRange.invert(range.getSize())).map(SizeNode::new);
         } else {
             throw new IllegalStateException("Unimplemented node type: " + node.getType());
         }
@@ -87,7 +87,7 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, RangeNode> {
     }
 
     @Override
-    public Optional<SizeNode> visit(ValueNode<RangeNode> node) {
+    public Optional<SizeNode> visit(ValueNode<IntegerRange> node) {
         return Optional.of(new SizeNode(Arrays.asList(node.getValue())));
     }
 

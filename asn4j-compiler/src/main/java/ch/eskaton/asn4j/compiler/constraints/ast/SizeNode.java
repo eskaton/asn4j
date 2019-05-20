@@ -27,21 +27,19 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.parser.ast.RangeNode;
-
 import java.util.List;
 
 public class SizeNode extends AbstractNode {
 
-    private List<RangeNode> size;
+    private List<IntegerRange> size;
 
-    public SizeNode(List<RangeNode> size) {
+    public SizeNode(List<IntegerRange> size) {
         super(NodeType.SIZE);
 
         this.size = size;
     }
 
-    public List<RangeNode> getSize() {
+    public List<IntegerRange> getSize() {
         return size;
     }
 

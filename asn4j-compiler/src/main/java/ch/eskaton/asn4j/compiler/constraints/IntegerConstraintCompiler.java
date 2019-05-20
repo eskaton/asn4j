@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
-import ch.eskaton.asn4j.parser.ast.EndpointNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -47,9 +47,9 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import java.math.BigInteger;
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getLowerBound;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getUpperBound;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
 import static java.util.Collections.emptyList;
 
 public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
@@ -61,7 +61,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
+    protected Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
         return constraint.map(c ->
                 new IntegerValueBounds(getLowerBound(BOUNDS_VISITOR.visit(c.getRoots()).orElse(emptyList())),
                         getUpperBound(BOUNDS_VISITOR.visit(c.getRoots()).orElse(emptyList()))));
@@ -80,7 +80,9 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
                     // TODO: resolve
                     throw new CompilerException("not yet supported");
                 } else {
-                    return new ValueNode(new RangeNode(new EndpointNode(value), new EndpointNode(value)));
+                    long intValue = ((IntegerValue) value).getValue().longValue();
+
+                    return new ValueNode(new IntegerRange(intValue, intValue));
                 }
             } else {
                 throw new CompilerException("Invalid single-value constraint %s for INTEGER type",
@@ -93,10 +95,10 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
             long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
 
-            EndpointNode lower = RangeNodes.canonicalizeLowerEndpoint(((RangeNode) elements).getLower(), min);
-            EndpointNode upper = RangeNodes.canonicalizeUpperEndpoint(((RangeNode) elements).getUpper(), max);
+            IntegerValue lower = ((RangeNode) elements).getLower().getLowerEndPointValue(min);
+            IntegerValue upper = ((RangeNode) elements).getUpper().getUpperEndPointValue(max);
 
-            return new ValueNode(new RangeNode(lower, upper));
+            return new ValueNode(new IntegerRange(lower.getValue().longValue(), upper.getValue().longValue()));
         } else {
             throw new CompilerException("Invalid constraint %s for INTEGER type",
                     elements.getClass().getSimpleName());
@@ -120,15 +122,15 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                RangeNode value = ((ValueNode<RangeNode>) node).getValue();
-                BigInteger lower = ((IntegerValue) value.getLower().getValue()).getValue();
-                BigInteger upper = ((IntegerValue) value.getUpper().getValue()).getValue();
+                IntegerRange range = ((ValueNode<IntegerRange>) node).getValue();
+                long lower = range.getLower();
+                long upper = range.getUpper();
 
-                if (lower.equals(upper)) {
+                if (lower == upper) {
                     return Optional.of(String.format("(value.compareTo(BigInteger.valueOf(%dL)) == 0)", lower));
-                } else if (lower.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) == 0) {
+                } else if (lower == Long.MIN_VALUE) {
                     return Optional.of(String.format("(value.compareTo(BigInteger.valueOf(%dL)) <= 0)", upper));
-                } else if (upper.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) == 0) {
+                } else if (upper == Long.MAX_VALUE) {
                     return Optional.of(String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0)", lower));
                 } else {
                     return Optional.of(String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0 && " +

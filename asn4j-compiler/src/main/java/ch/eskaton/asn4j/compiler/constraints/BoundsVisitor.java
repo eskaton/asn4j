@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
-import ch.eskaton.asn4j.parser.ast.RangeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,34 +39,34 @@ import java.util.Optional;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.commons.utils.OptionalUtils.combine;
 
-public interface BoundsVisitor<V> extends Visitor<Optional<List<RangeNode>>, V> {
+public interface BoundsVisitor<V> extends Visitor<Optional<List<IntegerRange>>, V> {
 
     @Override
-    default Optional<List<RangeNode>> visit(AllValuesNode node) {
+    default Optional<List<IntegerRange>> visit(AllValuesNode node) {
         return Optional.empty();
     }
 
     @Override
-    default Optional<List<RangeNode>> visit(BinOpNode node) {
-        Optional<List<RangeNode>> left = node.getLeft().accept(this);
-        Optional<List<RangeNode>> right = node.getRight().accept(this);
+    default Optional<List<IntegerRange>> visit(BinOpNode node) {
+        Optional<List<IntegerRange>> left = node.getLeft().accept(this);
+        Optional<List<IntegerRange>> right = node.getRight().accept(this);
 
         switch (node.getType()) {
             case UNION:
-                return combine(left, right, RangeNodes::union);
+                return combine(left, right, IntegerRange::union);
             case INTERSECTION:
-                return combine(left, right, RangeNodes::intersection);
+                return combine(left, right, IntegerRange::intersection);
             case COMPLEMENT:
-                return combine(left, right, RangeNodes::exclude);
+                return combine(left, right, IntegerRange::exclude);
             default:
                 throw new IllegalStateException("Unimplemented node type: " + node.getType());
         }
     }
 
     @Override
-    default Optional<List<RangeNode>> visit(OpNode node) {
+    default Optional<List<IntegerRange>> visit(OpNode node) {
         if (node.getType() == NEGATION) {
-            return node.getNode().accept(this).map(range -> RangeNodes.invert(range));
+            return node.getNode().accept(this).map(range -> IntegerRange.invert(range));
         } else {
             throw new IllegalStateException("Unimplemented node type: " + node.getType());
         }

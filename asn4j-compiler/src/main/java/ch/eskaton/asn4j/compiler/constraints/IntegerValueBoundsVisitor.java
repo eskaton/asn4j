@@ -29,23 +29,22 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
-import ch.eskaton.asn4j.parser.ast.RangeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 
-public class IntegerValueBoundsVisitor implements BoundsVisitor<RangeNode> {
+public class IntegerValueBoundsVisitor implements BoundsVisitor<IntegerRange> {
 
     @Override
-    public Optional<List<RangeNode>> visit(SizeNode node) {
+    public Optional<List<IntegerRange>> visit(SizeNode node) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<List<RangeNode>> visit(ValueNode<RangeNode> node) {
+    public Optional<List<IntegerRange>> visit(ValueNode<IntegerRange> node) {
         return Optional.of(singletonList(node.getValue()));
     }
 
