@@ -34,7 +34,6 @@ import ch.eskaton.asn4jtest.x680_51_1.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString5;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString6;
 import ch.eskaton.asn4jtest.x680_51_1.TestBoolean2;
-import ch.eskaton.asn4jtest.x680_51_3.TestBoolean4;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -88,7 +87,6 @@ public class TestX680_51_1 {
         testBitStringFailure(new TestBitString3(), 0x06, 5);
         testBitStringFailure(new TestBitString3(), 0x08, 4);
     }
-
 
     @Test
     public void testBitString5() {

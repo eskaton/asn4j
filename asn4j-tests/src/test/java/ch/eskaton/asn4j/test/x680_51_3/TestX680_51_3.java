@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.test.x680_51_3;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString4;
-import ch.eskaton.asn4jtest.x680_51_3.TestBoolean3;
+import ch.eskaton.asn4jtest.x680_51_3.TestBoolean2;
 import ch.eskaton.asn4jtest.x680_51_3.TestInteger1;
 import ch.eskaton.asn4jtest.x680_51_3.TestInteger2;
 import org.junit.Test;
@@ -71,10 +71,10 @@ public class TestX680_51_3 {
     }
 
     @Test
-    public void testBoolean3() {
-        testBooleanSuccess(TestBoolean3.class, new TestBoolean3(), true);
+    public void testBoolean2() {
+        testBooleanSuccess(TestBoolean2.class, new TestBoolean2(), true);
 
-        testBooleanFailure(new TestBoolean3(), false);
+        testBooleanFailure(new TestBoolean2(), false);
     }
 
     @Test
