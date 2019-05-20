@@ -27,8 +27,10 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 public class EndpointNode {
@@ -52,6 +54,49 @@ public class EndpointNode {
 
     public boolean isInclusive() {
         return inclusive;
+    }
+
+    public IntegerValue getLowerEndPointValue(long bound) {
+        return canonicalizeLowerEndpoint(this, bound);
+    }
+
+    public IntegerValue getUpperEndPointValue(long bound) {
+        return canonicalizeUpperEndpoint(this, bound);
+    }
+
+    static IntegerValue canonicalizeLowerEndpoint(EndpointNode node, long bound) {
+        return canonicalizeEndpoint(node, true, bound);
+    }
+
+    static IntegerValue canonicalizeUpperEndpoint(EndpointNode node, long bound) {
+        return canonicalizeEndpoint(node, false, bound);
+    }
+
+    /**
+     * Canonicalizes an {@link EndpointNode}, i.e. resolves MIN and MAX values
+     * and converts the value to inclusive.
+     *
+     * @param node    An {@link EndpointNode}
+     * @param isLower true, if it's a lower {@link EndpointNode}
+     * @return a canonical {@link EndpointNode}
+     */
+    private static IntegerValue canonicalizeEndpoint(EndpointNode node, boolean isLower, long bound) {
+        Value value = node.getValue();
+        boolean inclusive = node.isInclusive();
+
+        if (Value.MAX.equals(value)) {
+            return new IntegerValue(inclusive ? bound : bound - 1);
+        } else if (Value.MIN.equals(value)) {
+            return new IntegerValue(inclusive ? bound : bound + 1);
+        } else {
+            if (inclusive) {
+                return (IntegerValue) value;
+            }
+
+            return new IntegerValue(
+                    isLower ? ((IntegerValue) value).getValue().add(BigInteger.ONE)
+                            : ((IntegerValue) value).getValue().subtract(BigInteger.ONE));
+        }
     }
 
     @Override

@@ -25,47 +25,42 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.EndpointNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 import org.junit.Test;
 
 import java.util.ArrayList;
 
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodeTestUtils.createRange;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeLowerEndpoint;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeRanges;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.canonicalizeUpperEndpoint;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalEndpoint;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.compareCanonicalRange;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.exclude;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getLowerBound;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.getUpperBound;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.intersection;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.invert;
-import static ch.eskaton.asn4j.compiler.constraints.RangeNodes.union;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.canonicalizeRanges;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.compareCanonicalEndpoint;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.compareCanonicalRange;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.exclude;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.intersection;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.invert;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.union;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class RangeNodesTest {
+public class IntegerRangeTest {
 
     @Test
     public void testCompareCanonicalEndpoint() {
-        assertEquals(-1, invokeCompareCanonicalEndpoint(-2, -1));
-        assertEquals(-2, invokeCompareCanonicalEndpoint(-5, -1));
-        assertEquals(0, invokeCompareCanonicalEndpoint(5, 5));
-        assertEquals(1, invokeCompareCanonicalEndpoint(5, 4));
-        assertEquals(2, invokeCompareCanonicalEndpoint(5, -5));
-        assertEquals(2, invokeCompareCanonicalEndpoint(Long.MAX_VALUE, Long.MIN_VALUE));
-        assertEquals(-2, invokeCompareCanonicalEndpoint(Long.MIN_VALUE, Long.MAX_VALUE));
-        assertEquals(-1, invokeCompareCanonicalEndpoint(Long.MIN_VALUE, Long.MIN_VALUE + 1));
+        assertEquals(-1, compareCanonicalEndpoint(-2, -1));
+        assertEquals(-2, compareCanonicalEndpoint(-5, -1));
+        assertEquals(0, compareCanonicalEndpoint(5, 5));
+        assertEquals(1, compareCanonicalEndpoint(5, 4));
+        assertEquals(2, compareCanonicalEndpoint(5, -5));
+        assertEquals(2, compareCanonicalEndpoint(Long.MAX_VALUE, Long.MIN_VALUE));
+        assertEquals(-2, compareCanonicalEndpoint(Long.MIN_VALUE, Long.MAX_VALUE));
+        assertEquals(-1, compareCanonicalEndpoint(Long.MIN_VALUE, Long.MIN_VALUE + 1));
     }
 
     @Test
@@ -75,45 +70,6 @@ public class RangeNodesTest {
         assertEquals(0, invokeCompareCanonicalRange(-2L, -1L, -2L, -1L));
         assertTrue(1 <= invokeCompareCanonicalRange(0L, 5L, -5L, 5L));
         assertTrue(1 <= invokeCompareCanonicalRange(0L, 5L, 0L, 4L));
-    }
-
-    @Test
-    public void testCanonicalizeEndpoints() {
-        assertEquals(new EndpointNode(new IntegerValue(Long.MIN_VALUE), true),
-                canonicalizeLowerEndpoint(new EndpointNode(Value.MIN, true), Long.MIN_VALUE));
-
-        assertEquals(new EndpointNode(new IntegerValue(Long.MIN_VALUE + 1), true),
-                canonicalizeLowerEndpoint(new EndpointNode(Value.MIN, false), Long.MIN_VALUE));
-
-        assertEquals(new EndpointNode(new IntegerValue(-12), true),
-                canonicalizeLowerEndpoint(new EndpointNode(Value.MIN, true), -12));
-
-        assertEquals(new EndpointNode(new IntegerValue(-11), true),
-                canonicalizeLowerEndpoint(new EndpointNode(Value.MIN, false), -12));
-
-        assertEquals(new EndpointNode(new IntegerValue(Long.MAX_VALUE), true),
-                canonicalizeUpperEndpoint(new EndpointNode(Value.MAX, true), Long.MAX_VALUE));
-
-        assertEquals(new EndpointNode(new IntegerValue(Long.MAX_VALUE - 1), true),
-                canonicalizeUpperEndpoint(new EndpointNode(Value.MAX, false), Long.MAX_VALUE));
-
-        assertEquals(new EndpointNode(new IntegerValue(23), true),
-                canonicalizeUpperEndpoint(new EndpointNode(Value.MAX, true), 23));
-
-        assertEquals(new EndpointNode(new IntegerValue(22), true),
-                canonicalizeUpperEndpoint(new EndpointNode(Value.MAX, false), 23));
-
-        assertEquals(new EndpointNode(new IntegerValue(-15), true),
-                canonicalizeLowerEndpoint(new EndpointNode(new IntegerValue(-15), true), Long.MIN_VALUE));
-
-        assertEquals(new EndpointNode(new IntegerValue(-14), true),
-                canonicalizeLowerEndpoint(new EndpointNode(new IntegerValue(-15), false), Long.MIN_VALUE));
-
-        assertEquals(new EndpointNode(new IntegerValue(15), true),
-                canonicalizeUpperEndpoint(new EndpointNode(new IntegerValue(15), true), Long.MAX_VALUE));
-
-        assertEquals(new EndpointNode(new IntegerValue(14), true),
-                canonicalizeUpperEndpoint(new EndpointNode(new IntegerValue(15), false), Long.MAX_VALUE));
     }
 
     @Test
@@ -277,16 +233,15 @@ public class RangeNodesTest {
 
         assertEquals(20L, getUpperBound(asList(createRange(-10L, 20L), createRange(-20L, 10L))));
 
-        assertEquals(20L, getUpperBound(asList(createRange(-20L, 10L), createRange(-10L, 20L))));
-    }
-
-    private int invokeCompareCanonicalEndpoint(long a, long b) {
-        return compareCanonicalEndpoint(new EndpointNode(new IntegerValue(a), true),
-                new EndpointNode(new IntegerValue(b), true));
+        assertEquals(20L, getUpperBound(asList(createRange(-20L, 10L), new IntegerRange(-20L, 20L))));
     }
 
     private int invokeCompareCanonicalRange(long a1, long a2, long b1, long b2) {
-        return compareCanonicalRange(createRange(a1, a2), createRange(b1, b2));
+        return compareCanonicalRange(new IntegerRange(a1, a2), new IntegerRange(b1, b2));
+    }
+
+    private IntegerRange createRange(long l1, long l2) {
+        return new IntegerRange(l1, l2);
     }
 
 }

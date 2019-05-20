@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
-import ch.eskaton.asn4j.parser.ast.RangeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
 import java.util.List;
@@ -38,12 +38,12 @@ import java.util.Optional;
 public class SizeBoundsVisitor implements BoundsVisitor<BitStringValue> {
 
     @Override
-    public Optional<List<RangeNode>> visit(SizeNode node) {
+    public Optional<List<IntegerRange>> visit(SizeNode node) {
         return Optional.of(node.getSize());
     }
 
     @Override
-    public Optional<List<RangeNode>> visit(ValueNode<BitStringValue> node) {
+    public Optional<List<IntegerRange>> visit(ValueNode<BitStringValue> node) {
         return Optional.empty();
     }
 
