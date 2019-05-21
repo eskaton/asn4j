@@ -1,0 +1,12 @@
+X680-51-4 DEFINITIONS ::=
+BEGIN
+
+TestInteger1 ::= INTEGER (1..4)
+TestInteger2 ::= INTEGER (1<..<4)
+TestInteger3 ::= INTEGER (MIN..0)
+TestInteger4 ::= INTEGER (MIN<..0)
+TestInteger5 ::= INTEGER (0..MAX)
+TestInteger6 ::= INTEGER (0..<MAX)
+TestInteger7 ::= TestInteger3 (-4..MAX)
+
+END
