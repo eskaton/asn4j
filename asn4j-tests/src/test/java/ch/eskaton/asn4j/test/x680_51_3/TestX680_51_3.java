@@ -78,25 +78,15 @@ public class TestX680_51_3 {
     }
 
     @Test
-    public void testInteger1() {
-        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 1);
-        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 2);
-        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 4);
-
-        testIntegerFailure(new TestInteger1(), 0);
-        testIntegerFailure(new TestInteger1(), 3);
-        testIntegerFailure(new TestInteger1(), 5);
+    public void testInteger1() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger1.class, 1, 2, 4);
+        testIntegerFailure(TestInteger1.class, 0, 3, 5);
     }
 
     @Test
-    public void testInteger2() {
-        testIntegerSuccess(TestInteger2.class, new TestInteger2(), 1);
-        testIntegerSuccess(TestInteger2.class, new TestInteger2(), 2);
-        testIntegerSuccess(TestInteger2.class, new TestInteger2(), 4);
-
-        testIntegerFailure(new TestInteger2(), 0);
-        testIntegerFailure(new TestInteger2(), 3);
-        testIntegerFailure(new TestInteger2(), 5);
+    public void testInteger2() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger2.class, 1, 2, 4);
+        testIntegerFailure(TestInteger2.class, 0, 3, 5);
     }
 
 }

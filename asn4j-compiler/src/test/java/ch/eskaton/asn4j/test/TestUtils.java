@@ -44,4 +44,13 @@ public class TestUtils {
         }
     }
 
+    public static void assertThrows(ExceptionAction action, Class<? extends Exception> exception, String message) {
+        try {
+            action.execute();
+            fail(exception.getSimpleName() + " expected. " + message);
+        } catch (Exception e) {
+            assertTrue(exception.isAssignableFrom(e.getClass()));
+        }
+    }
+
 }

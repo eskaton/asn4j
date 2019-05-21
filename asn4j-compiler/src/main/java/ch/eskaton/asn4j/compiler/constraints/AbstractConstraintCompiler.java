@@ -49,6 +49,7 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.commons.utils.OptionalUtils;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
@@ -81,11 +82,12 @@ public abstract class AbstractConstraintCompiler {
     }
 
     ConstraintDefinition compileConstraints(Type node, Type base) throws CompilerException {
-        Stack<ConstraintDefinition> cons = new Stack<>();
+        LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
+        Stack<List<Constraint>> constraints = new Stack<>();
 
         while (true) {
             if (node.hasConstraint()) {
-                cons.push(compileConstraints(base, node.getConstraints()));
+                constraints.push(node.getConstraints());
             }
 
             if (base.equals(node)) {
@@ -107,20 +109,25 @@ public abstract class AbstractConstraintCompiler {
             }
         }
 
-        if (cons.size() == 1) {
-            return cons.pop();
-        } else if (cons.size() > 1) {
-            ConstraintDefinition op1 = cons.pop();
-            ConstraintDefinition op2 = cons.pop();
+        while (!constraints.isEmpty()) {
+            Optional<Bounds> bounds = getBounds(Optional.ofNullable(definitions.peek()));
+            definitions.addLast(compileConstraints(base, constraints.pop(), bounds));
+        }
+
+        if (definitions.size() == 1) {
+            return definitions.pop();
+        } else if (definitions.size() > 1) {
+            ConstraintDefinition op1 = definitions.pop();
+            ConstraintDefinition op2 = definitions.pop();
 
             do {
                 op1 = op1.serialApplication(op2);
 
-                if (cons.isEmpty()) {
+                if (definitions.isEmpty()) {
                     break;
                 }
 
-                op2 = cons.pop();
+                op2 = definitions.pop();
             } while (true);
 
             return op1;
@@ -131,7 +138,8 @@ public abstract class AbstractConstraintCompiler {
 
     abstract Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint);
 
-    ConstraintDefinition compileConstraints(Type base, List<Constraint> constraints) throws CompilerException {
+    ConstraintDefinition compileConstraints(Type base, List<Constraint> constraints, Optional<Bounds> bounds)
+            throws CompilerException {
         ConstraintDefinition constraintDef = null;
 
         for (Constraint constraint : constraints) {
@@ -139,7 +147,7 @@ public abstract class AbstractConstraintCompiler {
                 SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
                 if (constraintDef == null) {
-                    constraintDef = compileConstraint(base, setSpecs, getBounds(Optional.empty()));
+                    constraintDef = compileConstraint(base, setSpecs, bounds);
                 } else {
                     constraintDef = constraintDef.serialApplication(compileConstraint(base, setSpecs,
                             getBounds(Optional.of(constraintDef))));
@@ -245,7 +253,8 @@ public abstract class AbstractConstraintCompiler {
             Optional<SizeNode> maybeSizes = new SizeVisitor().visit(node);
 
             if (!maybeSizes.isPresent() || maybeSizes.get().getSize().isEmpty()) {
-                throw new CompilerException(setSpecs.getPosition(), "Invalid SIZE constraint. It contains no restrications.");
+                throw new CompilerException(setSpecs.getPosition(),
+                        "Invalid SIZE constraint. It contains no restrications.");
             }
 
             return maybeSizes.get();

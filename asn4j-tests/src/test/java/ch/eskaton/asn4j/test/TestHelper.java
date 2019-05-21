@@ -102,8 +102,23 @@ public class TestHelper {
         assertEquals(intValue, result);
     }
 
+    public static <T extends ASN1Integer> void testIntegerSuccess(Class<? extends T> clazz, long... values)
+            throws IllegalAccessException, InstantiationException {
+        for (long value : values) {
+            testIntegerSuccess(clazz, clazz.newInstance(), value);
+        }
+    }
+
     public static <T extends ASN1Integer> void testIntegerFailure(T intValue, long value) {
-        TestUtils.assertThrows(() -> intValue.setValue(BigInteger.valueOf(value)), ConstraintViolatedException.class);
+        TestUtils.assertThrows(() -> intValue.setValue(BigInteger.valueOf(value)), ConstraintViolatedException.class,
+                "Value: " + value);
+    }
+
+    public static <T extends ASN1Integer> void testIntegerFailure(Class<? extends T> clazz, long... values)
+            throws IllegalAccessException, InstantiationException {
+        for (long value : values) {
+            testIntegerFailure(clazz.newInstance(), value);
+        }
     }
 
 }

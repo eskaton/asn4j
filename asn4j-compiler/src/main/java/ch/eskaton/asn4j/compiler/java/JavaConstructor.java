@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,13 +27,13 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.commons.utils.StringUtils;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import ch.eskaton.commons.utils.StringUtils;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.PackagePrivate;
 
@@ -49,65 +49,64 @@ public class JavaConstructor extends JavaMethod {
 
     private List<String> exceptions;
 
-    public JavaConstructor(JavaVisibility visibility, String clazz,
-    		List<JavaParameter> parameters, String body) {
-    	this(visibility, clazz, parameters, body, new ArrayList<String>());
+    public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters, String body) {
+        this(visibility, clazz, parameters, body, new ArrayList<>());
     }
 
-    public JavaConstructor(JavaVisibility visibility, String clazz,
-    		List<JavaParameter> parameters, String body, List<String> exceptions) {
-    	this.visibility = visibility;
-    	this.clazz = clazz;
-    	this.parameters = parameters;
-    	this.body = body;
-    	this.exceptions = exceptions;
+    public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters, String body,
+            List<String> exceptions) {
+        this.visibility = visibility;
+        this.clazz = clazz;
+        this.parameters = parameters;
+        this.body = body;
+        this.exceptions = exceptions;
     }
 
     public JavaVisibility getVisibility() {
-    	return visibility;
+        return visibility;
     }
 
     public String getClazz() {
-    	return clazz;
+        return clazz;
     }
 
     public List<JavaParameter> getParameters() {
-    	return parameters;
+        return parameters;
     }
 
     public String getBody() {
-    	return body;
+        return body;
     }
 
     public void setBody(String body) {
-    	this.body = body;
+        this.body = body;
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {
-    	int paramCount = 0;
+        int paramCount = 0;
 
-    	writer.write(StringUtils.concat(prefix, "\t",
-    			(visibility == PackagePrivate ? "" : visibility.toString().toLowerCase()), " ", clazz, "("));
+        writer.write(StringUtils.concat(prefix, "\t",
+                (visibility == PackagePrivate ? "" : visibility.toString().toLowerCase()), " ", clazz, "("));
 
-    	for (JavaParameter parameter : parameters) {
-    		if (paramCount++ > 0) {
-    			writer.write(", ");
-    		}
-    		parameter.write(writer, "");
-    	}
+        for (JavaParameter parameter : parameters) {
+            if (paramCount++ > 0) {
+                writer.write(", ");
+            }
+            parameter.write(writer, "");
+        }
 
-    	writer.write(prefix);
-    	writer.write(") ");
+        writer.write(prefix);
+        writer.write(") ");
 
-    	if (!exceptions.isEmpty()) {
-    		writer.write(" throws " + StringUtils.join(exceptions, ", "));
-    	}
+        if (!exceptions.isEmpty()) {
+            writer.write(" throws " + StringUtils.join(exceptions, ", "));
+        }
 
-    	writer.write(" {\n");
-    	writer.write(StringUtils.inject(body, "\n", prefix));
-    	writer.write("\n");
-    	writer.write(prefix);
-    	writer.write("\t}\n");
+        writer.write(" {\n");
+        writer.write(StringUtils.inject(body, "\n", prefix));
+        writer.write("\n");
+        writer.write(prefix);
+        writer.write("\t}\n");
     }
 
     @Override

@@ -34,12 +34,22 @@ import ch.eskaton.asn4jtest.x680_51_1.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString5;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString6;
 import ch.eskaton.asn4jtest.x680_51_1.TestBoolean2;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger1;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger2;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger3;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger4;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger5;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger6;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger7;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger8;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
 
 public class TestX680_51_1 {
 
@@ -111,6 +121,54 @@ public class TestX680_51_1 {
         testBooleanSuccess(TestBoolean2.class, new TestBoolean2(), false);
 
         testBooleanFailure(new TestBoolean2(), true);
+    }
+
+    @Test
+    public void testInteger1() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger1.class, -1, 1);
+        testIntegerFailure(TestInteger1.class, 0);
+    }
+
+    @Test
+    public void testInteger2() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger2.class, -2, 2);
+        testIntegerFailure(TestInteger2.class, -1, 0, 1);
+    }
+
+    @Test
+    public void testInteger3() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger3.class, 0, 1, 2, 4, 5, 6, 9);
+        testIntegerFailure(TestInteger3.class, -1, 3, 7, 8, 10);
+    }
+
+    @Test
+    public void testInteger4() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger4.class, 1, 2, 4, 5);
+        testIntegerFailure(TestInteger4.class, 0, 3, 6);
+    }
+
+    @Test
+    public void testInteger5() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger5.class, 5, 6);
+        testIntegerFailure(TestInteger5.class, 4, 7, 8, 9);
+    }
+
+    @Test
+    public void testInteger6() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger6.class, 4, 5);
+        testIntegerFailure(TestInteger6.class, 0, 1, 2, 3, 6);
+    }
+
+    @Test
+    public void testInteger7() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger7.class, 5);
+        testIntegerFailure(TestInteger7.class, 0, 1, 2, 3, 4, 6);
+    }
+
+    @Test
+    public void testInteger8() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger8.class, 6);
+        testIntegerFailure(TestInteger8.class, 4, 5, 7, 8, 9);
     }
 
 }
