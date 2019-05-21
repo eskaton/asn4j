@@ -42,66 +42,45 @@ import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
 public class TestX680_51_4 {
 
     @Test
-    public void testInteger1() {
-        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 1);
-        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 2);
-        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 3);
-        testIntegerSuccess(TestInteger1.class, new TestInteger1(), 4);
-
-        testIntegerFailure(new TestInteger1(), 0);
-        testIntegerFailure(new TestInteger1(), 5);
+    public void testInteger1() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger1.class, 1, 2, 3, 4);
+        testIntegerFailure(TestInteger1.class, 0, 5);
     }
 
     @Test
-    public void testInteger2() {
-        testIntegerSuccess(TestInteger2.class, new TestInteger2(), 2);
-        testIntegerSuccess(TestInteger2.class, new TestInteger2(), 3);
-
-        testIntegerFailure(new TestInteger2(), 1);
-        testIntegerFailure(new TestInteger2(), 4);
+    public void testInteger2() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger2.class, 2, 3);
+        testIntegerFailure(TestInteger2.class, 1, 4);
     }
 
     @Test
-    public void testInteger3() {
-        testIntegerSuccess(TestInteger3.class, new TestInteger3(), Long.MIN_VALUE);
-        testIntegerSuccess(TestInteger3.class, new TestInteger3(), 0);
-
-        testIntegerFailure(new TestInteger3(), 1);
+    public void testInteger3() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger3.class, Long.MIN_VALUE, 0);
+        testIntegerFailure(TestInteger3.class, 1);
     }
 
     @Test
-    public void testInteger4() {
-        testIntegerSuccess(TestInteger4.class, new TestInteger4(), Long.MIN_VALUE + 1);
-        testIntegerSuccess(TestInteger4.class, new TestInteger4(), 0);
-
-        testIntegerFailure(new TestInteger4(), Long.MIN_VALUE);
-        testIntegerFailure(new TestInteger4(), 1);
+    public void testInteger4() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger4.class, Long.MIN_VALUE + 1, 0);
+        testIntegerFailure(TestInteger4.class, Long.MIN_VALUE, 1);
     }
 
     @Test
-    public void testInteger5() {
-        testIntegerSuccess(TestInteger5.class, new TestInteger5(), 0);
-        testIntegerSuccess(TestInteger5.class, new TestInteger5(), Long.MAX_VALUE);
-
-        testIntegerFailure(new TestInteger5(), -1);
+    public void testInteger5() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger5.class, 0, Long.MAX_VALUE);
+        testIntegerFailure(TestInteger5.class, -1);
     }
 
     @Test
-    public void testInteger6() {
-        testIntegerSuccess(TestInteger6.class, new TestInteger6(), 0);
-        testIntegerSuccess(TestInteger6.class, new TestInteger6(), Long.MAX_VALUE - 1);
-
-        testIntegerFailure(new TestInteger6(), -1);
-        testIntegerFailure(new TestInteger6(), Long.MAX_VALUE);
+    public void testInteger6() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger6.class, 0, Long.MAX_VALUE - 1);
+        testIntegerFailure(TestInteger6.class, -1, Long.MAX_VALUE);
     }
 
     @Test
-    public void testInteger7() {
-        testIntegerSuccess(TestInteger7.class, new TestInteger7(), -4);
-        testIntegerSuccess(TestInteger7.class, new TestInteger7(), 0);
-
-        testIntegerFailure(new TestInteger7(), -5);
-        testIntegerFailure(new TestInteger7(), 1);
+    public void testInteger7() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger7.class, -4, 0);
+        testIntegerFailure(TestInteger7.class, -5, 1);
     }
 
 }

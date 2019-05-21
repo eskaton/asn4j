@@ -11,4 +11,13 @@ TestBitString6 ::= BIT STRING (INCLUDES BIT STRING EXCEPT '010'B)
 TestBoolean1 ::= BOOLEAN (TRUE | FALSE)
 TestBoolean2 ::= BOOLEAN (INCLUDES TestBoolean1 EXCEPT TRUE)
 
+TestInteger1 ::= INTEGER (ALL EXCEPT 0)
+TestInteger2 ::= INTEGER (ALL EXCEPT (-1..1))
+TestInteger3 ::= INTEGER ((0..2) | (4..6) | 9)
+TestInteger4 ::= TestInteger3 (MIN<..5)
+TestInteger5 ::= TestInteger3 (5..<MAX)
+TestInteger6 ::= INTEGER (TestInteger4 ^ (4 | 5 | 6))
+TestInteger7 ::= INTEGER (TestInteger6 EXCEPT 4)
+TestInteger8 ::= TestInteger5 (ALL EXCEPT 5)
+
 END
