@@ -29,12 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
-import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.*;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
@@ -55,10 +50,7 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.function.BiFunction;
 
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.*;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public abstract class AbstractConstraintCompiler {
@@ -271,7 +263,7 @@ public abstract class AbstractConstraintCompiler {
         if (definition.isExtensible()) {
             builder.append("return true;");
         } else {
-            Node roots = definition.getRoots();
+            Node roots = optimize(definition.getRoots());
             Optional<String> expression = buildExpression(roots);
 
             if (expression.isPresent()) {
@@ -284,6 +276,10 @@ public abstract class AbstractConstraintCompiler {
                 builder.append("return true;");
             }
         }
+    }
+
+    protected Node optimize(Node node) {
+        return node;
     }
 
     protected Optional<String> buildExpression(Node node) {

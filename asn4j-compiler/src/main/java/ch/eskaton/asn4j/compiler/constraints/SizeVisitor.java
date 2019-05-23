@@ -27,22 +27,15 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
+import ch.eskaton.asn4j.compiler.constraints.ast.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.commons.utils.OptionalUtils.combine;
 
-public class SizeVisitor implements Visitor<Optional<SizeNode>, IntegerRange> {
+public class SizeVisitor implements Visitor<Optional<SizeNode>, List<IntegerRange>> {
 
     @Override
     public Optional<SizeNode> visit(AllValuesNode node) {
@@ -87,8 +80,8 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, IntegerRange> {
     }
 
     @Override
-    public Optional<SizeNode> visit(ValueNode<IntegerRange> node) {
-        return Optional.of(new SizeNode(Arrays.asList(node.getValue())));
+    public Optional<SizeNode> visit(ValueNode<List<IntegerRange>> node) {
+        return Optional.of(new SizeNode(node.getValue()));
     }
 
 }

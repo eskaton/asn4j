@@ -27,4 +27,29 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
-public enum NodeType { UNION, INTERSECTION, COMPLEMENT, NEGATION, VALUE, ALL_VALUES, SIZE }
+public enum NodeType {
+
+    UNION(Id.UNION), INTERSECTION(Id.INTERSECTION), COMPLEMENT(Id.COMPLEMENT), NEGATION(Id.NEGATION),
+    VALUE(Id.VALUE), ALL_VALUES(Id.ALL_VALUES), SIZE(Id.SIZE);
+
+    private final int id;
+
+    NodeType(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public static class Id {
+        public static final int UNION = 1;
+        public static final int INTERSECTION = 2;
+        public static final int COMPLEMENT = 3;
+        public static final int NEGATION = 4;
+        public static final int VALUE = 5;
+        public static final int ALL_VALUES = 6;
+        public static final int SIZE = 7;
+    }
+
+}
