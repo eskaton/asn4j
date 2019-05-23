@@ -29,11 +29,12 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -45,12 +46,15 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
+import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -82,7 +86,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
                 } else {
                     long intValue = ((IntegerValue) value).getValue().longValue();
 
-                    return new ValueNode(new IntegerRange(intValue, intValue));
+                    return new IntegerRangeValueNode((singletonList(new IntegerRange(intValue, intValue))));
                 }
             } else {
                 throw new CompilerException("Invalid single-value constraint %s for INTEGER type",
@@ -98,7 +102,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             IntegerValue lower = ((RangeNode) elements).getLower().getLowerEndPointValue(min);
             IntegerValue upper = ((RangeNode) elements).getUpper().getUpperEndPointValue(max);
 
-            return new ValueNode(new IntegerRange(lower.getValue().longValue(), upper.getValue().longValue()));
+            return new IntegerRangeValueNode(singletonList(new IntegerRange(lower.getValue().longValue(), upper.getValue().longValue())));
         } else {
             throw new CompilerException("Invalid constraint %s for INTEGER type",
                     elements.getClass().getSimpleName());
@@ -119,27 +123,36 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         builder.finish().build();
     }
 
+    @Override
+    protected Node optimize(Node node) {
+        return new IntegerConstraintOptimizingVisitor().visit(node);
+    }
+
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                IntegerRange range = ((ValueNode<IntegerRange>) node).getValue();
-                long lower = range.getLower();
-                long upper = range.getUpper();
-
-                if (lower == upper) {
-                    return Optional.of(String.format("(value.compareTo(BigInteger.valueOf(%dL)) == 0)", lower));
-                } else if (lower == Long.MIN_VALUE) {
-                    return Optional.of(String.format("(value.compareTo(BigInteger.valueOf(%dL)) <= 0)", upper));
-                } else if (upper == Long.MAX_VALUE) {
-                    return Optional.of(String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0)", lower));
-                } else {
-                    return Optional.of(String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0 && " +
-                            "value.compareTo(BigInteger.valueOf(%dL)) <= 0)", lower, upper));
-                }
+                List<IntegerRange> range = ((IntegerRangeValueNode) node).getValue();
+                return Optional.of(range.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
             case ALL_VALUES:
                 return Optional.empty();
             default:
                 return super.buildExpression(node);
+        }
+    }
+
+    private String buildExpression(IntegerRange range) {
+        long lower = range.getLower();
+        long upper = range.getUpper();
+
+        if (lower == upper) {
+            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) == 0)", lower);
+        } else if (lower == Long.MIN_VALUE) {
+            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) <= 0)", upper);
+        } else if (upper == Long.MAX_VALUE) {
+            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0)", lower);
+        } else {
+            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0 && " +
+                    "value.compareTo(BigInteger.valueOf(%dL)) <= 0)", lower, upper);
         }
     }
 

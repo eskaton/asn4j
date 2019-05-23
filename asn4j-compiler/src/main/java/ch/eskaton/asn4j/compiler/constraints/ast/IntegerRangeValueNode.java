@@ -25,25 +25,14 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
-
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
 import java.util.List;
-import java.util.Optional;
 
-public class IntegerValueBoundsVisitor implements BoundsVisitor<List<IntegerRange>> {
+public class IntegerRangeValueNode extends ValueNode<List<IntegerRange>> {
 
-    @Override
-    public Optional<List<IntegerRange>> visit(SizeNode node) {
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<List<IntegerRange>> visit(ValueNode<List<IntegerRange>> node) {
-        return Optional.of(node.getValue());
+    public IntegerRangeValueNode(List<IntegerRange> value) {
+        super(value);
     }
 
 }
