@@ -103,6 +103,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.collections.Maps;
+import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -158,17 +159,15 @@ public class CompilerContext {
             .build();
 
     @SuppressWarnings("serial")
-    private Set<String> builtinTypes = new HashSet<String>() {
-        {
-            add(BooleanType.class.getSimpleName());
-            add(BitString.class.getSimpleName());
-            add(IntegerType.class.getSimpleName());
-            add(Null.class.getSimpleName());
-            add(OctetString.class.getSimpleName());
-            add(Real.class.getSimpleName());
-            add(VisibleString.class.getSimpleName());
-        }
-    };
+    private Set<String> builtinTypes = Sets.<String>builder()
+            .add(BooleanType.class.getSimpleName())
+            .add(BitString.class.getSimpleName())
+            .add(IntegerType.class.getSimpleName())
+            .add(Null.class.getSimpleName())
+            .add(OctetString.class.getSimpleName())
+            .add(Real.class.getSimpleName())
+            .add(VisibleString.class.getSimpleName())
+            .build();
 
     @SuppressWarnings("serial")
     private Map<String, String> runtimeTypes = Maps.<String, String>builder()
@@ -536,7 +535,8 @@ public class CompilerContext {
         new JavaWriter().write(structs, outputDir);
     }
 
-    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
+    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node)
+            throws CompilerException {
         return constraintCompiler.compileConstraint(javaClass, name, node);
     }
 
