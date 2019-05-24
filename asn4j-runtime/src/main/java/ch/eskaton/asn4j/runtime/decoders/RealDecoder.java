@@ -29,17 +29,18 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1Real.Type;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 import java.math.BigDecimal;
 
+import static ch.eskaton.commons.utils.HexDump.toHexString;
+
 public class RealDecoder implements TypeDecoder<ASN1Real> {
 
-    public void decode(DecoderStates states, DecoderState state, ASN1Real obj) throws ConstraintViolatedException {
+    public void decode(DecoderStates states, DecoderState state, ASN1Real obj) {
         outer:
         switch (state.tlv.length) {
             case 0:
@@ -63,12 +64,15 @@ public class RealDecoder implements TypeDecoder<ASN1Real> {
                     case 0x43:
                         obj.setType(Type.MINUS_ZERO);
                         break outer;
+                    default:
+                        throw new DecodingException("Invalid value 0x" + toHexString(states.buf[state.tlv.pos])
+                                + " in an encoding of a REAL value");
                 }
 
             default:
                 if ((states.buf[state.tlv.pos] >> 6) == 0x00) {
                     obj.setValue(new BigDecimal(new String(RuntimeUtils.getValue(states, state,
-                        1 + (states.buf[state.tlv.pos + 1] == 0x20 ? 1 : 0)))));
+                            1 + (states.buf[state.tlv.pos + 1] == 0x20 ? 1 : 0)))));
                 } else {
                     throw new DecodingException("Binary encoding not yet supported");
                 }

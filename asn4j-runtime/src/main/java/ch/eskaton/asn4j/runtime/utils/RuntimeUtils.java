@@ -66,7 +66,7 @@ public class RuntimeUtils {
 
             tags.add(tag);
 
-            if (tag.mode() != ASN1Tag.Mode.Explicit || tag.clazz() == Clazz.Universal) {
+            if (tag.mode() != ASN1Tag.Mode.EXPLICIT || tag.clazz() == Clazz.UNIVERSAL) {
                 break;
             }
 
@@ -80,7 +80,7 @@ public class RuntimeUtils {
         List<ASN1Tag> tags;
 
         if (tag != null) {
-            if (tag.mode() == ASN1Tag.Mode.Implicit) {
+            if (tag.mode() == ASN1Tag.Mode.IMPLICIT) {
                 tags = new LinkedList<>();
                 tags.add(0, tag);
             } else {

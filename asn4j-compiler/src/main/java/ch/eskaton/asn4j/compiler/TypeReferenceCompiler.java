@@ -61,7 +61,7 @@ public class TypeReferenceCompiler implements NamedCompiler<TypeReference, Compi
         Type base = assignment.getType();
         ASN1Tag.Mode mode = CompilerUtils.getTaggingMode(ctx.getModule(), base);
 
-        if (ASN1Tag.Mode.Explicit.equals(mode)) {
+        if (ASN1Tag.Mode.EXPLICIT.equals(mode)) {
             return true;
         }
 

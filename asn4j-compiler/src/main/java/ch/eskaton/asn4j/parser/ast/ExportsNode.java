@@ -35,7 +35,7 @@ import ch.eskaton.commons.utils.StringUtils;
 public class ExportsNode extends AbstractNode {
 
     public enum Mode {
-    	All, Specific
+        ALL, SPECIFIC
     }
 
     private Mode mode;

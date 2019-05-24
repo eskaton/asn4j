@@ -29,16 +29,15 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 35, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 35, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1IRI extends AbstractASN1IRI {
 
-    public static ASN1IRI from(String... components) throws ValidationException {
+    public static ASN1IRI from(String... components) {
         ASN1IRI iri = new ASN1IRI();
 
         iri.setValue(components);
@@ -46,7 +45,7 @@ public class ASN1IRI extends AbstractASN1IRI {
         return iri;
     }
 
-    public static ASN1IRI from(List<String> components) throws ValidationException {
+    public static ASN1IRI from(List<String> components) {
         ASN1IRI iri = new ASN1IRI();
 
         iri.setValue(components);

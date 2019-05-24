@@ -108,13 +108,12 @@ import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Stack;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
@@ -197,7 +196,7 @@ public class CompilerContext {
 
     private DefaultsCompiler defaultsCompiler = new DefaultsCompiler(this);
 
-    private Deque<JavaClass> currentClass = new LinkedList<>();
+    private Stack<JavaClass> currentClass = new Stack<>();
 
     private Map<String, JavaStructure> structs = new HashMap<>();
 
@@ -205,7 +204,7 @@ public class CompilerContext {
 
     private Map<String, ModuleNode> modules = new HashMap<>();
 
-    private Deque<ModuleNode> currentModule = new LinkedList<>();
+    private Stack<ModuleNode> currentModule = new Stack<>();
 
     private CompilerImpl compiler;
 
@@ -225,7 +224,7 @@ public class CompilerContext {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> clazz) {
+    public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> clazz) throws CompilerException {
         Compiler<?> compiler = compilers.get(clazz);
 
         if (compiler == null) {
@@ -250,7 +249,7 @@ public class CompilerContext {
             javaClass.createEqualsAndHashCode();
         }
 
-        if (currentClass.isEmpty()) {
+        if (currentClass.empty()) {
             structs.put(javaClass.getName(), javaClass);
         } else {
             currentClass.peek().addInnerClass(javaClass);
@@ -258,7 +257,7 @@ public class CompilerContext {
         }
     }
 
-    public JavaClass createClass(String name, Type type, boolean constructed) {
+    public JavaClass createClass(String name, Type type, boolean constructed) throws CompilerException {
         String className = formatName(name);
         Tag tag = type.getTag();
 
@@ -334,7 +333,7 @@ public class CompilerContext {
         }
     }
 
-    public String getTypeName(Type type) {
+    public String getTypeName(Type type) throws CompilerException {
         String typeName;
         String name = null;
 
@@ -445,8 +444,10 @@ public class CompilerContext {
         }
 
         for (AssignmentNode assignment : module.getBody().getAssignments()) {
-            if (assignment instanceof TypeAssignmentNode && typeName.equals(assignment.getReference())) {
-                return (TypeAssignmentNode) assignment;
+            if (assignment instanceof TypeAssignmentNode) {
+                if (typeName.equals(assignment.getReference())) {
+                    return (TypeAssignmentNode) assignment;
+                }
             }
         }
 
@@ -501,7 +502,7 @@ public class CompilerContext {
         return getTypeAssignment(type, null);
     }
 
-    public ValueOrObjectAssignmentNode<?, ?> resolveDefinedValue(DefinedValue ref) {
+    public ValueOrObjectAssignmentNode<?, ?> resolveDefinedValue(DefinedValue ref) throws CompilerException {
         if (ref instanceof ExternalValueReference) {
             throw new CompilerException("External references not yet supported");
             // TODO: external references
@@ -520,22 +521,27 @@ public class CompilerContext {
         return (ValueOrObjectAssignmentNode<?, ?>) assignment;
     }
 
-    public void writeClasses() {
+    public void writeClasses() throws CompilerException {
         String pkgDir = pkg.replace('.', File.separatorChar);
+
         File pkgFile = new File(StringUtils.concat(outputDir, File.separator, pkgDir));
 
-        if (pkgFile.exists() || pkgFile.mkdirs()) {
-            new JavaWriter().write(structs, outputDir);
-        } else {
-            throw new CompilerException("Failed to create directory " + pkgFile);
+        if (!pkgFile.exists()) {
+            if (!pkgFile.mkdirs()) {
+                throw new CompilerException("Failed to create directory " + pkgFile);
+            }
         }
+
+        new JavaWriter().write(structs, outputDir);
     }
 
-    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) {
+    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node)
+            throws CompilerException {
         return constraintCompiler.compileConstraint(javaClass, name, node);
     }
 
-    public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value) {
+    public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value)
+            throws CompilerException {
         defaultsCompiler.compileDefault(javaClass, field, typeName, type, value);
     }
 
@@ -594,8 +600,8 @@ public class CompilerContext {
 
             if (compiledType == null) {
                 if (!isSubType) {
-                    Deque<JavaClass> oldClass = currentClass;
-                    currentClass = new LinkedList<>();
+                    Stack<JavaClass> oldClass = currentClass;
+                    currentClass = new Stack<>();
 
                     compiledType = compiler.compileType(((TypeReference) type).getType());
 

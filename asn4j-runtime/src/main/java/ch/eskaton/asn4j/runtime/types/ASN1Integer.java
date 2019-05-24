@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -34,47 +34,42 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import java.math.BigInteger;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 2, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 2, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1Integer implements ASN1Type {
 
     private BigInteger value;
 
-    public ASN1Integer() {
-    }
-
-    protected boolean checkConstraint(BigInteger value)
-    		throws ConstraintViolatedException {
-    	return true;
+    protected boolean checkConstraint(BigInteger value) {
+        return true;
     }
 
     public BigInteger getValue() {
-    	return value;
+        return value;
     }
 
-    public void setValue(BigInteger value) throws ConstraintViolatedException {
-    	if (!checkConstraint(value)) {
-    		throw new ConstraintViolatedException(String.format(
-    				"%d doesn't satisfy a constraint", value));
-    	}
-    	
-    	this.value = value;
+    public void setValue(BigInteger value) {
+        if (!checkConstraint(value)) {
+            throw new ConstraintViolatedException(String.format(
+                    "%d doesn't satisfy a constraint", value));
+        }
+
+        this.value = value;
     }
 
-    public static ASN1Integer valueOf(long i)
-    		throws ConstraintViolatedException {
-    	ASN1Integer value = new ASN1Integer();
-    	value.setValue(BigInteger.valueOf(i));
-    	return value;
+    public static ASN1Integer valueOf(long i) {
+        ASN1Integer value = new ASN1Integer();
+        value.setValue(BigInteger.valueOf(i));
+        return value;
     }
 
     @Override
     public String toString() {
-    	return String.valueOf(value);
+        return String.valueOf(value);
     }
 
     @Override
     public int hashCode() {
-    	return Objects.hash(value);
+        return Objects.hash(value);
     }
 
     @Override

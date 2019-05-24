@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 16, mode = ASN1Tag.Mode.Explicit, constructed = true)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 16, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
 public abstract class ASN1Sequence implements ASN1Type {
 
 }

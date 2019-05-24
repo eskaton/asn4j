@@ -82,11 +82,11 @@ public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
     private <T> T getAttribute(ComponentType component, Function<ComponentType, T> namedFunction,
             Function<ComponentType, T> function) {
         switch (component.getCompType()) {
-            case NamedType:
+            case NAMED_TYPE:
                 // fall through
-            case NamedTypeDef:
+            case NAMED_TYPE_DEF:
                 // fall through
-            case NamedTypeOpt:
+            case NAMED_TYPE_OPT:
                 return namedFunction.apply(component);
             case Type:
                 return function.apply(component);

@@ -29,15 +29,13 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
-import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 public class RelativeIRIDecoder implements TypeDecoder<ASN1RelativeIRI> {
 
     @Override
-    public void decode(DecoderStates states, DecoderState state, ASN1RelativeIRI obj) throws DecodingException {
+    public void decode(DecoderStates states, DecoderState state, ASN1RelativeIRI obj) {
         obj.setValue(new String(RuntimeUtils.getValue(states, state)).split("/"));
     }
 

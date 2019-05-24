@@ -1072,15 +1072,15 @@ public class Parser {
     		if (matched()) {
                 switch ($0()) {
                     case EXPLICIT_KW:
-                        return ModuleNode.TagMode.Explicit;
+                        return ModuleNode.TagMode.EXPLICIT;
                     case IMPLICIT_KW:
-                        return ModuleNode.TagMode.Implicit;
+                        return ModuleNode.TagMode.IMPLICIT;
                     case AUTOMATIC_KW:
-                        return ModuleNode.TagMode.Automatic;
+                        return ModuleNode.TagMode.AUTOMATIC;
                 }
     		}
 
-    		return ModuleNode.TagMode.Explicit;
+    		return ModuleNode.TagMode.EXPLICIT;
     	}
 
     }
@@ -1210,11 +1210,11 @@ public class Parser {
                 if (maybeSymbols instanceof List) {
                     List<ReferenceNode> referenceNodeList = (List<ReferenceNode>) maybeSymbols;
 
-                    return new ExportsNode(getPosition(referenceNodeList), ExportsNode.Mode.Specific, referenceNodeList);
+                    return new ExportsNode(getPosition(referenceNodeList), ExportsNode.Mode.SPECIFIC, referenceNodeList);
                 }
             }
 
-            return new ExportsNode(NO_POSITION, ExportsNode.Mode.All);
+            return new ExportsNode(NO_POSITION, ExportsNode.Mode.ALL);
         }
 
     }
@@ -2142,14 +2142,14 @@ public class Parser {
             if (rule != null) {
                 switch (rule.size()) {
                     case 1:
-                        return new ComponentType(P(), ComponentType.CompType.NamedType, (NamedType) rule.get(0));
+                        return new ComponentType(P(), ComponentType.CompType.NAMED_TYPE, (NamedType) rule.get(0));
                     case 2:
-                        return new ComponentType(P(), ComponentType.CompType.NamedTypeOpt, (NamedType) rule.get(0));
+                        return new ComponentType(P(), ComponentType.CompType.NAMED_TYPE_OPT, (NamedType) rule.get(0));
                     case 3:
                         if (rule.get(0) instanceof Token) {
                             return new ComponentType(P(), ComponentType.CompType.Type, (Type) rule.get(2));
                         } else {
-                            return new ComponentType(P(), ComponentType.CompType.NamedTypeDef, (NamedType) rule.get(0),
+                            return new ComponentType(P(), ComponentType.CompType.NAMED_TYPE_DEF, (NamedType) rule.get(0),
                                     (Value) rule.get(2));
                         }
                 }
@@ -2234,7 +2234,7 @@ public class Parser {
 
                 if (token != null) {
                     type.setTaggingMode(a.$1() == TokenType.IMPLICIT_KW ?
-                            TaggingMode.Implicit : TaggingMode.Explicit);
+                            TaggingMode.IMPLICIT : TaggingMode.EXPLICIT);
                 }
 
                 return type;
@@ -2964,11 +2964,11 @@ public class Parser {
     				TokenType.MINUS_INFINITY_KW, TokenType.NOT_A_NUMBER_KW), a -> {
                 switch (a.$()) {
                     case PLUS_INFINITY_KW:
-                        return new RealValue(a.P(), RealValue.Type.PositiveInf);
+                        return new RealValue(a.P(), RealValue.Type.POSITIVE_INF);
                     case MINUS_INFINITY_KW:
-                        return new RealValue(a.P(), RealValue.Type.NegativeInf);
+                        return new RealValue(a.P(), RealValue.Type.NEGATIVE_INF);
                     case NOT_A_NUMBER_KW:
-                        return new RealValue(a.P(), RealValue.Type.NaN);
+                        return new RealValue(a.P(), RealValue.Type.NAN);
                     default:
                         return null;
                 }
@@ -3426,7 +3426,7 @@ public class Parser {
     	public ElementSet parse() throws ParserException {
     		return parse(new ChoiceParser<>(new SequenceParser(TokenType.ALL_KW, exclusionsParser),
                     unionsParser), a -> a.p() instanceof List ?
-                         new ElementSet(a.l().P1(), OpType.All, (ElementSet) a.l().n1()) : (ElementSet) a.p());
+                         new ElementSet(a.l().P1(), OpType.ALL, (ElementSet) a.l().n1()) : (ElementSet) a.p());
     	}
 
     }
@@ -3441,7 +3441,7 @@ public class Parser {
     				intersectionsParser, TokenType.PIPE, TokenType.UNION_KW).parse();
 
     		if (elements != null) {
-    			return new ElementSet(getPosition(elements), OpType.Union, elements.toArray(new Elements[] {}));
+    			return new ElementSet(getPosition(elements), OpType.UNION, elements.toArray(new Elements[] {}));
     		}
 
     		return null;
@@ -3459,7 +3459,7 @@ public class Parser {
     				TokenType.INTERSECTION_KW).parse();
 
     		if (elements != null) {
-    			return new ElementSet(getPosition(elements), OpType.Intersection, elements.toArray(new Elements[] {}));
+    			return new ElementSet(getPosition(elements), OpType.INTERSECTION, elements.toArray(new Elements[] {}));
     		}
 
     		return null;
@@ -3474,7 +3474,7 @@ public class Parser {
     	public Elements parse() throws ParserException {
     		return parse(new SequenceParser(new boolean[] { true, false }, elementsParser,
     				exclusionsParser), a -> a.n1() == null ? a.n0() :
-                    new ElementSet(a.P(), OpType.Exclude, a.n0(), ((ElementSet) a.n1()).getOperands().get(0)));
+                    new ElementSet(a.P(), OpType.EXCLUDE, a.n0(), ((ElementSet) a.n1()).getOperands().get(0)));
     	}
 
     }
@@ -3484,7 +3484,7 @@ public class Parser {
 
         public ElementSet parse() throws ParserException {
             return parse(new SequenceParser(TokenType.EXCEPT_KW, elementsParser),
-                    a -> new ElementSet(a.P(), OpType.Exclude, (Elements) a.n1()));
+                    a -> new ElementSet(a.P(), OpType.EXCLUDE, (Elements) a.n1()));
         }
 
     }
@@ -3744,11 +3744,11 @@ public class Parser {
                     a -> {
                         switch (a.$()) {
                             case PRESENT_KW:
-                                return new PresenceConstraint(a.P(), PresenceConstraint.Type.Present);
+                                return new PresenceConstraint(a.P(), PresenceConstraint.Type.PRESENT);
                             case ABSENT_KW:
-                                return new PresenceConstraint(a.P(), PresenceConstraint.Type.Absent);
+                                return new PresenceConstraint(a.P(), PresenceConstraint.Type.ABSENT);
                             case OPTIONAL_KW:
-                                return new PresenceConstraint(a.P(), PresenceConstraint.Type.Optional);
+                                return new PresenceConstraint(a.P(), PresenceConstraint.Type.OPTIONAL);
                         }
 
                         return null;

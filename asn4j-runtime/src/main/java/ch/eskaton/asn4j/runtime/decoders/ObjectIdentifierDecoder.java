@@ -35,7 +35,7 @@ public class ObjectIdentifierDecoder extends AbstractOIDDecoder<ASN1ObjectIdenti
 
     @Override
     public void decodeComponent(List<Integer> components, int component) {
-        if (components.size() == 0) {
+        if (components.isEmpty()) {
             if (component >= 80) {
                 components.add(2);
                 components.add(component - 80);

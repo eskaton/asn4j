@@ -33,8 +33,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 
 public class BooleanEncoder implements TypeEncoder<ASN1Boolean> {
 
-    public byte[] encode(Encoder encoder, ASN1Boolean obj)
-            throws EncodingException {
+    @Override
+    public byte[] encode(Encoder encoder, ASN1Boolean obj) {
         return new byte[] { obj.getValue() ? (byte) 0xFF : (byte) 0x00 };
     }
 

@@ -39,30 +39,30 @@ public class TagIdTest {
 
     @Test
     public void testFromTag() {
-        assertEquals(new TagId(Clazz.Application, 21), TagId.fromTag(getTag(TestA.class)));
+        assertEquals(new TagId(Clazz.APPLICATION, 21), TagId.fromTag(getTag(TestA.class)));
     }
 
     @Test
     public void testFromTags() {
-        assertEquals(Arrays.asList(new TagId(Clazz.Private, 37), new TagId(Clazz.Application, 21)),
+        assertEquals(Arrays.asList(new TagId(Clazz.PRIVATE, 37), new TagId(Clazz.APPLICATION, 21)),
                 TagId.fromTags(Arrays.asList(getTag(TestB.class), getTag(TestA.class))));
     }
 
     @Test
     public void testEqualsASN1Tag() {
-        assertTrue(new TagId(Clazz.Application, 21).equalsASN1Tag(getTag(TestA.class)));
+        assertTrue(new TagId(Clazz.APPLICATION, 21).equalsASN1Tag(getTag(TestA.class)));
     }
 
     private ASN1Tag getTag(Class<?> clazz) {
         return clazz.getAnnotation(ASN1Tag.class);
     }
 
-    @ASN1Tag(clazz = Clazz.Application, tag = 21, mode = ASN1Tag.Mode.Explicit, constructed = true)
+    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 21, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
     private static class TestA {
 
     }
 
-    @ASN1Tag(clazz = Clazz.Private, tag = 37, mode = ASN1Tag.Mode.Explicit, constructed = true)
+    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 37, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
     private static class TestB {
 
     }

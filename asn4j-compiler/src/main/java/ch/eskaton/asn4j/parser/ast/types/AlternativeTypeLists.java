@@ -27,14 +27,13 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
-import java.util.List;
-
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.AbstractNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
-import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.commons.utils.StringUtils;
+
+import java.util.List;
 
 public class AlternativeTypeLists extends AbstractNode {
 

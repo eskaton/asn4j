@@ -115,9 +115,11 @@ public class BitStringValue extends AbstractValue {
 
     @Override
     public String toString() {
-        return StringUtils.concat(getClass().getSimpleName() + "[",
-                byteValue != null ? "0x" + new BigInteger(byteValue).toString(16) :
-                        (namedValues != null ? StringUtils.join(namedValues, ", ") : value), "]");
+        String namedValuesStr = namedValues != null ? StringUtils.join(namedValues, ", ") :
+                String.valueOf(this.value);
+        String valueStr = byteValue != null ? "0x" + new BigInteger(byteValue).toString(16) : namedValuesStr;
+
+        return StringUtils.concat(getClass().getSimpleName() + "[", valueStr, "]");
     }
 
 }

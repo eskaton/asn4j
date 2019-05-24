@@ -31,8 +31,11 @@ import java.util.Collection;
 
 public class Assert {
 
+    private Assert() {
+    }
+
     public static void notEmpty(Collection<?> coll, String name) {
-        if (coll == null || coll.size() == 0) {
+        if (coll == null || coll.isEmpty()) {
             throw new IllegalArgumentException(name + " must not be null or empty");
         }
     }

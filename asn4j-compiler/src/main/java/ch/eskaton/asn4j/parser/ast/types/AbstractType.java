@@ -81,7 +81,7 @@ public abstract class AbstractType implements Type {
     }
 
     public boolean hasConstraint() {
-        return constraints != null && constraints.size() > 0;
+        return constraints != null && !constraints.isEmpty();
     }
 
     public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {

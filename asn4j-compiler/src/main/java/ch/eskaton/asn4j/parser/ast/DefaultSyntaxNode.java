@@ -39,7 +39,7 @@ public class DefaultSyntaxNode extends ObjectSyntaxNode {
     public DefaultSyntaxNode(Position position, List<FieldSettingNode> fieldSetting) {
         super(position);
 
-        this.fieldSetting = fieldSetting != null ? fieldSetting : new ArrayList<FieldSettingNode>();
+        this.fieldSetting = fieldSetting != null ? fieldSetting : new ArrayList<>();
     }
 
     public List<FieldSettingNode> getFieldSetting() {

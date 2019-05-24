@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 10, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 10, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1EnumeratedType implements ASN1Type {
 
     private int value;

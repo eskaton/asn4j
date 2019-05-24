@@ -30,14 +30,13 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.collections.Maps;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ModuleNode extends AbstractNode {
 
     public enum TagMode {
-        Implicit, Explicit, Automatic
+        IMPLICIT, EXPLICIT, AUTOMATIC
     }
 
     public enum Encoding {

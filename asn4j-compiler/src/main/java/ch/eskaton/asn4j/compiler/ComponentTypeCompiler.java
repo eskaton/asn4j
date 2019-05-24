@@ -57,11 +57,11 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         TagMode mode = ctx.getModule().getTagMode();
 
         switch (node.getCompType()) {
-            case NamedTypeOpt:
+            case NAMED_TYPE_OPT:
                 // fall through
-            case NamedTypeDef:
+            case NAMED_TYPE_DEF:
                 // fall through
-            case NamedType:
+            case NAMED_TYPE:
                 compileComponentNamedType(ctx, node, node.getNamedType());
                 break;
             case Type:
@@ -78,11 +78,11 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         TaggingMode taggingMode = type.getTaggingMode();
         Tag tag = ctx.resolveType(type).getTag();
         JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
-        boolean hasDefault = component.getCompType() == CompType.NamedTypeDef;
+        boolean hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
         String typeName = ctx.getTypeName(namedType);
         JavaDefinedField field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
 
-        if (component.getCompType() == CompType.NamedTypeOpt) {
+        if (component.getCompType() == CompType.NAMED_TYPE_OPT) {
             compAnnotation.addParameter("optional", "true");
         } else if (hasDefault) {
             compAnnotation.addParameter("hasDefault", "true");

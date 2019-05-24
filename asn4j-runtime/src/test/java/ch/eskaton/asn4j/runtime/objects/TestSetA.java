@@ -36,11 +36,11 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 
 public class TestSetA extends ASN1Set {
 
-    @ASN1Tag(mode = ASN1Tag.Mode.Explicit, constructed = true, tag = 0, clazz = Clazz.ContextSpecific)
+    @ASN1Tag(mode = ASN1Tag.Mode.EXPLICIT, constructed = true, tag = 0, clazz = Clazz.CONTEXT_SPECIFIC)
     @ASN1Component
     private ASN1Integer a;
 
-    @ASN1Tag(mode = ASN1Tag.Mode.Explicit, constructed = true, tag = 1, clazz = Clazz.ContextSpecific)
+    @ASN1Tag(mode = ASN1Tag.Mode.EXPLICIT, constructed = true, tag = 1, clazz = Clazz.CONTEXT_SPECIFIC)
     @ASN1Component(optional = true)
     private ASN1OctetString b;
 

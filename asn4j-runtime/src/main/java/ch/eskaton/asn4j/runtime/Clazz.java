@@ -28,5 +28,5 @@
 package ch.eskaton.asn4j.runtime;
 
 public enum Clazz {
-    Universal, Application, ContextSpecific, Private
+    UNIVERSAL, APPLICATION, CONTEXT_SPECIFIC, PRIVATE
 }

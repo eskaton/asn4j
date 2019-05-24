@@ -38,6 +38,7 @@ public class LexerInputStream extends CharArrayReader {
     	super(buf);
     }
 
+    @Override
     public int read() throws IOException {
     	int c = super.read();
 
@@ -60,6 +61,7 @@ public class LexerInputStream extends CharArrayReader {
     	this.mark = pos;
     }
 
+    @Override
     public void reset() {
     	pos = mark;
     }

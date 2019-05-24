@@ -36,7 +36,7 @@ import java.util.List;
 public class ElementSet extends Elements {
 
     public enum OpType {
-        All, Exclude, Union, Intersection
+        ALL, EXCLUDE, UNION, INTERSECTION
     }
 
     private OpType operation;

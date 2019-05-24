@@ -49,7 +49,7 @@ public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        TLV tlv = getTlv(Clazz.Universal, 1, false);
+        TLV tlv = getTlv(Clazz.UNIVERSAL, 1, false);
 
         assertTrue(matcher.accept(tlv));
         assertFalse(matcher.hasNext());
@@ -61,7 +61,7 @@ public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        TLV tlv = getTlv(Clazz.Universal, 7, false);
+        TLV tlv = getTlv(Clazz.UNIVERSAL, 7, false);
 
         assertFalse(matcher.accept(tlv));
         assertFalse(matcher.hasNext());
@@ -73,11 +73,11 @@ public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        TLV tlv = getTlv(Clazz.Application, 2, false);
+        TLV tlv = getTlv(Clazz.APPLICATION, 2, false);
 
         assertTrue(matcher.accept(tlv));
 
-        tlv = getTlv(Clazz.Universal, 1, false);
+        tlv = getTlv(Clazz.UNIVERSAL, 1, false);
 
         assertTrue(matcher.hasNext());
         assertTrue(matcher.accept(tlv));
@@ -90,17 +90,17 @@ public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
 
         assertTrue(matcher.hasNext());
 
-        TLV tlv = getTlv(Clazz.Universal, 7, false);
+        TLV tlv = getTlv(Clazz.UNIVERSAL, 7, false);
 
         assertFalse(matcher.accept(tlv));
         assertTrue(matcher.hasNext());
     }
 
-    @ASN1Tag(clazz = Clazz.Universal, tag = 1, mode = ASN1Tag.Mode.Explicit, constructed = false)
+    @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
     private static class TestTag1 implements ASN1Type {
     }
 
-    @ASN1Tag(clazz = Clazz.Application, tag = 2, mode = ASN1Tag.Mode.Explicit, constructed = false)
+    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
     private static class TestTag2 extends TestTag1 {
     }
 

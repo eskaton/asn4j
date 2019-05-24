@@ -37,7 +37,6 @@ public class ParameterizedObjectAssignmentNode extends
     public ParameterizedObjectAssignmentNode(Position position, String reference, List<ParameterNode> parameters,
             ObjectClassReferenceNode objectClass, ObjectNode object) {
         super(position, reference, parameters, objectClass, object);
-
     }
 
 }

@@ -37,7 +37,7 @@ import java.lang.annotation.RetentionPolicy;
 public @interface ASN1Tag {
 
     enum Mode {
-        Implicit, Explicit
+        IMPLICIT, EXPLICIT
     }
 
     Clazz clazz();

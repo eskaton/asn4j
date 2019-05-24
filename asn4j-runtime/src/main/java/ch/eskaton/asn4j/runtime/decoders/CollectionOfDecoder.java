@@ -32,9 +32,7 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
-import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1CollectionOf;
-import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 import java.lang.reflect.ParameterizedType;
@@ -44,7 +42,7 @@ import java.util.List;
 public abstract class CollectionOfDecoder<T extends ASN1CollectionOf> implements CollectionDecoder<T> {
 
     @SuppressWarnings("unchecked")
-    public void decode(Decoder decoder, DecoderStates states, T obj) throws DecodingException {
+    public void decode(Decoder decoder, DecoderStates states, T obj) {
         ParameterizedType pt = (ParameterizedType) obj.getClass().getGenericSuperclass();
         Class<ASN1Type> typeParam = (Class<ASN1Type>) pt.getActualTypeArguments()[0];
         List<ASN1Type> elements = new LinkedList<>();

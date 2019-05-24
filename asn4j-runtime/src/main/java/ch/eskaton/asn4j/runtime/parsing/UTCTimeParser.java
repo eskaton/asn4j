@@ -33,42 +33,39 @@ import java.io.IOException;
 
 public class UTCTimeParser extends AbstractDateTimeParser {
 
-    public UTCTimeParser() {
-    }
-
     public DateTime parse(String s) throws ASN1RuntimeException {
         Context ctx = new Context(s);
 
         while (true) {
             try {
                 switch (ctx.getState()) {
-                    case Initial:
+                    case INITIAL:
                         ctx.year = parseYear(ctx);
                         break;
-                    case Year:
+                    case YEAR:
                         ctx.month = parseMonth(ctx);
                         break;
-                    case Month:
+                    case MONTH:
                         ctx.day = parseDay(ctx);
                         break;
-                    case Day:
+                    case DAY:
                         ctx.hour = parseHour(ctx);
                         break;
-                    case Hour:
+                    case HOUR:
                         ctx.minute = parseMinute(ctx);
                         break;
-                    case Minute:
+                    case MINUTE:
                         ctx.second = parseSecond(ctx);
 
                         if (ctx.second == null) {
                             ctx.second = ZERO;
-                            ctx.setState(State.TimeZone);
+                            ctx.setState(State.TIME_ZONE);
                         }
                         break;
-                    case TimeZone:
+                    case TIME_ZONE:
                         ctx.timeZone = parseTimeZone(ctx);
                         break;
-                    case Accept:
+                    case ACCEPT:
                         if (ctx.available()) {
                             throw new ASN1RuntimeException("Failed to parse: " + s);
                         }
@@ -84,8 +81,10 @@ public class UTCTimeParser extends AbstractDateTimeParser {
                         }
 
                         return dateTime;
-                    case Error:
+                    case ERROR:
                         throw new ASN1RuntimeException("Failed to parse: " + s);
+                    default:
+                        throw new ASN1RuntimeException("Unimplemented state: " + ctx.getState());
                 }
             } catch (IOException e) {
                 throw new ASN1RuntimeException(e);
@@ -94,11 +93,11 @@ public class UTCTimeParser extends AbstractDateTimeParser {
     }
 
     protected Integer parseYear(Context ctx) throws IOException, ASN1RuntimeException {
-        return parseComponent(ctx, State.Year, 2, null);
+        return parseComponent(ctx, State.YEAR, 2, null);
     }
 
     protected Integer parseSecond(Context ctx) throws IOException, ASN1RuntimeException {
-        return parseComponent(ctx, State.TimeZone, 2, second ->
+        return parseComponent(ctx, State.TIME_ZONE, 2, second ->
                 new LessEqualVerifiyer("second", 59).verify(second));
     }
 
@@ -106,7 +105,7 @@ public class UTCTimeParser extends AbstractDateTimeParser {
         StringBuilder sb = new StringBuilder();
         int chr = ctx.read();
 
-        ctx.setState(State.Accept);
+        ctx.setState(State.ACCEPT);
 
         if (chr == 'Z') {
             sb.append((char) chr);

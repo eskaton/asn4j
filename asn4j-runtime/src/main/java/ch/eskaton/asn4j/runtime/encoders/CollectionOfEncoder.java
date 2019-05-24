@@ -37,7 +37,8 @@ import java.util.List;
 
 public abstract class CollectionOfEncoder<C extends ASN1CollectionOf<T>, T extends ASN1Type> implements TypeEncoder<C> {
 
-    public byte[] encode(Encoder encoder, C obj) throws EncodingException {
+    @Override
+    public byte[] encode(Encoder encoder, C obj) {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
         List<T> values = obj.getValues();
@@ -46,7 +47,7 @@ public abstract class CollectionOfEncoder<C extends ASN1CollectionOf<T>, T exten
             for (T value : values) {
                 try {
                     content.write(encoder.encode(value));
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     throw new EncodingException(e);
                 }
             }

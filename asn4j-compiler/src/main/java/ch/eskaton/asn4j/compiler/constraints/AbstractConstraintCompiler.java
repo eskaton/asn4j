@@ -164,10 +164,10 @@ public abstract class AbstractConstraintCompiler {
         List<Elements> operands = set.getOperands();
 
         switch (set.getOperation()) {
-            case All:
+            case ALL:
                 return calculateInversion(compileConstraint(base, (ElementSet) operands.get(0), bounds));
 
-            case Exclude:
+            case EXCLUDE:
                 if (operands.size() == 1) {
                     // ALL EXCEPT
                     return calculateElements(base, operands.get(0), bounds);
@@ -176,10 +176,10 @@ public abstract class AbstractConstraintCompiler {
                             calculateElements(base, operands.get(1), bounds));
                 }
 
-            case Intersection:
+            case INTERSECTION:
                 return calculateIntersection(base, operands, bounds);
 
-            case Union:
+            case UNION:
                 return calculateUnion(base, operands, bounds);
 
             default:

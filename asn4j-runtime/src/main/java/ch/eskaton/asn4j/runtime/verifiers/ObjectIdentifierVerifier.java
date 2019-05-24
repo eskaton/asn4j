@@ -36,7 +36,7 @@ public class ObjectIdentifierVerifier {
     private ObjectIdentifierVerifier() {
     }
 
-    public static void verifyComponents(List<Integer> components) throws ValidationException {
+    public static void verifyComponents(List<Integer> components) {
         int i = 0;
         int firstComponent = 0;
 

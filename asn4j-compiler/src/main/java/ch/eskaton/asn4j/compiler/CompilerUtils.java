@@ -97,22 +97,22 @@ public class CompilerUtils {
 
         if (taggingMode != null) {
             switch (taggingMode) {
-                case Explicit:
-                    return ASN1Tag.Mode.Explicit;
-                case Implicit:
-                    return ASN1Tag.Mode.Implicit;
+                case EXPLICIT:
+                    return ASN1Tag.Mode.EXPLICIT;
+                case IMPLICIT:
+                    return ASN1Tag.Mode.IMPLICIT;
             }
         }
 
         switch (module.getTagMode()) {
-            case Explicit:
-                return ASN1Tag.Mode.Explicit;
-            case Implicit:
-                return ASN1Tag.Mode.Implicit;
-            case Automatic:
+            case EXPLICIT:
+                return ASN1Tag.Mode.EXPLICIT;
+            case IMPLICIT:
+                return ASN1Tag.Mode.IMPLICIT;
+            case AUTOMATIC:
                 throw new CompilerException("Automatic tagging not supported");
             default:
-                return Mode.Explicit;
+                return Mode.EXPLICIT;
         }
     }
 
@@ -133,8 +133,8 @@ public class CompilerUtils {
 
         tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz().toString());
         tagAnnotation.addParameter("clazz", "Clazz."
-                + (tag.getClazz() != null ? StringUtils.initCap(tag.getClazz().toString().toLowerCase())
-                : Clazz.ContextSpecific.toString()));
+                + (tag.getClazz() != null ? tag.getClazz().toString()
+                : Clazz.CONTEXT_SPECIFIC.toString()));
         tagAnnotation.addParameter("constructed", constructed.toString().toLowerCase());
         tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName() + ".Mode." + taggingModeString);
 
@@ -146,18 +146,18 @@ public class CompilerUtils {
         ClassType clazzType = tag.getClazz();
 
         if (clazzType == null) {
-            clazz = Clazz.ContextSpecific;
+            clazz = Clazz.CONTEXT_SPECIFIC;
         } else {
 
             switch (clazzType) {
                 case APPLICATION:
-                    clazz = Clazz.Application;
+                    clazz = Clazz.APPLICATION;
                     break;
                 case PRIVATE:
-                    clazz = Clazz.Private;
+                    clazz = Clazz.PRIVATE;
                     break;
                 case UNIVERSAL:
-                    clazz = Clazz.Universal;
+                    clazz = Clazz.UNIVERSAL;
                     break;
                 default:
                     throw new CompilerException("Unknown class type: " + clazzType.name());

@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.exceptions.PrematureEndOfInputException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
@@ -37,7 +36,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 public class BitStringDecoder implements TypeDecoder<ASN1BitString> {
 
     @Override
-    public void decode(DecoderStates states, DecoderState state, ASN1BitString obj) throws ConstraintViolatedException {
+    public void decode(DecoderStates states, DecoderState state, ASN1BitString obj) {
         byte unusedBits = states.buf[2];
 
         if (state.length == 1) {

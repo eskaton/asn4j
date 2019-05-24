@@ -34,7 +34,7 @@ import ch.eskaton.commons.utils.StringUtils;
 public class ComponentType extends AbstractType {
 
     public enum CompType {
-    	NamedType, NamedTypeOpt, NamedTypeDef, Type
+        NAMED_TYPE, NAMED_TYPE_OPT, NAMED_TYPE_DEF, Type
     }
 
     private CompType compType;
@@ -86,11 +86,11 @@ public class ComponentType extends AbstractType {
     @Override
     public String toString() {
     	switch (compType) {
-    		case NamedType:
+    		case NAMED_TYPE:
     			return StringUtils.concat("ComponentType[namedType=", namedType, "]");
-    		case NamedTypeOpt:
+    		case NAMED_TYPE_OPT:
     			return StringUtils.concat("ComponentType[namedType=", namedType, ",optional", "]");
-    		case NamedTypeDef:
+    		case NAMED_TYPE_DEF:
     			return StringUtils.concat("ComponentType[namedType=", namedType, ",default=", value, "]");
     		case Type:
     			return StringUtils.concat("ComponentType[Components of type=", type, "]");

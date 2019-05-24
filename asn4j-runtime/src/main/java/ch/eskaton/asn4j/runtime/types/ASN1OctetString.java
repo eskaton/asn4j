@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import java.util.Arrays;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 4, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 4, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1OctetString implements ASN1Type {
 
     private byte[] value;
