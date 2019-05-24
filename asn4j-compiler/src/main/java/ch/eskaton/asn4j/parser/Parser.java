@@ -516,13 +516,13 @@ public class Parser {
     public Parser(InputStream is) throws IOException {
         this.lexer = new Lexer(is);
 
-        lexerContext.push(Context.Normal);
+        lexerContext.push(Context.NORMAL);
     }
 
     public Parser(String moduleFile) throws IOException {
         this.lexer = new Lexer(moduleFile);
 
-        lexerContext.push(Context.Normal);
+        lexerContext.push(Context.NORMAL);
     }
 
     private Token getToken() throws ParserException {
@@ -989,7 +989,7 @@ public class Parser {
 
             List<Object> rule = new SequenceParser(
                     TokenType.ENCODING_CONTROL_KW, new SingleTokenParser(
-                            TokenType.ENCODING_REFERENCE, Context.Encoding))
+                            TokenType.ENCODING_REFERENCE, Context.ENCODING))
                     .parse();
 
             List<Token> encodingInstruction = new ArrayList<>();
@@ -1039,7 +1039,7 @@ public class Parser {
     protected class EncodingReferenceDefaultParser extends ListRuleParser<ModuleNode.Encoding> {
 
         public Encoding parse() throws ParserException {
-            lexerContext.push(Context.Encoding);
+            lexerContext.push(Context.ENCODING);
 
             try {
                 super.parse(new SequenceParser(TokenType.ENCODING_REFERENCE, TokenType.INSTRUCTIONS_KW));
@@ -2260,7 +2260,7 @@ public class Parser {
 
         public String parse() throws ParserException {
             return super.parse(new SequenceParser(
-                            new SingleTokenParser(TokenType.ENCODING_REFERENCE, Context.Encoding), TokenType.COLON),
+                            new SingleTokenParser(TokenType.ENCODING_REFERENCE, Context.ENCODING), TokenType.COLON),
                     a -> a.t0() != null ? a.s0() : null);
         }
     }
@@ -3784,9 +3784,9 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public PropertySettingsConstraint parse() throws ParserException {
             return super.parse(new SequenceParser(TokenType.SETTINGS_KW,
-                            new SingleTokenParser(TokenType.QUOTATION, Context.PropertySettings),
+                            new SingleTokenParser(TokenType.QUOTATION, Context.PROPERTY_SETTINGS),
                             new RepetitionParser<>(propertyAndSettingPairParser),
-                            new SingleTokenParser(TokenType.QUOTATION, Context.PropertySettings)),
+                            new SingleTokenParser(TokenType.QUOTATION, Context.PROPERTY_SETTINGS)),
                     a -> new PropertySettingsConstraint(a.P(), a.n2()));
         }
 
@@ -3924,7 +3924,7 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public ObjectClassReferenceNode parse() throws ParserException {
             return super.parse(new ChoiceParser<>(externalObjectClassReferenceParser,
-                    new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.ObjectClass),
+                    new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.OBJECT_CLASS),
                     usefulObjectClassReferenceParser),
                     a -> a.n() instanceof  Token ? new ObjectClassReferenceNode(a.P(), a.s())
                             : (ObjectClassReferenceNode) a.n());
@@ -3937,7 +3937,7 @@ public class Parser {
 
         public ExternalObjectClassReferenceNode parse() throws ParserException {
             return super.parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.DOT,
-                    new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.ObjectClass)),
+                    new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.OBJECT_CLASS)),
                     a -> new ExternalObjectClassReferenceNode(a.P0(), a.s0(),a.s2()));
         }
 
@@ -4014,8 +4014,8 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public PrimitiveFieldNameNode parse() throws ParserException {
-            Token rule = new ChoiceParser<>(new SingleTokenParser(TokenType.TYPE_FIELD_REFERENCE, Context.TypeField),
-                    new SingleTokenParser(TokenType.VALUE_FIELD_REFERENCE, Context.ValueField)).parse();
+            Token rule = new ChoiceParser<>(new SingleTokenParser(TokenType.TYPE_FIELD_REFERENCE, Context.TYPE_FIELD),
+                    new SingleTokenParser(TokenType.VALUE_FIELD_REFERENCE, Context.VALUE_FIELD)).parse();
 
             if (rule != null) {
                 String reference = rule.getText().substring(1);
@@ -4348,9 +4348,9 @@ public class Parser {
         public Group parse() throws ParserException {
             List<TokenOrGroup> rule = new ValueExtractor<List<TokenOrGroup>>(1,
                     new SequenceParser(new SingleTokenParser(
-                            TokenType.L_BRACKET, Context.Syntax),
+                            TokenType.L_BRACKET, Context.SYNTAX),
                             new RepetitionParser<>(tokenOrGroupSpecParser),
-                            new SingleTokenParser(TokenType.R_BRACKET, Context.Syntax))).parse();
+                            new SingleTokenParser(TokenType.R_BRACKET, Context.SYNTAX))).parse();
 
             if (rule != null) {
                 return new Group(getPosition(rule), rule);
@@ -4395,7 +4395,7 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public LiteralNode parse() throws ParserException {
             Token token = new ChoiceParser<>(new ValueExtractor<>(0,
-                    new SequenceParser(new SingleTokenParser(TokenType.WORD, Context.Syntax),
+                    new SequenceParser(new SingleTokenParser(TokenType.WORD, Context.SYNTAX),
                             new NegativeLookaheadParser(TokenType.DOT))),
                     new SingleTokenParser(TokenType.COMMA)).parse();
 
@@ -4810,7 +4810,7 @@ public class Parser {
             List<Object> rule = new ChoiceParser<>(
                     new SequenceParser(TokenType.AT, componentIdListParser),
                     new SequenceParser(new boolean[] { true, true, false, true },
-                            TokenType.AT, new SingleTokenParser(TokenType.DOT, Context.Level), levelParser,
+                            TokenType.AT, new SingleTokenParser(TokenType.DOT, Context.LEVEL), levelParser,
                             componentIdListParser)).parse();
 
             if (rule != null) {
@@ -4831,7 +4831,7 @@ public class Parser {
     protected class LevelParser extends ListRuleParser<Integer> {
 
         public Integer parse() throws ParserException {
-            return super.parse(new RepetitionParser<>(new SingleTokenParser(TokenType.DOT, Context.Level)),
+            return super.parse(new RepetitionParser<>(new SingleTokenParser(TokenType.DOT, Context.LEVEL)),
                     ListAccessor::size, 0);
         }
 

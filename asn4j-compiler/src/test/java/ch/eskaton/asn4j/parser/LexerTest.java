@@ -50,15 +50,15 @@ public class LexerTest {
     			"T Type Test-Type".getBytes()));
 
     	assertEquals(Token.TokenType.TYPE_REFERENCE,
-    			lexer.nextToken(Context.Normal).getType());
+    			lexer.nextToken(Context.NORMAL).getType());
 
     	assertEquals(Token.TokenType.TYPE_REFERENCE,
-    			lexer.nextToken(Context.Normal).getType());
+    			lexer.nextToken(Context.NORMAL).getType());
 
     	assertEquals(Token.TokenType.TYPE_REFERENCE,
-    			lexer.nextToken(Context.Normal).getType());
+    			lexer.nextToken(Context.NORMAL).getType());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -66,12 +66,12 @@ public class LexerTest {
     public void testInvalidTypeReference() throws IOException, ParserException {
     	Lexer lexer = new Lexer(new ByteArrayInputStream(
     			"Test--Type".getBytes()));
-    	assertEquals("Test", lexer.nextToken(Context.Normal).getText());
+    	assertEquals("Test", lexer.nextToken(Context.NORMAL).getText());
 
     	lexer = new Lexer(new ByteArrayInputStream("Type-".getBytes()));
 
     	try {
-    		lexer.nextToken(Context.Normal);
+    		lexer.nextToken(Context.NORMAL);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
     	}
@@ -83,18 +83,18 @@ public class LexerTest {
     			"t type test-type test-TYPE".getBytes()));
 
     	assertEquals(Token.TokenType.IDENTIFIER, lexer
-    			.nextToken(Context.Normal).getType());
+    			.nextToken(Context.NORMAL).getType());
 
     	assertEquals(Token.TokenType.IDENTIFIER, lexer
-    			.nextToken(Context.Normal).getType());
+    			.nextToken(Context.NORMAL).getType());
 
     	assertEquals(Token.TokenType.IDENTIFIER, lexer
-    			.nextToken(Context.Normal).getType());
+    			.nextToken(Context.NORMAL).getType());
 
     	assertEquals(Token.TokenType.IDENTIFIER, lexer
-    			.nextToken(Context.Normal).getType());
+    			.nextToken(Context.NORMAL).getType());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -102,12 +102,12 @@ public class LexerTest {
     public void testInvalidIdentifier() throws IOException, ParserException {
     	Lexer lexer = new Lexer(new ByteArrayInputStream(
     			"test--type".getBytes()));
-    	assertEquals("test", lexer.nextToken(Context.Normal).getText());
+    	assertEquals("test", lexer.nextToken(Context.NORMAL).getText());
 
     	lexer = new Lexer(new ByteArrayInputStream("type-".getBytes()));
 
     	try {
-    		lexer.nextToken(Context.Normal);
+    		lexer.nextToken(Context.NORMAL);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
     	}
@@ -119,12 +119,12 @@ public class LexerTest {
     			"T OBJECT-CLASS".getBytes()));
 
     	assertEquals(Token.TokenType.OBJECT_CLASS_REFERENCE,
-    			lexer.nextToken(Context.ObjectClass).getType());
+    			lexer.nextToken(Context.OBJECT_CLASS).getType());
 
     	assertEquals(Token.TokenType.OBJECT_CLASS_REFERENCE,
-    			lexer.nextToken(Context.ObjectClass).getType());
+    			lexer.nextToken(Context.OBJECT_CLASS).getType());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -134,7 +134,7 @@ public class LexerTest {
     	Lexer lexer = new Lexer(new ByteArrayInputStream("Invalid".getBytes()));
 
     	try {
-    		lexer.nextToken(Context.ObjectClass).getType();
+    		lexer.nextToken(Context.OBJECT_CLASS).getType();
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
     	}
@@ -146,12 +146,12 @@ public class LexerTest {
     			"&T &Type-Field".getBytes()));
 
     	assertEquals(Token.TokenType.TYPE_FIELD_REFERENCE,
-    			lexer.nextToken(Context.TypeField).getType());
+    			lexer.nextToken(Context.TYPE_FIELD).getType());
 
     	assertEquals(Token.TokenType.TYPE_FIELD_REFERENCE,
-    			lexer.nextToken(Context.TypeField).getType());
+    			lexer.nextToken(Context.TYPE_FIELD).getType());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -161,9 +161,9 @@ public class LexerTest {
     			"&value-field".getBytes()));
 
     	assertEquals(Token.TokenType.VALUE_FIELD_REFERENCE,
-    			lexer.nextToken(Context.ValueField).getType());
+    			lexer.nextToken(Context.VALUE_FIELD).getType());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -171,10 +171,10 @@ public class LexerTest {
     public void testWord() throws IOException, ParserException {
     	Lexer lexer = new Lexer(new ByteArrayInputStream("A-WORD".getBytes()));
 
-    	assertEquals(Token.TokenType.WORD, lexer.nextToken(Context.Syntax)
+    	assertEquals(Token.TokenType.WORD, lexer.nextToken(Context.SYNTAX)
     			.getType());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -185,22 +185,22 @@ public class LexerTest {
     	Token token;
 
     	assertEquals(Token.TokenType.NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("0", token.getText());
 
     	assertEquals(Token.TokenType.NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("1", token.getText());
 
     	assertEquals(Token.TokenType.NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("42", token.getText());
 
     	assertEquals(Token.TokenType.NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("4711", token.getText());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -212,54 +212,54 @@ public class LexerTest {
     	Token token;
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("01", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("2.", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("3.41", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("3e0", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("3e12", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("3e-12", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("42.e-0", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("42.e5", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("42.e-5", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("77.35E0", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("77.35e+6", token.getText());
 
     	assertEquals(Token.TokenType.REAL_NUMBER,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("77.35e-6", token.getText());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -268,7 +268,7 @@ public class LexerTest {
     	Lexer lexer = new Lexer(new ByteArrayInputStream("5e".getBytes()));
 
     	try {
-    		lexer.nextToken(Context.Normal);
+    		lexer.nextToken(Context.NORMAL);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
     	}
@@ -276,7 +276,7 @@ public class LexerTest {
     	lexer = new Lexer(new ByteArrayInputStream("5e01".getBytes()));
 
     	try {
-    		lexer.nextToken(Context.Normal);
+    		lexer.nextToken(Context.NORMAL);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
     	}
@@ -289,26 +289,26 @@ public class LexerTest {
     	Token token;
 
     	assertEquals(Token.TokenType.B_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("", token.getText());
 
     	assertEquals(Token.TokenType.B_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("0", token.getText());
 
     	assertEquals(Token.TokenType.B_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("1", token.getText());
 
     	assertEquals(Token.TokenType.B_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("0101", token.getText());
 
     	assertEquals(Token.TokenType.B_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("1011", token.getText());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -319,22 +319,22 @@ public class LexerTest {
     	Token token;
 
     	assertEquals(Token.TokenType.H_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("", token.getText());
 
     	assertEquals(Token.TokenType.H_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("0", token.getText());
 
     	assertEquals(Token.TokenType.H_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("0B0F", token.getText());
 
     	assertEquals(Token.TokenType.H_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("FAD5", token.getText());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -347,34 +347,34 @@ public class LexerTest {
     	Token token;
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("", getCString(token));
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("\"", getCString(token));
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals(" ", getCString(token));
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("a\"b", getCString(token));
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("abc def", getCString(token));
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("abcdefghi", getCString(token));
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("abc", getCString(token));
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -389,18 +389,18 @@ public class LexerTest {
     	Token token;
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("a", getSimpleString(token));
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("abc def", getSimpleString(token));
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals("abc  def", getSimpleString(token));
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -411,7 +411,7 @@ public class LexerTest {
 
     	try {
     		assertEquals(Token.TokenType.C_STRING,
-    				(token = lexer.nextToken(Context.Normal)).getType());
+    				(token = lexer.nextToken(Context.NORMAL)).getType());
     		getSimpleString(token);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
@@ -421,7 +421,7 @@ public class LexerTest {
 
     	try {
     		assertEquals(Token.TokenType.C_STRING,
-    				(token = lexer.nextToken(Context.Normal)).getType());
+    				(token = lexer.nextToken(Context.NORMAL)).getType());
     		getSimpleString(token);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
@@ -431,7 +431,7 @@ public class LexerTest {
 
     	try {
     		assertEquals(Token.TokenType.C_STRING,
-    				(token = lexer.nextToken(Context.Normal)).getType());
+    				(token = lexer.nextToken(Context.NORMAL)).getType());
     		getSimpleString(token);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
@@ -449,15 +449,15 @@ public class LexerTest {
     	Token token;
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals(new TimeValue(NO_POSITION, "."), getTimeValue(token));
 
     	assertEquals(Token.TokenType.C_STRING,
-    			(token = lexer.nextToken(Context.Normal)).getType());
+    			(token = lexer.nextToken(Context.NORMAL)).getType());
     	assertEquals(new TimeValue(NO_POSITION, "0123456789+-:.,/CDHMRPSTWYZ"),
     			getTimeValue(token));
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -468,7 +468,7 @@ public class LexerTest {
 
     	try {
     		assertEquals(Token.TokenType.C_STRING,
-    				(token = lexer.nextToken(Context.Normal)).getType());
+    				(token = lexer.nextToken(Context.NORMAL)).getType());
     		getTimeValue(token);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
@@ -478,7 +478,7 @@ public class LexerTest {
 
     	try {
     		assertEquals(Token.TokenType.C_STRING,
-    				(token = lexer.nextToken(Context.Normal)).getType());
+    				(token = lexer.nextToken(Context.NORMAL)).getType());
     		getTimeValue(token);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
@@ -488,7 +488,7 @@ public class LexerTest {
 
     	try {
     		assertEquals(Token.TokenType.C_STRING,
-    				(token = lexer.nextToken(Context.Normal)).getType());
+    				(token = lexer.nextToken(Context.NORMAL)).getType());
     		getTimeValue(token);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
@@ -631,18 +631,18 @@ public class LexerTest {
     	Token token;
 
     	assertEquals(Token.TokenType.ENCODING_REFERENCE,
-    			(token = lexer.nextToken(Context.Encoding)).getType());
+    			(token = lexer.nextToken(Context.ENCODING)).getType());
     	assertEquals("TAG", token.getText());
 
     	assertEquals(Token.TokenType.ENCODING_REFERENCE,
-    			(token = lexer.nextToken(Context.Encoding)).getType());
+    			(token = lexer.nextToken(Context.ENCODING)).getType());
     	assertEquals("XER", token.getText());
 
     	assertEquals(Token.TokenType.ENCODING_REFERENCE,
-    			(token = lexer.nextToken(Context.Encoding)).getType());
+    			(token = lexer.nextToken(Context.ENCODING)).getType());
     	assertEquals("PER", token.getText());
 
-    	assertNull(lexer.nextToken(Context.Normal));
+    	assertNull(lexer.nextToken(Context.NORMAL));
     	assertTrue(lexer.isEOF());
     }
 
@@ -651,7 +651,7 @@ public class LexerTest {
     	Lexer lexer = new Lexer(new ByteArrayInputStream("ABC".getBytes()));
 
     	try {
-    		lexer.nextToken(Context.Encoding);
+    		lexer.nextToken(Context.ENCODING);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
     	}
@@ -659,7 +659,7 @@ public class LexerTest {
     	lexer = new Lexer(new ByteArrayInputStream("xer".getBytes()));
 
     	try {
-    		lexer.nextToken(Context.Encoding);
+    		lexer.nextToken(Context.ENCODING);
     		fail("ASN1ParserException expected");
     	} catch (ParserException e) {
     	}
@@ -669,7 +669,7 @@ public class LexerTest {
     		throws IOException, ParserException {
     	Lexer lexer = new Lexer(new ByteArrayInputStream(token.getBytes()));
 
-    	assertEquals(type, lexer.nextToken(Context.Normal).getType());
+    	assertEquals(type, lexer.nextToken(Context.NORMAL).getType());
     }
 
 }

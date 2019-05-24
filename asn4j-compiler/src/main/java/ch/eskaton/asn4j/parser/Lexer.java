@@ -42,7 +42,7 @@ import java.util.Map;
 public class Lexer {
 
     public enum Context {
-    	Normal, Encoding, ObjectClass, Syntax, TypeField, ValueField, Level, PropertySettings
+        NORMAL, ENCODING, OBJECT_CLASS, SYNTAX, TYPE_FIELD, VALUE_FIELD, LEVEL, PROPERTY_SETTINGS
     }
 
     public static final String ABSENT_LIT = "ABSENT";
@@ -330,7 +330,7 @@ public class Lexer {
     				case '}':
     					return new Token(ctx, TokenType.R_BRACE, offset, position(line, pos));
     				case '[':
-    					if (ctx == Context.Syntax) {
+    					if (ctx == Context.SYNTAX) {
     						return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
     					}
 
@@ -342,7 +342,7 @@ public class Lexer {
     						return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
     					}
     				case ']':
-    					if (ctx == Context.Syntax) {
+    					if (ctx == Context.SYNTAX) {
     						return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos));
     					}
 
@@ -380,7 +380,6 @@ public class Lexer {
     				case '-':
     					if (is.read() == '-') {
     						pos++;
-    						offset++;
     						skipComment();
     					} else {
     						is.unread();
@@ -390,7 +389,6 @@ public class Lexer {
     				case '/':
     					if (is.read() == '*') {
     						pos++;
-    						offset++;
     						skipMLComment();
     					} else {
     						is.unread();
@@ -399,11 +397,11 @@ public class Lexer {
     					break;
     				case '&':
     					switch (ctx) {
-    						case TypeField:
-    							return parseFieldReference(Context.Normal, TokenType.TYPE_REFERENCE,
+    						case TYPE_FIELD:
+    							return parseFieldReference(Context.NORMAL, TokenType.TYPE_REFERENCE,
     									TokenType.TYPE_FIELD_REFERENCE);
-    						case ValueField:
-    							return parseFieldReference(Context.Normal,TokenType.IDENTIFIER,
+    						case VALUE_FIELD:
+    							return parseFieldReference(Context.NORMAL,TokenType.IDENTIFIER,
     									TokenType.VALUE_FIELD_REFERENCE);
     						default:
     							return new Token(ctx, TokenType.AMPERSAND, offset, position(line, pos));
@@ -425,13 +423,13 @@ public class Lexer {
 
     					return new Token(ctx, TokenType.APOSTROPHE, offset, position(line, pos));
     				case '"':
-    					if (ctx != Context.PropertySettings && (token = parseCharString(ctx)) != null) {
+    					if (ctx != Context.PROPERTY_SETTINGS && (token = parseCharString(ctx)) != null) {
     						return token;
     					}
 
     					return new Token(ctx, TokenType.QUOTATION, offset, position(line, pos));
     				case '.':
-    					if (ctx != Context.Level) {
+    					if (ctx != Context.LEVEL) {
     						if (is.read() == '.') {
     							pos++;
     							offset++;
@@ -825,7 +823,7 @@ public class Lexer {
 
     		String str = sb.toString();
 
-    		if (ctx != Context.Syntax) {
+    		if (ctx != Context.SYNTAX) {
     			Token.TokenType kwType = keywords.get(str);
 
     			if (kwType != null) {
@@ -835,7 +833,7 @@ public class Lexer {
     		}
 
     		switch (ctx) {
-    			case Encoding:
+    			case ENCODING:
     				if (type == TokenType.TYPE_REFERENCE && ModuleNode.getEncoding(str) != null) {
     					type = TokenType.ENCODING_REFERENCE;
     					break;
@@ -844,7 +842,7 @@ public class Lexer {
     				is.reset();
     				return null;
 
-    			case ObjectClass:
+    			case OBJECT_CLASS:
     				if (type == TokenType.TYPE_REFERENCE && allUc) {
     					type = TokenType.OBJECT_CLASS_REFERENCE;
     					break;
@@ -853,7 +851,7 @@ public class Lexer {
     				is.reset();
     				return null;
 
-    			case Syntax:
+    			case SYNTAX:
     				if (type == TokenType.TYPE_REFERENCE && allUc && !digits) {
     					type = TokenType.WORD;
     					break;
