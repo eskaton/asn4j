@@ -102,6 +102,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
+import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -120,46 +121,41 @@ public class CompilerContext {
 
     private HashMap<String, HashMap<String, CompiledType>> definedTypes = new HashMap<>();
 
-    @SuppressWarnings("serial")
-    private Map<Class<?>, Compiler<?>> compilers = new HashMap<Class<?>, Compiler<?>>() {
-        {
-            put(BitString.class, new BitStringCompiler());
-            put(BooleanType.class, new BooleanCompiler());
-            put(Choice.class, new ChoiceCompiler());
-            put(ComponentType.class, new ComponentTypeCompiler());
-            put(EnumeratedType.class, new EnumeratedTypeCompiler());
-            put(IntegerType.class, new IntegerCompiler());
-            put(Null.class, new NullCompiler());
-            put(OctetString.class, new OctetStringCompiler());
-            put(Real.class, new RealCompiler());
-            put(SequenceType.class, new SequenceCompiler());
-            put(SequenceOfType.class, new SequenceOfCompiler());
-            put(SetType.class, new SetCompiler());
-            put(SetOfType.class, new SetOfCompiler());
-            put(Type.class, new TypeCompiler());
-            put(TypeReference.class, new TypeReferenceCompiler());
-            put(TypeAssignmentNode.class, new TypeAssignmentCompiler());
-            put(VisibleString.class, new VisibleStringCompiler());
-            put(SelectionType.class, new SelectionTypeCompiler());
-            put(ObjectIdentifier.class, new ObjectIdentifierCompiler());
-            put(RelativeOID.class, new RelativeOIDCompiler());
-            put(IRI.class, new IRICompiler());
-            put(RelativeIRI.class, new RelativeIRICompiler());
-            put(GeneralizedTime.class, new GeneralizedTimeCompiler());
-            put(UTCTime.class, new UTCTimeCompiler());
-        }
-    };
+    private Map<Class<?>, Compiler<?>> compilers = Maps.<Class<?>, Compiler<?>>builder()
+            .put(BitString.class, new BitStringCompiler())
+            .put(BooleanType.class, new BooleanCompiler())
+            .put(Choice.class, new ChoiceCompiler())
+            .put(ComponentType.class, new ComponentTypeCompiler())
+            .put(EnumeratedType.class, new EnumeratedTypeCompiler())
+            .put(IntegerType.class, new IntegerCompiler())
+            .put(Null.class, new NullCompiler())
+            .put(OctetString.class, new OctetStringCompiler())
+            .put(Real.class, new RealCompiler())
+            .put(SequenceType.class, new SequenceCompiler())
+            .put(SequenceOfType.class, new SequenceOfCompiler())
+            .put(SetType.class, new SetCompiler())
+            .put(SetOfType.class, new SetOfCompiler())
+            .put(Type.class, new TypeCompiler())
+            .put(TypeReference.class, new TypeReferenceCompiler())
+            .put(TypeAssignmentNode.class, new TypeAssignmentCompiler())
+            .put(VisibleString.class, new VisibleStringCompiler())
+            .put(SelectionType.class, new SelectionTypeCompiler())
+            .put(ObjectIdentifier.class, new ObjectIdentifierCompiler())
+            .put(RelativeOID.class, new RelativeOIDCompiler())
+            .put(IRI.class, new IRICompiler())
+            .put(RelativeIRI.class, new RelativeIRICompiler())
+            .put(GeneralizedTime.class, new GeneralizedTimeCompiler())
+            .put(UTCTime.class, new UTCTimeCompiler())
+            .build();
 
-    private Map<Class<?>, ValueResolver<?>> valueResolvers = new HashMap<Class<?>, ValueResolver<?>>() {
-        {
-            put(BigInteger.class, new IntegerValueResolver(CompilerContext.this));
-            put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this));
-            put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this, ObjectIdentifier.class, ObjectIdentifierValue.class));
-            put(RelativeOIDValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeOID.class, RelativeOIDValue.class));
-            put(IRIValue.class, new DefaultValueResolver<>(CompilerContext.this, IRI.class, IRIValue.class));
-            put(RelativeIRIValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeIRI.class, RelativeIRIValue.class));
-        }
-    };
+    private Map<Class<?>, ValueResolver<?>> valueResolvers = Maps.<Class<?>, ValueResolver<?>>builder()
+            .put(BigInteger.class, new IntegerValueResolver(CompilerContext.this))
+            .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
+            .put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this, ObjectIdentifier.class, ObjectIdentifierValue.class))
+            .put(RelativeOIDValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeOID.class, RelativeOIDValue.class))
+            .put(IRIValue.class, new DefaultValueResolver<>(CompilerContext.this, IRI.class, IRIValue.class))
+            .put(RelativeIRIValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeIRI.class, RelativeIRIValue.class))
+            .build();
 
     @SuppressWarnings("serial")
     private Set<String> builtinTypes = new HashSet<String>() {
@@ -175,29 +171,27 @@ public class CompilerContext {
     };
 
     @SuppressWarnings("serial")
-    private Map<String, String> runtimeTypes = new HashMap<String, String>() {
-        {
-            put(BooleanType.class.getSimpleName(), ASN1Boolean.class.getSimpleName());
-            put(BitString.class.getSimpleName(), ASN1BitString.class.getSimpleName());
-            put(Choice.class.getSimpleName(), ASN1Choice.class.getSimpleName());
-            put(EnumeratedType.class.getSimpleName(), ASN1EnumeratedType.class.getSimpleName());
-            put(GeneralizedTime.class.getSimpleName(), ASN1GeneralizedTime.class.getSimpleName());
-            put(UTCTime.class.getSimpleName(), ASN1UTCTime.class.getSimpleName());
-            put(IntegerType.class.getSimpleName(), ASN1Integer.class.getSimpleName());
-            put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName());
-            put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName());
-            put(RelativeOID.class.getSimpleName(), ASN1RelativeOID.class.getSimpleName());
-            put(IRI.class.getSimpleName(), ASN1IRI.class.getSimpleName());
-            put(RelativeIRI.class.getSimpleName(), ASN1RelativeIRI.class.getSimpleName());
-            put(OctetString.class.getSimpleName(), ASN1OctetString.class.getSimpleName());
-            put(SequenceType.class.getSimpleName(), ASN1Sequence.class.getSimpleName());
-            put(SequenceOfType.class.getSimpleName(), ASN1SequenceOf.class.getSimpleName());
-            put(SetType.class.getSimpleName(), ASN1Set.class.getSimpleName());
-            put(SetOfType.class.getSimpleName(), ASN1SetOf.class.getSimpleName());
-            put(Real.class.getSimpleName(), ASN1Real.class.getSimpleName());
-            put(VisibleString.class.getSimpleName(), ASN1VisibleString.class.getSimpleName());
-        }
-    };
+    private Map<String, String> runtimeTypes = Maps.<String, String>builder()
+            .put(BooleanType.class.getSimpleName(), ASN1Boolean.class.getSimpleName())
+            .put(BitString.class.getSimpleName(), ASN1BitString.class.getSimpleName())
+            .put(Choice.class.getSimpleName(), ASN1Choice.class.getSimpleName())
+            .put(EnumeratedType.class.getSimpleName(), ASN1EnumeratedType.class.getSimpleName())
+            .put(GeneralizedTime.class.getSimpleName(), ASN1GeneralizedTime.class.getSimpleName())
+            .put(UTCTime.class.getSimpleName(), ASN1UTCTime.class.getSimpleName())
+            .put(IntegerType.class.getSimpleName(), ASN1Integer.class.getSimpleName())
+            .put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName())
+            .put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName())
+            .put(RelativeOID.class.getSimpleName(), ASN1RelativeOID.class.getSimpleName())
+            .put(IRI.class.getSimpleName(), ASN1IRI.class.getSimpleName())
+            .put(RelativeIRI.class.getSimpleName(), ASN1RelativeIRI.class.getSimpleName())
+            .put(OctetString.class.getSimpleName(), ASN1OctetString.class.getSimpleName())
+            .put(SequenceType.class.getSimpleName(), ASN1Sequence.class.getSimpleName())
+            .put(SequenceOfType.class.getSimpleName(), ASN1SequenceOf.class.getSimpleName())
+            .put(SetType.class.getSimpleName(), ASN1Set.class.getSimpleName())
+            .put(SetOfType.class.getSimpleName(), ASN1SetOf.class.getSimpleName())
+            .put(Real.class.getSimpleName(), ASN1Real.class.getSimpleName())
+            .put(VisibleString.class.getSimpleName(), ASN1VisibleString.class.getSimpleName())
+            .build();
 
     private ConstraintCompiler constraintCompiler = new ConstraintCompiler(this);
 
