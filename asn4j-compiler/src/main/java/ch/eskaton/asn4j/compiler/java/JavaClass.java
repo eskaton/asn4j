@@ -493,7 +493,7 @@ public class JavaClass implements JavaStructure {
             return sb.toString();
         }
 
-        private static class JavaLiteralMethod extends JavaMethod {
+        private static class JavaLiteralMethod implements JavaMethod {
 
             private String body;
 

@@ -67,8 +67,7 @@ public class DefaultsCompiler {
         this.ctx = ctx;
     }
 
-    public void compileDefault(JavaClass clazz, String field, String typeName, Type type, Value value)
-            throws CompilerException {
+    public void compileDefault(JavaClass clazz, String field, String typeName, Type type, Value value) {
         Type base;
 
         if (type instanceof TypeReference) {
@@ -90,8 +89,6 @@ public class DefaultsCompiler {
                     + (type instanceof NamedType ? ((NamedType) type).getName()
                     : getTypeName(type)) + ": " + e.getMessage(), e);
         }
-
-        return;
     }
 
 }

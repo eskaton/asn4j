@@ -172,10 +172,10 @@ public class IntegerRange {
 
         int excludeInd = 0;
         int rangeInd = 0;
+        long upper;
+        long lower;
         IntegerRange exclude = r2.get(excludeInd++);
         IntegerRange range = r1.get(rangeInd++);
-        long lower, upper;
-
         List<IntegerRange> result = new ArrayList<>();
 
         while (true) {

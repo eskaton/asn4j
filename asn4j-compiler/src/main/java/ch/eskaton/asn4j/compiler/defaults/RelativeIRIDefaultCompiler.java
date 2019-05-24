@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 
 public class RelativeIRIDefaultCompiler extends AbstractIRIDefaultCompiler<RelativeIRIValue> {
 
-
     public RelativeIRIDefaultCompiler() {
         super(RelativeIRIValue.class);
     }

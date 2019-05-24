@@ -49,7 +49,7 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
     }
 
     @Override
-    protected V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
+    protected V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
         Node type = valueAssignment.getType();
         Node value = valueAssignment.getValue();
 
@@ -71,7 +71,7 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
     }
 
     @Override
-    public V resolveGeneric(Type type, Value value) throws CompilerException {
+    public V resolveGeneric(Type type, Value value) {
         if (!valueClass.isAssignableFrom(value.getClass())) {
             throw new IllegalStateException("Value class " + value.getClass().getSimpleName() + " is not an instance of "
                     + valueClass.getClass().getSimpleName()+ ". resolveGeneric() must be overridden." );

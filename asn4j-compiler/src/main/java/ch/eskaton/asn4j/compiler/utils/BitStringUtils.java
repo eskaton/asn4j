@@ -32,6 +32,9 @@ import java.util.stream.IntStream;
 
 public class BitStringUtils {
 
+    private BitStringUtils() {
+    }
+
     public static String getInitializerString(byte[] bytes) {
         String bytesStr = IntStream.range(0, bytes.length).boxed().map(
                 i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));

@@ -66,7 +66,7 @@ public class ConstraintCompiler {
                 .build();
     }
 
-    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
+    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) {
         Type base;
 
         if (node instanceof TypeReference) {

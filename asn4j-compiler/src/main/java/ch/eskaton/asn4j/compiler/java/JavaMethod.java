@@ -27,6 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
-public abstract class JavaMethod implements JavaObject {
+public interface JavaMethod extends JavaObject {
 
 }

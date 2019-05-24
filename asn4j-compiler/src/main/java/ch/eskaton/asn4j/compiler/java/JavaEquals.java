@@ -34,7 +34,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JavaEquals extends JavaMethod {
+public class JavaEquals implements JavaMethod {
 
     private List<String> fieldNames;
 

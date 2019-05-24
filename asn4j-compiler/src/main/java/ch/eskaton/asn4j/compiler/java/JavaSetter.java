@@ -32,7 +32,7 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-public class JavaSetter extends JavaMethod {
+public class JavaSetter implements JavaMethod {
 
     private String typeName;
 

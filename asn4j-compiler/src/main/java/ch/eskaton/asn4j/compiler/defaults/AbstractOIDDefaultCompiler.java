@@ -48,8 +48,9 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> implements DefaultCompiler {
 
+    @Override
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) throws CompilerException {
+            Value value) {
         List<Integer> ids = new ArrayList<>();
 
         resolveComponents(ctx, field, value, ids);
@@ -89,7 +90,7 @@ public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> imp
     protected abstract Class<T> getValueClass();
 
 
-    abstract public void resolveComponents(CompilerContext ctx, String field, Value value, List<Integer> ids);
+    public abstract void resolveComponents(CompilerContext ctx, String field, Value value, List<Integer> ids);
 
     public void verifyObjectIds(List<Integer> ids) {
     }

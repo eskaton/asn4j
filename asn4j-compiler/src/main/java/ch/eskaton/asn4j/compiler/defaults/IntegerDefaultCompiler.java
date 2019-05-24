@@ -44,8 +44,9 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class IntegerDefaultCompiler implements DefaultCompiler {
 
+    @Override
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) throws CompilerException {
+            Value value) {
         long intValue;
 
         if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {

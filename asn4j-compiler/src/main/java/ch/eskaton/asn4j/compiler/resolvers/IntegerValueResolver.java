@@ -52,7 +52,7 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
     }
 
     @Override
-    protected BigInteger resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
+    protected BigInteger resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
         Node type = valueAssignment.getType();
         Node value = valueAssignment.getValue();
 
@@ -66,7 +66,7 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
                 value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
                 AssignmentNode assignment = ctx.getModule().getBody().getAssignments(((TypeReference) type).getType());
 
-                if (assignment != null && assignment instanceof TypeAssignmentNode) {
+                if (assignment instanceof TypeAssignmentNode) {
                     TypeAssignmentNode typeAssignment = (TypeAssignmentNode) assignment;
 
                     if (typeAssignment.getType() instanceof IntegerType) {
@@ -89,7 +89,7 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
     }
 
     @Override
-    public BigInteger resolveGeneric(Type type, Value value) throws CompilerException {
+    public BigInteger resolveGeneric(Type type, Value value)  {
         throw new CompilerException("resolveGeneric() not implemented for INTEGER type");
     }
 

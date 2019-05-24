@@ -57,8 +57,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
         return Optional.empty();
     }
 
-    protected Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
-            throws CompilerException {
+    protected Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds) {
         if (elements instanceof ElementSet) {
             return compileConstraint(base, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
@@ -88,6 +87,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
         builder.finish().build();
     }
 
+    @Override
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:

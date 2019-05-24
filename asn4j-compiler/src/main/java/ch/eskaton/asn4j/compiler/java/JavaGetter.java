@@ -33,7 +33,7 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-public class JavaGetter extends JavaMethod {
+public class JavaGetter implements JavaMethod {
 
     private String typeName;
 
