@@ -71,6 +71,7 @@ public class IntegerConstraintOptimizingVisitor implements Visitor<Node, List<In
                 temp = right;
                 right = left;
                 left = temp;
+                // fall through
 
             case VALUE << 16 | NEGATION:
                 right = (((OpNode) right).getNode());

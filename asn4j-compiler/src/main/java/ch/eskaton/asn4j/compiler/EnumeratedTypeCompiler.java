@@ -57,7 +57,8 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         addEnumerationItems(ctx, name, names, numbers, node.getRootEnum());
 
-        int i, n = 0;
+        int i;
+        int n = 0;
 
         for (i = 0; i < numbers.size(); i++) {
             if (numbers.get(i) == null) {
@@ -108,7 +109,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         builder.append("switch(value) {");
 
         for (Entry<Integer, String> entry : cases.entrySet()) {
-            builder.append("\tcase " + String.valueOf(entry.getKey()) + ":");
+            builder.append("\tcase " + entry.getKey() + ":");
             builder.append("\t\treturn " + entry.getValue() + ";");
         }
 

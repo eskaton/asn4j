@@ -39,8 +39,9 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class BitStringDefaultCompiler implements DefaultCompiler {
 
+    @Override
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) throws CompilerException {
+            Value value) {
         byte[] bytes;
         int unusedBits = 0;
 

@@ -40,7 +40,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 public class OctetStringDefaultCompiler implements DefaultCompiler {
 
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) throws CompilerException {
+            Value value) {
         value = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
 
         if (!(value instanceof StringValue)) {

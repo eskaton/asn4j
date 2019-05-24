@@ -44,6 +44,8 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.commons.utils.OptionalUtils;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -75,7 +77,7 @@ public abstract class AbstractConstraintCompiler {
 
     ConstraintDefinition compileConstraints(Type node, Type base) throws CompilerException {
         LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
-        Stack<List<Constraint>> constraints = new Stack<>();
+        Deque<List<Constraint>> constraints = new ArrayDeque<>();
 
         while (true) {
             if (node.hasConstraint()) {

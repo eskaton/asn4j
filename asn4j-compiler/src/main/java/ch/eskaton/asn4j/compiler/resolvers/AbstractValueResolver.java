@@ -28,7 +28,6 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
@@ -42,20 +41,20 @@ public abstract class AbstractValueResolver<V> implements ValueResolver<V> {
     }
 
     @Override
-    public V resolve(DefinedValue ref) throws CompilerException {
+    public V resolve(DefinedValue ref) {
         return resolve(ctx.resolveDefinedValue(ref));
     }
 
     @Override
-    public V resolve(String ref) throws CompilerException {
+    public V resolve(String ref) {
         return resolve(ctx.resolveReference(ref));
     }
 
     @Override
-    public V resolve(Type type, V value) throws CompilerException {
+    public V resolve(Type type, V value) {
         return value;
     }
 
-    protected abstract V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException;
+    protected abstract V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment);
 
 }

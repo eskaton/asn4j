@@ -31,7 +31,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.List;
 
-public class JavaHashCode extends JavaMethod {
+public class JavaHashCode implements JavaMethod {
 
     private List<String> fieldNames;
 

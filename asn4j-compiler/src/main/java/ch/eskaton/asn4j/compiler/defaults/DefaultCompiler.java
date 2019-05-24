@@ -37,8 +37,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public interface DefaultCompiler {
 
-    void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type, Value value)
-            throws CompilerException;
+    void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type, Value value);
 
     default String addDefaultField(JavaClass clazz, String typeName, String field) {
         String defaultField = CompilerUtils.getDefaultFieldName(field);

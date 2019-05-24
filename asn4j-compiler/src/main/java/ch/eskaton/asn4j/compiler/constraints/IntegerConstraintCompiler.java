@@ -32,7 +32,6 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
@@ -72,8 +71,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
-            throws CompilerException {
+    protected Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds) {
         if (elements instanceof ElementSet) {
             return compileConstraint(base, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
@@ -110,8 +108,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition)
-            throws CompilerException {
+    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
         javaClass.addImport(BigInteger.class);
 
         BodyBuilder builder = javaClass.method().annotation(Override.class).modifier(Protected)
@@ -128,6 +125,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         return new IntegerConstraintOptimizingVisitor().visit(node);
     }
 
+    @Override
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:

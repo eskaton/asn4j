@@ -30,12 +30,10 @@ package ch.eskaton.asn4j.compiler.defaults;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
-import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class RelativeOIDDefaultCompiler extends AbstractOIDDefaultCompiler<RelativeOIDValue> {
 

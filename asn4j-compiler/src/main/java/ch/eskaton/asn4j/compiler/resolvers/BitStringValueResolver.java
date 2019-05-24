@@ -57,7 +57,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
     }
 
     @Override
-    protected BitStringValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) throws CompilerException {
+    protected BitStringValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
         Node type = valueAssignment.getType();
         Node value = valueAssignment.getValue();
 
@@ -80,6 +80,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
         throw new CompilerException("Failed to resolve a BIT STRING value");
     }
 
+    @Override
     public BitStringValue resolve(Type type, BitStringValue value) {
         Type base = ctx.getBase(type);
 
@@ -94,7 +95,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
     }
 
     @Override
-    public BitStringValue resolveGeneric(Type type, Value value) throws CompilerException {
+    public BitStringValue resolveGeneric(Type type, Value value) {
         BitStringValue bitStringValue = null;
 
         if (value instanceof AbstractBaseXStringValue) {

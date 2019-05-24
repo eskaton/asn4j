@@ -37,7 +37,7 @@ import java.util.Objects;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.PackagePrivate;
 
-public class JavaConstructor extends JavaMethod {
+public class JavaConstructor implements JavaMethod {
 
     private JavaVisibility visibility;
 

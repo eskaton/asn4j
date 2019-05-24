@@ -92,9 +92,10 @@ public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<
             case "joint-iso-itu-t":
             case "joint-iso-ccitt":
                 return 2;
+            default:
+                return null;
         }
 
-        return null;
     }
 
 }

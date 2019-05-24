@@ -31,16 +31,17 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 public class JavaWriter {
 
-    public void write(Map<String, JavaStructure> structs, String outputDir) throws CompilerException {
+    public void write(Map<String, JavaStructure> structs, String outputDir) {
         Set<JavaStructure> processed = new HashSet<>();
 
         for (JavaStructure struct : structs.values()) {
@@ -50,11 +51,11 @@ public class JavaWriter {
 
             if (struct instanceof JavaClass) {
                 JavaClass clazz = (JavaClass) struct;
-                Stack<JavaClass> clazzHierarchy = getClassHierarchy(structs, clazz);
+                Deque<JavaClass> clazzHierarchy = getClassHierarchy(structs, clazz);
 
                 List<JavaConstructor> constructors = new ArrayList<>();
 
-                while (!clazzHierarchy.empty()) {
+                while (!clazzHierarchy.isEmpty()) {
                     clazz = clazzHierarchy.pop();
 
                     if (!constructors.isEmpty()) {
@@ -100,8 +101,8 @@ public class JavaWriter {
 
     }
 
-    protected Stack<JavaClass> getClassHierarchy(Map<String, JavaStructure> structs, JavaClass clazz) {
-        Stack<JavaClass> clazzHierarchy = new Stack<>();
+    protected Deque<JavaClass> getClassHierarchy(Map<String, JavaStructure> structs, JavaClass clazz) {
+        Deque<JavaClass> clazzHierarchy = new LinkedList<>();
 
         clazzHierarchy.push(clazz);
 
