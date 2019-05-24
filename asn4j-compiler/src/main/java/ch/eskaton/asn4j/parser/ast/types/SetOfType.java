@@ -44,9 +44,4 @@ public class SetOfType extends AbstractType {
     	return type;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("SetOf[", type, "]");
-    }
-
 }

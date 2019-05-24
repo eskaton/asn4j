@@ -36,9 +36,4 @@ public class EmptyValue extends AbstractValue {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("EmptyValue[]");
-    }
-
 }

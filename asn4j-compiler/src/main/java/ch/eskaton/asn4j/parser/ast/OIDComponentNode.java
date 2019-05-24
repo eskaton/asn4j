@@ -92,14 +92,4 @@ public class OIDComponentNode extends AbstractNode {
         return definedValue;
     }
 
-    @Override
-    public String toString() {
-        if (definedValue != null) {
-            return definedValue.toString();
-        }
-
-        return (name != null ? name : "") + Optional.of(id).map(
-                v -> StringUtils.concat("(", v, ")")).orElse("");
-    }
-
 }

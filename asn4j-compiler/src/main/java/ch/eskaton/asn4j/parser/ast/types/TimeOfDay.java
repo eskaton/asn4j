@@ -35,9 +35,4 @@ public class TimeOfDay extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "TimeOfDay";
-    }
-
 }

@@ -58,10 +58,4 @@ public class ExtensionAdditionAlternativeNode extends AbstractNode {
         return altGroups;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ExtensionAdditionAlternative[",
-                namedType != null ? namedType : altGroups, "]");
-    }
-
 }

@@ -58,9 +58,4 @@ public class ModuleRefNode extends AbstractNode {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ModuleRef[", name, value != null ? "{" + value + "}" : "", "]");
-    }
-
 }

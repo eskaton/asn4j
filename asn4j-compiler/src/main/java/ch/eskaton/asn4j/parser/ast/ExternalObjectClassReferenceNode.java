@@ -44,9 +44,4 @@ public class ExternalObjectClassReferenceNode extends ObjectClassReferenceNode {
         return module;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat(getClass().getSimpleName(), "[", module, ".", getReference(), "]");
-    }
-
 }

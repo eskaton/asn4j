@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.ast.SourcePosition;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
@@ -73,7 +74,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return "Position[file=" + file + ", line=" + line + ", position=" + position + ']';
+        return ToString.get(this);
     }
 
 }

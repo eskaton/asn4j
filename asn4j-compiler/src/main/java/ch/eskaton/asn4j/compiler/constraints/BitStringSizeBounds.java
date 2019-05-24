@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
+
 public class BitStringSizeBounds implements SizeBounds {
 
     private long minSize;
@@ -50,7 +52,7 @@ public class BitStringSizeBounds implements SizeBounds {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '[' + "minSize=" + minSize + ", maxSize=" + maxSize + ']';
+        return ToString.get(this);
     }
 
 }

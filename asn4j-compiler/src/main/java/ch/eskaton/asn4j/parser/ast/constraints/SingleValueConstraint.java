@@ -45,9 +45,4 @@ public class SingleValueConstraint extends AbstractConstraint {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("SingleValueConstraint[", value, "]");
-    }
-
 }

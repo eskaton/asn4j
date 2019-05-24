@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
+
 public abstract class AbstractNode implements Node {
 
     private NodeType type;
@@ -42,6 +44,11 @@ public abstract class AbstractNode implements Node {
 
     public void setType(NodeType type) {
         this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.getExcept(this, "type");
     }
 
 }

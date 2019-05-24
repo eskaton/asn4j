@@ -35,9 +35,4 @@ public class NumericString extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "NumericString";
-    }
-
 }

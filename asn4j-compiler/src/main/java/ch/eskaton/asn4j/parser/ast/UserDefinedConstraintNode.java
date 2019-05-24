@@ -48,9 +48,4 @@ public class UserDefinedConstraintNode extends AbstractConstraint {
         return params;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("UserDefinedConstraint[(", StringUtils.join(params, ","), ")]");
-    }
-
 }

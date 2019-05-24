@@ -119,9 +119,4 @@ public class IntegerValue extends AbstractValue {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("IntegerValue[", (ref != null ? ref : value.toString()), "]");
-    }
-
 }

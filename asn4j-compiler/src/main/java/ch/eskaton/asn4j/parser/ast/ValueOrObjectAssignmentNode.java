@@ -50,9 +50,4 @@ public class ValueOrObjectAssignmentNode<T extends Node, V extends Node> extends
         return value;
     }
 
-    @Override
-    public String toString() {
-        return "ValueOrObjectAssignment[" + getReference() + "(" + type + ") = " + value + "]";
-    }
-
 }

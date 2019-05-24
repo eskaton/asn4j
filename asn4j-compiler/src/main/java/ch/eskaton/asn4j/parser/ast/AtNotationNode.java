@@ -55,11 +55,4 @@ public class AtNotationNode extends AbstractNode {
         return level;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("AtNotation[@",
-                StringUtils.repeat(".", level),
-                StringUtils.join(componentIds.getIdentifiers(), "."), "]");
-    }
-
 }

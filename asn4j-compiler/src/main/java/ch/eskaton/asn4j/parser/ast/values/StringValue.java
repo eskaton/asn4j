@@ -146,9 +146,4 @@ public class StringValue extends AbstractValue {
     	return new TimeValue(getPosition(), tString);
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("String[", simpleString, "]");
-    }
-
 }

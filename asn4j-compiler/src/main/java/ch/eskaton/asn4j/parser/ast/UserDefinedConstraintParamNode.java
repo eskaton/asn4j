@@ -56,10 +56,4 @@ public class UserDefinedConstraintParamNode extends AbstractNode {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("UserDefinedConstraintParam[governor=", governor,
-                (value != null ? ",value=" + value : ""), "]");
-    }
-
 }

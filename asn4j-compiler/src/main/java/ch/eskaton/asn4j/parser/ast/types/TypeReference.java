@@ -36,9 +36,4 @@ public class TypeReference extends SimpleDefinedType {
     	super(position, type);
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("TypeReference[", getType(), "]");
-    }
-
 }

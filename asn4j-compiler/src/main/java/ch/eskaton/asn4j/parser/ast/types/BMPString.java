@@ -35,9 +35,4 @@ public class BMPString extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "BMPString";
-    }
-
 }

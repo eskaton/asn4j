@@ -78,17 +78,4 @@ public class AlternativeTypeLists extends AbstractNode {
     	return optExtMarker;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils
-    			.concat("AlternativeTypeLists[ext=", (extensionAndException != null ? "true" : "false"),
-    					", optExtMarker=", optExtMarker,
-    					(extensionAndException != null
-    							&& extensionAndException.getExceptionId() != null ? ", exceptionId="
-    							+ extensionAndException.getExceptionId()
-    							: ""), ", root=(", StringUtils.join(rootTypeList, ","), "), extAlts=(",
-    					extAddAlts != null ? StringUtils.join(extAddAlts, ",")
-    							: "", ")", "]");
-    }
-
 }

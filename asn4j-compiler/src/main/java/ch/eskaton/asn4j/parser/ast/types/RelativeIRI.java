@@ -35,9 +35,4 @@ public class RelativeIRI extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "RelativeIRI";
-    }
-
 }

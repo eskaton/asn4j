@@ -58,9 +58,4 @@ public class ClassNumber extends AbstractNode {
         return ref;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ClassNumber[", (clazz != null ? clazz : ref), "]");
-    }
-
 }

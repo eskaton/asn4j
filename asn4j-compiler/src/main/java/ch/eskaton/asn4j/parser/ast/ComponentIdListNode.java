@@ -52,9 +52,4 @@ public class ComponentIdListNode extends AbstractNode {
         return identifiers;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ComponentIdList[", StringUtils.join(identifiers, "."), "]");
-    }
-
 }

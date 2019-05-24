@@ -83,20 +83,4 @@ public class ComponentType extends AbstractType {
     	return value;
     }
 
-    @Override
-    public String toString() {
-    	switch (compType) {
-    		case NAMED_TYPE:
-    			return StringUtils.concat("ComponentType[namedType=", namedType, "]");
-    		case NAMED_TYPE_OPT:
-    			return StringUtils.concat("ComponentType[namedType=", namedType, ",optional", "]");
-    		case NAMED_TYPE_DEF:
-    			return StringUtils.concat("ComponentType[namedType=", namedType, ",default=", value, "]");
-    		case Type:
-    			return StringUtils.concat("ComponentType[Components of type=", type, "]");
-    		default:
-    			throw new RuntimeException("Implementation error");
-    	}
-    }
-
 }

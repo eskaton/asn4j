@@ -51,9 +51,4 @@ public class PropertyAndSettingNode extends AbstractNode {
         return setting;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat(getClass().getSimpleName(), "[property=", property, ", setting=", setting, "]");
-    }
-
 }

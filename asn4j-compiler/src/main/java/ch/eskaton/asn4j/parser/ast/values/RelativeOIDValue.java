@@ -39,9 +39,4 @@ public class RelativeOIDValue extends AbstractOIDValue {
         super(position, components);
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("RelativeOIDValue[components=", components, "]");
-    }
-
 }

@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.Lexer.Context;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 public class Token {
 
@@ -105,8 +106,7 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token[" + type + ", offset=" + offset + ", position=" + position +
-                (text != null ? ", text=" + text : "") + "]";
+        return ToString.get(this);
     }
 
 }

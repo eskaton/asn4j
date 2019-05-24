@@ -35,9 +35,4 @@ public class ObjectIdentifier extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "ObjectIdentifier";
-    }
-
 }

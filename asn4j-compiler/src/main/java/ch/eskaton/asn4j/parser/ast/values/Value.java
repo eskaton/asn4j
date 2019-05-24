@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
@@ -53,7 +54,7 @@ public interface Value extends Node {
 
         @Override
         public String toString() {
-            return name;
+            return ToString.get(this);
         }
 
     }

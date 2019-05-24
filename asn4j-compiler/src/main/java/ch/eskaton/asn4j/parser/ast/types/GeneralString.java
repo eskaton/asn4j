@@ -35,9 +35,4 @@ public class GeneralString extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "GeneralString";
-    }
-
 }

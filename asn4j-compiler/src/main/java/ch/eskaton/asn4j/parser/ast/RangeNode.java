@@ -80,11 +80,4 @@ public class RangeNode extends AbstractConstraint {
         return Objects.equals(lower, rangeNode.lower) && Objects.equals(upper, rangeNode.upper);
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("Range[", lower.isInclusive() ? "[" : "(",
-                lower.getValue(), "..", upper.getValue(),
-                upper.isInclusive() ? "]" : ")", "]");
-    }
-
 }

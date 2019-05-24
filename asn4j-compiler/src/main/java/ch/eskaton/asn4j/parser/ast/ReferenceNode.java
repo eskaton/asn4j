@@ -60,8 +60,4 @@ public class ReferenceNode extends AbstractNode {
         return this;
     }
 
-    public String toString() {
-        return StringUtils.concat(getClass().getSimpleName(), "[", name, (parameterized ? "{}" : ""), "]");
-    }
-
 }

@@ -67,10 +67,4 @@ public class Tag implements Node {
         return classNumber;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("Tag[", (encodingReference != null ? encodingReference
-                + " " : ""), (clazz != null ? clazz + " " : ""), classNumber, "]");
-    }
-
 }

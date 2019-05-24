@@ -44,9 +44,4 @@ public class ExternalTypeReference extends SimpleDefinedType {
         return module;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ExternalTypeReference[", module, ".", getType(), "]");
-    }
-
 }

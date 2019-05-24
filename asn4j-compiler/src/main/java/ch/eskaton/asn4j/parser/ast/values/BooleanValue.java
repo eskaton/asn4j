@@ -44,9 +44,4 @@ public class BooleanValue extends AbstractValue {
     	return value;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("BooleanValue[", value, "]");
-    }
-
 }

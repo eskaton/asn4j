@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.parser.ast.ReferencedObjectsNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 public class TypeFromObjects extends InformationFromObjects implements Type {
 
@@ -86,6 +87,11 @@ public class TypeFromObjects extends InformationFromObjects implements Type {
     public EncodingPrefixNode getEncodingPrefix() {
     	// TODO Auto-generated method stub
     	return null;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

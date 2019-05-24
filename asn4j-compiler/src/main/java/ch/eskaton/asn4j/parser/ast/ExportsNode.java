@@ -63,10 +63,4 @@ public class ExportsNode extends AbstractNode {
     	return symbols;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("Exports[", mode, symbols != null ? ", ("
-    			+ StringUtils.join(symbols, ", ") + ")" : "", "]");
-    }
-
 }
