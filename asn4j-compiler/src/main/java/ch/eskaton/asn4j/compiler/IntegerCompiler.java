@@ -49,7 +49,7 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, IntegerType node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, IntegerType node) {
         JavaClass javaClass = ctx.createClass(name, node, false);
         Collection<NamedNumber> namedNumbers = node.getNamedNumbers();
         IdentifierUniquenessChecker<BigInteger> iuc = new IdentifierUniquenessChecker<>(name);

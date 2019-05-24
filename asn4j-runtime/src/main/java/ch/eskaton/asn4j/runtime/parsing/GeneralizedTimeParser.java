@@ -99,7 +99,8 @@ public class GeneralizedTimeParser extends AbstractDateTimeParser {
                             throw new ASN1RuntimeException("Failed to parse: " + s);
                         }
 
-                        DateTime dateTime = new DateTime(ctx.year, ctx.month, ctx.day, ctx.hour, ctx.minute, ctx.second).nanos(ctx.nanos);
+                        DateTime dateTime = new DateTime(ctx.year, ctx.month, ctx.day, ctx.hour, ctx.minute, ctx.second)
+                                .nanos(ctx.nanos);
 
                         if (ctx.timeZone != null) {
                             if ("Z".equals(ctx.timeZone)) {

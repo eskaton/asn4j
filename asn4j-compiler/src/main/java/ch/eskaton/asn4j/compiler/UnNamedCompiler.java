@@ -31,6 +31,6 @@ import ch.eskaton.asn4j.parser.ast.Node;
 
 public interface UnNamedCompiler<T extends Node> extends Compiler<T> {
 
-    void compile(CompilerContext ctx, T node) throws CompilerException;
+    void compile(CompilerContext ctx, T node);
 
 }

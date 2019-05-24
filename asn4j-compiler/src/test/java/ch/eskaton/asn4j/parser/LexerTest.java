@@ -49,13 +49,13 @@ public class LexerTest {
     	Lexer lexer = new Lexer(new ByteArrayInputStream(
     			"T Type Test-Type".getBytes()));
 
-    	assertEquals(Token.TokenType.TypeReference,
+    	assertEquals(Token.TokenType.TYPE_REFERENCE,
     			lexer.nextToken(Context.Normal).getType());
 
-    	assertEquals(Token.TokenType.TypeReference,
+    	assertEquals(Token.TokenType.TYPE_REFERENCE,
     			lexer.nextToken(Context.Normal).getType());
 
-    	assertEquals(Token.TokenType.TypeReference,
+    	assertEquals(Token.TokenType.TYPE_REFERENCE,
     			lexer.nextToken(Context.Normal).getType());
 
     	assertNull(lexer.nextToken(Context.Normal));
@@ -82,16 +82,16 @@ public class LexerTest {
     	Lexer lexer = new Lexer(new ByteArrayInputStream(
     			"t type test-type test-TYPE".getBytes()));
 
-    	assertEquals(Token.TokenType.Identifier, lexer
+    	assertEquals(Token.TokenType.IDENTIFIER, lexer
     			.nextToken(Context.Normal).getType());
 
-    	assertEquals(Token.TokenType.Identifier, lexer
+    	assertEquals(Token.TokenType.IDENTIFIER, lexer
     			.nextToken(Context.Normal).getType());
 
-    	assertEquals(Token.TokenType.Identifier, lexer
+    	assertEquals(Token.TokenType.IDENTIFIER, lexer
     			.nextToken(Context.Normal).getType());
 
-    	assertEquals(Token.TokenType.Identifier, lexer
+    	assertEquals(Token.TokenType.IDENTIFIER, lexer
     			.nextToken(Context.Normal).getType());
 
     	assertNull(lexer.nextToken(Context.Normal));
@@ -118,10 +118,10 @@ public class LexerTest {
     	Lexer lexer = new Lexer(new ByteArrayInputStream(
     			"T OBJECT-CLASS".getBytes()));
 
-    	assertEquals(Token.TokenType.ObjectClassReference,
+    	assertEquals(Token.TokenType.OBJECT_CLASS_REFERENCE,
     			lexer.nextToken(Context.ObjectClass).getType());
 
-    	assertEquals(Token.TokenType.ObjectClassReference,
+    	assertEquals(Token.TokenType.OBJECT_CLASS_REFERENCE,
     			lexer.nextToken(Context.ObjectClass).getType());
 
     	assertNull(lexer.nextToken(Context.Normal));
@@ -145,10 +145,10 @@ public class LexerTest {
     	Lexer lexer = new Lexer(new ByteArrayInputStream(
     			"&T &Type-Field".getBytes()));
 
-    	assertEquals(Token.TokenType.TypeFieldReference,
+    	assertEquals(Token.TokenType.TYPE_FIELD_REFERENCE,
     			lexer.nextToken(Context.TypeField).getType());
 
-    	assertEquals(Token.TokenType.TypeFieldReference,
+    	assertEquals(Token.TokenType.TYPE_FIELD_REFERENCE,
     			lexer.nextToken(Context.TypeField).getType());
 
     	assertNull(lexer.nextToken(Context.Normal));
@@ -160,7 +160,7 @@ public class LexerTest {
     	Lexer lexer = new Lexer(new ByteArrayInputStream(
     			"&value-field".getBytes()));
 
-    	assertEquals(Token.TokenType.ValueFieldReference,
+    	assertEquals(Token.TokenType.VALUE_FIELD_REFERENCE,
     			lexer.nextToken(Context.ValueField).getType());
 
     	assertNull(lexer.nextToken(Context.Normal));
@@ -171,7 +171,7 @@ public class LexerTest {
     public void testWord() throws IOException, ParserException {
     	Lexer lexer = new Lexer(new ByteArrayInputStream("A-WORD".getBytes()));
 
-    	assertEquals(Token.TokenType.Word, lexer.nextToken(Context.Syntax)
+    	assertEquals(Token.TokenType.WORD, lexer.nextToken(Context.Syntax)
     			.getType());
 
     	assertNull(lexer.nextToken(Context.Normal));
@@ -184,19 +184,19 @@ public class LexerTest {
     			"0 1 42 4711".getBytes()));
     	Token token;
 
-    	assertEquals(Token.TokenType.Number,
+    	assertEquals(Token.TokenType.NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("0", token.getText());
 
-    	assertEquals(Token.TokenType.Number,
+    	assertEquals(Token.TokenType.NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("1", token.getText());
 
-    	assertEquals(Token.TokenType.Number,
+    	assertEquals(Token.TokenType.NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("42", token.getText());
 
-    	assertEquals(Token.TokenType.Number,
+    	assertEquals(Token.TokenType.NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("4711", token.getText());
 
@@ -211,51 +211,51 @@ public class LexerTest {
     					.getBytes()));
     	Token token;
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("01", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("2.", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("3.41", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("3e0", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("3e12", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("3e-12", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("42.e-0", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("42.e5", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("42.e-5", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("77.35E0", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("77.35e+6", token.getText());
 
-    	assertEquals(Token.TokenType.RealNumber,
+    	assertEquals(Token.TokenType.REAL_NUMBER,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("77.35e-6", token.getText());
 
@@ -288,23 +288,23 @@ public class LexerTest {
     			"''B '0'B '1'B '0101'B '1 01 1'B".getBytes()));
     	Token token;
 
-    	assertEquals(Token.TokenType.BString,
+    	assertEquals(Token.TokenType.B_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("", token.getText());
 
-    	assertEquals(Token.TokenType.BString,
+    	assertEquals(Token.TokenType.B_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("0", token.getText());
 
-    	assertEquals(Token.TokenType.BString,
+    	assertEquals(Token.TokenType.B_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("1", token.getText());
 
-    	assertEquals(Token.TokenType.BString,
+    	assertEquals(Token.TokenType.B_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("0101", token.getText());
 
-    	assertEquals(Token.TokenType.BString,
+    	assertEquals(Token.TokenType.B_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("1011", token.getText());
 
@@ -318,19 +318,19 @@ public class LexerTest {
     			"''H '0'H '0B0F'H 'F AD 5'H".getBytes()));
     	Token token;
 
-    	assertEquals(Token.TokenType.HString,
+    	assertEquals(Token.TokenType.H_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("", token.getText());
 
-    	assertEquals(Token.TokenType.HString,
+    	assertEquals(Token.TokenType.H_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("0", token.getText());
 
-    	assertEquals(Token.TokenType.HString,
+    	assertEquals(Token.TokenType.H_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("0B0F", token.getText());
 
-    	assertEquals(Token.TokenType.HString,
+    	assertEquals(Token.TokenType.H_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("FAD5", token.getText());
 
@@ -346,31 +346,31 @@ public class LexerTest {
     							.getBytes()));
     	Token token;
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("", getCString(token));
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("\"", getCString(token));
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals(" ", getCString(token));
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("a\"b", getCString(token));
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("abc def", getCString(token));
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("abcdefghi", getCString(token));
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("abc", getCString(token));
 
@@ -388,15 +388,15 @@ public class LexerTest {
     			"\"a\" \"abc def\" \"abc\n\ndef\"".getBytes()));
     	Token token;
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("a", getSimpleString(token));
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("abc def", getSimpleString(token));
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals("abc  def", getSimpleString(token));
 
@@ -410,7 +410,7 @@ public class LexerTest {
     	Token token;
 
     	try {
-    		assertEquals(Token.TokenType.CString,
+    		assertEquals(Token.TokenType.C_STRING,
     				(token = lexer.nextToken(Context.Normal)).getType());
     		getSimpleString(token);
     		fail("ASN1ParserException expected");
@@ -420,7 +420,7 @@ public class LexerTest {
     	lexer = new Lexer(new ByteArrayInputStream("\"\"\"\"".getBytes()));
 
     	try {
-    		assertEquals(Token.TokenType.CString,
+    		assertEquals(Token.TokenType.C_STRING,
     				(token = lexer.nextToken(Context.Normal)).getType());
     		getSimpleString(token);
     		fail("ASN1ParserException expected");
@@ -430,7 +430,7 @@ public class LexerTest {
     	lexer = new Lexer(new ByteArrayInputStream("\"ü\"".getBytes()));
 
     	try {
-    		assertEquals(Token.TokenType.CString,
+    		assertEquals(Token.TokenType.C_STRING,
     				(token = lexer.nextToken(Context.Normal)).getType());
     		getSimpleString(token);
     		fail("ASN1ParserException expected");
@@ -448,11 +448,11 @@ public class LexerTest {
     			"\".\" \"0123456789+-:.,/CDHMRPSTWYZ\"".getBytes()));
     	Token token;
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals(new TimeValue(NO_POSITION, "."), getTimeValue(token));
 
-    	assertEquals(Token.TokenType.CString,
+    	assertEquals(Token.TokenType.C_STRING,
     			(token = lexer.nextToken(Context.Normal)).getType());
     	assertEquals(new TimeValue(NO_POSITION, "0123456789+-:.,/CDHMRPSTWYZ"),
     			getTimeValue(token));
@@ -467,7 +467,7 @@ public class LexerTest {
     	Token token;
 
     	try {
-    		assertEquals(Token.TokenType.CString,
+    		assertEquals(Token.TokenType.C_STRING,
     				(token = lexer.nextToken(Context.Normal)).getType());
     		getTimeValue(token);
     		fail("ASN1ParserException expected");
@@ -477,7 +477,7 @@ public class LexerTest {
     	lexer = new Lexer(new ByteArrayInputStream("\"A\"".getBytes()));
 
     	try {
-    		assertEquals(Token.TokenType.CString,
+    		assertEquals(Token.TokenType.C_STRING,
     				(token = lexer.nextToken(Context.Normal)).getType());
     		getTimeValue(token);
     		fail("ASN1ParserException expected");
@@ -487,7 +487,7 @@ public class LexerTest {
     	lexer = new Lexer(new ByteArrayInputStream("\"0 1\"".getBytes()));
 
     	try {
-    		assertEquals(Token.TokenType.CString,
+    		assertEquals(Token.TokenType.C_STRING,
     				(token = lexer.nextToken(Context.Normal)).getType());
     		getTimeValue(token);
     		fail("ASN1ParserException expected");
@@ -501,32 +501,32 @@ public class LexerTest {
 
     @Test
     public void testTokens() throws IOException, ParserException {
-    	testToken("::=", Token.TokenType.Assign);
-    	testToken("..", Token.TokenType.Range);
-    	testToken("...", Token.TokenType.Ellipsis);
-    	testToken("[[", Token.TokenType.LVersionBrackets);
-    	testToken("]]", Token.TokenType.RVersionBrackets);
-    	testToken("{", Token.TokenType.LBrace);
-    	testToken("}", Token.TokenType.RBrace);
+    	testToken("::=", Token.TokenType.ASSIGN);
+    	testToken("..", Token.TokenType.RANGE);
+    	testToken("...", Token.TokenType.ELLIPSIS);
+    	testToken("[[", Token.TokenType.L_VERSION_BRACKETS);
+    	testToken("]]", Token.TokenType.R_VERSION_BRACKETS);
+    	testToken("{", Token.TokenType.L_BRACE);
+    	testToken("}", Token.TokenType.R_BRACE);
     	testToken("<", Token.TokenType.LT);
     	testToken(">", Token.TokenType.GT);
-    	testToken(",", Token.TokenType.Comma);
-    	testToken(".", Token.TokenType.Dot);
-    	testToken("/", Token.TokenType.Solidus);
-    	testToken("(", Token.TokenType.LParen);
-    	testToken(")", Token.TokenType.RParen);
-    	testToken("[", Token.TokenType.LBracket);
-    	testToken("]", Token.TokenType.RBracket);
-    	testToken("-", Token.TokenType.Minus);
-    	testToken(":", Token.TokenType.Colon);
-    	testToken("=", Token.TokenType.Equals);
-    	testToken("\"", Token.TokenType.Quotation);
-    	testToken("'", Token.TokenType.Apostrophe);
-    	testToken(";", Token.TokenType.Semicolon);
+    	testToken(",", Token.TokenType.COMMA);
+    	testToken(".", Token.TokenType.DOT);
+    	testToken("/", Token.TokenType.SOLIDUS);
+    	testToken("(", Token.TokenType.L_PAREN);
+    	testToken(")", Token.TokenType.R_PAREN);
+    	testToken("[", Token.TokenType.L_BRACKET);
+    	testToken("]", Token.TokenType.R_BRACKET);
+    	testToken("-", Token.TokenType.MINUS);
+    	testToken(":", Token.TokenType.COLON);
+    	testToken("=", Token.TokenType.EQUALS);
+    	testToken("\"", Token.TokenType.QUOTATION);
+    	testToken("'", Token.TokenType.APOSTROPHE);
+    	testToken(";", Token.TokenType.SEMICOLON);
     	testToken("@", Token.TokenType.AT);
-    	testToken("|", Token.TokenType.Pipe);
-    	testToken("!", Token.TokenType.Exclamation);
-    	testToken("^", Token.TokenType.Circumflex);
+    	testToken("|", Token.TokenType.PIPE);
+    	testToken("!", Token.TokenType.EXCLAMATION);
+    	testToken("^", Token.TokenType.CIRCUMFLEX);
     }
 
     @Test
@@ -538,7 +538,7 @@ public class LexerTest {
     	testToken("AUTOMATIC", Token.TokenType.AUTOMATIC_KW);
     	testToken("BEGIN", Token.TokenType.BEGIN_KW);
     	testToken("BIT", Token.TokenType.BIT_KW);
-    	testToken("BMPString", Token.TokenType.BMPString_KW);
+    	testToken("BMPString", Token.TokenType.BMP_STRING_KW);
     	testToken("BOOLEAN", Token.TokenType.BOOLEAN_KW);
     	testToken("BY", Token.TokenType.BY_KW);
     	testToken("CHARACTER", Token.TokenType.CHARACTER_KW);
@@ -565,10 +565,10 @@ public class LexerTest {
     	testToken("EXTERNAL", Token.TokenType.EXTERNAL_KW);
     	testToken("FALSE", Token.TokenType.FALSE_KW);
     	testToken("FROM", Token.TokenType.FROM_KW);
-    	testToken("GeneralizedTime", Token.TokenType.GeneralizedTime_KW);
-    	testToken("GeneralString", Token.TokenType.GeneralString_KW);
-    	testToken("GraphicString", Token.TokenType.GraphicString_KW);
-    	testToken("IA5String", Token.TokenType.IA5String_KW);
+    	testToken("GeneralizedTime", Token.TokenType.GENERALIZED_TIME_KW);
+    	testToken("GeneralString", Token.TokenType.GENERAL_STRING_KW);
+    	testToken("GraphicString", Token.TokenType.GRAPHIC_STRING_KW);
+    	testToken("IA5String", Token.TokenType.IA5_STRING_KW);
     	testToken("IDENTIFIER", Token.TokenType.IDENTIFIER_KW);
     	testToken("IMPLICIT", Token.TokenType.IMPLICIT_KW);
     	testToken("IMPLIED", Token.TokenType.IMPLIED_KW);
@@ -578,15 +578,15 @@ public class LexerTest {
     	testToken("INSTRUCTIONS", Token.TokenType.INSTRUCTIONS_KW);
     	testToken("INTEGER", Token.TokenType.INTEGER_KW);
     	testToken("INTERSECTION", Token.TokenType.INTERSECTION_KW);
-    	testToken("ISO646String", Token.TokenType.ISO646String_KW);
+    	testToken("ISO646String", Token.TokenType.ISO646_STRING_KW);
     	testToken("MAX", Token.TokenType.MAX_KW);
     	testToken("MIN", Token.TokenType.MIN_KW);
     	testToken("MINUS-INFINITY", Token.TokenType.MINUS_INFINITY_KW);
     	testToken("NOT-A-NUMBER", Token.TokenType.NOT_A_NUMBER_KW);
     	testToken("NULL", Token.TokenType.NULL_KW);
-    	testToken("NumericString", Token.TokenType.NumericString_KW);
+    	testToken("NumericString", Token.TokenType.NUMERIC_STRING_KW);
     	testToken("OBJECT", Token.TokenType.OBJECT_KW);
-    	testToken("ObjectDescriptor", Token.TokenType.ObjectDescriptor_KW);
+    	testToken("ObjectDescriptor", Token.TokenType.OBJECT_DESCRIPTOR_KW);
     	testToken("OCTET", Token.TokenType.OCTET_KW);
     	testToken("OF", Token.TokenType.OF_KW);
     	testToken("OID-IRI", Token.TokenType.OID_IRI_KW);
@@ -595,7 +595,7 @@ public class LexerTest {
     	testToken("PDV", Token.TokenType.PDV_KW);
     	testToken("PLUS-INFINITY", Token.TokenType.PLUS_INFINITY_KW);
     	testToken("PRESENT", Token.TokenType.PRESENT_KW);
-    	testToken("PrintableString", Token.TokenType.PrintableString_KW);
+    	testToken("PrintableString", Token.TokenType.PRINTABLE_STRING_KW);
     	testToken("PRIVATE", Token.TokenType.PRIVATE_KW);
     	testToken("REAL", Token.TokenType.REAL_KW);
     	testToken("RELATIVE-OID", Token.TokenType.RELATIVE_OID_KW);
@@ -606,9 +606,9 @@ public class LexerTest {
     	testToken("SIZE", Token.TokenType.SIZE_KW);
     	testToken("STRING", Token.TokenType.STRING_KW);
     	testToken("SYNTAX", Token.TokenType.SYNTAX_KW);
-    	testToken("T61String", Token.TokenType.T61String_KW);
+    	testToken("T61String", Token.TokenType.T61_STRING_KW);
     	testToken("TAGS", Token.TokenType.TAGS_KW);
-    	testToken("TeletexString", Token.TokenType.TeletexString_KW);
+    	testToken("TeletexString", Token.TokenType.TELETEX_STRING_KW);
     	testToken("TIME", Token.TokenType.TIME_KW);
     	testToken("TIME-OF-DAY", Token.TokenType.TIME_OF_DAY_KW);
     	testToken("TRUE", Token.TokenType.TRUE_KW);
@@ -616,11 +616,11 @@ public class LexerTest {
     	testToken("UNION", Token.TokenType.UNION_KW);
     	testToken("UNIQUE", Token.TokenType.UNIQUE_KW);
     	testToken("UNIVERSAL", Token.TokenType.UNIVERSAL_KW);
-    	testToken("UniversalString", Token.TokenType.UniversalString_KW);
-    	testToken("UTCTime", Token.TokenType.UTCTime_KW);
-    	testToken("UTF8String", Token.TokenType.UTF8String_KW);
-    	testToken("VideotexString", Token.TokenType.VideotexString_KW);
-    	testToken("VisibleString", Token.TokenType.VisibleString_KW);
+    	testToken("UniversalString", Token.TokenType.UNIVERSAL_STRING_KW);
+    	testToken("UTCTime", Token.TokenType.UTC_TIME_KW);
+    	testToken("UTF8String", Token.TokenType.UTF8_STRING_KW);
+    	testToken("VideotexString", Token.TokenType.VIDEOTEX_STRING_KW);
+    	testToken("VisibleString", Token.TokenType.VISIBLE_STRING_KW);
     	testToken("WITH", Token.TokenType.WITH_KW);
     }
 
@@ -630,15 +630,15 @@ public class LexerTest {
     			"TAG XER PER".getBytes()));
     	Token token;
 
-    	assertEquals(Token.TokenType.EncodingReference,
+    	assertEquals(Token.TokenType.ENCODING_REFERENCE,
     			(token = lexer.nextToken(Context.Encoding)).getType());
     	assertEquals("TAG", token.getText());
 
-    	assertEquals(Token.TokenType.EncodingReference,
+    	assertEquals(Token.TokenType.ENCODING_REFERENCE,
     			(token = lexer.nextToken(Context.Encoding)).getType());
     	assertEquals("XER", token.getText());
 
-    	assertEquals(Token.TokenType.EncodingReference,
+    	assertEquals(Token.TokenType.ENCODING_REFERENCE,
     			(token = lexer.nextToken(Context.Encoding)).getType());
     	assertEquals("PER", token.getText());
 

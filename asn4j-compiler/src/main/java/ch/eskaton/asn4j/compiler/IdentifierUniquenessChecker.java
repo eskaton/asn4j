@@ -34,15 +34,15 @@ public class IdentifierUniquenessChecker<T> {
 
     private String typeName;
 
-    private List<String> names = new ArrayList<String>();
+    private List<String> names = new ArrayList<>();
 
-    private List<T> values = new ArrayList<T>();
+    private List<T> values = new ArrayList<>();
 
     public IdentifierUniquenessChecker(String typeName) {
     	this.typeName = typeName;
     }
 
-    public void add(String name, T value) throws CompilerException {
+    public void add(String name, T value) {
     	if (names.contains(name)) {
     		throw new CompilerException("Duplicate identifier '%s' in %s" + typeName, name, typeName);
     	}

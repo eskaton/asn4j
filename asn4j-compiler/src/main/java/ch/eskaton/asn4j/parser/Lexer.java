@@ -166,7 +166,7 @@ public class Lexer {
             .put(AUTOMATIC_LIT, TokenType.AUTOMATIC_KW)
             .put(BEGIN_LIT, TokenType.BEGIN_KW)
             .put(BIT_LIT, TokenType.BIT_KW)
-            .put(BMPSTRING_LIT, TokenType.BMPString_KW)
+            .put(BMPSTRING_LIT, TokenType.BMP_STRING_KW)
             .put(BOOLEAN_LIT, TokenType.BOOLEAN_KW)
             .put(BY_LIT, TokenType.BY_KW)
             .put(CHARACTER_LIT, TokenType.CHARACTER_KW)
@@ -193,10 +193,10 @@ public class Lexer {
             .put(EXTERNAL_LIT, TokenType.EXTERNAL_KW)
             .put(FALSE_LIT, TokenType.FALSE_KW)
             .put(FROM_LIT, TokenType.FROM_KW)
-            .put(GENERALIZEDTIME_LIT, TokenType.GeneralizedTime_KW)
-            .put(GENERALSTRING_LIT, TokenType.GeneralString_KW)
-            .put(GRAPHICSTRING_LIT, TokenType.GraphicString_KW)
-            .put(IA5STRING_LIT, TokenType.IA5String_KW)
+            .put(GENERALIZEDTIME_LIT, TokenType.GENERALIZED_TIME_KW)
+            .put(GENERALSTRING_LIT, TokenType.GENERAL_STRING_KW)
+            .put(GRAPHICSTRING_LIT, TokenType.GRAPHIC_STRING_KW)
+            .put(IA5STRING_LIT, TokenType.IA5_STRING_KW)
             .put(IDENTIFIER_LIT, TokenType.IDENTIFIER_KW)
             .put(IMPLICIT_LIT, TokenType.IMPLICIT_KW)
             .put(IMPLIED_LIT, TokenType.IMPLIED_KW)
@@ -206,15 +206,15 @@ public class Lexer {
             .put(INSTRUCTIONS_LIT, TokenType.INSTRUCTIONS_KW)
             .put(INTEGER_LIT, TokenType.INTEGER_KW)
             .put(INTERSECTION_LIT, TokenType.INTERSECTION_KW)
-            .put(ISO646STRING_LIT, TokenType.ISO646String_KW)
+            .put(ISO646STRING_LIT, TokenType.ISO646_STRING_KW)
             .put(MAX_LIT, TokenType.MAX_KW)
             .put(MIN_LIT, TokenType.MIN_KW)
             .put(MINUS_INFINITY_LIT, TokenType.MINUS_INFINITY_KW)
             .put(NOT_A_NUMBER_LIT, TokenType.NOT_A_NUMBER_KW)
             .put(NULL_LIT, TokenType.NULL_KW)
-            .put(NUMERICSTRING_LIT, TokenType.NumericString_KW)
+            .put(NUMERICSTRING_LIT, TokenType.NUMERIC_STRING_KW)
             .put(OBJECT_LIT, TokenType.OBJECT_KW)
-            .put(OBJECTDESCRIPTOR_LIT, TokenType.ObjectDescriptor_KW)
+            .put(OBJECTDESCRIPTOR_LIT, TokenType.OBJECT_DESCRIPTOR_KW)
             .put(OCTET_LIT, TokenType.OCTET_KW)
             .put(OF_LIT, TokenType.OF_KW)
             .put(OID_IRI_LIT, TokenType.OID_IRI_KW)
@@ -223,7 +223,7 @@ public class Lexer {
             .put(PDV_LIT, TokenType.PDV_KW)
             .put(PLUS_INFINITY_LIT, TokenType.PLUS_INFINITY_KW)
             .put(PRESENT_LIT, TokenType.PRESENT_KW)
-            .put(PRINTABLESTRING_LIT, TokenType.PrintableString_KW)
+            .put(PRINTABLESTRING_LIT, TokenType.PRINTABLE_STRING_KW)
             .put(PRIVATE_LIT, TokenType.PRIVATE_KW)
             .put(REAL_LIT, TokenType.REAL_KW)
             .put(RELATIVE_OID_LIT, TokenType.RELATIVE_OID_KW)
@@ -234,9 +234,9 @@ public class Lexer {
             .put(SIZE_LIT, TokenType.SIZE_KW)
             .put(STRING_LIT, TokenType.STRING_KW)
             .put(SYNTAX_LIT, TokenType.SYNTAX_KW)
-            .put(T61STRING_LIT, TokenType.T61String_KW)
+            .put(T61STRING_LIT, TokenType.T61_STRING_KW)
             .put(TAGS_LIT, TokenType.TAGS_KW)
-            .put(TELETEXSTRING_LIT, TokenType.TeletexString_KW)
+            .put(TELETEXSTRING_LIT, TokenType.TELETEX_STRING_KW)
             .put(TIME_LIT, TokenType.TIME_KW)
             .put(TIME_OF_DAY_LIT, TokenType.TIME_OF_DAY_KW)
             .put(TRUE_LIT, TokenType.TRUE_KW)
@@ -244,11 +244,11 @@ public class Lexer {
             .put(UNION_LIT, TokenType.UNION_KW)
             .put(UNIQUE_LIT, TokenType.UNIQUE_KW)
             .put(UNIVERSAL_LIT, TokenType.UNIVERSAL_KW)
-            .put(UNIVERSALSTRING_LIT, TokenType.UniversalString_KW)
-            .put(UTCTIME_LIT, TokenType.UTCTime_KW)
-            .put(UTF8STRING_LIT, TokenType.UTF8String_KW)
-            .put(VIDEOTEXSTRING_LIT, TokenType.VideotexString_KW)
-            .put(VISIBLESTRING_LIT, TokenType.VisibleString_KW)
+            .put(UNIVERSALSTRING_LIT, TokenType.UNIVERSAL_STRING_KW)
+            .put(UTCTIME_LIT, TokenType.UTC_TIME_KW)
+            .put(UTF8STRING_LIT, TokenType.UTF8_STRING_KW)
+            .put(VIDEOTEXSTRING_LIT, TokenType.VIDEOTEX_STRING_KW)
+            .put(VISIBLESTRING_LIT, TokenType.VISIBLE_STRING_KW)
             .put(WITH_LIT, TokenType.WITH_KW)
             .build();
 
@@ -322,36 +322,36 @@ public class Lexer {
     					pos = 0;
     					break;
     				case '(':
-    					return new Token(ctx, TokenType.LParen, offset, position(line, pos));
+    					return new Token(ctx, TokenType.L_PAREN, offset, position(line, pos));
     				case ')':
-    					return new Token(ctx, TokenType.RParen, offset, position(line, pos));
+    					return new Token(ctx, TokenType.R_PAREN, offset, position(line, pos));
     				case '{':
-    					return new Token(ctx, TokenType.LBrace, offset, position(line, pos));
+    					return new Token(ctx, TokenType.L_BRACE, offset, position(line, pos));
     				case '}':
-    					return new Token(ctx, TokenType.RBrace, offset, position(line, pos));
+    					return new Token(ctx, TokenType.R_BRACE, offset, position(line, pos));
     				case '[':
     					if (ctx == Context.Syntax) {
-    						return new Token(ctx, TokenType.LBracket, offset, position(line, pos));
+    						return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
     					}
 
     					if (is.read() == '[') {
     						pos++;
-    						return new Token(ctx, TokenType.LVersionBrackets, offset, position(line, pos - 1));
+    						return new Token(ctx, TokenType.L_VERSION_BRACKETS, offset, position(line, pos - 1));
     					} else {
     						is.unread();
-    						return new Token(ctx, TokenType.LBracket, offset, position(line, pos));
+    						return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
     					}
     				case ']':
     					if (ctx == Context.Syntax) {
-    						return new Token(ctx, TokenType.RBracket, offset, position(line, pos));
+    						return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos));
     					}
 
     					if (is.read() == ']') {
     						pos++;
-    						return new Token(ctx, TokenType.RVersionBrackets, offset, position(line, pos - 1));
+    						return new Token(ctx, TokenType.R_VERSION_BRACKETS, offset, position(line, pos - 1));
     					} else {
     						is.unread();
-    						return new Token(ctx, TokenType.RBracket, offset, position(line, pos));
+    						return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos));
     					}
     				case ':':
     					switch (is.read()) {
@@ -359,24 +359,24 @@ public class Lexer {
     							switch (is.read()) {
     								case '=':
     									pos += 2;
-    									return new Token(ctx, TokenType.Assign, offset, position(line, pos - 1));
+    									return new Token(ctx, TokenType.ASSIGN, offset, position(line, pos - 1));
     								default:
     									is.unread();
     							} // fall through
     						default:
     							is.unread();
     					}
-    					return new Token(ctx, TokenType.Colon, offset, position(line, pos));
+    					return new Token(ctx, TokenType.COLON, offset, position(line, pos));
     				case ';':
-    					return new Token(ctx, TokenType.Semicolon, offset, position(line, pos));
+    					return new Token(ctx, TokenType.SEMICOLON, offset, position(line, pos));
     				case ',':
-    					return new Token(ctx, TokenType.Comma, offset, position(line, pos));
+    					return new Token(ctx, TokenType.COMMA, offset, position(line, pos));
     				case '|':
-    					return new Token(ctx, TokenType.Pipe, offset, position(line, pos));
+    					return new Token(ctx, TokenType.PIPE, offset, position(line, pos));
     				case '!':
-    					return new Token(ctx, TokenType.Exclamation, offset,position(line, pos));
+    					return new Token(ctx, TokenType.EXCLAMATION, offset,position(line, pos));
     				case '*':
-    					return new Token(ctx, TokenType.Asterisk, offset, position(line, pos));
+    					return new Token(ctx, TokenType.ASTERISK, offset, position(line, pos));
     				case '-':
     					if (is.read() == '-') {
     						pos++;
@@ -384,7 +384,7 @@ public class Lexer {
     						skipComment();
     					} else {
     						is.unread();
-    						return new Token(ctx, TokenType.Minus, offset, position(line, pos));
+    						return new Token(ctx, TokenType.MINUS, offset, position(line, pos));
     					}
     					break;
     				case '/':
@@ -394,22 +394,22 @@ public class Lexer {
     						skipMLComment();
     					} else {
     						is.unread();
-    						return new Token(ctx, TokenType.Solidus, offset, position(line, pos));
+    						return new Token(ctx, TokenType.SOLIDUS, offset, position(line, pos));
     					}
     					break;
     				case '&':
     					switch (ctx) {
     						case TypeField:
-    							return parseFieldReference(Context.Normal, TokenType.TypeReference,
-    									TokenType.TypeFieldReference);
+    							return parseFieldReference(Context.Normal, TokenType.TYPE_REFERENCE,
+    									TokenType.TYPE_FIELD_REFERENCE);
     						case ValueField:
-    							return parseFieldReference(Context.Normal,TokenType.Identifier,
-    									TokenType.ValueFieldReference);
+    							return parseFieldReference(Context.Normal,TokenType.IDENTIFIER,
+    									TokenType.VALUE_FIELD_REFERENCE);
     						default:
-    							return new Token(ctx, TokenType.Ampersand, offset, position(line, pos));
+    							return new Token(ctx, TokenType.AMPERSAND, offset, position(line, pos));
     					}
     				case '^':
-    					return new Token(ctx, TokenType.Circumflex, offset, position(line, pos));
+    					return new Token(ctx, TokenType.CIRCUMFLEX, offset, position(line, pos));
     				case '@':
     					return new Token(ctx, TokenType.AT, offset, position(line, pos));
     				case '<':
@@ -417,19 +417,19 @@ public class Lexer {
     				case '>':
     					return new Token(ctx, TokenType.GT, offset, position(line, pos));
     				case '=':
-    					return new Token(ctx, TokenType.Equals, offset, position(line, pos));
+    					return new Token(ctx, TokenType.EQUALS, offset, position(line, pos));
     				case '\'':
     					if ((token = parseNumString(ctx)) != null) {
     						return token;
     					}
 
-    					return new Token(ctx, TokenType.Apostrophe, offset, position(line, pos));
+    					return new Token(ctx, TokenType.APOSTROPHE, offset, position(line, pos));
     				case '"':
     					if (ctx != Context.PropertySettings && (token = parseCharString(ctx)) != null) {
     						return token;
     					}
 
-    					return new Token(ctx, TokenType.Quotation, offset, position(line, pos));
+    					return new Token(ctx, TokenType.QUOTATION, offset, position(line, pos));
     				case '.':
     					if (ctx != Context.Level) {
     						if (is.read() == '.') {
@@ -438,11 +438,11 @@ public class Lexer {
     							if (is.read() == '.') {
     								pos++;
     								offset++;
-    								return new Token(ctx, TokenType.Ellipsis,offset - 2,
+    								return new Token(ctx, TokenType.ELLIPSIS,offset - 2,
                                             position(line, pos - 2));
     							} else {
     								is.unread();
-    								return new Token(ctx, TokenType.Range, offset - 1,
+    								return new Token(ctx, TokenType.RANGE, offset - 1,
                                             position(line, pos -1 ));
     							}
     						}
@@ -450,7 +450,7 @@ public class Lexer {
     						is.unread();
     					}
 
-    					return new Token(ctx, TokenType.Dot, offset, position(line, pos));
+    					return new Token(ctx, TokenType.DOT, offset, position(line, pos));
 
     				default:
     					if ('0' <= c && c <= '9') {
@@ -570,7 +570,7 @@ public class Lexer {
 
     				pos = tmpPos;
     				line = tmpLine;
-    				return new StringToken(ctx, TokenType.CString, beginOffset, position(beginLine, beginPos),
+    				return new StringToken(ctx, TokenType.C_STRING, beginOffset, position(beginLine, beginPos),
     						sb.toString(), flags);
     			default:
     				if (c < 32 || c > 126) {
@@ -623,7 +623,7 @@ public class Lexer {
 
     private Token parseNumber(Context ctx, int c) throws IOException {
     	StringBuilder sb = new StringBuilder();
-    	TokenType type = TokenType.Number;
+    	TokenType type = TokenType.NUMBER;
     	int beginOffset = is.getPos() - 1;
     	int beginPos = pos;
     	int tmpPos = pos;
@@ -644,7 +644,7 @@ public class Lexer {
     					break loop;
     				}
 
-    				type = TokenType.RealNumber;
+    				type = TokenType.REAL_NUMBER;
     				exp = 0;
     				sb.append((char) c);
     				cn = is.read();
@@ -671,7 +671,7 @@ public class Lexer {
     						break loop;
     					}
 
-    					type = TokenType.RealNumber;
+    					type = TokenType.REAL_NUMBER;
     					fractional = 0;
     					sb.append((char) c);
     					break;
@@ -690,8 +690,8 @@ public class Lexer {
     						break loop;
     					}
 
-    					if (type == TokenType.Number && sb.length() != 1 && sb.charAt(0) == '0') {
-    						type = TokenType.RealNumber;
+    					if (type == TokenType.NUMBER && sb.length() != 1 && sb.charAt(0) == '0') {
+    						type = TokenType.REAL_NUMBER;
     					}
 
     					if (c != -1) {
@@ -715,7 +715,7 @@ public class Lexer {
     	int beginOffset = is.getPos() - 1;
     	int beginPos = pos;
     	int tmpPos = pos;
-    	TokenType type = TokenType.BString;
+    	TokenType type = TokenType.B_STRING;
 
     	is.mark();
 
@@ -735,16 +735,16 @@ public class Lexer {
     				break;
     			case '\'':
     				cn = is.read();
-    				if (cn == 'H' || cn == 'B' && type == TokenType.BString) {
+    				if (cn == 'H' || cn == 'B' && type == TokenType.B_STRING) {
     					pos = tmpPos + 1;
-    					return new Token(ctx, cn == 'H' ? TokenType.HString : type, beginOffset,
+    					return new Token(ctx, cn == 'H' ? TokenType.H_STRING : type, beginOffset,
                                 position(line, beginPos), sb.toString());
     				}
     				break loop;
     			default:
     				if (c >= 'A' && c <= 'F' || c >= '0' && c <= '9') {
     					if (c != '0' && c != '1') {
-    						type = TokenType.HString;
+    						type = TokenType.H_STRING;
     					}
 
     					sb.append((char) c);
@@ -812,9 +812,9 @@ public class Lexer {
     		int fc = sb.charAt(0);
 
     		if (fc >= 'A' && fc <= 'Z') {
-    			type = TokenType.TypeReference;
+    			type = TokenType.TYPE_REFERENCE;
     		} else if (fc >= 'a' && fc <= 'z') {
-    			type = TokenType.Identifier;
+    			type = TokenType.IDENTIFIER;
     		} else {
     			break;
     		}
@@ -836,8 +836,8 @@ public class Lexer {
 
     		switch (ctx) {
     			case Encoding:
-    				if (type == TokenType.TypeReference && ModuleNode.getEncoding(str) != null) {
-    					type = TokenType.EncodingReference;
+    				if (type == TokenType.TYPE_REFERENCE && ModuleNode.getEncoding(str) != null) {
+    					type = TokenType.ENCODING_REFERENCE;
     					break;
     				}
 
@@ -845,8 +845,8 @@ public class Lexer {
     				return null;
 
     			case ObjectClass:
-    				if (type == TokenType.TypeReference && allUc) {
-    					type = TokenType.ObjectClassReference;
+    				if (type == TokenType.TYPE_REFERENCE && allUc) {
+    					type = TokenType.OBJECT_CLASS_REFERENCE;
     					break;
     				}
 
@@ -854,8 +854,8 @@ public class Lexer {
     				return null;
 
     			case Syntax:
-    				if (type == TokenType.TypeReference && allUc && !digits) {
-    					type = TokenType.Word;
+    				if (type == TokenType.TYPE_REFERENCE && allUc && !digits) {
+    					type = TokenType.WORD;
     					break;
     				}
 
@@ -865,7 +865,7 @@ public class Lexer {
 
     		String value = sb.toString();
 
-    		if (type == TokenType.TypeReference) {
+    		if (type == TokenType.TYPE_REFERENCE) {
     			if (PLUS_INFINITY_LIT.equals(value)) {
     				type = Token.TokenType.PLUS_INFINITY_KW;
     			} else if (MINUS_INFINITY_LIT.equals(value)) {

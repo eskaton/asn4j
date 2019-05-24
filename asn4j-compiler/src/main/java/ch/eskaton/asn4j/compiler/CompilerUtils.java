@@ -59,7 +59,7 @@ public class CompilerUtils {
         for (char c : name.toCharArray()) {
             if (c == '-') {
                 cap = true;
-            } else if (cap == true) {
+            } else if (cap) {
                 cap = false;
                 if ('a' <= c && c <= 'z') {
                     sb.append((char) (c & ~0x20));
@@ -92,7 +92,7 @@ public class CompilerUtils {
         return sb.toString();
     }
 
-    static Mode getTaggingMode(ModuleNode module, Type type) throws CompilerException {
+    static Mode getTaggingMode(ModuleNode module, Type type) {
         TaggingMode taggingMode = type.getTaggingMode();
 
         if (taggingMode != null) {

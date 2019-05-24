@@ -50,7 +50,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
 
     @SuppressWarnings("unchecked")
-    public CompiledType compile(CompilerContext ctx, String name, Type node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, Type node) {
         if (node instanceof SequenceType) {
             return ctx.<SequenceType, SequenceCompiler>getCompiler(SequenceType.class).compile(ctx, name, (SequenceType) node);
         } else if (node instanceof SequenceOfType) {

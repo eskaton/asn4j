@@ -50,7 +50,8 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, CompiledType> {
 
-    public CompiledType compile(CompilerContext ctx, String name, EnumeratedType node) throws CompilerException {
+    @Override
+    public CompiledType compile(CompilerContext ctx, String name, EnumeratedType node) {
         JavaClass javaClass = ctx.createClass(name, node, true);
         List<String> names = new ArrayList<>();
         List<Integer> numbers = new ArrayList<>();
@@ -161,7 +162,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
     }
 
     private void addEnumerationItem(String typeName, List<String> names, List<Integer> values, String name,
-            Integer value) throws CompilerException {
+            Integer value) {
         if (names.contains(name)) {
             throw new CompilerException("Duplicate enumeration item '%s' in %s", name, typeName);
         }

@@ -48,7 +48,7 @@ public class PrimitiveFieldNameNode extends AbstractNode {
     }
 
     public boolean isTypeFieldReference() {
-        return type == TokenType.TypeFieldReference;
+        return type == TokenType.TYPE_FIELD_REFERENCE;
     }
 
     public boolean isValueSetFieldReference() {
@@ -60,7 +60,7 @@ public class PrimitiveFieldNameNode extends AbstractNode {
     }
 
     public boolean isValueFieldReference() {
-        return type == TokenType.ValueFieldReference;
+        return type == TokenType.VALUE_FIELD_REFERENCE;
     }
 
     public boolean isObjectFieldReference() {

@@ -29,7 +29,12 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.constraints.ast.*;
+import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
+import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
@@ -49,10 +54,12 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Stack;
 import java.util.function.BiFunction;
 
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.*;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public abstract class AbstractConstraintCompiler {
@@ -63,8 +70,7 @@ public abstract class AbstractConstraintCompiler {
         this.ctx = ctx;
     }
 
-    public ConstraintDefinition compileConstraint(Type base, SetSpecsNode setSpecs, Optional<Bounds> bounds)
-            throws CompilerException {
+    public ConstraintDefinition compileConstraint(Type base, SetSpecsNode setSpecs, Optional<Bounds> bounds) {
         Node root = compileConstraint(base, setSpecs.getRootElements(), bounds);
         Node extension = null;
 
@@ -75,7 +81,7 @@ public abstract class AbstractConstraintCompiler {
         return new ConstraintDefinition(root, extension).extensible(setSpecs.hasExtensionMarker());
     }
 
-    ConstraintDefinition compileConstraints(Type node, Type base) throws CompilerException {
+    ConstraintDefinition compileConstraints(Type node, Type base) {
         LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
         Deque<List<Constraint>> constraints = new ArrayDeque<>();
 
@@ -132,8 +138,7 @@ public abstract class AbstractConstraintCompiler {
 
     abstract Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint);
 
-    ConstraintDefinition compileConstraints(Type base, List<Constraint> constraints, Optional<Bounds> bounds)
-            throws CompilerException {
+    ConstraintDefinition compileConstraints(Type base, List<Constraint> constraints, Optional<Bounds> bounds) {
         ConstraintDefinition constraintDef = null;
 
         for (Constraint constraint : constraints) {
@@ -155,7 +160,7 @@ public abstract class AbstractConstraintCompiler {
         return constraintDef;
     }
 
-    protected Node compileConstraint(Type base, ElementSet set, Optional<Bounds> bounds) throws CompilerException {
+    protected Node compileConstraint(Type base, ElementSet set, Optional<Bounds> bounds) {
         List<Elements> operands = set.getOperands();
 
         switch (set.getOperation()) {
@@ -182,8 +187,7 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
-    protected Node calculateIntersection(Type base, List<Elements> elements, Optional<Bounds> bounds)
-            throws CompilerException {
+    protected Node calculateIntersection(Type base, List<Elements> elements, Optional<Bounds> bounds) {
         return calculateBinOp(base, elements, bounds, INTERSECTION);
     }
 
@@ -211,14 +215,13 @@ public abstract class AbstractConstraintCompiler {
         return new OpNode(NEGATION, node);
     }
 
-    protected Node calculateExclude(Node values1, Node values2) throws CompilerException {
+    protected Node calculateExclude(Node values1, Node values2) {
         return new BinOpNode(COMPLEMENT, values1, values2);
     }
 
-    protected abstract Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds)
-            throws CompilerException;
+    protected abstract Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds);
 
-    protected Node calculateContainedSubtype(Type base, Type type) throws CompilerException {
+    protected Node calculateContainedSubtype(Type base, Type type) {
         if (type.equals(base)) {
             return new AllValuesNode();
         } else {
@@ -258,8 +261,7 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
-    protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition)
-            throws CompilerException;
+    protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition);
 
     protected void addConstraintCondition(ConstraintDefinition definition, JavaClass.BodyBuilder builder) {
         if (definition.isExtensible()) {

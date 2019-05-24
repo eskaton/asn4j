@@ -224,6 +224,9 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.ValueFromObject;
 import ch.eskaton.asn4j.runtime.TaggingMode;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
+import ch.eskaton.asn4j.runtime.types.ASN1ObjectDescriptor;
+import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -496,19 +499,19 @@ public class Parser {
     private VariableTypeValueSetFieldSpecParser variableTypeValueSetFieldSpecParser = new VariableTypeValueSetFieldSpecParser();
     private VersionNumberParser versionNumberParser = new VersionNumberParser();
     private WithSyntaxSpecParser withSyntaxSpecParser = new WithSyntaxSpecParser();
-    private RuleParser<Type> bmpStringParser = () -> parseToken(TokenType.BMPString_KW, BMPString::new);
-    private RuleParser<Type> generalStringParser = () -> parseToken(TokenType.GeneralString_KW, GeneralString::new);
-    private RuleParser<Type> graphicStringParser = () -> parseToken(TokenType.GraphicString_KW, GraphicString::new);
-    private RuleParser<Type> ia5StringParser = () -> parseToken(TokenType.IA5String_KW, IA5String::new);
-    private RuleParser<Type> iso646StringParser = () -> parseToken(TokenType.ISO646String_KW, ISO646String::new);
-    private RuleParser<Type> numericStringParser = () -> parseToken(TokenType.NumericString_KW, NumericString::new);
-    private RuleParser<Type> printableStringParser = () -> parseToken(TokenType.PrintableString_KW, PrintableString::new);
-    private RuleParser<Type> teletexStringParser = () -> parseToken(TokenType.TeletexString_KW, TeletexString::new);
-    private RuleParser<Type> t61StringParser = () -> parseToken(TokenType.T61String_KW, T61String::new);
-    private RuleParser<Type> universalStringParser = () -> parseToken(TokenType.UniversalString_KW, UniversalString::new);
-    private RuleParser<Type> utf8StringParser = () -> parseToken(TokenType.UTF8String_KW, UTF8String::new);
-    private RuleParser<Type> videotexStringParser = () -> parseToken(TokenType.VideotexString_KW, VideotexString::new);
-    private RuleParser<Type> visibleStringParser = () -> parseToken(TokenType.VisibleString_KW, VisibleString::new);
+    private RuleParser<Type> bmpStringParser = () -> parseToken(TokenType.BMP_STRING_KW, BMPString::new);
+    private RuleParser<Type> generalStringParser = () -> parseToken(TokenType.GENERAL_STRING_KW, GeneralString::new);
+    private RuleParser<Type> graphicStringParser = () -> parseToken(TokenType.GRAPHIC_STRING_KW, GraphicString::new);
+    private RuleParser<Type> ia5StringParser = () -> parseToken(TokenType.IA5_STRING_KW, IA5String::new);
+    private RuleParser<Type> iso646StringParser = () -> parseToken(TokenType.ISO646_STRING_KW, ISO646String::new);
+    private RuleParser<Type> numericStringParser = () -> parseToken(TokenType.NUMERIC_STRING_KW, NumericString::new);
+    private RuleParser<Type> printableStringParser = () -> parseToken(TokenType.PRINTABLE_STRING_KW, PrintableString::new);
+    private RuleParser<Type> teletexStringParser = () -> parseToken(TokenType.TELETEX_STRING_KW, TeletexString::new);
+    private RuleParser<Type> t61StringParser = () -> parseToken(TokenType.T61_STRING_KW, T61String::new);
+    private RuleParser<Type> universalStringParser = () -> parseToken(TokenType.UNIVERSAL_STRING_KW, UniversalString::new);
+    private RuleParser<Type> utf8StringParser = () -> parseToken(TokenType.UTF8_STRING_KW, UTF8String::new);
+    private RuleParser<Type> videotexStringParser = () -> parseToken(TokenType.VIDEOTEX_STRING_KW, VideotexString::new);
+    private RuleParser<Type> visibleStringParser = () -> parseToken(TokenType.VISIBLE_STRING_KW, VisibleString::new);
 
     public Parser(InputStream is) throws IOException {
         this.lexer = new Lexer(is);
@@ -910,7 +913,7 @@ public class Parser {
     protected class CommaSeparatedRuleParser<T> extends TokenSeparatedRuleParser<T> {
 
     	public CommaSeparatedRuleParser(RuleParser<T> parser) {
-    		super(parser, TokenType.Comma);
+    		super(parser, TokenType.COMMA);
     	}
 
     }
@@ -937,7 +940,7 @@ public class Parser {
     		List<Object> rule = new SequenceParser(new boolean[] { true, true,
     				false, false, false, true, true }, moduleIdentifierParser,
     				TokenType.DEFINITIONS_KW, encodingReferenceDefaultParser,
-    				tagDefaultParser, extensionDefaultParser, TokenType.Assign,
+    				tagDefaultParser, extensionDefaultParser, TokenType.ASSIGN,
     				TokenType.BEGIN_KW).parse();
     		ModuleBodyNode body = moduleBodyParser.parse();
     		List<EncodingControlSectionNode> encCtrl = encodingControlSectionsParser
@@ -987,7 +990,7 @@ public class Parser {
 
     		List<Object> rule = new SequenceParser(
     				TokenType.ENCODING_CONTROL_KW, new SingleTokenParser(
-    						TokenType.EncodingReference, Context.Encoding))
+    						TokenType.ENCODING_REFERENCE, Context.Encoding))
     				.parse();
 
     		List<Token> encodingInstruction = new ArrayList<>();
@@ -1025,7 +1028,7 @@ public class Parser {
     protected class ModuleIdentifierParser extends ListRuleParser<ModuleIdentifierNode> {
 
     	public ModuleIdentifierNode parse() throws ParserException {
-    	    return parse(new SequenceParser(new boolean[] { true, false }, TokenType.TypeReference,
+    	    return parse(new SequenceParser(new boolean[] { true, false }, TokenType.TYPE_REFERENCE,
                     definitiveIdentificationParser), a -> new ModuleIdentifierNode(a.P0(), a.s0(), a.n1()));
     	}
 
@@ -1040,7 +1043,7 @@ public class Parser {
     		lexerContext.push(Context.Encoding);
 
     		try {
-    		    parse(new SequenceParser(TokenType.EncodingReference, TokenType.INSTRUCTIONS_KW));
+    		    parse(new SequenceParser(TokenType.ENCODING_REFERENCE, TokenType.INSTRUCTIONS_KW));
 
     			if (matched()) {
     				return ModuleNode.getEncoding(s0());
@@ -1113,8 +1116,8 @@ public class Parser {
     protected class DefinitiveNameAndNumberFormParser extends ListRuleParser<OIDComponentNode> {
 
     	public OIDComponentNode parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.Identifier, TokenType.LParen,
-    				definitiveNumberFormParser, TokenType.RParen), a -> ((OIDComponentNode) a.n2()).name(a.s0()));
+    		return parse(new SequenceParser(TokenType.IDENTIFIER, TokenType.L_PAREN,
+    				definitiveNumberFormParser, TokenType.R_PAREN), a -> ((OIDComponentNode) a.n2()).name(a.s0()));
     	}
 
     }
@@ -1123,7 +1126,7 @@ public class Parser {
     protected class DefinitiveNumberFormParser extends ListRuleParser<OIDComponentNode> {
 
     	public OIDComponentNode parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.Number),
+    		return parse(new SequenceParser(TokenType.NUMBER),
                     a -> new OIDComponentNode(a.P0(), Integer.parseInt(a.s0())));
     	}
 
@@ -1133,7 +1136,7 @@ public class Parser {
     protected class NameFormParser extends ListRuleParser<OIDComponentNode> {
 
     	public OIDComponentNode parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.Identifier), a -> new OIDComponentNode(a.P0(), a.s0()));
+    		return parse(new SequenceParser(TokenType.IDENTIFIER), a -> new OIDComponentNode(a.P0(), a.s0()));
     	}
 
     }
@@ -1168,7 +1171,7 @@ public class Parser {
     protected class DefinitiveOIDParser extends ListRuleParser<OIDNode> {
 
     	public OIDNode parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.LBrace, definitiveObjIdComponentListParser, TokenType.RBrace),
+    		return parse(new SequenceParser(TokenType.L_BRACE, definitiveObjIdComponentListParser, TokenType.R_BRACE),
                     SequenceListAccessor::n1);
     	}
 
@@ -1198,8 +1201,8 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public ExportsNode parse() throws ParserException {
             parse(new ChoiceParser<Object>(
-                    new SequenceParser(TokenType.EXPORTS_KW, TokenType.ALL_KW, TokenType.Semicolon),
-                    new SequenceParser(TokenType.EXPORTS_KW, symbolListParser, TokenType.Semicolon)));
+                    new SequenceParser(TokenType.EXPORTS_KW, TokenType.ALL_KW, TokenType.SEMICOLON),
+                    new SequenceParser(TokenType.EXPORTS_KW, symbolListParser, TokenType.SEMICOLON)));
 
             if (matched()) {
                 Object maybeSymbols = ((List<Object>) p()).get(1);
@@ -1236,7 +1239,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
         public ReferenceNode parse() throws ParserException {
-            return parse(new ChoiceParser<>(new SequenceParser(referenceParser, TokenType.LBrace, TokenType.RBrace),
+            return parse(new ChoiceParser<>(new SequenceParser(referenceParser, TokenType.L_BRACE, TokenType.R_BRACE),
                     referenceParser), a -> a.p() instanceof List ?
                     ((ReferenceNode) ((List<Object>) a.p()).get(0)).parameterized(true) : (ReferenceNode) a.p());
         }
@@ -1252,7 +1255,7 @@ public class Parser {
     protected class ReferenceParser implements RuleParser<ReferenceNode> {
 
     	public ReferenceNode parse() throws ParserException {
-    	    Token rule = new ChoiceParser<Token>(TokenType.TypeReference, TokenType.Identifier).parse();
+    	    Token rule = new ChoiceParser<Token>(TokenType.TYPE_REFERENCE, TokenType.IDENTIFIER).parse();
 
     		if (rule != null) {
     			return new ReferenceNode(rule.getPosition(), rule.getText());
@@ -1271,7 +1274,7 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public List<ImportNode> parse() throws ParserException {
     	    return parse(new SequenceParser(new boolean[] { true, false, true }, TokenType.IMPORTS_KW,
-                    symbolsImportedParser, TokenType.Semicolon), a -> a.n1() == null ? new ArrayList<>() : a.n1());
+                    symbolsImportedParser, TokenType.SEMICOLON), a -> a.n1() == null ? new ArrayList<>() : a.n1());
     	}
 
     }
@@ -1315,7 +1318,7 @@ public class Parser {
     protected class GlobalModuleReferenceParser extends ListRuleParser<ModuleRefNode> {
 
         public ModuleRefNode parse() throws ParserException {
-            return parse(new SequenceParser(new boolean[] { true, false }, TokenType.TypeReference,
+            return parse(new SequenceParser(new boolean[] { true, false }, TokenType.TYPE_REFERENCE,
                             assignedIdentifierParser),
                     a -> a.p().size() == 1 ? new ModuleRefNode(a.P0(), a.s0())
                             : new ModuleRefNode(a.P0(), a.s0(), a.n1()));
@@ -1333,7 +1336,7 @@ public class Parser {
         public ObjectIdentifierValue parse() throws ParserException {
             return parse(new ChoiceParser<>(objectIdentifierValueParser,
                             new ValueExtractor<Node>(0, new SequenceParser(definedValueParser,
-                                    new NegativeLookaheadParser(TokenType.Comma, TokenType.FROM_KW)))),
+                                    new NegativeLookaheadParser(TokenType.COMMA, TokenType.FROM_KW)))),
                     a -> a.n() instanceof ObjectIdentifierValue ? (ObjectIdentifierValue) a.n() :
                             new ObjectIdentifierValue(a.P(), (DefinedValue) a.n()));
         }
@@ -1347,7 +1350,7 @@ public class Parser {
 
     	public ObjectIdentifierValue parse() throws ParserException {
     		List<OIDComponentNode> rule = new ValueExtractor<List<OIDComponentNode>>(1,
-                    new SequenceParser(TokenType.LBrace, objIdComponentsListParser, TokenType.RBrace)).parse();
+                    new SequenceParser(TokenType.L_BRACE, objIdComponentsListParser, TokenType.R_BRACE)).parse();
 
     		if (rule != null) {
     			return new ObjectIdentifierValue(getPosition(rule), rule);
@@ -1388,7 +1391,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public OIDComponentNode parse() throws ParserException {
-    		return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.Number), definedValueParser),
+    		return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.NUMBER), definedValueParser),
                     a -> a.p() instanceof Token ? new OIDComponentNode(a.P(), Integer.parseInt(a.s())) :
                     new OIDComponentNode(a.P(), (DefinedValue) a.n()));
     	}
@@ -1400,7 +1403,7 @@ public class Parser {
     protected class NameAndNumberFormParser extends ListRuleParser<OIDComponentNode> {
 
     	public OIDComponentNode parse() throws ParserException {
-            return parse(new SequenceParser(TokenType.Identifier, TokenType.LParen, numberFormParser, TokenType.RParen),
+            return parse(new SequenceParser(TokenType.IDENTIFIER, TokenType.L_PAREN, numberFormParser, TokenType.R_PAREN),
                     a -> ((OIDComponentNode)a.n2()).name(a.s0()));
     	}
 
@@ -1424,7 +1427,7 @@ public class Parser {
     protected class ValueReferenceParser extends ObjectRuleParser<DefinedValue> {
 
     	public DefinedValue parse() throws ParserException {
-    	    return parse(new SingleTokenParser(TokenType.Identifier), a -> new SimpleDefinedValue(a.P(), a.s()));
+    	    return parse(new SingleTokenParser(TokenType.IDENTIFIER), a -> new SimpleDefinedValue(a.P(), a.s()));
     	}
 
     }
@@ -1436,7 +1439,7 @@ public class Parser {
     protected class ExternalValueReferenceParser extends ListRuleParser<SimpleDefinedValue> {
 
         public SimpleDefinedValue parse() throws ParserException {
-            return parse(new SequenceParser(TokenType.TypeReference, TokenType.Dot, TokenType.Identifier),
+            return parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.DOT, TokenType.IDENTIFIER),
                     a -> new ExternalValueReference(a.P0(), a.s0(), a.s2()));
         }
 
@@ -1477,7 +1480,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public TypeOrObjectClassAssignmentNode<?> parse() throws ParserException {
-            return parse(new SequenceParser(TokenType.TypeReference, TokenType.Assign,
+            return parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.ASSIGN,
                             new ChoiceParser<>(typeParser, objectClassParser)),
                     a -> {
                         if (a.n2() instanceof Type) {
@@ -1528,7 +1531,7 @@ public class Parser {
     protected class NamedTypeParser extends ListRuleParser<NamedType> {
 
     	public NamedType parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.Identifier, typeParser),
+    	    return parse(new SequenceParser(TokenType.IDENTIFIER, typeParser),
                     a -> new NamedType(a.P0(), a.s0(), a.n1()));
     	}
 
@@ -1537,7 +1540,7 @@ public class Parser {
     protected class TypeOrNamedTypeParser extends ListRuleParser<Type> {
 
         public Type parse() throws ParserException {
-            return parse(new SequenceParser(new boolean[] { false, true }, TokenType.Identifier, typeParser),
+            return parse(new SequenceParser(new boolean[] { false, true }, TokenType.IDENTIFIER, typeParser),
                     a -> a.n0() == null ? a.n1() : new NamedType(a.P0(), a.s0(), a.n1()));
         }
 
@@ -1663,8 +1666,8 @@ public class Parser {
 
                 case BIT_KW:
                     List<Object> bitRule = new SequenceParser(new boolean[] { true, false }, TokenType.STRING_KW,
-                            new ValueExtractor<List<NamedBitNode>>(1, new SequenceParser(TokenType.LBrace,
-                                            namedBitListParser, TokenType.RBrace))).parse();
+                            new ValueExtractor<List<NamedBitNode>>(1, new SequenceParser(TokenType.L_BRACE,
+                                            namedBitListParser, TokenType.R_BRACE))).parse();
 
                     if (bitRule != null) {
                         if (bitRule.get(1) != null) {
@@ -1685,7 +1688,7 @@ public class Parser {
 
                 case INTEGER_KW:
                     List<NamedNumber> intRule = new ValueExtractor<List<NamedNumber>>(1,
-                            new SequenceParser(TokenType.LBrace, namedNumberListParser, TokenType.RBrace)).parse();
+                            new SequenceParser(TokenType.L_BRACE, namedNumberListParser, TokenType.R_BRACE)).parse();
 
                     if (intRule != null) {
                         type = new IntegerType(position, intRule);
@@ -1730,8 +1733,8 @@ public class Parser {
                     break;
 
                 case CHOICE_KW:
-                    List<Object> choiceRule = new SequenceParser(TokenType.LBrace,
-                            alternativeTypeListsParser, TokenType.RBrace).parse();
+                    List<Object> choiceRule = new SequenceParser(TokenType.L_BRACE,
+                            alternativeTypeListsParser, TokenType.R_BRACE).parse();
 
                     if (choiceRule != null) {
                         type = new Choice(position, (AlternativeTypeLists) choiceRule.get(1));
@@ -1739,8 +1742,8 @@ public class Parser {
                     break;
 
                 case ENUMERATED_KW:
-                    List<Object> enumRule = new SequenceParser(TokenType.LBrace,
-                            enumerationsParser, TokenType.RBrace).parse();
+                    List<Object> enumRule = new SequenceParser(TokenType.L_BRACE,
+                            enumerationsParser, TokenType.R_BRACE).parse();
 
                     if (enumRule != null) {
                         type = (EnumeratedType) enumRule.get(1);
@@ -1774,11 +1777,11 @@ public class Parser {
                                     new SetOfType(position, rule);
                         }
                     } else {
-                        List<Object> rule = new SequenceParser(new boolean[] { true, false, true }, TokenType.LBrace,
+                        List<Object> rule = new SequenceParser(new boolean[] { true, false, true }, TokenType.L_BRACE,
                                 new ChoiceParser<>(new SequenceParser(componentTypeListsParser),
                                         new SequenceParser(new boolean[] { true, false },
                                                 extensionAndExceptionParser, optionalExtensionMarkerParser)),
-                                TokenType.RBrace).parse();
+                                TokenType.R_BRACE).parse();
 
                         if (rule != null) {
                             if (rule.get(1) == null) {
@@ -1831,9 +1834,9 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public NamedBitNode parse() throws ParserException {
-            return parse(new SequenceParser(TokenType.Identifier, TokenType.LParen,
-                            new ChoiceParser<>(new SingleTokenParser(TokenType.Number), definedValueParser),
-                            TokenType.RParen),
+            return parse(new SequenceParser(TokenType.IDENTIFIER, TokenType.L_PAREN,
+                            new ChoiceParser<>(new SingleTokenParser(TokenType.NUMBER), definedValueParser),
+                            TokenType.R_PAREN),
                     a -> a.n2() instanceof Token ? new NamedBitNode(a.P0(), a.s0(), Integer.parseInt(a.s2())) :
                             new NamedBitNode(a.P0(), a.s0(), a.n2()));
         }
@@ -1863,8 +1866,8 @@ public class Parser {
             return parse(new SequenceParser(
                             new boolean[] { true, false }, enumerationParser,
                             new SequenceParser(new boolean[] { true, true, false, false },
-                                    TokenType.Comma, TokenType.Ellipsis, exceptionSpecParser,
-                                    new SequenceParser(TokenType.Comma, enumerationParser))),
+                                    TokenType.COMMA, TokenType.ELLIPSIS, exceptionSpecParser,
+                                    new SequenceParser(TokenType.COMMA, enumerationParser))),
                     a -> {
                         if (a.n1() == null) {
                             return new EnumeratedType(a.P0(), a.n0());
@@ -1902,7 +1905,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public EnumerationItemNode parse() throws ParserException {
-    		Object rule = new ChoiceParser<>(namedNumberParser,	new SingleTokenParser(TokenType.Identifier)).parse();
+    		Object rule = new ChoiceParser<>(namedNumberParser,	new SingleTokenParser(TokenType.IDENTIFIER)).parse();
 
     		if (rule == null) {
     			return null;
@@ -1956,8 +1959,8 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public NamedNumber parse() throws ParserException {
-            return parse(new SequenceParser(TokenType.Identifier, TokenType.LParen,
-                            new ChoiceParser<Object>(signedNumberParser, definedValueParser), TokenType.RParen),
+            return parse(new SequenceParser(TokenType.IDENTIFIER, TokenType.L_PAREN,
+                            new ChoiceParser<Object>(signedNumberParser, definedValueParser), TokenType.R_PAREN),
                     a -> a.n2() instanceof DefinedValue ? new NamedNumber(a.P0(), a.s0(), (DefinedValue) a.n2()) :
                             new NamedNumber(a.P0(), a.s0(), (SignedNumber) a.n2()));
         }
@@ -1982,13 +1985,13 @@ public class Parser {
     				new SequenceParser(new boolean[] { true, false },
     						componentTypeListParser, new SequenceParser(
     								new boolean[] { true, true, false, false },
-    								TokenType.Comma,
+    								TokenType.COMMA,
     								extensionAndExceptionParser,
     								extensionAdditionsParser,
     								new ChoiceParser<>(
     										new SequenceParser(
     												extensionEndMarkerParser,
-    												TokenType.Comma,
+    												TokenType.COMMA,
     												componentTypeListParser),
     										optionalExtensionMarkerParser))),
     				new SequenceParser(new boolean[] { true, false, false },
@@ -1996,7 +1999,7 @@ public class Parser {
     						extensionAdditionsParser, new ChoiceParser<>(
     								new SequenceParser(
     										extensionEndMarkerParser,
-    										TokenType.Comma,
+    										TokenType.COMMA,
     										componentTypeListParser),
     								optionalExtensionMarkerParser))).parse();
 
@@ -2056,7 +2059,7 @@ public class Parser {
     protected class ExtensionEndMarkerParser implements RuleParser<Object> {
 
     	public Object parse() throws ParserException {
-    		return new SequenceParser(TokenType.Comma, TokenType.Ellipsis).parse();
+    		return new SequenceParser(TokenType.COMMA, TokenType.ELLIPSIS).parse();
     	}
 
     }
@@ -2068,7 +2071,7 @@ public class Parser {
 
     	public List<Object> parse() throws ParserException {
     		return new ValueExtractor<List<Object>>(1, new SequenceParser(
-    				TokenType.Comma, extensionAdditionListParser)).parse();
+    				TokenType.COMMA, extensionAdditionListParser)).parse();
     	}
 
     }
@@ -2102,8 +2105,8 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public ExtensionAdditionGroup parse() throws ParserException {
             return parse(new SequenceParser(new boolean[] { true, false, true, true },
-                    TokenType.LVersionBrackets, versionNumberParser, componentTypeListParser,
-                    TokenType.RVersionBrackets), a -> new ExtensionAdditionGroup(a.P0(), a.n1(), a.n2()));
+                    TokenType.L_VERSION_BRACKETS, versionNumberParser, componentTypeListParser,
+                    TokenType.R_VERSION_BRACKETS), a -> new ExtensionAdditionGroup(a.P0(), a.n1(), a.n2()));
         }
 
     }
@@ -2188,7 +2191,7 @@ public class Parser {
     protected class EncodingPrefixParser extends ListRuleParser<EncodingPrefixNode> {
 
         public EncodingPrefixNode parse() throws ParserException {
-            return parse(new SequenceParser(new boolean[] { true, false }, TokenType.LBracket,
+            return parse(new SequenceParser(new boolean[] { true, false }, TokenType.L_BRACKET,
                             encodingReferenceParser),
                     a -> {
                         List<Token> encodingInstruction = new ArrayList<>();
@@ -2200,9 +2203,9 @@ public class Parser {
 
                             if (token == null) {
                                 throw new ParserException("Premature EOF");
-                            } else if (token.getType() == TokenType.RBracket) {
+                            } else if (token.getType() == TokenType.R_BRACKET) {
                                 break;
-                            } else if (token.getType() == TokenType.LBracket) {
+                            } else if (token.getType() == TokenType.L_BRACKET) {
                                 throw new ParserException("Invalid token " + token + " in EncodingInstruction");
                             }
 
@@ -2245,7 +2248,7 @@ public class Parser {
 
         public Tag parse() throws ParserException {
             return parse(new SequenceParser(new boolean[] { true, false, false, true, true },
-                            TokenType.LBracket, encodingReferenceParser, classParser, classNumberParser, TokenType.RBracket),
+                            TokenType.L_BRACKET, encodingReferenceParser, classParser, classNumberParser, TokenType.R_BRACKET),
                     a -> new Tag(a.P(), a.n1(), a.n2(), a.n3()));
         }
 
@@ -2258,7 +2261,7 @@ public class Parser {
 
         public String parse() throws ParserException {
             return parse(new SequenceParser(
-                            new SingleTokenParser(TokenType.EncodingReference, Context.Encoding), TokenType.Colon),
+                            new SingleTokenParser(TokenType.ENCODING_REFERENCE, Context.Encoding), TokenType.COLON),
                     a -> a.t0() != null ? a.s0() : null);
         }
     }
@@ -2270,7 +2273,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
         public ClassNumber parse() throws ParserException {
-            return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.Number), definedValueParser), a ->
+            return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.NUMBER), definedValueParser), a ->
                     a.p() instanceof Token ? new ClassNumber(a.P(), Integer.parseInt(a.s())) :
                             new ClassNumber(a.P(), (DefinedValue) a.n())
             );
@@ -2341,7 +2344,7 @@ public class Parser {
     	public AlternativeTypeLists parse() throws ParserException {
     		List<Object> rule = new ChoiceParser<>(
     				new SequenceParser(new boolean[] { true, true, true, false,	false },
-                            rootAlternativeTypeListParser, TokenType.Comma, extensionAndExceptionParser,
+                            rootAlternativeTypeListParser, TokenType.COMMA, extensionAndExceptionParser,
     						extensionAdditionAlternativesParser, optionalExtensionMarkerParser),
                     new SequenceParser(rootAlternativeTypeListParser)).parse();
 
@@ -2367,7 +2370,7 @@ public class Parser {
     protected class OptionalExtensionMarkerParser extends ListRuleParser<Boolean> {
 
     	public Boolean parse() throws ParserException {
-    	    return match(new SequenceParser(TokenType.Comma, TokenType.Ellipsis));
+    	    return match(new SequenceParser(TokenType.COMMA, TokenType.ELLIPSIS));
     	}
 
     }
@@ -2388,7 +2391,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public List<ExtensionAdditionAlternativeNode> parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.Comma, extensionAdditionAlternativesListParser), a -> a.n1());
+    	    return parse(new SequenceParser(TokenType.COMMA, extensionAdditionAlternativesListParser), a -> a.n1());
     	}
 
     }
@@ -2425,8 +2428,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ExtensionAdditionAlternativesGroup parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.LVersionBrackets, versionNumberParser,
-                    alternativeTypeListParser, TokenType.RVersionBrackets),
+    		return parse(new SequenceParser(TokenType.L_VERSION_BRACKETS, versionNumberParser,
+                    alternativeTypeListParser, TokenType.R_VERSION_BRACKETS),
                     a -> new ExtensionAdditionAlternativesGroup(a.P(), a.n1(), a.n2()));
     	}
 
@@ -2436,7 +2439,7 @@ public class Parser {
     protected class VersionNumberParser extends ListRuleParser<Integer> {
 
     	public Integer parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.Number, TokenType.Colon), a -> Integer.valueOf(a.s0()));
+    		return parse(new SequenceParser(TokenType.NUMBER, TokenType.COLON), a -> Integer.valueOf(a.s0()));
     	}
 
     }
@@ -2456,7 +2459,7 @@ public class Parser {
     protected class ExtensionAndExceptionParser extends ListRuleParser<ExtensionAndExceptionNode> {
 
         public ExtensionAndExceptionNode parse() throws ParserException {
-            return parse(new SequenceParser(new boolean[] { true, false }, TokenType.Ellipsis, exceptionSpecParser),
+            return parse(new SequenceParser(new boolean[] { true, false }, TokenType.ELLIPSIS, exceptionSpecParser),
                     a -> a.p().size() > 1 ? new ExtensionAndExceptionNode(a.P(), a.n1()) :
                             new ExtensionAndExceptionNode(a.P()));
         }
@@ -2468,7 +2471,7 @@ public class Parser {
 
     	public ExceptionIdentificationNode parse() throws ParserException {
     		return new ValueExtractor<ExceptionIdentificationNode>(1,
-    				new SequenceParser(TokenType.Exclamation, exceptionIdentificationParser)).parse();
+    				new SequenceParser(TokenType.EXCLAMATION, exceptionIdentificationParser)).parse();
     	}
 
     }
@@ -2484,7 +2487,7 @@ public class Parser {
     	    return parse(new ChoiceParser<>(
                     new SequenceParser(signedNumberParser),
                     new SequenceParser(definedValueParser),
-                    new SequenceParser(typeParser, TokenType.Colon, valueParser)),
+                    new SequenceParser(typeParser, TokenType.COLON, valueParser)),
                     a -> {
     	                List<Object> rule = (List<Object>) a.p();
 
@@ -2504,7 +2507,7 @@ public class Parser {
     protected class SignedNumberParser extends ListRuleParser<SignedNumber> {
 
         public SignedNumber parse() throws ParserException {
-            return parse(new SequenceParser(new boolean[] { false, true }, TokenType.Minus, TokenType.Number),
+            return parse(new SequenceParser(new boolean[] { false, true }, TokenType.MINUS, TokenType.NUMBER),
                     a -> a.t0() != null ? new SignedNumber(a.P(), new BigInteger("-" + a.s1())) :
                             new SignedNumber(a.P1(), new BigInteger(a.s1())));
         }
@@ -2585,10 +2588,10 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    	    return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.BString),
-                    new SingleTokenParser(TokenType.HString),
-                    new SequenceParser(TokenType.LBrace, identifierListParser,
-                            TokenType.RBrace), new SequenceParser(TokenType.CONTAINING_KW, valueParser)),
+    	    return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.B_STRING),
+                    new SingleTokenParser(TokenType.H_STRING),
+                    new SequenceParser(TokenType.L_BRACE, identifierListParser,
+                            TokenType.R_BRACE), new SequenceParser(TokenType.CONTAINING_KW, valueParser)),
                     a -> {
                         if (a.p() instanceof List) {
                             List<Object> list = (List<Object>) a.p();
@@ -2603,7 +2606,7 @@ public class Parser {
                         } else {
                             String value = a.s().substring(0, a.s().length());
 
-                            if (a.$() == TokenType.BString) {
+                            if (a.$() == TokenType.B_STRING) {
                                 return new BinaryStringValue(a.P(), value);
                             } else {
                                 return new HexStringValue(a.P(), value);
@@ -2620,7 +2623,7 @@ public class Parser {
     protected class IdentifierListParser extends ListRuleParser<List<String>> {
 
         public List<String> parse() throws ParserException {
-            return parse(new CommaSeparatedRuleParser<>(new SingleTokenParser(TokenType.Identifier)),
+            return parse(new CommaSeparatedRuleParser<>(new SingleTokenParser(TokenType.IDENTIFIER)),
                     a -> a.p().stream().map(t -> ((Token) t).getText()).collect(Collectors.toList()));
         }
 
@@ -2658,7 +2661,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    	    parse(new ChoiceParser<>(new SingleTokenParser(TokenType.CString), characterStringListParser,
+    	    parse(new ChoiceParser<>(new SingleTokenParser(TokenType.C_STRING), characterStringListParser,
                     collectionValueParser));
 
     		if (matched()) {
@@ -2695,7 +2698,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public CharacterStringList parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.LBrace, charSymsParser, TokenType.RBrace),
+    	    return parse(new SequenceParser(TokenType.L_BRACE, charSymsParser, TokenType.R_BRACE),
                     a -> new CharacterStringList(a.P(), a.n1()));
     	}
 
@@ -2721,7 +2724,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public Value parse() throws ParserException {
-    	    parse(new ChoiceParser<>(new SingleTokenParser(TokenType.CString), collectionValueParser,
+    	    parse(new ChoiceParser<>(new SingleTokenParser(TokenType.C_STRING), collectionValueParser,
                     definedValueParser));
 
     		if (matched()) {
@@ -2766,7 +2769,7 @@ public class Parser {
     protected class ChoiceValueParser extends ListRuleParser<ChoiceValue> {
 
     	public ChoiceValue parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.Identifier, TokenType.Colon, valueParser),
+    	    return parse(new SequenceParser(TokenType.IDENTIFIER, TokenType.COLON, valueParser),
                     a -> new ChoiceValue(a.P0(), a.s0(), a.n2()));
     	}
 
@@ -2788,7 +2791,7 @@ public class Parser {
 
     	@SuppressWarnings({ "unchecked" })
     	public IntegerValue parse() throws ParserException {
-    		return parse(new ChoiceParser<>(signedNumberParser, new SingleTokenParser(TokenType.Identifier)), a ->
+    		return parse(new ChoiceParser<>(signedNumberParser, new SingleTokenParser(TokenType.IDENTIFIER)), a ->
                     (a.p() instanceof Token) ? new IntegerValue(a.P(), a.s()) :
                             new IntegerValue(a.P(), ((SignedNumber)a.n()).getNumber())
             );
@@ -2844,7 +2847,7 @@ public class Parser {
     protected class IRIValueParser extends ObjectRuleParser<Value> {
 
     	public Value parse() throws ParserException {
-    		return parse(new SingleTokenParser(TokenType.CString), a -> {
+    		return parse(new SingleTokenParser(TokenType.C_STRING), a -> {
                 List<IRIToken> iriTokens = parseArcIdSequence(a.s(),false);
 
                 if (iriTokens.size() == 0) {
@@ -2892,8 +2895,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
         public RealValue parse() throws ParserException {
-            return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.RealNumber),
-                    new SequenceParser(TokenType.Minus, TokenType.RealNumber), collectionValueParser), a -> {
+            return parse(new ChoiceParser<>(new SingleTokenParser(TokenType.REAL_NUMBER),
+                    new SequenceParser(TokenType.MINUS, TokenType.REAL_NUMBER), collectionValueParser), a -> {
                 Object rule = a.p();
 
                 if (rule instanceof Token) {
@@ -2989,7 +2992,7 @@ public class Parser {
     protected class RelativeIRIValueParser extends ObjectRuleParser<Value> {
 
     	public Value parse() throws ParserException {
-    		return parse(new SingleTokenParser(TokenType.CString), a -> {
+    		return parse(new SingleTokenParser(TokenType.C_STRING), a -> {
                 List<IRIToken> iriTokens = parseArcIdSequence(a.s(), true);
 
                 if (iriTokens.size() == 0) {
@@ -3008,7 +3011,7 @@ public class Parser {
 
     	public RelativeOIDValue parse() throws ParserException {
     		List<OIDComponentNode> rule = new ValueExtractor<List<OIDComponentNode>>(1,
-                    new SequenceParser(TokenType.LBrace, relativeOIDComponentsListParser, TokenType.RBrace)).parse();
+                    new SequenceParser(TokenType.L_BRACE, relativeOIDComponentsListParser, TokenType.R_BRACE)).parse();
 
     		if (rule != null) {
     			return new RelativeOIDValue(getPosition(rule), rule);
@@ -3069,8 +3072,8 @@ public class Parser {
     	@SuppressWarnings("unchecked")
         public Value parse() throws ParserException {
             return parse(new ChoiceParser<>(
-                    new SequenceParser(TokenType.LBrace, namedValueListParser, TokenType.RBrace),
-                    new SequenceParser(TokenType.LBrace, valueListParser, TokenType.RBrace)), a ->
+                    new SequenceParser(TokenType.L_BRACE, namedValueListParser, TokenType.R_BRACE),
+                    new SequenceParser(TokenType.L_BRACE, valueListParser, TokenType.R_BRACE)), a ->
                     a.l().n0() instanceof NamedValue ? new CollectionValue(a.P(), (List<Value>) a.l().n1()) :
                             new CollectionOfValue(a.P(), (List<Value>) a.l().n1())
             );
@@ -3082,7 +3085,7 @@ public class Parser {
     protected class EmptyValueParser extends ListRuleParser<Value> {
 
         public Value parse() throws ParserException {
-            return parse(new SequenceParser(TokenType.LBrace, TokenType.RBrace), a -> new EmptyValue(a.P()));
+            return parse(new SequenceParser(TokenType.L_BRACE, TokenType.R_BRACE), a -> new EmptyValue(a.P()));
         }
 
     }
@@ -3091,7 +3094,7 @@ public class Parser {
     protected class NamedValueParser extends ListRuleParser<NamedValue> {
 
     	public NamedValue parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.Identifier, valueParser),
+    		return parse(new SequenceParser(TokenType.IDENTIFIER, valueParser),
                     a -> new NamedValue(a.P(), a.s0(), a.n1()));
     	}
 
@@ -3160,7 +3163,7 @@ public class Parser {
     protected class TypeReferenceParser implements RuleParser<TypeReference> {
 
     	public TypeReference parse() throws ParserException {
-    		Token token = expect(TokenType.TypeReference);
+    		Token token = expect(TokenType.TYPE_REFERENCE);
 
     		if (token != null) {
     			return new TypeReference(token.getPosition(), token.getText());
@@ -3178,7 +3181,7 @@ public class Parser {
     protected class ExternalTypeReferenceParser extends ListRuleParser<ExternalTypeReference> {
 
     	public ExternalTypeReference parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.TypeReference, TokenType.Dot, TokenType.TypeReference),
+    		return parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.DOT, TokenType.TYPE_REFERENCE),
                     a -> new ExternalTypeReference(a.P0(), a.s0(), a.s2()));
     	}
 
@@ -3188,18 +3191,15 @@ public class Parser {
     protected class UsefulTypeParser extends ObjectRuleParser<UsefulType> {
 
     	public UsefulType parse() throws ParserException {
-    		return parse(new ChoiceParser<Token>(TokenType.UTCTime_KW, TokenType.GeneralizedTime_KW,
-                    TokenType.ObjectDescriptor_KW), a -> {
-                String tmp = a.$().toString();
-                String typeName = StringUtils.concat("ASN1", tmp.substring(0, tmp.length() - 3));
-
+    		return parse(new ChoiceParser<Token>(TokenType.UTC_TIME_KW, TokenType.GENERALIZED_TIME_KW,
+                    TokenType.OBJECT_DESCRIPTOR_KW), a -> {
                 switch (a.$()) {
-                    case UTCTime_KW:
-                        return new UTCTime(a.P(), typeName);
-                    case GeneralizedTime_KW:
-                        return new GeneralizedTime(a.P(), typeName);
-                    case ObjectDescriptor_KW:
-                        return new ObjectDescriptor(a.P(), typeName);
+                    case UTC_TIME_KW:
+                        return new UTCTime(a.P(), ASN1UTCTime.class.getSimpleName());
+                    case GENERALIZED_TIME_KW:
+                        return new GeneralizedTime(a.P(), ASN1GeneralizedTime.class.getSimpleName());
+                    case OBJECT_DESCRIPTOR_KW:
+                        return new ObjectDescriptor(a.P(), ASN1ObjectDescriptor.class.getSimpleName());
                     default:
                         return null;
                 }
@@ -3212,7 +3212,7 @@ public class Parser {
     protected class SelectionTypeParser extends ListRuleParser<SelectionType> {
 
     	public SelectionType parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.Identifier, TokenType.LT, typeParser),
+    		return parse(new SequenceParser(TokenType.IDENTIFIER, TokenType.LT, typeParser),
                     a -> new SelectionType(a.P0(), a.s0(), a.n2()));
     	}
 
@@ -3263,8 +3263,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ValueOrObjectAssignmentNode<?, ?> parse() throws ParserException {
-    		return parse(new SequenceParser(new SingleTokenParser(TokenType.Identifier),
-                    new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser), TokenType.Assign,
+    		return parse(new SequenceParser(new SingleTokenParser(TokenType.IDENTIFIER),
+                    new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser), TokenType.ASSIGN,
     				new ChoiceParser<>(valueParser, objectParser)), a-> {
                 Node type = a.n1();
 
@@ -3295,9 +3295,9 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
         public ValueSetTypeOrObjectSetAssignmentNode parse() throws ParserException {
-            return parse(new SequenceParser(TokenType.TypeReference,
+            return parse(new SequenceParser(TokenType.TYPE_REFERENCE,
                             new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
-                            TokenType.Assign, new ChoiceParser<Node>(valueSetParser, objectSetParser)),
+                            TokenType.ASSIGN, new ChoiceParser<Node>(valueSetParser, objectSetParser)),
                     a -> new ValueSetTypeOrObjectSetAssignmentNode(a.P0(), a.s0(), a.n1(), a.n3()));
         }
 
@@ -3364,7 +3364,7 @@ public class Parser {
 
     	public SetSpecsNode parse() throws ParserException {
     		return new ValueExtractor<SetSpecsNode>(1, new SequenceParser(
-    				TokenType.LBrace, setSpecsParser, TokenType.RBrace)).parse();
+    				TokenType.L_BRACE, setSpecsParser, TokenType.R_BRACE)).parse();
     	}
 
     }
@@ -3386,11 +3386,11 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public SetSpecsNode parse() throws ParserException {
     		return parse(new ChoiceParser<>(
-    		        new SequenceParser(elementSetSpecParser, TokenType.Comma, TokenType.Ellipsis, TokenType.Comma,
+    		        new SequenceParser(elementSetSpecParser, TokenType.COMMA, TokenType.ELLIPSIS, TokenType.COMMA,
                             elementSetSpecParser),
-                    new SequenceParser(elementSetSpecParser, TokenType.Comma, TokenType.Ellipsis), elementSetSpecParser,
-                    new SequenceParser(TokenType.Ellipsis, TokenType.Comma, elementSetSpecParser),
-                    new SingleTokenParser(TokenType.Ellipsis)), a -> {
+                    new SequenceParser(elementSetSpecParser, TokenType.COMMA, TokenType.ELLIPSIS), elementSetSpecParser,
+                    new SequenceParser(TokenType.ELLIPSIS, TokenType.COMMA, elementSetSpecParser),
+                    new SingleTokenParser(TokenType.ELLIPSIS)), a -> {
                 if (a.p() instanceof List) {
                     switch (a.l().size()) {
                         case 3:
@@ -3438,7 +3438,7 @@ public class Parser {
 
     	public ElementSet parse() throws ParserException {
     		List<Elements> elements = new TokenSeparatedRuleParser<Elements>(
-    				intersectionsParser, TokenType.Pipe, TokenType.UNION_KW).parse();
+    				intersectionsParser, TokenType.PIPE, TokenType.UNION_KW).parse();
 
     		if (elements != null) {
     			return new ElementSet(getPosition(elements), OpType.Union, elements.toArray(new Elements[] {}));
@@ -3455,7 +3455,7 @@ public class Parser {
     protected class IntersectionsParser extends ListRuleParser<ElementSet> {
 
     	public ElementSet parse() throws ParserException {
-    		List<Elements> elements = new TokenSeparatedRuleParser<>(intersectionElementsParser, TokenType.Circumflex,
+    		List<Elements> elements = new TokenSeparatedRuleParser<>(intersectionElementsParser, TokenType.CIRCUMFLEX,
     				TokenType.INTERSECTION_KW).parse();
 
     		if (elements != null) {
@@ -3498,7 +3498,7 @@ public class Parser {
     	@SuppressWarnings("unchecked")
         public Elements parse() throws ParserException {
             return parse(new ChoiceParser<>(subtypeElementsParser, objectSetElementsParser,
-                            new SequenceParser(TokenType.LParen, elementSetSpecParser, TokenType.RParen)),
+                            new SequenceParser(TokenType.L_PAREN, elementSetSpecParser, TokenType.R_PAREN)),
                     a -> a.p() instanceof List ? (ElementSet) a.l().n1() : (Elements) a.p());
         }
 
@@ -3563,7 +3563,7 @@ public class Parser {
     protected class ValueRangeParser extends ListRuleParser<RangeNode> {
 
         public RangeNode parse() throws ParserException {
-            return parse(new SequenceParser(lowerEndpointParser, TokenType.Range, upperEndpointParser),
+            return parse(new SequenceParser(lowerEndpointParser, TokenType.RANGE, upperEndpointParser),
                     a -> new RangeNode(a.P(), a.n0(), a.n2()));
         }
 
@@ -3677,7 +3677,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public MultipleTypeConstraints parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.LBrace, typeConstraintsParser, TokenType.RBrace),
+    		return parse(new SequenceParser(TokenType.L_BRACE, typeConstraintsParser, TokenType.R_BRACE),
                     a -> new MultipleTypeConstraints(a.P(), a.n1(), false));
     	}
 
@@ -3688,8 +3688,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public MultipleTypeConstraints parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.LBrace, TokenType.Ellipsis, TokenType.Comma,
-                    typeConstraintsParser, TokenType.RBrace), a -> new MultipleTypeConstraints(a.P(), a.n3(), true));
+    		return parse(new SequenceParser(TokenType.L_BRACE, TokenType.ELLIPSIS, TokenType.COMMA,
+                    typeConstraintsParser, TokenType.R_BRACE), a -> new MultipleTypeConstraints(a.P(), a.n3(), true));
     	}
 
     }
@@ -3710,7 +3710,7 @@ public class Parser {
     protected class NamedConstraintParser extends ListRuleParser<NamedConstraint> {
 
     	public NamedConstraint parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.Identifier, componentConstraintParser),
+    		return parse(new SequenceParser(TokenType.IDENTIFIER, componentConstraintParser),
                     a -> new NamedConstraint(a.P(), a.s0(), a.n1()));
     	}
 
@@ -3784,9 +3784,9 @@ public class Parser {
     	@SuppressWarnings("unchecked")
         public PropertySettingsConstraint parse() throws ParserException {
             return parse(new SequenceParser(TokenType.SETTINGS_KW,
-                            new SingleTokenParser(TokenType.Quotation, Context.PropertySettings),
+                            new SingleTokenParser(TokenType.QUOTATION, Context.PropertySettings),
                             new RepetitionParser<>(propertyAndSettingPairParser),
-                            new SingleTokenParser(TokenType.Quotation, Context.PropertySettings)),
+                            new SingleTokenParser(TokenType.QUOTATION, Context.PropertySettings)),
                     a -> new PropertySettingsConstraint(a.P(), a.n2()));
         }
 
@@ -3811,7 +3811,7 @@ public class Parser {
                 .build();
 
     	public PropertyAndSettingNode parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.TypeReference, TokenType.Equals, TokenType.TypeReference), a -> {
+    		return parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.EQUALS, TokenType.TYPE_REFERENCE), a -> {
                 Token propertyToken = a.t0();
                 Token settingToken = a.t2();
                 String property = a.s0();
@@ -3875,8 +3875,8 @@ public class Parser {
     protected class ConstraintParser extends ListRuleParser<Constraint> {
 
     	public Constraint parse() throws ParserException {
-    		return parse(new SequenceParser(new boolean[] { true, true, false, true }, TokenType.LParen,
-                    constraintSpecParser, exceptionSpecParser, TokenType.RParen), a -> {
+    		return parse(new SequenceParser(new boolean[] { true, true, false, true }, TokenType.L_PAREN,
+                    constraintSpecParser, exceptionSpecParser, TokenType.R_PAREN), a -> {
                 AbstractConstraint constraint = a.n1();
 
                 if (a.n2() != null) {
@@ -3925,7 +3925,7 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public ObjectClassReferenceNode parse() throws ParserException {
     	    return parse(new ChoiceParser<>(externalObjectClassReferenceParser,
-                    new SingleTokenParser(TokenType.ObjectClassReference, Context.ObjectClass),
+                    new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.ObjectClass),
                     usefulObjectClassReferenceParser),
                     a -> a.n() instanceof  Token ? new ObjectClassReferenceNode(a.P(), a.s())
                             : (ObjectClassReferenceNode) a.n());
@@ -3937,8 +3937,8 @@ public class Parser {
     protected class ExternalObjectClassReferenceParser extends ListRuleParser<ExternalObjectClassReferenceNode> {
 
     	public ExternalObjectClassReferenceNode parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.TypeReference, TokenType.Dot,
-                    new SingleTokenParser(TokenType.ObjectClassReference, Context.ObjectClass)),
+    	    return parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.DOT,
+                    new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.ObjectClass)),
                     a -> new ExternalObjectClassReferenceNode(a.P0(), a.s0(),a.s2()));
     	}
 
@@ -3980,8 +3980,8 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public ObjectClassDefn parse() throws ParserException {
     	    return parse(new SequenceParser(new boolean[] { true, true, true, true, false },
-                    TokenType.CLASS_KW, TokenType.LBrace, new CommaSeparatedRuleParser<>(fieldSpecParser),
-                    TokenType.RBrace, withSyntaxSpecParser),
+                    TokenType.CLASS_KW, TokenType.L_BRACE, new CommaSeparatedRuleParser<>(fieldSpecParser),
+                    TokenType.R_BRACE, withSyntaxSpecParser),
                     a -> new ObjectClassDefn(a.P(), a.n2(), a.n4()));
     	}
 
@@ -4015,17 +4015,17 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public PrimitiveFieldNameNode parse() throws ParserException {
-    		Token rule = new ChoiceParser<>(new SingleTokenParser(TokenType.TypeFieldReference, Context.TypeField),
-    				new SingleTokenParser(TokenType.ValueFieldReference, Context.ValueField)).parse();
+    		Token rule = new ChoiceParser<>(new SingleTokenParser(TokenType.TYPE_FIELD_REFERENCE, Context.TypeField),
+    				new SingleTokenParser(TokenType.VALUE_FIELD_REFERENCE, Context.ValueField)).parse();
 
             if (rule != null) {
                 String reference = rule.getText().substring(1);
 
                 switch (rule.getType()) {
-                    case TypeFieldReference:
-                        return new PrimitiveFieldNameNode(rule.getPosition(), reference, TokenType.TypeFieldReference);
-                    case ValueFieldReference:
-                        return new PrimitiveFieldNameNode(rule.getPosition(), reference, TokenType.ValueFieldReference);
+                    case TYPE_FIELD_REFERENCE:
+                        return new PrimitiveFieldNameNode(rule.getPosition(), reference, TokenType.TYPE_FIELD_REFERENCE);
+                    case VALUE_FIELD_REFERENCE:
+                        return new PrimitiveFieldNameNode(rule.getPosition(), reference, TokenType.VALUE_FIELD_REFERENCE);
                 }
             }
 
@@ -4039,7 +4039,7 @@ public class Parser {
 
     	public FieldNameNode parse() throws ParserException {
     		List<PrimitiveFieldNameNode> rule = new TokenSeparatedRuleParser<>(primitiveFieldNameParser,
-                    TokenType.Dot).parse();
+                    TokenType.DOT).parse();
 
     		if (rule != null) {
     			return new FieldNameNode(getPosition(rule), rule);
@@ -4055,7 +4055,7 @@ public class Parser {
 
     	public TypeFieldSpecNode parse() throws ParserException {
     	    return parse(new SequenceParser(new boolean[] { true, true, false },
-                    TokenType.Ampersand, TokenType.TypeReference, typeOptionalitySpecParser),
+                    TokenType.AMPERSAND, TokenType.TYPE_REFERENCE, typeOptionalitySpecParser),
                     a -> new TypeFieldSpecNode(a.P0(), a.s1(),a.n2()));
     	}
 
@@ -4093,7 +4093,7 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public FieldSpecNode parse() throws ParserException {
     	    return parse(new SequenceParser(new boolean[] { true, true, true, false, false },
-                    TokenType.Ampersand, TokenType.Identifier,
+                    TokenType.AMPERSAND, TokenType.IDENTIFIER,
                     new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
                     TokenType.UNIQUE_KW, optionalitySpecParser),
                     a -> {
@@ -4179,7 +4179,7 @@ public class Parser {
 
     	public VariableTypeValueFieldSpecNode parse() throws ParserException {
     	    return parse(new SequenceParser(new boolean[] { true, true, true, false },
-                    TokenType.Ampersand, TokenType.Identifier, fieldNameParser, valueOptionalitySpecParser),
+                    TokenType.AMPERSAND, TokenType.IDENTIFIER, fieldNameParser, valueOptionalitySpecParser),
                     a -> new VariableTypeValueFieldSpecNode(a.P(), a.s1(),a.n2(), a.n3()));
     	}
 
@@ -4193,8 +4193,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public SetFieldSpecNode parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(new boolean[] { true, true, true, false }, TokenType.Ampersand,
-    				TokenType.TypeReference, new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
+    		List<Object> rule = new SequenceParser(new boolean[] { true, true, true, false }, TokenType.AMPERSAND,
+    				TokenType.TYPE_REFERENCE, new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
     				setOptionalitySpecParser).parse();
 
     		if (rule != null) {
@@ -4307,7 +4307,7 @@ public class Parser {
 
     	public VariableTypeValueSetFieldSpecNode parse() throws ParserException {
     	    return parse(new SequenceParser(new boolean[] { true, true, true, false },
-                    TokenType.Ampersand, TokenType.TypeReference, fieldNameParser, valueSetOptionalitySpecParser),
+                    TokenType.AMPERSAND, TokenType.TYPE_REFERENCE, fieldNameParser, valueSetOptionalitySpecParser),
                     a -> new VariableTypeValueSetFieldSpecNode(a.P(), a.s1(), a.n2(), a.n3()));
     	}
 
@@ -4327,8 +4327,8 @@ public class Parser {
     protected class SyntaxListParser implements RuleParser<List<TokenOrGroup>> {
 
     	public List<TokenOrGroup> parse() throws ParserException {
-            return new ValueExtractor<List<TokenOrGroup>>(1, new SequenceParser(TokenType.LBrace,
-                    new RepetitionParser<>(tokenOrGroupSpecParser), TokenType.RBrace)).parse();
+            return new ValueExtractor<List<TokenOrGroup>>(1, new SequenceParser(TokenType.L_BRACE,
+                    new RepetitionParser<>(tokenOrGroupSpecParser), TokenType.R_BRACE)).parse();
         }
 
     }
@@ -4349,9 +4349,9 @@ public class Parser {
     	public Group parse() throws ParserException {
     		List<TokenOrGroup> rule = new ValueExtractor<List<TokenOrGroup>>(1,
     				new SequenceParser(new SingleTokenParser(
-    						TokenType.LBracket, Context.Syntax),
+    						TokenType.L_BRACKET, Context.Syntax),
     						new RepetitionParser<>(tokenOrGroupSpecParser),
-    						new SingleTokenParser(TokenType.RBracket, Context.Syntax))).parse();
+    						new SingleTokenParser(TokenType.R_BRACKET, Context.Syntax))).parse();
 
     		if (rule != null) {
     			return new Group(getPosition(rule), rule);
@@ -4396,12 +4396,12 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public LiteralNode parse() throws ParserException {
             Token token = new ChoiceParser<>(new ValueExtractor<>(0,
-                    new SequenceParser(new SingleTokenParser(TokenType.Word, Context.Syntax),
-                            new NegativeLookaheadParser(TokenType.Dot))),
-                    new SingleTokenParser(TokenType.Comma)).parse();
+                    new SequenceParser(new SingleTokenParser(TokenType.WORD, Context.Syntax),
+                            new NegativeLookaheadParser(TokenType.DOT))),
+                    new SingleTokenParser(TokenType.COMMA)).parse();
 
     		if (token != null) {
-    			if (TokenType.Word == token.getType()) {
+    			if (TokenType.WORD == token.getType()) {
     				if (invalidWords.contains(token.getText())) {
     					return null;
     				}
@@ -4423,7 +4423,7 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public ObjectReferenceNode parse() throws ParserException {
     		Object rule = new ChoiceParser<>(externalObjectReferenceParser,
-                    new SingleTokenParser(TokenType.Identifier)).parse();
+                    new SingleTokenParser(TokenType.IDENTIFIER)).parse();
 
     		if (rule != null) {
     			if (rule instanceof ExternalObjectReferenceNode) {
@@ -4444,8 +4444,8 @@ public class Parser {
     protected class ExternalObjectReferenceParser extends ListRuleParser<ExternalObjectReferenceNode> {
 
     	public ExternalObjectReferenceNode parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.TypeReference, TokenType.Dot,
-                    new SingleTokenParser(TokenType.Identifier)),
+    	    return parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.DOT,
+                    new SingleTokenParser(TokenType.IDENTIFIER)),
                     a -> new ExternalObjectReferenceNode(a.P(), a.s0(), a.s2())
             );
     	}
@@ -4496,9 +4496,9 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public DefaultSyntaxNode parse() throws ParserException {
     	    return parse(new SequenceParser(new boolean[] { true, false,	true },
-                    new SingleTokenParser(TokenType.LBrace),
+                    new SingleTokenParser(TokenType.L_BRACE),
                     new CommaSeparatedRuleParser<>(fieldSettingParser),
-                    new SingleTokenParser(TokenType.RBrace)),
+                    new SingleTokenParser(TokenType.R_BRACE)),
                     a -> new DefaultSyntaxNode(a.P(), a.n1()));
     	}
 
@@ -4520,7 +4520,7 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public DefinedSyntaxNode parse() throws ParserException {
     	    return parse(new SequenceParser(new boolean[] { true, false, true },
-                    TokenType.LBrace, new RepetitionParser<>(definedSyntaxTokenParser), TokenType.RBrace),
+                    TokenType.L_BRACE, new RepetitionParser<>(definedSyntaxTokenParser), TokenType.R_BRACE),
                     a -> new DefinedSyntaxNode(a.P(), a.n1()));
     	}
 
@@ -4552,7 +4552,7 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public ObjectSetReferenceNode parse() throws ParserException {
     		Object rule = new ChoiceParser<>(externalObjectSetReferenceParser,
-                    new SingleTokenParser(TokenType.TypeReference)).parse();
+                    new SingleTokenParser(TokenType.TYPE_REFERENCE)).parse();
 
     		if (rule != null) {
     			if (rule instanceof ExternalObjectSetReferenceNode) {
@@ -4573,7 +4573,7 @@ public class Parser {
     protected class ExternalObjectSetReferenceParser extends ListRuleParser<ExternalObjectSetReferenceNode> {
 
     	public ExternalObjectSetReferenceNode parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.TypeReference, TokenType.Dot, TokenType.TypeReference),
+    	    return parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.DOT, TokenType.TYPE_REFERENCE),
                     a -> new ExternalObjectSetReferenceNode(a.P0(), a.s0(), a.s2()));
     	}
 
@@ -4601,7 +4601,7 @@ public class Parser {
     protected class ObjectClassFieldTypeParser extends ListRuleParser<ObjectClassFieldTypeNode> {
 
     	public ObjectClassFieldTypeNode parse() throws ParserException {
-    	    return parse(new SequenceParser(definedObjectClassParser, TokenType.Dot, fieldNameParser),
+    	    return parse(new SequenceParser(definedObjectClassParser, TokenType.DOT, fieldNameParser),
                     a -> new ObjectClassFieldTypeNode(a.P(), a.n0(), a.n2()));
     	}
 
@@ -4621,7 +4621,7 @@ public class Parser {
     protected class OpenTypeFieldValParser extends ListRuleParser<OpenTypeFieldValue> {
 
     	public OpenTypeFieldValue parse() throws ParserException {
-    	    return parse (new SequenceParser(typeParser, TokenType.Colon, valueParser),
+    	    return parse (new SequenceParser(typeParser, TokenType.COLON, valueParser),
                     a -> new OpenTypeFieldValue(a.P(), a.n0(), a.n2()));
     	}
 
@@ -4671,7 +4671,7 @@ public class Parser {
     protected class TypeFromObjectsParser extends ListRuleParser<TypeFromObjects> {
 
     	public TypeFromObjects parse() throws ParserException {
-    	    return parse(new SequenceParser(referencedObjectsParser, TokenType.Dot, fieldNameParser),
+    	    return parse(new SequenceParser(referencedObjectsParser, TokenType.DOT, fieldNameParser),
                     a -> {
                         PrimitiveFieldNameNode lastField = a.<FieldNameNode>n2().getPrimitiveFieldNames()
                                 .get(a.<FieldNameNode>n2().getPrimitiveFieldNames().size() - 1);
@@ -4690,7 +4690,7 @@ public class Parser {
     protected class ValueFromObjectParser extends ListRuleParser<ValueFromObject> {
 
     	public ValueFromObject parse() throws ParserException {
-    	    return parse(new SequenceParser(referencedObjectsParser, TokenType.Dot, fieldNameParser),
+    	    return parse(new SequenceParser(referencedObjectsParser, TokenType.DOT, fieldNameParser),
                     a -> {
                         PrimitiveFieldNameNode lastField = a.<FieldNameNode>n2().getPrimitiveFieldNames()
                                 .get(a.<FieldNameNode>n2().getPrimitiveFieldNames().size() - 1);
@@ -4725,8 +4725,8 @@ public class Parser {
     	public UserDefinedConstraintNode parse() throws ParserException {
     	    return parse(new SequenceParser(
                     new boolean[] { true, true, true, false, true },
-                    TokenType.CONSTRAINED_KW, TokenType.BY_KW, TokenType.LBrace,
-                    new CommaSeparatedRuleParser<>(userDefinedConstraintParameterParser), TokenType.RBrace),
+                    TokenType.CONSTRAINED_KW, TokenType.BY_KW, TokenType.L_BRACE,
+                    new CommaSeparatedRuleParser<>(userDefinedConstraintParameterParser), TokenType.R_BRACE),
                     a -> new UserDefinedConstraintNode(a.P(), a.n3()));
     	}
 
@@ -4742,7 +4742,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public UserDefinedConstraintParamNode parse() throws ParserException {
-            Object rule = new ChoiceParser<>(new SequenceParser(governorParser, TokenType.Colon,
+            Object rule = new ChoiceParser<>(new SequenceParser(governorParser, TokenType.COLON,
                     new ChoiceParser<>(valueParser, objectParser)), typeParser, usefulObjectClassReferenceParser).parse();
 
     		if (rule != null) {
@@ -4796,8 +4796,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ComponentRelationConstraint parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.LBrace, definedObjectSetParser, TokenType.RBrace,
-                    TokenType.LBrace, new CommaSeparatedRuleParser<>(atNotationParser), TokenType.RBrace),
+    	    return parse(new SequenceParser(TokenType.L_BRACE, definedObjectSetParser, TokenType.R_BRACE,
+                    TokenType.L_BRACE, new CommaSeparatedRuleParser<>(atNotationParser), TokenType.R_BRACE),
                     a -> new ComponentRelationConstraint(a.P(), a.n1(), a.n4()));
     	}
 
@@ -4811,7 +4811,7 @@ public class Parser {
     		List<Object> rule = new ChoiceParser<>(
     				new SequenceParser(TokenType.AT, componentIdListParser),
     				new SequenceParser(new boolean[] { true, true, false, true },
-    						TokenType.AT, new SingleTokenParser(TokenType.Dot, Context.Level), levelParser,
+    						TokenType.AT, new SingleTokenParser(TokenType.DOT, Context.Level), levelParser,
     						componentIdListParser)).parse();
 
     		if (rule != null) {
@@ -4832,7 +4832,7 @@ public class Parser {
     protected class LevelParser extends ListRuleParser<Integer> {
 
     	public Integer parse() throws ParserException {
-    	    return parse(new RepetitionParser<>(new SingleTokenParser(TokenType.Dot, Context.Level)),
+    	    return parse(new RepetitionParser<>(new SingleTokenParser(TokenType.DOT, Context.Level)),
                     ListAccessor::size, 0);
     	}
 
@@ -4843,7 +4843,7 @@ public class Parser {
 
     	public ComponentIdListNode parse() throws ParserException {
     		List<Token> rule = new TokenSeparatedRuleParser<>(
-    		        new SingleTokenParser(TokenType.Identifier), TokenType.Dot).parse();
+    		        new SingleTokenParser(TokenType.IDENTIFIER), TokenType.DOT).parse();
 
     		if (rule != null) {
     			return new ComponentIdListNode(getPosition(rule), rule);
@@ -4914,7 +4914,7 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ParameterizedTypeOrObjectClassAssignmentNode<?> parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.TypeReference, parameterListParser, TokenType.Assign,
+    		return parse(new SequenceParser(TokenType.TYPE_REFERENCE, parameterListParser, TokenType.ASSIGN,
                     new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser, objectClassDefnParser)),
                     a -> {
                         if (a.n3() instanceof ObjectClassDefn || a.n3() instanceof ObjectClassReferenceNode) {
@@ -4940,8 +4940,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ParameterizedValueOrObjectAssignmentNode<?, ?> parse() throws ParserException {
-    		List<Object> rule = new SequenceParser(TokenType.Identifier, parameterListParser,
-                    new ChoiceParser<>(typeParser,usefulObjectClassReferenceParser), TokenType.Assign,
+    		List<Object> rule = new SequenceParser(TokenType.IDENTIFIER, parameterListParser,
+                    new ChoiceParser<>(typeParser,usefulObjectClassReferenceParser), TokenType.ASSIGN,
                     new ChoiceParser<>(informationFromObjectsParser, valueParser, objectDefnParser)).parse();
 
     		if (rule != null) {
@@ -5021,8 +5021,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ParameterizedValueSetTypeAssignmentNode parse() throws ParserException {
-            return parse(new SequenceParser(TokenType.TypeReference, parameterListParser, typeParser,
-                    TokenType.Assign, valueSetParser),
+            return parse(new SequenceParser(TokenType.TYPE_REFERENCE, parameterListParser, typeParser,
+                    TokenType.ASSIGN, valueSetParser),
                     a -> new ParameterizedValueSetTypeAssignmentNode(a.P0(), a.s0(), a.n1(), a.n2(), a.n4()));
     	}
 
@@ -5034,8 +5034,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public ParameterizedObjectSetAssignmentNode parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.TypeReference, parameterListParser,
-                    definedObjectClassParser, TokenType.Assign, objectSetParser),
+    	    return parse(new SequenceParser(TokenType.TYPE_REFERENCE, parameterListParser,
+                    definedObjectClassParser, TokenType.ASSIGN, objectSetParser),
                     a -> new ParameterizedObjectSetAssignmentNode(a.P0(), a.s0(), a.n1(), a.n2(), a.n4()));
     	}
 
@@ -5046,8 +5046,8 @@ public class Parser {
 
     	public List<ParameterNode> parse() throws ParserException {
     		return new ValueExtractor<List<ParameterNode>>(1,
-    				new SequenceParser(TokenType.LBrace,
-    						new CommaSeparatedRuleParser<>(parameterParser), TokenType.RBrace)).parse();
+    				new SequenceParser(TokenType.L_BRACE,
+    						new CommaSeparatedRuleParser<>(parameterParser), TokenType.R_BRACE)).parse();
     	}
 
     }
@@ -5058,7 +5058,7 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public ParameterNode parse() throws ParserException {
     		List<Object> rule = new ChoiceParser<>(
-    				new SequenceParser(paramGovernorParser, TokenType.Colon,dummyReferenceParser),
+    				new SequenceParser(paramGovernorParser, TokenType.COLON,dummyReferenceParser),
                     new SequenceParser(dummyReferenceParser)).parse();
 
     		if (rule != null) {
@@ -5142,7 +5142,7 @@ public class Parser {
     	@SuppressWarnings("unchecked")
     	public SimpleDefinedValue parse() throws ParserException {
     		Object rule = new ChoiceParser<>(
-    				externalValueReferenceParser, new SingleTokenParser(TokenType.Identifier)).parse();
+    				externalValueReferenceParser, new SingleTokenParser(TokenType.IDENTIFIER)).parse();
 
     		if (rule != null) {
     			if (rule instanceof Token) {
@@ -5220,8 +5220,8 @@ public class Parser {
 
     	@SuppressWarnings("unchecked")
     	public List<Node> parse() throws ParserException {
-    	    return parse(new SequenceParser(TokenType.LBrace,
-                    new CommaSeparatedRuleParser<>(actualParameterParser), TokenType.RBrace),
+    	    return parse(new SequenceParser(TokenType.L_BRACE,
+                    new CommaSeparatedRuleParser<>(actualParameterParser), TokenType.R_BRACE),
                     ListAccessor::n1);
     	}
 

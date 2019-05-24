@@ -38,7 +38,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 public class TypeReferenceCompiler implements NamedCompiler<TypeReference, CompiledType> {
 
-    public CompiledType compile(CompilerContext ctx, String name, TypeReference node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, TypeReference node) {
         JavaClass javaClass = ctx.createClass(name, node, isConstructed(ctx, name));
 
         ConstraintDefinition constraintDef = ctx.compileConstraint(javaClass, name, node);
@@ -65,11 +65,7 @@ public class TypeReferenceCompiler implements NamedCompiler<TypeReference, Compi
             return true;
         }
 
-        if (ctx.isBuiltin(ctx.getBase(base).getClass().getSimpleName())) {
-            return false;
-        }
-
-        return true;
+        return !ctx.isBuiltin(ctx.getBase(base).getClass().getSimpleName());
     }
 
 }
