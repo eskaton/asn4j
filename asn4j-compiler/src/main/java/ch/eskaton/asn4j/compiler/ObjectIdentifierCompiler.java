@@ -32,7 +32,8 @@ import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 
 public class ObjectIdentifierCompiler implements NamedCompiler<ObjectIdentifier, CompiledType> {
 
-    public CompiledType compile(CompilerContext ctx, String name, ObjectIdentifier node) throws CompilerException {
+    @Override
+    public CompiledType compile(CompilerContext ctx, String name, ObjectIdentifier node) {
         ctx.createClass(name, node, false);
         ctx.finishClass();
 

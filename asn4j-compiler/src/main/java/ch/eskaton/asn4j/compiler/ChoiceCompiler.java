@@ -57,7 +57,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
     private static final String CHOICE_FIELD = "choice";
 
-    public CompiledType compile(CompilerContext ctx, String name, Choice node) throws CompilerException {
+    @Override
+    public CompiledType compile(CompilerContext ctx, String name, Choice node) {
         JavaClass javaClass = ctx.createClass(name, node, true);
         List<String> fieldNames = new ArrayList<>();
         JavaEnum typeEnum = new JavaEnum(CHOICE_ENUM);
@@ -92,7 +93,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
     }
 
     private String compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,
-            String typeConstant, String beforeCode) throws CompilerException {
+            String typeConstant, String beforeCode) {
         String name = CompilerUtils.formatName(namedType.getName());
         String typeName = ctx.getTypeName(namedType);
         Tag tag = namedType.getType().getTag();

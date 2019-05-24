@@ -33,7 +33,8 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 
 public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledType> {
 
-    public CompiledType compile(CompilerContext ctx, String name, SequenceType node) throws CompilerException {
+    @Override
+    public CompiledType compile(CompilerContext ctx, String name, SequenceType node) {
         ctx.createClass(name, node, true);
 
         for (ComponentType component : node.getAllComponents()) {

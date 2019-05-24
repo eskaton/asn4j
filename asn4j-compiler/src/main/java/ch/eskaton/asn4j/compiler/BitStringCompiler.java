@@ -41,7 +41,7 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, BitString node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, BitString node) {
         JavaClass javaClass = ctx.createClass(name, node, false);
         Collection<NamedBitNode> namedBits = node.getNamedBits();
         IdentifierUniquenessChecker<Long> iuc = new IdentifierUniquenessChecker<>(name);

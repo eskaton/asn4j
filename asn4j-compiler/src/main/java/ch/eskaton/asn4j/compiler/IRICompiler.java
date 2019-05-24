@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.parser.ast.types.IRI;
 public class IRICompiler implements NamedCompiler<IRI, CompiledType> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, IRI node) throws CompilerException {
+    public CompiledType compile(CompilerContext ctx, String name, IRI node) {
         ctx.createClass(name, node, false);
         ctx.finishClass();
 

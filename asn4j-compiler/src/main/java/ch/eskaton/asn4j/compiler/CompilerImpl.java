@@ -45,12 +45,13 @@ import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Stack;
 
 public class CompilerImpl {
 
@@ -58,13 +59,13 @@ public class CompilerImpl {
 
     private String[] includePath;
 
-    private Map<String, ModuleNode> modules = new HashMap<String, ModuleNode>();
+    private Map<String, ModuleNode> modules = new HashMap<>();
 
     private CompilerContext compilerContext;
 
-    private Stack<AssignmentNode> assignments;
+    private Deque<AssignmentNode> assignments;
 
-    public static void main(String[] args) throws IOException, ParserException, CompilerException {
+    public static void main(String[] args) throws IOException, ParserException {
         if (args.length != 4) {
             System.err.println("Usage: ASN1Compiler <ASN1Module> <Include-Path> <Java-Package> <Output-Dir>");
             System.exit(1);
@@ -80,7 +81,7 @@ public class CompilerImpl {
         compilerContext = new CompilerContext(this, pkg, outputDir);
     }
 
-    public void run() throws IOException, ParserException, CompilerException {
+    public void run() throws IOException, ParserException {
         long begin = System.currentTimeMillis();
 
         module = stripExtension(module);
@@ -93,7 +94,7 @@ public class CompilerImpl {
                 (System.currentTimeMillis() - begin) / 1000.0) + "s");
     }
 
-    private void loadAndCompileModule(String moduleName) throws IOException, ParserException, CompilerException {
+    private void loadAndCompileModule(String moduleName) throws IOException, ParserException {
         load(moduleName);
 
         try {
@@ -104,8 +105,7 @@ public class CompilerImpl {
         }
     }
 
-    private void compileModule(String moduleName, Set<String> neededSymbols)
-            throws CompilerException, IOException, ParserException {
+    private void compileModule(String moduleName, Set<String> neededSymbols) throws IOException, ParserException {
         System.out.println("Compiling module " + moduleName + "...");
 
         ModuleNode module = modules.get(moduleName);
@@ -114,11 +114,11 @@ public class CompilerImpl {
         compileBody(neededSymbols, module);
     }
 
-    private void compileBody(Set<String> neededSymbols, ModuleNode module) throws CompilerException {
+    private void compileBody(Set<String> neededSymbols, ModuleNode module) {
         ModuleBodyNode moduleBody = module.getBody();
 
         if (moduleBody != null) {
-            assignments = new Stack<>();
+            assignments = new LinkedList<>();
             assignments.addAll(moduleBody.getAssignments());
 
             while (!assignments.isEmpty()) {
@@ -127,7 +127,7 @@ public class CompilerImpl {
         }
     }
 
-    private void compileAssignment(AssignmentNode assignment) throws CompilerException {
+    private void compileAssignment(AssignmentNode assignment) {
         if (assignment instanceof TypeAssignmentNode) {
             compileTypeAssignment((TypeAssignmentNode) assignment);
         } else if (assignment instanceof ValueAssignmentNode) {
@@ -159,7 +159,7 @@ public class CompilerImpl {
         // TODO Auto-generated method stub
     }
 
-    private void compileImports(ModuleNode module) throws IOException, ParserException, CompilerException {
+    private void compileImports(ModuleNode module) throws IOException, ParserException {
         List<ImportNode> imports = module.getBody().getImports();
 
         for (ImportNode imp : imports) {

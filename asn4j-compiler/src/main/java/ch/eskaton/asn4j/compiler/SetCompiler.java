@@ -39,7 +39,8 @@ import java.util.function.Function;
 
 public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
 
-    public CompiledType compile(CompilerContext ctx, String name, SetType node) throws CompilerException {
+    @Override
+    public CompiledType compile(CompilerContext ctx, String name, SetType node) {
         HashMap<TagId, ComponentType> seenTags = new HashMap<>();
 
         ctx.createClass(name, node, true);

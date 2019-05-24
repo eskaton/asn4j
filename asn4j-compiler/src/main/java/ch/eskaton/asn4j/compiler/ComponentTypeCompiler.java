@@ -52,7 +52,7 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
-    public void compile(CompilerContext ctx, ComponentType node) throws CompilerException {
+    public void compile(CompilerContext ctx, ComponentType node) {
 
         TagMode mode = ctx.getModule().getTagMode();
 
@@ -72,8 +72,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         }
     }
 
-    private void compileComponentNamedType(CompilerContext ctx, ComponentType component, NamedType namedType)
-            throws CompilerException {
+    private void compileComponentNamedType(CompilerContext ctx, ComponentType component, NamedType namedType) {
         JavaClass javaClass = ctx.getCurrentClass();
         Type type = namedType.getType();
         TaggingMode taggingMode = type.getTaggingMode();
@@ -99,8 +98,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         javaClass.addField(field);
     }
 
-    private Collection<String> compileComponentType(CompilerContext ctx, TagMode mode, Type type)
-            throws CompilerException {
+    private Collection<String> compileComponentType(CompilerContext ctx, TagMode mode, Type type) {
         TypeAssignmentNode assignment;
 
         if (type instanceof TypeReference) {

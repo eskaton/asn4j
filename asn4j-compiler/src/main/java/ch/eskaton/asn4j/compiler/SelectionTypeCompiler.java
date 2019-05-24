@@ -38,7 +38,8 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 public class SelectionTypeCompiler implements NamedCompiler<SelectionType, CompiledType> {
 
-    public CompiledType compile(CompilerContext ctx, String name, SelectionType node) throws CompilerException {
+    @Override
+    public CompiledType compile(CompilerContext ctx, String name, SelectionType node) {
         AssignmentNode assignment;
 
         String selectedId = node.getId();
