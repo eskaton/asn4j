@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 import java.util.List;
 
+@SuppressWarnings("squid:S2187")
 public class AbstractTagsMatcherTest {
 
     List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
