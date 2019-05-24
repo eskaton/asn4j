@@ -47,7 +47,7 @@ public class Position {
 
     public static Position of(Object... objects) {
         for (Object object : objects) {
-            if (object != null && object instanceof SourcePosition) {
+            if (object instanceof SourcePosition) {
                 return ((SourcePosition) object).getPosition();
             }
         }

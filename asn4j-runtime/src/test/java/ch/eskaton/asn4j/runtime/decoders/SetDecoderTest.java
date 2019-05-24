@@ -66,15 +66,15 @@ public class SetDecoderTest {
 
         Map.Entry<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToType = getTagsToType(tagsToTypes, ASN1Integer.class);
 
-        checkTagsToTypeKey(tagsToType, 0, 0, Clazz.ContextSpecific);
-        checkTagsToTypeKey(tagsToType, 1, 2, Clazz.Universal);
+        checkTagsToTypeKey(tagsToType, 0, 0, Clazz.CONTEXT_SPECIFIC);
+        checkTagsToTypeKey(tagsToType, 1, 2, Clazz.UNIVERSAL);
 
         assertTrue(tagsToType.getValue().isAssignableFrom(ASN1Integer.class));
 
         tagsToType = getTagsToType(tagsToTypes, ASN1OctetString.class);
 
-        checkTagsToTypeKey(tagsToType, 0, 1, Clazz.ContextSpecific);
-        checkTagsToTypeKey(tagsToType, 1, 4, Clazz.Universal);
+        checkTagsToTypeKey(tagsToType, 0, 1, Clazz.CONTEXT_SPECIFIC);
+        checkTagsToTypeKey(tagsToType, 1, 4, Clazz.UNIVERSAL);
 
         assertTrue(tagsToType.getValue().isAssignableFrom(ASN1OctetString.class));
 
@@ -82,15 +82,15 @@ public class SetDecoderTest {
 
         Map.Entry<List<TagId>, Field> tagsToField = getTagsToField(tagsToFields, "a");
 
-        checkTagsToFieldKey(tagsToField, 0, 0, Clazz.ContextSpecific);
-        checkTagsToFieldKey(tagsToField, 1, 2, Clazz.Universal);
+        checkTagsToFieldKey(tagsToField, 0, 0, Clazz.CONTEXT_SPECIFIC);
+        checkTagsToFieldKey(tagsToField, 1, 2, Clazz.UNIVERSAL);
 
         assertEquals("a", tagsToField.getValue().getName());
 
         tagsToField = getTagsToField(tagsToFields, "b");
 
-        checkTagsToFieldKey(tagsToField, 0, 1, Clazz.ContextSpecific);
-        checkTagsToFieldKey(tagsToField, 1, 4, Clazz.Universal);
+        checkTagsToFieldKey(tagsToField, 0, 1, Clazz.CONTEXT_SPECIFIC);
+        checkTagsToFieldKey(tagsToField, 1, 4, Clazz.UNIVERSAL);
 
         assertEquals("b", tagsToField.getValue().getName());
     }
@@ -111,8 +111,8 @@ public class SetDecoderTest {
 
         List<TagId> tags = mandatoryFields.stream().findFirst().get();
 
-        checkTagsToFieldKey(tags, 0, 0, Clazz.ContextSpecific);
-        checkTagsToFieldKey(tags, 1, 2, Clazz.Universal);
+        checkTagsToFieldKey(tags, 0, 0, Clazz.CONTEXT_SPECIFIC);
+        checkTagsToFieldKey(tags, 1, 2, Clazz.UNIVERSAL);
     }
 
     @Test

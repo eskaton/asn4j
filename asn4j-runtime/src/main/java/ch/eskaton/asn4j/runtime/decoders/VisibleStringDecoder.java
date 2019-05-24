@@ -30,7 +30,6 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
@@ -38,8 +37,7 @@ import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 public class VisibleStringDecoder implements TypeDecoder<ASN1VisibleString> {
 
     @Override
-    public void decode(DecoderStates states, DecoderState state, ASN1VisibleString obj)
-            throws ConstraintViolatedException {
+    public void decode(DecoderStates states, DecoderState state, ASN1VisibleString obj) {
         try {
             obj.setValue(new String(RuntimeUtils.getValue(states, state)));
         } catch (ASN1RuntimeException e) {

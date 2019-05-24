@@ -31,12 +31,12 @@ import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
 import ch.eskaton.asn4j.runtime.TagId;
-import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.lang.reflect.Field;
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 
 public class ChoiceDecoder {
 
-    public void decode(Decoder decoder, DecoderStates states, ASN1Choice obj) throws DecodingException {
+    public void decode(Decoder decoder, DecoderStates states, ASN1Choice obj) {
         Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = new HashMap<>();
         Map<List<TagId>, Field> tagsToFields = new HashMap<>();
 

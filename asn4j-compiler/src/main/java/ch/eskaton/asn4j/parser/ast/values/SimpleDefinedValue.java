@@ -27,15 +27,14 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-import java.util.List;
-
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.Token;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 import ch.eskaton.commons.utils.StringUtils;
+
+import java.util.List;
 
 public class SimpleDefinedValue extends DefinedValue implements	ParameterizedNode {
 

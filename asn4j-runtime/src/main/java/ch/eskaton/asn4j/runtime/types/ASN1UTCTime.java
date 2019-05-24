@@ -35,15 +35,12 @@ import ch.eskaton.asn4j.runtime.parsing.UTCTimeParser;
 
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 23, mode = ASN1Tag.Mode.Implicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 23, mode = ASN1Tag.Mode.IMPLICIT, constructed = false)
 public class ASN1UTCTime extends ASN1VisibleString {
 
     private static UTCTimeParser utcTimeParser = new UTCTimeParser();
 
     private DateTime dateTime;
-
-    public ASN1UTCTime() {
-    }
 
     public static ASN1UTCTime from(String dateTimeString) throws ASN1RuntimeException {
         ASN1UTCTime instance = new ASN1UTCTime();
@@ -53,10 +50,12 @@ public class ASN1UTCTime extends ASN1VisibleString {
         return instance;
     }
 
+    @Override
     public void setValue(String value) throws ASN1RuntimeException {
         this.dateTime = utcTimeParser.parse(value);
     }
 
+    @Override
     public String getValue() {
         StringBuilder sb = new StringBuilder();
 

@@ -442,11 +442,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -591,15 +593,15 @@ public class ParserTest {
     public void testTagDefaultParser() throws IOException, ParserException {
         TagDefaultParser parser = new Parser(new ByteArrayInputStream(
                 "EXPLICIT TAGS".getBytes())).new TagDefaultParser();
-        assertEquals(TagMode.Explicit, parser.parse());
+        assertEquals(TagMode.EXPLICIT, parser.parse());
 
         parser = new Parser(
                 new ByteArrayInputStream("IMPLICIT TAGS".getBytes())).new TagDefaultParser();
-        assertEquals(TagMode.Implicit, parser.parse());
+        assertEquals(TagMode.IMPLICIT, parser.parse());
 
         parser = new Parser(new ByteArrayInputStream(
                 "AUTOMATIC TAGS".getBytes())).new TagDefaultParser();
-        assertEquals(TagMode.Automatic, parser.parse());
+        assertEquals(TagMode.AUTOMATIC, parser.parse());
     }
 
     @Test
@@ -622,7 +624,7 @@ public class ParserTest {
         assertNotNull(result);
         assertNotNull(result.getExports());
         assertEquals(0, result.getImports().size());
-        assertNull(result.getAssignments());
+        assertTrue(result.getAssignments().isEmpty());
 
         parser = new Parser(
                 new ByteArrayInputStream(
@@ -633,9 +635,9 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getExports());
-        assertEquals(Mode.All, result.getExports().getMode());
+        assertEquals(Mode.ALL, result.getExports().getMode());
         assertFalse(0 == result.getImports().size());
-        assertNull(result.getAssignments());
+        assertTrue(result.getAssignments().isEmpty());
 
         parser = new Parser(new ByteArrayInputStream(
                 "value INTEGER ::= 23".getBytes())).new ModuleBodyParser();
@@ -644,9 +646,9 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getExports());
-        assertEquals(Mode.All, result.getExports().getMode());
+        assertEquals(Mode.ALL, result.getExports().getMode());
         assertEquals(0, result.getImports().size());
-        assertNotNull(result.getAssignments());
+        assertFalse(result.getAssignments().isEmpty());
         assertEquals(1, result.getAssignments().size());
 
         parser = new Parser(
@@ -658,9 +660,9 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getExports());
-        assertEquals(Mode.All, result.getExports().getMode());
+        assertEquals(Mode.ALL, result.getExports().getMode());
         assertFalse(0 == result.getImports().size());
-        assertNotNull(result.getAssignments());
+        assertFalse(result.getAssignments().isEmpty());
         assertEquals(1, result.getAssignments().size());
     }
 
@@ -672,7 +674,7 @@ public class ParserTest {
         ExportsNode result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(Mode.All, result.getMode());
+        assertEquals(Mode.ALL, result.getMode());
 
         parser = new Parser(new ByteArrayInputStream(
                 "EXPORTS value, Type{};".getBytes())).new ExportsParser();
@@ -680,7 +682,7 @@ public class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(Mode.Specific, result.getMode());
+        assertEquals(Mode.SPECIFIC, result.getMode());
         assertEquals(2, result.getSymbols().size());
     }
 
@@ -1746,7 +1748,7 @@ public class ParserTest {
         RealValue result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.Normal, result.getType());
+        assertEquals(RealValue.Type.NORMAL, result.getType());
         assertEquals(BigDecimal.valueOf(314), result.getValue());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -1755,7 +1757,7 @@ public class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.Special, result.getType());
+        assertEquals(RealValue.Type.SPECIAL, result.getType());
         assertEquals(Long.valueOf(23), result.getMantissa());
         assertEquals(Long.valueOf(2), result.getBase());
         assertEquals(Long.valueOf(-11), result.getExponent());
@@ -1766,7 +1768,7 @@ public class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.NegativeInf, result.getType());
+        assertEquals(RealValue.Type.NEGATIVE_INF, result.getType());
     }
 
     @Test
@@ -1778,7 +1780,7 @@ public class ParserTest {
         RealValue result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.Normal, result.getType());
+        assertEquals(RealValue.Type.NORMAL, result.getType());
         assertEquals(new BigDecimal("-1.5"), result.getValue());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -1787,7 +1789,7 @@ public class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.Special, result.getType());
+        assertEquals(RealValue.Type.SPECIAL, result.getType());
         assertEquals(Long.valueOf(3), result.getMantissa());
         assertEquals(Long.valueOf(10), result.getBase());
         assertEquals(Long.valueOf(5), result.getExponent());
@@ -1822,7 +1824,7 @@ public class ParserTest {
         RealValue result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.PositiveInf, result.getType());
+        assertEquals(RealValue.Type.POSITIVE_INF, result.getType());
 
         parser = new Parser(new ByteArrayInputStream(
                 "MINUS-INFINITY".getBytes())).new SpecialRealValueParser();
@@ -1830,14 +1832,14 @@ public class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.NegativeInf, result.getType());
+        assertEquals(RealValue.Type.NEGATIVE_INF, result.getType());
 
         parser = new Parser(new ByteArrayInputStream("NOT-A-NUMBER".getBytes())).new SpecialRealValueParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.NaN, result.getType());
+        assertEquals(RealValue.Type.NAN, result.getType());
     }
 
     /**
@@ -2333,7 +2335,7 @@ public class ParserTest {
 
         assertNotNull(result);
 
-        assertEquals(ComponentType.CompType.NamedType, result.getCompType());
+        assertEquals(ComponentType.CompType.NAMED_TYPE, result.getCompType());
 
         NamedType namedType = result.getNamedType();
 
@@ -2347,7 +2349,7 @@ public class ParserTest {
 
         assertNotNull(result);
 
-        assertEquals(ComponentType.CompType.NamedTypeOpt, result.getCompType());
+        assertEquals(ComponentType.CompType.NAMED_TYPE_OPT, result.getCompType());
 
         namedType = result.getNamedType();
 
@@ -2361,7 +2363,7 @@ public class ParserTest {
 
         assertNotNull(result);
 
-        assertEquals(ComponentType.CompType.NamedTypeDef, result.getCompType());
+        assertEquals(ComponentType.CompType.NAMED_TYPE_DEF, result.getCompType());
 
         namedType = result.getNamedType();
 
@@ -4090,7 +4092,7 @@ public class ParserTest {
         ElementSet result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(OpType.All, result.getOperation());
+        assertEquals(OpType.ALL, result.getOperation());
 
         parser = new Parser(new ByteArrayInputStream(
                 "true UNION false".getBytes())).new ElementSetSpecParser();
@@ -4109,7 +4111,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ElementSet);
-        assertEquals(OpType.Union, ((ElementSet) result).getOperation());
+        assertEquals(OpType.UNION, ((ElementSet) result).getOperation());
     }
 
     @Test
@@ -4121,7 +4123,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ElementSet);
-        assertEquals(OpType.Intersection, ((ElementSet) result).getOperation());
+        assertEquals(OpType.INTERSECTION, ((ElementSet) result).getOperation());
 
         parser = new Parser(new ByteArrayInputStream(
                 "(1 .. 40) INTERSECTION (ALL EXCEPT (20..50))".getBytes())).new IntersectionsParser();
@@ -4130,7 +4132,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ElementSet);
-        assertEquals(OpType.Intersection, ((ElementSet) result).getOperation());
+        assertEquals(OpType.INTERSECTION, ((ElementSet) result).getOperation());
     }
 
     @Test
@@ -4150,7 +4152,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ElementSet);
-        assertEquals(OpType.Exclude, ((ElementSet) result).getOperation());
+        assertEquals(OpType.EXCLUDE, ((ElementSet) result).getOperation());
     }
 
     @Test
@@ -4579,7 +4581,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getValue());
-        assertEquals(PresenceConstraint.Type.Optional, result.getPresence()
+        assertEquals(PresenceConstraint.Type.OPTIONAL, result.getPresence()
                 .getType());
     }
 
@@ -4602,21 +4604,21 @@ public class ParserTest {
         PresenceConstraint result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(PresenceConstraint.Type.Present, result.getType());
+        assertEquals(PresenceConstraint.Type.PRESENT, result.getType());
 
         parser = new Parser(new ByteArrayInputStream("ABSENT".getBytes())).new PresenceConstraintParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(PresenceConstraint.Type.Absent, result.getType());
+        assertEquals(PresenceConstraint.Type.ABSENT, result.getType());
 
         parser = new Parser(new ByteArrayInputStream("OPTIONAL".getBytes())).new PresenceConstraintParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(PresenceConstraint.Type.Optional, result.getType());
+        assertEquals(PresenceConstraint.Type.OPTIONAL, result.getType());
     }
 
     @Test

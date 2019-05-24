@@ -29,21 +29,16 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier.verifyComponents;
-
-@ASN1Tag(clazz = Clazz.Universal, tag = 13, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 13, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1RelativeOID extends AbstractASN1OID {
 
-    public static ASN1RelativeOID from(int... components) throws ValidationException {
+    public static ASN1RelativeOID from(int... components) {
         ASN1RelativeOID oid = new ASN1RelativeOID();
 
         oid.setValue(components);
@@ -51,7 +46,7 @@ public class ASN1RelativeOID extends AbstractASN1OID {
         return oid;
     }
 
-    public static ASN1RelativeOID from(List<Integer> components) throws ValidationException {
+    public static ASN1RelativeOID from(List<Integer> components) {
         ASN1RelativeOID oid = new ASN1RelativeOID();
 
         oid.setValue(components);
@@ -59,7 +54,7 @@ public class ASN1RelativeOID extends AbstractASN1OID {
         return oid;
     }
 
-    protected ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) throws ValidationException {
+    protected ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) {
         return components;
     }
 

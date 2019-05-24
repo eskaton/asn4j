@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 9, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 9, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1Real implements ASN1Type {
 
     public enum Type {
@@ -62,8 +62,7 @@ public class ASN1Real implements ASN1Type {
         this.type = type;
     }
 
-    protected boolean checkConstraint(BigDecimal value)
-            throws ConstraintViolatedException {
+    protected boolean checkConstraint(BigDecimal value) {
         return true;
     }
 
@@ -71,7 +70,7 @@ public class ASN1Real implements ASN1Type {
         return value;
     }
 
-    public void setValue(BigDecimal value) throws ConstraintViolatedException {
+    public void setValue(BigDecimal value) {
         if (!checkConstraint(value)) {
             throw new ConstraintViolatedException(String.format("%d doesn't satisfy a constraint", value));
         }
@@ -89,7 +88,7 @@ public class ASN1Real implements ASN1Type {
         this.value = null;
     }
 
-    public static ASN1Real valueOf(double d) throws ConstraintViolatedException {
+    public static ASN1Real valueOf(double d) {
         ASN1Real value = new ASN1Real();
         value.setValue(new BigDecimal(d));
         return value;

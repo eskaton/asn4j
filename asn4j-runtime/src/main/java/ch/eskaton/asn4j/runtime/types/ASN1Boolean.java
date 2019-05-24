@@ -33,12 +33,12 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 1, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1Boolean implements ASN1Type {
 
-    public static ASN1Boolean TRUE = new ASN1Boolean(true);
+    public static final ASN1Boolean TRUE = new ASN1Boolean(true);
 
-    public static ASN1Boolean FALSE = new ASN1Boolean(false);
+    public static final ASN1Boolean FALSE = new ASN1Boolean(false);
 
     protected Boolean value;
 

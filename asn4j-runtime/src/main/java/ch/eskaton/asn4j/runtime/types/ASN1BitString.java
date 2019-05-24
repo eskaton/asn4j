@@ -38,7 +38,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 3, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1BitString implements ASN1Type {
 
     protected byte[] value = new byte[0];

@@ -62,7 +62,9 @@ public class CollectionOfValue extends CollectionValue {
         List<Value> values = getValues();
 
         if (values.size() != 2) {
-            return isTuple = false;
+            isTuple = false;
+
+            return isTuple;
         }
 
         int pos = 0;
@@ -72,11 +74,15 @@ public class CollectionOfValue extends CollectionValue {
                     || ((IntegerValue) value).isReference()
                     || ((IntegerValue) value).getValue().compareTo(BigInteger.ZERO) < 0
                     || ((IntegerValue) value).getValue().compareTo(MAX_TUPLE_VALUES[pos++]) > 0) {
-                return isTuple = false;
+                isTuple = false;
+
+                return isTuple;
             }
         }
 
-        return isTuple = true;
+        isTuple = true;
+
+        return isTuple;
     }
 
     public TupleNode toTuple() {
@@ -97,7 +103,9 @@ public class CollectionOfValue extends CollectionValue {
         List<Value> values = getValues();
 
         if (values.size() != 4) {
-            return isQuadruple = false;
+            isQuadruple = false;
+
+            return isQuadruple;
         }
 
         int pos = 0;
@@ -107,11 +115,15 @@ public class CollectionOfValue extends CollectionValue {
                     || ((IntegerValue) value).isReference()
                     || ((IntegerValue) value).getValue().compareTo(BigInteger.ZERO) < 0
                     || ((IntegerValue) value).getValue().compareTo(MAX_QUADRUPLE_VALUES[pos++]) > 0) {
-                return isQuadruple = false;
+                isQuadruple = false;
+
+                return isQuadruple;
             }
         }
 
-        return isQuadruple = true;
+        isQuadruple = true;
+
+        return isQuadruple;
     }
 
     public QuadrupleNode toQuadruple() {

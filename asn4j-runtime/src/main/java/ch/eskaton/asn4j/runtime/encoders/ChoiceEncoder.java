@@ -28,18 +28,19 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.utils.TLVUtils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.utils.TLVUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 
 public class ChoiceEncoder implements TypeEncoder<ASN1Choice> {
 
-    public byte[] encode(Encoder encoder, ASN1Choice obj) throws EncodingException {
+    @Override
+    public byte[] encode(Encoder encoder, ASN1Choice obj) {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
         ASN1Type value = obj.getValue();
@@ -62,7 +63,7 @@ public class ChoiceEncoder implements TypeEncoder<ASN1Choice> {
             } else {
                 content.write(encoder.encode(value));
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new EncodingException(e);
         }
 

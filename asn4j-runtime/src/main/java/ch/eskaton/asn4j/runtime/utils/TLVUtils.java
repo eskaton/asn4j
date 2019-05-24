@@ -41,15 +41,17 @@ public class TLVUtils {
 
     private static final double LOG10_2_DIV_8 = Math.log10(2) / 8;
 
-    public static byte[] getTagLength(ASN1Type obj, int contentLen)
-            throws EncodingException {
+    private TLVUtils() {
+    }
+
+    public static byte[] getTagLength(ASN1Type obj, int contentLen) {
         List<ASN1Tag> tags = RuntimeUtils.getTags(obj.getClass());
 
         return getTagLength(tags, contentLen);
     }
 
     public static byte[] getTagLength(ASN1Tag tag, ASN1Type obj, int contentLength) {
-        if (tag.mode() != ASN1Tag.Mode.Implicit) {
+        if (tag.mode() != ASN1Tag.Mode.IMPLICIT) {
             ArrayList<ASN1Tag> tags = new ArrayList<>();
 
             tags.add(tag);

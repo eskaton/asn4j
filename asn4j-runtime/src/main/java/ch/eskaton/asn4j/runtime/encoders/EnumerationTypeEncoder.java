@@ -28,15 +28,14 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 
 import java.math.BigInteger;
 
 public class EnumerationTypeEncoder implements TypeEncoder<ASN1EnumeratedType> {
 
-    public byte[] encode(Encoder encoder, ASN1EnumeratedType obj)
-            throws EncodingException {
+    @Override
+    public byte[] encode(Encoder encoder, ASN1EnumeratedType obj) {
         return BigInteger.valueOf(obj.getValue()).toByteArray();
     }
 

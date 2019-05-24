@@ -39,7 +39,7 @@ public class DefinedSyntaxNode extends ObjectSyntaxNode {
     public DefinedSyntaxNode(Position position, List<Node> nodes) {
     	super(position);
 
-    	this.nodes = nodes != null ? nodes : new ArrayList<Node>();
+    	this.nodes = nodes != null ? nodes : new ArrayList<>();
     }
 
     public List<Node> getNodes() {

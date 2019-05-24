@@ -1,5 +1,3 @@
-package ch.eskaton.asn4j.parser;
-
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
@@ -26,6 +24,8 @@ package ch.eskaton.asn4j.parser;
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+package ch.eskaton.asn4j.parser;
 
 import java.util.List;
 

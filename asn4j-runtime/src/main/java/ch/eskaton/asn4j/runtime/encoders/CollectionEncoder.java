@@ -28,11 +28,11 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
@@ -41,12 +41,13 @@ import java.util.List;
 public abstract class CollectionEncoder<T extends ASN1Type> implements
         TypeEncoder<T> {
 
-    public byte[] encode(Encoder encoder, T obj) throws EncodingException {
+    @Override
+    public byte[] encode(Encoder encoder, T obj) {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
         List<Field> compFields = RuntimeUtils.getComponents(obj);
 
-        if (compFields.size() > 0) {
+        if (!compFields.isEmpty()) {
             for (Field compField : compFields) {
                 ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
                 if (annotation != null) {
@@ -71,11 +72,9 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements
                                     compField.getName() + " missing");
 
                         }
-                    } catch (Throwable e) {
-                        if (e instanceof EncodingException) {
-                            throw (EncodingException) e;
-                        }
-
+                    } catch (EncodingException e) {
+                        throw e;
+                    } catch (Exception e) {
                         throw new EncodingException(e);
                     }
                 }

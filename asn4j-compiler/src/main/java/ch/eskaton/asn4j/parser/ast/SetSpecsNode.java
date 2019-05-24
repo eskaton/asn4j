@@ -29,7 +29,10 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.commons.utils.StringUtils;
+
+import static ch.eskaton.commons.utils.StringUtils.asString;
+import static ch.eskaton.commons.utils.StringUtils.concat;
+import static ch.eskaton.commons.utils.StringUtils.ifPresent;
 
 public class SetSpecsNode extends AbstractNode {
 
@@ -92,12 +95,12 @@ public class SetSpecsNode extends AbstractNode {
 
     @Override
     public String toString() {
-        return StringUtils.concat("SetSpecs[",
-                (rootElements != null ? String.valueOf(rootElements) : ""),
-                (extensionMarker ? (rootElements != null ? ", " : "") + "..."
-                        : ""), (extensionElements != null ? (extensionMarker
-                        || rootElements != null ? ", " : "")
-                        + extensionElements : ""), "]");
+        String rootElementsStr = asString(rootElements);
+        String extensionMarkerStr = ifPresent(extensionMarker, (ifPresent(rootElements, ", ")) + "...");
+        String commaStr = extensionMarker || rootElements != null ? ", " : "";
+        String extensionElementsStr = ifPresent(extensionElements, str -> commaStr + str);
+
+        return concat("SetSpecs[", rootElementsStr, extensionMarkerStr, extensionElementsStr, "]");
     }
 
 }

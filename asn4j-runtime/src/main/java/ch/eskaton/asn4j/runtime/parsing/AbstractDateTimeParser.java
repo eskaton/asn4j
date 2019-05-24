@@ -36,30 +36,31 @@ public class AbstractDateTimeParser {
     public static final Integer ZERO = Integer.valueOf(0);
 
     protected enum State {
-        Initial, Year, Month, Day, Hour, Minute, Second, HourFraction, MinuteFraction, SecondFraction, TimeZone, Accept, Error
+        INITIAL, YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, HOUR_FRACTION, MINUTE_FRACTION,
+        SECOND_FRACTION, TIME_ZONE, ACCEPT, ERROR
     }
 
     protected Integer parseYear(Context ctx) throws IOException, ASN1RuntimeException {
-        return parseComponent(ctx, State.Year, 4, null);
+        return parseComponent(ctx, State.YEAR, 4, null);
     }
 
     protected Integer parseMonth(Context ctx) throws IOException, ASN1RuntimeException {
-        return parseComponent(ctx, State.Month, 2, month ->
+        return parseComponent(ctx, State.MONTH, 2, month ->
                 new LessEqualVerifiyer("month", 12).verify(month));
     }
 
     protected Integer parseDay(Context ctx) throws IOException, ASN1RuntimeException {
-        return parseComponent(ctx, State.Day, 2, day ->
+        return parseComponent(ctx, State.DAY, 2, day ->
                 new LessEqualVerifiyer("day", 31).verify(day));
     }
 
     protected Integer parseHour(Context ctx) throws IOException, ASN1RuntimeException {
-        return parseComponent(ctx, State.Hour, 2, hour ->
+        return parseComponent(ctx, State.HOUR, 2, hour ->
                 new LessEqualVerifiyer("hour", 23).verify(hour));
     }
 
     protected Integer parseMinute(Context ctx) throws IOException, ASN1RuntimeException {
-        return parseComponent(ctx, State.Minute, 2, minute ->
+        return parseComponent(ctx, State.MINUTE, 2, minute ->
                 new LessEqualVerifiyer("minute", 59).verify(minute));
     }
 
@@ -76,7 +77,7 @@ public class AbstractDateTimeParser {
             return Integer.valueOf(component);
         }
 
-        ctx.setState(State.Error);
+        ctx.setState(State.ERROR);
 
         return null;
     }
@@ -116,7 +117,7 @@ public class AbstractDateTimeParser {
 
         private LexerInputStream is;
 
-        protected State state = State.Initial;
+        protected State state = State.INITIAL;
 
         Integer year = null;
 

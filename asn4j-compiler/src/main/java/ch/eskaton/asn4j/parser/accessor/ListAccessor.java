@@ -30,11 +30,10 @@ package ch.eskaton.asn4j.parser.accessor;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.Token;
 import ch.eskaton.asn4j.parser.Token.TokenType;
-import ch.eskaton.asn4j.parser.accessor.Accessor;
 
 import java.util.List;
 
-import static ch.eskaton.asn4j.parser.ParserUtils.*;
+import static ch.eskaton.asn4j.parser.ParserUtils.getPosition;
 
 public class ListAccessor<S> implements Accessor<List<S>> {
 

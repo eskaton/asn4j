@@ -40,7 +40,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 24, mode = ASN1Tag.Mode.Implicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 24, mode = ASN1Tag.Mode.IMPLICIT, constructed = false)
 public class ASN1GeneralizedTime extends ASN1VisibleString {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
@@ -54,9 +54,6 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
     private static GeneralizedTimeParser generalizedTimeParser = new GeneralizedTimeParser();
 
     private Temporal dateTime;
-
-    public ASN1GeneralizedTime() {
-    }
 
     public static ASN1GeneralizedTime from(LocalDateTime dateTime) throws ASN1RuntimeException {
         ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
@@ -82,6 +79,7 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
         return instance;
     }
 
+    @Override
     public void setValue(String value) throws ASN1RuntimeException {
         DateTime dateTime = generalizedTimeParser.parse(value);
         LocalDateTime localDateTime = LocalDateTime.of(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay(), dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond(), dateTime.getNanos());
@@ -97,6 +95,7 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
         }
     }
 
+    @Override
     public String getValue() {
         String date = DATE_FORMATTER.format(dateTime);
         String time = TIME_FORMATTER.format(dateTime);

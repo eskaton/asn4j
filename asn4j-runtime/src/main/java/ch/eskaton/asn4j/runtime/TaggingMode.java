@@ -28,5 +28,5 @@
 package ch.eskaton.asn4j.runtime;
 
 public enum TaggingMode {
-    Implicit, Explicit
+    IMPLICIT, EXPLICIT
 }

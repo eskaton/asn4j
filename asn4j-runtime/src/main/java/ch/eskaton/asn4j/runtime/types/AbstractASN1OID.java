@@ -23,6 +23,6 @@ public abstract class AbstractASN1OID implements ASN1Type {
         return components;
     }
 
-    abstract protected ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) throws ValidationException;
+    protected abstract ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) throws ValidationException;
 
 }

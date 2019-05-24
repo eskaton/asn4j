@@ -35,11 +35,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptySet;
+
 public class ModuleBodyNode extends AbstractNode {
 
     private ExportsNode exports;
 
-    private List<ImportNode> imports = new ArrayList<ImportNode>();
+    private List<ImportNode> imports = new ArrayList<>();
 
     private Map<String, AssignmentNode> assignments;
 
@@ -73,7 +75,7 @@ public class ModuleBodyNode extends AbstractNode {
         if (assignments != null) {
             return assignments.values();
         } else {
-            return null;
+            return emptySet();
         }
     }
 

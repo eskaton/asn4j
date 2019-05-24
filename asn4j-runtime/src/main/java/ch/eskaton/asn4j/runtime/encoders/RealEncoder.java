@@ -35,8 +35,8 @@ import java.math.BigDecimal;
 
 public class RealEncoder implements TypeEncoder<ASN1Real> {
 
-    public byte[] encode(Encoder encoder, ASN1Real obj)
-            throws EncodingException {
+    @Override
+    public byte[] encode(Encoder encoder, ASN1Real obj) {
         switch (obj.getType()) {
             case NORMAL:
                 break;
@@ -54,7 +54,7 @@ public class RealEncoder implements TypeEncoder<ASN1Real> {
                 return new byte[] { 0x43 };
 
             default:
-                throw new RuntimeException("Unsupported ASN1Real " + obj.toString());
+                throw new EncodingException("Unsupported ASN1Real " + obj.toString());
         }
 
         if (BigDecimal.ZERO.equals(obj.getValue())) {

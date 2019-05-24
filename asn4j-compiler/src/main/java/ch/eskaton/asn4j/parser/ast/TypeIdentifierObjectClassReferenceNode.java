@@ -36,6 +36,7 @@ public class TypeIdentifierObjectClassReferenceNode extends ObjectClassReference
         super(position, "TYPE-IDENTIFIER");
     }
 
+    @Override
     public String toString() {
         return StringUtils.concat(getClass().getSimpleName(), "[", getReference(), "]");
     }

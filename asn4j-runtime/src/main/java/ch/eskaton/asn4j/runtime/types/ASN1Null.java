@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 5, mode = ASN1Tag.Mode.Explicit, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 5, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1Null implements ASN1Type {
 
     @Override
@@ -51,11 +51,7 @@ public class ASN1Null implements ASN1Type {
             return true;
         }
 
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        return true;
+        return obj != null && getClass() == obj.getClass();
     }
 
 }

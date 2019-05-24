@@ -34,8 +34,8 @@ import java.math.BigDecimal;
 public class RealValue extends AbstractValue {
 
     public enum Type {
-    	PositiveInf, NegativeInf, NaN, Normal, Special
-    };
+        POSITIVE_INF, NEGATIVE_INF, NAN, NORMAL, SPECIAL
+    }
 
     private Type type;
 
@@ -56,14 +56,14 @@ public class RealValue extends AbstractValue {
     public RealValue(Position position, BigDecimal value) {
         super(position);
 
-    	this.type = Type.Normal;
+    	this.type = Type.NORMAL;
     	this.value = value;
     }
 
     public RealValue(Position position, Long mantissa, Long base, Long exponent) {
         super(position);
 
-    	this.type = Type.Special;
+    	this.type = Type.SPECIAL;
     	this.mantissa = mantissa;
     	this.base = base;
     	this.exponent = exponent;

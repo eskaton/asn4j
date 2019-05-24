@@ -57,7 +57,7 @@ public class TLV {
         TLV tlv = new TLV();
 
         tlv.clazz = Clazz.values()[(id >> 6) & 0x3];
-        tlv.constructed = ((id >> 5) & 0x1) == 1 ? true : false;
+        tlv.constructed = ((id >> 5) & 0x1) == 1;
         tlv.tag = id & 0x1f;
 
         if (tlv.tag == 0x1f) {

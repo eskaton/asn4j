@@ -68,7 +68,7 @@ public abstract class Collection extends AbstractType {
     }
 
     public List<ComponentType> getAllComponents() {
-    	List<ComponentType> components = new ArrayList<ComponentType>(2);
+    	List<ComponentType> components = new ArrayList<>(2);
     	if (rootComponents != null) {
     		components.addAll(rootComponents);
     	}

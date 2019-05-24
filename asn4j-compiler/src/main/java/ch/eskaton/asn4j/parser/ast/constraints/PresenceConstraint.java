@@ -33,7 +33,7 @@ import ch.eskaton.commons.utils.StringUtils;
 public class PresenceConstraint extends AbstractConstraint {
 
     public enum Type {
-    	Present, Absent, Optional
+        PRESENT, ABSENT, OPTIONAL
     }
 
     private Type type;

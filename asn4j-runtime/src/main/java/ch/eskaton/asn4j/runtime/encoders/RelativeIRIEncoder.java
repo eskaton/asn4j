@@ -28,14 +28,13 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.commons.utils.StringUtils;
 
 public class RelativeIRIEncoder implements TypeEncoder<ASN1RelativeIRI> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1RelativeIRI obj) throws EncodingException {
+    public byte[] encode(Encoder encoder, ASN1RelativeIRI obj) {
         return (StringUtils.join(obj.getValue(), "/")).getBytes();
     }
 

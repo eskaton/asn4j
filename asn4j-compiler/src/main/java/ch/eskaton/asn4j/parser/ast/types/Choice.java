@@ -50,7 +50,7 @@ public class Choice extends AbstractType {
         super(position);
 
     	this.rootTypeList = alternatives.getRootTypeList();
-    	this.ext = alternatives.getExtensionAndException() != null ? true : false;
+    	this.ext = alternatives.getExtensionAndException() != null;
     	this.exId = this.ext ? alternatives.getExtensionAndException().getExceptionId() : null;
     	this.extAddAlts = alternatives.getExtAddAlts();
     	this.optExtMarker = alternatives.hasOptExtMarker();

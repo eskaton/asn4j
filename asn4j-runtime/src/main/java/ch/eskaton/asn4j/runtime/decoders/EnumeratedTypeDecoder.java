@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.commons.utils.ReflectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -40,8 +40,7 @@ import java.math.BigInteger;
 public class EnumeratedTypeDecoder {
 
     @SuppressWarnings("unchecked")
-    public <T extends ASN1EnumeratedType> T decode(DecoderStates states, DecoderState state, Class<T> type)
-            throws DecodingException {
+    public <T extends ASN1EnumeratedType> T decode(DecoderStates states, DecoderState state, Class<T> type) {
         try {
             return (T) ReflectionUtils.invokeStaticMethod(type, "valueOf", new Object[] {
                     new BigInteger(RuntimeUtils.getValue(states, state)).intValue()

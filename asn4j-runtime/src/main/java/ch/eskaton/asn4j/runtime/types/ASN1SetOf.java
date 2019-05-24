@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.Universal, tag = 17, mode = ASN1Tag.Mode.Explicit, constructed = true)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
 public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<T> {
 
     @Override
