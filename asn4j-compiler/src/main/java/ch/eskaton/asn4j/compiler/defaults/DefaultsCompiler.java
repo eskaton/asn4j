@@ -41,8 +41,8 @@ import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.commons.collections.Maps;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.getTypeName;
@@ -50,20 +50,17 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.getTypeName;
 public class DefaultsCompiler {
 
     private Map<Class<? extends Type>, DefaultCompiler> compilers =
-            new HashMap<Class<? extends Type>, DefaultCompiler>() {
-                {
-                    put(IntegerType.class, new IntegerDefaultCompiler());
-                    put(OctetString.class, new OctetStringDefaultCompiler());
-                    put(BitString.class, new BitStringDefaultCompiler());
-                    put(ObjectIdentifier.class, new ObjectIdentifierDefaultCompiler());
-                    put(RelativeOID.class, new RelativeOIDDefaultCompiler());
-                    put(IRI.class, new IRIDefaultCompiler());
-                    put(RelativeIRI.class, new RelativeIRIDefaultCompiler());
-                }
-            };
+            Maps.<Class<? extends Type>, DefaultCompiler>builder()
+                    .put(IntegerType.class, new IntegerDefaultCompiler())
+                    .put(OctetString.class, new OctetStringDefaultCompiler())
+                    .put(BitString.class, new BitStringDefaultCompiler())
+                    .put(ObjectIdentifier.class, new ObjectIdentifierDefaultCompiler())
+                    .put(RelativeOID.class, new RelativeOIDDefaultCompiler())
+                    .put(IRI.class, new IRIDefaultCompiler())
+                    .put(RelativeIRI.class, new RelativeIRIDefaultCompiler())
+                    .build();
 
     private CompilerContext ctx;
-
 
     @SuppressWarnings("serial")
     public DefaultsCompiler(CompilerContext ctx) {

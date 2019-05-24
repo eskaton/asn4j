@@ -36,8 +36,8 @@ import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.commons.collections.Maps;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class ConstraintCompiler {
@@ -50,21 +50,20 @@ public class ConstraintCompiler {
     public ConstraintCompiler(CompilerContext ctx) {
         this.ctx = ctx;
 
-        compilers = new HashMap<Class<? extends Type>, AbstractConstraintCompiler>() {
-            {
-                put(BitString.class, new BitStringConstraintCompiler(ctx));
-                put(BooleanType.class, new BooleanConstraintCompiler(ctx));
-                put(IntegerType.class, new IntegerConstraintCompiler(ctx));
-//                put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver));
-//                put(OctetString.class, new OctetStringConstraintCompiler(typeResolver));
-//                put(Null.class, new NullConstraintCompiler(typeResolver));
-//                put(SetOfType.class, new SetOfConstraintCompiler(typeResolver));
-//                put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(typeResolver));
-//                put(RelativeOID.class, new RelativeOIDConstraintCompiler(typeResolver));
-//                put(IRI.class, new IRIConstraintCompiler(typeResolver));
-//                put(RelativeIRI.class, new RelativeIRIConstraintCompiler(typeResolver));
-            }
-        };
+        compilers = Maps.<Class<? extends Type>, AbstractConstraintCompiler>builder()
+                .put(BitString.class, new BitStringConstraintCompiler(ctx))
+                .put(BooleanType.class, new BooleanConstraintCompiler(ctx))
+                .put(IntegerType.class, new IntegerConstraintCompiler(ctx))
+//                .put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver))
+//                .put(OctetString.class, new OctetStringConstraintCompiler(typeResolver))
+//                .put(Null.class, new NullConstraintCompiler(typeResolver))
+//                .put(SetOfType.class, new SetOfConstraintCompiler(typeResolver))
+//                .put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(typeResolver))
+//                .put(RelativeOID.class, new RelativeOIDConstraintCompiler(typeResolver))
+//                .put(IRI.class, new IRIConstraintCompiler(typeResolver))
+//                .put(RelativeIRI.class, new RelativeIRIConstraintCompiler(typeResolver))
+
+                .build();
     }
 
     public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) throws CompilerException {
