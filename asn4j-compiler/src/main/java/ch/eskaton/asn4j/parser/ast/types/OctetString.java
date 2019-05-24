@@ -35,9 +35,4 @@ public class OctetString extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "OctetString";
-    }
-
 }

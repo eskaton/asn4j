@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints.ast;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -371,7 +372,7 @@ public class IntegerRange {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '[' + "lower=" + lower + ", upper=" + upper + ']';
+        return ToString.get(this);
     }
 
     private static class RangeComparator implements Comparator<IntegerRange> {

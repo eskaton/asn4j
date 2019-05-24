@@ -45,9 +45,4 @@ public class DummyGovernor extends ParamGovernorNode {
         return reference;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("DummyGovernor[", reference, "]");
-    }
-
 }

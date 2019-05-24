@@ -52,9 +52,4 @@ public class TupleNode extends AbstractValue {
     	return row;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("Tuple[column=", column, ",row=", row, "]");
-    }
-
 }

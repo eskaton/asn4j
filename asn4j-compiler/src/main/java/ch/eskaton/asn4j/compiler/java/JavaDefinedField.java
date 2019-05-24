@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.BufferedWriter;
@@ -82,8 +83,7 @@ public class JavaDefinedField implements JavaField {
 
     @Override
     public String toString() {
-        return "JavaDefinedField [typeName=" + typeName + ", name=" + name + ", hasDefault=" + hasDefault +
-                ", annotations=" + annotations + "]";
+        return ToString.get(this);
     }
 
 }

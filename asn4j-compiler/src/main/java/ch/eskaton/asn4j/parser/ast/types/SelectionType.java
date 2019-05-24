@@ -50,9 +50,4 @@ public class SelectionType extends AbstractType {
         return type;
     }
 
-    @Override
-    public String toString() {
-        return "SelectionType[" + "id=" + id + ", type=" + type + ']';
-    }
-
 }

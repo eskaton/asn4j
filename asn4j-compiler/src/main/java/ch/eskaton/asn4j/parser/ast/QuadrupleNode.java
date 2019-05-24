@@ -66,10 +66,4 @@ public class QuadrupleNode extends AbstractValue {
     	return cell;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("Quadruple[group=", group, ",plane=", plane,
-    			",row=", row, ",cell=", cell, "]");
-    }
-
 }

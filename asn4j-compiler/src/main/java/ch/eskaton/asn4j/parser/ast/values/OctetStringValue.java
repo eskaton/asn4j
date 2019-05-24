@@ -56,10 +56,4 @@ public class OctetStringValue extends AbstractValue {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("OctetStringValue[",
-                stringValue != null ? new String(stringValue) : value, "]");
-    }
-
 }

@@ -64,9 +64,4 @@ public class SimpleDefinedType extends AbstractType implements ParameterizedNode
         return this;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("SimpleDefinedType[", getType(), "]");
-    }
-
 }

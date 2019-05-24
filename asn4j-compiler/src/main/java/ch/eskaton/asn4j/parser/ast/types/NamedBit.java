@@ -54,9 +54,4 @@ public class NamedBit extends AbstractNode {
         this.ref = ref;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("NamedBit[", id, "(", (ref == null ? String.valueOf(num) : ref), ")]");
-    }
-
 }

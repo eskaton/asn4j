@@ -41,9 +41,4 @@ public class BooleanType extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-        return "Boolean";
-    }
-
 }

@@ -66,16 +66,16 @@ public class IntegerType extends AbstractType {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if (other == null || getClass() != other.getClass()) {
             return false;
         }
 
-        IntegerType that = (IntegerType) o;
+        IntegerType that = (IntegerType) other;
 
         return Objects.equals(namedNumbers, that.namedNumbers);
     }
@@ -83,12 +83,6 @@ public class IntegerType extends AbstractType {
     @Override
     public int hashCode() {
         return Objects.hash(namedNumbers);
-    }
-
-    @Override
-    public String toString() {
-        return StringUtils.concat("Integer", namedNumbers != null ? StringUtils.concat("[",
-                StringUtils.join(namedNumbers, ", "), "]") : "");
     }
 
 }

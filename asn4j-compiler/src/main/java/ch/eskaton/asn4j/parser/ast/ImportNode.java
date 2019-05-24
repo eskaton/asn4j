@@ -53,9 +53,4 @@ public class ImportNode extends AbstractNode {
         return reference;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("Import[", reference, " (", StringUtils.join(symbols, ", "), ")", "]");
-    }
-
 }

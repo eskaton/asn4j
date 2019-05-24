@@ -45,9 +45,4 @@ public class SubtypeConstraint extends AbstractConstraint {
     	return elementSetSpecs;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("SubtypeConstraint[", elementSetSpecs, "]");
-    }
-
 }

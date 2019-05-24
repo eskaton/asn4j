@@ -76,14 +76,4 @@ public class Choice extends AbstractType {
     	return optExtMarker;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("Choice[ext=", ext, ", optExtMarker=",
-    			optExtMarker, (exId != null ? ", exceptionId=" + exId : ""),
-    			", root=(", StringUtils.join(rootTypeList, ","),
-    			"), extAlts=(",
-    			extAddAlts != null ? StringUtils.join(extAddAlts, ",") : "",
-    			")", "]");
-    }
-
 }

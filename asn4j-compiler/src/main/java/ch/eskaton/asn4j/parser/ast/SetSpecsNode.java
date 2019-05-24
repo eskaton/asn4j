@@ -93,14 +93,4 @@ public class SetSpecsNode extends AbstractNode {
         return new ObjectSetSpecNode(position, rootElements, extensionMarker, extensionElements);
     }
 
-    @Override
-    public String toString() {
-        String rootElementsStr = asString(rootElements);
-        String extensionMarkerStr = ifPresent(extensionMarker, (ifPresent(rootElements, ", ")) + "...");
-        String commaStr = extensionMarker || rootElements != null ? ", " : "";
-        String extensionElementsStr = ifPresent(extensionElements, str -> commaStr + str);
-
-        return concat("SetSpecs[", rootElementsStr, extensionMarkerStr, extensionElementsStr, "]");
-    }
-
 }

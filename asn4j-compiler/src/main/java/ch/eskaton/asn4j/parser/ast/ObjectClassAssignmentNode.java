@@ -35,9 +35,4 @@ public class ObjectClassAssignmentNode extends TypeOrObjectClassAssignmentNode<O
         super(position, reference, type);
     }
 
-    @Override
-    public String toString() {
-        return "ObjectClassAssignment[" + getReference() + " = " + getType() + "]";
-    }
-
 }

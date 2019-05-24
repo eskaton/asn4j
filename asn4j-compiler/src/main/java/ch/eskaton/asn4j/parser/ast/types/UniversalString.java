@@ -35,9 +35,4 @@ public class UniversalString extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "UniversalString";
-    }
-
 }

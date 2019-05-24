@@ -53,11 +53,6 @@ public class NamedValue extends AbstractValue {
     }
 
     @Override
-    public String toString() {
-        return "NamedValue[name=" + name + ", value=" + value + ']';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

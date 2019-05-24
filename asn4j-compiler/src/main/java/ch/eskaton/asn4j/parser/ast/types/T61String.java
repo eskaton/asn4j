@@ -35,9 +35,4 @@ public class T61String extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "T61String";
-    }
-
 }

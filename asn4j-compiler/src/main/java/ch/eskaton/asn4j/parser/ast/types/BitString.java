@@ -78,10 +78,4 @@ public class BitString extends AbstractType {
         return Objects.hash(namedBits);
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("BitString[",
-                (namedBits != null ? StringUtils.join(namedBits, ", ") : ""), "]");
-    }
-
 }

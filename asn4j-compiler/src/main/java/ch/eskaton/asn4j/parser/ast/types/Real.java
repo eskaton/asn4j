@@ -35,9 +35,4 @@ public class Real extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "RealString";
-    }
-
 }

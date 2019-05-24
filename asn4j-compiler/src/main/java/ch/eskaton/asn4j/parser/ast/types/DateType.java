@@ -35,9 +35,4 @@ public class DateType extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "Date";
-    }
-
 }

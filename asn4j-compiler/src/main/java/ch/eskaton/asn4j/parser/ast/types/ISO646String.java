@@ -35,9 +35,4 @@ public class ISO646String extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "ISO646String";
-    }
-
 }

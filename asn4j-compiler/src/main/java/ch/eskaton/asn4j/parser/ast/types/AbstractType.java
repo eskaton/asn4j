@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.List;
 
@@ -90,6 +91,11 @@ public abstract class AbstractType implements Type {
 
     public EncodingPrefixNode getEncodingPrefix() {
         return encodingPrefix;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

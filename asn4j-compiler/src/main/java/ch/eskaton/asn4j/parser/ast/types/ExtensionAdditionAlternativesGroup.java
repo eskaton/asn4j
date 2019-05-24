@@ -60,10 +60,4 @@ public class ExtensionAdditionAlternativesGroup implements Node {
         return alternatives;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ExtensionAdditionAlternativesGroup[",
-                version != null ? version : "", "(", StringUtils.join(alternatives, ", "), ")]");
-    }
-
 }

@@ -67,9 +67,4 @@ public class PrimitiveFieldNameNode extends AbstractNode {
         return isValueFieldReference();
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "[reference=" + reference + ", type=" + type + "]";
-    }
-
 }

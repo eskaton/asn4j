@@ -28,8 +28,7 @@
 package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.Lexer.Context;
-
-import static ch.eskaton.commons.utils.StringUtils.ifPresent;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 public class StringToken extends Token {
 
@@ -54,8 +53,9 @@ public class StringToken extends Token {
 
     @Override
     public String toString() {
-        return "StringToken[" + type + ", offset=" + offset + ", position=" + position +
-                ifPresent(text, str -> ", text=" + str) + ", flags=0x" + Integer.toHexString(flags) + "]";
+        return ToString.builder(this)
+                .addAll()
+                .map("flags", f -> "0x" + Integer.toHexString(flags)).build();
     }
 
 }

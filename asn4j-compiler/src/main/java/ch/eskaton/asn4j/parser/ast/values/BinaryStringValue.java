@@ -36,9 +36,4 @@ public class BinaryStringValue extends AbstractBaseXStringValue {
         super(position, value, 2);
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat(getClass().getSimpleName() + "["+value+"]" );
-    }
-
 }

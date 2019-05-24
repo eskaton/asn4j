@@ -44,9 +44,4 @@ public class PermittedAlphabetConstraint extends AbstractConstraint {
         return constraint;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("PermittedAlphabetConstraint[", constraint, "]");
-    }
-
 }

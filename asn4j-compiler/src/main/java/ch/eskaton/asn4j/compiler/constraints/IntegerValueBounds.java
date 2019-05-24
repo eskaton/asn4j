@@ -26,6 +26,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
+
 public class IntegerValueBounds implements ValueBounds {
 
     private long minValue;
@@ -49,7 +51,7 @@ public class IntegerValueBounds implements ValueBounds {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + '[' + "minValue=" + minValue + ", maxValue=" + maxValue + ']';
+        return ToString.get(this);
     }
 
 }

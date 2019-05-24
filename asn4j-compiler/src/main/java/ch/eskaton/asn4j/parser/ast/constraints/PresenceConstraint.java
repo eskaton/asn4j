@@ -48,9 +48,4 @@ public class PresenceConstraint extends AbstractConstraint {
     	return type;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("PresenceConstraint[", type, "]");
-    }
-
 }

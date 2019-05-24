@@ -119,9 +119,4 @@ public class EndpointNode {
         return inclusive == that.inclusive && Objects.equals(value, that.value);
     }
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "[value=" + value + ", inclusive=" + inclusive + "]";
-    }
-
 }

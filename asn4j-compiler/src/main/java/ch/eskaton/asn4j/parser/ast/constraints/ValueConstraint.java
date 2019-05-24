@@ -40,9 +40,4 @@ public class ValueConstraint extends AbstractConstraint {
         this.constraint = constraint;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ValueConstraint[", constraint, "]");
-    }
-
 }

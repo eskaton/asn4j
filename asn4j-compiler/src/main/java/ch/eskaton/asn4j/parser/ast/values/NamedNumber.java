@@ -64,9 +64,4 @@ public class NamedNumber extends AbstractValue {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("NamedNumber[", id, "=", (ref != null ? ref : value), "]");
-    }
-
 }

@@ -51,9 +51,4 @@ public class ComponentConstraint extends AbstractConstraint {
         return presence;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ComponentConstraint[", value != null ? value + ", " : "", presence, "]");
-    }
-
 }

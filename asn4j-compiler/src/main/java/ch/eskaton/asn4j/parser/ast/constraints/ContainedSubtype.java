@@ -52,10 +52,4 @@ public class ContainedSubtype extends AbstractConstraint {
     	return hasIncludes;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("ContainedSubtype[",
-    			(hasIncludes ? "INCLUDES " : ""), type, "]");
-    }
-
 }

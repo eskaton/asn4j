@@ -46,9 +46,4 @@ public class SignedNumber extends AbstractValue {
         return number;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("SignedNumber[", number.toString(), "]");
-    }
-
 }

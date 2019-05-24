@@ -44,9 +44,4 @@ public class SizeConstraint extends AbstractConstraint {
     	return constraint;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("SizeConstraint[", constraint, "]");
-    }
-
 }

@@ -35,9 +35,4 @@ public class UTF8String extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "UTF8String";
-    }
-
 }

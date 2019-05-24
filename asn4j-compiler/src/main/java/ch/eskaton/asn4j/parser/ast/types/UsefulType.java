@@ -36,9 +36,4 @@ public class UsefulType extends TypeReference {
         super(position, type);
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("UsefulType[", getType(), "]");
-    }
-
 }

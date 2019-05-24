@@ -35,9 +35,4 @@ public class TeletexString extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "TelexString";
-    }
-
 }

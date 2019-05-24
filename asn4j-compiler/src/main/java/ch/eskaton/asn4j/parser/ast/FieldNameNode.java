@@ -47,11 +47,4 @@ public class FieldNameNode extends AbstractNode {
         return fieldNames;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("FieldName[", CollectionUtils.foldr(fieldNames, new StringBuilder(),
-                (accumulator, value) -> (accumulator.length() != 0 ? accumulator
-                        .append(".") : accumulator).append("&").append(value.getReference())), "]");
-    }
-
 }

@@ -52,10 +52,4 @@ public class ObjectSetAssignmentNode extends AssignmentNode {
         return objectSet;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ObjectSetAssignment[reference=", getReference(),
-                ", objectClass=", objectClass, ", objectSet=", objectSet, "]");
-    }
-
 }

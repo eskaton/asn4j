@@ -52,9 +52,4 @@ public class ObjectIdentifierValue extends AbstractOIDValue {
         return reference;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ObjectIdentifierValue[reference=", reference, ", components=", components, "]");
-    }
-
 }

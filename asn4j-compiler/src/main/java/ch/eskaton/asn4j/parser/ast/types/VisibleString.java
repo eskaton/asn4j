@@ -35,9 +35,4 @@ public class VisibleString extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "VisibleString";
-    }
-
 }

@@ -45,9 +45,4 @@ public class Governor extends ParamGovernorNode {
         return type;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("Governor[", type, "]");
-    }
-
 }

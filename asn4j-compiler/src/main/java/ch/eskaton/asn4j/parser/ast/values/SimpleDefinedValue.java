@@ -73,9 +73,4 @@ public class SimpleDefinedValue extends DefinedValue implements	ParameterizedNod
     	return ref;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat("SimpleDefinedValue[", value, "]");
-    }
-
 }

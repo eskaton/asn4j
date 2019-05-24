@@ -54,10 +54,4 @@ public class ExtensionAdditionGroup extends AbstractNode {
         return components;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ExtensionAdditionGroup[",
-                version != null ? version : "", "(", StringUtils.join(components, ", "), ")]");
-    }
-
 }

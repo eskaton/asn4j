@@ -62,8 +62,4 @@ public class ObjectClassReferenceNode extends ObjectClassNode implements Paramet
         return this;
     }
 
-    public String toString() {
-        return StringUtils.concat(getClass().getSimpleName(), "[", reference, "]");
-    }
-
 }

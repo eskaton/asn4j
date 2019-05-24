@@ -46,11 +46,4 @@ public class ConstrainedType extends AbstractType {
         this.constraints = constraints;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat(
-                "ConstrainedType[type=", type,
-                (constraints != null ? ",constraints=(" + StringUtils.join(constraints, ",") + ")" : ""), "]");
-    }
-
 }

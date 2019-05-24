@@ -52,9 +52,4 @@ public class OpenTypeFieldValue extends AbstractValue {
         return value;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat(getClass().getSimpleName(), "[type=", type, ", value=", value, "]");
-    }
-
 }

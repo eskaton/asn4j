@@ -51,9 +51,4 @@ public class ExternalValueReference extends SimpleDefinedValue {
         return new ExternalObjectReferenceNode(getPosition(), getValue(), module).parameters(getParameters());
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("ExternalValueReference[", module, ".", getValue(), "]");
-    }
-
 }

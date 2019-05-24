@@ -77,14 +77,4 @@ public class EnumeratedType extends AbstractType {
     	return additionalEnum;
     }
 
-    @Override
-    public String toString() {
-    	return StringUtils.concat(
-    			"Enumeration[",
-    			StringUtils.join(rootEnum, ", "),
-    			(hasExceptionSpec() || additionalEnum != null ? ", " + "..." : ""),
-    			exceptionSpec != null ? " ! " + exceptionSpec : "",
-    			(additionalEnum != null ? ", " + StringUtils.join(additionalEnum, ", ") : ""), "]");
-    }
-
 }

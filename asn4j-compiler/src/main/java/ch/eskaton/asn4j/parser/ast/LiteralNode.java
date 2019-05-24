@@ -44,9 +44,4 @@ public class LiteralNode extends AbstractNode {
         return text;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat("Literal[text=", text, "]");
-    }
-
 }

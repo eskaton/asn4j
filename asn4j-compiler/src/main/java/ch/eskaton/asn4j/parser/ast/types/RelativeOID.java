@@ -35,9 +35,4 @@ public class RelativeOID extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "RelativeOID";
-    }
-
 }

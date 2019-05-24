@@ -62,10 +62,4 @@ public class ElementSet extends Elements {
         return operands;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.concat(getClass().getSimpleName() + "[op=", operation.toString(),
-                ", operands={", StringUtils.join(operands, ","), "}]");
-    }
-
 }

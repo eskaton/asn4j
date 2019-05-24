@@ -46,9 +46,4 @@ public class OIDNode extends AbstractNode {
         return oidComponents;
     }
 
-    @Override
-    public String toString() {
-        return StringUtils.join(oidComponents.toArray(), " ");
-    }
-
 }

@@ -64,9 +64,4 @@ public class NamedBitNode extends AbstractNode {
         return ref;
     }
 
-    @Override
-    public String toString() {
-        return id + "(" + (ref == null ? String.valueOf(num) : ref) + ")";
-    }
-
 }

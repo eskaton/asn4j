@@ -35,9 +35,4 @@ public class External extends AbstractType {
         super(position);
     }
 
-    @Override
-    public String toString() {
-    	return "External";
-    }
-
 }
