@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.commons.collections.Maps;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,13 +45,11 @@ public class ModuleNode extends AbstractNode {
     }
 
     @SuppressWarnings("serial")
-    private static final Map<String, Encoding> encodings = new HashMap<String, Encoding>() {
-        {
-            put("TAG", Encoding.TAG);
-            put("XER", Encoding.XER);
-            put("PER", Encoding.PER);
-        }
-    };
+    private static final Map<String, Encoding> encodings = Maps.<String, Encoding>builder()
+            .put("TAG", Encoding.TAG)
+            .put("XER", Encoding.XER)
+            .put("PER", Encoding.PER)
+            .build();
 
     private ModuleIdentifierNode moduleId;
 

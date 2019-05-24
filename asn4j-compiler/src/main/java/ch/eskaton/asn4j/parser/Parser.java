@@ -224,6 +224,7 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.ValueFromObject;
 import ch.eskaton.asn4j.runtime.TaggingMode;
+import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.IOException;
@@ -246,6 +247,7 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static ch.eskaton.asn4j.parser.ParserUtils.getPosition;
+import static java.util.Arrays.asList;
 
 public class Parser {
 
@@ -573,7 +575,7 @@ public class Parser {
     	resetToMark(marks.pop());
     }
 
-    private Token expect(TokenType type) throws ParserException {
+    private Token expect(TokenType type) {
         Token token;
 
         try {
@@ -604,7 +606,7 @@ public class Parser {
         return token;
     }
 
-    public Type parseToken(TokenType tokenType, Function<Position, Type> ctor) throws ParserException {
+    public Type parseToken(TokenType tokenType, Function<Position, Type> ctor) {
         Token token = expect(tokenType);
 
         if (token != null) {
@@ -695,20 +697,16 @@ public class Parser {
     			for (TokenType type : types) {
     				mark();
 
-    				try {
-    					@SuppressWarnings("unchecked")
-    					T token = (T) expect(type);
+                    @SuppressWarnings("unchecked")
+                    T token = (T) expect(type);
 
-    					if (token != null) {
-    						clearMark();
-    						return token;
-    					} else {
-    						resetToMark();
-    					}
-    				} catch (ParserException e) {
-    					resetToMark();
-    				}
-    			}
+                    if (token != null) {
+                        clearMark();
+                        return token;
+                    } else {
+                        resetToMark();
+                    }
+                }
     		}
 
     		return null;
@@ -3800,23 +3798,20 @@ public class Parser {
     protected class PropertyAndSettingPairParser extends ListRuleParser<PropertyAndSettingNode> {
 
     	@SuppressWarnings("serial")
-    	private final Map<String, Set<String>> PROPERTIES = new HashMap<String, Set<String>>() {
-    		{
-    			put("Basic", new HashSet<>(Arrays.asList("Date", "Time", "Date-Time", "Interval", "Rec-Interval")));
-    			put("Date", new HashSet<>(Arrays.asList("C", "Y", "YM", "YMD", "YD", "YW", "YWD")));
-    			put("Year",	new HashSet<>(Arrays.asList("Basic", "Proleptic", "Negative")));
-    			put("Time",	new HashSet<>(Arrays.asList("H", "HM", "HMS")));
-    			put("Local-or-UTC",	new HashSet<>(Arrays.asList("L", "Z", "LD")));
-    			put("Interval-type", new HashSet<>(Arrays.asList("SE", "D", "SD", "DE")));
-    			put("SE-point",	new HashSet<>(Arrays.asList("Date", "Time", "Date-Time")));
-    			put("Recurrence", new HashSet<>(Arrays.asList("Unlimited")));
-    			put("Midnight",	new HashSet<>(Arrays.asList("Start", "End")));
-    		}
-    	};
+        private final Map<String, Set<String>> PROPERTIES = Maps.<String, Set<String>>builder()
+                .put("Basic", new HashSet<>(asList("Date", "Time", "Date-Time", "Interval", "Rec-Interval")))
+                .put("Date", new HashSet<>(asList("C", "Y", "YM", "YMD", "YD", "YW", "YWD")))
+                .put("Year", new HashSet<>(asList("Basic", "Proleptic", "Negative")))
+                .put("Time", new HashSet<>(asList("H", "HM", "HMS")))
+                .put("Local-or-UTC", new HashSet<>(asList("L", "Z", "LD")))
+                .put("Interval-type", new HashSet<>(asList("SE", "D", "SD", "DE")))
+                .put("SE-point", new HashSet<>(asList("Date", "Time", "Date-Time")))
+                .put("Recurrence", new HashSet<>(asList("Unlimited")))
+                .put("Midnight", new HashSet<>(asList("Start", "End")))
+                .build();
 
     	public PropertyAndSettingNode parse() throws ParserException {
-    		return parse(new SequenceParser(TokenType.TypeReference, TokenType.Equals,
-                    TokenType.TypeReference), a -> {
+    		return parse(new SequenceParser(TokenType.TypeReference, TokenType.Equals, TokenType.TypeReference), a -> {
                 Token propertyToken = a.t0();
                 Token settingToken = a.t2();
                 String property = a.s0();

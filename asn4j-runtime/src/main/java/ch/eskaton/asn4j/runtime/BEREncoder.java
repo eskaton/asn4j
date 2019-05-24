@@ -45,7 +45,6 @@ import ch.eskaton.asn4j.runtime.encoders.SequenceOfEncoder;
 import ch.eskaton.asn4j.runtime.encoders.SetEncoder;
 import ch.eskaton.asn4j.runtime.encoders.SetOfEncoder;
 import ch.eskaton.asn4j.runtime.encoders.TypeEncoder;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
@@ -66,13 +65,13 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.runtime.utils.TLVUtils;
+import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.HexDump;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class BEREncoder implements Encoder {
@@ -81,40 +80,37 @@ public class BEREncoder implements Encoder {
 
     @SuppressWarnings("serial")
     private Map<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>> encoders =
-            new HashMap<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>>() {
-                {
-                    put(ASN1BitString.class, new BitStringEncoder());
-                    put(ASN1Boolean.class, new BooleanEncoder());
-                    put(ASN1Choice.class, new ChoiceEncoder());
-                    put(ASN1EnumeratedType.class, new EnumerationTypeEncoder());
-                    put(ASN1Integer.class, new IntegerEncoder());
-                    put(ASN1Real.class, new RealEncoder());
-                    put(ASN1Null.class, new NullEncoder());
-                    put(ASN1ObjectIdentifier.class, new ObjectIdentifierEncoder());
-                    put(ASN1RelativeOID.class, new RelativeOIDEncoder());
-                    put(ASN1IRI.class, new IRIEncoder());
-                    put(ASN1RelativeIRI.class, new RelativeIRIEncoder());
-                    put(ASN1OctetString.class, new OctetStringEncoder());
-                    put(ASN1Sequence.class, new SequenceEncoder());
-                    put(ASN1SequenceOf.class, new SequenceOfEncoder());
-                    put(ASN1Set.class, new SetEncoder());
-                    put(ASN1SetOf.class, new SetOfEncoder());
-                }
-            };
+            Maps.<Class<? extends ASN1Type>, TypeEncoder<? extends ASN1Type>>builder()
+                    .put(ASN1BitString.class, new BitStringEncoder())
+                    .put(ASN1Boolean.class, new BooleanEncoder())
+                    .put(ASN1Choice.class, new ChoiceEncoder())
+                    .put(ASN1EnumeratedType.class, new EnumerationTypeEncoder())
+                    .put(ASN1Integer.class, new IntegerEncoder())
+                    .put(ASN1Real.class, new RealEncoder())
+                    .put(ASN1Null.class, new NullEncoder())
+                    .put(ASN1ObjectIdentifier.class, new ObjectIdentifierEncoder())
+                    .put(ASN1RelativeOID.class, new RelativeOIDEncoder())
+                    .put(ASN1IRI.class, new IRIEncoder())
+                    .put(ASN1RelativeIRI.class, new RelativeIRIEncoder())
+                    .put(ASN1OctetString.class, new OctetStringEncoder())
+                    .put(ASN1Sequence.class, new SequenceEncoder())
+                    .put(ASN1SequenceOf.class, new SequenceOfEncoder())
+                    .put(ASN1Set.class, new SetEncoder())
+                    .put(ASN1SetOf.class, new SetOfEncoder())
+                    .build();
 
-    public byte[] encode(ASN1Type obj) throws EncodingException, ConstraintViolatedException {
+    public byte[] encode(ASN1Type obj) {
         byte[] encoded = encode(obj, null);
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("Encoded value of type " + obj.getClass().getSimpleName() + " = " + HexDump
-                    .toHexString(encoded));
+            LOGGER.trace("Encoded value of type {} = {}", obj.getClass().getSimpleName(), HexDump.toHexString(encoded));
         }
 
         return encoded;
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends ASN1Type, C extends TypeEncoder<T>> C getEncoder(Class<T> clazz) throws EncodingException {
+    public <T extends ASN1Type, C extends TypeEncoder<T>> C getEncoder(Class<T> clazz) {
         TypeEncoder<?> encoder = encoders.get(clazz);
 
         if (encoder == null) {
@@ -125,7 +121,7 @@ public class BEREncoder implements Encoder {
     }
 
     @SuppressWarnings("rawtypes")
-    public byte[] encode(ASN1Type obj, ASN1Tag tag) throws EncodingException, ConstraintViolatedException {
+    public byte[] encode(ASN1Type obj, ASN1Tag tag) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf;
 

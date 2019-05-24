@@ -30,21 +30,20 @@ package ch.eskaton.asn4j.parser;
 import ch.eskaton.asn4j.parser.Token.TokenType;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.runtime.parsing.LexerInputStream;
+import ch.eskaton.commons.collections.Maps;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 public class Lexer {
 
     public enum Context {
-    	Normal, Encoding, ObjectClass, Syntax, TypeField, ValueField, Level,
-    	PropertySettings
-    };
+    	Normal, Encoding, ObjectClass, Syntax, TypeField, ValueField, Level, PropertySettings
+    }
 
     public static final String ABSENT_LIT = "ABSENT";
     public static final String ABSTRACT_SYNTAX_LIT = "ABSTRACT-SYNTAX";
@@ -159,101 +158,99 @@ public class Lexer {
 
     // @formatter:on
     @SuppressWarnings("serial")
-    private static final Map<String, Token.TokenType> keywords = new HashMap<String, Token.TokenType>() {
-    	{
-    		put(ABSENT_LIT, Token.TokenType.ABSENT_KW);
-    		put(ABSTRACT_SYNTAX_LIT, Token.TokenType.ABSTRACT_SYNTAX_KW);
-    		put(ALL_LIT, Token.TokenType.ALL_KW);
-    		put(APPLICATION_LIT, Token.TokenType.APPLICATION_KW);
-    		put(AUTOMATIC_LIT, Token.TokenType.AUTOMATIC_KW);
-    		put(BEGIN_LIT, Token.TokenType.BEGIN_KW);
-    		put(BIT_LIT, Token.TokenType.BIT_KW);
-    		put(BMPSTRING_LIT, Token.TokenType.BMPString_KW);
-    		put(BOOLEAN_LIT, Token.TokenType.BOOLEAN_KW);
-    		put(BY_LIT, Token.TokenType.BY_KW);
-    		put(CHARACTER_LIT, Token.TokenType.CHARACTER_KW);
-    		put(CHOICE_LIT, Token.TokenType.CHOICE_KW);
-    		put(CLASS_LIT, Token.TokenType.CLASS_KW);
-    		put(COMPONENT_LIT, Token.TokenType.COMPONENT_KW);
-    		put(COMPONENTS_LIT, Token.TokenType.COMPONENTS_KW);
-    		put(CONSTRAINED_LIT, Token.TokenType.CONSTRAINED_KW);
-    		put(CONTAINING_LIT, Token.TokenType.CONTAINING_KW);
-    		put(DATE_LIT, Token.TokenType.DATE_KW);
-    		put(DATE_TIME_LIT, Token.TokenType.DATE_TIME_KW);
-    		put(DEFAULT_LIT, Token.TokenType.DEFAULT_KW);
-    		put(DEFINITIONS_LIT, Token.TokenType.DEFINITIONS_KW);
-    		put(DURATION_LIT, Token.TokenType.DURATION_KW);
-    		put(EMBEDDED_LIT, Token.TokenType.EMBEDDED_KW);
-    		put(ENCODED_LIT, Token.TokenType.ENCODED_KW);
-    		put(ENCODING_CONTROL_LIT, Token.TokenType.ENCODING_CONTROL_KW);
-    		put(END_LIT, Token.TokenType.END_KW);
-    		put(ENUMERATED_LIT, Token.TokenType.ENUMERATED_KW);
-    		put(EXCEPT_LIT, Token.TokenType.EXCEPT_KW);
-    		put(EXPLICIT_LIT, Token.TokenType.EXPLICIT_KW);
-    		put(EXPORTS_LIT, Token.TokenType.EXPORTS_KW);
-    		put(EXTENSIBILITY_LIT, Token.TokenType.EXTENSIBILITY_KW);
-    		put(EXTERNAL_LIT, Token.TokenType.EXTERNAL_KW);
-    		put(FALSE_LIT, Token.TokenType.FALSE_KW);
-    		put(FROM_LIT, Token.TokenType.FROM_KW);
-    		put(GENERALIZEDTIME_LIT, Token.TokenType.GeneralizedTime_KW);
-    		put(GENERALSTRING_LIT, Token.TokenType.GeneralString_KW);
-    		put(GRAPHICSTRING_LIT, Token.TokenType.GraphicString_KW);
-    		put(IA5STRING_LIT, Token.TokenType.IA5String_KW);
-    		put(IDENTIFIER_LIT, Token.TokenType.IDENTIFIER_KW);
-    		put(IMPLICIT_LIT, Token.TokenType.IMPLICIT_KW);
-    		put(IMPLIED_LIT, Token.TokenType.IMPLIED_KW);
-    		put(IMPORTS_LIT, Token.TokenType.IMPORTS_KW);
-    		put(INCLUDES_LIT, Token.TokenType.INCLUDES_KW);
-    		put(INSTANCE_LIT, Token.TokenType.INSTANCE_KW);
-    		put(INSTRUCTIONS_LIT, Token.TokenType.INSTRUCTIONS_KW);
-    		put(INTEGER_LIT, Token.TokenType.INTEGER_KW);
-    		put(INTERSECTION_LIT, Token.TokenType.INTERSECTION_KW);
-    		put(ISO646STRING_LIT, Token.TokenType.ISO646String_KW);
-    		put(MAX_LIT, Token.TokenType.MAX_KW);
-    		put(MIN_LIT, Token.TokenType.MIN_KW);
-    		put(MINUS_INFINITY_LIT, Token.TokenType.MINUS_INFINITY_KW);
-    		put(NOT_A_NUMBER_LIT, Token.TokenType.NOT_A_NUMBER_KW);
-    		put(NULL_LIT, Token.TokenType.NULL_KW);
-    		put(NUMERICSTRING_LIT, Token.TokenType.NumericString_KW);
-    		put(OBJECT_LIT, Token.TokenType.OBJECT_KW);
-    		put(OBJECTDESCRIPTOR_LIT, Token.TokenType.ObjectDescriptor_KW);
-    		put(OCTET_LIT, Token.TokenType.OCTET_KW);
-    		put(OF_LIT, Token.TokenType.OF_KW);
-    		put(OID_IRI_LIT, Token.TokenType.OID_IRI_KW);
-    		put(OPTIONAL_LIT, Token.TokenType.OPTIONAL_KW);
-    		put(PATTERN_LIT, Token.TokenType.PATTERN_KW);
-    		put(PDV_LIT, Token.TokenType.PDV_KW);
-    		put(PLUS_INFINITY_LIT, Token.TokenType.PLUS_INFINITY_KW);
-    		put(PRESENT_LIT, Token.TokenType.PRESENT_KW);
-    		put(PRINTABLESTRING_LIT, Token.TokenType.PrintableString_KW);
-    		put(PRIVATE_LIT, Token.TokenType.PRIVATE_KW);
-    		put(REAL_LIT, Token.TokenType.REAL_KW);
-    		put(RELATIVE_OID_LIT, Token.TokenType.RELATIVE_OID_KW);
-    		put(RELATIVE_OID_IRI_LIT, Token.TokenType.RELATIVE_OID_IRI_KW);
-    		put(SEQUENCE_LIT, Token.TokenType.SEQUENCE_KW);
-    		put(SET_LIT, Token.TokenType.SET_KW);
-    		put(SETTINGS_LIT, Token.TokenType.SETTINGS_KW);
-    		put(SIZE_LIT, Token.TokenType.SIZE_KW);
-    		put(STRING_LIT, Token.TokenType.STRING_KW);
-    		put(SYNTAX_LIT, Token.TokenType.SYNTAX_KW);
-    		put(T61STRING_LIT, Token.TokenType.T61String_KW);
-    		put(TAGS_LIT, Token.TokenType.TAGS_KW);
-    		put(TELETEXSTRING_LIT, Token.TokenType.TeletexString_KW);
-    		put(TIME_LIT, Token.TokenType.TIME_KW);
-    		put(TIME_OF_DAY_LIT, Token.TokenType.TIME_OF_DAY_KW);
-    		put(TRUE_LIT, Token.TokenType.TRUE_KW);
-    		put(TYPE_IDENTIFIER_LIT, Token.TokenType.TYPE_IDENTIFIER_KW);
-    		put(UNION_LIT, Token.TokenType.UNION_KW);
-    		put(UNIQUE_LIT, Token.TokenType.UNIQUE_KW);
-    		put(UNIVERSAL_LIT, Token.TokenType.UNIVERSAL_KW);
-    		put(UNIVERSALSTRING_LIT, Token.TokenType.UniversalString_KW);
-    		put(UTCTIME_LIT, Token.TokenType.UTCTime_KW);
-    		put(UTF8STRING_LIT, Token.TokenType.UTF8String_KW);
-    		put(VIDEOTEXSTRING_LIT, Token.TokenType.VideotexString_KW);
-    		put(VISIBLESTRING_LIT, Token.TokenType.VisibleString_KW);
-    		put(WITH_LIT, Token.TokenType.WITH_KW);
-    	}
-    };
+    private static final Map<String, TokenType> keywords = Maps.<String, TokenType>builder()
+            .put(ABSENT_LIT, TokenType.ABSENT_KW)
+            .put(ABSTRACT_SYNTAX_LIT, TokenType.ABSTRACT_SYNTAX_KW)
+            .put(ALL_LIT, TokenType.ALL_KW)
+            .put(APPLICATION_LIT, TokenType.APPLICATION_KW)
+            .put(AUTOMATIC_LIT, TokenType.AUTOMATIC_KW)
+            .put(BEGIN_LIT, TokenType.BEGIN_KW)
+            .put(BIT_LIT, TokenType.BIT_KW)
+            .put(BMPSTRING_LIT, TokenType.BMPString_KW)
+            .put(BOOLEAN_LIT, TokenType.BOOLEAN_KW)
+            .put(BY_LIT, TokenType.BY_KW)
+            .put(CHARACTER_LIT, TokenType.CHARACTER_KW)
+            .put(CHOICE_LIT, TokenType.CHOICE_KW)
+            .put(CLASS_LIT, TokenType.CLASS_KW)
+            .put(COMPONENT_LIT, TokenType.COMPONENT_KW)
+            .put(COMPONENTS_LIT, TokenType.COMPONENTS_KW)
+            .put(CONSTRAINED_LIT, TokenType.CONSTRAINED_KW)
+            .put(CONTAINING_LIT, TokenType.CONTAINING_KW)
+            .put(DATE_LIT, TokenType.DATE_KW)
+            .put(DATE_TIME_LIT, TokenType.DATE_TIME_KW)
+            .put(DEFAULT_LIT, TokenType.DEFAULT_KW)
+            .put(DEFINITIONS_LIT, TokenType.DEFINITIONS_KW)
+            .put(DURATION_LIT, TokenType.DURATION_KW)
+            .put(EMBEDDED_LIT, TokenType.EMBEDDED_KW)
+            .put(ENCODED_LIT, TokenType.ENCODED_KW)
+            .put(ENCODING_CONTROL_LIT, TokenType.ENCODING_CONTROL_KW)
+            .put(END_LIT, TokenType.END_KW)
+            .put(ENUMERATED_LIT, TokenType.ENUMERATED_KW)
+            .put(EXCEPT_LIT, TokenType.EXCEPT_KW)
+            .put(EXPLICIT_LIT, TokenType.EXPLICIT_KW)
+            .put(EXPORTS_LIT, TokenType.EXPORTS_KW)
+            .put(EXTENSIBILITY_LIT, TokenType.EXTENSIBILITY_KW)
+            .put(EXTERNAL_LIT, TokenType.EXTERNAL_KW)
+            .put(FALSE_LIT, TokenType.FALSE_KW)
+            .put(FROM_LIT, TokenType.FROM_KW)
+            .put(GENERALIZEDTIME_LIT, TokenType.GeneralizedTime_KW)
+            .put(GENERALSTRING_LIT, TokenType.GeneralString_KW)
+            .put(GRAPHICSTRING_LIT, TokenType.GraphicString_KW)
+            .put(IA5STRING_LIT, TokenType.IA5String_KW)
+            .put(IDENTIFIER_LIT, TokenType.IDENTIFIER_KW)
+            .put(IMPLICIT_LIT, TokenType.IMPLICIT_KW)
+            .put(IMPLIED_LIT, TokenType.IMPLIED_KW)
+            .put(IMPORTS_LIT, TokenType.IMPORTS_KW)
+            .put(INCLUDES_LIT, TokenType.INCLUDES_KW)
+            .put(INSTANCE_LIT, TokenType.INSTANCE_KW)
+            .put(INSTRUCTIONS_LIT, TokenType.INSTRUCTIONS_KW)
+            .put(INTEGER_LIT, TokenType.INTEGER_KW)
+            .put(INTERSECTION_LIT, TokenType.INTERSECTION_KW)
+            .put(ISO646STRING_LIT, TokenType.ISO646String_KW)
+            .put(MAX_LIT, TokenType.MAX_KW)
+            .put(MIN_LIT, TokenType.MIN_KW)
+            .put(MINUS_INFINITY_LIT, TokenType.MINUS_INFINITY_KW)
+            .put(NOT_A_NUMBER_LIT, TokenType.NOT_A_NUMBER_KW)
+            .put(NULL_LIT, TokenType.NULL_KW)
+            .put(NUMERICSTRING_LIT, TokenType.NumericString_KW)
+            .put(OBJECT_LIT, TokenType.OBJECT_KW)
+            .put(OBJECTDESCRIPTOR_LIT, TokenType.ObjectDescriptor_KW)
+            .put(OCTET_LIT, TokenType.OCTET_KW)
+            .put(OF_LIT, TokenType.OF_KW)
+            .put(OID_IRI_LIT, TokenType.OID_IRI_KW)
+            .put(OPTIONAL_LIT, TokenType.OPTIONAL_KW)
+            .put(PATTERN_LIT, TokenType.PATTERN_KW)
+            .put(PDV_LIT, TokenType.PDV_KW)
+            .put(PLUS_INFINITY_LIT, TokenType.PLUS_INFINITY_KW)
+            .put(PRESENT_LIT, TokenType.PRESENT_KW)
+            .put(PRINTABLESTRING_LIT, TokenType.PrintableString_KW)
+            .put(PRIVATE_LIT, TokenType.PRIVATE_KW)
+            .put(REAL_LIT, TokenType.REAL_KW)
+            .put(RELATIVE_OID_LIT, TokenType.RELATIVE_OID_KW)
+            .put(RELATIVE_OID_IRI_LIT, TokenType.RELATIVE_OID_IRI_KW)
+            .put(SEQUENCE_LIT, TokenType.SEQUENCE_KW)
+            .put(SET_LIT, TokenType.SET_KW)
+            .put(SETTINGS_LIT, TokenType.SETTINGS_KW)
+            .put(SIZE_LIT, TokenType.SIZE_KW)
+            .put(STRING_LIT, TokenType.STRING_KW)
+            .put(SYNTAX_LIT, TokenType.SYNTAX_KW)
+            .put(T61STRING_LIT, TokenType.T61String_KW)
+            .put(TAGS_LIT, TokenType.TAGS_KW)
+            .put(TELETEXSTRING_LIT, TokenType.TeletexString_KW)
+            .put(TIME_LIT, TokenType.TIME_KW)
+            .put(TIME_OF_DAY_LIT, TokenType.TIME_OF_DAY_KW)
+            .put(TRUE_LIT, TokenType.TRUE_KW)
+            .put(TYPE_IDENTIFIER_LIT, TokenType.TYPE_IDENTIFIER_KW)
+            .put(UNION_LIT, TokenType.UNION_KW)
+            .put(UNIQUE_LIT, TokenType.UNIQUE_KW)
+            .put(UNIVERSAL_LIT, TokenType.UNIVERSAL_KW)
+            .put(UNIVERSALSTRING_LIT, TokenType.UniversalString_KW)
+            .put(UTCTIME_LIT, TokenType.UTCTime_KW)
+            .put(UTF8STRING_LIT, TokenType.UTF8String_KW)
+            .put(VIDEOTEXSTRING_LIT, TokenType.VideotexString_KW)
+            .put(VISIBLESTRING_LIT, TokenType.VisibleString_KW)
+            .put(WITH_LIT, TokenType.WITH_KW)
+            .build();
 
     private LexerInputStream is;
 
@@ -265,7 +262,7 @@ public class Lexer {
 
     private boolean eof = false;
 
-    private LinkedList<Token> tokens = new LinkedList<Token>();
+    private LinkedList<Token> tokens = new LinkedList<>();
 
     public Lexer(InputStream is) throws IOException {
     	ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -286,7 +283,7 @@ public class Lexer {
 
     public Token nextToken(Context ctx) throws ParserException {
     	int c, offset;
-    	Token token = null;
+    	Token token;
 
     	if (!tokens.isEmpty()) {
     		if (tokens.peek().getContext() == ctx) {
@@ -297,7 +294,6 @@ public class Lexer {
     			pos = token.getPosition().getPosition() - 1;
     			line = token.getPosition().getLine();
     			tokens.clear();
-    			token = null;
     			eof = false;
     		}
     	}
@@ -442,10 +438,12 @@ public class Lexer {
     							if (is.read() == '.') {
     								pos++;
     								offset++;
-    								return new Token(ctx, TokenType.Ellipsis,offset - 2, position(line, pos - 2));
+    								return new Token(ctx, TokenType.Ellipsis,offset - 2,
+                                            position(line, pos - 2));
     							} else {
     								is.unread();
-    								return new Token(ctx, TokenType.Range, offset - 1, position(line, pos -1 ));
+    								return new Token(ctx, TokenType.Range, offset - 1,
+                                            position(line, pos -1 ));
     							}
     						}
 
@@ -508,8 +506,7 @@ public class Lexer {
     	return null;
     }
 
-    private Token parseFieldReference(Context parseCtx, TokenType expected,
-    		TokenType actual) throws IOException {
+    private Token parseFieldReference(Context parseCtx, TokenType expected, TokenType actual) throws IOException {
         Token token = parseOther(parseCtx);
 
         if (token != null) {
@@ -869,11 +866,11 @@ public class Lexer {
     		String value = sb.toString();
 
     		if (type == TokenType.TypeReference) {
-    			if ("PLUS-INFINITY".equals(value)) {
+    			if (PLUS_INFINITY_LIT.equals(value)) {
     				type = Token.TokenType.PLUS_INFINITY_KW;
-    			} else if ("MINUS-INFINITY".equals(value)) {
+    			} else if (MINUS_INFINITY_LIT.equals(value)) {
     				type = Token.TokenType.MINUS_INFINITY_KW;
-    			} else if ("NOT-A-NUMBER".equals(value)) {
+    			} else if (NOT_A_NUMBER_LIT.equals(value)) {
     				type = Token.TokenType.NOT_A_NUMBER_KW;
     			}
     		}

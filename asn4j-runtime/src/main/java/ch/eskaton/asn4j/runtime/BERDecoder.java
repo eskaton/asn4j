@@ -68,6 +68,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
+import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.CollectionUtils;
 import ch.eskaton.commons.utils.ReflectionUtils;
 import ch.eskaton.commons.utils.StringUtils;
@@ -77,7 +78,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -94,20 +94,18 @@ public class BERDecoder implements Decoder {
     private static final Logger LOGGER = LoggerFactory.getLogger(BERDecoder.class);
 
     private Map<Class<? extends ASN1Type>, TypeDecoder<? extends ASN1Type>> decoders =
-            new HashMap<Class<? extends ASN1Type>, TypeDecoder<? extends ASN1Type>>() {
-                {
-                    put(ASN1BitString.class, new BitStringDecoder());
-                    put(ASN1Boolean.class, new BooleanDecoder());
-                    put(ASN1Integer.class, new IntegerDecoder());
-                    put(ASN1Real.class, new RealDecoder());
-                    put(ASN1ObjectIdentifier.class, new ObjectIdentifierDecoder());
-                    put(ASN1RelativeOID.class, new RelativeOIDDecoder());
-                    put(ASN1IRI.class, new IRIDecoder());
-                    put(ASN1RelativeIRI.class, new RelativeIRIDecoder());
-                    put(ASN1OctetString.class, new OctetStringDecoder());
-                    put(ASN1VisibleString.class, new VisibleStringDecoder());
-                }
-            };
+            Maps.<Class<? extends ASN1Type>, TypeDecoder<? extends ASN1Type>>builder()
+                    .put(ASN1BitString.class, new BitStringDecoder())
+                    .put(ASN1Boolean.class, new BooleanDecoder())
+                    .put(ASN1Integer.class, new IntegerDecoder())
+                    .put(ASN1Real.class, new RealDecoder())
+                    .put(ASN1ObjectIdentifier.class, new ObjectIdentifierDecoder())
+                    .put(ASN1RelativeOID.class, new RelativeOIDDecoder())
+                    .put(ASN1IRI.class, new IRIDecoder())
+                    .put(ASN1RelativeIRI.class, new RelativeIRIDecoder())
+                    .put(ASN1OctetString.class, new OctetStringDecoder())
+                    .put(ASN1VisibleString.class, new VisibleStringDecoder())
+                    .build();
 
     private EnumeratedTypeDecoder enumeratedTypeDecoder = new EnumeratedTypeDecoder();
 
@@ -121,7 +119,7 @@ public class BERDecoder implements Decoder {
 
     private SetOfDecoder setOfDecoder = new SetOfDecoder();
 
-    public <T extends ASN1Type> T decode(Class<T> type, byte[] buf) throws DecodingException {
+    public <T extends ASN1Type> T decode(Class<T> type, byte[] buf) {
         DecoderStates states = new DecoderStates();
         DecoderState state = new DecoderState(0, buf.length);
         states.buf = buf;
@@ -130,12 +128,12 @@ public class BERDecoder implements Decoder {
         return result.getObj();
     }
 
-    public <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states) throws DecodingException {
+    public <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states) {
         return decode(type, states, null, false);
     }
 
     public DecodingResult<? extends ASN1Type> decode(DecoderStates states, Map<List<ASN1Tag>,
-            Class<? extends ASN1Type>> tags) throws DecodingException {
+            Class<? extends ASN1Type>> tags) {
         MultipleTagsMatcher matcher = new MultipleTagsMatcher(tags.keySet());
         DecoderState state = consumeMultipleTags(states, matcher);
 
@@ -152,8 +150,8 @@ public class BERDecoder implements Decoder {
         return null;
     }
 
-    public <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states, ASN1Tag tag, boolean optional)
-            throws DecodingException {
+    public <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states, ASN1Tag tag,
+            boolean optional) {
         List<ASN1Tag> tags;
 
         if (ReflectionUtils.extendsClazz(type, ASN1Choice.class)) {
@@ -185,7 +183,7 @@ public class BERDecoder implements Decoder {
         return new DecodingResult<>(Collections.emptyList(), obj);
     }
 
-    public <T extends ASN1Type, C extends TypeDecoder<T>> C getDecoder(Class<T> clazz) throws DecodingException {
+    public <T extends ASN1Type, C extends TypeDecoder<T>> C getDecoder(Class<T> clazz) {
         TypeDecoder<?> decoder = decoders.get(clazz);
 
         if (decoder == null) {
@@ -243,7 +241,7 @@ public class BERDecoder implements Decoder {
                     throw new DecodingException("Decoding of object " + obj.getClass().getName() + " not supported");
                 }
             }
-        } catch (Throwable th) {
+        } catch (Exception th) {
             if (DecodingException.class.isAssignableFrom(th.getClass())) {
                 throw (DecodingException) th;
             }
@@ -256,13 +254,11 @@ public class BERDecoder implements Decoder {
         return new DecodingResult(state.getTagIds(), obj);
     }
 
-    private DecoderState consumeMultipleTags(DecoderStates states, MultipleTagsMatcher matcher)
-            throws DecodingException {
+    private DecoderState consumeMultipleTags(DecoderStates states, MultipleTagsMatcher matcher) {
         return consumeTags(states, matcher, true);
     }
 
-    private DecoderState consumeTags(DecoderStates states, List<ASN1Tag> tags, boolean optional)
-            throws DecodingException {
+    private DecoderState consumeTags(DecoderStates states, List<ASN1Tag> tags, boolean optional) {
         return consumeTags(states, new SingleTagsMatcher(tags), optional);
     }
 
@@ -282,8 +278,7 @@ public class BERDecoder implements Decoder {
         return state;
     }
 
-    private DecoderState consumeTags(DecoderStates states, TagsMatcher tags)
-            throws DecodingException {
+    private DecoderState consumeTags(DecoderStates states, TagsMatcher tags) {
         if (!tags.hasNext()) {
             throw new DecodingException("Empty tag list");
         }
@@ -317,7 +312,7 @@ public class BERDecoder implements Decoder {
             return states.push(new DecoderState(tlv, pos, length));
         } catch (DecodingException e) {
             throw e;
-        } catch (Throwable th) {
+        } catch (Exception th) {
             throw new DecodingException(th);
         }
     }
@@ -430,10 +425,12 @@ public class BERDecoder implements Decoder {
             }
         }
 
+        @Override
         public boolean hasChilds() {
             return !childs.isEmpty();
         }
 
+        @Override
         public ASN1Tag getTag() {
             return null;
         }
@@ -444,7 +441,7 @@ public class BERDecoder implements Decoder {
 
         protected ASN1Tag tag;
 
-        protected Set<TagNode> childs = new HashSet<TagNode>();
+        protected Set<TagNode> childs = new HashSet<>();
 
         public TagNodeImpl() {
         }
