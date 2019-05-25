@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import java.util.List;
 import java.util.Optional;
 
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.commons.utils.OptionalUtils.combine;
 
@@ -63,20 +64,22 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, List<IntegerRang
                     return combine(left, right, IntegerRange::exclude).map(SizeNode::new);
                 } else if (left.isPresent()) {
                     return left.map(SizeNode::new);
-                } else if (right.isPresent()) {
+                } else {
                     return right.map(IntegerRange::invert).map(SizeNode::new);
                 }
             default:
-                throw new IllegalStateException("Unimplemented node type: " + node.getType());
+                return throwUnimplementedNodeType(node);
         }
     }
 
     @Override
     public Optional<SizeNode> visit(OpNode node) {
         if (node.getType() == NEGATION) {
-            return node.getNode().accept(this).map(range -> IntegerRange.invert(range.getSize())).map(SizeNode::new);
+            return node.getNode().accept(this)
+                    .map(range -> IntegerRange.invert(range.getSize()))
+                    .map(SizeNode::new);
         } else {
-            throw new IllegalStateException("Unimplemented node type: " + node.getType());
+            return throwUnimplementedNodeType(node);
         }
     }
 
