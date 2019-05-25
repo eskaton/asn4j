@@ -27,15 +27,16 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
-import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import org.junit.Test;
 
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.complement;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersection;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.range;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -102,26 +103,6 @@ public class IntegerConstraintOptimizingVisitorTest {
 
     private static IntegerRangeValueNode value(IntegerRange... ranges) {
         return new IntegerRangeValueNode(asList(ranges));
-    }
-
-    private static IntegerRange range(long lower, long upper) {
-        return new IntegerRange(lower, upper);
-    }
-
-    private static BinOpNode union(Node left, Node right) {
-        return new BinOpNode(NodeType.UNION, left, right);
-    }
-
-    private static BinOpNode intersection(Node left, Node right) {
-        return new BinOpNode(NodeType.INTERSECTION, left, right);
-    }
-
-    private static BinOpNode complement(Node left, Node right) {
-        return new BinOpNode(NodeType.COMPLEMENT, left, right);
-    }
-
-    private static OpNode not(Node node) {
-        return new OpNode(NodeType.NEGATION, node);
     }
 
 }
