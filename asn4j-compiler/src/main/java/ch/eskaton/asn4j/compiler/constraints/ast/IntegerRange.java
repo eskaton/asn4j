@@ -27,7 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
@@ -163,60 +162,69 @@ public class IntegerRange {
         return result;
     }
 
-    public static List<IntegerRange> exclude(List<IntegerRange> r1, List<IntegerRange> r2) {
-        r1 = canonicalizeRanges(r1);
-        r2 = canonicalizeRanges(r2);
+    public static List<IntegerRange> exclude(List<IntegerRange> l1, List<IntegerRange> l2) {
+        l1 = canonicalizeRanges(l1);
+        l2 = canonicalizeRanges(l2);
 
-        if (r1.isEmpty() || r2.isEmpty()) {
-            return r1;
+        if (l1.isEmpty() || l2.isEmpty()) {
+            return l1;
         }
 
         int excludeInd = 0;
         int rangeInd = 0;
-        long upper;
-        long lower;
-        IntegerRange exclude = r2.get(excludeInd++);
-        IntegerRange range = r1.get(rangeInd++);
+
+        IntegerRange exclude = getRange(l2, excludeInd++);
+        IntegerRange range = getRange(l1, rangeInd++);
         List<IntegerRange> result = new ArrayList<>();
 
         while (true) {
-            if (compareCanonicalEndpoint(exclude.getLower(), range.getLower()) < 0) {
-                throwParentTypeException(exclude.getLower());
-            } else if (compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) > 0) {
+            if (range == null || exclude == null) {
+                break;
+            }
+
+            if (compareCanonicalEndpoint(exclude.getUpper(), range.getLower()) < 0) {
+                // exclude < range
+                exclude = getRange(l2, excludeInd++);
+            } else if (compareCanonicalEndpoint(range.getUpper(), exclude.getLower()) < 0) {
+                // range < exclude
                 result.add(range);
-                range = getRange(r1, rangeInd++);
-            } else if ((lower = compareCanonicalEndpoint(exclude.getLower(), range.getLower())) >= 0
-                    && compareCanonicalEndpoint(exclude.getLower(), range.getUpper()) <= 0) {
-
-                if ((upper = compareCanonicalEndpoint(exclude.getUpper(), range.getUpper())) > 0) {
-                    throwParentTypeException(exclude.getUpper());
-                }
-
-                if (lower != 0) {
+                range = getRange(l1, rangeInd++);
+            } else if (compareCanonicalEndpoint(range.getLower(), exclude.getLower()) >= 0
+                    && compareCanonicalEndpoint(range.getUpper(), exclude.getUpper()) <= 0) {
+                // range included in exclude
+                range = getRange(l1, rangeInd++);
+            } else if (compareCanonicalEndpoint(exclude.getLower(), range.getLower()) >= 0
+                    && compareCanonicalEndpoint(exclude.getUpper(), range.getUpper()) <= 0) {
+                // exclude included in range
+                if (compareCanonicalEndpoint(exclude.getLower(), range.getLower()) > 0) {
                     result.add(new IntegerRange(range.getLower(), exclude.getLower() - 1));
                 }
 
-                if (upper != 0) {
-                    result.add(new IntegerRange(exclude.getUpper() + 1, range.getUpper()));
+                if (compareCanonicalEndpoint(range.getUpper(), exclude.getUpper()) > 0) {
+                    range = new IntegerRange(exclude.getUpper() + 1, range.getUpper());
+                } else {
+                    range = getRange(l1, rangeInd++);
                 }
 
-                exclude = getRange(r2, excludeInd++);
-                range = getRange(r1, rangeInd++);
+                exclude = getRange(l2, excludeInd++);
+            } else if (compareCanonicalEndpoint(range.getUpper(), exclude.getLower()) >= 0
+                    && compareCanonicalEndpoint(range.getUpper(), exclude.getUpper()) <= 0) {
+                // range < exclude with intersection
+                result.add(new IntegerRange(range.getLower(), exclude.getLower() - 1));
+                range = getRange(l1, rangeInd++);
+            } else if (compareCanonicalEndpoint(exclude.getUpper(), range.getLower()) >= 0
+                    && compareCanonicalEndpoint(exclude.getUpper(), range.getUpper()) <= 0) {
+                // exclude < range with intersection
+                range = new IntegerRange(exclude.getUpper() + 1, range.getUpper());
+                exclude = getRange(l2, excludeInd++);
             } else {
                 throw new IllegalStateException();
             }
+        }
 
-            if (range == null && exclude != null) {
-                throwParentTypeException(exclude.getLower());
-            }
-
-            if (exclude == null) {
-                while (range != null) {
-                    result.add(range);
-                    range = getRange(r1, rangeInd++);
-                }
-                break;
-            }
+        while (range != null) {
+            result.add(range);
+            range = getRange(l1, rangeInd++);
         }
 
         return result;
@@ -344,10 +352,6 @@ public class IntegerRange {
         }
 
         return max;
-    }
-
-    private static void throwParentTypeException(long value) {
-        throw new CompilerException(value + " doesn't exist in parent type");
     }
 
     @Override

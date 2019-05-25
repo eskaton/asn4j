@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
+import java.util.Objects;
+
 public class BinOpNode extends AbstractNode {
 
     private Node left;
@@ -46,6 +48,26 @@ public class BinOpNode extends AbstractNode {
 
     public Node getRight() {
         return right;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        BinOpNode binOpNode = (BinOpNode) other;
+
+        return Objects.equals(left, binOpNode.left) && Objects.equals(right, binOpNode.right);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(left, right);
     }
 
 }

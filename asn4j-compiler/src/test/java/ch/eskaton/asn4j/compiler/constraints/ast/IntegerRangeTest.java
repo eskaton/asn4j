@@ -171,18 +171,6 @@ public class IntegerRangeTest {
 
     @Test
     public void testExclude() {
-        assertThrows(() -> exclude(asList(createRange(5L, 10L)), asList(createRange(3L, 4L))),
-                CompilerException.class);
-
-        assertThrows(() -> exclude(asList(createRange(5L, 10L)), asList(createRange(3L, 6L))),
-                CompilerException.class);
-
-        assertThrows(() -> exclude(asList(createRange(5L, 10L)), asList(createRange(8L, 12L))),
-                CompilerException.class);
-
-        assertThrows(() -> exclude(asList(createRange(5L, 10L)), asList(createRange(11L, 12L))),
-                CompilerException.class);
-
         assertEquals(emptyList(), exclude(emptyList(), emptyList()));
 
         assertEquals(emptyList(), exclude(emptyList(), asList(createRange(0L, 10L))));
@@ -197,6 +185,12 @@ public class IntegerRangeTest {
                 exclude(asList(createRange(0L, 10L)), asList(createRange(3L, 8L))));
 
         assertEquals(asList(createRange(0L, 5L)), exclude(asList(createRange(0L, 10L)), asList(createRange(6L, 10L))));
+
+        assertEquals(asList(createRange(0L, 4L)),
+                exclude(asList(createRange(0L, 10L)), asList(createRange(5L, 12L))));
+
+        assertEquals(asList(createRange(11L, 12L)),
+                exclude(asList(createRange(5L, 12L)), asList(createRange(0L, 10L))));
 
         assertEquals(asList(createRange(0L, 5L), createRange(7L, 10L), createRange(20L, 30L)),
                 exclude(asList(createRange(0L, 10L), createRange(20L, 30L)), asList(createRange(6L, 6L))));
