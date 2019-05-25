@@ -30,7 +30,9 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
+import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import org.junit.Test;
 
@@ -81,6 +83,15 @@ public class IntegerConstraintOptimizingVisitorTest {
                 equalTo(value(range(1, 2), range(5, 5))));
     }
 
+    @Test
+    public void testVisitBinOpNodeNot() {
+        Visitor visitor = new IntegerConstraintOptimizingVisitor();
+
+        assertThat(visitor.visit(intersection(value(1, 10), not(value(3, 7)))),
+                equalTo(value(range(1, 2), range(8, 10))));
+        assertThat(visitor.visit(intersection(not(value(3, 7)), value(1, 6))), equalTo(value(1, 2)));
+    }
+
     private static IntegerRangeValueNode value() {
         return new IntegerRangeValueNode(emptyList());
     }
@@ -97,16 +108,20 @@ public class IntegerConstraintOptimizingVisitorTest {
         return new IntegerRange(lower, upper);
     }
 
-    private static BinOpNode union(IntegerRangeValueNode left, IntegerRangeValueNode right) {
+    private static BinOpNode union(Node left, Node right) {
         return new BinOpNode(NodeType.UNION, left, right);
     }
 
-    private static BinOpNode intersection(IntegerRangeValueNode left, IntegerRangeValueNode right) {
+    private static BinOpNode intersection(Node left, Node right) {
         return new BinOpNode(NodeType.INTERSECTION, left, right);
     }
 
-    private static BinOpNode complement(IntegerRangeValueNode left, IntegerRangeValueNode right) {
+    private static BinOpNode complement(Node left, Node right) {
         return new BinOpNode(NodeType.COMPLEMENT, left, right);
+    }
+
+    private static OpNode not(Node node) {
+        return new OpNode(NodeType.NEGATION, node);
     }
 
 }
