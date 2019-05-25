@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
+import java.util.Objects;
+
 public class ValueNode<T> extends AbstractNode {
 
     private T value;
@@ -39,6 +41,26 @@ public class ValueNode<T> extends AbstractNode {
 
     public T getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        ValueNode<?> valueNode = (ValueNode<?>) other;
+
+        return Objects.equals(value, valueNode.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
 }
