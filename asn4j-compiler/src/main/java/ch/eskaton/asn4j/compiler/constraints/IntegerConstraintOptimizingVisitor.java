@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 
 import java.util.List;
 
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.NEGATION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.VALUE;
@@ -73,7 +74,7 @@ public class IntegerConstraintOptimizingVisitor implements Visitor<Node, List<In
                     case COMPLEMENT:
                         return new IntegerRangeValueNode(IntegerRange.exclude(leftValue, rightValue));
                     default:
-                        throw new IllegalStateException("Unimplemented node type: " + node.getType());
+                        return throwUnimplementedNodeType(node);
                 }
 
             case NEGATION << 16 | VALUE:
@@ -92,7 +93,7 @@ public class IntegerConstraintOptimizingVisitor implements Visitor<Node, List<In
                     if (node.getType() == INTERSECTION) {
                         return new IntegerRangeValueNode(IntegerRange.exclude(leftValue, rightValue));
                     } else {
-                        throw new IllegalStateException("Unimplemented node type: " + node.getType());
+                        return throwUnimplementedNodeType(node);
                     }
                 }
 

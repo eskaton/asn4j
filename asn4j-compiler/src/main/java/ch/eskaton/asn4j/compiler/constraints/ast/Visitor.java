@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
+
 public interface Visitor<T, V> {
 
     default T visit(Node node) {
@@ -44,7 +46,7 @@ public interface Visitor<T, V> {
             case ALL_VALUES:
                 return visit((AllValuesNode) node);
             default:
-                throw new IllegalStateException("Unimplemented node type: " + node.getType());
+                return throwUnimplementedNodeType(node);
         }
     }
 

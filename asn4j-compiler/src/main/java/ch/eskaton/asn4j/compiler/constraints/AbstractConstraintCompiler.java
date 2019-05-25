@@ -303,8 +303,12 @@ public abstract class AbstractConstraintCompiler {
             case NEGATION:
                 return buildExpression(((OpNode) node).getNode()).map(this::negate);
             default:
-                throw new IllegalStateException("Unimplemented node type: " + node.getType());
+                return throwUnimplementedNodeType(node);
         }
+    }
+
+    private Optional<String> throwUnimplementedNodeType(Node node) {
+        throw new IllegalStateException("Unimplemented node type: " + node.getType());
     }
 
     private String negate(String expr) {

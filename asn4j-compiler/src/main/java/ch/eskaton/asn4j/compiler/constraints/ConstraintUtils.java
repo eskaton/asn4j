@@ -25,35 +25,17 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints.ast;
+package ch.eskaton.asn4j.compiler.constraints;
 
-public enum NodeType {
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 
-    UNION(Id.UNION), INTERSECTION(Id.INTERSECTION), COMPLEMENT(Id.COMPLEMENT), NEGATION(Id.NEGATION),
-    VALUE(Id.VALUE), ALL_VALUES(Id.ALL_VALUES), SIZE(Id.SIZE);
+public class ConstraintUtils {
 
-    private final int id;
-
-    NodeType(int id) {
-        this.id = id;
+    private ConstraintUtils() {
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public static class Id {
-        public static final int UNION = 1;
-        public static final int INTERSECTION = 2;
-        public static final int COMPLEMENT = 3;
-        public static final int NEGATION = 4;
-        public static final int VALUE = 5;
-        public static final int ALL_VALUES = 6;
-        public static final int SIZE = 7;
-
-        private Id() {
-        }
-
+    public static <T> T throwUnimplementedNodeType(Node node) {
+        throw new IllegalStateException("Unimplemented node type: " + node.getType());
     }
 
 }

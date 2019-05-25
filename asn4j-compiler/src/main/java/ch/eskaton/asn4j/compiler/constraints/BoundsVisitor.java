@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import java.util.List;
 import java.util.Optional;
 
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.commons.utils.OptionalUtils.combine;
 
@@ -59,7 +60,7 @@ public interface BoundsVisitor<V> extends Visitor<Optional<List<IntegerRange>>, 
             case COMPLEMENT:
                 return combine(left, right, IntegerRange::exclude);
             default:
-                throw new IllegalStateException("Unimplemented node type: " + node.getType());
+                return throwUnimplementedNodeType(node);
         }
     }
 
@@ -68,7 +69,7 @@ public interface BoundsVisitor<V> extends Visitor<Optional<List<IntegerRange>>, 
         if (node.getType() == NEGATION) {
             return node.getNode().accept(this).map(IntegerRange::invert);
         } else {
-            throw new IllegalStateException("Unimplemented node type: " + node.getType());
+            return throwUnimplementedNodeType(node);
         }
     }
 
