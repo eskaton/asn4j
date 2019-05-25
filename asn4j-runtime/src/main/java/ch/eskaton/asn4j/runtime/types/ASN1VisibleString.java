@@ -29,11 +29,12 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 26, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1VisibleString extends AbstractASN1String {
 
-    public static ASN1VisibleString fromString(String s) {
+    public static ASN1VisibleString fromString(String s) throws ASN1RuntimeException {
         ASN1VisibleString vs = new ASN1VisibleString();
         vs.setValue(s);
         return vs;
