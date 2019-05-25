@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
 import java.util.Objects;

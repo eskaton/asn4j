@@ -28,7 +28,6 @@
 package ch.eskaton.asn4j.runtime.annotations;
 
 import ch.eskaton.asn4j.runtime.Clazz;
-import ch.eskaton.asn4j.runtime.TagId;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

@@ -1,6 +1,8 @@
 package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.exceptions.ValidationException;
+import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,5 +26,12 @@ public abstract class AbstractASN1OID implements ASN1Type {
     }
 
     protected abstract ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) throws ValidationException;
+
+    @Override
+    public String toString() {
+        return ToString.builder(this).addAll()
+                .map("components", c -> StringUtils.join(((List<Integer>)c), "."))
+                .build();
+    }
 
 }

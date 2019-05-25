@@ -28,7 +28,6 @@
 package ch.eskaton.asn4j.parser.ast.constraints;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;

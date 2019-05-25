@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.runtime;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
+
 import java.io.IOException;
 
 public class TLV {
@@ -120,8 +122,7 @@ public class TLV {
 
     @Override
     public String toString() {
-        return "TLV [pos=" + pos + ", clazz=" + clazz + ", constructed=" + constructed + ", tag=" + tag +
-                ", length=" + length + ", nextTlv=" + nextTlv + "]";
+        return ToString.get(this);
     }
 
 }

@@ -27,13 +27,13 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
-import java.util.List;
-
 import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
+
+import java.util.List;
 
 public interface Type extends Node {
 

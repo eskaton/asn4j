@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.AbstractNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
 

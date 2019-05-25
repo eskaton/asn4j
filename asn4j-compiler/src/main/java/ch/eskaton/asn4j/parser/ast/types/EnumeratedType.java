@@ -27,12 +27,11 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
-import java.util.List;
-
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
-import ch.eskaton.commons.utils.StringUtils;
+
+import java.util.List;
 
 public class EnumeratedType extends AbstractType {
 

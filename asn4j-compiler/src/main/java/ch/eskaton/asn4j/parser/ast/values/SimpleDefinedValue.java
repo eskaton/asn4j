@@ -32,7 +32,6 @@ import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
 

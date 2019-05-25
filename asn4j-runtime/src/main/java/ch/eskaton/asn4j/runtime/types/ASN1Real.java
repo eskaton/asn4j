@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.math.BigDecimal;
 import java.util.Objects;
@@ -41,11 +42,9 @@ public class ASN1Real implements ASN1Type {
         NORMAL, PLUS_INFINITY, MINUS_INFINITY, NOT_A_NUMBER, MINUS_ZERO
     }
 
-    public static final ASN1Real PLUS_INFINITY = new ASN1Real(
-            Type.PLUS_INFINITY);
+    public static final ASN1Real PLUS_INFINITY = new ASN1Real(Type.PLUS_INFINITY);
 
-    public static final ASN1Real MINUS_INFINITY = new ASN1Real(
-            Type.MINUS_INFINITY);
+    public static final ASN1Real MINUS_INFINITY = new ASN1Real(Type.MINUS_INFINITY);
 
     public static final ASN1Real NOT_A_NUMBER = new ASN1Real(Type.NOT_A_NUMBER);
 
@@ -94,12 +93,9 @@ public class ASN1Real implements ASN1Type {
         return value;
     }
 
+    @Override
     public String toString() {
-        if (type == Type.NORMAL) {
-            return String.valueOf(value);
-        } else {
-            return type.toString();
-        }
+        return ToString.get(this);
     }
 
     @Override

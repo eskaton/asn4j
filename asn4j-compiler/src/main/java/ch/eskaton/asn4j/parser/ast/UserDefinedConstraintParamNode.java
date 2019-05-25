@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Governor;
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.commons.utils.StringUtils;
 
 public class UserDefinedConstraintParamNode extends AbstractNode {
 

@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.ClassNumber;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
-import ch.eskaton.commons.utils.StringUtils;
 
 public class Tag implements Node {
 

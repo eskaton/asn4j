@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,11 +55,6 @@ public class ASN1RelativeOID extends AbstractASN1OID {
 
     protected ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) {
         return components;
-    }
-
-    @Override
-    public String toString() {
-        return components != null ? StringUtils.join(components, ".") : "null";
     }
 
     @Override

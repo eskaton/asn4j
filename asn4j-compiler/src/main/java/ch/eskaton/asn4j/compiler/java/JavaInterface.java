@@ -27,13 +27,13 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.commons.utils.StringUtils;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-
-import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaInterface implements JavaStructure {
 

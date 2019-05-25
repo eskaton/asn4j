@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 
 import java.util.List;
 import java.util.Optional;

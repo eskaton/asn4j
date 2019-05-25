@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.runtime;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
+
 import java.util.List;
 
 public class DecoderState {
@@ -59,7 +61,7 @@ public class DecoderState {
 
     @Override
     public String toString() {
-        return "DecoderState [pos=" + pos + ", length=" + length + ", tlv=" + tlv + "]";
+        return ToString.get(this);
     }
 
 }

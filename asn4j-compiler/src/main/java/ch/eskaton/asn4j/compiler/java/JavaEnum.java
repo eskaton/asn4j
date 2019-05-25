@@ -27,12 +27,12 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.commons.utils.StringUtils;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import ch.eskaton.commons.utils.StringUtils;
 
 public class JavaEnum implements JavaObject {
 

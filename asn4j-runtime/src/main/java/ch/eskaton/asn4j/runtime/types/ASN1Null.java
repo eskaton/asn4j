@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
@@ -37,7 +38,7 @@ public class ASN1Null implements ASN1Type {
 
     @Override
     public String toString() {
-    	return "null";
+        return ToString.get(this);
     }
 
     @Override

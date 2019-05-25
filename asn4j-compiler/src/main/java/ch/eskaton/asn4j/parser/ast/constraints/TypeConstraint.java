@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.parser.ast.constraints;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.commons.utils.StringUtils;
 
 public class TypeConstraint extends AbstractConstraint {
 

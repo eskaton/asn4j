@@ -27,12 +27,12 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
 import ch.eskaton.commons.utils.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Collection extends AbstractType {
 

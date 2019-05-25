@@ -30,7 +30,6 @@ package ch.eskaton.asn4j.parser.ast.types;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.AbstractNode;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
-import ch.eskaton.commons.utils.StringUtils;
 
 public class ClassNumber extends AbstractNode {
 
