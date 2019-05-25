@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
-import ch.eskaton.commons.utils.StringUtils;
 
 public class Governor extends ParamGovernorNode {
 

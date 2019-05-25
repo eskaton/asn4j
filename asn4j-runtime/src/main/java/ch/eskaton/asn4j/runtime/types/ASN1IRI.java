@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -51,11 +50,6 @@ public class ASN1IRI extends AbstractASN1IRI {
         iri.setValue(components);
 
         return iri;
-    }
-
-    @Override
-    public String toString() {
-        return components != null ? "/" + StringUtils.join(components, "/") : "null";
     }
 
     @Override

@@ -27,8 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 

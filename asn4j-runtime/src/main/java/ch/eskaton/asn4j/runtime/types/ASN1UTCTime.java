@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.parsing.DateTime;
 import ch.eskaton.asn4j.runtime.parsing.UTCTimeParser;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
@@ -103,7 +104,7 @@ public class ASN1UTCTime extends ASN1VisibleString {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "[dateTime=" + dateTime + ']';
+        return ToString.getExcept(this, "value");
     }
 
 }

@@ -27,7 +27,16 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.*;
+import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
+import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 
 import java.util.List;
 

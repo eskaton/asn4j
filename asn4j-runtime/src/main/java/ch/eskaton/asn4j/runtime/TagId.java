@@ -30,6 +30,7 @@
 package ch.eskaton.asn4j.runtime;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.List;
 import java.util.Objects;
@@ -89,7 +90,7 @@ public class TagId {
 
     @Override
     public String toString() {
-        return "TagId[class=" + clazz + ", tag=" + tag + ']';
+        return ToString.get(this);
     }
 
 }

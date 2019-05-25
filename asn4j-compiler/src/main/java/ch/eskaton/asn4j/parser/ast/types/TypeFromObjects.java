@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
-import java.util.List;
-
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
 import ch.eskaton.asn4j.parser.ast.FieldNameNode;
@@ -37,6 +35,8 @@ import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.utils.ToString;
+
+import java.util.List;
 
 public class TypeFromObjects extends InformationFromObjects implements Type {
 

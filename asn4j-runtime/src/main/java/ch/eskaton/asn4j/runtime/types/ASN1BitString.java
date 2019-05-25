@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.utils.HexDump;
 import ch.eskaton.commons.utils.StreamsUtils;
 
@@ -134,6 +135,13 @@ public class ASN1BitString implements ASN1Type {
     }
 
     @Override
+    public String toString() {
+        return ToString.builder(this).addAll()
+                .map("value", v -> "0x" + HexDump.toHexString(value))
+                .build();
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(value);
     }
@@ -151,11 +159,6 @@ public class ASN1BitString implements ASN1Type {
         ASN1BitString other = (ASN1BitString) obj;
 
         return unusedBits == other.unusedBits && Arrays.equals(value, other.value);
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "[value=0x" + HexDump.toHexString(value) + ", unusedBits=" + unusedBits + "]";
     }
 
 }

@@ -27,9 +27,9 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
 import java.util.List;

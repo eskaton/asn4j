@@ -30,10 +30,6 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 
-import static ch.eskaton.commons.utils.StringUtils.asString;
-import static ch.eskaton.commons.utils.StringUtils.concat;
-import static ch.eskaton.commons.utils.StringUtils.ifPresent;
-
 public class SetSpecsNode extends AbstractNode {
 
     private ElementSet rootElements;

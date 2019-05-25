@@ -28,8 +28,6 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.commons.utils.CollectionUtils;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
 

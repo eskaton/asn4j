@@ -29,9 +29,6 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
-import ch.eskaton.commons.utils.StringUtils;
-
-import java.util.Optional;
 
 public class OIDComponentNode extends AbstractNode {
 

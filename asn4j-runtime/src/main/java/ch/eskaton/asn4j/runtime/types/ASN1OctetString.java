@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -59,7 +60,7 @@ public class ASN1OctetString implements ASN1Type {
 
     @Override
     public String toString() {
-        return new String(value);
+        return ToString.get(this);
     }
 
     @Override

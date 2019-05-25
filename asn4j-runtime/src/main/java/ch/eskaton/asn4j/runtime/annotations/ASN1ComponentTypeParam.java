@@ -27,10 +27,10 @@
 
 package ch.eskaton.asn4j.runtime.annotations;
 
+import ch.eskaton.asn4j.runtime.types.ASN1Type;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-
-import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ASN1ComponentTypeParam {
