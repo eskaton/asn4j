@@ -25,43 +25,30 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints.ast;
+package ch.eskaton.asn4j.parser.ast.values;
 
-import java.util.List;
-import java.util.Objects;
-
-public class SizeNode extends AbstractNode {
-
-    private List<IntegerRange> size;
-
-    public SizeNode(List<IntegerRange> size) {
-        super(NodeType.SIZE);
-
-        this.size = size;
-    }
-
-    public List<IntegerRange> getSize() {
-        return size;
-    }
+public class BitStringValueComparator implements java.util.Comparator<BitStringValue> {
 
     @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
+    public int compare(BitStringValue bitString1, BitStringValue bitString2) {
+        int result = Integer.compare(bitString1.getSize(), bitString2.getSize());
+
+        if (result != 0) {
+            return result;
         }
 
-        if (other == null || getClass() != other.getClass()) {
-            return false;
+        byte[] value1 = bitString1.getByteValue();
+        byte[] value2 = bitString2.getByteValue();
+
+        for (int i = 0; i < value1.length; i++) {
+            result = Integer.compare(value1[i], value2[i]);
+
+            if (result != 0) {
+                return result;
+            }
         }
 
-        SizeNode sizeNode = (SizeNode) other;
-
-        return Objects.equals(size, sizeNode.size);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(size);
+        return 0;
     }
 
 }

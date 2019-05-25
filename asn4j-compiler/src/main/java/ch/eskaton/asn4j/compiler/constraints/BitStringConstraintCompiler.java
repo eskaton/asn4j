@@ -29,10 +29,10 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
@@ -57,6 +57,7 @@ import static ch.eskaton.asn4j.compiler.java.JavaType.BYTE_ARRAY;
 import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -84,7 +85,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                 // TODO: implement a more convenient resolver
                 BitStringValue bitStringValue = ctx.resolveGenericValue(BitStringValue.class, base, value);
 
-                return new ValueNode<>(bitStringValue);
+                return new BitStringValueNode(singletonList(bitStringValue));
             } catch (Exception e) {
                 throw new CompilerException("Invalid single-value constraint %s for BIT STRING type", e,
                         value.getClass().getSimpleName());
@@ -114,12 +115,16 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
+    protected Node optimize(Node node) {
+        return new BitStringConstraintOptimizingVisitor().visit(node);
+    }
+
+    @Override
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                BitStringValue value = ((ValueNode<BitStringValue>) node).getValue();
-                return Optional.of("(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) +
-                        ", value) && " + value.getUnusedBits() + " == unusedBits)");
+                List<BitStringValue> values = ((BitStringValueNode) node).getValue();
+                return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
             case ALL_VALUES:
                 return Optional.empty();
             case SIZE:
@@ -131,6 +136,11 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
             default:
                 return super.buildExpression(node);
         }
+    }
+
+    private String buildExpression(BitStringValue value) {
+        return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) +
+                ", value) && " + value.getUnusedBits() + " == unusedBits)";
     }
 
 }

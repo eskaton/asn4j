@@ -27,41 +27,14 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+
 import java.util.List;
-import java.util.Objects;
 
-public class SizeNode extends AbstractNode {
+public class BitStringValueNode extends ValueNode<List<BitStringValue>> {
 
-    private List<IntegerRange> size;
-
-    public SizeNode(List<IntegerRange> size) {
-        super(NodeType.SIZE);
-
-        this.size = size;
-    }
-
-    public List<IntegerRange> getSize() {
-        return size;
-    }
-
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-
-        if (other == null || getClass() != other.getClass()) {
-            return false;
-        }
-
-        SizeNode sizeNode = (SizeNode) other;
-
-        return Objects.equals(size, sizeNode.size);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(size);
+    public BitStringValueNode(List<BitStringValue> value) {
+        super(value);
     }
 
 }

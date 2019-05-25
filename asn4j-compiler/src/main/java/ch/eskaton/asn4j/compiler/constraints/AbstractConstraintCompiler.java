@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
@@ -305,10 +306,6 @@ public abstract class AbstractConstraintCompiler {
             default:
                 return throwUnimplementedNodeType(node);
         }
-    }
-
-    private Optional<String> throwUnimplementedNodeType(Node node) {
-        throw new IllegalStateException("Unimplemented node type: " + node.getType());
     }
 
     private String negate(String expr) {

@@ -25,43 +25,34 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints.ast;
+package ch.eskaton.asn4j.compiler.constraints;
 
-import java.util.List;
-import java.util.Objects;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
+import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 
-public class SizeNode extends AbstractNode {
+public class ConstraintTestUtils {
 
-    private List<IntegerRange> size;
-
-    public SizeNode(List<IntegerRange> size) {
-        super(NodeType.SIZE);
-
-        this.size = size;
+    static BinOpNode union(Node left, Node right) {
+        return new BinOpNode(NodeType.UNION, left, right);
     }
 
-    public List<IntegerRange> getSize() {
-        return size;
+    static BinOpNode intersection(Node left, Node right) {
+        return new BinOpNode(NodeType.INTERSECTION, left, right);
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-
-        if (other == null || getClass() != other.getClass()) {
-            return false;
-        }
-
-        SizeNode sizeNode = (SizeNode) other;
-
-        return Objects.equals(size, sizeNode.size);
+    static BinOpNode complement(Node left, Node right) {
+        return new BinOpNode(NodeType.COMPLEMENT, left, right);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(size);
+    static OpNode not(Node node) {
+        return new OpNode(NodeType.NEGATION, node);
+    }
+
+    static IntegerRange range(long lower, long upper) {
+        return new IntegerRange(lower, upper);
     }
 
 }

@@ -88,6 +88,14 @@ public class BitStringValue extends AbstractValue {
         return unusedBits;
     }
 
+    public int getSize() {
+        if (byteValue == null) {
+            return -1;
+        }
+
+        return byteValue.length * 8 - unusedBits;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
