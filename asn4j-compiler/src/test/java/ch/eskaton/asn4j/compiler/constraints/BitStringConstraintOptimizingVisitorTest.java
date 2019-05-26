@@ -28,8 +28,6 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import org.junit.Test;
@@ -38,11 +36,11 @@ import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.compleme
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.range;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.size;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -103,7 +101,8 @@ public class BitStringConstraintOptimizingVisitorTest {
         assertThat(visitor.visit(union(size(), size(1, 2))), equalTo(size(1, 2)));
         assertThat(visitor.visit(union(size(1, 2), size(2, 3))), equalTo(size(1, 3)));
         assertThat(visitor.visit(union(size(1, 2), size(3, 4))), equalTo(size(1, 4)));
-        assertThat(visitor.visit(union(size(1, 2), size(4, 5))), equalTo(size(range(1, 2), range(4, 5))));
+        assertThat(visitor.visit(union(size(1, 2), size(4, 5))), equalTo(size(range(1, 2),
+                range(4, 5))));
         assertThat(visitor.visit(union(size(1, 2), size(range(3, 4), range(6, 7)))),
                 equalTo(size(range(1, 4), range(6, 7))));
     }
@@ -142,16 +141,8 @@ public class BitStringConstraintOptimizingVisitorTest {
         assertThat(visitor.visit(intersection(not(size(3, 7)), size(1, 6))), equalTo(size(1, 2)));
     }
 
-    private static SizeNode size() {
-        return new SizeNode(emptyList());
-    }
-
-    private static SizeNode size(long lower, long upper) {
-        return new SizeNode(singletonList(range(lower, upper)));
-    }
-
-    private static SizeNode size(IntegerRange... ranges) {
-        return new SizeNode(asList(ranges));
+    private BitStringValue bitString(int value) {
+        return new BitStringValue(NO_POSITION, new byte[] { (byte) value }, 0);
     }
 
     private static BitStringValueNode value() {
@@ -160,10 +151,6 @@ public class BitStringConstraintOptimizingVisitorTest {
 
     private static BitStringValueNode value(BitStringValue... values) {
         return new BitStringValueNode(asList(values));
-    }
-
-    private BitStringValue bitString(int value) {
-        return new BitStringValue(NO_POSITION, new byte[] { (byte) value }, 0);
     }
 
 }
