@@ -44,9 +44,12 @@ import ch.eskaton.commons.collections.Lists;
 import ch.eskaton.commons.collections.Sets;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
+import static java.util.stream.Collectors.toList;
 
 public class BitStringConstraintOptimizingVisitor implements Visitor<Node, List<BitStringValue>> {
 
@@ -68,7 +71,7 @@ public class BitStringConstraintOptimizingVisitor implements Visitor<Node, List<
                 return transformValueNegation(node, (BitStringValueNode) left, right);
 
             case NEGATION_VALUE:
-                return transformValueNegation(node, (BitStringValueNode)right, left);
+                return transformValueNegation(node, (BitStringValueNode) right, left);
 
             case SIZE_SIZE:
                 return transformSizeSize(node, (SizeNode) left, (SizeNode) right);
@@ -78,6 +81,12 @@ public class BitStringConstraintOptimizingVisitor implements Visitor<Node, List<
 
             case NEGATION_SIZE:
                 return transformSizeNegation(node, (SizeNode) right, left);
+
+            case VALUE_SIZE:
+                return transformValueSize(node, (BitStringValueNode) left, (SizeNode) right);
+
+            case SIZE_VALUE:
+                return transformSizeValue(node, (SizeNode) left, (BitStringValueNode) right);
 
             default:
                 return node;
@@ -189,6 +198,73 @@ public class BitStringConstraintOptimizingVisitor implements Visitor<Node, List<
         }
 
         return node;
+    }
+
+    private Node transformValueSize(BinOpNode node, BitStringValueNode left, SizeNode right) {
+        List<BitStringValue> values = left.getValue();
+        List<IntegerRange> sizes = right.getSize();
+
+        switch (node.getType()) {
+            case UNION:
+                return transformValueSizeUnion(values, sizes);
+            case INTERSECTION:
+                return transformValueSizeIntersection(values, sizes);
+            case COMPLEMENT:
+                return transformValueSizeComplement(values, sizes);
+            default:
+                return throwUnimplementedNodeType(node);
+        }
+    }
+
+    private Node transformSizeValue(BinOpNode node, SizeNode left, BitStringValueNode right) {
+        List<IntegerRange> sizes = left.getSize();
+        List<BitStringValue> values = right.getValue();
+
+        switch (node.getType()) {
+            case UNION:
+                return transformValueSizeUnion(values, sizes);
+            case INTERSECTION:
+                return transformValueSizeIntersection(values, sizes);
+            case COMPLEMENT:
+                return node;
+            default:
+                return throwUnimplementedNodeType(node);
+        }
+    }
+
+    private Node transformValueSizeUnion(List<BitStringValue> values, List<IntegerRange> sizes) {
+        if (sizes.isEmpty()) {
+            return new BitStringValueNode(values);
+        }
+
+        values = values.stream()
+                .filter(value -> sizes.stream().noneMatch(inRangePredicate(value)))
+                .collect(toList());
+
+        if (values.isEmpty()) {
+            return new SizeNode(sizes);
+        }
+
+        return new BinOpNode(UNION, new BitStringValueNode(values), new SizeNode(sizes));
+    }
+
+    private Node transformValueSizeIntersection(List<BitStringValue> values, List<IntegerRange> sizes) {
+        values = values.stream()
+                .filter(value -> sizes.stream().anyMatch(inRangePredicate(value)))
+                .collect(toList());
+
+        return new BitStringValueNode(values);
+    }
+
+    private Node transformValueSizeComplement(List<BitStringValue> values, List<IntegerRange> sizes) {
+        values = values.stream()
+                .filter(value -> sizes.stream().noneMatch(inRangePredicate(value))).collect(toList());
+
+        return new BitStringValueNode(values);
+    }
+
+    private Predicate<IntegerRange> inRangePredicate(BitStringValue value) {
+        return size -> size.getLower() <= value.getSize() && size.getUpper() >= value.getSize();
     }
 
 }

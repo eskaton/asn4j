@@ -32,7 +32,9 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.BinOpType.BinOpId.NEGATI
 import static ch.eskaton.asn4j.compiler.constraints.ast.BinOpType.BinOpId.NEGATION_VALUE_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.BinOpType.BinOpId.SIZE_NEGATION_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.BinOpType.BinOpId.SIZE_SIZE_ID;
+import static ch.eskaton.asn4j.compiler.constraints.ast.BinOpType.BinOpId.SIZE_VALUE_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.BinOpType.BinOpId.VALUE_NEGATION_ID;
+import static ch.eskaton.asn4j.compiler.constraints.ast.BinOpType.BinOpId.VALUE_SIZE_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.BinOpType.BinOpId.VALUE_VALUE_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.NEGATION_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.SIZE_ID;
@@ -43,7 +45,7 @@ public enum BinOpType {
 
     VALUE_VALUE(VALUE_VALUE_ID), NEGATION_VALUE(NEGATION_VALUE_ID), VALUE_NEGATION(VALUE_NEGATION_ID),
     SIZE_SIZE(SIZE_SIZE_ID), NEGATION_SIZE(NEGATION_SIZE_ID), SIZE_NEGATION(SIZE_NEGATION_ID),
-    IGNORED(IGNORED_ID);
+    VALUE_SIZE(VALUE_SIZE_ID), SIZE_VALUE(SIZE_VALUE_ID), IGNORED(IGNORED_ID);
 
     private final int id;
 
@@ -69,6 +71,8 @@ public enum BinOpType {
         public static final int SIZE_SIZE_ID = combine(SIZE_ID, SIZE_ID);
         public static final int NEGATION_SIZE_ID = combine(NEGATION_ID, SIZE_ID);
         public static final int SIZE_NEGATION_ID = combine(SIZE_ID, NEGATION_ID);
+        public static final int VALUE_SIZE_ID = combine(VALUE_ID, SIZE_ID);
+        public static final int SIZE_VALUE_ID = combine(SIZE_ID, VALUE_ID);
         public static final int IGNORED_ID = combine(0xff, 0xff);
 
         private BinOpId() {
