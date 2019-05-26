@@ -100,7 +100,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             IntegerValue lower = ((RangeNode) elements).getLower().getLowerEndPointValue(min);
             IntegerValue upper = ((RangeNode) elements).getUpper().getUpperEndPointValue(max);
 
-            return new IntegerRangeValueNode(singletonList(new IntegerRange(lower.getValue().longValue(), upper.getValue().longValue())));
+            return new IntegerRangeValueNode(singletonList(new IntegerRange(lower.getValue().longValue(), upper
+                    .getValue().longValue())));
         } else {
             throw new CompilerException("Invalid constraint %s for INTEGER type",
                     elements.getClass().getSimpleName());
@@ -149,8 +150,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         } else if (upper == Long.MAX_VALUE) {
             return String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0)", lower);
         } else {
-            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0 && " +
-                    "value.compareTo(BigInteger.valueOf(%dL)) <= 0)", lower, upper);
+            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0 && "
+                    + "value.compareTo(BigInteger.valueOf(%dL)) <= 0)", lower, upper);
         }
     }
 
