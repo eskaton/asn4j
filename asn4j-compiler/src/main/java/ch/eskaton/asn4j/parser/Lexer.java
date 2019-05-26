@@ -359,7 +359,7 @@ public class Lexer {
     							switch (is.read()) {
     								case '=':
     									pos += 2;
-    									return new Token(ctx, TokenType.ASSIGN, offset, position(line, pos - 1));
+    									return new Token(ctx, TokenType.ASSIGN, offset, position(line, pos - 2));
     								default:
     									is.unread();
     							} // fall through
