@@ -41,6 +41,7 @@ import java.util.Optional;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.commons.utils.OptionalUtils.combine;
+import static java.util.stream.Collectors.toList;
 
 public class SizeVisitor implements Visitor<Optional<SizeNode>, List<IntegerRange>> {
 
@@ -65,7 +66,7 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, List<IntegerRang
                 } else if (left.isPresent()) {
                     return left.map(SizeNode::new);
                 } else {
-                    return right.map(IntegerRange::invert).map(SizeNode::new);
+                    return createInvertedSizeNode(right);
                 }
             default:
                 return throwUnimplementedNodeType(node);
@@ -75,9 +76,7 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, List<IntegerRang
     @Override
     public Optional<SizeNode> visit(OpNode node) {
         if (node.getType() == NEGATION) {
-            return node.getNode().accept(this)
-                    .map(range -> IntegerRange.invert(range.getSize()))
-                    .map(SizeNode::new);
+            return createInvertedSizeNode(node.getNode().accept(this).map(SizeNode::getSize));
         } else {
             return throwUnimplementedNodeType(node);
         }
@@ -91,6 +90,15 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, List<IntegerRang
     @Override
     public Optional<SizeNode> visit(ValueNode<List<IntegerRange>> node) {
         return Optional.of(new SizeNode(node.getValue()));
+    }
+
+    private Optional<SizeNode> createInvertedSizeNode(Optional<List<IntegerRange>> maybeRanges) {
+        return maybeRanges.map(IntegerRange::invert)
+                .map(ranges -> ranges.stream()
+                        .filter(range -> range.getUpper() >= 0)
+                        .map(range -> range.getLower() < 0 ? new IntegerRange(0, range.getUpper()) : range)
+                        .collect(toList()))
+                .map(SizeNode::new);
     }
 
 }

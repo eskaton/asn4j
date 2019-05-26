@@ -29,9 +29,17 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+
+import java.util.Optional;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 public class ConstraintTestUtils {
 
@@ -54,5 +62,42 @@ public class ConstraintTestUtils {
     static IntegerRange range(long lower, long upper) {
         return new IntegerRange(lower, upper);
     }
+
+    static SizeNode size() {
+        return new SizeNode(emptyList());
+    }
+
+    static SizeNode size(long lower, long upper) {
+        return new SizeNode(singletonList(range(lower, upper)));
+    }
+
+    static SizeNode size(IntegerRange... ranges) {
+        return new SizeNode(asList(ranges));
+    }
+
+    static Optional<SizeNode> optSize() {
+        return Optional.of(new SizeNode(emptyList()));
+    }
+
+    static Optional<SizeNode> optSize(long lower, long upper) {
+        return Optional.of(new SizeNode(singletonList(range(lower, upper))));
+    }
+
+    static Optional<SizeNode> optSize(IntegerRange... ranges) {
+        return Optional.of(new SizeNode(asList(ranges)));
+    }
+
+    static IntegerRangeValueNode value() {
+        return new IntegerRangeValueNode(emptyList());
+    }
+
+    static IntegerRangeValueNode value(long lower, long upper) {
+        return new IntegerRangeValueNode(singletonList(range(lower, upper)));
+    }
+
+    static IntegerRangeValueNode value(IntegerRange... ranges) {
+        return new IntegerRangeValueNode(asList(ranges));
+    }
+
 
 }

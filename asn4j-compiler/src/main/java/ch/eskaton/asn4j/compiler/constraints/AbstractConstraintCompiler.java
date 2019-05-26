@@ -245,7 +245,8 @@ public abstract class AbstractConstraintCompiler {
 
             Node node = new IntegerConstraintCompiler(ctx).calculateElements(new IntegerType(NO_POSITION),
                     setSpecs.getRootElements(), Optional.of(bounds.map(b ->
-                            new IntegerValueBounds(((SizeBounds) b).getMinSize(), ((SizeBounds) b).getMaxSize()))
+                            new IntegerValueBounds(Math.max(0, ((SizeBounds) b).getMinSize()),
+                                    ((SizeBounds) b).getMaxSize()))
                             .orElse(new IntegerValueBounds(0L, Long.MAX_VALUE))));
 
             Optional<SizeNode> maybeSizes = new SizeVisitor().visit(node);

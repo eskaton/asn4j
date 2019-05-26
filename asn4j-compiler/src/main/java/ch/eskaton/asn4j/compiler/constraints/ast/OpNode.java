@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
+
 public class OpNode extends AbstractNode {
 
     private Node node;
@@ -43,6 +45,11 @@ public class OpNode extends AbstractNode {
 
     public void setNode(Node node) {
         this.node = node;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }
