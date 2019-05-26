@@ -129,10 +129,8 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                 return Optional.empty();
             case SIZE:
                 List<IntegerRange> sizes = ((SizeNode) node).getSize();
+                return Optional.of(sizes.stream().map(this::buildSizeExpression).collect(Collectors.joining(" || ")));
 
-                return Optional.of(sizes.stream().map(range -> "(" + range.getLower() +
-                        "L <= ASN1BitString.getSize(value, unusedBits) && " + range.getUpper() +
-                        "L >= ASN1BitString.getSize(value, unusedBits))").collect(Collectors.joining(" || ")));
             default:
                 return super.buildExpression(node);
         }
@@ -141,6 +139,22 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     private String buildExpression(BitStringValue value) {
         return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) +
                 ", value) && " + value.getUnusedBits() + " == unusedBits)";
+    }
+
+    private String buildSizeExpression(IntegerRange range) {
+        long lower = range.getLower();
+        long upper = range.getUpper();
+
+        if (lower == upper) {
+            return String.format("(ASN1BitString.getSize(value, unusedBits) == %dL)", lower);
+        } else if (lower == 0) {
+            return String.format("(ASN1BitString.getSize(value, unusedBits) <= %dL)", upper);
+        } else if (upper == Long.MAX_VALUE) {
+            return String.format("(ASN1BitString.getSize(value, unusedBits) >= %dL)", lower);
+        } else {
+            return String.format("(%dL <= ASN1BitString.getSize(value, unusedBits) && "
+                    + "%dL >= ASN1BitString.getSize(value, unusedBits))", lower, upper);
+        }
     }
 
 }
