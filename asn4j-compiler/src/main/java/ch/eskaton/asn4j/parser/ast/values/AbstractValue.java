@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 public class AbstractValue implements Value {
 
@@ -40,6 +41,11 @@ public class AbstractValue implements Value {
     @Override
     public Position getPosition() {
         return position;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }
