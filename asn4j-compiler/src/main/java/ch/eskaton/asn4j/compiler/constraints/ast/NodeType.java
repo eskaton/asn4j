@@ -27,10 +27,18 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.ALL_VALUES_ID;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.COMPLEMENT_ID;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.INTERSECTION_ID;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.NEGATION_ID;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.SIZE_ID;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.UNION_ID;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.VALUE_ID;
+
 public enum NodeType {
 
-    UNION(Id.UNION), INTERSECTION(Id.INTERSECTION), COMPLEMENT(Id.COMPLEMENT), NEGATION(Id.NEGATION),
-    VALUE(Id.VALUE), ALL_VALUES(Id.ALL_VALUES), SIZE(Id.SIZE);
+    UNION(UNION_ID), INTERSECTION(INTERSECTION_ID), COMPLEMENT(COMPLEMENT_ID), NEGATION(NEGATION_ID),
+    VALUE(VALUE_ID), ALL_VALUES(ALL_VALUES_ID), SIZE(SIZE_ID);
 
     private final int id;
 
@@ -43,17 +51,19 @@ public enum NodeType {
     }
 
     public static class Id {
-        public static final int UNION = 1;
-        public static final int INTERSECTION = 2;
-        public static final int COMPLEMENT = 3;
-        public static final int NEGATION = 4;
-        public static final int VALUE = 5;
-        public static final int ALL_VALUES = 6;
-        public static final int SIZE = 7;
+        public static final int UNION_ID = 1;
+        public static final int INTERSECTION_ID = 2;
+        public static final int COMPLEMENT_ID = 3;
+        public static final int NEGATION_ID = 4;
+        public static final int VALUE_ID = 5;
+        public static final int ALL_VALUES_ID = 6;
+        public static final int SIZE_ID = 7;
 
         private Id() {
         }
 
     }
+
+
 
 }

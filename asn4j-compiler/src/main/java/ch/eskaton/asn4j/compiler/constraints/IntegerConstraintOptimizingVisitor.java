@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
@@ -42,8 +43,6 @@ import java.util.List;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.NEGATION;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.VALUE;
 
 public class IntegerConstraintOptimizingVisitor implements Visitor<Node, List<IntegerRange>> {
 
@@ -57,47 +56,15 @@ public class IntegerConstraintOptimizingVisitor implements Visitor<Node, List<In
         Node left = node.getLeft().accept(this);
         Node right = node.getRight().accept(this);
 
-        List<IntegerRange> leftValue;
-        List<IntegerRange> rightValue;
-        Node temp;
+        switch (BinOpType.of(left.getType(), right.getType())) {
+            case VALUE_VALUE:
+                return transformValueValue(node, (IntegerRangeValueNode) left, (IntegerRangeValueNode) right);
 
-        switch (left.getType().getId() << 16 | right.getType().getId()) {
-            case VALUE << 16 | VALUE:
-                leftValue = ((IntegerRangeValueNode) left).getValue();
-                rightValue = ((IntegerRangeValueNode) right).getValue();
+            case VALUE_NEGATION:
+                return transformValueNegation(node, (IntegerRangeValueNode) left, right);
 
-                switch (node.getType()) {
-                    case UNION:
-                        return new IntegerRangeValueNode(IntegerRange.union(leftValue, rightValue));
-                    case INTERSECTION:
-                        return new IntegerRangeValueNode(IntegerRange.intersection(leftValue, rightValue));
-                    case COMPLEMENT:
-                        return new IntegerRangeValueNode(IntegerRange.exclude(leftValue, rightValue));
-                    default:
-                        return throwUnimplementedNodeType(node);
-                }
-
-            case NEGATION << 16 | VALUE:
-                temp = right;
-                right = left;
-                left = temp;
-                // fall through
-
-            case VALUE << 16 | NEGATION:
-                right = (((OpNode) right).getNode());
-
-                if (right.getType() == NodeType.VALUE) {
-                    leftValue = ((IntegerRangeValueNode) left).getValue();
-                    rightValue = ((IntegerRangeValueNode) right).getValue();
-
-                    if (node.getType() == INTERSECTION) {
-                        return new IntegerRangeValueNode(IntegerRange.exclude(leftValue, rightValue));
-                    } else {
-                        return throwUnimplementedNodeType(node);
-                    }
-                }
-
-                return node;
+            case NEGATION_VALUE:
+                return transformValueNegation(node, (IntegerRangeValueNode) right, left);
 
             default:
                 return node;
@@ -116,6 +83,43 @@ public class IntegerConstraintOptimizingVisitor implements Visitor<Node, List<In
 
     @Override
     public Node visit(ValueNode<List<IntegerRange>> node) {
+        return node;
+    }
+
+    private Node transformValueValue(BinOpNode node, IntegerRangeValueNode left, IntegerRangeValueNode right) {
+        List<IntegerRange> leftValue;
+        List<IntegerRange> rightValue;
+        leftValue = left.getValue();
+        rightValue = right.getValue();
+
+        switch (node.getType()) {
+            case UNION:
+                return new IntegerRangeValueNode(IntegerRange.union(leftValue, rightValue));
+            case INTERSECTION:
+                return new IntegerRangeValueNode(IntegerRange.intersection(leftValue, rightValue));
+            case COMPLEMENT:
+                return new IntegerRangeValueNode(IntegerRange.exclude(leftValue, rightValue));
+            default:
+                return throwUnimplementedNodeType(node);
+        }
+    }
+
+    private Node transformValueNegation(BinOpNode node, IntegerRangeValueNode left, Node right) {
+        List<IntegerRange> leftValue;
+        List<IntegerRange> rightValue;
+        right = (((OpNode) right).getNode());
+
+        if (right.getType() == NodeType.VALUE) {
+            leftValue = left.getValue();
+            rightValue = ((IntegerRangeValueNode) right).getValue();
+
+            if (node.getType() == INTERSECTION) {
+                return new IntegerRangeValueNode(IntegerRange.exclude(leftValue, rightValue));
+            } else {
+                return throwUnimplementedNodeType(node);
+            }
+        }
+
         return node;
     }
 
