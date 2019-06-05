@@ -35,6 +35,7 @@ import ch.eskaton.asn4jtest.x680_51_1.TestBitString5;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString6;
 import ch.eskaton.asn4jtest.x680_51_1.TestBoolean2;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger1;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger10;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger2;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger3;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger4;
@@ -42,6 +43,7 @@ import ch.eskaton.asn4jtest.x680_51_1.TestInteger5;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger6;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger7;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger8;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger9;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -169,6 +171,18 @@ public class TestX680_51_1 {
     public void testInteger8() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger8.class, 6);
         testIntegerFailure(TestInteger8.class, 4, 5, 7, 8, 9);
+    }
+
+    @Test
+    public void testInteger9() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger9.class, 2, 4);
+        testIntegerFailure(TestInteger9.class, 3);
+    }
+
+    @Test
+    public void testInteger10() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger10.class, 0, 2);
+        testIntegerFailure(TestInteger10.class, 1);
     }
 
 }
