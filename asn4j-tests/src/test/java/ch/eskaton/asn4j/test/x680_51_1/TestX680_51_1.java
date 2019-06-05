@@ -33,6 +33,7 @@ import ch.eskaton.asn4jtest.x680_51_1.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString5;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString6;
+import ch.eskaton.asn4jtest.x680_51_1.TestBitString7;
 import ch.eskaton.asn4jtest.x680_51_1.TestBoolean2;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger1;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger10;
@@ -117,6 +118,15 @@ public class TestX680_51_1 {
         testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0xffee, 1);
 
         testBitStringFailure(new TestBitString6(), 0x02, 5);
+    }
+
+    @Test
+    public void testBitString7() {
+        testBitStringSuccess(TestBitString7.class, new TestBitString7(), 0x00, 5);
+        testBitStringSuccess(TestBitString7.class, new TestBitString7(), 0x02, 5);
+        testBitStringSuccess(TestBitString7.class, new TestBitString7(), 0x01, 6);
+
+        testBitStringFailure(new TestBitString7(), 0x01, 5);
     }
 
     @Test
