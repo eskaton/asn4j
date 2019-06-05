@@ -77,17 +77,13 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         } else if (elements instanceof SingleValueConstraint) {
             Value value = ((SingleValueConstraint) elements).getValue();
 
-            if (value instanceof IntegerValue) {
-                if (((IntegerValue) value).isReference()) {
-                    // TODO: resolve
-                    throw new CompilerException("not yet supported");
-                } else {
-                    long intValue = ((IntegerValue) value).getValue().longValue();
+            try {
+                BigInteger intValue = ctx.resolveGenericValue(BigInteger.class, base, value);
+                long longValue = intValue.longValue();
 
-                    return new IntegerRangeValueNode((singletonList(new IntegerRange(intValue, intValue))));
-                }
-            } else {
-                throw new CompilerException("Invalid single-value constraint %s for INTEGER type",
+                return new IntegerRangeValueNode((singletonList(new IntegerRange(longValue, longValue))));
+            } catch (Exception e) {
+                throw new CompilerException("Invalid single-value constraint %s for INTEGER type", e,
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
