@@ -1,12 +1,15 @@
 X680-51-1 DEFINITIONS ::=
 BEGIN
 
+testBitString1 BIT STRING ::= '001'B
+
 TestBitString1 ::= BIT STRING ((ALL EXCEPT '011'B) ^ (SIZE(3..3)))
 TestBitString2 ::= BIT STRING ((SIZE(1..2)) | '111'B)
 TestBitString3 ::= BIT STRING (INCLUDES TestBitString2 | '000'B)
 TestBitString4 ::= BIT STRING ('000'B | '001'B | '010'B, ...)
 TestBitString5 ::= BIT STRING (INCLUDES TestBitString4 EXCEPT '010'B)
 TestBitString6 ::= BIT STRING (INCLUDES BIT STRING EXCEPT '010'B)
+TestBitString7 ::= BIT STRING (ALL EXCEPT testBitString1)
 
 TestBoolean1 ::= BOOLEAN (TRUE | FALSE)
 TestBoolean2 ::= BOOLEAN (INCLUDES TestBoolean1 EXCEPT TRUE)
