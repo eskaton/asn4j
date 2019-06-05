@@ -36,6 +36,7 @@ import ch.eskaton.asn4jtest.x680_51_1.TestBitString6;
 import ch.eskaton.asn4jtest.x680_51_1.TestBoolean2;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger1;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger10;
+import ch.eskaton.asn4jtest.x680_51_1.TestInteger11;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger2;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger3;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger4;
@@ -183,6 +184,12 @@ public class TestX680_51_1 {
     public void testInteger10() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger10.class, 0, 2);
         testIntegerFailure(TestInteger10.class, 1);
+    }
+
+    @Test
+    public void testInteger11() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger11.class, 3, 5);
+        testIntegerFailure(TestInteger11.class, 4);
     }
 
 }
