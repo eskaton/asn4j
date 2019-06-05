@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
+import ch.eskaton.asn4j.parser.ast.values.SignedNumber;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
@@ -85,12 +86,38 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
             }
         }
 
-        throw new CompilerException("Failed to resolve an integer value");
+        throw new CompilerException("Failed to resolve an INTEGER value");
     }
 
     @Override
-    public BigInteger resolveGeneric(Type type, Value value)  {
-        throw new CompilerException("resolveGeneric() not implemented for INTEGER type");
+    public BigInteger resolveGeneric(Type type, Value value) {
+        if (value instanceof IntegerValue) {
+            if (((IntegerValue) value).isReference()) {
+                throw new CompilerException("References are not yet supported");
+            } else {
+                return ((IntegerValue) value).getValue();
+            }
+        } else {
+            Value resolvedValue;
+
+            if ((resolvedValue = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
+                NamedNumber namedNumber = ((IntegerType)type).getNamedNumber(((SimpleDefinedValue)resolvedValue).getValue());
+
+                if (namedNumber != null) {
+                    SignedNumber signedNumber = namedNumber.getValue();
+
+                    if (signedNumber != null) {
+                        return signedNumber.getNumber();
+                    } else {
+                        throw new CompilerException("References are not yet supported");
+                    }
+                }
+
+                return ctx.resolveValue(BigInteger.class, (SimpleDefinedValue) resolvedValue);
+            }
+        }
+
+        throw new CompilerException("Failed to resolve an INTEGER value");
     }
 
 }
