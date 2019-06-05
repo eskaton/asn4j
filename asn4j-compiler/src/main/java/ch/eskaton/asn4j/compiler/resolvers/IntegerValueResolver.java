@@ -93,7 +93,7 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
     public BigInteger resolveGeneric(Type type, Value value) {
         if (value instanceof IntegerValue) {
             if (((IntegerValue) value).isReference()) {
-                throw new CompilerException("References are not yet supported");
+                return ctx.resolveValue(BigInteger.class, ((IntegerValue) value).getRef());
             } else {
                 return ((IntegerValue) value).getValue();
             }
@@ -109,7 +109,7 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
                     if (signedNumber != null) {
                         return signedNumber.getNumber();
                     } else {
-                        throw new CompilerException("References are not yet supported");
+                        return ctx.resolveValue(BigInteger.class, namedNumber.getRef());
                     }
                 }
 
