@@ -50,6 +50,12 @@ public class EnumerationItemNode extends AbstractNode {
         this.name = name;
     }
 
+    public EnumerationItemNode name(String name) {
+        setName(name);
+
+        return this;
+    }
+
     public Integer getNumber() {
         return number;
     }
@@ -58,12 +64,24 @@ public class EnumerationItemNode extends AbstractNode {
         this.number = number;
     }
 
+    public EnumerationItemNode number(Integer number) {
+        setNumber(number);
+
+        return this;
+    }
+
     public DefinedValue getRef() {
         return ref;
     }
 
     public void setRef(DefinedValue ref) {
         this.ref = ref;
+    }
+
+    public EnumerationItemNode ref(DefinedValue ref) {
+        setRef(ref);
+
+        return this;
     }
 
 }
