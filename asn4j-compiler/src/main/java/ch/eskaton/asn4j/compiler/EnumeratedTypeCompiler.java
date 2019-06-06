@@ -179,7 +179,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         return number;
     }
 
-    private Integer getNextNumber(List<Integer> numbers, int last) {
+    Integer getNextNumber(List<Integer> numbers, int last) {
         int n = 0;
 
         for (int i = 0; i < last; i++) {
