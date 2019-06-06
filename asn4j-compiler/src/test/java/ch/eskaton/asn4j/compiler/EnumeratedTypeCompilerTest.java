@@ -29,12 +29,17 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.EnumeratedTypeCompiler.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
+import ch.eskaton.commons.collections.Tuple2;
+import ch.eskaton.commons.utils.StreamsUtils;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -47,47 +52,42 @@ public class EnumeratedTypeCompilerTest {
     public void testAddRootItems() {
         CompilerContext context = mock(CompilerContext.class);
         EnumeratedTypeCompiler compiler = new EnumeratedTypeCompiler();
-        EnumerationItems items = new EnumerationItems();
         List<EnumerationItemNode> nodes = asList(createNode("a", 0), createNode("b"), createNode("c", 3));
 
-        compiler.addRootItems(context, "type", items, nodes);
+        EnumerationItems items = compiler.getRootItems(context, "type", nodes);
 
-        assertEquals(0, (int) items.getNumbers().get(0));
-        assertEquals(1, (int) items.getNumbers().get(1));
-        assertEquals(3, (int) items.getNumbers().get(2));
+        assertEquals(0, (int) items.getNumber(0));
+        assertEquals(1, (int) items.getNumber(1));
+        assertEquals(3, (int) items.getNumber(2));
 
-        items = new EnumerationItems();
         nodes = asList(createNode("a", -2), createNode("b"), createNode("c", 0));
 
-        compiler.addRootItems(context, "type", items, nodes);
+        items = compiler.getRootItems(context, "type", nodes);
 
-        assertEquals(-2, (int) items.getNumbers().get(0));
-        assertEquals(1, (int) items.getNumbers().get(1));
-        assertEquals(0, (int) items.getNumbers().get(2));
+        assertEquals(-2, (int) items.getNumber(0));
+        assertEquals(1, (int) items.getNumber(1));
+        assertEquals(0, (int) items.getNumber(2));
     }
 
     @Test
     public void testAdditionalItems() {
         CompilerContext context = mock(CompilerContext.class);
         EnumeratedTypeCompiler compiler = new EnumeratedTypeCompiler();
-        EnumerationItems items = new EnumerationItems();
         List<EnumerationItemNode> rootNodes = asList(createNode("a", 0), createNode("b"), createNode("c", 3));
 
-        compiler.addRootItems(context, "type", items, rootNodes);
+        EnumerationItems items = compiler.getRootItems(context, "type", rootNodes);
 
         List<EnumerationItemNode> additionalNodes = asList(createNode("d"), createNode("e", 5), createNode("f", 7),
                 createNode("g"));
 
         compiler.addAdditionalItems(context, "type", items, additionalNodes);
 
-        assertEquals(4, (int) items.getNumbers().get(3));
-        assertEquals(5, (int) items.getNumbers().get(4));
-        assertEquals(7, (int) items.getNumbers().get(5));
-        assertEquals(8, (int) items.getNumbers().get(6));
+        assertEquals(4, (int) items.getNumber(3));
+        assertEquals(5, (int) items.getNumber(4));
+        assertEquals(7, (int) items.getNumber(5));
+        assertEquals(8, (int) items.getNumber(6));
 
-        items = new EnumerationItems();
-
-        compiler.addRootItems(context, "type", items, rootNodes);
+        items = compiler.getRootItems(context, "type", rootNodes);
 
         additionalNodes = asList(createNode("d"), createNode("e", 4));
 
@@ -103,9 +103,9 @@ public class EnumeratedTypeCompilerTest {
     public void testGetNextNumber() {
         EnumeratedTypeCompiler compiler = new EnumeratedTypeCompiler();
 
-        assertEquals(4, (int) compiler.getNextNumber(asList(1, 2, 3), 3));
-        assertEquals(3, (int) compiler.getNextNumber(asList(1, 2, 3), 2));
-        assertEquals(10, (int) compiler.getNextNumber(asList(1, 9, 2, 5), 3));
+        assertEquals(4, compiler.getNextNumber(createTuples(1, 2, 3), 3));
+        assertEquals(3, compiler.getNextNumber(createTuples(1, 2, 3), 2));
+        assertEquals(10, compiler.getNextNumber(createTuples(1, 9, 2, 5), 3));
     }
 
     private EnumerationItemNode createNode(String name) {
@@ -114,6 +114,11 @@ public class EnumeratedTypeCompilerTest {
 
     private EnumerationItemNode createNode(String name, Integer value) {
         return new EnumerationItemNode(NO_POSITION).name(name).number(value);
+    }
+
+    private List<Tuple2<String, Integer>> createTuples(int... values) {
+        return StreamsUtils.zip(IntStream.rangeClosed('a', 'z').boxed().map(String::valueOf),
+                Arrays.stream(values).boxed()).collect(toList());
     }
 
 }
