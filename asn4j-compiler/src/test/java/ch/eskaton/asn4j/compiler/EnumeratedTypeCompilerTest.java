@@ -75,24 +75,24 @@ public class EnumeratedTypeCompilerTest {
         EnumeratedTypeCompiler compiler = new EnumeratedTypeCompiler();
         List<EnumerationItemNode> rootNodes = asList(createNode("a", 0), createNode("b"), createNode("c", 3));
 
-        EnumerationItems items = compiler.getRootItems(context, "type", rootNodes);
+        EnumerationItems rootItems = compiler.getRootItems(context, "type", rootNodes);
 
         List<EnumerationItemNode> additionalNodes = asList(createNode("d"), createNode("e", 5), createNode("f", 7),
                 createNode("g"));
 
-        compiler.addAdditionalItems(context, "type", items, additionalNodes);
+        EnumerationItems additionalItems = compiler.getAdditionalItems(context, "type", rootItems, additionalNodes);
 
-        assertEquals(4, (int) items.getNumber(3));
-        assertEquals(5, (int) items.getNumber(4));
-        assertEquals(7, (int) items.getNumber(5));
-        assertEquals(8, (int) items.getNumber(6));
+        assertEquals(4, (int) additionalItems.getNumber(0));
+        assertEquals(5, (int) additionalItems.getNumber(1));
+        assertEquals(7, (int) additionalItems.getNumber(2));
+        assertEquals(8, (int) additionalItems.getNumber(3));
 
-        items = compiler.getRootItems(context, "type", rootNodes);
+        rootItems = compiler.getRootItems(context, "type", rootNodes);
 
         additionalNodes = asList(createNode("d"), createNode("e", 4));
 
         try {
-            compiler.addAdditionalItems(context, "type", items, additionalNodes);
+            compiler.getAdditionalItems(context, "type", rootItems, additionalNodes);
             fail("CompilerException expected");
         } catch (CompilerException e) {
             assertThat(e.getMessage(), containsString("Duplicate enumeration value"));
