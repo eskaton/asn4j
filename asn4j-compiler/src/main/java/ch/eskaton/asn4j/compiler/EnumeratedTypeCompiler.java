@@ -52,38 +52,12 @@ import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, CompiledType> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, EnumeratedType node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
-        List<String> names = new ArrayList<>();
-        List<Integer> numbers = new ArrayList<>();
+    public CompiledType compile(CompilerContext ctx, String typeName, EnumeratedType node) {
+        JavaClass javaClass = ctx.createClass(typeName, node, true);
+        EnumerationItems items = new EnumerationItems();
 
-        addEnumerationItems(ctx, name, names, numbers, node.getRootEnum());
-
-        int i;
-        int n = 0;
-
-        for (i = 0; i < numbers.size(); i++) {
-            if (numbers.get(i) == null) {
-                while (numbers.contains(n)) {
-                    n++;
-                }
-                numbers.set(i, n);
-            }
-        }
-
-        if (node.getAdditionalEnum() != null) {
-            addEnumerationItems(ctx, name, names, numbers, node.getAdditionalEnum());
-
-            for (; i < numbers.size(); i++) {
-                if (numbers.get(i) == null) {
-                    n = getNextNumber(numbers, i);
-                    if (numbers.contains(n)) {
-                        throw new CompilerException("Duplicate enumeration value %s(%s) in %s", names.get(i), n, name);
-                    }
-                    numbers.set(i, n);
-                }
-            }
-        }
+        addRootItems(ctx, typeName, items, node.getRootEnum());
+        addAdditionalItems(ctx, typeName, items, node.getAdditionalEnum());
 
         if (node.hasExceptionSpec()) {
             // TODO: figure out what to do
@@ -91,21 +65,21 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         Map<Integer, String> cases = new HashMap<>();
 
-        for (int j = 0; j < names.size(); j++) {
-            String fieldName = CompilerUtils.formatConstant(names.get(j));
-            int value = numbers.get(j);
+        for (int j = 0; j < items.getNames().size(); j++) {
+            String fieldName = CompilerUtils.formatConstant(items.getNames().get(j));
+            int value = items.getNumbers().get(j);
 
             cases.put(value, fieldName);
 
-            javaClass.field().modifier(Public).asStatic().asFinal().type(name).name(fieldName)
-                    .initializer("new " + name + "(" + value + ")").build();
+            javaClass.field().modifier(Public).asStatic().asFinal().type(typeName).name(fieldName)
+                    .initializer("new " + typeName + "(" + value + ")").build();
         }
 
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, name,
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, typeName,
                 Arrays.asList(new JavaParameter("int", "value")),
                 "\t\tsuper.setValue(value);\n"));
 
-        BodyBuilder builder = javaClass.method().asStatic().returnType(name).name("valueOf")
+        BodyBuilder builder = javaClass.method().asStatic().returnType(typeName).name("valueOf")
                 .parameter(INT, "value").exception(ASN1RuntimeException.class).body();
 
         builder.append("switch(value) {");
@@ -126,7 +100,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         ConstraintDefinition constraintDef = null;
 
         if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, node);
+            constraintDef = ctx.compileConstraint(javaClass, typeName, node);
         }
 
         ctx.finishClass(false);
@@ -134,10 +108,56 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         return new CompiledType(node, constraintDef);
     }
 
-    private void addEnumerationItems(CompilerContext ctx, String name, List<String> names, List<Integer> numbers,
+    void addRootItems(CompilerContext ctx, String typeName, EnumerationItems items,
+            List<EnumerationItemNode> nodes) {
+        addEnumerationItems(ctx, typeName, items, nodes);
+
+        List<Integer> numbers = items.getNumbers();
+
+        int i;
+        int n = 0;
+
+        for (i = 0; i < numbers.size(); i++) {
+            if (numbers.get(i) == null) {
+                while (numbers.contains(n)) {
+                    n++;
+                }
+                numbers.set(i, n);
+            }
+        }
+    }
+
+    void addAdditionalItems(CompilerContext ctx, String typeName, EnumerationItems items,
+            List<EnumerationItemNode> nodes) {
+
+        if (nodes != null) {
+            int i = items.getNumbers().size();
+            int n;
+
+            addEnumerationItems(ctx, typeName, items, nodes);
+
+            List<Integer> numbers = items.getNumbers();
+            List<String> names = items.getNames();
+
+            for (; i < numbers.size(); i++) {
+                if (numbers.get(i) == null) {
+                    n = getNextNumber(numbers, i);
+
+                    if (numbers.contains(n)) {
+                        throw new CompilerException("Duplicate enumeration value %s(%s) in %s", names.get(i),
+                                n, typeName);
+                    }
+
+                    numbers.set(i, n);
+                }
+            }
+        }
+    }
+
+    private void addEnumerationItems(CompilerContext ctx, String name, EnumerationItems items,
             List<EnumerationItemNode> rootEnum) {
         for (EnumerationItemNode item : rootEnum) {
-            addEnumerationItem(name, names, numbers, item.getName(), getNumber(ctx, name, item));
+            addEnumerationItem(name, items, item.getName(), getNumber(ctx, name, item));
         }
     }
 
@@ -155,6 +175,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         } else {
             number = item.getNumber();
         }
+
         return number;
     }
 
@@ -168,18 +189,41 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         return n + 1;
     }
 
-    private void addEnumerationItem(String typeName, List<String> names, List<Integer> values, String name,
-            Integer value) {
-        if (names.contains(name)) {
+    private void addEnumerationItem(String typeName, EnumerationItems items, String name, Integer value) {
+        if (items.getNames().contains(name)) {
             throw new CompilerException("Duplicate enumeration item '%s' in %s", name, typeName);
         }
 
-        if (value != null && values.contains(value)) {
+        if (value != null && items.getNumbers().contains(value)) {
             throw new CompilerException("Duplicate enumeration value %s(%s) in %s", name, value, typeName);
         }
 
-        names.add(name);
-        values.add(value);
+        items.getNames().add(name);
+        items.getNumbers().add(value);
+    }
+
+    static class EnumerationItems {
+
+        List<String> names = new ArrayList<>();
+
+        List<Integer> numbers = new ArrayList<>();
+
+        public List<String> getNames() {
+            return names;
+        }
+
+        public void setNames(List<String> names) {
+            this.names = names;
+        }
+
+        public List<Integer> getNumbers() {
+            return numbers;
+        }
+
+        public void setNumbers(List<Integer> numbers) {
+            this.numbers = numbers;
+        }
+
     }
 
 }
