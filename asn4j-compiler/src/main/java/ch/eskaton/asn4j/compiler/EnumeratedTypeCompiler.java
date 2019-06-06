@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.java.JavaConstructor;
@@ -100,7 +101,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
                     .initializer("new " + name + "(" + value + ")").build();
         }
 
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.Private, name,
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, name,
                 Arrays.asList(new JavaParameter("int", "value")),
                 "\t\tsuper.setValue(value);\n"));
 
@@ -122,9 +123,15 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
 
-        ctx.finishClass();
+        ConstraintDefinition constraintDef = null;
 
-        return new CompiledType(node);
+        if (node.hasConstraint()) {
+            constraintDef = ctx.compileConstraint(javaClass, name, node);
+        }
+
+        ctx.finishClass(false);
+
+        return new CompiledType(node, constraintDef);
     }
 
     private void addEnumerationItems(CompilerContext ctx, String name, List<String> names, List<Integer> numbers,
