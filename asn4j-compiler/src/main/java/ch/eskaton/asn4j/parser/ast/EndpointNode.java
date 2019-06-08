@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.math.BigInteger;
 import java.util.Objects;
@@ -117,6 +118,11 @@ public class EndpointNode {
         EndpointNode that = (EndpointNode) other;
 
         return inclusive == that.inclusive && Objects.equals(value, that.value);
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

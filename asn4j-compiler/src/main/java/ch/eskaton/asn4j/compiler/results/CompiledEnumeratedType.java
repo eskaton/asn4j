@@ -29,34 +29,27 @@ package ch.eskaton.asn4j.compiler.results;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class CompiledType implements CompilationResult {
+public class CompiledEnumeratedType extends CompiledType {
 
-    private Type type;
+    private EnumerationItems roots;
 
-    private ConstraintDefinition constraintDefinition;
+    private EnumerationItems additions;
 
-    public CompiledType(Type type) {
-        this.type = type;
+    public CompiledEnumeratedType(Type type, EnumerationItems roots, EnumerationItems additions,
+            ConstraintDefinition constraintDefinition) {
+        super(type, constraintDefinition);
+
+        this.roots = roots;
+        this.additions = additions;
     }
 
-    public CompiledType(Type type, ConstraintDefinition constraintDefinition) {
-        this.type = type;
-        this.constraintDefinition = constraintDefinition;
+    public EnumerationItems getRoots() {
+        return roots;
     }
 
-    public Type getType() {
-        return type;
-    }
-
-    public ConstraintDefinition getConstraintDefinition() {
-        return constraintDefinition;
-    }
-
-    @Override
-    public String toString() {
-       return ToString.get(this);
+    public EnumerationItems getAdditions() {
+        return additions;
     }
 
 }

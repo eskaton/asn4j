@@ -613,8 +613,10 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    public Optional<CompiledType> getCompiledType(Type type) {
-        return getCompiledType(type, false);
+    public CompiledType getCompiledType(Type type) {
+        Optional<CompiledType> compiledType = getCompiledType(type, false);
+
+        return compiledType.orElse(new CompiledType(type));
     }
 
     private HashMap<String, CompiledType> getTypesOfCurrentModule() {

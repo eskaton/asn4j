@@ -25,38 +25,14 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.results;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.runtime.utils.ToString;
+import java.util.List;
 
-public class CompiledType implements CompilationResult {
+public class EnumeratedValueNode extends ValueNode<List<Long>> {
 
-    private Type type;
-
-    private ConstraintDefinition constraintDefinition;
-
-    public CompiledType(Type type) {
-        this.type = type;
-    }
-
-    public CompiledType(Type type, ConstraintDefinition constraintDefinition) {
-        this.type = type;
-        this.constraintDefinition = constraintDefinition;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public ConstraintDefinition getConstraintDefinition() {
-        return constraintDefinition;
-    }
-
-    @Override
-    public String toString() {
-       return ToString.get(this);
+    public EnumeratedValueNode(List<Long> value) {
+        super(value);
     }
 
 }
