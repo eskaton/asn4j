@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -75,9 +76,10 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds) {
+    protected Node calculateElements(Type base, CompiledType compiledType, Elements elements,
+            Optional<Bounds> bounds) {
         if (elements instanceof ElementSet) {
-            return compileConstraint(base, (ElementSet) elements, bounds);
+            return compileConstraint(base, compiledType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
             Value value = ((SingleValueConstraint) elements).getValue();
 
@@ -93,7 +95,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(base, ((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
-            return calculateSize(((SizeConstraint) elements).getConstraint(), bounds);
+            return calculateSize(compiledType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
             throw new CompilerException("Invalid constraint %s for BIT STRING type",
                     elements.getClass().getSimpleName());

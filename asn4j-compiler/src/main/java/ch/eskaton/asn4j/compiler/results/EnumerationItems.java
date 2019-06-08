@@ -27,36 +27,68 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.commons.MutableInteger;
+import ch.eskaton.commons.collections.Tuple2;
 
-public class CompiledType implements CompilationResult {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-    private Type type;
+public class EnumerationItems {
 
-    private ConstraintDefinition constraintDefinition;
+    private List<Tuple2<String, Integer>> items = new ArrayList<>();
 
-    public CompiledType(Type type) {
-        this.type = type;
+    public List<Tuple2<String, Integer>> getItems() {
+        return items;
     }
 
-    public CompiledType(Type type, ConstraintDefinition constraintDefinition) {
-        this.type = type;
-        this.constraintDefinition = constraintDefinition;
+    public String getName(int index) {
+        return items.get(index).get_1();
     }
 
-    public Type getType() {
-        return type;
+    public Integer getNumber(int index) {
+        return items.get(index).get_2();
     }
 
-    public ConstraintDefinition getConstraintDefinition() {
-        return constraintDefinition;
+    public void setNumber(int index, int value) {
+        items.get(index).set_2(value);
+    }
+
+    public boolean contains(MutableInteger n) {
+        return getItems().stream().anyMatch(item -> Objects.equals(item.get_2(), n.getValue()));
+    }
+
+    public void add(String name, Integer value) {
+        items.forEach(item -> {
+            if (name.equals(item.get_1())) {
+                throw new CompilerException("Duplicate enumeration item '%s'", name);
+            } else if (value != null && value.equals(item.get_2())) {
+                throw new CompilerException("Duplicate enumeration value %s(%s)", name, value);
+            }
+        });
+
+        items.add(Tuple2.of(name, value));
+    }
+
+    public EnumerationItems addAll(List<Tuple2<String, Integer>> otherItems) {
+        items.addAll(otherItems);
+
+        return this;
+    }
+
+    public EnumerationItems copy() {
+        EnumerationItems enumerationItems = new EnumerationItems();
+
+        enumerationItems.getItems().addAll(items);
+
+        return enumerationItems;
     }
 
     @Override
     public String toString() {
-       return ToString.get(this);
+        return ToString.get(this);
     }
 
 }

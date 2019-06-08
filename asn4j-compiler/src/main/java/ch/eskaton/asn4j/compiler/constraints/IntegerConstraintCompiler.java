@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -71,9 +72,10 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Node calculateElements(Type base, Elements elements, Optional<Bounds> bounds) {
+    protected Node calculateElements(Type base, CompiledType compiledType, Elements elements,
+            Optional<Bounds> bounds) {
         if (elements instanceof ElementSet) {
-            return compileConstraint(base, (ElementSet) elements, bounds);
+            return compileConstraint(base, compiledType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
             Value value = ((SingleValueConstraint) elements).getValue();
 

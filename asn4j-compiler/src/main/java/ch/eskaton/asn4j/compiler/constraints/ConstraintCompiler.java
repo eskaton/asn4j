@@ -30,8 +30,10 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
+import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -39,6 +41,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Maps;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class ConstraintCompiler {
 
@@ -75,6 +78,8 @@ public class ConstraintCompiler {
             base = node;
         }
 
+        CompiledType compiledType = ctx.getCompiledType(base);
+
         if (!compilers.containsKey(base.getClass())) {
             //throw new CompilerException("Constraints for type %s not yet supported", base.getClass().getSimpleName());
             return null;
@@ -85,7 +90,7 @@ public class ConstraintCompiler {
         ConstraintDefinition constraintDef;
 
         try {
-            constraintDef = compiler.compileConstraints(node, base);
+            constraintDef = compiler.compileConstraints(node, base, compiledType);
         } catch (CompilerException e) {
             throw new CompilerException("Error in constraints for type %s: %s", e, name, e.getMessage());
         }

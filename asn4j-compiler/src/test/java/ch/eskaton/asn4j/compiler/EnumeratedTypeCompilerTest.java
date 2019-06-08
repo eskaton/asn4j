@@ -27,7 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.EnumeratedTypeCompiler.EnumerationItems;
+import ch.eskaton.asn4j.compiler.results.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StreamsUtils;
