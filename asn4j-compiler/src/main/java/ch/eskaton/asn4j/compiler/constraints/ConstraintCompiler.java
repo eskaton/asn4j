@@ -70,22 +70,21 @@ public class ConstraintCompiler {
     }
 
     public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) {
-        Type base;
+        Type parent = node;
+        CompiledType compiledType;
 
-        if (node instanceof TypeReference) {
-            base = ctx.getBase((TypeReference) node);
-        } else {
-            base = node;
-        }
+        do {
+            compiledType = ctx.getCompiledType(parent);
 
-        CompiledType compiledType = ctx.getCompiledType(base);
+            parent = compiledType.getType();
+        } while (parent instanceof TypeReference);
 
-        if (!compilers.containsKey(base.getClass())) {
+        if (!compilers.containsKey(parent.getClass())) {
             //throw new CompilerException("Constraints for type %s not yet supported", base.getClass().getSimpleName());
             return null;
         }
 
-        AbstractConstraintCompiler compiler = compilers.get(base.getClass());
+        AbstractConstraintCompiler compiler = compilers.get(parent.getClass());
 
         ConstraintDefinition constraintDef;
 
