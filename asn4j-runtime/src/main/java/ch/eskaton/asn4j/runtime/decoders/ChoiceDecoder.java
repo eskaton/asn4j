@@ -30,41 +30,30 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
-import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ChoiceDecoder {
 
     public void decode(Decoder decoder, DecoderStates states, ASN1Choice obj) {
-        Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = new HashMap<>();
-        Map<List<TagId>, Field> tagsToFields = new HashMap<>();
-
-        fillMetaData(obj, tagsToTypes, tagsToFields);
-
+        FieldMetaData metaData = new FieldMetaData(obj, ASN1Alternative.class);
         DecodingResult<? extends ASN1Type> result;
 
-        result = decoder.decode(states, tagsToTypes);
+        result = decoder.decode(states, metaData.getTagsToTypes());
 
         if (result == null) {
             throw new DecodingException("Empty choice");
         }
 
         String typeName = result.getClass().getSimpleName();
-        Field altField = tagsToFields.get(result.getTags());
+        Field altField = metaData.getField(result.getTags());
 
         if (altField == null) {
             throw new DecodingException("Failed to decode a value of the type " + typeName);
@@ -80,20 +69,6 @@ public class ChoiceDecoder {
             throw new DecodingException(e);
         } catch (NoSuchMethodException e) {
             throw new DecodingException("Setter '" + setterName + "' missing on type " + typeName);
-        }
-    }
-
-    protected void fillMetaData(ASN1Choice obj, Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes,
-            Map<List<TagId>, Field> tagsToFields) {
-        for (Field altField : RuntimeUtils.getComponents(obj)) {
-            ASN1Alternative annotation = altField.getAnnotation(ASN1Alternative.class);
-
-            if (annotation != null) {
-                Class<? extends ASN1Type> type = (Class<? extends ASN1Type>) altField.getType();
-                List<ASN1Tag> tags = RuntimeUtils.getTags(type, altField.getAnnotation(ASN1Tag.class));
-                tagsToFields.put(tags.stream().map(TagId::fromTag).collect(Collectors.toList()), altField);
-                tagsToTypes.put(tags, type);
-            }
         }
     }
 

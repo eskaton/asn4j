@@ -1,4 +1,4 @@
-/*
+package ch.eskaton.asn4j.runtime.decoders;/*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
  *
@@ -25,66 +25,63 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.decoders;
-
-import ch.eskaton.asn4j.runtime.Decoder;
-import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.DecodingResult;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
-import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.commons.utils.StringUtils;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class SetDecoder implements CollectionDecoder<ASN1Set> {
+public class FieldMetaData {
 
-    @SuppressWarnings("squid:S3011")
-    public void decode(Decoder decoder, DecoderStates states, ASN1Set obj) {
-        FieldMetaData metaData = new FieldMetaData(obj, ASN1Component.class);
-        Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = metaData.getTagsToTypes();
-        DecodingResult<? extends ASN1Type> result;
+    private Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = new HashMap<>();
 
-        do {
-            result = decoder.decode(states, tagsToTypes);
+    private Map<List<TagId>, Field> tagsToFields = new HashMap<>();
 
-            if (result == null) {
-                checkMandatoryFields(metaData);
-                return;
+    public FieldMetaData(ASN1Type type, Class<? extends Annotation> annotationClass) {
+        for (Field field : RuntimeUtils.getComponents(type)) {
+            Annotation annotation = field.getAnnotation(annotationClass);
+
+            if (annotation != null) {
+                Class<? extends ASN1Type> fieldType = (Class<? extends ASN1Type>) field.getType();
+                List<ASN1Tag> tags = RuntimeUtils.getTags(fieldType, field.getAnnotation(ASN1Tag.class));
+                tagsToFields.put(tags.stream().map(TagId::fromTag).collect(Collectors.toList()), field);
+                tagsToTypes.put(tags, fieldType);
             }
-
-            Field compField = metaData.getField(result.getTags());
-
-            if (compField == null) {
-                throw new DecodingException("Failed to decode a value of the type " + result.getClass()
-                        .getSimpleName());
-            }
-
-            compField.setAccessible(true);
-
-            try {
-                compField.set(obj, result.getObj());
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                throw new DecodingException(e);
-            }
-        } while (!tagsToTypes.isEmpty());
+        }
     }
 
-    protected void checkMandatoryFields(FieldMetaData metaData) {
-        Set<List<TagId>> mandatoryFields = metaData.getMandatoryFields();
+    public Map<List<ASN1Tag>, Class<? extends ASN1Type>> getTagsToTypes() {
+        return tagsToTypes;
+    }
 
-        if (!mandatoryFields.isEmpty()) {
-            throw new DecodingException("Mandatory fields missing: " +
-                    StringUtils.join(mandatoryFields.stream().map(tag -> metaData.getFieldName(tag))
-                            .collect(Collectors.toList()), ", "));
-        }
+    public Field getField(List<TagId> tags) {
+        return tagsToFields.get(tags);
+    }
+
+    public Set<List<TagId>> getMandatoryFields() {
+        return tagsToTypes.keySet().stream().map(TagId::fromTags)
+                .filter(t -> !tagsToFields.get(t).getAnnotation(ASN1Component.class).optional())
+                .collect(Collectors.toSet());
+    }
+
+    protected String getFieldName(List<TagId> tags) {
+        Field field = tagsToFields.get(tags);
+
+        return field.getDeclaringClass().getSimpleName() + "." + field.getName();
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

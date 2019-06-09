@@ -43,6 +43,7 @@ import java.util.List;
 
 public class SequenceDecoder implements CollectionDecoder<ASN1Sequence> {
 
+    @SuppressWarnings("squid:S3011")
     public void decode(Decoder decoder, DecoderStates states, ASN1Sequence obj) {
         List<Field> compFields = RuntimeUtils.getComponents(obj);
 
