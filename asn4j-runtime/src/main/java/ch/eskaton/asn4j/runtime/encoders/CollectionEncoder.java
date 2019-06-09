@@ -50,7 +50,7 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements TypeEncod
         if (!compFields.isEmpty()) {
             for (Field compField : compFields) {
                 ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
-                
+
                 if (annotation != null) {
                     compField.setAccessible(true);
 
