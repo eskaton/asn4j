@@ -38,7 +38,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -58,9 +57,9 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
         return Optional.empty();
     }
 
-    protected Node calculateElements(Type base, CompiledType compiledType, Elements elements, Optional<Bounds> bounds) {
+    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
         if (elements instanceof ElementSet) {
-            return compileConstraint(base, compiledType, (ElementSet) elements, bounds);
+            return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
             Value value = ((SingleValueConstraint) elements).getValue();
             if (value instanceof BooleanValue) {
@@ -70,7 +69,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(base, ((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else {
             throw new CompilerException("Invalid constraint %s for BOOLEAN type",
                     elements.getClass().getSimpleName());

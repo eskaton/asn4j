@@ -72,15 +72,15 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Node calculateElements(Type base, CompiledType compiledType, Elements elements,
+    protected Node calculateElements(CompiledType baseType, Elements elements,
             Optional<Bounds> bounds) {
         if (elements instanceof ElementSet) {
-            return compileConstraint(base, compiledType, (ElementSet) elements, bounds);
+            return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
             Value value = ((SingleValueConstraint) elements).getValue();
 
             try {
-                BigInteger intValue = ctx.resolveGenericValue(BigInteger.class, base, value);
+                BigInteger intValue = ctx.resolveGenericValue(BigInteger.class, baseType.getType(), value);
                 long longValue = intValue.longValue();
 
                 return new IntegerRangeValueNode((singletonList(new IntegerRange(longValue, longValue))));
@@ -90,7 +90,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             }
         } else if (elements instanceof ContainedSubtype) {
             Type type = ((ContainedSubtype) elements).getType();
-            return calculateContainedSubtype(base, type);
+            return calculateContainedSubtype(baseType, type);
         } else if (elements instanceof RangeNode) {
             long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
             long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
