@@ -43,7 +43,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
-import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
@@ -61,7 +60,6 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
-import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public abstract class AbstractConstraintCompiler {
 
@@ -71,19 +69,19 @@ public abstract class AbstractConstraintCompiler {
         this.ctx = ctx;
     }
 
-    public ConstraintDefinition compileConstraint(Type base, CompiledType compiledType, SetSpecsNode setSpecs,
+    public ConstraintDefinition compileConstraint(CompiledType baseType, SetSpecsNode setSpecs,
             Optional<Bounds> bounds) {
-        Node root = compileConstraint(base, compiledType, setSpecs.getRootElements(), bounds);
+        Node root = compileConstraint(baseType, setSpecs.getRootElements(), bounds);
         Node extension = null;
 
         if (setSpecs.hasExtensionElements()) {
-            extension = compileConstraint(base, compiledType, setSpecs.getExtensionElements(), bounds);
+            extension = compileConstraint(baseType, setSpecs.getExtensionElements(), bounds);
         }
 
         return new ConstraintDefinition(root, extension).extensible(setSpecs.hasExtensionMarker());
     }
 
-    ConstraintDefinition compileConstraints(Type node, Type base, CompiledType compiledType) {
+    ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
         LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
         Deque<List<Constraint>> constraints = new ArrayDeque<>();
 
@@ -92,7 +90,7 @@ public abstract class AbstractConstraintCompiler {
                 constraints.push(node.getConstraints());
             }
 
-            if (base.equals(node)) {
+            if (baseType.getType().equals(node)) {
                 break;
             }
 
@@ -113,7 +111,7 @@ public abstract class AbstractConstraintCompiler {
 
         while (!constraints.isEmpty()) {
             Optional<Bounds> bounds = getBounds(Optional.ofNullable(definitions.peek()));
-            definitions.addLast(compileConstraints(base, compiledType, constraints.pop(), bounds));
+            definitions.addLast(compileConstraints(baseType, constraints.pop(), bounds));
         }
 
         if (definitions.size() == 1) {
@@ -142,8 +140,8 @@ public abstract class AbstractConstraintCompiler {
         return Optional.empty();
     }
 
-    ConstraintDefinition compileConstraints(Type base, CompiledType compiledType,
-            List<Constraint> constraints, Optional<Bounds> bounds) {
+    ConstraintDefinition compileConstraints(CompiledType baseType, List<Constraint> constraints,
+            Optional<Bounds> bounds) {
         ConstraintDefinition constraintDef = null;
 
         for (Constraint constraint : constraints) {
@@ -151,9 +149,9 @@ public abstract class AbstractConstraintCompiler {
                 SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
                 if (constraintDef == null) {
-                    constraintDef = compileConstraint(base, compiledType, setSpecs, bounds);
+                    constraintDef = compileConstraint(baseType, setSpecs, bounds);
                 } else {
-                    constraintDef = constraintDef.serialApplication(compileConstraint(base, compiledType, setSpecs,
+                    constraintDef = constraintDef.serialApplication(compileConstraint(baseType, setSpecs,
                             getBounds(Optional.of(constraintDef))));
                 }
             } else {
@@ -165,49 +163,47 @@ public abstract class AbstractConstraintCompiler {
         return constraintDef;
     }
 
-    protected Node compileConstraint(Type base, CompiledType compiledType, ElementSet set, Optional<Bounds> bounds) {
+    protected Node compileConstraint(CompiledType baseType, ElementSet set, Optional<Bounds> bounds) {
         List<Elements> operands = set.getOperands();
 
         switch (set.getOperation()) {
             case ALL:
-                return calculateInversion(compileConstraint(base, compiledType, (ElementSet) operands.get(0), bounds));
+                return calculateInversion(compileConstraint(baseType, (ElementSet) operands.get(0), bounds));
 
             case EXCLUDE:
                 if (operands.size() == 1) {
                     // ALL EXCEPT
-                    return calculateElements(base, compiledType, operands.get(0), bounds);
+                    return calculateElements(baseType, operands.get(0), bounds);
                 } else {
-                    return calculateExclude(calculateElements(base, compiledType, operands.get(0), bounds),
-                            calculateElements(base, compiledType, operands.get(1), bounds));
+                    return calculateExclude(calculateElements(baseType, operands.get(0), bounds),
+                            calculateElements(baseType, operands.get(1), bounds));
                 }
 
             case INTERSECTION:
-                return calculateIntersection(base, compiledType, operands, bounds);
+                return calculateIntersection(baseType, operands, bounds);
 
             case UNION:
-                return calculateUnion(base, compiledType, operands, bounds);
+                return calculateUnion(baseType, operands, bounds);
 
             default:
                 throw new IllegalStateException("Unimplemented node type " + set.getOperation());
         }
     }
 
-    protected Node calculateIntersection(Type base, CompiledType compiledType, List<Elements> elements,
-            Optional<Bounds> bounds) {
-        return calculateBinOp(base, compiledType, elements, bounds, INTERSECTION);
+    protected Node calculateIntersection(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds) {
+        return calculateBinOp(baseType, elements, bounds, INTERSECTION);
     }
 
-    protected Node calculateUnion(Type base, CompiledType compiledType, List<Elements> elements,
-            Optional<Bounds> bounds) {
-        return calculateBinOp(base, compiledType, elements, bounds, UNION);
+    protected Node calculateUnion(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds) {
+        return calculateBinOp(baseType, elements, bounds, UNION);
     }
 
-    protected Node calculateBinOp(Type base, CompiledType compiledType, List<Elements> elements,
-            Optional<Bounds> bounds, NodeType type) {
+    protected Node calculateBinOp(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds,
+            NodeType type) {
         Node node = null;
 
         for (Elements element : elements) {
-            Node tmpNode = calculateElements(base, compiledType, element, bounds);
+            Node tmpNode = calculateElements(baseType, element, bounds);
 
             if (node == null) {
                 node = tmpNode;
@@ -227,11 +223,11 @@ public abstract class AbstractConstraintCompiler {
         return new BinOpNode(COMPLEMENT, values1, values2);
     }
 
-    protected abstract Node calculateElements(Type base, CompiledType compiledType, Elements elements,
+    protected abstract Node calculateElements(CompiledType baseType, Elements elements,
             Optional<Bounds> bounds);
 
-    protected Node calculateContainedSubtype(Type base, Type type) {
-        if (type.equals(base)) {
+    protected Node calculateContainedSubtype(CompiledType baseType, Type type) {
+        if (type.equals(baseType.getType())) {
             return new AllValuesNode();
         } else {
             CompiledType compiledType = ctx.getCompiledType(type);
@@ -241,13 +237,13 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
-    protected SizeNode calculateSize(CompiledType compiledType, Constraint constraint,
+    protected SizeNode calculateSize(CompiledType baseType, Constraint constraint,
             Optional<Bounds> bounds) {
         if (constraint instanceof SubtypeConstraint) {
             SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
-            Node node = new IntegerConstraintCompiler(ctx).calculateElements(new IntegerType(NO_POSITION),
-                    compiledType, setSpecs.getRootElements(), Optional.of(bounds.map(b ->
+            Node node = new IntegerConstraintCompiler(ctx).calculateElements(
+                    baseType, setSpecs.getRootElements(), Optional.of(bounds.map(b ->
                             new IntegerValueBounds(Math.max(0, ((SizeBounds) b).getMinSize()),
                                     ((SizeBounds) b).getMaxSize()))
                             .orElse(new IntegerValueBounds(0L, Long.MAX_VALUE))));

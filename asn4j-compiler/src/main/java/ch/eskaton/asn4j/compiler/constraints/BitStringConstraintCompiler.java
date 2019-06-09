@@ -42,7 +42,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -76,16 +75,16 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Node calculateElements(Type base, CompiledType compiledType, Elements elements,
+    protected Node calculateElements(CompiledType baseType, Elements elements,
             Optional<Bounds> bounds) {
         if (elements instanceof ElementSet) {
-            return compileConstraint(base, compiledType, (ElementSet) elements, bounds);
+            return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
             Value value = ((SingleValueConstraint) elements).getValue();
 
             try {
                 // TODO: implement a more convenient resolver
-                BitStringValue bitStringValue = ctx.resolveGenericValue(BitStringValue.class, base, value);
+                BitStringValue bitStringValue = ctx.resolveGenericValue(BitStringValue.class, baseType.getType(), value);
 
                 return new BitStringValueNode(singletonList(bitStringValue));
             } catch (Exception e) {
@@ -93,9 +92,9 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(base, ((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
-            return calculateSize(compiledType, ((SizeConstraint) elements).getConstraint(), bounds);
+            return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
             throw new CompilerException("Invalid constraint %s for BIT STRING type",
                     elements.getClass().getSimpleName());

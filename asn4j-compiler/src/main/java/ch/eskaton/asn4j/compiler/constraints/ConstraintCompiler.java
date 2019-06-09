@@ -90,7 +90,7 @@ public class ConstraintCompiler {
         ConstraintDefinition constraintDef;
 
         try {
-            constraintDef = compiler.compileConstraints(node, base, compiledType);
+            constraintDef = compiler.compileConstraints(node, compiledType);
         } catch (CompilerException e) {
             throw new CompilerException("Error in constraints for type %s: %s", e, name, e.getMessage());
         }
