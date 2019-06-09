@@ -184,7 +184,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
     }
 
     int getNextNumber(List<Tuple2<String, Integer>> numbers, int last) {
-        return numbers.stream().map(Tuple2::get_2).limit(last).collect(Collectors.maxBy(Integer::compare)).get() + 1;
+        return numbers.stream().map(Tuple2::get_2).limit(last).collect(Collectors.maxBy(Integer::compare)).orElse(-1) + 1;
     }
 
 }
