@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
@@ -43,6 +45,15 @@ public class ASN1EnumeratedType implements ASN1Type {
 
     protected void setValue(int value) {
     	this.value = value;
+    }
+
+    protected boolean checkConstraint(ASN1EnumeratedType value) throws ConstraintViolatedException {
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
     @Override

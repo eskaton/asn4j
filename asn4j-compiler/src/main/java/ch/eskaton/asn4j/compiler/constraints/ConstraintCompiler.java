@@ -56,6 +56,7 @@ public class ConstraintCompiler {
         compilers = Maps.<Class<? extends Type>, AbstractConstraintCompiler>builder()
                 .put(BitString.class, new BitStringConstraintCompiler(ctx))
                 .put(BooleanType.class, new BooleanConstraintCompiler(ctx))
+                .put(EnumeratedType.class, new EnumeratedConstraintCompiler(ctx))
                 .put(IntegerType.class, new IntegerConstraintCompiler(ctx))
 //                .put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver))
 //                .put(OctetString.class, new OctetStringConstraintCompiler(typeResolver))

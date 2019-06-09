@@ -27,11 +27,11 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import java.util.List;
+import java.util.Set;
 
-public class EnumeratedValueNode extends ValueNode<List<Long>> {
+public class EnumeratedValueNode extends ValueNode<Set<String>> {
 
-    public EnumeratedValueNode(List<Long> value) {
+    public EnumeratedValueNode(Set<String> value) {
         super(value);
     }
 
