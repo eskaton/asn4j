@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.io.IOException;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class TLV {
 
     public int pos;
@@ -51,7 +52,7 @@ public class TLV {
     public static TLV getTLV(byte[] buf, int pos, int length)
             throws IOException {
         if (pos >= buf.length) {
-            throw new IOException("Premature end of input");
+            return throwPrematureEndOfInput();
         }
 
         int id = buf[pos++];
@@ -64,11 +65,11 @@ public class TLV {
 
         if (tlv.tag == 0x1f) {
             int longTag = 0;
-            int c = 0;
+            int c;
 
             do {
                 if (pos >= buf.length) {
-                    throw new IOException("Premature end of input");
+                    throwPrematureEndOfInput();
                 }
 
                 c = buf[pos++];
@@ -81,7 +82,7 @@ public class TLV {
         }
 
         if (pos >= buf.length) {
-            throw new IOException("Premature end of input");
+            throwPrematureEndOfInput();
         }
 
         tlv.length = buf[pos++] & 0xFF;
@@ -92,7 +93,7 @@ public class TLV {
 
             while (sizeLen-- > 0) {
                 if (pos >= buf.length) {
-                    throw new IOException("Premature end of input");
+                    throwPrematureEndOfInput();
                 }
 
                 int c = buf[pos++];
@@ -114,6 +115,10 @@ public class TLV {
         }
 
         return tlv;
+    }
+
+    private static TLV throwPrematureEndOfInput() throws IOException {
+        throw new IOException("Premature end of input");
     }
 
     public TagId getTagId() {

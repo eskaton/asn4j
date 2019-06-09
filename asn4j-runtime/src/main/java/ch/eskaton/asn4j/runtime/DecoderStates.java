@@ -29,16 +29,20 @@ package ch.eskaton.asn4j.runtime;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.Stack;
+import java.util.Deque;
+import java.util.LinkedList;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class DecoderStates {
 
     public byte[] buf;
 
-    private Stack<DecoderState> states = new Stack<>();
+    private Deque<DecoderState> states = new LinkedList<>();
 
     public DecoderState push(DecoderState state) {
-        return states.push(state);
+        states.push(state);
+
+        return state;
     }
 
     public DecoderState pop() {
