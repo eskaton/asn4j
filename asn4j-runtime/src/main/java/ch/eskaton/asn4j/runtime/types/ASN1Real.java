@@ -89,7 +89,7 @@ public class ASN1Real implements ASN1Type {
 
     public static ASN1Real valueOf(double d) {
         ASN1Real value = new ASN1Real();
-        value.setValue(new BigDecimal(d));
+        value.setValue(BigDecimal.valueOf(d).stripTrailingZeros());
         return value;
     }
 
