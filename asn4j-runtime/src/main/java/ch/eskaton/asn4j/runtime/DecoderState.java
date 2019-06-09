@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.List;
 
+@SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class DecoderState {
 
     public int pos;
