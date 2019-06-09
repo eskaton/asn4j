@@ -19,6 +19,14 @@ TestBoolean4 ::= BOOLEAN (TRUE | FALSE)
 TestBoolean5 ::= BOOLEAN ((TRUE | FALSE) ^ TRUE)
 TestBoolean6 ::= TestBoolean4 (ALL EXCEPT FALSE)
 
+TestEnumeration1 ::= ENUMERATED {
+        a, b, c, d
+}
+
+TestEnumeration2 ::= TestEnumeration1 (a | b)
+TestEnumeration3 ::= TestEnumeration1 ((a | b | c) ^ (b | c | d))
+TestEnumeration4 ::= TestEnumeration1 (ALL EXCEPT d)
+
 TestInteger1 ::= INTEGER (1 | 2)
 TestInteger2 ::= INTEGER (ALL EXCEPT 0)
 TestInteger3 ::= INTEGER (((1 | 2 | 3) ^ (2 | 3)) EXCEPT 3)
