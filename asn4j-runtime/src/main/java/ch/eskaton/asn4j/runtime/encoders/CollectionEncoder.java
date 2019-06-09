@@ -38,10 +38,10 @@ import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public abstract class CollectionEncoder<T extends ASN1Type> implements
-        TypeEncoder<T> {
+public abstract class CollectionEncoder<T extends ASN1Type> implements TypeEncoder<T> {
 
     @Override
+    @SuppressWarnings("squid:S3011")
     public byte[] encode(Encoder encoder, T obj) {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
@@ -50,6 +50,7 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements
         if (!compFields.isEmpty()) {
             for (Field compField : compFields) {
                 ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
+                
                 if (annotation != null) {
                     compField.setAccessible(true);
 
@@ -66,8 +67,7 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements
                             } else {
                                 content.write(encoder.encode((ASN1Type) value));
                             }
-                        } else if (!(annotation.optional() || annotation
-                                .hasDefault())) {
+                        } else if (!(annotation.optional() || annotation.hasDefault())) {
                             throw new EncodingException("Value for " + obj.getClass().getSimpleName() + "." +
                                     compField.getName() + " missing");
 
