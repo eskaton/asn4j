@@ -34,11 +34,13 @@ import ch.eskaton.commons.utils.StreamsUtils;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -103,6 +105,8 @@ public class EnumeratedTypeCompilerTest {
     public void testGetNextNumber() {
         EnumeratedTypeCompiler compiler = new EnumeratedTypeCompiler();
 
+        assertEquals(0, compiler.getNextNumber(emptyList(), 0));
+        assertEquals(0, compiler.getNextNumber(createTuples(1, 2, 3), 0));
         assertEquals(4, compiler.getNextNumber(createTuples(1, 2, 3), 3));
         assertEquals(3, compiler.getNextNumber(createTuples(1, 2, 3), 2));
         assertEquals(10, compiler.getNextNumber(createTuples(1, 9, 2, 5), 3));
