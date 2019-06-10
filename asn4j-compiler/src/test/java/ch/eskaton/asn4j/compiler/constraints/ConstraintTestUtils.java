@@ -28,17 +28,22 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.commons.collections.Sets;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 
 public class ConstraintTestUtils {
@@ -87,17 +92,28 @@ public class ConstraintTestUtils {
         return Optional.of(new SizeNode(asList(ranges)));
     }
 
-    static IntegerRangeValueNode value() {
+    static IntegerRangeValueNode intValue() {
         return new IntegerRangeValueNode(emptyList());
     }
 
-    static IntegerRangeValueNode value(long lower, long upper) {
+    static IntegerRangeValueNode intValue(long lower, long upper) {
         return new IntegerRangeValueNode(singletonList(range(lower, upper)));
     }
 
-    static IntegerRangeValueNode value(IntegerRange... ranges) {
+    static IntegerRangeValueNode intValue(IntegerRange... ranges) {
         return new IntegerRangeValueNode(asList(ranges));
     }
 
+    static EnumeratedValueNode enumValue() {
+        return new EnumeratedValueNode(emptySet());
+    }
+
+    static EnumeratedValueNode enumValue(Integer value) {
+        return new EnumeratedValueNode(singleton(value));
+    }
+
+    static EnumeratedValueNode enumValue(Integer... values) {
+        return new EnumeratedValueNode(Sets.<Integer>builder().addAll(asList(values)).build());
+    }
 
 }

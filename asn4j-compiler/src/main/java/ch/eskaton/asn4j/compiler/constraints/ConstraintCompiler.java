@@ -41,7 +41,6 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Maps;
 
 import java.util.Map;
-import java.util.Optional;
 
 public class ConstraintCompiler {
 
@@ -56,7 +55,7 @@ public class ConstraintCompiler {
         compilers = Maps.<Class<? extends Type>, AbstractConstraintCompiler>builder()
                 .put(BitString.class, new BitStringConstraintCompiler(ctx))
                 .put(BooleanType.class, new BooleanConstraintCompiler(ctx))
-                .put(EnumeratedType.class, new EnumeratedConstraintCompiler(ctx))
+                .put(EnumeratedType.class, new EnumeratedTypeConstraintCompiler(ctx))
                 .put(IntegerType.class, new IntegerConstraintCompiler(ctx))
 //                .put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver))
 //                .put(OctetString.class, new OctetStringConstraintCompiler(typeResolver))
