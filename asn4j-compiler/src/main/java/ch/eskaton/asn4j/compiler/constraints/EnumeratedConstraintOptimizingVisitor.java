@@ -38,6 +38,7 @@ import ch.eskaton.commons.collections.Sets;
 import java.util.Set;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 
 public class EnumeratedConstraintOptimizingVisitor implements OptimizingVisitor<Set<Integer>> {
@@ -84,6 +85,10 @@ public class EnumeratedConstraintOptimizingVisitor implements OptimizingVisitor<
 
             if (node.getType() == INTERSECTION) {
                 return new EnumeratedValueNode(Sets.<Integer>builder().addAll(leftValue).removeAll(rightValue).build());
+            } else if (node.getType() == COMPLEMENT) {
+                Set<Integer> values = Sets.<Integer>builder().addAll(leftValue).addAll(rightValue).build();
+
+                return new OpNode(NodeType.NEGATION, new EnumeratedValueNode(values));
             } else {
                 return throwUnimplementedNodeType(node);
             }

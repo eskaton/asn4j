@@ -31,6 +31,8 @@ import ch.eskaton.asn4jtest.x680_51_3.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString4;
 import ch.eskaton.asn4jtest.x680_51_3.TestBoolean2;
+import ch.eskaton.asn4jtest.x680_51_3.TestEnumeration1;
+import ch.eskaton.asn4jtest.x680_51_3.TestEnumeration2;
 import ch.eskaton.asn4jtest.x680_51_3.TestInteger1;
 import ch.eskaton.asn4jtest.x680_51_3.TestInteger2;
 import org.junit.Test;
@@ -39,6 +41,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
 
@@ -75,6 +79,15 @@ public class TestX680_51_3 {
         testBooleanSuccess(TestBoolean2.class, new TestBoolean2(), true);
 
         testBooleanFailure(new TestBoolean2(), false);
+    }
+
+    @Test
+    public void testEnumeration2() {
+        testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.B);
+        testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.C);
+        testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.D);
+
+        testEnumeratedFailure(new TestEnumeration2(), TestEnumeration1.A);
     }
 
     @Test
