@@ -227,13 +227,39 @@ public abstract class AbstractConstraintCompiler {
             Optional<Bounds> bounds);
 
     protected Node calculateContainedSubtype(CompiledType baseType, Type type) {
-        if (type.equals(baseType.getType())) {
-            return new AllValuesNode();
-        } else {
-            CompiledType compiledType = ctx.getCompiledType(type);
-            ConstraintDefinition constraintDefinition = compiledType.getConstraintDefinition();
+        Type parent = type;
+        CompiledType compiledType;
+        Deque<Node> constraints = new ArrayDeque<>();
 
-            return constraintDefinition == null ? new AllValuesNode() : constraintDefinition.getRoots();
+        do {
+            compiledType = ctx.getCompiledType(parent);
+
+            if (compiledType.getConstraintDefinition() != null) {
+                constraints.push(compiledType.getConstraintDefinition().getRoots());
+            }
+
+            parent = compiledType.getType();
+        } while (parent instanceof TypeReference);
+
+        if (constraints.size() == 0) {
+            return new AllValuesNode();
+        } else if (constraints.size() == 1) {
+            return constraints.pop();
+        } else {
+            Node node1 = constraints.pop();
+            Node node2 = constraints.pop();
+
+            do {
+                node1 = new BinOpNode(NodeType.INTERSECTION, node1, node2);
+
+                if (constraints.isEmpty()) {
+                    break;
+                }
+
+                node2 = constraints.pop();
+            } while (true);
+
+            return node1;
         }
     }
 
@@ -309,7 +335,7 @@ public abstract class AbstractConstraintCompiler {
     }
 
     private String negate(String expr) {
-        return "(!" + expr + ")";
+        return "(!(" + expr + "))";
     }
 
     private BiFunction<String, String, String> getBinOperation(String operator) {

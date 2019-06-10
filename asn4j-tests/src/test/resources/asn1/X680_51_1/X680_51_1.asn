@@ -14,6 +14,14 @@ TestBitString7 ::= BIT STRING (ALL EXCEPT testBitString1)
 TestBoolean1 ::= BOOLEAN (TRUE | FALSE)
 TestBoolean2 ::= BOOLEAN (INCLUDES TestBoolean1 EXCEPT TRUE)
 
+TestEnumeration1 ::= ENUMERATED {
+        a, b, c, ..., d(4), e, f
+}
+
+TestEnumeration2 ::= TestEnumeration1 ((c | d | e) ^ (d | e | f))
+TestEnumeration3 ::= TestEnumeration1 (ALL EXCEPT (c | d))
+TestEnumeration4 ::= TestEnumeration1 (TestEnumeration2 EXCEPT e)
+
 testInteger1 INTEGER ::= 3
 testInteger2 INTEGER ::= 4
 

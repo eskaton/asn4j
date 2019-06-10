@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
 public abstract class AbstractType implements Type {
 

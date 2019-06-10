@@ -48,7 +48,7 @@ public class ASN1EnumeratedType implements ASN1Type {
 
     protected void setValue(int value) {
         if (!checkConstraint(value)) {
-            throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
+            throw new ConstraintViolatedException(String.format("%d doesn't satisfy a constraint", value));
         }
 
     	this.value = value;
