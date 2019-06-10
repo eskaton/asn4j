@@ -96,20 +96,13 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
             }
         } else if (elements instanceof ContainedSubtype) {
             Type type = ((ContainedSubtype) elements).getType();
-            Type parent = type;
-            CompiledType compiledType;
+            CompiledType compiledType = ctx.getCompiledBaseType(type);
 
-            do {
-                compiledType = ctx.getCompiledType(parent);
-
-                parent = compiledType.getType();
-            } while (parent instanceof TypeReference);
-
-            if (!baseType.getType().equals(parent)) {
+            if (!baseType.getType().equals(compiledType.getType())) {
                 throw new CompilerException("Invalid type in contained subtype constraint: " + type);
             }
 
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(baseType, compiledType.getType());
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {

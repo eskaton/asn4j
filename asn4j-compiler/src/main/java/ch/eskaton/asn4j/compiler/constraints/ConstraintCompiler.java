@@ -36,7 +36,6 @@ import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Maps;
 
@@ -70,21 +69,14 @@ public class ConstraintCompiler {
     }
 
     public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) {
-        Type parent = node;
-        CompiledType compiledType;
+        CompiledType compiledType = ctx.getCompiledBaseType(node);
 
-        do {
-            compiledType = ctx.getCompiledType(parent);
-
-            parent = compiledType.getType();
-        } while (parent instanceof TypeReference);
-
-        if (!compilers.containsKey(parent.getClass())) {
+        if (!compilers.containsKey(compiledType.getType().getClass())) {
             //throw new CompilerException("Constraints for type %s not yet supported", base.getClass().getSimpleName());
             return null;
         }
 
-        AbstractConstraintCompiler compiler = compilers.get(parent.getClass());
+        AbstractConstraintCompiler compiler = compilers.get(compiledType.getType().getClass());
 
         ConstraintDefinition constraintDef;
 

@@ -619,6 +619,18 @@ public class CompilerContext {
         return compiledType.orElse(new CompiledType(type));
     }
 
+    public CompiledType getCompiledBaseType(Type node) {
+        CompiledType compiledType;
+
+        do {
+            compiledType = getCompiledType(node);
+
+            node = compiledType.getType();
+        } while (node instanceof TypeReference);
+
+        return compiledType;
+    }
+
     private HashMap<String, CompiledType> getTypesOfCurrentModule() {
         return definedTypes.computeIfAbsent(currentModule.peek().getModuleId().getModuleName(), key -> new HashMap<>());
     }
