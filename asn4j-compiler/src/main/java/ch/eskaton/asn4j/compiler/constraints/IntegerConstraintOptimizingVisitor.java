@@ -27,7 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
@@ -35,21 +34,13 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 
 import java.util.List;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 
-public class IntegerConstraintOptimizingVisitor implements Visitor<Node, List<IntegerRange>> {
-
-    @Override
-    public Node visit(AllValuesNode node) {
-        return node;
-    }
+public class IntegerConstraintOptimizingVisitor implements OptimizingVisitor<List<IntegerRange>> {
 
     @Override
     public Node visit(BinOpNode node) {
@@ -71,21 +62,6 @@ public class IntegerConstraintOptimizingVisitor implements Visitor<Node, List<In
         }
     }
 
-    @Override
-    public Node visit(OpNode node) {
-        return node;
-    }
-
-    @Override
-    public Node visit(SizeNode node) {
-        return node;
-    }
-
-    @Override
-    public Node visit(ValueNode<List<IntegerRange>> node) {
-        return node;
-    }
-
     private Node transformValueValue(BinOpNode node, IntegerRangeValueNode left, IntegerRangeValueNode right) {
         List<IntegerRange> leftValue = left.getValue();
         List<IntegerRange> rightValue = right.getValue();
@@ -103,13 +79,11 @@ public class IntegerConstraintOptimizingVisitor implements Visitor<Node, List<In
     }
 
     private Node transformValueNegation(BinOpNode node, IntegerRangeValueNode left, Node right) {
-        List<IntegerRange> leftValue;
-        List<IntegerRange> rightValue;
         right = (((OpNode) right).getNode());
 
         if (right.getType() == NodeType.VALUE) {
-            leftValue = left.getValue();
-            rightValue = ((IntegerRangeValueNode) right).getValue();
+            List<IntegerRange> leftValue = left.getValue();
+            List<IntegerRange> rightValue = ((IntegerRangeValueNode) right).getValue();
 
             if (node.getType() == INTERSECTION) {
                 return new IntegerRangeValueNode(IntegerRange.exclude(leftValue, rightValue));

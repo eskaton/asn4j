@@ -27,16 +27,12 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import ch.eskaton.commons.collections.Sets;
 
 import java.util.Set;
@@ -44,12 +40,7 @@ import java.util.Set;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 
-public class EnumeratedConstraintOptimizingVisitor implements Visitor<Node, Set<Integer>> {
-
-    @Override
-    public Node visit(AllValuesNode node) {
-        return node;
-    }
+public class EnumeratedConstraintOptimizingVisitor implements OptimizingVisitor<Set<Integer>> {
 
     @Override
     public Node visit(BinOpNode node) {
@@ -98,21 +89,6 @@ public class EnumeratedConstraintOptimizingVisitor implements Visitor<Node, Set<
             }
         }
 
-        return node;
-    }
-
-    @Override
-    public Node visit(OpNode node) {
-        return node;
-    }
-
-    @Override
-    public Node visit(SizeNode node) {
-        return node;
-    }
-
-    @Override
-    public Node visit(ValueNode<Set<Integer>> node) {
         return node;
     }
 
