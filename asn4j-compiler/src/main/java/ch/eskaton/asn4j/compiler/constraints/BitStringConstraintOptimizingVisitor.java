@@ -27,7 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
@@ -36,8 +35,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValueComparator;
 import ch.eskaton.commons.collections.Lists;
@@ -51,12 +48,7 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 import static java.util.stream.Collectors.toList;
 
-public class BitStringConstraintOptimizingVisitor implements Visitor<Node, List<BitStringValue>> {
-
-    @Override
-    public Node visit(AllValuesNode node) {
-        return node;
-    }
+public class BitStringConstraintOptimizingVisitor implements OptimizingVisitor<List<BitStringValue>> {
 
     @Override
     public Node visit(BinOpNode node) {
@@ -93,21 +85,6 @@ public class BitStringConstraintOptimizingVisitor implements Visitor<Node, List<
         }
     }
 
-    @Override
-    public Node visit(OpNode node) {
-        return node;
-    }
-
-    @Override
-    public Node visit(SizeNode node) {
-        return node;
-    }
-
-    @Override
-    public Node visit(ValueNode<List<BitStringValue>> node) {
-        return node;
-    }
-
     private Node transformValueValue(BinOpNode node, BitStringValueNode left, BitStringValueNode right) {
         List<BitStringValue> leftValue = left.getValue();
         List<BitStringValue> rightValue = right.getValue();
@@ -140,14 +117,11 @@ public class BitStringConstraintOptimizingVisitor implements Visitor<Node, List<
     }
 
     private Node transformValueNegation(BinOpNode node, BitStringValueNode left, Node right) {
-        List<BitStringValue> leftValue;
-        List<BitStringValue> rightValue;
-
         right = (((OpNode) right).getNode());
 
         if (right.getType() == NodeType.VALUE) {
-            leftValue = left.getValue();
-            rightValue = ((BitStringValueNode) right).getValue();
+            List<BitStringValue> leftValue = left.getValue();
+            List<BitStringValue> rightValue = ((BitStringValueNode) right).getValue();
 
             if (node.getType() == INTERSECTION) {
                 return new BitStringValueNode(Lists.<BitStringValue>builder()
@@ -181,14 +155,11 @@ public class BitStringConstraintOptimizingVisitor implements Visitor<Node, List<
     }
 
     private Node transformSizeNegation(BinOpNode node, SizeNode left, Node right) {
-        List<IntegerRange> leftSize;
-        List<IntegerRange> rightSize;
-
         right = (((OpNode) right).getNode());
 
         if (right.getType() == NodeType.SIZE) {
-            leftSize = left.getSize();
-            rightSize = ((SizeNode) right).getSize();
+            List<IntegerRange> leftSize = left.getSize();
+            List<IntegerRange> rightSize = ((SizeNode) right).getSize();
 
             if (node.getType() == INTERSECTION) {
                 return new SizeNode(IntegerRange.exclude(leftSize, rightSize));
