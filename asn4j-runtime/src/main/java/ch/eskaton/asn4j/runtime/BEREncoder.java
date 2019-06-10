@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.encoders.BitStringEncoder;
 import ch.eskaton.asn4j.runtime.encoders.BooleanEncoder;
 import ch.eskaton.asn4j.runtime.encoders.ChoiceEncoder;
-import ch.eskaton.asn4j.runtime.encoders.EnumerationTypeEncoder;
+import ch.eskaton.asn4j.runtime.encoders.EnumeratedTypeEncoder;
 import ch.eskaton.asn4j.runtime.encoders.IRIEncoder;
 import ch.eskaton.asn4j.runtime.encoders.IntegerEncoder;
 import ch.eskaton.asn4j.runtime.encoders.NullEncoder;
@@ -84,7 +84,7 @@ public class BEREncoder implements Encoder {
                     .put(ASN1BitString.class, new BitStringEncoder())
                     .put(ASN1Boolean.class, new BooleanEncoder())
                     .put(ASN1Choice.class, new ChoiceEncoder())
-                    .put(ASN1EnumeratedType.class, new EnumerationTypeEncoder())
+                    .put(ASN1EnumeratedType.class, new EnumeratedTypeEncoder())
                     .put(ASN1Integer.class, new IntegerEncoder())
                     .put(ASN1Real.class, new RealEncoder())
                     .put(ASN1Null.class, new NullEncoder())
@@ -132,7 +132,7 @@ public class BEREncoder implements Encoder {
             buf = this.<ASN1Integer, IntegerEncoder>getEncoder(
                     ASN1Integer.class).encode(this, (ASN1Integer) obj);
         } else if (obj instanceof ASN1EnumeratedType) {
-            buf = this.<ASN1EnumeratedType, EnumerationTypeEncoder>getEncoder(ASN1EnumeratedType.class)
+            buf = this.<ASN1EnumeratedType, EnumeratedTypeEncoder>getEncoder(ASN1EnumeratedType.class)
                     .encode(this, (ASN1EnumeratedType) obj);
         } else if (obj instanceof ASN1Real) {
             buf = this.<ASN1Real, RealEncoder>getEncoder(ASN1Real.class).encode(this, (ASN1Real) obj);

@@ -35,7 +35,7 @@ import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersec
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.range;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.value;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intValue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -45,48 +45,48 @@ public class IntegerConstraintOptimizingVisitorTest {
     public void testVisitBinOpNodeUnion() {
         Visitor visitor = new IntegerConstraintOptimizingVisitor();
 
-        assertThat(visitor.visit(union(value(), value())), equalTo(value()));
-        assertThat(visitor.visit(union(value(1, 2), value())), equalTo(value(1, 2)));
-        assertThat(visitor.visit(union(value(), value(1, 2))), equalTo(value(1, 2)));
-        assertThat(visitor.visit(union(value(1, 2), value(2, 3))), equalTo(value(1, 3)));
-        assertThat(visitor.visit(union(value(1, 2), value(3, 4))), equalTo(value(1, 4)));
-        assertThat(visitor.visit(union(value(1, 2), value(4, 5))), equalTo(value(range(1, 2), range(4, 5))));
-        assertThat(visitor.visit(union(value(1, 2), value(range(3, 4), range(6, 7)))),
-                equalTo(value(range(1, 4), range(6, 7))));
+        assertThat(visitor.visit(union(intValue(), intValue())), equalTo(intValue()));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue())), equalTo(intValue(1, 2)));
+        assertThat(visitor.visit(union(intValue(), intValue(1, 2))), equalTo(intValue(1, 2)));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue(2, 3))), equalTo(intValue(1, 3)));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue(3, 4))), equalTo(intValue(1, 4)));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue(4, 5))), equalTo(intValue(range(1, 2), range(4, 5))));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue(range(3, 4), range(6, 7)))),
+                equalTo(intValue(range(1, 4), range(6, 7))));
     }
 
     @Test
     public void testVisitBinOpNodeIntersection() {
         Visitor visitor = new IntegerConstraintOptimizingVisitor();
 
-        assertThat(visitor.visit(intersection(value(), value())), equalTo(value()));
-        assertThat(visitor.visit(intersection(value(1, 2), value())), equalTo(value()));
-        assertThat(visitor.visit(intersection(value(), value(1, 2))), equalTo(value()));
-        assertThat(visitor.visit(intersection(value(1, 2), value(2, 3))), equalTo(value(2, 2)));
-        assertThat(visitor.visit(intersection(value(1, 2), value(3, 4))), equalTo(value()));
-        assertThat(visitor.visit(intersection(value(1, 6), value(range(3, 4), range(6, 7)))),
-                equalTo(value(range(3, 4), range(6, 6))));
+        assertThat(visitor.visit(intersection(intValue(), intValue())), equalTo(intValue()));
+        assertThat(visitor.visit(intersection(intValue(1, 2), intValue())), equalTo(intValue()));
+        assertThat(visitor.visit(intersection(intValue(), intValue(1, 2))), equalTo(intValue()));
+        assertThat(visitor.visit(intersection(intValue(1, 2), intValue(2, 3))), equalTo(intValue(2, 2)));
+        assertThat(visitor.visit(intersection(intValue(1, 2), intValue(3, 4))), equalTo(intValue()));
+        assertThat(visitor.visit(intersection(intValue(1, 6), intValue(range(3, 4), range(6, 7)))),
+                equalTo(intValue(range(3, 4), range(6, 6))));
     }
 
     @Test
     public void testVisitBinOpNodeComplement() {
         Visitor visitor = new IntegerConstraintOptimizingVisitor();
 
-        assertThat(visitor.visit(complement(value(), value())), equalTo(value()));
-        assertThat(visitor.visit(complement(value(1, 2), value())), equalTo(value(1, 2)));
-        assertThat(visitor.visit(complement(value(), value(1, 2))), equalTo(value()));
-        assertThat(visitor.visit(complement(value(1, 4), value(2, 3))), equalTo(value(range(1, 1), range(4, 4))));
-        assertThat(visitor.visit(complement(value(1, 7), value(range(3, 4), range(6, 7)))),
-                equalTo(value(range(1, 2), range(5, 5))));
+        assertThat(visitor.visit(complement(intValue(), intValue())), equalTo(intValue()));
+        assertThat(visitor.visit(complement(intValue(1, 2), intValue())), equalTo(intValue(1, 2)));
+        assertThat(visitor.visit(complement(intValue(), intValue(1, 2))), equalTo(intValue()));
+        assertThat(visitor.visit(complement(intValue(1, 4), intValue(2, 3))), equalTo(intValue(range(1, 1), range(4, 4))));
+        assertThat(visitor.visit(complement(intValue(1, 7), intValue(range(3, 4), range(6, 7)))),
+                equalTo(intValue(range(1, 2), range(5, 5))));
     }
 
     @Test
     public void testVisitBinOpNodeNot() {
         Visitor visitor = new IntegerConstraintOptimizingVisitor();
 
-        assertThat(visitor.visit(intersection(value(1, 10), not(value(3, 7)))),
-                equalTo(value(range(1, 2), range(8, 10))));
-        assertThat(visitor.visit(intersection(not(value(3, 7)), value(1, 6))), equalTo(value(1, 2)));
+        assertThat(visitor.visit(intersection(intValue(1, 10), not(intValue(3, 7)))),
+                equalTo(intValue(range(1, 2), range(8, 10))));
+        assertThat(visitor.visit(intersection(not(intValue(3, 7)), intValue(1, 6))), equalTo(intValue(1, 2)));
     }
 
 }

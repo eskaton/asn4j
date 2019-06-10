@@ -38,10 +38,8 @@ import ch.eskaton.commons.collections.Sets;
 import java.util.Set;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 
-public class EnumeratedConstraintOptimizingVisitor implements OptimizingVisitor<Set<Integer>> {
+public class EnumeratedTypeConstraintOptimizingVisitor implements OptimizingVisitor<Set<Integer>> {
 
     @Override
     public Node visit(BinOpNode node) {
@@ -52,9 +50,9 @@ public class EnumeratedConstraintOptimizingVisitor implements OptimizingVisitor<
             case VALUE_VALUE:
                 return transformValueValue(node, (EnumeratedValueNode) left, (EnumeratedValueNode) right);
             case VALUE_NEGATION:
-                return transformValueNegation(node, (EnumeratedValueNode) left, right);
+                return transformValueNegation(node, (EnumeratedValueNode) left, right, false);
             case NEGATION_VALUE:
-                return transformValueNegation(node, (EnumeratedValueNode) right, left);
+                return transformValueNegation(node, (EnumeratedValueNode) right, left, true);
             default:
                 return node;
         }
@@ -76,21 +74,26 @@ public class EnumeratedConstraintOptimizingVisitor implements OptimizingVisitor<
         }
     }
 
-    private Node transformValueNegation(BinOpNode node, EnumeratedValueNode left, Node right) {
+    private Node transformValueNegation(BinOpNode node, EnumeratedValueNode left, Node right, boolean opSwitched) {
         right = (((OpNode) right).getNode());
 
         if (right.getType() == NodeType.VALUE) {
             Set<Integer> leftValue = left.getValue();
             Set<Integer> rightValue = ((EnumeratedValueNode) right).getValue();
 
-            if (node.getType() == INTERSECTION) {
-                return new EnumeratedValueNode(Sets.<Integer>builder().addAll(leftValue).removeAll(rightValue).build());
-            } else if (node.getType() == COMPLEMENT) {
-                Set<Integer> values = Sets.<Integer>builder().addAll(leftValue).addAll(rightValue).build();
+            switch (node.getType()) {
+                case INTERSECTION:
+                    return new EnumeratedValueNode(Sets.<Integer>builder().addAll(leftValue).removeAll(rightValue).build());
+                case COMPLEMENT:
+                    Sets.Builder<Integer> values = Sets.<Integer>builder().addAll(leftValue);
 
-                return new OpNode(NodeType.NEGATION, new EnumeratedValueNode(values));
-            } else {
-                return throwUnimplementedNodeType(node);
+                    if (opSwitched) {
+                        return new OpNode(NodeType.NEGATION, new EnumeratedValueNode(values.addAll(rightValue).build()));
+                    } else {
+                        return new EnumeratedValueNode(values.retainAll(rightValue).build());
+                    }
+                default:
+                    return throwUnimplementedNodeType(node);
             }
         }
 

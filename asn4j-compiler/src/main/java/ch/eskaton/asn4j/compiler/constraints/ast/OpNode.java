@@ -27,7 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.runtime.utils.ToString;
+import java.util.Objects;
 
 public class OpNode extends AbstractNode {
 
@@ -48,8 +48,23 @@ public class OpNode extends AbstractNode {
     }
 
     @Override
-    public String toString() {
-        return ToString.get(this);
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        OpNode opNode = (OpNode) other;
+
+        return Objects.equals(node, opNode.node);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(node);
     }
 
 }

@@ -42,10 +42,11 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.collections.Tuple2;
 
@@ -55,9 +56,9 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 
-public class EnumeratedConstraintCompiler extends AbstractConstraintCompiler {
+public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler {
 
-    public EnumeratedConstraintCompiler(CompilerContext ctx) {
+    public EnumeratedTypeConstraintCompiler(CompilerContext ctx) {
         super(ctx);
     }
 
@@ -94,6 +95,20 @@ public class EnumeratedConstraintCompiler extends AbstractConstraintCompiler {
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
+            Type type = ((ContainedSubtype) elements).getType();
+            Type parent = type;
+            CompiledType compiledType;
+
+            do {
+                compiledType = ctx.getCompiledType(parent);
+
+                parent = compiledType.getType();
+            } while (parent instanceof TypeReference);
+
+            if (!baseType.getType().equals(parent)) {
+                throw new CompilerException("Invalid type in contained subtype constraint: " + type);
+            }
+
             return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
@@ -117,7 +132,7 @@ public class EnumeratedConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     protected Node optimize(Node node) {
-        return new EnumeratedConstraintOptimizingVisitor().visit(node);
+        return new EnumeratedTypeConstraintOptimizingVisitor().visit(node);
     }
 
     @Override

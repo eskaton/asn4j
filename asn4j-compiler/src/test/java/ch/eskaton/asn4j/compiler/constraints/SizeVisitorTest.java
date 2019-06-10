@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import java.util.Optional;
 
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.*;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.complement;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
@@ -40,7 +41,7 @@ import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.optSize;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.range;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.size;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.value;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intValue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -50,13 +51,13 @@ public class SizeVisitorTest {
     public void testVisitBinOpNodeUnion() {
         Visitor visitor = new SizeVisitor();
 
-        assertThat(visitor.visit(union(value(), value())), equalTo(optSize()));
-        assertThat(visitor.visit(union(value(1, 2), value())), equalTo(optSize(1, 2)));
-        assertThat(visitor.visit(union(value(), value(1, 2))), equalTo(optSize(1, 2)));
-        assertThat(visitor.visit(union(value(1, 2), value(2, 3))), equalTo(optSize(1, 3)));
-        assertThat(visitor.visit(union(value(1, 2), value(3, 4))), equalTo(optSize(1, 4)));
-        assertThat(visitor.visit(union(value(1, 2), value(4, 5))), equalTo(optSize(range(1, 2), range(4, 5))));
-        assertThat(visitor.visit(union(value(1, 2), value(range(3, 4), range(6, 7)))),
+        assertThat(visitor.visit(union(intValue(), intValue())), equalTo(optSize()));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue())), equalTo(optSize(1, 2)));
+        assertThat(visitor.visit(union(intValue(), intValue(1, 2))), equalTo(optSize(1, 2)));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue(2, 3))), equalTo(optSize(1, 3)));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue(3, 4))), equalTo(optSize(1, 4)));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue(4, 5))), equalTo(optSize(range(1, 2), range(4, 5))));
+        assertThat(visitor.visit(union(intValue(1, 2), intValue(range(3, 4), range(6, 7)))),
                 equalTo(optSize(range(1, 4), range(6, 7))));
     }
 
@@ -64,12 +65,12 @@ public class SizeVisitorTest {
     public void testVisitBinOpNodeIntersection() {
         Visitor visitor = new SizeVisitor();
 
-        assertThat(visitor.visit(intersection(value(), value())), equalTo(optSize()));
-        assertThat(visitor.visit(intersection(value(1, 2), value())), equalTo(optSize()));
-        assertThat(visitor.visit(intersection(value(), value(1, 2))), equalTo(optSize()));
-        assertThat(visitor.visit(intersection(value(1, 2), value(2, 3))), equalTo(optSize(2, 2)));
-        assertThat(visitor.visit(intersection(value(1, 2), value(3, 4))), equalTo(optSize()));
-        assertThat(visitor.visit(intersection(value(1, 6), value(range(3, 4), range(6, 7)))),
+        assertThat(visitor.visit(intersection(intValue(), intValue())), equalTo(optSize()));
+        assertThat(visitor.visit(intersection(intValue(1, 2), intValue())), equalTo(optSize()));
+        assertThat(visitor.visit(intersection(intValue(), intValue(1, 2))), equalTo(optSize()));
+        assertThat(visitor.visit(intersection(intValue(1, 2), intValue(2, 3))), equalTo(optSize(2, 2)));
+        assertThat(visitor.visit(intersection(intValue(1, 2), intValue(3, 4))), equalTo(optSize()));
+        assertThat(visitor.visit(intersection(intValue(1, 6), intValue(range(3, 4), range(6, 7)))),
                 equalTo(optSize(range(3, 4), range(6, 6))));
     }
 
@@ -77,13 +78,13 @@ public class SizeVisitorTest {
     public void testVisitBinOpNodeComplement() {
         Visitor visitor = new SizeVisitor();
 
-        assertThat(visitor.visit(complement(value(), value())), equalTo(optSize()));
-        assertThat(visitor.visit(complement(value(1, 2), value())), equalTo(optSize(1, 2)));
-        assertThat(visitor.visit(complement(value(), value(1, 2))), equalTo(optSize()));
-        assertThat(visitor.visit(complement(value(1, 4), value(2, 3))), equalTo(optSize(range(1, 1), range(4, 4))));
-        assertThat(visitor.visit(complement(value(1, 7), value(range(3, 4), range(6, 7)))),
+        assertThat(visitor.visit(complement(intValue(), intValue())), equalTo(optSize()));
+        assertThat(visitor.visit(complement(intValue(1, 2), intValue())), equalTo(optSize(1, 2)));
+        assertThat(visitor.visit(complement(intValue(), intValue(1, 2))), equalTo(optSize()));
+        assertThat(visitor.visit(complement(intValue(1, 4), intValue(2, 3))), equalTo(optSize(range(1, 1), range(4, 4))));
+        assertThat(visitor.visit(complement(intValue(1, 7), intValue(range(3, 4), range(6, 7)))),
                 equalTo(optSize(range(1, 2), range(5, 5))));
-        assertThat(visitor.visit(complement(new AllValuesNode(), value(0, 0))),
+        assertThat(visitor.visit(complement(new AllValuesNode(), intValue(0, 0))),
                 equalTo(Optional.of(size(range(1, Long.MAX_VALUE)))));
     }
 
@@ -91,9 +92,9 @@ public class SizeVisitorTest {
     public void testVisitOpNode() {
         Visitor visitor = new SizeVisitor();
 
-        assertThat(visitor.visit(not(value(10, 15))),
+        assertThat(visitor.visit(not(intValue(10, 15))),
                 equalTo(Optional.of(size(range(0, 9), range(16, Long.MAX_VALUE)))));
-        assertThat(visitor.visit(not(value(0, 5))),
+        assertThat(visitor.visit(not(intValue(0, 5))),
                 equalTo(Optional.of(size(range(6, Long.MAX_VALUE)))));
     }
 

@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.runtime.utils.ToString;
-
 import java.util.Objects;
 
 public class BinOpNode extends AbstractNode {
@@ -70,11 +68,6 @@ public class BinOpNode extends AbstractNode {
     @Override
     public int hashCode() {
         return Objects.hash(left, right);
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
     }
 
 }
