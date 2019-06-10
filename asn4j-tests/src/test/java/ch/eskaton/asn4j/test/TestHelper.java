@@ -27,12 +27,16 @@
 
 package ch.eskaton.asn4j.test;
 
+import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4jtest.x680_51_2.TestEnumeration1;
+import ch.eskaton.asn4jtest.x680_51_2.TestEnumeration2;
 
 import java.math.BigInteger;
 
@@ -83,11 +87,26 @@ public class TestHelper {
         T result = decoder.decode(clazz, encoder.encode(booleanValue));
 
         assertEquals(booleanValue, result);
-        assertEquals(booleanValue, result);
     }
 
     public static <T extends ASN1Boolean> void testBooleanFailure(T booleanValue, boolean value) {
         TestUtils.assertThrows(() -> booleanValue.setValue(value), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1EnumeratedType> void testEnumeratedSuccess(Class<? extends T> clazz, T enumValue,
+            T value) {
+        enumValue.setValue(value);
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        T result = decoder.decode(clazz, encoder.encode(enumValue));
+
+        assertEquals(enumValue, result);
+    }
+
+    public static <T extends ASN1EnumeratedType> void testEnumeratedFailure(T enumValue, T value) {
+        TestUtils.assertThrows(() -> enumValue.setValue(value), ConstraintViolatedException.class);
     }
 
     public static <T extends ASN1Integer> void testIntegerSuccess(Class<? extends T> clazz, T intValue, long value) {
@@ -98,7 +117,6 @@ public class TestHelper {
 
         T result = decoder.decode(clazz, encoder.encode(intValue));
 
-        assertEquals(intValue, result);
         assertEquals(intValue, result);
     }
 
