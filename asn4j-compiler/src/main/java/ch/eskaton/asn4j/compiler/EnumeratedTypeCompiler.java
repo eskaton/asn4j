@@ -44,6 +44,7 @@ import ch.eskaton.commons.collections.Tuple2;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,8 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
+import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, CompiledType> {
 
@@ -76,11 +79,13 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
             javaClass.field().modifier(Public).asStatic().asFinal().type(typeName).name(fieldName)
                     .initializer("new " + typeName + "(" + value + ")").build();
-
         });
 
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, typeName));
         javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, typeName,
-                Arrays.asList(new JavaParameter("int", "value")), "\t\tsuper.setValue(value);\n"));
+                asList(new JavaParameter("int", "value")), "\t\tsuper.setValue(value);"));
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, typeName,
+                asList(new JavaParameter(typeName, "value")), "\t\tsuper.setValue(value.getValue());"));
 
         BodyBuilder builder = javaClass.method().asStatic().returnType(typeName).name("valueOf")
                 .parameter(INT, "value").exception(ASN1RuntimeException.class).body();

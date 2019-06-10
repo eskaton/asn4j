@@ -37,14 +37,13 @@ import ch.eskaton.commons.utils.ReflectionUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 
-public class EnumeratedTypeDecoder {
+public class EnumeratedTypeDecoder implements TypeDecoder<ASN1EnumeratedType> {
 
-    @SuppressWarnings("unchecked")
-    public <T extends ASN1EnumeratedType> T decode(DecoderStates states, DecoderState state, Class<T> type) {
+    @Override
+    public void decode(DecoderStates states, DecoderState state, ASN1EnumeratedType obj) {
         try {
-            return (T) ReflectionUtils.invokeStaticMethod(type, "valueOf", new Object[] {
-                    new BigInteger(RuntimeUtils.getValue(states, state)).intValue()
-            }, new Class<?>[] { int.class });
+            int value = new BigInteger(RuntimeUtils.getValue(states, state)).intValue();
+            ReflectionUtils.invokePrivateMethod(obj, "setValue", new Object[] { value });
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new DecodingException(e);
         }

@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.compiler.constraints.ast;
 
 import java.util.Set;
 
-public class EnumeratedValueNode extends ValueNode<Set<String>> {
+public class EnumeratedValueNode extends ValueNode<Set<Integer>> {
 
-    public EnumeratedValueNode(Set<String> value) {
+    public EnumeratedValueNode(Set<Integer> value) {
         super(value);
     }
 

@@ -37,17 +37,28 @@ import java.util.Objects;
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 10, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1EnumeratedType implements ASN1Type {
 
-    private int value;
+    private Integer value;
+
+    public ASN1EnumeratedType() {
+    }
 
     public int getValue() {
     	return value;
     }
 
     protected void setValue(int value) {
+        if (!checkConstraint(value)) {
+            throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
+        }
+
     	this.value = value;
     }
 
-    protected boolean checkConstraint(ASN1EnumeratedType value) throws ConstraintViolatedException {
+    public <T extends ASN1EnumeratedType> void setValue(T value) {
+        this.setValue(value.getValue());
+    }
+
+    protected boolean checkConstraint(int value) throws ConstraintViolatedException {
         return true;
     }
 
@@ -62,18 +73,18 @@ public class ASN1EnumeratedType implements ASN1Type {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object other) {
+        if (this == other) {
             return true;
         }
 
-        if (obj == null || getClass() != obj.getClass()) {
+        if (other == null || getClass() != other.getClass()) {
             return false;
         }
 
-        ASN1EnumeratedType other = (ASN1EnumeratedType) obj;
+        ASN1EnumeratedType that = (ASN1EnumeratedType) other;
 
-        return value == other.value;
+        return Objects.equals(value, that.value);
     }
 
 }

@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.java.JavaType;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.EnumerationItems;
@@ -69,17 +70,17 @@ public class EnumeratedConstraintCompiler extends AbstractConstraintCompiler {
 
             try {
                 SimpleDefinedValue definedValue = CompilerUtils.resolveAmbiguousValue(value, SimpleDefinedValue.class);
-                String enumItem;
+                Integer enumValue;
 
                 if (definedValue != null) {
                     CompiledEnumeratedType compiledEnumeratedType = (CompiledEnumeratedType) baseType;
                     EnumerationItems allItems = compiledEnumeratedType.getRoots().copy()
                             .addAll(compiledEnumeratedType.getAdditions().getItems());
-                    Optional<Tuple2<String, Integer>> enumValue = allItems.getItems().stream()
+                    Optional<Tuple2<String, Integer>> enumItem = allItems.getItems().stream()
                             .filter(t -> t.get_1().equals(definedValue.getValue())).findAny();
 
-                    if (enumValue.isPresent()) {
-                        enumItem = enumValue.get().get_1();
+                    if (enumItem.isPresent()) {
+                        enumValue = enumItem.get().get_2();
                     } else {
                         throw new CompilerException("Failed to resolve enum value: " + definedValue.getValue());
                     }
@@ -87,7 +88,7 @@ public class EnumeratedConstraintCompiler extends AbstractConstraintCompiler {
                     throw new CompilerException("Failed to resolve value: ", value.getClass().getSimpleName());
                 }
 
-                return new EnumeratedValueNode(Sets.<String>builder().add(enumItem).build());
+                return new EnumeratedValueNode(Sets.<Integer>builder().add(enumValue).build());
             } catch (Exception e) {
                 throw new CompilerException("Invalid single-value constraint %s for ENUMERATED type", e,
                         value.getClass().getSimpleName());
@@ -106,7 +107,7 @@ public class EnumeratedConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
         JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
                 .returnType(boolean.class).name("checkConstraint")
-                .parameter(ASN1EnumeratedType.class.getSimpleName(), "value")
+                .parameter(JavaType.INT, "value")
                 .exception(ConstraintViolatedException.class).body();
 
         addConstraintCondition(definition, builder);
@@ -118,15 +119,15 @@ public class EnumeratedConstraintCompiler extends AbstractConstraintCompiler {
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                Set<String> values = ((EnumeratedValueNode) node).getValue();
+                Set<Integer> values = ((EnumeratedValueNode) node).getValue();
                 return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
             default:
                 return super.buildExpression(node);
         }
     }
 
-    private String buildExpression(String enumItem) {
-        return "(value == " + enumItem.toUpperCase() + ")";
+    private String buildExpression(Integer enumValue) {
+        return "(value == " + enumValue + ")";
     }
 
 }

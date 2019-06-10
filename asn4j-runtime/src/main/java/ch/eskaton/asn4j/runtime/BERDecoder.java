@@ -97,6 +97,7 @@ public class BERDecoder implements Decoder {
             Maps.<Class<? extends ASN1Type>, TypeDecoder<? extends ASN1Type>>builder()
                     .put(ASN1BitString.class, new BitStringDecoder())
                     .put(ASN1Boolean.class, new BooleanDecoder())
+                    .put(ASN1EnumeratedType.class, new EnumeratedTypeDecoder())
                     .put(ASN1Integer.class, new IntegerDecoder())
                     .put(ASN1Real.class, new RealDecoder())
                     .put(ASN1ObjectIdentifier.class, new ObjectIdentifierDecoder())
@@ -175,7 +176,7 @@ public class BERDecoder implements Decoder {
         try {
             obj = type.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-           throw new DecodingException(e);
+            throw new DecodingException(e);
         }
 
         choiceDecoder.decode(this, states, (ASN1Choice) obj);
@@ -193,7 +194,7 @@ public class BERDecoder implements Decoder {
         return (C) decoder;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private <T> DecodingResult<T> decodeState(Class<T> type, DecoderStates states, DecoderState state) {
         if (state == null) {
             return null;
@@ -202,44 +203,42 @@ public class BERDecoder implements Decoder {
         T obj;
 
         try {
-            if (ReflectionUtils.extendsClazz(type, ASN1EnumeratedType.class)) {
-                obj = (T) enumeratedTypeDecoder.decode(states, state, (Class<ASN1EnumeratedType>) type);
-            } else {
-                obj = type.newInstance();
+            obj = type.newInstance();
 
-                if (obj instanceof ASN1Boolean) {
-                    getDecoder(ASN1Boolean.class).decode(states, state, (ASN1Boolean) obj);
-                } else if (obj instanceof ASN1BitString) {
-                    getDecoder(ASN1BitString.class).decode(states, state, (ASN1BitString) obj);
-                } else if (obj instanceof ASN1Null) {
-                    // nothing to do
-                } else if (obj instanceof ASN1Sequence) {
-                    sequenceDecoder.decode(this, states, (ASN1Sequence) obj);
-                } else if (obj instanceof ASN1SequenceOf) {
-                    sequenceOfDecoder.decode(this, states, (ASN1SequenceOf) obj);
-                } else if (obj instanceof ASN1Set) {
-                    setDecoder.decode(this, states, (ASN1Set) obj);
-                } else if (obj instanceof ASN1SetOf) {
-                    setOfDecoder.decode(this, states, (ASN1SetOf) obj);
-                } else if (obj instanceof ASN1Integer || ReflectionUtils.extendsClazz(type, ASN1NamedInteger.class)) {
-                    getDecoder(ASN1Integer.class).decode(states, state, (ASN1Integer) obj);
-                } else if (obj instanceof ASN1Real) {
-                    getDecoder(ASN1Real.class).decode(states, state, (ASN1Real) obj);
-                } else if (obj instanceof ASN1OctetString) {
-                    getDecoder(ASN1OctetString.class).decode(states, state, (ASN1OctetString) obj);
-                } else if (obj instanceof ASN1VisibleString) {
-                    getDecoder(ASN1VisibleString.class).decode(states, state, (ASN1VisibleString) obj);
-                } else if (obj instanceof ASN1ObjectIdentifier) {
-                    getDecoder(ASN1ObjectIdentifier.class).decode(states, state, (ASN1ObjectIdentifier) obj);
-                } else if (obj instanceof ASN1RelativeOID) {
-                    getDecoder(ASN1RelativeOID.class).decode(states, state, (ASN1RelativeOID) obj);
-                } else if (obj instanceof ASN1IRI) {
-                    getDecoder(ASN1IRI.class).decode(states, state, (ASN1IRI) obj);
-                } else if (obj instanceof ASN1RelativeIRI) {
-                    getDecoder(ASN1RelativeIRI.class).decode(states, state, (ASN1RelativeIRI) obj);
-                } else {
-                    throw new DecodingException("Decoding of object " + obj.getClass().getName() + " not supported");
-                }
+            if (obj instanceof ASN1Boolean) {
+                getDecoder(ASN1Boolean.class).decode(states, state, (ASN1Boolean) obj);
+            } else if (obj instanceof ASN1BitString) {
+                getDecoder(ASN1BitString.class).decode(states, state, (ASN1BitString) obj);
+            } else if (obj instanceof ASN1EnumeratedType) {
+                getDecoder(ASN1EnumeratedType.class).decode(states, state, (ASN1EnumeratedType) obj);
+            } else if (obj instanceof ASN1Null) {
+                // nothing to do
+            } else if (obj instanceof ASN1Sequence) {
+                sequenceDecoder.decode(this, states, (ASN1Sequence) obj);
+            } else if (obj instanceof ASN1SequenceOf) {
+                sequenceOfDecoder.decode(this, states, (ASN1SequenceOf) obj);
+            } else if (obj instanceof ASN1Set) {
+                setDecoder.decode(this, states, (ASN1Set) obj);
+            } else if (obj instanceof ASN1SetOf) {
+                setOfDecoder.decode(this, states, (ASN1SetOf) obj);
+            } else if (obj instanceof ASN1Integer || ReflectionUtils.extendsClazz(type, ASN1NamedInteger.class)) {
+                getDecoder(ASN1Integer.class).decode(states, state, (ASN1Integer) obj);
+            } else if (obj instanceof ASN1Real) {
+                getDecoder(ASN1Real.class).decode(states, state, (ASN1Real) obj);
+            } else if (obj instanceof ASN1OctetString) {
+                getDecoder(ASN1OctetString.class).decode(states, state, (ASN1OctetString) obj);
+            } else if (obj instanceof ASN1VisibleString) {
+                getDecoder(ASN1VisibleString.class).decode(states, state, (ASN1VisibleString) obj);
+            } else if (obj instanceof ASN1ObjectIdentifier) {
+                getDecoder(ASN1ObjectIdentifier.class).decode(states, state, (ASN1ObjectIdentifier) obj);
+            } else if (obj instanceof ASN1RelativeOID) {
+                getDecoder(ASN1RelativeOID.class).decode(states, state, (ASN1RelativeOID) obj);
+            } else if (obj instanceof ASN1IRI) {
+                getDecoder(ASN1IRI.class).decode(states, state, (ASN1IRI) obj);
+            } else if (obj instanceof ASN1RelativeIRI) {
+                getDecoder(ASN1RelativeIRI.class).decode(states, state, (ASN1RelativeIRI) obj);
+            } else {
+                throw new DecodingException("Decoding of object " + obj.getClass().getName() + " not supported");
             }
         } catch (Exception th) {
             if (DecodingException.class.isAssignableFrom(th.getClass())) {
