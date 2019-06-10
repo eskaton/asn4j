@@ -49,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
@@ -83,9 +84,9 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, typeName));
         javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, typeName,
-                asList(new JavaParameter("int", "value")), "\t\tsuper.setValue(value);"));
+                asList(new JavaParameter("int", "value")), Optional.of("\t\tsuper.setValue(value);")));
         javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, typeName,
-                asList(new JavaParameter(typeName, "value")), "\t\tsuper.setValue(value.getValue());"));
+                asList(new JavaParameter(typeName, "value")), Optional.of("\t\tsuper.setValue(value.getValue());")));
 
         BodyBuilder builder = javaClass.method().asStatic().returnType(typeName).name("valueOf")
                 .parameter(INT, "value").exception(ASN1RuntimeException.class).body();

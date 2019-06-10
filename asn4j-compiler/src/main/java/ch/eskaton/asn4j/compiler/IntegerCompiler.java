@@ -43,8 +43,11 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
+import static java.util.Collections.*;
+import static java.util.Collections.singletonList;
 
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
@@ -95,14 +98,12 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
         javaClass.addImport(BigInteger.class, ConstraintViolatedException.class);
 
-        javaClass.addMethod(new JavaConstructor(Public, name,
-                Collections.emptyList(), "\t\tsuper();",
-                Collections.emptyList()));
+        javaClass.addMethod(new JavaConstructor(Public, name, emptyList(), Optional.of("\t\tsuper();")));
 
         javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, name,
-                Arrays.asList(new JavaParameter("long", "value")),
-                "\t\tsuper.setValue(BigInteger.valueOf(value));", Arrays
-                .asList(ConstraintViolatedException.class.getName())));
+                singletonList(new JavaParameter("long", "value")),
+                Optional.of("\t\tsuper.setValue(BigInteger.valueOf(value));"),
+                singletonList(ConstraintViolatedException.class.getName())));
 
         ConstraintDefinition constraintDef = null;
 

@@ -32,12 +32,13 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.PackagePrivate;
 import static java.util.Collections.emptyList;
+import static java.util.Optional.empty;
 
 public class JavaConstructor implements JavaMethod {
 
@@ -47,24 +48,25 @@ public class JavaConstructor implements JavaMethod {
 
     private List<JavaParameter> parameters;
 
-    private String body;
+    private Optional<String> body;
 
     private List<String> exceptions;
 
     public JavaConstructor(JavaVisibility visibility, String clazz) {
-        this(visibility, clazz, emptyList(), "", new ArrayList<>());
+        this(visibility, clazz, emptyList(), empty(), new ArrayList<>());
     }
 
     public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters) {
-        this(visibility, clazz, parameters, "", new ArrayList<>());
+        this(visibility, clazz, parameters, empty(), new ArrayList<>());
     }
 
-    public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters, String body) {
+    public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters,
+            Optional<String> body) {
         this(visibility, clazz, parameters, body, new ArrayList<>());
     }
 
-    public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters, String body,
-            List<String> exceptions) {
+    public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters,
+            Optional<String> body, List<String> exceptions) {
         this.visibility = visibility;
         this.clazz = clazz;
         this.parameters = parameters;
@@ -84,11 +86,11 @@ public class JavaConstructor implements JavaMethod {
         return parameters;
     }
 
-    public String getBody() {
+    public Optional<String> getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(Optional<String> body) {
         this.body = body;
     }
 
@@ -113,9 +115,14 @@ public class JavaConstructor implements JavaMethod {
         }
 
         writer.write(" {\n");
-        writer.write(StringUtils.inject(body, "\n", prefix));
-        writer.write("\n");
-        writer.write(prefix);
+
+        if (body.isPresent()) {
+            writer.write(StringUtils.inject(body.get(), "\n", prefix));
+            if (!body.get().endsWith("\n")) {
+                writer.write("\n");
+            }
+        }
+
         writer.write("\t}\n");
     }
 
