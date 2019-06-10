@@ -32,10 +32,12 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.PackagePrivate;
+import static java.util.Collections.emptyList;
 
 public class JavaConstructor implements JavaMethod {
 
@@ -48,6 +50,14 @@ public class JavaConstructor implements JavaMethod {
     private String body;
 
     private List<String> exceptions;
+
+    public JavaConstructor(JavaVisibility visibility, String clazz) {
+        this(visibility, clazz, emptyList(), "", new ArrayList<>());
+    }
+
+    public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters) {
+        this(visibility, clazz, parameters, "", new ArrayList<>());
+    }
 
     public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters, String body) {
         this(visibility, clazz, parameters, body, new ArrayList<>());
