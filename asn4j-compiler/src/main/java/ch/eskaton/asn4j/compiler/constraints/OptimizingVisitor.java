@@ -49,7 +49,7 @@ public interface OptimizingVisitor<V> extends Visitor<Node, V> {
 
     @Override
     default Node visit(OpNode node) {
-        return node;
+        return new OpNode(node.getType(), visit(node.getNode()));
     }
 
     @Override
