@@ -41,4 +41,6 @@ public class BooleanType extends AbstractType {
         super(position);
     }
 
+
+
 }
