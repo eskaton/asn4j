@@ -116,6 +116,11 @@ public class EnumeratedConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
+    protected Node optimize(Node node) {
+        return new EnumeratedConstraintOptimizingVisitor().visit(node);
+    }
+
+    @Override
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
