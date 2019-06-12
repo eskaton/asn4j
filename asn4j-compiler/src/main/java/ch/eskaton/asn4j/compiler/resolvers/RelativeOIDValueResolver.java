@@ -1,4 +1,4 @@
-/*
+package ch.eskaton.asn4j.compiler.resolvers;/*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
  *
@@ -25,27 +25,36 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
-
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<ObjectIdentifierValue> {
+import static ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver.getComponentId;
+
+public class RelativeOIDValueResolver extends AbstractOIDValueResolver<RelativeOIDValue> {
 
     @Override
-    public List<Integer> resolveComponents(CompilerContext ctx, Value value) {
-        return new ObjectIdentifierValueResolver()
-                .resolveComponents(ctx, resolveValue(ctx, value, ObjectIdentifierValue.class));
-    }
+    public List<Integer> resolveComponents(CompilerContext ctx, AbstractOIDValue value) {
+        List<Integer> ids = new ArrayList<>();
 
-    @Override
-    public void verifyObjectIds(List<Integer> ids) {
-        ObjectIdentifierVerifier.verifyComponents(ids);
+        for (OIDComponentNode component : value.getComponents()) {
+            try {
+                try {
+                    ids.add(getComponentId(ctx, component));
+                } catch (CompilerException e) {
+                    resolveOIDReference(ctx, ids, component, RelativeOIDValue.class);
+                }
+            } catch (CompilerException e) {
+                throw new CompilerException("Failed to resolve component of object identifier value", e);
+            }
+        }
+
+        return ids;
     }
 
 }

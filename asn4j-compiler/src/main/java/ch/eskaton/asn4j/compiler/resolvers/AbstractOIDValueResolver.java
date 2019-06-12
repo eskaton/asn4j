@@ -25,57 +25,33 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
+package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 import static ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver.getDefinedValueResolver;
+import static ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver.getReferenceResolver;
 
-public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> implements DefaultCompiler {
+public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
 
-    @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        List<Integer> ids = resolveComponents(ctx, value);
+    public void resolveOIDReference(CompilerContext ctx, List<Integer> ids, OIDComponentNode component,
+            Class<T> valueClass) {
+        T referencedOidValue;
 
-        verifyObjectIds(ids);
-
-        String defaultField = addDefaultField(clazz, typeName, field);
-        String idsString = ids.stream().map(Object::toString).collect(Collectors.joining(", "));
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
-                + "\t\t" + defaultField + ".setValue(" + idsString + ");"));
-    }
-
-    protected T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
-        T oidValue;
-
-        if (valueClass.isAssignableFrom(value.getClass())) {
-            oidValue = (T) value;
-        } else if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            oidValue = getDefinedValueResolver(valueClass).apply(ctx, (SimpleDefinedValue) value);
-        } else {
-            throw new CompilerException("Invalid default value");
+        try {
+            referencedOidValue = getReferenceResolver(valueClass).apply(ctx, component.getName());
+        } catch (CompilerException e2) {
+            referencedOidValue = getDefinedValueResolver(valueClass).apply(ctx, component.getDefinedValue());
         }
 
-        return oidValue;
+        ids.addAll(resolveComponents(ctx, referencedOidValue));
     }
 
-    public abstract List<Integer> resolveComponents(CompilerContext ctx, Value value);
-
-    public void verifyObjectIds(List<Integer> ids) {
-    }
+    public abstract List<Integer> resolveComponents(CompilerContext ctx, AbstractOIDValue value);
 
 }

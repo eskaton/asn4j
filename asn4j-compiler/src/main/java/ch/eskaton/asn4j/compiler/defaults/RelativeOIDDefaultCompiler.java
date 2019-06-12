@@ -28,8 +28,7 @@
 package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
@@ -38,27 +37,8 @@ import java.util.List;
 public class RelativeOIDDefaultCompiler extends AbstractOIDDefaultCompiler<RelativeOIDValue> {
 
     @Override
-    public Class<RelativeOIDValue> getValueClass() {
-        return RelativeOIDValue.class;
-    }
-
-    @Override
-    public void resolveComponents(CompilerContext ctx, Value value, List<Integer> ids) {
-        resolveComponents(ctx, resolveValue(ctx, value, RelativeOIDValue.class), ids);
-    }
-
-    public void resolveComponents(CompilerContext ctx, RelativeOIDValue value, List<Integer> ids) {
-        for (OIDComponentNode component : value.getComponents()) {
-            try {
-                try {
-                    ids.add(getComponentId(ctx, component));
-                } catch (CompilerException e) {
-                    resolveOIDReference(ctx, ids, component);
-                }
-            } catch (CompilerException e) {
-                throw new CompilerException("Failed to resolve component of object identifier value", e);
-            }
-        }
+    public List<Integer> resolveComponents(CompilerContext ctx, Value value) {
+        return new RelativeOIDValueResolver().resolveComponents(ctx, resolveValue(ctx, value, RelativeOIDValue.class));
     }
 
 }
