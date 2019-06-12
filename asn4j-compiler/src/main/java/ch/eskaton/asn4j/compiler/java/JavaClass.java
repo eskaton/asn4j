@@ -27,10 +27,12 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.commons.MutableInteger;
 import ch.eskaton.commons.utils.CollectionUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -40,13 +42,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
+import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -59,6 +65,8 @@ public class JavaClass implements JavaStructure {
     private static final String THROWS = "throws";
 
     private List<String> imports = new ArrayList<>();
+
+    private List<String> staticImports = new ArrayList<>();
 
     private List<JavaField> fields = new ArrayList<>();
 
@@ -135,6 +143,14 @@ public class JavaClass implements JavaStructure {
         imports.add(imp);
     }
 
+    public void addStaticImport(Class<?> clazz, String symbol) {
+        addStaticImport(clazz.getName().replace("$", ".") + "." + symbol);
+    }
+
+    public void addStaticImport(String imp) {
+        staticImports.add(imp);
+    }
+
     public void addField(JavaField field) {
         fields.add(field);
     }
@@ -177,6 +193,7 @@ public class JavaClass implements JavaStructure {
         if (this.staticInitializers == null) {
             this.staticInitializers = new ArrayList<>();
         }
+
         this.staticInitializers.add(staticInitializer);
     }
 
@@ -201,6 +218,42 @@ public class JavaClass implements JavaStructure {
         }
 
         return constructors;
+    }
+
+    public <T> void generateParentConstructors() {
+        try {
+            Class<? super T> parentClazz = (Class<? super T>) currentThread()
+                    .getContextClassLoader().loadClass("ch.eskaton.asn4j.runtime.types." + getParent());
+
+            Arrays.stream(parentClazz.getConstructors())
+                    .filter(ctor -> !Modifier.isPrivate(ctor.getModifiers()) && !Modifier.isFinal(ctor.getModifiers())).forEach(ctor -> {
+                JavaVisibility visibility = JavaVisibility.PackagePrivate;
+
+                if (Modifier.isPublic(ctor.getModifiers())) {
+                    visibility = JavaVisibility.Public;
+                } else if (Modifier.isProtected(ctor.getModifiers())) {
+                    visibility = JavaVisibility.Protected;
+                }
+
+                JavaConstructor javaCtor = new JavaConstructor(visibility, getName());
+                MutableInteger n = new MutableInteger(0);
+
+                List<JavaParameter> parameters = Arrays.stream(ctor.getParameterTypes())
+                        .map(clazz -> new JavaParameter(clazz.getSimpleName(),
+                                "arg" + n.increment().getValue())).collect(Collectors.toList());
+
+                javaCtor.getParameters().addAll(parameters);
+
+                String parametersString = parameters.stream().map(p -> p.getName()).collect(Collectors.joining(", "));
+
+                javaCtor.setBody(Optional.of("super(" + parametersString + ");"));
+
+                addMethod(javaCtor);
+            });
+
+        } catch (ClassNotFoundException e) {
+            throw new CompilerException("Failed to resolve builtin type: " + getParent());
+        }
     }
 
     public void save(String dir) throws IOException {
@@ -292,6 +345,10 @@ public class JavaClass implements JavaStructure {
 
         for (String imp : imports) {
             writer.write(StringUtils.concat("import ", imp, ";\n"));
+        }
+
+        for (String imp : staticImports) {
+            writer.write(StringUtils.concat("import " + STATIC + " ", imp, ";\n"));
         }
 
         String pkg = Clazz.class.getPackage().getName();
