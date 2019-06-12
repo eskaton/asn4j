@@ -53,7 +53,7 @@ public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> imp
             Value value) {
         List<Integer> ids = new ArrayList<>();
 
-        resolveComponents(ctx, field, value, ids);
+        resolveComponents(ctx, value, ids);
 
         verifyObjectIds(ids);
 
@@ -90,7 +90,7 @@ public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> imp
     protected abstract Class<T> getValueClass();
 
 
-    public abstract void resolveComponents(CompilerContext ctx, String field, Value value, List<Integer> ids);
+    public abstract void resolveComponents(CompilerContext ctx, Value value, List<Integer> ids);
 
     public void verifyObjectIds(List<Integer> ids) {
     }
@@ -111,7 +111,7 @@ public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> imp
         return ctx.resolveValue(BigInteger.class, component.getName()).intValue();
     }
 
-    public void resolveOIDReference(CompilerContext ctx, String field, List<Integer> ids, OIDComponentNode component) {
+    public void resolveOIDReference(CompilerContext ctx, List<Integer> ids, OIDComponentNode component) {
         T referencedOidValue;
 
         try {
@@ -120,7 +120,7 @@ public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> imp
             referencedOidValue = getDefinedValueResolver().apply(ctx, component.getDefinedValue());
         }
 
-        resolveComponents(ctx, field, referencedOidValue, ids);
+        resolveComponents(ctx, referencedOidValue, ids);
     }
 
 }

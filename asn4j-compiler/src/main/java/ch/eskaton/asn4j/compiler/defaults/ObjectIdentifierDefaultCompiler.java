@@ -45,8 +45,8 @@ public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<
     }
 
     @Override
-    public void resolveComponents(CompilerContext ctx, String field, Value value, List<Integer> ids) {
-        resolveComponents(ctx, field, resolveValue(ctx, value, ObjectIdentifierValue.class), ids);
+    public void resolveComponents(CompilerContext ctx, Value value, List<Integer> ids) {
+        resolveComponents(ctx, resolveValue(ctx, value, ObjectIdentifierValue.class), ids);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<
         ObjectIdentifierVerifier.verifyComponents(ids);
     }
 
-    public void resolveComponents(CompilerContext ctx, String field, AbstractOIDValue value, List<Integer> ids) {
+    public void resolveComponents(CompilerContext ctx, AbstractOIDValue value, List<Integer> ids) {
         int componentNum = 1;
 
         for (OIDComponentNode component : value.getComponents()) {
@@ -68,14 +68,14 @@ public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<
                         if (id != null) {
                             ids.add(id);
                         } else {
-                            resolveOIDReference(ctx, field, ids, component);
+                            resolveOIDReference(ctx, ids, component);
                         }
                     } else {
                         throw e;
                     }
                 }
             } catch (CompilerException e) {
-                throw new CompilerException("Failed to resolve component of object identifier value " + field, e);
+                throw new CompilerException("Failed to resolve component of object identifier value", e);
             }
 
             componentNum++;
