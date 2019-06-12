@@ -18,4 +18,11 @@ TestEnumeration2 ::= TestEnumeration1 (TestEnumeration1 EXCEPT a)
 TestInteger1 ::= INTEGER (1 | 2 | 4)
 TestInteger2 ::= INTEGER (INCLUDES TestInteger1)
 
+TestNull1 ::= NULL
+TestNull2 ::= NULL (INCLUDES TestNull1)
+TestNull3 ::= NULL (ALL EXCEPT NULL)
+TestNull4 ::= NULL (INCLUDES TestNull3)
+TestNull5 ::= NULL (NULL)
+TestNull6 ::= NULL (INCLUDES TestNull5)
+
 END
