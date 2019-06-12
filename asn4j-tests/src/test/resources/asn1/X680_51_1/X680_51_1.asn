@@ -41,4 +41,7 @@ TestInteger9 ::= INTEGER (ALL EXCEPT testInteger1)
 TestInteger10 ::= TestNamedInteger1 (ALL EXCEPT value1)
 TestInteger11 ::= TestNamedInteger1 (ALL EXCEPT value2)
 
+TestNull1 ::= NULL (NULL)
+TestNull2 ::= NULL (TestNull1 EXCEPT NULL)
+
 END

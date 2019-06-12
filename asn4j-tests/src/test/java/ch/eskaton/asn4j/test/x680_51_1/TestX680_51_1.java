@@ -27,7 +27,6 @@
 
 package ch.eskaton.asn4j.test.x680_51_1;
 
-
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString1;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_1.TestBitString3;
@@ -50,6 +49,8 @@ import ch.eskaton.asn4jtest.x680_51_1.TestInteger6;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger7;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger8;
 import ch.eskaton.asn4jtest.x680_51_1.TestInteger9;
+import ch.eskaton.asn4jtest.x680_51_1.TestNull1;
+import ch.eskaton.asn4jtest.x680_51_1.TestNull2;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -60,6 +61,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
 
 public class TestX680_51_1 {
 
@@ -239,6 +242,16 @@ public class TestX680_51_1 {
     public void testInteger11() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger11.class, 3, 5);
         testIntegerFailure(TestInteger11.class, 4);
+    }
+
+    @Test
+    public void testNull1() {
+        testNullSuccess(TestNull1.class, () -> new TestNull1());
+    }
+
+    @Test
+    public void testNull2() {
+        testNullFailure(() -> new TestNull2());
     }
 
 }
