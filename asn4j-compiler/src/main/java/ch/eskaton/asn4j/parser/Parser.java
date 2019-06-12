@@ -3524,9 +3524,9 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public Constraint parse() throws ParserException {
             return new ChoiceParser<>(containedSubtypeParser, valueRangeParser, permittedAlphabetParser,
-                    sizeConstraintParser, typeConstraintParser, innerTypeConstraintsParser, patternConstraintParser,
+                    sizeConstraintParser, innerTypeConstraintsParser, patternConstraintParser,
                     propertySettingsParser, durationRangeParser, timePointRangeParser, recurrenceRangeParser,
-                    singleValueParser).parse();
+                    singleValueParser, typeConstraintParser).parse();
         }
 
     }

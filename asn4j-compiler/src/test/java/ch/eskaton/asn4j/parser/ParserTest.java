@@ -4094,12 +4094,48 @@ public class ParserTest {
         assertNotNull(result);
         assertEquals(OpType.ALL, result.getOperation());
 
+        result = (ElementSet) result.getOperands().get(0);
+
+        assertEquals(OpType.EXCLUDE, result.getOperation());
+
+        Constraint constraint = (Constraint) result.getOperands().get(0);
+
+        assertTrue(constraint instanceof SingleValueConstraint);
+        assertTrue(((SingleValueConstraint) constraint).getValue() instanceof IntegerValue);
+
         parser = new Parser(new ByteArrayInputStream(
-                "true UNION false".getBytes())).new ElementSetSpecParser();
+                "TRUE UNION FALSE".getBytes())).new ElementSetSpecParser();
 
         result = parser.parse();
 
         assertNotNull(result);
+        assertEquals(OpType.UNION, result.getOperation());
+
+        result = (ElementSet) result.getOperands().get(0);
+
+        assertEquals(OpType.INTERSECTION, result.getOperation());
+
+        constraint = (Constraint) result.getOperands().get(0);
+
+        assertTrue(constraint instanceof SingleValueConstraint);
+        assertTrue(((SingleValueConstraint) constraint).getValue() instanceof BooleanValue);
+
+        parser = new Parser(new ByteArrayInputStream(
+                "ALL EXCEPT NULL".getBytes())).new ElementSetSpecParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertEquals(OpType.ALL, result.getOperation());
+
+        result = (ElementSet) result.getOperands().get(0);
+
+        assertEquals(OpType.EXCLUDE, result.getOperation());
+
+        constraint = (Constraint) result.getOperands().get(0);
+
+        assertTrue(constraint instanceof SingleValueConstraint);
+        assertTrue(((SingleValueConstraint) constraint).getValue() instanceof NullValue);
     }
 
     @Test
