@@ -53,7 +53,7 @@ public class JavaConstructor implements JavaMethod {
     private List<String> exceptions;
 
     public JavaConstructor(JavaVisibility visibility, String clazz) {
-        this(visibility, clazz, emptyList(), empty(), new ArrayList<>());
+        this(visibility, clazz, new ArrayList<>(), empty(), new ArrayList<>());
     }
 
     public JavaConstructor(JavaVisibility visibility, String clazz, List<JavaParameter> parameters) {
