@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,21 +29,43 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
+import static ch.eskaton.asn4j.runtime.types.ASN1Null.Value.NULL;
+
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 5, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1Null implements ASN1Type {
+
+    public enum Value {NULL}
+
+    private Value value;
+
+    public ASN1Null() {
+        setValue(NULL);
+    }
+
+    public Value getValue() {
+        return value;
+    }
+
+    public void setValue(Value value) {
+        if (!checkConstraint(value)) {
+            throw new ConstraintViolatedException("Value doesn't satisfy a constraint");
+        }
+
+        this.value = value;
+    }
+
+    protected boolean checkConstraint(Value value) throws ConstraintViolatedException {
+        return true;
+    }
 
     @Override
     public String toString() {
         return ToString.get(this);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash("null");
     }
 
     @Override
@@ -52,7 +74,18 @@ public class ASN1Null implements ASN1Type {
             return true;
         }
 
-        return obj != null && getClass() == obj.getClass();
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        ASN1Null other = (ASN1Null) obj;
+
+        return value == other.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
 }

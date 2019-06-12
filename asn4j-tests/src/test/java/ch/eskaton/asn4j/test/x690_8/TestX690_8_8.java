@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.test.x690_8;
 
+import static ch.eskaton.asn4j.runtime.types.ASN1Null.Value.NULL;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -45,16 +46,14 @@ public class TestX690_8_8 {
     public void testEncode() {
     	BEREncoder encoder = new BEREncoder();
 
-    	assertArrayEquals(new byte[] { 0x05, 0x00 },
-    			encoder.encode(new ASN1Null()));
+    	assertArrayEquals(new byte[] { 0x05, 0x00 }, encoder.encode(new ASN1Null()));
     }
 
     @Test
     public void testDecode() {
     	BERDecoder decoder = new BERDecoder();
 
-    	assertEquals(new ASN1Null(),
-    			decoder.decode(ASN1Null.class, new byte[] { 0x05, 0x00 }));
+    	assertEquals(new ASN1Null(), decoder.decode(ASN1Null.class, new byte[] { 0x05, 0x00 }));
     }
 
 }
