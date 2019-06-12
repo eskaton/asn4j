@@ -46,7 +46,6 @@ public class ObjectIdentifierValue extends AbstractOIDValue {
         this.reference = reference;
     }
 
-
     public DefinedValue getReference() {
         return reference;
     }

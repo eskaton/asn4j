@@ -30,31 +30,31 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 13, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1RelativeOID extends AbstractASN1OID {
 
-    public static ASN1RelativeOID from(int... components) {
+    public static ASN1RelativeOID from(int... value) {
         ASN1RelativeOID oid = new ASN1RelativeOID();
 
-        oid.setValue(components);
+        oid.setValue(value);
 
         return oid;
     }
 
-    public static ASN1RelativeOID from(List<Integer> components) {
+    public static ASN1RelativeOID from(List<Integer> value) {
         ASN1RelativeOID oid = new ASN1RelativeOID();
 
-        oid.setValue(components);
+        oid.setValue(value);
 
         return oid;
     }
 
-    protected ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) {
-        return components;
+    @Override
+    protected List<Integer> verifiedComponents(List<Integer> value) {
+        return value;
     }
 
     @Override

@@ -27,17 +27,8 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 
-public class ObjectIdentifierCompiler implements NamedCompiler<ObjectIdentifier, CompiledType> {
-
-    @Override
-    public CompiledType compile(CompilerContext ctx, String name, ObjectIdentifier node) {
-        ctx.createClass(name, node, false);
-        ctx.finishClass();
-
-        return new CompiledType(node);
-    }
+public class ObjectIdentifierCompiler extends BuiltinTypeCompiler<ObjectIdentifier> {
 
 }
