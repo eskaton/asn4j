@@ -43,20 +43,20 @@ public class RelativeOIDDefaultCompiler extends AbstractOIDDefaultCompiler<Relat
     }
 
     @Override
-    public void resolveComponents(CompilerContext ctx, String field, Value value, List<Integer> ids) {
-        resolveComponents(ctx, field, resolveValue(ctx, value, RelativeOIDValue.class), ids);
+    public void resolveComponents(CompilerContext ctx, Value value, List<Integer> ids) {
+        resolveComponents(ctx, resolveValue(ctx, value, RelativeOIDValue.class), ids);
     }
 
-    public void resolveComponents(CompilerContext ctx, String field, RelativeOIDValue value, List<Integer> ids) {
+    public void resolveComponents(CompilerContext ctx, RelativeOIDValue value, List<Integer> ids) {
         for (OIDComponentNode component : value.getComponents()) {
             try {
                 try {
                     ids.add(getComponentId(ctx, component));
                 } catch (CompilerException e) {
-                    resolveOIDReference(ctx, field, ids, component);
+                    resolveOIDReference(ctx, ids, component);
                 }
             } catch (CompilerException e) {
-                throw new CompilerException("Failed to resolve component of object identifier value " + field, e);
+                throw new CompilerException("Failed to resolve component of object identifier value", e);
             }
         }
     }
