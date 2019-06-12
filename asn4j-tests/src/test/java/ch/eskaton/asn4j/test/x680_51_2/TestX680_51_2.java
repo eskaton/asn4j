@@ -27,9 +27,6 @@
 
 package ch.eskaton.asn4j.test.x680_51_2;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.test.TestHelper;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString1;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_2.TestBitString3;
@@ -49,6 +46,9 @@ import ch.eskaton.asn4jtest.x680_51_2.TestEnumeration4;
 import ch.eskaton.asn4jtest.x680_51_2.TestInteger1;
 import ch.eskaton.asn4jtest.x680_51_2.TestInteger2;
 import ch.eskaton.asn4jtest.x680_51_2.TestInteger3;
+import ch.eskaton.asn4jtest.x680_51_2.TestNull1;
+import ch.eskaton.asn4jtest.x680_51_2.TestNull2;
+import ch.eskaton.asn4jtest.x680_51_2.TestNull3;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -59,7 +59,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
 
 public class TestX680_51_2 {
 
@@ -215,6 +216,21 @@ public class TestX680_51_2 {
 
         testIntegerFailure(new TestInteger3(), 1);
         testIntegerFailure(new TestInteger3(), 3);
+    }
+
+    @Test
+    public void testNull1() {
+        testNullSuccess(TestNull1.class, () -> new TestNull1());
+    }
+
+    @Test
+    public void testNull2() {
+        testNullFailure(() -> new TestNull2());
+    }
+
+    @Test
+    public void testNull3() {
+        testNullFailure(() -> new TestNull3());
     }
 
 }

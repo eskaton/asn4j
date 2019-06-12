@@ -31,4 +31,8 @@ TestInteger1 ::= INTEGER (1 | 2)
 TestInteger2 ::= INTEGER (ALL EXCEPT 0)
 TestInteger3 ::= INTEGER (((1 | 2 | 3) ^ (2 | 3)) EXCEPT 3)
 
+TestNull1 ::= NULL (NULL)
+TestNull2 ::= NULL (ALL EXCEPT NULL)
+TestNull3 ::= NULL ((NULL ^ NULL) EXCEPT NULL)
+
 END

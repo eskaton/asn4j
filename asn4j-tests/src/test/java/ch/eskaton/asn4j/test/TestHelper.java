@@ -27,7 +27,6 @@
 
 package ch.eskaton.asn4j.test;
 
-import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -35,10 +34,10 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
-import ch.eskaton.asn4jtest.x680_51_2.TestEnumeration1;
-import ch.eskaton.asn4jtest.x680_51_2.TestEnumeration2;
+import ch.eskaton.asn4j.runtime.types.ASN1Null;
 
 import java.math.BigInteger;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.assertEquals;
 
@@ -137,6 +136,21 @@ public class TestHelper {
         for (long value : values) {
             testIntegerFailure(clazz.newInstance(), value);
         }
+    }
+
+    public static <T extends ASN1Null> void testNullSuccess(Class<? extends T> clazz, Supplier<T> nullSupplier) {
+        T nullValue = nullSupplier.get();
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        T result = decoder.decode(clazz, encoder.encode(nullValue));
+
+        assertEquals(nullValue, result);
+    }
+
+    public static <T extends ASN1Null> void testNullFailure(Supplier<T> nullSupplier) {
+        TestUtils.assertThrows(() -> nullSupplier.get(), ConstraintViolatedException.class);
     }
 
 }
