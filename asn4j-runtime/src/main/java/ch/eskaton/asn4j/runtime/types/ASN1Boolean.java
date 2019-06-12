@@ -47,7 +47,7 @@ public class ASN1Boolean implements ASN1Type {
     }
 
     private ASN1Boolean(boolean value) {
-        this.value = value;
+        setValue(value);
     }
 
     public Boolean getValue() {
@@ -58,6 +58,7 @@ public class ASN1Boolean implements ASN1Type {
         if (!checkConstraint(value)) {
             throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
         }
+
         this.value = value;
     }
 
