@@ -30,7 +30,6 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,7 +54,8 @@ public class ASN1ObjectIdentifier extends AbstractASN1OID {
         return oid;
     }
 
-    protected ArrayList<Integer> verifiedComponents(ArrayList<Integer> components) {
+    @Override
+    protected List<Integer> verifiedComponents(List<Integer> components) {
         verifyComponents(components);
 
         return components;
