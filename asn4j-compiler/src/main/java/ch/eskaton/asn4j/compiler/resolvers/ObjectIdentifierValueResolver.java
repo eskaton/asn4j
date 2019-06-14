@@ -33,20 +33,30 @@ import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
+
+import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<ObjectIdentifierValue> {
 
-    public static <T extends AbstractOIDValue> BiFunction<CompilerContext, DefinedValue, T> getDefinedValueResolver(Class<T> valueClass) {
-        return (ctx, ref) -> ctx.resolveValue(valueClass, ref);
-    }
+    public static <T extends AbstractOIDValue> T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
+        T oidValue;
 
-    public static <T extends AbstractOIDValue> BiFunction<CompilerContext, String, T> getReferenceResolver(Class<T> valueClass) {
-        return (ctx, ref) -> ctx.resolveValue(valueClass, ref);
+        if (valueClass.isAssignableFrom(value.getClass())) {
+            oidValue = (T) value;
+        } else if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
+            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
+            oidValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
+        } else {
+            throw new CompilerException("Invalid default value");
+        }
+
+        return oidValue;
     }
 
     public static Integer getComponentId(CompilerContext ctx, OIDComponentNode component) {
@@ -64,6 +74,7 @@ public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<Obje
 
         return ctx.resolveValue(BigInteger.class, component.getName()).intValue();
     }
+
 
     @Override
     public List<Integer> resolveComponents(CompilerContext ctx, AbstractOIDValue value) {

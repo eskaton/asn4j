@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -38,7 +39,7 @@ public class RelativeOIDDefaultCompiler extends AbstractOIDDefaultCompiler<Relat
 
     @Override
     public List<Integer> resolveComponents(CompilerContext ctx, Value value) {
-        return new RelativeOIDValueResolver().resolveComponents(ctx, resolveValue(ctx, value, RelativeOIDValue.class));
+        return new RelativeOIDValueResolver().resolveComponents(ctx, ObjectIdentifierValueResolver.resolveValue(ctx, value, RelativeOIDValue.class));
     }
 
 }
