@@ -34,8 +34,6 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import java.util.ArrayList;
 import java.util.List;
 
-import static ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver.getComponentId;
-
 public class RelativeOIDValueResolver extends AbstractOIDValueResolver<RelativeOIDValue> {
 
     @Override

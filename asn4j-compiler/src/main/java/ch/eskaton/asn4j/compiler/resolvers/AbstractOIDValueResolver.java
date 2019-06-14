@@ -31,7 +31,9 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
+import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 
+import java.math.BigInteger;
 import java.util.List;
 
 public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
@@ -47,6 +49,22 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
         }
 
         ids.addAll(resolveComponents(ctx, referencedOidValue));
+    }
+
+    protected Integer getComponentId(CompilerContext ctx, OIDComponentNode component) {
+        Integer id = component.getId();
+
+        if (id != null) {
+            return id;
+        }
+
+        DefinedValue definedValue = component.getDefinedValue();
+
+        if (definedValue != null) {
+            return ctx.resolveValue(BigInteger.class, definedValue).intValue();
+        }
+
+        return ctx.resolveValue(BigInteger.class, component.getName()).intValue();
     }
 
     public abstract List<Integer> resolveComponents(CompilerContext ctx, AbstractOIDValue value);
