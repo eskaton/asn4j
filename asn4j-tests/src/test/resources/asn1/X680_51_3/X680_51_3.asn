@@ -25,4 +25,10 @@ TestNull4 ::= NULL (INCLUDES TestNull3)
 TestNull5 ::= NULL (NULL)
 TestNull6 ::= NULL (INCLUDES TestNull5)
 
+testObjectIdentifier1 OBJECT IDENTIFIER ::= { itu-t 3 }
+testObjectIdentifier2 OBJECT IDENTIFIER ::= { testObjectIdentifier1 6 2 }
+
+TestObjectIdentifier1 ::= OBJECT IDENTIFIER ({ 0 3 6 1 } | testObjectIdentifier2)
+TestObjectIdentifier2 ::= OBJECT IDENTIFIER (INCLUDES TestObjectIdentifier1)
+
 END
