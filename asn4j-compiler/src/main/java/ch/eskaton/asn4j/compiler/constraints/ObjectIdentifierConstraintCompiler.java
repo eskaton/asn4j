@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
@@ -44,6 +44,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -70,7 +71,7 @@ public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompil
             ObjectIdentifierValue oidValue = resolver.resolveValue(ctx, value, ObjectIdentifierValue.class);
 
             if (oidValue != null) {
-                return new ValueNode<>(resolver.resolveComponents(ctx, oidValue));
+                return new ObjectIdentifierValueNode(Collections.singleton(resolver.resolveComponents(ctx, oidValue)));
             } else {
                 throw new CompilerException("Invalid single-value constraint %s for OBJECT IDENTIFIER type",
                         value.getClass().getSimpleName());
@@ -97,17 +98,28 @@ public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompil
     }
 
     @Override
+    protected Node optimize(Node node) {
+        return new ObjectIdentifierConstraintOptimizingVisitor().visit(node);
+    }
+
+    @Override
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                String value = ((List<Integer>) ((ValueNode) node).getValue()).stream()
-                        .map(c -> String.valueOf(c.intValue()))
-                        .collect(Collectors.joining(", "));
+                String expression = (((ObjectIdentifierValueNode) node).getValue()).stream()
+                        .map(this::buildExpression)
+                        .collect(Collectors.joining(" || "));
 
-                return Optional.of("(Arrays.equals(value, new int[] { " + value + " }))");
+                return Optional.of(expression);
             default:
                 return super.buildExpression(node);
         }
+    }
+
+    private String buildExpression(List<Integer> value) {
+        String stringValue = value.stream().map(c -> c.toString()).collect(Collectors.joining(", "));
+
+        return "(Arrays.equals(value, new int[] { " + stringValue + " }))";
     }
 
 }
