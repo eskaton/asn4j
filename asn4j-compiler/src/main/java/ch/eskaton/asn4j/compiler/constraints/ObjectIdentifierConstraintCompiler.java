@@ -29,11 +29,11 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
+import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -44,6 +44,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -64,11 +65,12 @@ public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompil
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
+            ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver();
             Value value = ((SingleValueConstraint) elements).getValue();
-            ObjectIdentifierValue oidValue = CompilerUtils.resolveAmbiguousValue(value, ObjectIdentifierValue.class);
+            ObjectIdentifierValue oidValue = resolver.resolveValue(ctx, value, ObjectIdentifierValue.class);
 
             if (oidValue != null) {
-                return new ValueNode<>(oidValue);
+                return new ValueNode<>(resolver.resolveComponents(ctx, oidValue));
             } else {
                 throw new CompilerException("Invalid single-value constraint %s for OBJECT IDENTIFIER type",
                         value.getClass().getSimpleName());
@@ -98,8 +100,8 @@ public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompil
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                String value = ((ObjectIdentifierValue) ((ValueNode) node).getValue()).getComponents().stream()
-                        .map(c -> String.valueOf(c.getId().intValue()))
+                String value = ((List<Integer>) ((ValueNode) node).getValue()).stream()
+                        .map(c -> String.valueOf(c.intValue()))
                         .collect(Collectors.joining(", "));
 
                 return Optional.of("(Arrays.equals(value, new int[] { " + value + " }))");

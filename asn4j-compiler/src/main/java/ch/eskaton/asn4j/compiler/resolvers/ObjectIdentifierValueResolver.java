@@ -31,12 +31,10 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,37 +42,21 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<ObjectIdentifierValue> {
 
-    public static <T extends AbstractOIDValue> T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
+    public <T extends AbstractOIDValue> T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
         T oidValue;
 
         if (valueClass.isAssignableFrom(value.getClass())) {
             oidValue = (T) value;
-        } else if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
+        } else if ((oidValue = resolveAmbiguousValue(value, valueClass)) != null) {
+            // do nothing
+        } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
             oidValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
         } else {
-            throw new CompilerException("Invalid default value");
+            throw new CompilerException("Invalid OBJECT IDENTIFIER value");
         }
 
         return oidValue;
     }
-
-    public static Integer getComponentId(CompilerContext ctx, OIDComponentNode component) {
-        Integer id = component.getId();
-
-        if (id != null) {
-            return id;
-        }
-
-        DefinedValue definedValue = component.getDefinedValue();
-
-        if (definedValue != null) {
-            return ctx.resolveValue(BigInteger.class, definedValue).intValue();
-        }
-
-        return ctx.resolveValue(BigInteger.class, component.getName()).intValue();
-    }
-
 
     @Override
     public List<Integer> resolveComponents(CompilerContext ctx, AbstractOIDValue value) {
@@ -108,7 +90,7 @@ public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<Obje
         return ids;
     }
 
-    public static Integer resolveRootArc(String name) {
+    protected Integer resolveRootArc(String name) {
         switch (name) {
             case "itu-t":
             case "ccitt":

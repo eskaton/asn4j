@@ -35,12 +35,13 @@ import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
 
 import java.util.List;
 
-public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler<ObjectIdentifierValue> {
+public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler {
 
     @Override
     public List<Integer> resolveComponents(CompilerContext ctx, Value value) {
-        return new ObjectIdentifierValueResolver()
-                .resolveComponents(ctx, ObjectIdentifierValueResolver.resolveValue(ctx, value, ObjectIdentifierValue.class));
+        ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver();
+
+        return resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, ObjectIdentifierValue.class));
     }
 
     @Override

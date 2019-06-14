@@ -35,11 +35,14 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.List;
 
-public class RelativeOIDDefaultCompiler extends AbstractOIDDefaultCompiler<RelativeOIDValue> {
+public class RelativeOIDDefaultCompiler extends AbstractOIDDefaultCompiler {
 
     @Override
     public List<Integer> resolveComponents(CompilerContext ctx, Value value) {
-        return new RelativeOIDValueResolver().resolveComponents(ctx, ObjectIdentifierValueResolver.resolveValue(ctx, value, RelativeOIDValue.class));
+        ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver();
+
+        return new RelativeOIDValueResolver()
+                .resolveComponents(ctx, resolver.resolveValue(ctx, value, RelativeOIDValue.class));
     }
 
 }
