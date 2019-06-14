@@ -35,6 +35,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
+import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 import java.math.BigInteger;
 import java.util.function.Supplier;
@@ -45,7 +47,6 @@ public class TestHelper {
 
     private TestHelper() {
     }
-
 
     public static <T extends ASN1BitString> void testBitStringSuccess(Class<? extends T> clazz, T bitString, long value,
             int unusedBits) {
@@ -63,12 +64,7 @@ public class TestHelper {
 
         bitString.setValue(bytes, unusedBits);
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        T result = decoder.decode(clazz, encoder.encode(bitString));
-
-        assertEquals(bitString, result);
+        testEncodeDecodeValue((Class<T>) clazz, bitString);
     }
 
     public static <T extends ASN1BitString> void testBitStringFailure(T bitString, long value, int unusedBits) {
@@ -80,12 +76,7 @@ public class TestHelper {
             boolean value) {
         booleanValue.setValue(value);
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        T result = decoder.decode(clazz, encoder.encode(booleanValue));
-
-        assertEquals(booleanValue, result);
+        testEncodeDecodeValue((Class<T>) clazz, booleanValue);
     }
 
     public static <T extends ASN1Boolean> void testBooleanFailure(T booleanValue, boolean value) {
@@ -96,12 +87,7 @@ public class TestHelper {
             T value) {
         enumValue.setValue(value);
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        T result = decoder.decode(clazz, encoder.encode(enumValue));
-
-        assertEquals(enumValue, result);
+        testEncodeDecodeValue((Class<T>) clazz, enumValue);
     }
 
     public static <T extends ASN1EnumeratedType> void testEnumeratedFailure(T enumValue, T value) {
@@ -111,12 +97,7 @@ public class TestHelper {
     public static <T extends ASN1Integer> void testIntegerSuccess(Class<? extends T> clazz, T intValue, long value) {
         intValue.setValue(BigInteger.valueOf(value));
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        T result = decoder.decode(clazz, encoder.encode(intValue));
-
-        assertEquals(intValue, result);
+        testEncodeDecodeValue((Class<T>) clazz, intValue);
     }
 
     public static <T extends ASN1Integer> void testIntegerSuccess(Class<? extends T> clazz, long... values)
@@ -141,16 +122,31 @@ public class TestHelper {
     public static <T extends ASN1Null> void testNullSuccess(Class<? extends T> clazz, Supplier<T> nullSupplier) {
         T nullValue = nullSupplier.get();
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        T result = decoder.decode(clazz, encoder.encode(nullValue));
-
-        assertEquals(nullValue, result);
+        testEncodeDecodeValue((Class<T>) clazz, nullValue);
     }
 
     public static <T extends ASN1Null> void testNullFailure(Supplier<T> nullSupplier) {
         TestUtils.assertThrows(() -> nullSupplier.get(), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1ObjectIdentifier> void testObjectIdentifierSuccess(Class<? extends T> clazz,
+            T oidValue, int... value) {
+        oidValue.setValue(value);
+
+        testEncodeDecodeValue((Class<T>) clazz, oidValue);
+    }
+
+    public static <T extends ASN1ObjectIdentifier> void testObjectIdentifierFailure(T oidValue, int... value) {
+        TestUtils.assertThrows(() -> oidValue.setValue(value), ConstraintViolatedException.class);
+    }
+
+    private static <T extends ASN1Type> void testEncodeDecodeValue(Class<T> clazz, T value) {
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        T result = decoder.decode(clazz, encoder.encode(value));
+
+        assertEquals(value, result);
     }
 
 }

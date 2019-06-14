@@ -35,4 +35,13 @@ TestNull1 ::= NULL (NULL)
 TestNull2 ::= NULL (ALL EXCEPT NULL)
 TestNull3 ::= NULL ((NULL ^ NULL) EXCEPT NULL)
 
+testObjectIdentifier1 OBJECT IDENTIFIER ::= { itu-t 4 }
+testObjectIdentifier2 OBJECT IDENTIFIER ::= { testObjectIdentifier1 11 2 }
+
+TestObjectIdentifier1 ::= OBJECT IDENTIFIER ({ 1 3 6 1 } | { 1 3 6 2 })
+TestObjectIdentifier2 ::= OBJECT IDENTIFIER (({ 1 3 6 1 } | { 1 3 6 2 }) EXCEPT { 1 3 6 2 })
+TestObjectIdentifier3 ::= OBJECT IDENTIFIER (({ 1 3 6 1 } | { 1 3 6 2 }) ^ { 1 3 6 2 })
+TestObjectIdentifier4 ::= OBJECT IDENTIFIER ({ iso 3 6 1 })
+TestObjectIdentifier5 ::= OBJECT IDENTIFIER (testObjectIdentifier2)
+
 END
