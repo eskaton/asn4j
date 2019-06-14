@@ -49,6 +49,11 @@ import ch.eskaton.asn4jtest.x680_51_2.TestInteger3;
 import ch.eskaton.asn4jtest.x680_51_2.TestNull1;
 import ch.eskaton.asn4jtest.x680_51_2.TestNull2;
 import ch.eskaton.asn4jtest.x680_51_2.TestNull3;
+import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier1;
+import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier2;
+import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier3;
+import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier4;
+import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier5;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -61,6 +66,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierSuccess;
 
 public class TestX680_51_2 {
 
@@ -231,6 +238,42 @@ public class TestX680_51_2 {
     @Test
     public void testNull3() {
         testNullFailure(() -> new TestNull3());
+    }
+
+    @Test
+    public void testObjectIdentifier1() {
+        testObjectIdentifierSuccess(TestObjectIdentifier1.class, new TestObjectIdentifier1(), 1, 3, 6, 1);
+        testObjectIdentifierSuccess(TestObjectIdentifier1.class, new TestObjectIdentifier1(), 1, 3, 6, 2);
+
+        testObjectIdentifierFailure(new TestObjectIdentifier1(), 1, 3, 6, 0);
+    }
+
+    @Test
+    public void testObjectIdentifier2() {
+        testObjectIdentifierSuccess(TestObjectIdentifier2.class, new TestObjectIdentifier2(), 1, 3, 6, 1);
+
+        testObjectIdentifierFailure(new TestObjectIdentifier2(), 1, 3, 6, 2);
+    }
+
+    @Test
+    public void testObjectIdentifier3() {
+        testObjectIdentifierSuccess(TestObjectIdentifier3.class, new TestObjectIdentifier3(), 1, 3, 6, 2);
+
+        testObjectIdentifierFailure(new TestObjectIdentifier3(), 1, 3, 6, 1);
+    }
+
+    @Test
+    public void testObjectIdentifier4() {
+        testObjectIdentifierSuccess(TestObjectIdentifier4.class, new TestObjectIdentifier4(), 1, 3, 6, 1);
+
+        testObjectIdentifierFailure(new TestObjectIdentifier4(), 1, 3, 6, 2);
+    }
+
+    @Test
+    public void testObjectIdentifier5() {
+        testObjectIdentifierSuccess(TestObjectIdentifier5.class, new TestObjectIdentifier5(), 0, 4, 11, 2);
+
+        testObjectIdentifierFailure(new TestObjectIdentifier5(), 1, 3, 6, 2);
     }
 
 }
