@@ -44,4 +44,7 @@ TestInteger11 ::= TestNamedInteger1 (ALL EXCEPT value2)
 TestNull1 ::= NULL (NULL)
 TestNull2 ::= NULL (TestNull1 EXCEPT NULL)
 
+TestObjectIdentifier1 ::= OBJECT IDENTIFIER ({ 0 3 6 3 } | { 0 3 6 4 })
+TestObjectIdentifier2 ::= OBJECT IDENTIFIER (TestObjectIdentifier1 EXCEPT { itu-t 3 6 4})
+
 END
