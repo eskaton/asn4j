@@ -34,9 +34,6 @@ import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 
 import java.util.List;
 
-import static ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver.getDefinedValueResolver;
-import static ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver.getReferenceResolver;
-
 public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
 
     public void resolveOIDReference(CompilerContext ctx, List<Integer> ids, OIDComponentNode component,
@@ -44,9 +41,9 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
         T referencedOidValue;
 
         try {
-            referencedOidValue = getReferenceResolver(valueClass).apply(ctx, component.getName());
+            referencedOidValue = ctx.resolveValue(valueClass, component.getName());
         } catch (CompilerException e2) {
-            referencedOidValue = getDefinedValueResolver(valueClass).apply(ctx, component.getDefinedValue());
+            referencedOidValue = ctx.resolveValue(valueClass, component.getDefinedValue());
         }
 
         ids.addAll(resolveComponents(ctx, referencedOidValue));

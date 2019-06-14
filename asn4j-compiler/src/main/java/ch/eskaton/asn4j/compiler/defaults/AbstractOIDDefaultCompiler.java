@@ -28,19 +28,14 @@
 package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
-import static ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver.getDefinedValueResolver;
 
 public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> implements DefaultCompiler {
 
@@ -56,21 +51,6 @@ public abstract class AbstractOIDDefaultCompiler<T extends AbstractOIDValue> imp
 
         clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
                 + "\t\t" + defaultField + ".setValue(" + idsString + ");"));
-    }
-
-    protected T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
-        T oidValue;
-
-        if (valueClass.isAssignableFrom(value.getClass())) {
-            oidValue = (T) value;
-        } else if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            oidValue = getDefinedValueResolver(valueClass).apply(ctx, (SimpleDefinedValue) value);
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
-
-        return oidValue;
     }
 
     public abstract List<Integer> resolveComponents(CompilerContext ctx, Value value);
