@@ -27,50 +27,25 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
-import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 
 import java.util.List;
-import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
-import static ch.eskaton.commons.utils.OptionalUtils.combine;
-
-public interface BoundsVisitor<V> extends Visitor<Optional<List<IntegerRange>>, V> {
+public class IntegerRangeSetOperationsStrategy implements SetOperationsStrategy<IntegerRange, List<IntegerRange>> {
 
     @Override
-    default Optional<List<IntegerRange>> visit(AllValuesNode node) {
-        return Optional.empty();
+    public List<IntegerRange> union(List<IntegerRange> leftValue, List<IntegerRange> rightValue) {
+        return IntegerRange.union(leftValue, rightValue);
     }
 
     @Override
-    default Optional<List<IntegerRange>> visit(BinOpNode node) {
-        Optional<List<IntegerRange>> left = node.getLeft().accept(this);
-        Optional<List<IntegerRange>> right = node.getRight().accept(this);
-
-        switch (node.getType()) {
-            case UNION:
-                return combine(left, right, IntegerRange::union);
-            case INTERSECTION:
-                return combine(left, right, IntegerRange::intersection);
-            case COMPLEMENT:
-                return combine(left, right, IntegerRange::complement);
-            default:
-                return throwUnimplementedNodeType(node);
-        }
+    public List<IntegerRange> intersection(List<IntegerRange> leftValue, List<IntegerRange> rightValue) {
+        return IntegerRange.intersection(leftValue, rightValue);
     }
 
     @Override
-    default Optional<List<IntegerRange>> visit(OpNode node) {
-        if (node.getType() == NEGATION) {
-            return node.getNode().accept(this).map(IntegerRange::invert);
-        } else {
-            return throwUnimplementedNodeType(node);
-        }
+    public List<IntegerRange> complement(List<IntegerRange> leftValue, List<IntegerRange> rightValue) {
+        return IntegerRange.complement(leftValue, rightValue);
     }
 
 }

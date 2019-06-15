@@ -148,7 +148,7 @@ public class BitStringConstraintOptimizingVisitor implements OptimizingVisitor<L
             case INTERSECTION:
                 return new SizeNode(IntegerRange.intersection(leftSize, rightSize));
             case COMPLEMENT:
-                return new SizeNode(IntegerRange.exclude(leftSize, rightSize));
+                return new SizeNode(IntegerRange.complement(leftSize, rightSize));
             default:
                 return throwUnimplementedNodeType(node);
         }
@@ -162,7 +162,7 @@ public class BitStringConstraintOptimizingVisitor implements OptimizingVisitor<L
             List<IntegerRange> rightSize = ((SizeNode) right).getSize();
 
             if (node.getType() == INTERSECTION) {
-                return new SizeNode(IntegerRange.exclude(leftSize, rightSize));
+                return new SizeNode(IntegerRange.complement(leftSize, rightSize));
             } else {
                 return throwUnimplementedNodeType(node);
             }

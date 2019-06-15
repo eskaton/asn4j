@@ -28,31 +28,19 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
-import ch.eskaton.commons.collections.Sets;
 
 import java.util.Set;
 
 public class EnumeratedTypeConstraintOptimizingVisitor
-        extends AbstractConstraintOptimizingVisitor<EnumeratedValueNode, Set<Integer>> {
+        extends AbstractConstraintOptimizingVisitor<Integer, Set<Integer>, EnumeratedValueNode> {
+
+    public EnumeratedTypeConstraintOptimizingVisitor() {
+        super(new DefaultSetOperationsStrategy<>());
+    }
 
     @Override
     protected EnumeratedValueNode createNode(Set<Integer> value) {
         return new EnumeratedValueNode(value);
-    }
-
-    @Override
-    protected Set<Integer> union(Set<Integer> leftValue, Set<Integer> rightValue) {
-        return Sets.<Integer>builder().addAll(leftValue).addAll(rightValue).build();
-    }
-
-    @Override
-    protected Set<Integer> intersection(Set<Integer> leftValue, Set<Integer> rightValue) {
-        return Sets.<Integer>builder().addAll(leftValue).retainAll(rightValue).build();
-    }
-
-    @Override
-    protected Set<Integer> complement(Set<Integer> leftValue, Set<Integer> rightValue) {
-        return Sets.<Integer>builder().addAll(leftValue).removeAll(rightValue).build();
     }
 
 }

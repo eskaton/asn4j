@@ -27,21 +27,14 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
+import java.util.Collection;
 
-import java.util.List;
+public interface SetOperationsStrategy<V, C extends Collection<V>> {
 
-public class IntegerConstraintOptimizingVisitor
-        extends AbstractConstraintOptimizingVisitor<IntegerRange, List<IntegerRange>, IntegerRangeValueNode> {
+    C union(C leftValue, C rightValue);
 
-    public IntegerConstraintOptimizingVisitor() {
-        super(new IntegerRangeSetOperationsStrategy());
-    }
+    C intersection(C leftValue, C rightValue);
 
-    @Override
-    protected IntegerRangeValueNode createNode(List<IntegerRange> value) {
-        return new IntegerRangeValueNode(value);
-    }
+    C complement(C leftValue, C rightValue);
 
 }

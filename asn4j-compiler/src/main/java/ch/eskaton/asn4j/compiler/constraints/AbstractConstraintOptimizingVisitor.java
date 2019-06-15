@@ -34,9 +34,18 @@ import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 
+import java.util.Collection;
+
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 
-public abstract class AbstractConstraintOptimizingVisitor<N extends ValueNode<V>, V> implements OptimizingVisitor<V> {
+public abstract class AbstractConstraintOptimizingVisitor<V, C extends Collection<V>, N extends ValueNode<C>>
+        implements OptimizingVisitor<V> {
+
+    private SetOperationsStrategy<V, C> setOperations;
+
+    public AbstractConstraintOptimizingVisitor(SetOperationsStrategy<V, C> setOperations) {
+        this.setOperations = setOperations;
+    }
 
     @Override
     public Node visit(BinOpNode node) {
@@ -46,29 +55,26 @@ public abstract class AbstractConstraintOptimizingVisitor<N extends ValueNode<V>
         switch (BinOpType.of(left.getType(), right.getType())) {
             case VALUE_VALUE:
                 return transformValueValue(node, (N) left, (N) right);
-
             case VALUE_NEGATION:
                 return transformValueNegation(node, (N) left, right, false);
-
             case NEGATION_VALUE:
                 return transformValueNegation(node, (N) right, left, true);
-
             default:
                 return node;
         }
     }
 
     protected Node transformValueValue(BinOpNode node, N left, N right) {
-        V leftValue = left.getValue();
-        V rightValue = right.getValue();
+        C leftValue = left.getValue();
+        C rightValue = right.getValue();
 
         switch (node.getType()) {
             case UNION:
-                return createNode(union(leftValue, rightValue));
+                return createNode(setOperations.union(leftValue, rightValue));
             case INTERSECTION:
-                return createNode(intersection(leftValue, rightValue));
+                return createNode(setOperations.intersection(leftValue, rightValue));
             case COMPLEMENT:
-                return createNode(complement(leftValue, rightValue));
+                return createNode(setOperations.complement(leftValue, rightValue));
             default:
                 return throwUnimplementedNodeType(node);
         }
@@ -78,17 +84,17 @@ public abstract class AbstractConstraintOptimizingVisitor<N extends ValueNode<V>
         right = (((OpNode) right).getNode());
 
         if (right.getType() == NodeType.VALUE) {
-            V leftValue = left.getValue();
-            V rightValue = ((N) right).getValue();
+            C leftValue = left.getValue();
+            C rightValue = ((N) right).getValue();
 
             switch (node.getType()) {
                 case INTERSECTION:
-                    return createNode(complement(leftValue, rightValue));
+                    return createNode(setOperations.complement(leftValue, rightValue));
                 case COMPLEMENT:
                     if (opSwitched) {
-                        return new OpNode(NodeType.NEGATION, createNode(union(leftValue, rightValue)));
+                        return new OpNode(NodeType.NEGATION, createNode(setOperations.union(leftValue, rightValue)));
                     } else {
-                        return createNode(intersection(leftValue, rightValue));
+                        return createNode(setOperations.intersection(leftValue, rightValue));
                     }
                 default:
                     return throwUnimplementedNodeType(node);
@@ -98,12 +104,6 @@ public abstract class AbstractConstraintOptimizingVisitor<N extends ValueNode<V>
         return node;
     }
 
-    protected abstract N createNode(V value);
-
-    protected abstract V union(V leftValue, V rightValue);
-
-    protected abstract V intersection(V leftValue, V rightValue);
-
-    protected abstract V complement(V leftValue, V rightValue);
+    protected abstract N createNode(C value);
 
 }
