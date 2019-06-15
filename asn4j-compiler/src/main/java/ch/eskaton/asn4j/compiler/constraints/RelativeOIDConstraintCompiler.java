@@ -28,98 +28,46 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
+import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
-import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
-import static java.util.Collections.singleton;
+public class RelativeOIDConstraintCompiler extends AbstractOIDConstraintCompiler<RelativeOIDValueNode> {
 
-public class RelativeOIDConstraintCompiler extends AbstractConstraintCompiler {
+    private static final RelativeOIDValueResolver VALUE_RESOLVER = new RelativeOIDValueResolver();
 
     public RelativeOIDConstraintCompiler(CompilerContext ctx) {
         super(ctx);
     }
 
     @Override
-    Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
-        return Optional.empty();
-    }
-
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            RelativeOIDValueResolver resolver = new RelativeOIDValueResolver();
-            Value value = ((SingleValueConstraint) elements).getValue();
-            RelativeOIDValue oidValue = resolver.resolveValue(ctx, value, RelativeOIDValue.class);
-
-            if (oidValue != null) {
-                return new RelativeOIDValueNode(singleton(resolver.resolveComponents(ctx, oidValue)));
-            } else {
-                throw new CompilerException("Invalid single-value constraint %s for RELATIVE OID type",
-                        value.getClass().getSimpleName());
-            }
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
-        } else {
-            throw new CompilerException("Invalid constraint %s for RELATIVE OID type",
-                    elements.getClass().getSimpleName());
-        }
+    protected RelativeOIDValueNode createNode(Set<List<Integer>> value) {
+        return new RelativeOIDValueNode(value);
     }
 
     @Override
-    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter("int...", "value")
-                .exception(ConstraintViolatedException.class).body();
+    protected Class<RelativeOIDValue> getValueClass() {
+        return RelativeOIDValue.class;
+    }
 
-        javaClass.addImport(Arrays.class);
+    @Override
+    protected AbstractOIDValueResolver getValueResolver() {
+        return VALUE_RESOLVER;
+    }
 
-        addConstraintCondition(definition, builder);
-
-        builder.finish().build();
+    @Override
+    protected String getTypeName() {
+        return "RELATIVE OID";
     }
 
     @Override
     protected Node optimize(Node node) {
         return new RelativeOIDConstraintOptimizingVisitor().visit(node);
-    }
-
-    @Override
-    protected Optional<String> buildExpression(Node node) {
-        switch (node.getType()) {
-            case VALUE:
-                String expression = (((RelativeOIDValueNode) node).getValue()).stream()
-                        .map(this::buildExpression)
-                        .collect(Collectors.joining(" || "));
-
-                return Optional.of(expression);
-            default:
-                return super.buildExpression(node);
-        }
-    }
-
-    private String buildExpression(List<Integer> value) {
-        String stringValue = value.stream().map(Object::toString).collect(Collectors.joining(", "));
-
-        return "(Arrays.equals(value, new int[] { " + stringValue + " }))";
     }
 
 }

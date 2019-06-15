@@ -30,9 +30,9 @@ package ch.eskaton.asn4j.compiler.constraints.ast;
 import java.util.List;
 import java.util.Set;
 
-public class RelativeOIDValueNode extends AbstractOIDValueNode {
+public abstract class AbstractOIDValueNode extends ValueNode<Set<List<Integer>>> {
 
-    public RelativeOIDValueNode(Set<List<Integer>> value) {
+    public AbstractOIDValueNode(Set<List<Integer>> value) {
         super(value);
     }
 
