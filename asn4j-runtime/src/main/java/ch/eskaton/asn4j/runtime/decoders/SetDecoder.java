@@ -81,9 +81,9 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
         Set<List<TagId>> mandatoryFields = metaData.getMandatoryFields();
 
         if (!mandatoryFields.isEmpty()) {
-            throw new DecodingException("Mandatory fields missing: " +
-                    StringUtils.join(mandatoryFields.stream().map(tag -> metaData.getFieldName(tag))
-                            .collect(Collectors.toList()), ", "));
+            throw new DecodingException("Mandatory fields missing: " + StringUtils.join(mandatoryFields.stream()
+                    .map(metaData::getFieldName)
+                    .collect(Collectors.toList()), ", "));
         }
     }
 

@@ -59,7 +59,8 @@ public class ASN1Null implements ASN1Type {
         this.value = value;
     }
 
-    protected boolean checkConstraint(Value value) throws ConstraintViolatedException {
+    @SuppressWarnings("squid:S1172")
+    protected boolean checkConstraint(Value value) {
         return true;
     }
 

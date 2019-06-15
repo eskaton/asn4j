@@ -90,11 +90,7 @@ public abstract class AbstractConstraintCompiler {
                 constraints.push(node.getConstraints());
             }
 
-            if (baseType.getType().equals(node)) {
-                break;
-            }
-
-            if (node instanceof UsefulType) {
+            if (baseType.getType().equals(node) || node instanceof UsefulType) {
                 break;
             } else if (node instanceof TypeReference) {
                 TypeAssignmentNode type = ctx.getTypeAssignment((TypeReference) node);
@@ -136,6 +132,7 @@ public abstract class AbstractConstraintCompiler {
         return null;
     }
 
+    @SuppressWarnings("squid:S1172")
     Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
         return Optional.empty();
     }
@@ -226,7 +223,7 @@ public abstract class AbstractConstraintCompiler {
     protected abstract Node calculateElements(CompiledType baseType, Elements elements,
             Optional<Bounds> bounds);
 
-    protected Node calculateContainedSubtype(CompiledType baseType, Type type) {
+    protected Node calculateContainedSubtype(Type type) {
         Type parent = type;
         CompiledType compiledType;
         Deque<Node> constraints = new ArrayDeque<>();
@@ -241,7 +238,7 @@ public abstract class AbstractConstraintCompiler {
             parent = compiledType.getType();
         } while (parent instanceof TypeReference);
 
-        if (constraints.size() == 0) {
+        if (constraints.isEmpty()) {
             return new AllValuesNode();
         } else if (constraints.size() == 1) {
             return constraints.pop();

@@ -30,12 +30,8 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaType;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
@@ -47,15 +43,12 @@ import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -108,7 +101,7 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
                 throw new CompilerException("Invalid type in contained subtype constraint: " + type);
             }
 
-            return calculateContainedSubtype(baseType, type);
+            return calculateContainedSubtype(type);
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {

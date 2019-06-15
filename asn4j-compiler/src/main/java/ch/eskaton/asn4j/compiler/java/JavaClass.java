@@ -64,6 +64,8 @@ public class JavaClass implements JavaStructure {
 
     private static final String THROWS = "throws";
 
+    private static final String IMPORT = "import";
+
     private List<String> imports = new ArrayList<>();
 
     private List<String> staticImports = new ArrayList<>();
@@ -239,12 +241,14 @@ public class JavaClass implements JavaStructure {
                 MutableInteger n = new MutableInteger(0);
 
                 List<JavaParameter> parameters = Arrays.stream(ctor.getParameterTypes())
-                        .map(clazz -> new JavaParameter(clazz.getSimpleName(),
-                                "arg" + n.increment().getValue())).collect(Collectors.toList());
+                        .map(clazz -> new JavaParameter(clazz.getSimpleName(), "arg" + n.increment().getValue()))
+                        .collect(Collectors.toList());
 
                 javaCtor.getParameters().addAll(parameters);
 
-                String parametersString = parameters.stream().map(p -> p.getName()).collect(Collectors.joining(", "));
+                String parametersString = parameters.stream()
+                        .map(JavaParameter::getName)
+                        .collect(Collectors.joining(", "));
 
                 javaCtor.setBody(Optional.of("super(" + parametersString + ");"));
 
@@ -344,19 +348,19 @@ public class JavaClass implements JavaStructure {
         writer.newLine();
 
         for (String imp : imports) {
-            writer.write(StringUtils.concat("import ", imp, ";\n"));
+            writer.write(StringUtils.concat(IMPORT, " ", imp, ";\n"));
         }
 
         for (String imp : staticImports) {
-            writer.write(StringUtils.concat("import " + STATIC + " ", imp, ";\n"));
+            writer.write(StringUtils.concat(IMPORT + " " + STATIC + " ", imp, ";\n"));
         }
 
         String pkg = Clazz.class.getPackage().getName();
 
-        writer.write("import " + pkg + ".Clazz;\n");
-        writer.write("import " + pkg + ".types.*;\n");
-        writer.write("import " + pkg + ".annotations.*;\n");
-        writer.write("import java.util.Objects;\n");
+        writer.write(IMPORT + " " + pkg + ".Clazz;\n");
+        writer.write(IMPORT + " " + pkg + ".types.*;\n");
+        writer.write(IMPORT + " " + pkg + ".annotations.*;\n");
+        writer.write(IMPORT + " java.util.Objects;\n");
         writer.newLine();
     }
 
@@ -494,12 +498,9 @@ public class JavaClass implements JavaStructure {
             return new BodyBuilder(this);
         }
 
-        private MethodBuilder body(String body) {
-            return body(Arrays.asList(body.split("\n")));
-        }
-
         private MethodBuilder body(List<String> body) {
             this.body = body.stream().map(b -> "\t\t" + b + "\n").collect(toList());
+
             return this;
         }
 

@@ -90,7 +90,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             }
         } else if (elements instanceof ContainedSubtype) {
             Type type = ((ContainedSubtype) elements).getType();
-            return calculateContainedSubtype(baseType, type);
+            return calculateContainedSubtype(type);
         } else if (elements instanceof RangeNode) {
             long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
             long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);

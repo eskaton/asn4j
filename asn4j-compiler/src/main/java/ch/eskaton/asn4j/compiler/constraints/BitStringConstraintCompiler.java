@@ -92,7 +92,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
