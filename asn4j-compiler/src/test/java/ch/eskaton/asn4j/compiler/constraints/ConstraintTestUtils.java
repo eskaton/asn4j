@@ -33,11 +33,13 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
+import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.commons.collections.Sets;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static java.util.Arrays.asList;
@@ -114,6 +116,18 @@ public class ConstraintTestUtils {
 
     static EnumeratedValueNode enumValue(Integer... values) {
         return new EnumeratedValueNode(Sets.<Integer>builder().addAll(asList(values)).build());
+    }
+
+    static ObjectIdentifierValueNode oidValue() {
+        return new ObjectIdentifierValueNode(emptySet());
+    }
+
+    static ObjectIdentifierValueNode oidValue(Integer... value) {
+        return new ObjectIdentifierValueNode(singleton(Arrays.asList(value)));
+    }
+
+    static ObjectIdentifierValueNode oidValue(List<Integer>... value) {
+        return new ObjectIdentifierValueNode(Sets.<List<Integer>>builder().addAll(Arrays.asList(value)).build());
     }
 
 }
