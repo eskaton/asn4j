@@ -30,16 +30,16 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
-import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
@@ -51,9 +51,9 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 import static java.util.Collections.singleton;
 
-public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompiler {
+public class RelativeOIDConstraintCompiler extends AbstractConstraintCompiler {
 
-    public ObjectIdentifierConstraintCompiler(CompilerContext ctx) {
+    public RelativeOIDConstraintCompiler(CompilerContext ctx) {
         super(ctx);
     }
 
@@ -66,20 +66,20 @@ public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompil
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver();
+            RelativeOIDValueResolver resolver = new RelativeOIDValueResolver();
             Value value = ((SingleValueConstraint) elements).getValue();
-            ObjectIdentifierValue oidValue = resolver.resolveValue(ctx, value, ObjectIdentifierValue.class);
+            RelativeOIDValue oidValue = resolver.resolveValue(ctx, value, RelativeOIDValue.class);
 
             if (oidValue != null) {
-                return new ObjectIdentifierValueNode(singleton(resolver.resolveComponents(ctx, oidValue)));
+                return new RelativeOIDValueNode(singleton(resolver.resolveComponents(ctx, oidValue)));
             } else {
-                throw new CompilerException("Invalid single-value constraint %s for OBJECT IDENTIFIER type",
+                throw new CompilerException("Invalid single-value constraint %s for RELATIVE OID type",
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(((ContainedSubtype) elements).getType());
         } else {
-            throw new CompilerException("Invalid constraint %s for OBJECT IDENTIFIER type",
+            throw new CompilerException("Invalid constraint %s for RELATIVE OID type",
                     elements.getClass().getSimpleName());
         }
     }
@@ -99,14 +99,14 @@ public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompil
 
     @Override
     protected Node optimize(Node node) {
-        return new ObjectIdentifierConstraintOptimizingVisitor().visit(node);
+        return new RelativeOIDConstraintOptimizingVisitor().visit(node);
     }
 
     @Override
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                String expression = (((ObjectIdentifierValueNode) node).getValue()).stream()
+                String expression = (((RelativeOIDValueNode) node).getValue()).stream()
                         .map(this::buildExpression)
                         .collect(Collectors.joining(" || "));
 

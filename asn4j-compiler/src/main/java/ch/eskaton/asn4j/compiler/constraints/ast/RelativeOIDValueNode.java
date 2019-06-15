@@ -25,41 +25,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.resolvers;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
-import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
-public class RelativeOIDValueResolver extends AbstractOIDValueResolver<RelativeOIDValue> {
+public class RelativeOIDValueNode extends ValueNode<Set<List<Integer>>> {
 
-    @Override
-    protected String getTypeName() {
-        return "RELATIVE OID";
-    }
-
-    @Override
-    public List<Integer> resolveComponents(CompilerContext ctx, AbstractOIDValue value) {
-        List<Integer> ids = new ArrayList<>();
-
-        for (OIDComponentNode component : value.getComponents()) {
-            try {
-                try {
-                    ids.add(getComponentId(ctx, component));
-                } catch (CompilerException e) {
-                    resolveOIDReference(ctx, ids, component, RelativeOIDValue.class);
-                }
-            } catch (CompilerException e) {
-                throw new CompilerException("Failed to resolve component of object identifier value", e);
-            }
-        }
-
-        return ids;
+    public RelativeOIDValueNode(Set<List<Integer>> value) {
+        super(value);
     }
 
 }
