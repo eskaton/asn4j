@@ -52,6 +52,7 @@ import ch.eskaton.asn4jtest.x680_51_1.TestInteger9;
 import ch.eskaton.asn4jtest.x680_51_1.TestNull1;
 import ch.eskaton.asn4jtest.x680_51_1.TestNull2;
 import ch.eskaton.asn4jtest.x680_51_1.TestObjectIdentifier2;
+import ch.eskaton.asn4jtest.x680_51_1.TestRelativeOID2;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -66,6 +67,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
 
 public class TestX680_51_1 {
 
@@ -262,6 +265,13 @@ public class TestX680_51_1 {
         testObjectIdentifierSuccess(TestObjectIdentifier2.class, new TestObjectIdentifier2(), 0, 3, 6, 3);
 
         testObjectIdentifierFailure(new TestObjectIdentifier2(), 0, 3, 6, 4);
+    }
+
+    @Test
+    public void testRelativeOID2() {
+        testRelativeOIDSuccess(TestRelativeOID2.class, new TestRelativeOID2(), 3, 6, 3);
+
+        testRelativeOIDFailure(new TestRelativeOID2(), 3, 6, 4);
     }
 
 }

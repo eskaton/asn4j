@@ -31,4 +31,11 @@ testObjectIdentifier2 OBJECT IDENTIFIER ::= { testObjectIdentifier1 6 2 }
 TestObjectIdentifier1 ::= OBJECT IDENTIFIER ({ 0 3 6 1 } | testObjectIdentifier2)
 TestObjectIdentifier2 ::= OBJECT IDENTIFIER (INCLUDES TestObjectIdentifier1)
 
+testRelativeOID1 RELATIVE-OID ::= { 7 3 }
+testRelativeOID2 RELATIVE-OID ::= { testRelativeOID1 6 2 }
+
+TestRelativeOID1 ::= RELATIVE-OID ({ 7 3 6 1 } | testRelativeOID2)
+TestRelativeOID2 ::= RELATIVE-OID (INCLUDES TestRelativeOID1)
+
+
 END

@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 import java.math.BigInteger;
@@ -138,6 +139,17 @@ public class TestHelper {
 
     public static <T extends ASN1ObjectIdentifier> void testObjectIdentifierFailure(T oidValue, int... value) {
         TestUtils.assertThrows(() -> oidValue.setValue(value), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1RelativeOID> void testRelativeOIDSuccess(Class<? extends T> clazz,
+            T roidValue, int... value) {
+        roidValue.setValue(value);
+
+        testEncodeDecodeValue((Class<T>) clazz, roidValue);
+    }
+
+    public static <T extends ASN1RelativeOID> void testRelativeOIDFailure(T roidValue, int... value) {
+        TestUtils.assertThrows(() -> roidValue.setValue(value), ConstraintViolatedException.class);
     }
 
     private static <T extends ASN1Type> void testEncodeDecodeValue(Class<T> clazz, T value) {

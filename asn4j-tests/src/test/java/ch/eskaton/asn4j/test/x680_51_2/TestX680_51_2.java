@@ -54,6 +54,11 @@ import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier2;
 import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier3;
 import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier4;
 import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier5;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID1;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID2;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID3;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID4;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID5;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -68,6 +73,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
 
 public class TestX680_51_2 {
 
@@ -276,4 +283,40 @@ public class TestX680_51_2 {
         testObjectIdentifierFailure(new TestObjectIdentifier5(), 1, 3, 6, 2);
     }
 
+    @Test
+    public void testRelativeOID1() {
+        testRelativeOIDSuccess(TestRelativeOID1.class, new TestRelativeOID1(), 3, 6, 1);
+        testRelativeOIDSuccess(TestRelativeOID1.class, new TestRelativeOID1(), 3, 6, 2);
+
+        testRelativeOIDFailure(new TestRelativeOID1(), 3, 6, 0);
+    }
+
+    @Test
+    public void testRelativeOID2() {
+        testRelativeOIDSuccess(TestRelativeOID2.class, new TestRelativeOID2(), 3, 6, 1);
+
+        testRelativeOIDFailure(new TestRelativeOID2(), 3, 6, 2);
+    }
+
+    @Test
+    public void testRelativeOID3() {
+        testRelativeOIDSuccess(TestRelativeOID3.class, new TestRelativeOID3(), 3, 6, 2);
+
+        testRelativeOIDFailure(new TestRelativeOID3(), 3, 6, 1);
+    }
+
+    @Test
+    public void testRelativeOID4() {
+        testRelativeOIDSuccess(TestRelativeOID4.class, new TestRelativeOID4(), 3, 6, 1);
+
+        testRelativeOIDFailure(new TestRelativeOID4(), 3, 6, 2);
+    }
+
+    @Test
+    public void testRelativeOID5() {
+        testRelativeOIDSuccess(TestRelativeOID5.class, new TestRelativeOID5(), 4, 1, 11, 2);
+
+        testRelativeOIDFailure(new TestRelativeOID5(), 4, 1, 11, 1);
+    }
+    
 }
