@@ -27,77 +27,32 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
-import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.commons.collections.Sets;
 
 import java.util.Set;
 
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
-
-public class EnumeratedTypeConstraintOptimizingVisitor implements OptimizingVisitor<Set<Integer>> {
+public class EnumeratedTypeConstraintOptimizingVisitor
+        extends AbstractConstraintOptimizingVisitor<EnumeratedValueNode, Set<Integer>> {
 
     @Override
-    public Node visit(BinOpNode node) {
-        Node left = node.getLeft().accept(this);
-        Node right = node.getRight().accept(this);
-
-        switch (BinOpType.of(left.getType(), right.getType())) {
-            case VALUE_VALUE:
-                return transformValueValue(node, (EnumeratedValueNode) left, (EnumeratedValueNode) right);
-            case VALUE_NEGATION:
-                return transformValueNegation(node, (EnumeratedValueNode) left, right, false);
-            case NEGATION_VALUE:
-                return transformValueNegation(node, (EnumeratedValueNode) right, left, true);
-            default:
-                return node;
-        }
+    protected EnumeratedValueNode createNode(Set<Integer> value) {
+        return new EnumeratedValueNode(value);
     }
 
-    private Node transformValueValue(BinOpNode node, EnumeratedValueNode left, EnumeratedValueNode right) {
-        Set<Integer> leftValue = left.getValue();
-        Set<Integer> rightValue = right.getValue();
-
-        switch (node.getType()) {
-            case UNION:
-                return new EnumeratedValueNode(Sets.<Integer>builder().addAll(leftValue).addAll(rightValue).build());
-            case INTERSECTION:
-                return new EnumeratedValueNode(Sets.<Integer>builder().addAll(leftValue).retainAll(rightValue).build());
-            case COMPLEMENT:
-                return new EnumeratedValueNode(Sets.<Integer>builder().addAll(leftValue).removeAll(rightValue).build());
-            default:
-                return throwUnimplementedNodeType(node);
-        }
+    @Override
+    protected Set<Integer> union(Set<Integer> leftValue, Set<Integer> rightValue) {
+        return Sets.<Integer>builder().addAll(leftValue).addAll(rightValue).build();
     }
 
-    private Node transformValueNegation(BinOpNode node, EnumeratedValueNode left, Node right, boolean opSwitched) {
-        right = (((OpNode) right).getNode());
+    @Override
+    protected Set<Integer> intersection(Set<Integer> leftValue, Set<Integer> rightValue) {
+        return Sets.<Integer>builder().addAll(leftValue).retainAll(rightValue).build();
+    }
 
-        if (right.getType() == NodeType.VALUE) {
-            Set<Integer> leftValue = left.getValue();
-            Set<Integer> rightValue = ((EnumeratedValueNode) right).getValue();
-
-            switch (node.getType()) {
-                case INTERSECTION:
-                    return new EnumeratedValueNode(Sets.<Integer>builder().addAll(leftValue).removeAll(rightValue).build());
-                case COMPLEMENT:
-                    Sets.Builder<Integer> values = Sets.<Integer>builder().addAll(leftValue);
-
-                    if (opSwitched) {
-                        return new OpNode(NodeType.NEGATION, new EnumeratedValueNode(values.addAll(rightValue).build()));
-                    } else {
-                        return new EnumeratedValueNode(values.retainAll(rightValue).build());
-                    }
-                default:
-                    return throwUnimplementedNodeType(node);
-            }
-        }
-
-        return node;
+    @Override
+    protected Set<Integer> complement(Set<Integer> leftValue, Set<Integer> rightValue) {
+        return Sets.<Integer>builder().addAll(leftValue).removeAll(rightValue).build();
     }
 
 }

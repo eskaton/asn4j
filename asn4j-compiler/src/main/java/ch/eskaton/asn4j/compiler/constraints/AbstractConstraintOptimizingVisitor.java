@@ -36,7 +36,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 
-public abstract class AbstractOptimizingVisitor<N extends ValueNode<V>, V> implements OptimizingVisitor<V> {
+public abstract class AbstractConstraintOptimizingVisitor<N extends ValueNode<V>, V> implements OptimizingVisitor<V> {
 
     @Override
     public Node visit(BinOpNode node) {
