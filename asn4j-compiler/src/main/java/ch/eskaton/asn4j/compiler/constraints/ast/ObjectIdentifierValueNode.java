@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints.ast;
 import java.util.List;
 import java.util.Set;
 
-public class ObjectIdentifierValueNode extends ValueNode<Set<List<Integer>>> {
+public class ObjectIdentifierValueNode extends AbstractOIDValueNode {
 
     public ObjectIdentifierValueNode(Set<List<Integer>> value) {
         super(value);

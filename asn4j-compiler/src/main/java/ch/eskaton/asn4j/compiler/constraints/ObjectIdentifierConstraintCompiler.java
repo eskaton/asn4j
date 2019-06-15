@@ -28,73 +28,22 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
+import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
-import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
 
-import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
-import static java.util.Collections.singleton;
+public class ObjectIdentifierConstraintCompiler extends AbstractOIDConstraintCompiler<ObjectIdentifierValueNode> {
 
-public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompiler {
+    private static final ObjectIdentifierValueResolver VALUE_RESOLVER = new ObjectIdentifierValueResolver();
 
     public ObjectIdentifierConstraintCompiler(CompilerContext ctx) {
         super(ctx);
-    }
-
-    @Override
-    Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
-        return Optional.empty();
-    }
-
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver();
-            Value value = ((SingleValueConstraint) elements).getValue();
-            ObjectIdentifierValue oidValue = resolver.resolveValue(ctx, value, ObjectIdentifierValue.class);
-
-            if (oidValue != null) {
-                return new ObjectIdentifierValueNode(singleton(resolver.resolveComponents(ctx, oidValue)));
-            } else {
-                throw new CompilerException("Invalid single-value constraint %s for OBJECT IDENTIFIER type",
-                        value.getClass().getSimpleName());
-            }
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
-        } else {
-            throw new CompilerException("Invalid constraint %s for OBJECT IDENTIFIER type",
-                    elements.getClass().getSimpleName());
-        }
-    }
-
-    @Override
-    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter("int...", "value")
-                .exception(ConstraintViolatedException.class).body();
-
-        javaClass.addImport(Arrays.class);
-
-        addConstraintCondition(definition, builder);
-
-        builder.finish().build();
     }
 
     @Override
@@ -103,23 +52,23 @@ public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompil
     }
 
     @Override
-    protected Optional<String> buildExpression(Node node) {
-        switch (node.getType()) {
-            case VALUE:
-                String expression = (((ObjectIdentifierValueNode) node).getValue()).stream()
-                        .map(this::buildExpression)
-                        .collect(Collectors.joining(" || "));
-
-                return Optional.of(expression);
-            default:
-                return super.buildExpression(node);
-        }
+    protected ObjectIdentifierValueNode createNode(Set<List<Integer>> value) {
+        return new ObjectIdentifierValueNode(value);
     }
 
-    private String buildExpression(List<Integer> value) {
-        String stringValue = value.stream().map(Object::toString).collect(Collectors.joining(", "));
+    @Override
+    protected Class<? extends AbstractOIDValue> getValueClass() {
+        return ObjectIdentifierValue.class;
+    }
 
-        return "(Arrays.equals(value, new int[] { " + stringValue + " }))";
+    @Override
+    protected AbstractOIDValueResolver getValueResolver() {
+        return VALUE_RESOLVER;
+    }
+
+    @Override
+    protected String getTypeName() {
+        return "OBJECT IDENTIFIER";
     }
 
 }
