@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 public class ObjectIdentifierConstraintOptimizingVisitor
-        extends AbstractOptimizingVisitor<ObjectIdentifierValueNode, Set<List<Integer>>> {
+        extends AbstractConstraintOptimizingVisitor<ObjectIdentifierValueNode, Set<List<Integer>>> {
 
     @Override
     protected ObjectIdentifierValueNode createNode(Set<List<Integer>> value) {
