@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import org.junit.Test;
 
@@ -37,7 +35,7 @@ import java.util.ArrayList;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.canonicalizeRanges;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.compareCanonicalEndpoint;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.compareCanonicalRange;
-import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.exclude;
+import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.complement;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.intersection;
@@ -170,36 +168,36 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void testExclude() {
-        assertEquals(emptyList(), exclude(emptyList(), emptyList()));
+    public void testComplement() {
+        assertEquals(emptyList(), complement(emptyList(), emptyList()));
 
-        assertEquals(emptyList(), exclude(emptyList(), asList(createRange(0L, 10L))));
+        assertEquals(emptyList(), complement(emptyList(), asList(createRange(0L, 10L))));
 
-        assertEquals(asList(createRange(0L, 10L)), exclude(asList(createRange(0L, 10L)), emptyList()));
+        assertEquals(asList(createRange(0L, 10L)), complement(asList(createRange(0L, 10L)), emptyList()));
 
-        assertEquals(emptyList(), exclude(asList(createRange(0L, 10L)), asList(createRange(0L, 10L))));
+        assertEquals(emptyList(), complement(asList(createRange(0L, 10L)), asList(createRange(0L, 10L))));
 
-        assertEquals(asList(createRange(6L, 10L)), exclude(asList(createRange(0L, 10L)), asList(createRange(0L, 5L))));
+        assertEquals(asList(createRange(6L, 10L)), complement(asList(createRange(0L, 10L)), asList(createRange(0L, 5L))));
 
         assertEquals(asList(createRange(0L, 2L), createRange(9L, 10L)),
-                exclude(asList(createRange(0L, 10L)), asList(createRange(3L, 8L))));
+                complement(asList(createRange(0L, 10L)), asList(createRange(3L, 8L))));
 
-        assertEquals(asList(createRange(0L, 5L)), exclude(asList(createRange(0L, 10L)), asList(createRange(6L, 10L))));
+        assertEquals(asList(createRange(0L, 5L)), complement(asList(createRange(0L, 10L)), asList(createRange(6L, 10L))));
 
         assertEquals(asList(createRange(0L, 4L)),
-                exclude(asList(createRange(0L, 10L)), asList(createRange(5L, 12L))));
+                complement(asList(createRange(0L, 10L)), asList(createRange(5L, 12L))));
 
         assertEquals(asList(createRange(11L, 12L)),
-                exclude(asList(createRange(5L, 12L)), asList(createRange(0L, 10L))));
+                complement(asList(createRange(5L, 12L)), asList(createRange(0L, 10L))));
 
         assertEquals(asList(createRange(0L, 5L), createRange(7L, 10L), createRange(20L, 30L)),
-                exclude(asList(createRange(0L, 10L), createRange(20L, 30L)), asList(createRange(6L, 6L))));
+                complement(asList(createRange(0L, 10L), createRange(20L, 30L)), asList(createRange(6L, 6L))));
 
         assertEquals(asList(createRange(0L, 10L), createRange(20L, 21L), createRange(23L, 30L)),
-                exclude(asList(createRange(0L, 10L), createRange(20L, 30L)), asList(createRange(22L, 22L))));
+                complement(asList(createRange(0L, 10L), createRange(20L, 30L)), asList(createRange(22L, 22L))));
 
         assertEquals(asList(createRange(0L, 10L), createRange(40L, 50L), createRange(80L, 90L)),
-                exclude(asList(createRange(0L, 10L), createRange(20L, 30L), createRange(40L, 50L),
+                complement(asList(createRange(0L, 10L), createRange(20L, 30L), createRange(40L, 50L),
                         createRange(60L, 70L), createRange(80L, 90L)), asList(createRange(20L, 30L),
                         createRange(60L, 70L))));
     }

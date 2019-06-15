@@ -28,32 +28,20 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
-import ch.eskaton.commons.collections.Sets;
 
 import java.util.List;
 import java.util.Set;
 
 public class ObjectIdentifierConstraintOptimizingVisitor
-        extends AbstractConstraintOptimizingVisitor<ObjectIdentifierValueNode, Set<List<Integer>>> {
+        extends AbstractConstraintOptimizingVisitor<List<Integer>, Set<List<Integer>>, ObjectIdentifierValueNode> {
+
+    public ObjectIdentifierConstraintOptimizingVisitor() {
+        super(new DefaultSetOperationsStrategy<>());
+    }
 
     @Override
     protected ObjectIdentifierValueNode createNode(Set<List<Integer>> value) {
         return new ObjectIdentifierValueNode(value);
-    }
-
-    @Override
-    protected Set<List<Integer>> union(Set<List<Integer>> leftValue, Set<List<Integer>> rightValue) {
-        return Sets.<List<Integer>>builder().addAll(leftValue).addAll(rightValue).build();
-    }
-
-    @Override
-    protected Set<List<Integer>> intersection(Set<List<Integer>> leftValue, Set<List<Integer>> rightValue) {
-        return Sets.<List<Integer>>builder().addAll(leftValue).retainAll(rightValue).build();
-    }
-
-    @Override
-    protected Set<List<Integer>> complement(Set<List<Integer>> leftValue, Set<List<Integer>> rightValue) {
-        return Sets.<List<Integer>>builder().addAll(leftValue).removeAll(rightValue).build();
     }
 
 }

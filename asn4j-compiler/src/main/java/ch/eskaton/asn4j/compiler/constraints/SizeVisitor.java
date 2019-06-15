@@ -62,7 +62,7 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, List<IntegerRang
                 return combine(left, right, IntegerRange::intersection).map(SizeNode::new);
             case COMPLEMENT:
                 if (left.isPresent() && right.isPresent()) {
-                    return combine(left, right, IntegerRange::exclude).map(SizeNode::new);
+                    return combine(left, right, IntegerRange::complement).map(SizeNode::new);
                 } else if (left.isPresent()) {
                     return left.map(SizeNode::new);
                 } else {

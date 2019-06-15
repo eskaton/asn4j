@@ -162,7 +162,7 @@ public class IntegerRange {
         return result;
     }
 
-    public static List<IntegerRange> exclude(List<IntegerRange> l1, List<IntegerRange> l2) {
+    public static List<IntegerRange> complement(List<IntegerRange> l1, List<IntegerRange> l2) {
         l1 = canonicalizeRanges(l1);
         l2 = canonicalizeRanges(l2);
 
