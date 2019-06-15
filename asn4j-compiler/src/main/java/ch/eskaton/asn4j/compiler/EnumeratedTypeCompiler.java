@@ -43,8 +43,6 @@ import ch.eskaton.commons.MutableInteger;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +53,6 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, CompiledType> {
 

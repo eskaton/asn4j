@@ -44,12 +44,12 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
+import static java.util.Collections.singleton;
 
 public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -71,13 +71,13 @@ public class ObjectIdentifierConstraintCompiler extends AbstractConstraintCompil
             ObjectIdentifierValue oidValue = resolver.resolveValue(ctx, value, ObjectIdentifierValue.class);
 
             if (oidValue != null) {
-                return new ObjectIdentifierValueNode(Collections.singleton(resolver.resolveComponents(ctx, oidValue)));
+                return new ObjectIdentifierValueNode(singleton(resolver.resolveComponents(ctx, oidValue)));
             } else {
                 throw new CompilerException("Invalid single-value constraint %s for OBJECT IDENTIFIER type",
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
         } else {
             throw new CompilerException("Invalid constraint %s for OBJECT IDENTIFIER type",
                     elements.getClass().getSimpleName());

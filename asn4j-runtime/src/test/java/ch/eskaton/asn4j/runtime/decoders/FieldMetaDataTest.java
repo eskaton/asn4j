@@ -128,23 +128,6 @@ public class FieldMetaDataTest {
         assertEquals(0, mandatoryFields.size());
     }
 
-    @Test
-    public void testCheckMandatoryFieldsComplete() throws NoSuchFieldException, IllegalAccessException {
-        TestSetA testSet = new TestSetA();
-
-        FieldMetaData fieldMetaData = new FieldMetaData(testSet, ASN1Component.class);
-
-        Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes =
-                ReflectionUtils.getPrivateFieldValue(fieldMetaData, "tagsToTypes");
-
-        List<ASN1Tag> mandatoryKey = tagsToTypes.entrySet().stream().filter(
-                e -> e.getValue().isAssignableFrom(ASN1Integer.class)).collect(Collectors.toList()).get(0).getKey();
-
-        tagsToTypes.remove(mandatoryKey);
-
-        fieldMetaData.getMandatoryFields();
-    }
-
     private Map.Entry<List<ASN1Tag>, Class<? extends ASN1Type>> getTagsToType(Map<List<ASN1Tag>,
             Class<? extends ASN1Type>> tagsToTypes, Class<? extends ASN1Type> type) {
         return tagsToTypes.entrySet().stream().filter(e -> e.getValue().isAssignableFrom(type)).findFirst().get();

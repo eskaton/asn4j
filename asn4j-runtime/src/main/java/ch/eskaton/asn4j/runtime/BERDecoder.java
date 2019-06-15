@@ -108,8 +108,6 @@ public class BERDecoder implements Decoder {
                     .put(ASN1VisibleString.class, new VisibleStringDecoder())
                     .build();
 
-    private EnumeratedTypeDecoder enumeratedTypeDecoder = new EnumeratedTypeDecoder();
-
     private ChoiceDecoder choiceDecoder = new ChoiceDecoder();
 
     private SequenceDecoder sequenceDecoder = new SequenceDecoder();

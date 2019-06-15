@@ -40,13 +40,11 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
