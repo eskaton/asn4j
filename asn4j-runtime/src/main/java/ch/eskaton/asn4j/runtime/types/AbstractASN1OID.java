@@ -19,7 +19,8 @@ public abstract class AbstractASN1OID implements ASN1Type {
 
     public void setValue(List<Integer> value) {
         if (!checkConstraint(value.stream().mapToInt(Integer::valueOf).toArray())) {
-            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint", value));
+            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint",
+                    StringUtils.join(value, " ")));
         }
 
         this.components = verifiedComponents(new ArrayList<>(value));

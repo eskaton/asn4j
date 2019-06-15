@@ -53,4 +53,12 @@ TestRelativeOID3 ::= RELATIVE-OID (({ 3 6 1 } | { 3 6 2 }) ^ { 3 6 2 })
 TestRelativeOID4 ::= RELATIVE-OID ({ 3 6 1 })
 TestRelativeOID5 ::= RELATIVE-OID (testRelativeOID2)
 
+testOidIri1 OID-IRI ::= "/ISO/a/b/f"
+
+TestOidIri1 ::= OID-IRI ("/ISO/a/b/c" | "/ISO/a/b/d")
+TestOidIri2 ::= OID-IRI (("/ISO/a/b/c" | "/ISO/a/b/d") EXCEPT "/ISO/a/b/c")
+TestOidIri3 ::= OID-IRI (("/ISO/a/b/c" | "/ISO/a/b/d") ^ "/ISO/a/b/c")
+TestOidIri4 ::= OID-IRI ("/ISO/a/b/e")
+TestOidIri5 ::= OID-IRI (testOidIri1)
+
 END

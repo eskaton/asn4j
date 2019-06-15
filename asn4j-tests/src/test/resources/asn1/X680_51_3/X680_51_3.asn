@@ -37,5 +37,10 @@ testRelativeOID2 RELATIVE-OID ::= { testRelativeOID1 6 2 }
 TestRelativeOID1 ::= RELATIVE-OID ({ 7 3 6 1 } | testRelativeOID2)
 TestRelativeOID2 ::= RELATIVE-OID (INCLUDES TestRelativeOID1)
 
+testOidIri1 OID-IRI ::= "/ISO/a/b/a"
+testOidIri2 OID-IRI ::= "/ISO/a/b/b"
+
+TestOidIri1 ::= OID-IRI ("/ISO/a/b/a" | testOidIri2)
+TestOidIri2 ::= OID-IRI (INCLUDES TestOidIri1)
 
 END

@@ -50,4 +50,7 @@ TestObjectIdentifier2 ::= OBJECT IDENTIFIER (TestObjectIdentifier1 EXCEPT { itu-
 TestRelativeOID1 ::= RELATIVE-OID ({ 3 6 3 } | { 3 6 4 })
 TestRelativeOID2 ::= RELATIVE-OID (TestRelativeOID1 EXCEPT { 3 6 4})
 
+TestOidIri1 ::= OID-IRI ("/ISO/a/b/a" | "/ISO/a/b/b")
+TestOidIri2 ::= OID-IRI (TestOidIri1 EXCEPT "/ISO/a/b/a")
+
 END
