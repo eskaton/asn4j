@@ -27,81 +27,33 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.commons.collections.Sets;
 
 import java.util.List;
 import java.util.Set;
 
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
-
-public class ObjectIdentifierConstraintOptimizingVisitor implements OptimizingVisitor<Set<List<Integer>>> {
+public class ObjectIdentifierConstraintOptimizingVisitor
+        extends AbstractOptimizingVisitor<ObjectIdentifierValueNode, Set<List<Integer>>> {
 
     @Override
-    public Node visit(BinOpNode node) {
-        Node left = node.getLeft().accept(this);
-        Node right = node.getRight().accept(this);
-
-        switch (BinOpType.of(left.getType(), right.getType())) {
-            case VALUE_VALUE:
-                return transformValueValue(node, (ObjectIdentifierValueNode) left, (ObjectIdentifierValueNode) right);
-
-            case VALUE_NEGATION:
-                return transformValueNegation(node, (ObjectIdentifierValueNode) left, right, false);
-
-            case NEGATION_VALUE:
-                return transformValueNegation(node, (ObjectIdentifierValueNode) right, left, true);
-
-            default:
-                return node;
-        }
+    protected ObjectIdentifierValueNode createNode(Set<List<Integer>> value) {
+        return new ObjectIdentifierValueNode(value);
     }
 
-    private Node transformValueValue(BinOpNode node, ObjectIdentifierValueNode left, ObjectIdentifierValueNode right) {
-        Set<List<Integer>> leftValue = left.getValue();
-        Set<List<Integer>> rightValue = right.getValue();
-
-        switch (node.getType()) {
-            case UNION:
-                return new ObjectIdentifierValueNode(Sets.<List<Integer>>builder().addAll(leftValue).addAll(rightValue).build());
-            case INTERSECTION:
-                return new ObjectIdentifierValueNode(Sets.<List<Integer>>builder().addAll(leftValue).retainAll(rightValue).build());
-            case COMPLEMENT:
-                return new ObjectIdentifierValueNode(Sets.<List<Integer>>builder().addAll(leftValue).removeAll(rightValue).build());
-            default:
-                return throwUnimplementedNodeType(node);
-        }
+    @Override
+    protected Set<List<Integer>> union(Set<List<Integer>> leftValue, Set<List<Integer>> rightValue) {
+        return Sets.<List<Integer>>builder().addAll(leftValue).addAll(rightValue).build();
     }
 
-    private Node transformValueNegation(BinOpNode node, ObjectIdentifierValueNode left, Node right, boolean opSwitched) {
-        right = (((OpNode) right).getNode());
+    @Override
+    protected Set<List<Integer>> intersection(Set<List<Integer>> leftValue, Set<List<Integer>> rightValue) {
+        return Sets.<List<Integer>>builder().addAll(leftValue).retainAll(rightValue).build();
+    }
 
-        if (right.getType() == NodeType.VALUE) {
-            Set<List<Integer>> leftValue = left.getValue();
-            Set<List<Integer>> rightValue = ((ObjectIdentifierValueNode) right).getValue();
-
-            switch (node.getType()) {
-                case INTERSECTION:
-                    return new ObjectIdentifierValueNode(Sets.<List<Integer>>builder().addAll(leftValue).removeAll(rightValue).build());
-                case COMPLEMENT:
-                    Sets.Builder<List<Integer>> values = Sets.<List<Integer>>builder().addAll(leftValue);
-
-                    if (opSwitched) {
-                        return new OpNode(NodeType.NEGATION, new ObjectIdentifierValueNode(values.addAll(rightValue).build()));
-                    } else {
-                        return new ObjectIdentifierValueNode(values.retainAll(rightValue).build());
-                    }
-                default:
-                    return throwUnimplementedNodeType(node);
-            }
-        }
-
-        return node;
+    @Override
+    protected Set<List<Integer>> complement(Set<List<Integer>> leftValue, Set<List<Integer>> rightValue) {
+        return Sets.<List<Integer>>builder().addAll(leftValue).removeAll(rightValue).build();
     }
 
 }
