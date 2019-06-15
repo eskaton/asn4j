@@ -54,6 +54,11 @@ import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier2;
 import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier3;
 import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier4;
 import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier5;
+import ch.eskaton.asn4jtest.x680_51_2.TestOidIri1;
+import ch.eskaton.asn4jtest.x680_51_2.TestOidIri2;
+import ch.eskaton.asn4jtest.x680_51_2.TestOidIri3;
+import ch.eskaton.asn4jtest.x680_51_2.TestOidIri4;
+import ch.eskaton.asn4jtest.x680_51_2.TestOidIri5;
 import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID1;
 import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID2;
 import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID3;
@@ -67,6 +72,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testIRIFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
@@ -317,6 +324,43 @@ public class TestX680_51_2 {
         testRelativeOIDSuccess(TestRelativeOID5.class, new TestRelativeOID5(), 4, 1, 11, 2);
 
         testRelativeOIDFailure(new TestRelativeOID5(), 4, 1, 11, 1);
+    }
+
+
+    @Test
+    public void testOIDIRI1() {
+        testIRISuccess(TestOidIri1.class, new TestOidIri1(), "ISO", "a", "b", "c");
+        testIRISuccess(TestOidIri1.class, new TestOidIri1(), "ISO", "a", "b", "d");
+
+        testIRIFailure(new TestOidIri1(), "ISO", "a", "b", "e");
+    }
+
+    @Test
+    public void testOIDIRI2() {
+        testIRISuccess(TestOidIri2.class, new TestOidIri2(), "ISO", "a", "b", "d");
+
+        testIRIFailure(new TestOidIri2(), "ISO", "a", "b", "c");
+    }
+
+    @Test
+    public void testOIDIRI3() {
+        testIRISuccess(TestOidIri3.class, new TestOidIri3(), "ISO", "a", "b", "c");
+
+        testIRIFailure(new TestOidIri3(), "ISO", "a", "b", "d");
+    }
+
+    @Test
+    public void testOIDIRI4() {
+        testIRISuccess(TestOidIri4.class, new TestOidIri4(), "ISO", "a", "b", "e");
+
+        testIRIFailure(new TestOidIri4(), "ISO", "a", "b", "d");
+    }
+
+    @Test
+    public void testOIDIRI5() {
+        testIRISuccess(TestOidIri5.class, new TestOidIri5(), "ISO", "a", "b", "f");
+
+        testIRIFailure(new TestOidIri5(), "ISO", "a", "b", "e");
     }
     
 }

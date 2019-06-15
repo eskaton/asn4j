@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
@@ -159,6 +160,16 @@ public class TestHelper {
         T result = decoder.decode(clazz, encoder.encode(value));
 
         assertEquals(value, result);
+    }
+
+    public static <T extends ASN1IRI> void testIRISuccess(Class<? extends T> clazz, T iriValue, String... value) {
+        iriValue.setValue(value);
+
+        testEncodeDecodeValue((Class<T>) clazz, iriValue);
+    }
+
+    public static <T extends ASN1IRI> void testIRIFailure(T iriValue, String... value) {
+        TestUtils.assertThrows(() -> iriValue.setValue(value), ConstraintViolatedException.class);
     }
 
 }
