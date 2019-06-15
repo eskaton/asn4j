@@ -27,7 +27,6 @@
 
 package ch.eskaton.asn4j.test.x680_51_3;
 
-import ch.eskaton.asn4jtest.x680_51_2.TestObjectIdentifier5;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString2;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString3;
 import ch.eskaton.asn4jtest.x680_51_3.TestBitString4;
@@ -43,6 +42,7 @@ import ch.eskaton.asn4jtest.x680_51_3.TestNull4;
 import ch.eskaton.asn4jtest.x680_51_3.TestNull5;
 import ch.eskaton.asn4jtest.x680_51_3.TestNull6;
 import ch.eskaton.asn4jtest.x680_51_3.TestObjectIdentifier2;
+import ch.eskaton.asn4jtest.x680_51_3.TestRelativeOID2;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -57,6 +57,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
 
 public class TestX680_51_3 {
 
@@ -149,7 +151,15 @@ public class TestX680_51_3 {
         testObjectIdentifierSuccess(TestObjectIdentifier2.class, new TestObjectIdentifier2(), 0, 3, 6, 1);
         testObjectIdentifierSuccess(TestObjectIdentifier2.class, new TestObjectIdentifier2(), 0, 3, 6, 2);
 
-        testObjectIdentifierFailure(new TestObjectIdentifier5(), 0, 3, 6, 3);
+        testObjectIdentifierFailure(new TestObjectIdentifier2(), 0, 3, 6, 3);
+    }
+
+    @Test
+    public void testRelativeOID2() {
+        testRelativeOIDSuccess(TestRelativeOID2.class, new TestRelativeOID2(), 7, 3, 6, 1);
+        testRelativeOIDSuccess(TestRelativeOID2.class, new TestRelativeOID2(), 7, 3, 6, 2);
+
+        testRelativeOIDFailure(new TestRelativeOID2(), 7, 3, 6, 3);
     }
 
 }
