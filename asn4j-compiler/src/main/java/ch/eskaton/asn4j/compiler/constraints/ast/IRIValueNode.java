@@ -25,10 +25,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.parser.ast.types.IRI;
+import java.util.List;
+import java.util.Set;
 
-public class IRICompiler extends BuiltinTypeCompiler<IRI> {
+public class IRIValueNode extends AbstractIRIValueNode {
+
+    public IRIValueNode(Set<List<String>> value) {
+        super(value);
+    }
 
 }

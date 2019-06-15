@@ -25,10 +25,13 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-import ch.eskaton.asn4j.parser.ast.types.IRI;
+public class IRIValueResolver extends AbstractIRIValueResolver {
 
-public class IRICompiler extends BuiltinTypeCompiler<IRI> {
+    @Override
+    protected String getTypeName() {
+        return "OID-IRI";
+    }
 
 }

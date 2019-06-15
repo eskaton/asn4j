@@ -25,10 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
 
-public class IRICompiler extends BuiltinTypeCompiler<IRI> {
+import java.util.List;
+import java.util.Set;
+
+public class IRIConstraintOptimizingVisitor
+        extends AbstractConstraintOptimizingVisitor<List<String>, Set<List<String>>, IRIValueNode> {
+
+    public IRIConstraintOptimizingVisitor() {
+        super(new DefaultSetOperationsStrategy<>());
+    }
+
+    @Override
+    protected IRIValueNode createNode(Set<List<String>> value) {
+        return new IRIValueNode(value);
+    }
 
 }

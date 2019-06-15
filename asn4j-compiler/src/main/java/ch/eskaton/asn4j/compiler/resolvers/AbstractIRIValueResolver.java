@@ -25,10 +25,34 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class IRICompiler extends BuiltinTypeCompiler<IRI> {
+import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+
+public abstract class AbstractIRIValueResolver<T extends AbstractIRIValue> {
+
+    public <T extends AbstractIRIValue> T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
+        T iriValue;
+
+        if (valueClass.isAssignableFrom(value.getClass())) {
+            iriValue = (T) value;
+        } else if ((iriValue = resolveAmbiguousValue(value, valueClass)) != null) {
+            // do nothing
+        } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
+            iriValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
+        } else {
+            throw new CompilerException("Invalid " + getTypeName() + " value");
+        }
+
+        return iriValue;
+    }
+
+    protected abstract String getTypeName();
 
 }

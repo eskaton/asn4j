@@ -29,19 +29,21 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.constraints.ast.AbstractOIDValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.AbstractIRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.IRIToken;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
+import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -52,10 +54,10 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 import static java.util.Collections.singleton;
 
-public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNode>
+public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNode>
         extends AbstractConstraintCompiler {
 
-    public AbstractOIDConstraintCompiler(CompilerContext ctx) {
+    public AbstractIRIConstraintCompiler(CompilerContext ctx) {
         super(ctx);
     }
 
@@ -68,12 +70,16 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            AbstractOIDValueResolver resolver = getValueResolver();
+            AbstractIRIValueResolver resolver = getValueResolver();
             Value value = ((SingleValueConstraint) elements).getValue();
-            AbstractOIDValue oidValue = resolver.resolveValue(ctx, value, getValueClass());
+            AbstractIRIValue iriValue = resolver.resolveValue(ctx, value, getValueClass());
 
-            if (oidValue != null) {
-                return createNode(singleton(resolver.resolveComponents(ctx, oidValue)));
+            if (iriValue != null) {
+                List<String> components = iriValue.getArcIdentifiers().stream()
+                        .map(IRIToken::getText)
+                        .collect(Collectors.toList());
+
+                return createNode(singleton(components));
             } else {
                 throw new CompilerException("Invalid single-value constraint %s for " + getTypeName() + " type",
                         value.getClass().getSimpleName());
@@ -89,7 +95,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
     @Override
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
         BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter("int...", "value")
+                .returnType(boolean.class).name("checkConstraint").parameter("String...", "value")
                 .exception(ConstraintViolatedException.class).body();
 
         javaClass.addImport(Arrays.class);
@@ -113,17 +119,17 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
         }
     }
 
-    protected String buildExpression(List<Integer> value) {
-        String stringValue = value.stream().map(Object::toString).collect(Collectors.joining(", "));
+    protected String buildExpression(List<String> value) {
+        String stringValue = value.stream().map(s -> StringUtils.wrap(s, "\"")).collect(Collectors.joining(", "));
 
-        return "(Arrays.equals(value, new int[] { " + stringValue + " }))";
+        return "(Arrays.equals(value, new String[] { " + stringValue + " }))";
     }
 
-    protected abstract N createNode(Set<List<Integer>> value);
+    protected abstract N createNode(Set<List<String>> value);
 
-    protected abstract Class<? extends AbstractOIDValue> getValueClass();
+    protected abstract Class<? extends AbstractIRIValue> getValueClass();
 
-    protected abstract AbstractOIDValueResolver getValueResolver();
+    protected abstract AbstractIRIValueResolver getValueResolver();
 
     protected abstract String getTypeName();
 
