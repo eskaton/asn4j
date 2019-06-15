@@ -25,50 +25,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
-
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.IRIValue;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
 import java.util.List;
 import java.util.Set;
 
-public class IRIConstraintCompiler extends AbstractIRIConstraintCompiler<IRIValueNode> {
+public class RelativeIRIValueNode extends AbstractIRIValueNode {
 
-    private static final IRIValueResolver VALUE_RESOLVER = new IRIValueResolver();
-
-    public IRIConstraintCompiler(CompilerContext ctx) {
-        super(ctx);
-    }
-
-    @Override
-    protected Node optimize(Node node) {
-        return new IRIConstraintOptimizingVisitor().visit(node);
-    }
-
-    @Override
-    protected IRIValueNode createNode(Set<List<String>> value) {
-        return new IRIValueNode(value);
-    }
-
-    @Override
-    protected Class<? extends AbstractIRIValue> getValueClass() {
-        return IRIValue.class;
-    }
-
-    @Override
-    protected AbstractIRIValueResolver getValueResolver() {
-        return VALUE_RESOLVER;
-    }
-
-    @Override
-    protected String getTypeName() {
-        return "OID-IRI";
+    public RelativeIRIValueNode(Set<List<String>> value) {
+        super(value);
     }
 
 }
