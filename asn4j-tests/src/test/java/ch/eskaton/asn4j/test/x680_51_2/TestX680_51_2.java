@@ -64,6 +64,11 @@ import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID2;
 import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID3;
 import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID4;
 import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOID5;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOidIri1;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOidIri2;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOidIri3;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOidIri4;
+import ch.eskaton.asn4jtest.x680_51_2.TestRelativeOidIri5;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -326,7 +331,6 @@ public class TestX680_51_2 {
         testRelativeOIDFailure(new TestRelativeOID5(), 4, 1, 11, 1);
     }
 
-
     @Test
     public void testOIDIRI1() {
         testIRISuccess(TestOidIri1.class, new TestOidIri1(), "ISO", "a", "b", "c");
@@ -362,5 +366,41 @@ public class TestX680_51_2 {
 
         testIRIFailure(new TestOidIri5(), "ISO", "a", "b", "e");
     }
-    
+
+    @Test
+    public void testRelativeOIDIRI1() {
+        testIRISuccess(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "c");
+        testIRISuccess(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "d");
+
+        testIRIFailure(new TestRelativeOidIri1(), "a", "b", "e");
+    }
+
+    @Test
+    public void testRelativeOIDIRI2() {
+        testIRISuccess(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "d");
+
+        testIRIFailure(new TestRelativeOidIri2(), "a", "b", "c");
+    }
+
+    @Test
+    public void testRelativeOIDIRI3() {
+        testIRISuccess(TestRelativeOidIri3.class, new TestRelativeOidIri3(), "a", "b", "c");
+
+        testIRIFailure(new TestRelativeOidIri3(), "a", "b", "d");
+    }
+
+    @Test
+    public void testRelativeOIDIRI4() {
+        testIRISuccess(TestRelativeOidIri4.class, new TestRelativeOidIri4(), "a", "b", "e");
+
+        testIRIFailure(new TestRelativeOidIri4(), "a", "b", "d");
+    }
+
+    @Test
+    public void testRelativeOIDIRI5() {
+        testIRISuccess(TestRelativeOidIri5.class, new TestRelativeOidIri5(), "a", "b", "f");
+
+        testIRIFailure(new TestRelativeOidIri5(), "a", "b", "e");
+    }
+
 }

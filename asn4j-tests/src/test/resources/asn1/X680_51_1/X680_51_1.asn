@@ -53,4 +53,7 @@ TestRelativeOID2 ::= RELATIVE-OID (TestRelativeOID1 EXCEPT { 3 6 4})
 TestOidIri1 ::= OID-IRI ("/ISO/a/b/a" | "/ISO/a/b/b")
 TestOidIri2 ::= OID-IRI (TestOidIri1 EXCEPT "/ISO/a/b/a")
 
+TestRelativeOidIri1 ::= RELATIVE-OID-IRI ("a/b/a" | "a/b/b")
+TestRelativeOidIri2 ::= RELATIVE-OID-IRI (TestRelativeOidIri1 EXCEPT "a/b/a")
+
 END
