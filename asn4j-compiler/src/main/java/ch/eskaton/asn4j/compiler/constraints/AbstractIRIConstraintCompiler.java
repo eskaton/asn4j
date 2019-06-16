@@ -120,7 +120,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     }
 
     protected String buildExpression(List<String> value) {
-        String stringValue = value.stream().map(s -> StringUtils.wrap(s, "\"")).collect(Collectors.joining(", "));
+        String stringValue = value.stream().map(StringUtils::dquote).collect(Collectors.joining(", "));
 
         return "(Arrays.equals(value, new String[] { " + stringValue + " }))";
     }

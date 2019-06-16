@@ -27,12 +27,13 @@
 
 package ch.eskaton.asn4j.compiler.defaults;
 
+import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 
 public class RelativeIRIDefaultCompiler extends AbstractIRIDefaultCompiler<RelativeIRIValue> {
 
     public RelativeIRIDefaultCompiler() {
-        super(RelativeIRIValue.class);
+        super(RelativeIRIValue.class, new RelativeIRIValueResolver());
     }
 
 }

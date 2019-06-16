@@ -27,12 +27,13 @@
 
 package ch.eskaton.asn4j.compiler.defaults;
 
+import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 
 public class IRIDefaultCompiler extends AbstractIRIDefaultCompiler<IRIValue> {
 
     public IRIDefaultCompiler() {
-        super(IRIValue.class);
+        super(IRIValue.class, new IRIValueResolver());
     }
 
 }

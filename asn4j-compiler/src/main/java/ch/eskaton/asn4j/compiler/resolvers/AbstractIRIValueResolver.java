@@ -37,7 +37,7 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public abstract class AbstractIRIValueResolver<T extends AbstractIRIValue> {
 
-    public <T extends AbstractIRIValue> T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
+    public T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
         T iriValue;
 
         if (valueClass.isAssignableFrom(value.getClass())) {
