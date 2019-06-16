@@ -61,4 +61,12 @@ TestOidIri3 ::= OID-IRI (("/ISO/a/b/c" | "/ISO/a/b/d") ^ "/ISO/a/b/c")
 TestOidIri4 ::= OID-IRI ("/ISO/a/b/e")
 TestOidIri5 ::= OID-IRI (testOidIri1)
 
+testRelativeOidIri1 OID-IRI ::= "/a/b/f"
+
+TestRelativeOidIri1 ::= OID-IRI ("/a/b/c" | "/a/b/d")
+TestRelativeOidIri2 ::= OID-IRI (("/a/b/c" | "/a/b/d") EXCEPT "/a/b/c")
+TestRelativeOidIri3 ::= OID-IRI (("/a/b/c" | "/a/b/d") ^ "/a/b/c")
+TestRelativeOidIri4 ::= OID-IRI ("/a/b/e")
+TestRelativeOidIri5 ::= OID-IRI (testRelativeOidIri1)
+
 END

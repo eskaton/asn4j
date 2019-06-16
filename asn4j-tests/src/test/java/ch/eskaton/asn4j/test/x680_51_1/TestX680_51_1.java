@@ -54,6 +54,7 @@ import ch.eskaton.asn4jtest.x680_51_1.TestNull2;
 import ch.eskaton.asn4jtest.x680_51_1.TestObjectIdentifier2;
 import ch.eskaton.asn4jtest.x680_51_1.TestOidIri2;
 import ch.eskaton.asn4jtest.x680_51_1.TestRelativeOID2;
+import ch.eskaton.asn4jtest.x680_51_1.TestRelativeOidIri2;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -70,6 +71,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRIFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
 
@@ -282,6 +285,13 @@ public class TestX680_51_1 {
         testIRISuccess(TestOidIri2.class, new TestOidIri2(), "ISO", "a", "b", "b");
 
         testIRIFailure(new TestOidIri2(), "ISO", "a", "b", "a");
+    }
+
+    @Test
+    public void testRelativeOIDIRI2() {
+        testRelativeIRISuccess(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "b");
+
+        testRelativeIRIFailure(new TestRelativeOidIri2(), "a", "b", "a");
     }
 
 }

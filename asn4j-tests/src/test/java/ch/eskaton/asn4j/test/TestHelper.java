@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
@@ -170,6 +171,17 @@ public class TestHelper {
 
     public static <T extends ASN1IRI> void testIRIFailure(T iriValue, String... value) {
         TestUtils.assertThrows(() -> iriValue.setValue(value), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1RelativeIRI> void testRelativeIRISuccess(Class<? extends T> clazz, T ririValue,
+            String... value) {
+        ririValue.setValue(value);
+
+        testEncodeDecodeValue((Class<T>) clazz, ririValue);
+    }
+
+    public static <T extends ASN1RelativeIRI> void testRelativeIRIFailure(T ririValue, String... value) {
+        TestUtils.assertThrows(() -> ririValue.setValue(value), ConstraintViolatedException.class);
     }
 
 }

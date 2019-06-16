@@ -43,4 +43,11 @@ testOidIri2 OID-IRI ::= "/ISO/a/b/b"
 TestOidIri1 ::= OID-IRI ("/ISO/a/b/a" | testOidIri2)
 TestOidIri2 ::= OID-IRI (INCLUDES TestOidIri1)
 
+testRelativeOidIri1 RELATIVE-OID-IRI ::= "a/b/a"
+testRelativeOidIri2 RELATIVE-OID-IRI ::= "a/b/b"
+
+TestRelativeOidIri1 ::= RELATIVE-OID-IRI ("a/b/a" | testRelativeOidIri2)
+TestRelativeOidIri2 ::= RELATIVE-OID-IRI (INCLUDES TestRelativeOidIri1)
+TestRelativeOidIri3 ::= TestRelativeOidIri2 ("a/b/b")
+
 END

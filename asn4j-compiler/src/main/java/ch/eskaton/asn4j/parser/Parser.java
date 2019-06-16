@@ -258,9 +258,9 @@ public class Parser {
 
     private Deque<Context> lexerContext = new LinkedList<>();
 
-    private LinkedList<Integer> marks = new LinkedList<>();
+    private Deque<Integer> marks = new LinkedList<>();
 
-    private LinkedList<Token> tokens = new LinkedList<>();
+    private Deque<Token> tokens = new LinkedList<>();
 
     private TokenType lastExpectedToken;
 
