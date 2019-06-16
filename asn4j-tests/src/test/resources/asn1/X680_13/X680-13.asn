@@ -1,0 +1,10 @@
+X680-13 DEFINITIONS ::=
+BEGIN
+
+IMPORTS
+    TestEnumeratedType1
+        FROM X680-13-Sub1;
+
+TestEnumeratedType2 ::= TestEnumeratedType1
+
+END

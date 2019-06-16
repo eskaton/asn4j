@@ -211,16 +211,19 @@ public class CompilerImpl {
         return module;
     }
 
-    public CompiledType compileType(String name) {
+    public Optional<CompiledType> compileType(String name) {
         Optional<AssignmentNode> maybeTypeAssignment = assignments.stream().filter(
                 obj -> obj instanceof TypeAssignmentNode && name.equals(obj.getReference())).findFirst();
 
-        TypeAssignmentNode assignment = (TypeAssignmentNode) maybeTypeAssignment.orElseThrow(
-                () -> new CompilerException("Undefined type: " + name));
+        if (maybeTypeAssignment.isPresent()) {
+            TypeAssignmentNode assignment = (TypeAssignmentNode) maybeTypeAssignment.get();
 
-        assignments.remove(assignment);
+            assignments.remove(assignment);
 
-        return compileTypeAssignment(assignment);
+            return Optional.of(compileTypeAssignment(assignment));
+        }
+
+        return Optional.empty();
     }
 
 }

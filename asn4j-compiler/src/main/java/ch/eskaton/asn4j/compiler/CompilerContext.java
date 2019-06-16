@@ -41,8 +41,10 @@ import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
@@ -112,6 +114,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -591,23 +594,40 @@ public class CompilerContext {
 
     public Optional<CompiledType> getCompiledType(Type type, boolean isSubType) {
         if (type instanceof TypeReference) {
+            String typeName = ((TypeReference) type).getType();
             HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
-            CompiledType compiledType = moduleTypes.get(((TypeReference) type).getType());
+            Optional<CompiledType> compiledType = Optional.ofNullable(moduleTypes.get(typeName));
 
-            if (compiledType == null) {
+            if (!compiledType.isPresent()) {
                 if (!isSubType) {
                     Deque<JavaClass> oldClass = currentClass;
                     currentClass = new LinkedList<>();
 
-                    compiledType = compiler.compileType(((TypeReference) type).getType());
+                    compiledType = compiler.compileType(typeName);
 
                     currentClass = oldClass;
                 } else {
-                    compiledType = compiler.compileType(((TypeReference) type).getType());
+                    compiledType = compiler.compileType(typeName);
                 }
             }
 
-            return Optional.ofNullable(compiledType);
+            if (!compiledType.isPresent()) {
+                List<ImportNode> imports = currentModule.peek().getBody().getImports();
+
+                for (ImportNode imp : imports) {
+                    Optional<ReferenceNode> symbol = imp.getSymbols().stream()
+                            .filter(s -> s.getName().equals(typeName))
+                            .findAny();
+
+                    if (symbol.isPresent()) {
+                        moduleTypes = definedTypes.get(imp.getReference().getName());
+                        compiledType = Optional.ofNullable(moduleTypes.get(typeName));
+                        break;
+                    }
+                }
+            }
+
+            return compiledType;
         }
 
         return Optional.empty();
