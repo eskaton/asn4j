@@ -81,12 +81,8 @@ public abstract class AbstractConstraintCompiler {
 
     ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
         LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
-        Deque<List<Constraint>> constraints = new ArrayDeque<>();
+        Optional<List<Constraint>> constraint = Optional.ofNullable(node.getConstraints());
         CompiledType compiledType;
-
-        if (node.hasConstraint()) {
-            constraints.push(node.getConstraints());
-        }
 
         do {
             compiledType = ctx.getCompiledType(node);
@@ -98,10 +94,10 @@ public abstract class AbstractConstraintCompiler {
             node = compiledType.getType();
         } while (!compiledType.equals(baseType));
 
-        while (!constraints.isEmpty()) {
+        constraint.ifPresent(c -> {
             Optional<Bounds> bounds = getBounds(Optional.ofNullable(definitions.peek()));
-            definitions.addLast(compileConstraints(baseType, constraints.pop(), bounds));
-        }
+            definitions.addLast(compileConstraints(baseType, c, bounds));
+        });
 
         if (definitions.size() == 1) {
             return definitions.pop();
