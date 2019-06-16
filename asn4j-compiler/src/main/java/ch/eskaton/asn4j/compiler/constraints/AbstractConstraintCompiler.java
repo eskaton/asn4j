@@ -38,14 +38,12 @@ import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
-import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.commons.utils.OptionalUtils;
 
 import java.util.ArrayDeque;
@@ -84,26 +82,21 @@ public abstract class AbstractConstraintCompiler {
     ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
         LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
         Deque<List<Constraint>> constraints = new ArrayDeque<>();
+        CompiledType compiledType;
 
-        while (true) {
-            if (node.hasConstraint()) {
-                constraints.push(node.getConstraints());
-            }
-
-            if (baseType.getType().equals(node) || node instanceof UsefulType) {
-                break;
-            } else if (node instanceof TypeReference) {
-                TypeAssignmentNode type = ctx.getTypeAssignment((TypeReference) node);
-
-                if (type == null) {
-                    throw new CompilerException("Referenced type %s not found", ((TypeReference) node).getType());
-                }
-
-                node = type.getType();
-            } else {
-                throw new CompilerException("not yet supported");
-            }
+        if (node.hasConstraint()) {
+            constraints.push(node.getConstraints());
         }
+
+        do {
+            compiledType = ctx.getCompiledType(node);
+
+            if (compiledType.getConstraintDefinition() != null) {
+                definitions.addLast(compiledType.getConstraintDefinition());
+            }
+
+            node = compiledType.getType();
+        } while (!compiledType.equals(baseType));
 
         while (!constraints.isEmpty()) {
             Optional<Bounds> bounds = getBounds(Optional.ofNullable(definitions.peek()));

@@ -31,6 +31,8 @@ import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.Objects;
+
 public class CompiledType implements CompilationResult {
 
     private Type type;
@@ -55,8 +57,29 @@ public class CompiledType implements CompilationResult {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        CompiledType that = (CompiledType) obj;
+
+        return Objects.equals(type, that.type) &&
+                Objects.equals(constraintDefinition, that.constraintDefinition);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, constraintDefinition);
+    }
+
+    @Override
     public String toString() {
-       return ToString.get(this);
+        return ToString.get(this);
     }
 
 }
