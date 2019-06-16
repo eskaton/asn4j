@@ -48,7 +48,7 @@ public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler
 
     @Override
     protected Node optimize(Node node) {
-        return new IRIConstraintOptimizingVisitor().visit(node);
+        return new RelativeIRIConstraintOptimizingVisitor().visit(node);
     }
 
     @Override

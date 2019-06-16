@@ -28,45 +28,39 @@
 package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
 import ch.eskaton.asn4j.parser.IRIToken;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
-
 public abstract class AbstractIRIDefaultCompiler<V extends AbstractIRIValue> implements DefaultCompiler {
+
+    private AbstractIRIValueResolver<V> resolver;
 
     private Class<V> valueClass;
 
-    public AbstractIRIDefaultCompiler(Class<V> valueClass) {
+    public AbstractIRIDefaultCompiler(Class<V> valueClass, AbstractIRIValueResolver<V> resolver) {
         this.valueClass = valueClass;
+        this.resolver = resolver;
     }
 
     @Override
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
             Value value) {
-        V relativeIRIValue;
-
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            value = resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            relativeIRIValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
-        } else if (resolveAmbiguousValue(value, valueClass) != null) {
-            relativeIRIValue = resolveAmbiguousValue(value, valueClass);
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
+        V iriValue = resolver.resolveValue(ctx, value, valueClass);
 
         String defaultField = addDefaultField(clazz, typeName, field);
 
-        String valueString = relativeIRIValue.getArcIdentifiers().stream().map(IRIToken::getText).map(StringUtils::dquote).collect(Collectors.joining(", "));
+        String valueString = iriValue.getArcIdentifiers().stream()
+                .map(IRIToken::getText)
+                .map(StringUtils::dquote)
+                .collect(Collectors.joining(", "));
 
         clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
                 + "\t\t" + defaultField + ".setValue(" + valueString + ");"));

@@ -42,7 +42,7 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
 
-    public <T extends AbstractOIDValue> T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
+    public T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
         T oidValue;
 
         if (valueClass.isAssignableFrom(value.getClass())) {
@@ -52,7 +52,7 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
         } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
             oidValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
         } else {
-            throw new CompilerException("Invalid " + getTypeName() + " value");
+            throw new CompilerException("Invalid " + getTypeName() + " value: " + value);
         }
 
         return oidValue;
