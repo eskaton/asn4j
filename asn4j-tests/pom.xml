@@ -44,6 +44,21 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
+                        <id>X680_13</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>asn4j</goal>
+                        </goals>
+                        <configuration>
+                            <module>X680-13</module>
+                            <pkg>ch.eskaton.asn4jtest.x680_13</pkg>
+                            <includePaths>
+                                <includePath>src/test/resources/asn1/X680_13</includePath>
+                            </includePaths>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>X680_18</id>
                         <phase>generate-sources</phase>
                         <goals>
