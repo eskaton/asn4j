@@ -47,7 +47,7 @@ public abstract class AbstractIRIValueResolver<T extends AbstractIRIValue> {
         } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
             iriValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
         } else {
-            throw new CompilerException("Invalid " + getTypeName() + " value");
+            throw new CompilerException("Invalid " + getTypeName() + " value: " + value);
         }
 
         return iriValue;

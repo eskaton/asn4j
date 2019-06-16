@@ -491,7 +491,7 @@ public class ParserTest {
         assertNull(result.getIri());
 
         parser = new Parser(new ByteArrayInputStream(
-                "{ test-a test-b (47) 21 } \"/ISO/Registration_Authority/19785.CBEFF\""
+                "{ test-a test-b (47) 21 } \"/ISO/Registration-Authority/19785.CBEFF\""
                         .getBytes())).new DefinitiveIdentificationParser();
 
         result = parser.parse();
@@ -3168,7 +3168,7 @@ public class ParserTest {
     @Test
     public void testIRIValueParser() throws IOException, ParserException {
         IRIValueParser parser = new Parser(new ByteArrayInputStream(
-                "\"/ISO/Registration_Authority/19785.CBEFF\"".getBytes())).new IRIValueParser();
+                "\"/ISO/Registration-Authority/19785.CBEFF\"".getBytes())).new IRIValueParser();
 
         Value result = parser.parse();
 
@@ -3177,7 +3177,7 @@ public class ParserTest {
         assertEquals(3, ((IRIValue) result).getArcIdentifiers().size());
 
         parser = new Parser(new ByteArrayInputStream(
-                "\"/0/Registration_Authority/19785.CBEFF\"".getBytes())).new IRIValueParser();
+                "\"/0/Registration-Authority/19785.CBEFF\"".getBytes())).new IRIValueParser();
 
         result = parser.parse();
         assertTrue(result instanceof IRIValue);
@@ -3249,7 +3249,7 @@ public class ParserTest {
                 "\"0/01/19785.CBEFF\"".getBytes())).new RelativeIRIValueParser();
 
         try {
-            result = parser.parse();
+            parser.parse();
             fail("ASN1ParserException expected");
         } catch (ParserException e) {
         }
