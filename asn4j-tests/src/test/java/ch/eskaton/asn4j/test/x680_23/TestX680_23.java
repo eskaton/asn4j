@@ -27,16 +27,12 @@
 
 package ch.eskaton.asn4j.test.x680_23;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4jtest.x680_23.TestOctetString;
+import ch.eskaton.asn4j.test.modules.x680_23.TestOctetString;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestX680_23 {
 

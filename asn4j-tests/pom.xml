@@ -51,7 +51,7 @@
                         </goals>
                         <configuration>
                             <module>X680-13</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_13</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_13</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_13</includePath>
                             </includePaths>
@@ -66,7 +66,7 @@
                         </goals>
                         <configuration>
                             <module>X680-18</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_18</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_18</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_18</includePath>
                             </includePaths>
@@ -81,7 +81,7 @@
                         </goals>
                         <configuration>
                             <module>X680-19</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_19</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_19</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_19</includePath>
                             </includePaths>
@@ -96,7 +96,7 @@
                         </goals>
                         <configuration>
                             <module>X680-20</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_20</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_20</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_20</includePath>
                             </includePaths>
@@ -111,7 +111,7 @@
                         </goals>
                         <configuration>
                             <module>X680-21</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_21</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_21</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_21</includePath>
                             </includePaths>
@@ -126,7 +126,7 @@
                         </goals>
                         <configuration>
                             <module>X680-22</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_22</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_22</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_22</includePath>
                             </includePaths>
@@ -141,7 +141,7 @@
                         </goals>
                         <configuration>
                             <module>X680-23</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_23</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_23</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_23</includePath>
                             </includePaths>
@@ -156,7 +156,7 @@
                         </goals>
                         <configuration>
                             <module>X680-24</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_24</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_24</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_24</includePath>
                             </includePaths>
@@ -171,7 +171,7 @@
                         </goals>
                         <configuration>
                             <module>X680-25</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_25</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_25</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_25</includePath>
                             </includePaths>
@@ -186,7 +186,7 @@
                         </goals>
                         <configuration>
                             <module>X680-26</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_26</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_26</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_26</includePath>
                             </includePaths>
@@ -201,7 +201,7 @@
                         </goals>
                         <configuration>
                             <module>X680-27</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_27</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_27</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_27</includePath>
                             </includePaths>
@@ -216,7 +216,7 @@
                         </goals>
                         <configuration>
                             <module>X680-28</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_28</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_28</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_28</includePath>
                             </includePaths>
@@ -231,7 +231,7 @@
                         </goals>
                         <configuration>
                             <module>X680-29</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_29</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_29</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_29</includePath>
                             </includePaths>
@@ -246,7 +246,7 @@
                         </goals>
                         <configuration>
                             <module>X680-30</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_30</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_30</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_30</includePath>
                             </includePaths>
@@ -261,7 +261,7 @@
                         </goals>
                         <configuration>
                             <module>X680-31</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_31</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_31</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_31</includePath>
                             </includePaths>
@@ -276,7 +276,7 @@
                         </goals>
                         <configuration>
                             <module>X680-32</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_32</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_32</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_32</includePath>
                             </includePaths>
@@ -291,7 +291,7 @@
                         </goals>
                         <configuration>
                             <module>X680-33</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_33</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_33</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_33</includePath>
                             </includePaths>
@@ -306,7 +306,7 @@
                         </goals>
                         <configuration>
                             <module>X680-34</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_34</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_34</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_34</includePath>
                             </includePaths>
@@ -321,7 +321,7 @@
                         </goals>
                         <configuration>
                             <module>X680-35</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_35</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_35</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_35</includePath>
                             </includePaths>
@@ -336,7 +336,7 @@
                         </goals>
                         <configuration>
                             <module>X680-46</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_46</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_46</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_46</includePath>
                             </includePaths>
@@ -351,7 +351,7 @@
                         </goals>
                         <configuration>
                             <module>X680-47</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_47</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_47</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_47</includePath>
                             </includePaths>
@@ -366,7 +366,7 @@
                         </goals>
                         <configuration>
                             <module>X680-51-1</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_51_1</pkg>
+                                <pkg>ch.eskaton.asn4j.test.modules.x680_51_1</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_51_1</includePath>
                             </includePaths>
@@ -381,7 +381,7 @@
                         </goals>
                         <configuration>
                             <module>X680-51-2</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_51_2</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_51_2</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_51_2</includePath>
                             </includePaths>
@@ -396,7 +396,7 @@
                         </goals>
                         <configuration>
                             <module>X680-51-3</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_51_3</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_51_3</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_51_3</includePath>
                             </includePaths>
@@ -411,7 +411,7 @@
                         </goals>
                         <configuration>
                             <module>X680-51-4</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_51_4</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_51_4</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_51_4</includePath>
                             </includePaths>
@@ -426,7 +426,7 @@
                         </goals>
                         <configuration>
                             <module>X680-51-5</module>
-                            <pkg>ch.eskaton.asn4jtest.x680_51_5</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_51_5</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_51_5</includePath>
                             </includePaths>
@@ -441,7 +441,7 @@
                         </goals>
                         <configuration>
                             <module>X690-8</module>
-                            <pkg>ch.eskaton.asn4jtest.X690_8</pkg>
+                            <pkg>ch.eskaton.asn4j.test.modules.X690_8</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X690_8</includePath>
                             </includePaths>

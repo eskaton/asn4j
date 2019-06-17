@@ -27,16 +27,15 @@
 
 package ch.eskaton.asn4j.test.x680_20;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
-import ch.eskaton.asn4jtest.x680_20.TestEnumeration;
+import ch.eskaton.asn4j.test.modules.x680_20.TestEnumeration;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestX680_20 {
 

@@ -27,18 +27,18 @@
 
 package ch.eskaton.asn4j.test.x680_51_5;
 
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString1;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString10;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString11;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString12;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString2;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString3;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString4;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString5;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString6;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString7;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString8;
-import ch.eskaton.asn4jtest.x680_51_5.TestBitString9;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString1;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString10;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString11;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString12;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString2;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString3;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString4;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString5;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString6;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString7;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString8;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString9;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;

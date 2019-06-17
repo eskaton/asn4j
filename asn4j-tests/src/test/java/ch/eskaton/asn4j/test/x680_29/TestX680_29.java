@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.test.x680_29;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
-import ch.eskaton.asn4jtest.x680_29.TestChoice1;
+import ch.eskaton.asn4j.test.modules.x680_29.TestChoice1;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.test.x680_33;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
-import ch.eskaton.asn4jtest.x680_33.TestRelativeObjectIdentifiers;
+import ch.eskaton.asn4j.test.modules.x680_33.TestRelativeObjectIdentifiers;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

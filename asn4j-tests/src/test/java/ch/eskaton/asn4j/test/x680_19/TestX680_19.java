@@ -29,15 +29,15 @@ package ch.eskaton.asn4j.test.x680_19;
 
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4jtest.x680_19.TestInteger;
-import ch.eskaton.asn4jtest.x680_19.TestNamedInteger;
-import ch.eskaton.asn4jtest.x680_19.TestNamedInteger3;
-import ch.eskaton.asn4jtest.x680_19.TestNamedInteger5;
+import ch.eskaton.asn4j.test.modules.x680_19.TestInteger;
+import ch.eskaton.asn4j.test.modules.x680_19.TestNamedInteger;
+import ch.eskaton.asn4j.test.modules.x680_19.TestNamedInteger3;
+import ch.eskaton.asn4j.test.modules.x680_19.TestNamedInteger5;
 import org.junit.Test;
 
 import java.math.BigInteger;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
 public class TestX680_19 {

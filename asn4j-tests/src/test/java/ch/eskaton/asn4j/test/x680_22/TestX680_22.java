@@ -27,22 +27,21 @@
 
 package ch.eskaton.asn4j.test.x680_22;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
-import ch.eskaton.asn4jtest.x680_22.TestBitString1;
-import ch.eskaton.asn4jtest.x680_22.TestBitString2;
+import ch.eskaton.asn4j.test.modules.x680_22.TestBitString1;
+import ch.eskaton.asn4j.test.modules.x680_22.TestBitString2;
+import org.junit.Test;
+
+import java.io.IOException;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestX680_22 {
 

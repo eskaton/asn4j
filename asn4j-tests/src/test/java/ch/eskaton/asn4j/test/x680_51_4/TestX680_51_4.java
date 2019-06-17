@@ -27,13 +27,13 @@
 
 package ch.eskaton.asn4j.test.x680_51_4;
 
-import ch.eskaton.asn4jtest.x680_51_4.TestInteger1;
-import ch.eskaton.asn4jtest.x680_51_4.TestInteger2;
-import ch.eskaton.asn4jtest.x680_51_4.TestInteger3;
-import ch.eskaton.asn4jtest.x680_51_4.TestInteger4;
-import ch.eskaton.asn4jtest.x680_51_4.TestInteger5;
-import ch.eskaton.asn4jtest.x680_51_4.TestInteger6;
-import ch.eskaton.asn4jtest.x680_51_4.TestInteger7;
+import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger1;
+import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger2;
+import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger3;
+import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger4;
+import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger5;
+import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger6;
+import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger7;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
