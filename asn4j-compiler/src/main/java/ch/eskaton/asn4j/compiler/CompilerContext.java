@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ExportsNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
@@ -516,7 +517,7 @@ public class CompilerContext {
         return getTypeAssignment(type, null);
     }
 
-    public ValueOrObjectAssignmentNode<?, ?> resolveDefinedValue(DefinedValue ref) {
+    public ValueOrObjectAssignmentNode resolveDefinedValue(DefinedValue ref) {
         if (ref instanceof ExternalValueReference) {
             throw new CompilerException("External references not yet supported");
             // TODO: external references
@@ -525,7 +526,7 @@ public class CompilerContext {
         }
     }
 
-    public ValueOrObjectAssignmentNode<?, ?> resolveReference(String reference) {
+    public ValueOrObjectAssignmentNode resolveReference(String reference) {
         AssignmentNode assignment = getModule().getBody().getAssignments(reference);
 
         if (assignment == null) {
@@ -535,6 +536,14 @@ public class CompilerContext {
                 Optional<ReferenceNode> symbol = imp.getSymbols().stream()
                         .filter(s -> s.getName().equals(reference))
                         .findAny();
+
+                String moduleName = imp.getReference().getName();
+
+                if (!isSymbolExported(moduleName, reference)) {
+                    String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
+                    throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), reference,
+                            moduleName);
+                }
 
                 if (symbol.isPresent()) {
                     assignment = modules.get(imp.getReference().getName()).getBody().getAssignments(reference);
@@ -647,7 +656,15 @@ public class CompilerContext {
                             .findAny();
 
                     if (symbol.isPresent()) {
-                        moduleTypes = definedTypes.get(imp.getReference().getName());
+                        String moduleName = imp.getReference().getName();
+
+                        if (!isSymbolExported(moduleName, typeName)) {
+                            String format = "Module %s uses the type %s from module %s which the latter doesn't export";
+                            throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(),
+                                    typeName, moduleName);
+                        }
+
+                        moduleTypes = definedTypes.get(moduleName);
                         compiledType = Optional.ofNullable(moduleTypes.get(typeName));
                         break;
                     }
@@ -658,6 +675,17 @@ public class CompilerContext {
         }
 
         return Optional.empty();
+    }
+
+    private boolean isSymbolExported(String moduleName, String symbol) {
+        ModuleNode module = getModule(moduleName);
+        ExportsNode exports = module.getBody().getExports();
+
+        if (exports.getMode() == ExportsNode.Mode.SPECIFIC) {
+            return exports.getSymbols().stream().anyMatch(s -> s.getName().equals(symbol));
+        }
+
+        return false;
     }
 
     public CompiledType getCompiledType(Type type) {
