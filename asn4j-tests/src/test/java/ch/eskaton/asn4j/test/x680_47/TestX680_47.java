@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.test.x680_47;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4jtest.x680_47.TestUTCTime;
+import ch.eskaton.asn4j.test.modules.x680_47.TestUTCTime;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

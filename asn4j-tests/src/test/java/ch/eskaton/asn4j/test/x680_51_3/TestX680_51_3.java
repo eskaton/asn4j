@@ -27,27 +27,27 @@
 
 package ch.eskaton.asn4j.test.x680_51_3;
 
-import ch.eskaton.asn4jtest.x680_51_3.TestBitString2;
-import ch.eskaton.asn4jtest.x680_51_3.TestBitString3;
-import ch.eskaton.asn4jtest.x680_51_3.TestBitString4;
-import ch.eskaton.asn4jtest.x680_51_3.TestBoolean2;
-import ch.eskaton.asn4jtest.x680_51_3.TestEnumeration1;
-import ch.eskaton.asn4jtest.x680_51_3.TestEnumeration2;
-import ch.eskaton.asn4jtest.x680_51_3.TestInteger1;
-import ch.eskaton.asn4jtest.x680_51_3.TestInteger2;
-import ch.eskaton.asn4jtest.x680_51_3.TestNull1;
-import ch.eskaton.asn4jtest.x680_51_3.TestNull2;
-import ch.eskaton.asn4jtest.x680_51_3.TestNull3;
-import ch.eskaton.asn4jtest.x680_51_3.TestNull4;
-import ch.eskaton.asn4jtest.x680_51_3.TestNull5;
-import ch.eskaton.asn4jtest.x680_51_3.TestNull6;
-import ch.eskaton.asn4jtest.x680_51_3.TestObjectIdentifier2;
-import ch.eskaton.asn4jtest.x680_51_3.TestOidIri1;
-import ch.eskaton.asn4jtest.x680_51_3.TestOidIri2;
-import ch.eskaton.asn4jtest.x680_51_3.TestRelativeOID2;
-import ch.eskaton.asn4jtest.x680_51_3.TestRelativeOidIri1;
-import ch.eskaton.asn4jtest.x680_51_3.TestRelativeOidIri2;
-import ch.eskaton.asn4jtest.x680_51_3.TestRelativeOidIri3;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString3;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString4;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestBoolean2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull3;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull4;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull5;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull6;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestObjectIdentifier2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestOidIri1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestOidIri2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestRelativeOID2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestRelativeOidIri1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestRelativeOidIri2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestRelativeOidIri3;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;

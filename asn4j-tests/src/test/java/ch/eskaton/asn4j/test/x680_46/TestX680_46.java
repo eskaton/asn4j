@@ -30,12 +30,11 @@ package ch.eskaton.asn4j.test.x680_46;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4jtest.x680_46.TestGeneralizedTime;
+import ch.eskaton.asn4j.test.modules.x680_46.TestGeneralizedTime;
 import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 
 import static org.junit.Assert.assertEquals;
 

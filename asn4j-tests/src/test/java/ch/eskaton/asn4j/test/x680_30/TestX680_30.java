@@ -32,8 +32,8 @@ import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
-import ch.eskaton.asn4jtest.x680_30.SelectedType1;
-import ch.eskaton.asn4jtest.x680_30.TestSelectionSetType;
+import ch.eskaton.asn4j.test.modules.x680_30.SelectedType1;
+import ch.eskaton.asn4j.test.modules.x680_30.TestSelectionSetType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -32,8 +32,8 @@ import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
-import ch.eskaton.asn4jtest.x680_27.TestSet1;
-import ch.eskaton.asn4jtest.x680_27.TestSet2;
+import ch.eskaton.asn4j.test.modules.x680_27.TestSet1;
+import ch.eskaton.asn4j.test.modules.x680_27.TestSet2;
 import org.junit.Test;
 
 import static org.hamcrest.core.StringContains.containsString;

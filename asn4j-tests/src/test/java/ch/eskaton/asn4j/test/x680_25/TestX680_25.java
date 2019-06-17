@@ -27,24 +27,20 @@
 
 package ch.eskaton.asn4j.test.x680_25;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-
-import org.junit.Test;
-
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
-import ch.eskaton.asn4jtest.x680_25.TestSequence0;
-import ch.eskaton.asn4jtest.x680_25.TestSequence1;
-import ch.eskaton.asn4jtest.x680_25.TestSequence2;
-import ch.eskaton.asn4jtest.x680_25.TestSequence3;
-import ch.eskaton.asn4jtest.x680_25.TestSequence4;
-import ch.eskaton.asn4jtest.x680_25.TestSequence6;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequence0;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequence1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequence2;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequence3;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequence4;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequence6;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class TestX680_25 {
 
