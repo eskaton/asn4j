@@ -44,6 +44,7 @@ import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
+import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
@@ -107,6 +108,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.collections.Sets;
+import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -530,14 +532,11 @@ public class CompilerContext {
         AssignmentNode assignment = getModule().getBody().getAssignments(reference);
 
         if (assignment == null) {
-            List<ImportNode> imports = currentModule.peek().getBody().getImports();
+            Optional<ImportNode> imp = getImport(reference);
 
-            for (ImportNode imp : imports) {
-                Optional<ReferenceNode> symbol = imp.getSymbols().stream()
-                        .filter(s -> s.getName().equals(reference))
-                        .findAny();
-
-                String moduleName = imp.getReference().getName();
+            if (imp.isPresent()) {
+                ModuleRefNode moduleRef = imp.get().getReference();
+                String moduleName = moduleRef.getName();
 
                 if (!isSymbolExported(moduleName, reference)) {
                     String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
@@ -545,10 +544,7 @@ public class CompilerContext {
                             moduleName);
                 }
 
-                if (symbol.isPresent()) {
-                    assignment = modules.get(imp.getReference().getName()).getBody().getAssignments(reference);
-                    break;
-                }
+                assignment = modules.get(moduleRef.getName()).getBody().getAssignments(reference);
             }
         }
 
@@ -648,30 +644,39 @@ public class CompilerContext {
             }
 
             if (!compiledType.isPresent()) {
-                List<ImportNode> imports = currentModule.peek().getBody().getImports();
+                Optional<ImportNode> imp = getImport(typeName);
 
-                for (ImportNode imp : imports) {
-                    Optional<ReferenceNode> symbol = imp.getSymbols().stream()
-                            .filter(s -> s.getName().equals(typeName))
-                            .findAny();
+                if (imp.isPresent()) {
+                    String moduleName = imp.get().getReference().getName();
 
-                    if (symbol.isPresent()) {
-                        String moduleName = imp.getReference().getName();
-
-                        if (!isSymbolExported(moduleName, typeName)) {
-                            String format = "Module %s uses the type %s from module %s which the latter doesn't export";
-                            throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(),
-                                    typeName, moduleName);
-                        }
-
-                        moduleTypes = definedTypes.get(moduleName);
-                        compiledType = Optional.ofNullable(moduleTypes.get(typeName));
-                        break;
+                    if (!isSymbolExported(moduleName, typeName)) {
+                        String format = "Module %s uses the type %s from module %s which the latter doesn't export";
+                        throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(),
+                                typeName, moduleName);
                     }
+
+                    moduleTypes = definedTypes.get(moduleName);
+                    compiledType = Optional.ofNullable(moduleTypes.get(typeName));
                 }
             }
 
             return compiledType;
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<ImportNode> getImport(String symbolName) {
+        List<ImportNode> imports = currentModule.peek().getBody().getImports();
+
+        for (ImportNode imp : imports) {
+            Optional<ReferenceNode> symbol = imp.getSymbols().stream()
+                    .filter(s -> s.getName().equals(symbolName))
+                    .findAny();
+
+            if (symbol.isPresent()) {
+                return Optional.of(imp);
+            }
         }
 
         return Optional.empty();
