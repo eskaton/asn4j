@@ -2,10 +2,12 @@ X680-13-Sub1 DEFINITIONS ::=
 BEGIN
 
 EXPORTS
-    TestEnumeratedType1;
+    TestEnumeratedType1, testInteger1;
 
 TestEnumeratedType1 ::= ENUMERATED {
     a, b, c
 }
+
+testInteger1 INTEGER ::= 4711
 
 END
