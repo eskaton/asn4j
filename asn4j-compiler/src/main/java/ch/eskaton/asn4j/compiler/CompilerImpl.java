@@ -46,10 +46,8 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -58,8 +56,6 @@ public class CompilerImpl {
     private String module;
 
     private String[] includePath;
-
-    private Map<String, ModuleNode> modules = new HashMap<>();
 
     private CompilerContext compilerContext;
 
@@ -98,7 +94,7 @@ public class CompilerImpl {
         load(moduleName);
 
         try {
-            compilerContext.pushModule(modules.get(moduleName));
+            compilerContext.pushModule(compilerContext.getModule(moduleName));
             compileModule(moduleName, null);
         } finally {
             compilerContext.popModule();
@@ -108,7 +104,7 @@ public class CompilerImpl {
     private void compileModule(String moduleName, Set<String> neededSymbols) throws IOException, ParserException {
         System.out.println("Compiling module " + moduleName + "...");
 
-        ModuleNode module = modules.get(moduleName);
+        ModuleNode module = compilerContext.getModule(moduleName);
 
         compileImports(module);
         compileBody(neededSymbols, module);
@@ -166,7 +162,7 @@ public class CompilerImpl {
             ModuleRefNode importedModule = imp.getReference();
             String importedModuleName = importedModule.getName();
 
-            if (!modules.containsKey(importedModuleName)) {
+            if (!compilerContext.isModuleLoaded(importedModuleName)) {
                 loadAndCompileModule(importedModuleName);
             }
         }
@@ -194,7 +190,7 @@ public class CompilerImpl {
 
         try {
             ModuleNode module = parser.parse();
-            modules.put(moduleName, module);
+            compilerContext.addModule(moduleName, module);
             System.out.println("Loaded module " + moduleName);
         } catch (ParserException e) {
             throw new ParserException("Failed to load module " + moduleName, e);

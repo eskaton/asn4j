@@ -297,6 +297,18 @@ public class CompilerContext {
         currentModule.push(getModule());
     }
 
+    public boolean isModuleLoaded(String moduleName) {
+        return modules.containsKey(moduleName);
+    }
+
+    public void addModule(String moduleName, ModuleNode module) {
+        modules.put(moduleName, module);
+    }
+
+    public ModuleNode getModule(String moduleName) {
+        return modules.get(moduleName);
+    }
+
     public TypeAssignmentNode getTypeAssignment(TypeReference type) {
         // TODO: what to do if the type isn't known in the current module
         return (TypeAssignmentNode) getModule().getBody().getAssignments(type.getType());
@@ -515,6 +527,21 @@ public class CompilerContext {
 
     public ValueOrObjectAssignmentNode<?, ?> resolveReference(String reference) {
         AssignmentNode assignment = getModule().getBody().getAssignments(reference);
+
+        if (assignment == null) {
+            List<ImportNode> imports = currentModule.peek().getBody().getImports();
+
+            for (ImportNode imp : imports) {
+                Optional<ReferenceNode> symbol = imp.getSymbols().stream()
+                        .filter(s -> s.getName().equals(reference))
+                        .findAny();
+
+                if (symbol.isPresent()) {
+                    assignment = modules.get(imp.getReference().getName()).getBody().getAssignments(reference);
+                    break;
+                }
+            }
+        }
 
         if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
             throw new CompilerException("Failed to resolve reference " + reference);
