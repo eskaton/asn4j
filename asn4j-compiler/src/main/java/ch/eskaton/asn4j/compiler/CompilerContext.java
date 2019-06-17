@@ -108,7 +108,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.collections.Sets;
-import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;

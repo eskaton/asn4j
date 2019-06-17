@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.compiler.results;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
+import java.util.Objects;
+
 public class CompiledEnumeratedType extends CompiledType {
 
     private EnumerationItems roots;
@@ -50,6 +52,31 @@ public class CompiledEnumeratedType extends CompiledType {
 
     public EnumerationItems getAdditions() {
         return additions;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(obj)) {
+            return false;
+        }
+
+        CompiledEnumeratedType that = (CompiledEnumeratedType) obj;
+
+        return Objects.equals(roots, that.roots) &&
+                Objects.equals(additions, that.additions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), roots, additions);
     }
 
 }
