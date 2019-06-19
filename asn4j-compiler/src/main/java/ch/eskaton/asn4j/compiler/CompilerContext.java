@@ -520,35 +520,57 @@ public class CompilerContext {
 
     public ValueOrObjectAssignmentNode resolveDefinedValue(DefinedValue ref) {
         if (ref instanceof ExternalValueReference) {
-            throw new CompilerException("External references not yet supported");
-            // TODO: external references
+            return resolveExternalReference(((ExternalValueReference) ref));
         } else {
-            return resolveReference(((SimpleDefinedValue) ref).getValue());
+            return resolveReference(((SimpleDefinedValue) ref));
         }
     }
 
-    public ValueOrObjectAssignmentNode resolveReference(String reference) {
-        AssignmentNode assignment = getModule().getBody().getAssignments(reference);
+    private ValueOrObjectAssignmentNode resolveExternalReference(ExternalValueReference reference) {
+        String moduleName = reference.getModule();
+        String symbolName = reference.getValue();
+
+        if (!isSymbolExported(moduleName, symbolName)) {
+            String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
+            throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), symbolName,
+                    moduleName);
+        }
+
+        ValueOrObjectAssignmentNode assignment = (ValueOrObjectAssignmentNode) modules.get(moduleName).getBody().getAssignments(symbolName);
+
+        if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
+            throw new CompilerException("Failed to resolve reference " + reference);
+        }
+
+        return (ValueOrObjectAssignmentNode<?, ?>) assignment;
+    }
+
+    public ValueOrObjectAssignmentNode resolveReference(SimpleDefinedValue reference) {
+        return resolveReference(reference.getValue());
+    }
+
+    public ValueOrObjectAssignmentNode resolveReference(String symbolName) {
+        AssignmentNode assignment = getModule().getBody().getAssignments(symbolName);
 
         if (assignment == null) {
-            Optional<ImportNode> imp = getImport(reference);
+            Optional<ImportNode> imp = getImport(symbolName);
 
             if (imp.isPresent()) {
                 ModuleRefNode moduleRef = imp.get().getReference();
                 String moduleName = moduleRef.getName();
 
-                if (!isSymbolExported(moduleName, reference)) {
+                if (!isSymbolExported(moduleName, symbolName)) {
                     String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
-                    throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), reference,
+                    throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), symbolName,
                             moduleName);
                 }
 
-                assignment = modules.get(moduleRef.getName()).getBody().getAssignments(reference);
+                assignment = modules.get(moduleName).getBody().getAssignments(symbolName);
             }
         }
 
         if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
-            throw new CompilerException("Failed to resolve reference " + reference);
+            throw new CompilerException("Failed to resolve reference " + symbolName);
         }
 
         return (ValueOrObjectAssignmentNode<?, ?>) assignment;

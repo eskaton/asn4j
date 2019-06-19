@@ -8,7 +8,8 @@ IMPORTS
 TestEnumeratedType2 ::= TestEnumeratedType1
 
 TestSequence1 ::= SEQUENCE {
-   a INTEGER DEFAULT testInteger1
+   a INTEGER DEFAULT testInteger1,
+   b INTEGER DEFAULT X680-13-Sub1.testInteger2
 }
 
 END
