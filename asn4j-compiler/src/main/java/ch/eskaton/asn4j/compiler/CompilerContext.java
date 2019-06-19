@@ -542,13 +542,9 @@ public class CompilerContext {
             }
         }
 
-        if (!isSymbolExported(module, symbolName)) {
-            String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
-            throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), symbolName,
-                    moduleName);
-        }
+        ensureSymbolIsExported(module, symbolName);
 
-        ValueOrObjectAssignmentNode assignment = (ValueOrObjectAssignmentNode) modules.get(moduleName).getBody().getAssignments(symbolName);
+        AssignmentNode assignment = modules.get(moduleName).getBody().getAssignments(symbolName);
 
         if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
             throw new CompilerException("Failed to resolve reference " + reference);
@@ -572,11 +568,7 @@ public class CompilerContext {
                 String moduleName = moduleRef.getName();
                 ModuleNode module = getModule(moduleName);
 
-                if (!isSymbolExported(module, symbolName)) {
-                    String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
-                    throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), symbolName,
-                            moduleName);
-                }
+                ensureSymbolIsExported(module, symbolName);
 
                 assignment = modules.get(moduleName).getBody().getAssignments(symbolName);
             }
@@ -587,6 +579,14 @@ public class CompilerContext {
         }
 
         return (ValueOrObjectAssignmentNode<?, ?>) assignment;
+    }
+
+    private void ensureSymbolIsExported(ModuleNode module, String symbolName) {
+        if (!isSymbolExported(module, symbolName)) {
+            String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
+            throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), symbolName,
+                    module.getModuleId().getModuleName());
+        }
     }
 
     public void writeClasses() {
