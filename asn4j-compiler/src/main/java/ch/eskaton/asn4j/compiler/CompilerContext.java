@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
@@ -111,6 +112,7 @@ import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Deque;
 import java.util.HashMap;
@@ -529,8 +531,18 @@ public class CompilerContext {
     private ValueOrObjectAssignmentNode resolveExternalReference(ExternalValueReference reference) {
         String moduleName = reference.getModule();
         String symbolName = reference.getValue();
+        ModuleNode module = getModule(moduleName);
 
-        if (!isSymbolExported(moduleName, symbolName)) {
+        if (module == null) {
+            try {
+                compiler.load(moduleName);
+                module = getModule(moduleName);
+            } catch (IOException | ParserException e) {
+                throw new CompilerException("Failed to resolve external reference %s.%s", moduleName, symbolName, e);
+            }
+        }
+
+        if (!isSymbolExported(module, symbolName)) {
             String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
             throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), symbolName,
                     moduleName);
@@ -558,8 +570,9 @@ public class CompilerContext {
             if (imp.isPresent()) {
                 ModuleRefNode moduleRef = imp.get().getReference();
                 String moduleName = moduleRef.getName();
+                ModuleNode module = getModule(moduleName);
 
-                if (!isSymbolExported(moduleName, symbolName)) {
+                if (!isSymbolExported(module, symbolName)) {
                     String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
                     throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), symbolName,
                             moduleName);
@@ -669,8 +682,9 @@ public class CompilerContext {
 
                 if (imp.isPresent()) {
                     String moduleName = imp.get().getReference().getName();
+                    ModuleNode module = getModule(moduleName);
 
-                    if (!isSymbolExported(moduleName, typeName)) {
+                    if (!isSymbolExported(module, typeName)) {
                         String format = "Module %s uses the type %s from module %s which the latter doesn't export";
                         throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(),
                                 typeName, moduleName);
@@ -703,8 +717,7 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    private boolean isSymbolExported(String moduleName, String symbol) {
-        ModuleNode module = getModule(moduleName);
+    private boolean isSymbolExported(ModuleNode module, String symbol) {
         ExportsNode exports = module.getBody().getExports();
 
         if (exports.getMode() == ExportsNode.Mode.SPECIFIC) {
