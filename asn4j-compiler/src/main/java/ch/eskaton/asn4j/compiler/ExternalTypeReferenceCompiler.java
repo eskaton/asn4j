@@ -27,8 +27,18 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.ModuleNode;
+import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 
-public class TypeReferenceCompiler extends AbstractTypeReferenceCompiler<TypeReference> {
+public class ExternalTypeReferenceCompiler extends AbstractTypeReferenceCompiler<ExternalTypeReference> {
+
+    public CompiledType compile(CompilerContext ctx, String name, ExternalTypeReference node) {
+        ModuleNode module = ctx.getOrLoadModule(node.getModule());
+
+        ctx.ensureSymbolIsExported(module, node.getType());
+
+        return super.compile(ctx, name, node);
+    }
 
 }

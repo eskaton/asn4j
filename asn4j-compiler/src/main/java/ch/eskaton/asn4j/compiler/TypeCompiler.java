@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
@@ -51,7 +52,10 @@ public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
 
     @SuppressWarnings("unchecked")
     public CompiledType compile(CompilerContext ctx, String name, Type node) {
-        if (node instanceof SequenceType) {
+        if (node instanceof ExternalTypeReference) {
+            return ctx.<ExternalTypeReference, ExternalTypeReferenceCompiler>getCompiler(ExternalTypeReference.class)
+                    .compile(ctx, name, (ExternalTypeReference) node);
+        } else if (node instanceof SequenceType) {
             return ctx.<SequenceType, SequenceCompiler>getCompiler(SequenceType.class).compile(ctx, name, (SequenceType) node);
         } else if (node instanceof SequenceOfType) {
             return ctx.<SequenceOfType, SequenceOfCompiler>getCompiler(SequenceOfType.class).compile(ctx, name, (SequenceOfType) node);
