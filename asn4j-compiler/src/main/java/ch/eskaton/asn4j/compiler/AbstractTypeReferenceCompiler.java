@@ -27,8 +27,41 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
+import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-public class TypeReferenceCompiler extends AbstractTypeReferenceCompiler<TypeReference> {
+public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
+        implements NamedCompiler<T, CompiledType> {
+
+    public CompiledType compile(CompilerContext ctx, String name, T node) {
+        JavaClass javaClass = ctx.createClass(name, node, isConstructed(ctx, name));
+
+        ConstraintDefinition constraintDef = ctx.compileConstraint(javaClass, name, node);
+        ctx.finishClass();
+
+        if (node.getParameters() != null) {
+            throw new CompilerException("ParameterizedTypeReference not yet supported");
+        }
+
+        return new CompiledType(node, constraintDef);
+    }
+
+    protected boolean isConstructed(CompilerContext ctx, String type) {
+        // TODO: what to do if the type isn't known in the current module
+        TypeAssignmentNode assignment = (TypeAssignmentNode) ctx.getModule().getBody().getAssignments(type);
+        Type base = assignment.getType();
+        ASN1Tag.Mode mode = CompilerUtils.getTaggingMode(ctx.getModule(), base);
+
+        if (ASN1Tag.Mode.EXPLICIT.equals(mode)) {
+            return true;
+        }
+
+        return !ctx.isBuiltin(ctx.getBase(base).getClass().getSimpleName());
+    }
 
 }

@@ -56,6 +56,7 @@ import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
@@ -116,7 +117,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +146,7 @@ public class CompilerContext {
             .put(SetOfType.class, new SetOfCompiler())
             .put(Type.class, new TypeCompiler())
             .put(TypeReference.class, new TypeReferenceCompiler())
+            .put(ExternalTypeReference.class, new ExternalTypeReferenceCompiler())
             .put(TypeAssignmentNode.class, new TypeAssignmentCompiler())
             .put(VisibleString.class, new VisibleStringCompiler())
             .put(SelectionType.class, new SelectionTypeCompiler())
@@ -367,8 +368,9 @@ public class CompilerContext {
                 typeName = ((UsefulType) type).getType();
             } else {
                 typeName = CompilerUtils.formatTypeName(((TypeReference) type).getType());
-                addReferencedType(typeName);
             }
+        } else if (type instanceof ExternalTypeReference) {
+            typeName = CompilerUtils.formatTypeName(((ExternalTypeReference) type).getType());
         } else if (type instanceof Null) {
             typeName = ASN1Null.class.getSimpleName();
         } else if (type instanceof BooleanType) {
@@ -438,16 +440,6 @@ public class CompilerContext {
         CompiledType compiledType = this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
 
         addType(name, compiledType);
-    }
-
-    public void addReferencedType(String typeName) {
-        String moduleName = getModule().getModuleId().getModuleName();
-
-        if (!referencedTypes.containsKey(moduleName)) {
-            referencedTypes.put(moduleName, new HashSet<>());
-        }
-
-        referencedTypes.get(moduleName).add(typeName);
     }
 
     public TypeAssignmentNode getTypeAssignment(String typeName, String moduleName) {
@@ -531,15 +523,12 @@ public class CompilerContext {
     private ValueOrObjectAssignmentNode resolveExternalReference(ExternalValueReference reference) {
         String moduleName = reference.getModule();
         String symbolName = reference.getValue();
-        ModuleNode module = getModule(moduleName);
+        ModuleNode module;
 
-        if (module == null) {
-            try {
-                compiler.load(moduleName);
-                module = getModule(moduleName);
-            } catch (IOException | ParserException e) {
-                throw new CompilerException("Failed to resolve external reference %s.%s", moduleName, symbolName, e);
-            }
+        try {
+            module = getOrLoadModule(moduleName);
+        } catch (CompilerException e) {
+            throw new CompilerException("Failed to resolve external reference %s.%s", moduleName, symbolName, e);
         }
 
         ensureSymbolIsExported(module, symbolName);
@@ -551,6 +540,22 @@ public class CompilerContext {
         }
 
         return (ValueOrObjectAssignmentNode<?, ?>) assignment;
+    }
+
+    public ModuleNode getOrLoadModule(String moduleName) {
+        ModuleNode module = getModule(moduleName);
+
+        if (module == null) {
+            try {
+                compiler.load(moduleName);
+
+                module = getModule(moduleName);
+            } catch (IOException | ParserException e) {
+                throw new CompilerException("Failed to load module %s", moduleName, e);
+            }
+        }
+
+        return module;
     }
 
     public ValueOrObjectAssignmentNode resolveReference(SimpleDefinedValue reference) {
@@ -581,9 +586,9 @@ public class CompilerContext {
         return (ValueOrObjectAssignmentNode<?, ?>) assignment;
     }
 
-    private void ensureSymbolIsExported(ModuleNode module, String symbolName) {
+    public void ensureSymbolIsExported(ModuleNode module, String symbolName) {
         if (!isSymbolExported(module, symbolName)) {
-            String format = "Module %s uses the value/object %s from module %s which the latter doesn't export";
+            String format = "Module %s uses the symbol %s from module %s which the latter doesn't export";
             throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), symbolName,
                     module.getModuleId().getModuleName());
         }

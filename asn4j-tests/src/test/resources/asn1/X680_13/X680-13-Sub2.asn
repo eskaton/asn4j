@@ -1,0 +1,12 @@
+X680-13-Sub2 DEFINITIONS ::=
+BEGIN
+
+EXPORTS TestEnumeratedType3, testInteger3;
+
+TestEnumeratedType3 ::= ENUMERATED {
+    d, e, f
+}
+
+testInteger3 INTEGER ::= 4713
+
+END
