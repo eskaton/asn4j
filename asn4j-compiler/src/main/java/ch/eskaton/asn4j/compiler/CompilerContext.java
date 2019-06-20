@@ -122,6 +122,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
@@ -663,6 +664,18 @@ public class CompilerContext {
         }
     }
 
+    public <T> T withNewClass(Supplier<T> supplier) {
+        Deque<JavaClass> oldClass = currentClass;
+
+        try {
+            currentClass = new LinkedList<>();
+
+            return supplier.get();
+        } finally {
+            currentClass = oldClass;
+        }
+    }
+
     public Optional<CompiledType> getCompiledType(Type type, boolean isSubType) {
         if (type instanceof TypeReference) {
             String typeName = ((TypeReference) type).getType();
@@ -671,12 +684,7 @@ public class CompilerContext {
 
             if (!compiledType.isPresent()) {
                 if (!isSubType) {
-                    Deque<JavaClass> oldClass = currentClass;
-                    currentClass = new LinkedList<>();
-
-                    compiledType = compiler.compileType(typeName);
-
-                    currentClass = oldClass;
+                    compiledType = withNewClass(() -> compiler.compileType(typeName));
                 } else {
                     compiledType = compiler.compileType(typeName);
                 }
@@ -698,6 +706,11 @@ public class CompilerContext {
                     moduleTypes = definedTypes.get(moduleName);
                     compiledType = Optional.ofNullable(moduleTypes.get(typeName));
                 }
+            }
+
+            if (!compiledType.isPresent()) {
+                throw new CompilerException("Failed to resolve type %s in module %s ", typeName,
+                        currentModule.peek().getModuleId().getModuleName());
             }
 
             return compiledType;
@@ -733,9 +746,7 @@ public class CompilerContext {
     }
 
     public CompiledType getCompiledType(Type type) {
-        Optional<CompiledType> compiledType = getCompiledType(type, false);
-
-        return compiledType.orElse(new CompiledType(type));
+        return getCompiledType(type, false).orElse(new CompiledType(type));
     }
 
     public CompiledType getCompiledBaseType(Type node) {
