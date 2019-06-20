@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
+import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -51,6 +52,7 @@ public class DefaultsCompiler {
 
     private Map<Class<? extends Type>, DefaultCompiler> compilers =
             Maps.<Class<? extends Type>, DefaultCompiler>builder()
+                    .put(BooleanType.class, new BooleanDefaultCompiler())
                     .put(IntegerType.class, new IntegerDefaultCompiler())
                     .put(OctetString.class, new OctetStringDefaultCompiler())
                     .put(BitString.class, new BitStringDefaultCompiler())

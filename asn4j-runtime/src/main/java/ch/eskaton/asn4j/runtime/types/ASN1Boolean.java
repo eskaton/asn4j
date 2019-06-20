@@ -46,15 +46,19 @@ public class ASN1Boolean implements ASN1Type {
     public ASN1Boolean() {
     }
 
-    private ASN1Boolean(boolean value) {
+    public ASN1Boolean(boolean value) {
         setValue(value);
+    }
+
+    public static ASN1Boolean of(boolean value) {
+        return new ASN1Boolean(value);
     }
 
     public Boolean getValue() {
         return value;
     }
 
-    public void setValue(Boolean value) throws ConstraintViolatedException {
+    public void setValue(Boolean value) {
         if (!checkConstraint(value)) {
             throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
         }
@@ -62,7 +66,14 @@ public class ASN1Boolean implements ASN1Type {
         this.value = value;
     }
 
-    protected boolean checkConstraint(Boolean value) throws ConstraintViolatedException {
+    public ASN1Boolean value(Boolean value) {
+        setValue(value);
+
+        return this;
+    }
+
+    @SuppressWarnings("squid:S1172")
+    protected boolean checkConstraint(Boolean value) {
         return true;
     }
 

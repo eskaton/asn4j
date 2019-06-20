@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.compiler.java.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
@@ -78,6 +79,7 @@ import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
@@ -160,12 +162,16 @@ public class CompilerContext {
             .build();
 
     private Map<Class<?>, ValueResolver<?>> valueResolvers = Maps.<Class<?>, ValueResolver<?>>builder()
+            .put(BooleanValue.class, new BooleanValueResolver(CompilerContext.this))
             .put(BigInteger.class, new IntegerValueResolver(CompilerContext.this))
             .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
-            .put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this, ObjectIdentifier.class, ObjectIdentifierValue.class))
-            .put(RelativeOIDValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeOID.class, RelativeOIDValue.class))
+            .put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this, ObjectIdentifier.class,
+                    ObjectIdentifierValue.class))
+            .put(RelativeOIDValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeOID.class,
+                    RelativeOIDValue.class))
             .put(IRIValue.class, new DefaultValueResolver<>(CompilerContext.this, IRI.class, IRIValue.class))
-            .put(RelativeIRIValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeIRI.class, RelativeIRIValue.class))
+            .put(RelativeIRIValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeIRI.class,
+                    RelativeIRIValue.class))
             .build();
 
     @SuppressWarnings("serial")

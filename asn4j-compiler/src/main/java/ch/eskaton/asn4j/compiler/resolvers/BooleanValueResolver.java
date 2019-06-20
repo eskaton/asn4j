@@ -25,51 +25,51 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
+package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.types.ASN1Integer;
-
-import java.math.BigInteger;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
-public class IntegerDefaultCompiler implements DefaultCompiler {
+public class BooleanValueResolver extends AbstractValueResolver<BooleanValue> {
+
+    public BooleanValueResolver(CompilerContext ctx) {
+        super(ctx);
+    }
 
     @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        long intValue;
+    protected BooleanValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
+        Type type = (Type) valueAssignment.getType();
+        Value value = (Value) valueAssignment.getValue();
 
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            intValue = ctx.resolveValue(BigInteger.class,
-                    resolveAmbiguousValue(value, SimpleDefinedValue.class)).longValue();
-        } else if (value instanceof IntegerValue) {
-            intValue = ((IntegerValue) value).getValue().longValue();
+        return resolveGeneric(type, value);
+    }
 
-            try {
-                ASN1Integer.valueOf(intValue);
-            } catch (ConstraintViolatedException e) {
-                throw new CompilerException("Default value doesn't satisfy constraints", e);
+    @Override
+    public BooleanValue resolveGeneric(Type type, Value value) {
+        if (type instanceof BooleanType) {
+            if (value instanceof BooleanValue) {
+                return (BooleanValue) value;
             }
-        } else {
-            throw new CompilerException("Invalid default value");
+
+            throw new CompilerException("BOOLEAN value expected");
+        } else if (type instanceof TypeReference) {
+            BooleanValue booleanValue = resolveAmbiguousValue(value, BooleanValue.class);
+
+            if (booleanValue != null) {
+                return resolve(type, booleanValue);
+            }
         }
 
-        String defaultField = addDefaultField(clazz, typeName, field);
+        throw new CompilerException("Failed to resolve a BOOLEAN value");
 
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-                + typeName + ".valueOf(" + intValue + ");"));
-
-        clazz.addImport(ConstraintViolatedException.class);
     }
 
 }
