@@ -215,7 +215,7 @@ public class CompilerImpl {
         if (maybeTypeAssignment.isPresent()) {
             TypeAssignmentNode assignment = (TypeAssignmentNode) maybeTypeAssignment.get();
 
-            assignments.remove(assignment);
+            assignments.peek().remove(assignment);
 
             return Optional.of(compileTypeAssignment(assignment));
         }
