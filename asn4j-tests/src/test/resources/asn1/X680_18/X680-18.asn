@@ -3,8 +3,17 @@ BEGIN
 
 TestBoolean ::= BOOLEAN
 
-testBooleanValueT BOOLEAN ::= TRUE
+testBooleanValue1 BOOLEAN ::= TRUE
 
-testBooleanValueF BOOLEAN ::= FALSE
+testBooleanValue2 BOOLEAN ::= FALSE
+
+testBooleanValue3 TestBoolean ::= TRUE
+
+TestBooleans ::= SEQUENCE {
+    testBoolean1 BOOLEAN DEFAULT testBooleanValue1,
+    testBoolean2 BOOLEAN DEFAULT testBooleanValue2,
+    testBoolean3 TestBoolean DEFAULT testBooleanValue3,
+    testBoolean4 BOOLEAN DEFAULT FALSE
+}
 
 END

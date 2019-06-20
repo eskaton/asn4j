@@ -130,7 +130,7 @@ public class ASN1BitString implements ASN1Type {
         return 1 << 7 - (bit % 8);
     }
 
-    protected boolean checkConstraint(byte[] value, int unusedBits) throws ConstraintViolatedException {
+    protected boolean checkConstraint(byte[] value, int unusedBits) {
         return true;
     }
 
