@@ -27,6 +27,33 @@
 
 package ch.eskaton.asn4j.test.x680_13;
 
+import ch.eskaton.asn4j.test.modules.x680_13.TestEnumeratedType1;
+import ch.eskaton.asn4j.test.modules.x680_13.TestEnumeratedType2;
+import ch.eskaton.asn4j.test.modules.x680_13.TestEnumeratedType3;
+import ch.eskaton.asn4j.test.modules.x680_13.TestEnumeratedType4;
+import ch.eskaton.asn4j.test.modules.x680_13.TestEnumeratedType5;
+import ch.eskaton.asn4j.test.modules.x680_13.TestEnumeratedType6;
+import ch.eskaton.asn4j.test.modules.x680_13.TestSequence1;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 public class TestX680_13 {
+
+    @Test
+    public void testImportsAndExtReferencesCompiled() {
+        new TestEnumeratedType1();
+        new TestEnumeratedType2();
+        new TestEnumeratedType3();
+        new TestEnumeratedType4();
+        new TestEnumeratedType5();
+        new TestEnumeratedType6();
+
+        TestSequence1 sequence = new TestSequence1();
+
+        assertEquals(4711, sequence.getA().getValue().intValue());
+        assertEquals(4712, sequence.getB().getValue().intValue());
+        assertEquals(4713, sequence.getC().getValue().intValue());
+    }
 
 }
