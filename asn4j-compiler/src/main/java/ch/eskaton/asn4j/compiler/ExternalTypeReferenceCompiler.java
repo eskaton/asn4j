@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 public class ExternalTypeReferenceCompiler extends AbstractTypeReferenceCompiler<ExternalTypeReference> {
 
     public CompiledType compile(CompilerContext ctx, String name, ExternalTypeReference node) {
-        ModuleNode module = ctx.getOrLoadModule(node.getModule());
+        ModuleNode module = ctx.getModule(node.getModule());
 
         ctx.ensureSymbolIsExported(module, node.getType());
 

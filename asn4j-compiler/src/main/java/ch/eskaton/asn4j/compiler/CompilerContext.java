@@ -312,7 +312,19 @@ public class CompilerContext {
     }
 
     public ModuleNode getModule(String moduleName) {
-        return modules.get(moduleName);
+        ModuleNode module = modules.get(moduleName);
+
+        if (module == null) {
+            try {
+                compiler.loadAndCompileModule(moduleName);
+
+                module = modules.get(moduleName);
+            } catch (IOException | ParserException e) {
+                throw new CompilerException("Failed to load module %s", moduleName, e);
+            }
+        }
+
+        return module;
     }
 
     public TypeAssignmentNode getTypeAssignment(TypeReference type) {
@@ -527,7 +539,7 @@ public class CompilerContext {
         ModuleNode module;
 
         try {
-            module = getOrLoadModule(moduleName);
+            module = getModule(moduleName);
         } catch (CompilerException e) {
             throw new CompilerException("Failed to resolve external reference %s.%s", moduleName, symbolName, e);
         }
@@ -541,22 +553,6 @@ public class CompilerContext {
         }
 
         return (ValueOrObjectAssignmentNode<?, ?>) assignment;
-    }
-
-    public ModuleNode getOrLoadModule(String moduleName) {
-        ModuleNode module = getModule(moduleName);
-
-        if (module == null) {
-            try {
-                compiler.load(moduleName);
-
-                module = getModule(moduleName);
-            } catch (IOException | ParserException e) {
-                throw new CompilerException("Failed to load module %s", moduleName, e);
-            }
-        }
-
-        return module;
     }
 
     public ValueOrObjectAssignmentNode resolveReference(SimpleDefinedValue reference) {

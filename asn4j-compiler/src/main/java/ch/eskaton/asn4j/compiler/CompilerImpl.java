@@ -49,7 +49,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public class CompilerImpl {
 
@@ -59,7 +58,7 @@ public class CompilerImpl {
 
     private CompilerContext compilerContext;
 
-    private Deque<AssignmentNode> assignments;
+    private Deque<Deque<AssignmentNode>> assignments = new LinkedList<>();
 
     public static void main(String[] args) throws IOException, ParserException {
         if (args.length != 4) {
@@ -90,36 +89,37 @@ public class CompilerImpl {
                 (System.currentTimeMillis() - begin) / 1000.0) + "s");
     }
 
-    private void loadAndCompileModule(String moduleName) throws IOException, ParserException {
+    void loadAndCompileModule(String moduleName) throws IOException, ParserException {
         load(moduleName);
 
         try {
             compilerContext.pushModule(compilerContext.getModule(moduleName));
-            compileModule(moduleName, null);
+            compileModule(moduleName);
         } finally {
             compilerContext.popModule();
         }
     }
 
-    private void compileModule(String moduleName, Set<String> neededSymbols) throws IOException, ParserException {
+    private void compileModule(String moduleName) throws IOException, ParserException {
         System.out.println("Compiling module " + moduleName + "...");
 
         ModuleNode module = compilerContext.getModule(moduleName);
 
         compileImports(module);
-        compileBody(neededSymbols, module);
+        compileBody(module);
     }
 
-    private void compileBody(Set<String> neededSymbols, ModuleNode module) {
+    private void compileBody(ModuleNode module) {
         ModuleBodyNode moduleBody = module.getBody();
 
         if (moduleBody != null) {
-            assignments = new LinkedList<>();
-            assignments.addAll(moduleBody.getAssignments());
+            assignments.push(new LinkedList<>(moduleBody.getAssignments()));
 
-            while (!assignments.isEmpty()) {
-                compileAssignment(assignments.pop());
+            while (!assignments.peek().isEmpty()) {
+                compileAssignment(assignments.peek().pop());
             }
+
+            assignments.pop();
         }
     }
 
@@ -140,7 +140,8 @@ public class CompilerImpl {
     }
 
     private CompiledType compileTypeAssignment(TypeAssignmentNode assignment) {
-        return compilerContext.<TypeAssignmentNode, TypeAssignmentCompiler>getCompiler(TypeAssignmentNode.class).compile(compilerContext, assignment);
+        return compilerContext.<TypeAssignmentNode, TypeAssignmentCompiler>getCompiler(TypeAssignmentNode.class)
+                .compile(compilerContext, assignment);
     }
 
     private void compileObjectClassAssignment(ObjectClassAssignmentNode assignment) {
@@ -208,7 +209,7 @@ public class CompilerImpl {
     }
 
     public Optional<CompiledType> compileType(String name) {
-        Optional<AssignmentNode> maybeTypeAssignment = assignments.stream().filter(
+        Optional<AssignmentNode> maybeTypeAssignment = assignments.peek().stream().filter(
                 obj -> obj instanceof TypeAssignmentNode && name.equals(obj.getReference())).findFirst();
 
         if (maybeTypeAssignment.isPresent()) {
