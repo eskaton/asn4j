@@ -442,13 +442,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -1314,7 +1312,7 @@ public class ParserTest {
                 "value-reference".getBytes())).new ValueParser();
 
         result = parser.parse();
-        testAmbiguousValue(result, SimpleDefinedValue.class);
+        assertTrue(result instanceof SimpleDefinedValue);
 
         parser = new Parser(
                 new ByteArrayInputStream("INTEGER: 4711".getBytes())).new ValueParser();
@@ -1379,13 +1377,13 @@ public class ParserTest {
 
         // TODO: EmbeddedPDVValue
 
-        parser = new Parser(new ByteArrayInputStream("enum-value".getBytes())).new BuiltinOrReferencedValueParser();
+        parser = new Parser(new ByteArrayInputStream("Module.enum-value".getBytes())).new BuiltinOrReferencedValueParser();
 
         result = parser.parse();
 
-        testAmbiguousValue(result, SimpleDefinedValue.class, value -> assertEquals("enum-value", value.getValue()));
-
-        // TODO: ExternalValue
+        assertTrue(result instanceof ExternalValueReference);
+        assertEquals("Module", ((ExternalValueReference) result).getModule());
+        assertEquals("enum-value", ((ExternalValueReference) result).getValue());
 
         parser = new Parser(new ByteArrayInputStream("4711".getBytes())).new BuiltinOrReferencedValueParser();
 
@@ -1454,7 +1452,8 @@ public class ParserTest {
 
         result = parser.parse();
 
-        testAmbiguousValue(result, SimpleDefinedValue.class);
+        assertTrue(result instanceof SimpleDefinedValue);
+        assertEquals("value-reference", ((SimpleDefinedValue) result).getValue());
 
         parser = new Parser(new ByteArrayInputStream(
                 "object-reference {Object}.&value-reference1".getBytes())).new BuiltinOrReferencedValueParser();
@@ -1574,16 +1573,14 @@ public class ParserTest {
         SignedNumber result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(new BigInteger("18446744073709551615"),
-                ((SignedNumber) result).getNumber());
+        assertEquals(new BigInteger("18446744073709551615"), result.getNumber());
 
         parser = new Parser(new ByteArrayInputStream("-23".getBytes())).new SignedNumberParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(BigInteger.valueOf(-23),
-                ((SignedNumber) result).getNumber());
+        assertEquals(BigInteger.valueOf(-23), result.getNumber());
     }
 
     @Test
@@ -1594,16 +1591,7 @@ public class ParserTest {
         IntegerValue result = parser.parse();
 
         assertNotNull(result);
-        assertFalse(result.isReference());
         assertEquals(new BigInteger("-12"), result.getValue());
-
-        parser = new Parser(new ByteArrayInputStream("an-integer".getBytes())).new IntegerValueParser();
-
-        result = parser.parse();
-
-        assertNotNull(result);
-        assertTrue(result.isReference());
-        assertEquals("an-integer", result.getRef());
     }
 
     /**
@@ -6072,8 +6060,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertTrue(result.getType() instanceof VisibleString);
-        assertTrue(result.getValue() instanceof AmbiguousValue);
-        testAmbiguousValue(result.getValue(), DefinedValue.class);
+        assertTrue(result.getValue() instanceof SimpleDefinedValue);
     }
 
     @Test
