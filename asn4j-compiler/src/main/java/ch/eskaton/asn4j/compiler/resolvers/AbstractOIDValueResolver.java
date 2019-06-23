@@ -30,13 +30,16 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
@@ -82,6 +85,23 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
 
         if (definedValue != null) {
             return ctx.resolveValue(BigInteger.class, definedValue).intValue();
+        }
+
+        Optional<ValueOrObjectAssignmentNode> assignment = ctx.tryResolveReference(component.getName());
+
+        if (assignment.isPresent()) {
+            Value value = (Value) assignment.get().getValue();
+
+            if (value instanceof SimpleDefinedValue) {
+                assignment = ctx.tryResolveAllReferences((SimpleDefinedValue) value);
+
+                if (assignment.isPresent()) {
+                    value = (Value) assignment.get().getValue();
+                }
+            } else if (value instanceof IntegerValue) {
+                return ((IntegerValue) value).getValue().intValue();
+            }
+
         }
 
         return ctx.resolveValue(BigInteger.class, component.getName()).intValue();

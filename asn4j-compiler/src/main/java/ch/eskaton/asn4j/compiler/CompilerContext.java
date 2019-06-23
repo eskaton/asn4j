@@ -578,6 +578,10 @@ public class CompilerContext {
             }
 
             tmpAssignment = tryResolveReference(reference);
+
+            if (tmpAssignment.equals(assignment)) {
+                break;
+            }
         }
 
         return assignment;
@@ -605,7 +609,7 @@ public class CompilerContext {
         }
 
         if (assignment instanceof ValueOrObjectAssignmentNode) {
-            return Optional.of((ValueOrObjectAssignmentNode)assignment);
+            return Optional.of((ValueOrObjectAssignmentNode) assignment);
         }
 
         return Optional.empty();
