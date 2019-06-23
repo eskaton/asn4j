@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -127,6 +128,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
+import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class CompilerContext {
@@ -164,6 +166,7 @@ public class CompilerContext {
     private Map<Class<?>, ValueResolver<?>> valueResolvers = Maps.<Class<?>, ValueResolver<?>>builder()
             .put(BooleanValue.class, new BooleanValueResolver(CompilerContext.this))
             .put(BigInteger.class, new IntegerValueResolver(CompilerContext.this))
+            .put(Integer.class, new EnumeratedValueResolver(CompilerContext.this))
             .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
             .put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this, ObjectIdentifier.class,
                     ObjectIdentifierValue.class))
@@ -561,11 +564,30 @@ public class CompilerContext {
         return (ValueOrObjectAssignmentNode<?, ?>) assignment;
     }
 
-    public ValueOrObjectAssignmentNode resolveReference(SimpleDefinedValue reference) {
-        return resolveReference(reference.getValue());
+    public Optional<ValueOrObjectAssignmentNode> tryResolveAllReferences(SimpleDefinedValue reference) {
+        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveReference(reference);
+        Optional<ValueOrObjectAssignmentNode> tmpAssignment = assignment;
+
+        while (tmpAssignment.isPresent()) {
+            assignment = tmpAssignment;
+
+            reference = resolveAmbiguousValue(tmpAssignment.get().getValue(), SimpleDefinedValue.class);
+
+            if (reference == null) {
+                break;
+            }
+
+            tmpAssignment = tryResolveReference(reference);
+        }
+
+        return assignment;
     }
 
-    public ValueOrObjectAssignmentNode resolveReference(String symbolName) {
+    public Optional<ValueOrObjectAssignmentNode> tryResolveReference(SimpleDefinedValue reference) {
+        return tryResolveReference(reference.getValue());
+    }
+
+    public Optional<ValueOrObjectAssignmentNode> tryResolveReference(String symbolName) {
         AssignmentNode assignment = getModule().getBody().getAssignments(symbolName);
 
         if (assignment == null) {
@@ -582,11 +604,25 @@ public class CompilerContext {
             }
         }
 
-        if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
+        if (assignment instanceof ValueOrObjectAssignmentNode) {
+            return Optional.of((ValueOrObjectAssignmentNode)assignment);
+        }
+
+        return Optional.empty();
+    }
+
+    public ValueOrObjectAssignmentNode resolveReference(SimpleDefinedValue reference) {
+        return resolveReference(reference.getValue());
+    }
+
+    public ValueOrObjectAssignmentNode resolveReference(String symbolName) {
+        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveReference(symbolName);
+
+        if (!assignment.isPresent()) {
             throw new CompilerException("Failed to resolve reference " + symbolName);
         }
 
-        return (ValueOrObjectAssignmentNode<?, ?>) assignment;
+        return assignment.get();
     }
 
     public void ensureSymbolIsExported(ModuleNode module, String symbolName) {
