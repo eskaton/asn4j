@@ -92,11 +92,7 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
     @Override
     public BigInteger resolveGeneric(Type type, Value value) {
         if (value instanceof IntegerValue) {
-            if (((IntegerValue) value).isReference()) {
-                return ctx.resolveValue(BigInteger.class, ((IntegerValue) value).getRef());
-            } else {
-                return ((IntegerValue) value).getValue();
-            }
+            return ((IntegerValue) value).getValue();
         } else {
             Value resolvedValue;
 

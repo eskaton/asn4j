@@ -2793,10 +2793,8 @@ public class Parser {
 
         @SuppressWarnings({ "unchecked" })
         public IntegerValue parse() throws ParserException {
-            return super.parse(new ChoiceParser<>(signedNumberParser, new SingleTokenParser(TokenType.IDENTIFIER)), a ->
-                    (a.p() instanceof Token) ? new IntegerValue(a.P(), a.s()) :
-                            new IntegerValue(a.P(), ((SignedNumber)a.n()).getNumber())
-            );
+            // Ignore identifier. Will be parsed as SimpleDefinedValue
+            return super.parse(signedNumberParser, a -> new IntegerValue(a.P(), ((SignedNumber) a.n()).getNumber()));
         }
 
     }
@@ -2944,8 +2942,7 @@ public class Parser {
 
                 if (value instanceof NamedValue
                         && name.equals(((NamedValue) value).getName())
-                        && ((NamedValue) value).getValue() instanceof IntegerValue
-                        && !((IntegerValue) ((NamedValue) value).getValue()).isReference()) {
+                        && ((NamedValue) value).getValue() instanceof IntegerValue) {
                     return ((IntegerValue) ((NamedValue) value).getValue()).getValue();
                 }
             }

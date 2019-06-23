@@ -59,28 +59,7 @@ public class CollectionOfValue extends CollectionValue {
             return isTuple;
         }
 
-        List<Value> values = getValues();
-
-        if (values.size() != 2) {
-            isTuple = false;
-
-            return isTuple;
-        }
-
-        int pos = 0;
-
-        for (Value value : values) {
-            if (!(value instanceof IntegerValue)
-                    || ((IntegerValue) value).isReference()
-                    || ((IntegerValue) value).getValue().compareTo(BigInteger.ZERO) < 0
-                    || ((IntegerValue) value).getValue().compareTo(MAX_TUPLE_VALUES[pos++]) > 0) {
-                isTuple = false;
-
-                return isTuple;
-            }
-        }
-
-        isTuple = true;
+        isTuple = checkValues(getValues(), MAX_TUPLE_VALUES);
 
         return isTuple;
     }
@@ -100,28 +79,7 @@ public class CollectionOfValue extends CollectionValue {
             return isQuadruple;
         }
 
-        List<Value> values = getValues();
-
-        if (values.size() != 4) {
-            isQuadruple = false;
-
-            return isQuadruple;
-        }
-
-        int pos = 0;
-
-        for (Value value : values) {
-            if (!(value instanceof IntegerValue)
-                    || ((IntegerValue) value).isReference()
-                    || ((IntegerValue) value).getValue().compareTo(BigInteger.ZERO) < 0
-                    || ((IntegerValue) value).getValue().compareTo(MAX_QUADRUPLE_VALUES[pos++]) > 0) {
-                isQuadruple = false;
-
-                return isQuadruple;
-            }
-        }
-
-        isQuadruple = true;
+        isQuadruple = checkValues(getValues(), MAX_QUADRUPLE_VALUES);
 
         return isQuadruple;
     }
@@ -139,6 +97,24 @@ public class CollectionOfValue extends CollectionValue {
 
     private short getShort(List<Value> values, int pos) {
         return ((IntegerValue) values.get(pos)).getValue().shortValue();
+    }
+
+    private boolean checkValues(List<Value> values, BigInteger[] maxValues) {
+        int pos = 0;
+
+        if (values.size() != maxValues.length) {
+            return false;
+        }
+
+        for (Value value : values) {
+            if (!(value instanceof IntegerValue)
+                    || ((IntegerValue) value).getValue().compareTo(BigInteger.ZERO) < 0
+                    || ((IntegerValue) value).getValue().compareTo(maxValues[pos++]) > 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
