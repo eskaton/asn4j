@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.runtime.exceptions;
 
 @SuppressWarnings("serial")
-public class ASN1RuntimeException extends Exception {
+public class ASN1RuntimeException extends RuntimeException {
 
     public ASN1RuntimeException(String message) {
     	super(message);

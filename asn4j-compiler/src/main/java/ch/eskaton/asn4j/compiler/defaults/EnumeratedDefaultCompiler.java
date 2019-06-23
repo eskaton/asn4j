@@ -25,47 +25,39 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.test.x680_18;
+package ch.eskaton.asn4j.compiler.defaults;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
-import ch.eskaton.asn4j.test.modules.x680_18.TestBoolean;
-import ch.eskaton.asn4j.test.modules.x680_18.TestBooleans;
-import org.junit.Test;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
-public class TestX680_18 {
+public class EnumeratedDefaultCompiler implements DefaultCompiler {
 
-    @Test
-    public void testBoolean() {
-        TestBoolean a = new TestBoolean();
+    @Override
+    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
+            Value value) {
+        Integer enumeratedValue;
 
-        a.setValue(true);
+        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
+            enumeratedValue = ctx.resolveGenericValue(Integer.class, type,
+                    resolveAmbiguousValue(value, SimpleDefinedValue.class));
+        } else {
+            throw new CompilerException("Invalid default value");
+        }
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
+        String defaultField = addDefaultField(clazz, typeName, field);
 
-        TestBoolean b = decoder.decode(TestBoolean.class, encoder.encode(a));
+        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new "
+                + typeName + "(" + typeName + ".valueOf(" + enumeratedValue + "));"));
 
-        assertEquals(a, b);
-    }
-
-    @Test
-    public void testBooleanDefault() {
-        TestBooleans a = new TestBooleans();
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestBooleans b = decoder.decode(TestBooleans.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(ASN1Boolean.of(true), b.getTestBoolean1());
-        assertEquals(ASN1Boolean.of(false), b.getTestBoolean2());
-        assertEquals(new TestBoolean(true), b.getTestBoolean3());
-        assertEquals(ASN1Boolean.of(false), b.getTestBoolean4());
+        clazz.addImport(ConstraintViolatedException.class);
     }
 
 }

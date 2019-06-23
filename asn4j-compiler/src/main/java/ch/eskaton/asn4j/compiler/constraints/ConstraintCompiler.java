@@ -57,10 +57,10 @@ public class ConstraintCompiler {
         this.ctx = ctx;
 
         compilers = Maps.<Class<? extends Type>, AbstractConstraintCompiler>builder()
-                .put(BitString.class, new BitStringConstraintCompiler(ctx))
                 .put(BooleanType.class, new BooleanConstraintCompiler(ctx))
-                .put(EnumeratedType.class, new EnumeratedTypeConstraintCompiler(ctx))
                 .put(IntegerType.class, new IntegerConstraintCompiler(ctx))
+                .put(EnumeratedType.class, new EnumeratedTypeConstraintCompiler(ctx))
+                .put(BitString.class, new BitStringConstraintCompiler(ctx))
                 .put(Null.class, new NullConstraintCompiler(ctx))
                 .put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(ctx))
                 .put(RelativeOID.class, new RelativeOIDConstraintCompiler(ctx))
