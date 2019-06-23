@@ -60,7 +60,6 @@ public class EnumeratedValueResolver extends AbstractValueResolver<Integer> {
         if (type instanceof TypeReference && value instanceof SimpleDefinedValue) {
             CompiledEnumeratedType compiledType = (CompiledEnumeratedType) ctx.getCompiledType(type);
 
-
             if (compiledType != null) {
                 Optional<ValueOrObjectAssignmentNode> assignmentNode =
                         ctx.tryResolveAllReferences((SimpleDefinedValue) value);
