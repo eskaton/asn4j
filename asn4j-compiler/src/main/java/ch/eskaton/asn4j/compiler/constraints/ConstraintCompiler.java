@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
+import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -63,11 +64,11 @@ public class ConstraintCompiler {
                 .put(BitString.class, new BitStringConstraintCompiler(ctx))
                 .put(Null.class, new NullConstraintCompiler(ctx))
                 .put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(ctx))
+                .put(OctetString.class, new OctetStringConstraintCompiler(ctx))
                 .put(RelativeOID.class, new RelativeOIDConstraintCompiler(ctx))
                 .put(IRI.class, new IRIConstraintCompiler(ctx))
                 .put(RelativeIRI.class, new RelativeIRIConstraintCompiler(ctx))
 //                .put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver))
-//                .put(OctetString.class, new OctetStringConstraintCompiler(typeResolver))
 //                .put(Null.class, new NullConstraintCompiler(typeResolver))
 //                .put(SetOfType.class, new SetOfConstraintCompiler(typeResolver))
 //                .put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(typeResolver))

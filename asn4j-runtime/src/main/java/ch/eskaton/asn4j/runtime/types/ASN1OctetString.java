@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Arrays;
@@ -55,7 +56,22 @@ public class ASN1OctetString implements ASN1Type {
     }
 
     public void setValue(byte[] value) {
+        if (!checkConstraint(value)) {
+            throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
+        }
+
         this.value = value;
+    }
+
+    public ASN1OctetString value(byte[] value) {
+        setValue(value);
+
+        return this;
+    }
+
+    @SuppressWarnings("squid:S1172")
+    protected boolean checkConstraint(byte[] value) {
+        return true;
     }
 
     @Override

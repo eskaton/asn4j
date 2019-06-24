@@ -25,50 +25,50 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.Arrays;
+import java.util.Optional;
 
-import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+public class OctetStringValueResolver extends AbstractValueResolver<OctetStringValue> {
 
-public class OctetStringValue extends AbstractValue {
-
-    private byte[] value;
-
-    public OctetStringValue(Position position, byte[] value) {
-        super(position);
-
-        this.value = value;
-    }
-
-    public OctetStringValue(byte[] value) {
-        this(NO_POSITION, value);
-    }
-
-    public byte[] getValue() {
-        return value;
+    public OctetStringValueResolver(CompilerContext ctx) {
+        super(ctx);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
+    protected OctetStringValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
+        Type type = (Type) valueAssignment.getType();
+        Value value = (Value) valueAssignment.getValue();
 
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        OctetStringValue that = (OctetStringValue) obj;
-
-        return Arrays.equals(value, that.value);
+        return resolveGeneric(type, value);
     }
 
     @Override
-    public int hashCode() {
-        return Arrays.hashCode(value);
+    public OctetStringValue resolveGeneric(Type type, Value value) {
+        if (value instanceof SimpleDefinedValue) {
+            Optional<ValueOrObjectAssignmentNode> assignment = ctx.tryResolveAllReferences((SimpleDefinedValue) value);
+
+            if (assignment.isPresent()) {
+                value = (Value) assignment.get().getValue();
+            } else {
+                value = null;
+            }
+        }
+
+        if (value instanceof AbstractBaseXStringValue) {
+            return ((AbstractBaseXStringValue) value).toOctetString();
+        }
+
+        throw new CompilerException("Failed to resolve an OCTET STRING value");
     }
 
 }

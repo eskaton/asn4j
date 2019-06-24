@@ -69,7 +69,6 @@ public class BooleanValueResolver extends AbstractValueResolver<BooleanValue> {
         }
 
         throw new CompilerException("Failed to resolve a BOOLEAN value");
-
     }
 
 }

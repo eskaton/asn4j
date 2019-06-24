@@ -1965,8 +1965,8 @@ public class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof BinaryStringValue);
-        assertEquals(0xD0, ((BinaryStringValue) result).toOctetString().getStringValue()[0]);
-        assertEquals(0xE0, ((BinaryStringValue) result).toOctetString().getStringValue()[1]);
+        assertEquals((byte) 0xD0, ((BinaryStringValue) result).toOctetString().getValue()[0]);
+        assertEquals((byte) 0xE0, ((BinaryStringValue) result).toOctetString().getValue()[1]);
 
         parser = new Parser(new ByteArrayInputStream("'1CF'H".getBytes())).new BitOrOctetStringValueParser();
 
@@ -1974,8 +1974,8 @@ public class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof HexStringValue);
-        assertEquals(0x1C, ((HexStringValue) result).toOctetString().getStringValue()[0]);
-        assertEquals(0xF0, ((HexStringValue) result).toOctetString().getStringValue()[1]);
+        assertEquals((byte) 0x1C, ((HexStringValue) result).toOctetString().getValue()[0]);
+        assertEquals((byte) 0xF0, ((HexStringValue) result).toOctetString().getValue()[1]);
 
         parser = new Parser(new ByteArrayInputStream("CONTAINING 23".getBytes())).new BitOrOctetStringValueParser();
 

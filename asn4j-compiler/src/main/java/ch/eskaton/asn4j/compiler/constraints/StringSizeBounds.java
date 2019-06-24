@@ -29,13 +29,13 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class BitStringSizeBounds implements SizeBounds {
+public class StringSizeBounds implements SizeBounds {
 
     private long minSize;
 
     private long maxSize;
 
-    public BitStringSizeBounds(long minSize, long maxSize) {
+    public StringSizeBounds(long minSize, long maxSize) {
         this.minSize = minSize;
         this.maxSize = maxSize;
     }
