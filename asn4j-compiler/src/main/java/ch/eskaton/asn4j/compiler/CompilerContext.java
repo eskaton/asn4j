@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.OctetStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -85,6 +86,7 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -168,6 +170,7 @@ public class CompilerContext {
             .put(BigInteger.class, new IntegerValueResolver(CompilerContext.this))
             .put(Integer.class, new EnumeratedValueResolver(CompilerContext.this))
             .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
+            .put(OctetStringValue.class, new OctetStringValueResolver(CompilerContext.this))
             .put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this, ObjectIdentifier.class,
                     ObjectIdentifierValue.class))
             .put(RelativeOIDValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeOID.class,

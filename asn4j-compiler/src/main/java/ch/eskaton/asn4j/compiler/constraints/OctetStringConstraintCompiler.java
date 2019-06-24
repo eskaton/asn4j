@@ -29,9 +29,9 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.OctetStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
@@ -42,7 +42,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
-import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
@@ -54,16 +54,15 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
 import static ch.eskaton.asn4j.compiler.java.JavaType.BYTE_ARRAY;
-import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Protected;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
+public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
     private static final SizeBoundsVisitor BOUNDS_VISITOR = new SizeBoundsVisitor();
 
-    public BitStringConstraintCompiler(CompilerContext ctx) {
+    public OctetStringConstraintCompiler(CompilerContext ctx) {
         super(ctx);
     }
 
@@ -83,12 +82,12 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
             Value value = ((SingleValueConstraint) elements).getValue();
 
             try {
-                // TODO: implement a more convenient resolver
-                BitStringValue bitStringValue = ctx.resolveGenericValue(BitStringValue.class, baseType.getType(), value);
+                OctetStringValue octetStringValue = ctx
+                        .resolveGenericValue(OctetStringValue.class, baseType.getType(), value);
 
-                return new BitStringValueNode(singletonList(bitStringValue));
+                return new OctetStringValueNode(singletonList(octetStringValue));
             } catch (Exception e) {
-                throw new CompilerException("Invalid single-value constraint %s for BIT STRING type", e,
+                throw new CompilerException("Invalid single-value constraint %s for OCTET STRING type", e,
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
@@ -96,7 +95,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
-            throw new CompilerException("Invalid constraint %s for BIT STRING type",
+            throw new CompilerException("Invalid constraint %s for OCTET STRING type",
                     elements.getClass().getSimpleName());
         }
     }
@@ -107,7 +106,6 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
         BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
                 .returnType(boolean.class).name("checkConstraint").parameter(BYTE_ARRAY, "value")
-                .parameter(INT, "unusedBits")
                 .exception(ConstraintViolatedException.class).body();
 
         addConstraintCondition(definition, builder);
@@ -117,14 +115,14 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     protected Node optimize(Node node) {
-        return new BitStringConstraintOptimizingVisitor().visit(node);
+        return node;
     }
 
     @Override
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                List<BitStringValue> values = ((BitStringValueNode) node).getValue();
+                List<OctetStringValue> values = ((OctetStringValueNode) node).getValue();
                 return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
             case ALL_VALUES:
                 return Optional.empty();
@@ -137,9 +135,8 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
-    private String buildExpression(BitStringValue value) {
-        return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) +
-                ", value) && " + value.getUnusedBits() + " == unusedBits)";
+    private String buildExpression(OctetStringValue value) {
+        return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getValue()) + ", value))";
     }
 
     private String buildSizeExpression(IntegerRange range) {
@@ -147,14 +144,13 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return String.format("(ASN1BitString.getSize(value, unusedBits) == %dL)", lower);
+            return String.format("(value.size() == %dL)", lower);
         } else if (lower == 0) {
-            return String.format("(ASN1BitString.getSize(value, unusedBits) <= %dL)", upper);
+            return String.format("(value.size() <= %dL)", upper);
         } else if (upper == Long.MAX_VALUE) {
-            return String.format("(ASN1BitString.getSize(value, unusedBits) >= %dL)", lower);
+            return String.format("(value.size() >= %dL)", lower);
         } else {
-            return String.format("(%dL <= ASN1BitString.getSize(value, unusedBits) && "
-                    + "%dL >= ASN1BitString.getSize(value, unusedBits))", lower, upper);
+            return String.format("(%dL <= value.size() && %dL >= value.size())", lower, upper);
         }
     }
 

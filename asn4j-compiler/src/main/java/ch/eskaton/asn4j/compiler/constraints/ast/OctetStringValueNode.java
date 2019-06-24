@@ -25,50 +25,16 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 
-import java.util.Arrays;
+import java.util.List;
 
-import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+public class OctetStringValueNode extends ValueNode<List<OctetStringValue>> {
 
-public class OctetStringValue extends AbstractValue {
-
-    private byte[] value;
-
-    public OctetStringValue(Position position, byte[] value) {
-        super(position);
-
-        this.value = value;
-    }
-
-    public OctetStringValue(byte[] value) {
-        this(NO_POSITION, value);
-    }
-
-    public byte[] getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        OctetStringValue that = (OctetStringValue) obj;
-
-        return Arrays.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(value);
+    public OctetStringValueNode(List<OctetStringValue> value) {
+        super(value);
     }
 
 }
