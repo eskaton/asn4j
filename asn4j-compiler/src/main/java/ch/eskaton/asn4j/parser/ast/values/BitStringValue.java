@@ -35,6 +35,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+
 public class BitStringValue extends AbstractValue {
 
     private int unusedBits;
@@ -51,6 +53,13 @@ public class BitStringValue extends AbstractValue {
 
     public BitStringValue(Position position, byte[] byteValue, int unusedBits) {
         super(position);
+
+        this.byteValue = byteValue;
+        this.unusedBits = unusedBits;
+    }
+
+    public BitStringValue(byte[] byteValue, int unusedBits) {
+        super(NO_POSITION);
 
         this.byteValue = byteValue;
         this.unusedBits = unusedBits;
