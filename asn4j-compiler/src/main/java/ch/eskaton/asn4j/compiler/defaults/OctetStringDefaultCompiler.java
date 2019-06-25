@@ -29,30 +29,28 @@ package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.StringValue;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 
 public class OctetStringDefaultCompiler implements DefaultCompiler {
 
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
             Value value) {
-        value = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
+        OctetStringValue octetStringValue = ctx.resolveGenericValue(OctetStringValue.class, type, value);
 
-        if (!(value instanceof StringValue)) {
+        if (octetStringValue == null) {
             throw new CompilerException("Invalid default value");
         }
 
         String defaultField = addDefaultField(clazz, typeName, field);
-        String strValue = ((StringValue) value).getCString();
 
         clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-                + ASN1OctetString.class.getSimpleName() + ".valueOf(\""
-                + strValue + "\");"));
+                + "new " + typeName + "("
+                + BitStringUtils.getInitializerString(octetStringValue.getValue()) + ");"));
     }
 
 }
