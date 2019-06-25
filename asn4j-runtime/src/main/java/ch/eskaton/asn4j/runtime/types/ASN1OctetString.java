@@ -41,14 +41,15 @@ public class ASN1OctetString implements ASN1Type {
     private byte[] value;
 
     public ASN1OctetString() {
+        this.value = new byte[] {};
     }
 
-    private ASN1OctetString(byte[] value) {
+    public ASN1OctetString(byte[] value) {
         this.value = value;
     }
 
-    public static ASN1OctetString valueOf(String value) {
-        return new ASN1OctetString(value.getBytes());
+    public static ASN1OctetString valueOf(byte[] value) {
+        return new ASN1OctetString(value);
     }
 
     public byte[] getValue() {

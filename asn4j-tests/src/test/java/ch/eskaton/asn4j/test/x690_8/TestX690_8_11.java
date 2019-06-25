@@ -67,7 +67,7 @@ public class TestX690_8_11 {
         TestSet2 a = new TestSet2();
 
         a.setA(ASN1Integer.valueOf(4711));
-        a.setB(ASN1OctetString.valueOf("test"));
+        a.setB(ASN1OctetString.valueOf("test".getBytes()));
 
         assertArrayEquals(new byte[] { 0x31, 0x0e, (byte) 0xa0, 0x04, 0x02, 0x02, 0x12, 0x67, (byte) 0xa1, 0x06, 0x04,
                 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(a));
@@ -84,7 +84,7 @@ public class TestX690_8_11 {
 
         TestSet2 a = new TestSet2();
         a.setA(ASN1Integer.valueOf(4711));
-        a.setB(ASN1OctetString.valueOf("test"));
+        a.setB(ASN1OctetString.valueOf("test".getBytes()));
 
         assertEquals(a, decoder.decode(TestSet2.class, new byte[] { 0x31, 0x0e, (byte) 0xa1, 0x06, 0x04,
                 0x04, 0x74, 0x65, 0x73, 0x74, (byte) 0xa0, 0x04, 0x02, 0x02, 0x12, 0x67 }));
