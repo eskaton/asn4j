@@ -144,13 +144,13 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return String.format("(value.size() == %dL)", lower);
+            return String.format("(value.length == %dL)", lower);
         } else if (lower == 0) {
-            return String.format("(value.size() <= %dL)", upper);
+            return String.format("(value.length <= %dL)", upper);
         } else if (upper == Long.MAX_VALUE) {
-            return String.format("(value.size() >= %dL)", lower);
+            return String.format("(value.length >= %dL)", lower);
         } else {
-            return String.format("(%dL <= value.size() && %dL >= value.size())", lower, upper);
+            return String.format("(%dL <= value.length && %dL >= value.length)", lower, upper);
         }
     }
 
