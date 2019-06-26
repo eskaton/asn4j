@@ -27,7 +27,9 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-public class OctetStringValueComparator implements java.util.Comparator<OctetStringValue> {
+import java.util.Comparator;
+
+public class OctetStringValueComparator implements Comparator<OctetStringValue> {
 
     @Override
     public int compare(OctetStringValue bitString1, OctetStringValue bitString2) {
