@@ -56,4 +56,14 @@ TestOidIri2 ::= OID-IRI (TestOidIri1 EXCEPT "/ISO/a/b/a")
 TestRelativeOidIri1 ::= RELATIVE-OID-IRI ("a/b/a" | "a/b/b")
 TestRelativeOidIri2 ::= RELATIVE-OID-IRI (TestRelativeOidIri1 EXCEPT "a/b/a")
 
+testOctetString1 OCTET STRING ::= '0F'H
+
+TestOctetString1 ::= OCTET STRING ((ALL EXCEPT '010203'H) ^ (SIZE(3..3)))
+TestOctetString2 ::= OCTET STRING ((SIZE(1..2)) | '010203'H)
+TestOctetString3 ::= OCTET STRING (INCLUDES TestOctetString2 | '0A0B0C'H)
+TestOctetString4 ::= OCTET STRING ('00'H | '0F'H | 'F0'H, ...)
+TestOctetString5 ::= OCTET STRING (INCLUDES TestOctetString4 EXCEPT 'F0'H)
+TestOctetString6 ::= OCTET STRING (INCLUDES OCTET STRING EXCEPT 'F0'H)
+TestOctetString7 ::= OCTET STRING (ALL EXCEPT testOctetString1)
+
 END
