@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
+import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
@@ -182,6 +183,17 @@ public class TestHelper {
 
     public static <T extends ASN1RelativeIRI> void testRelativeIRIFailure(T ririValue, String... value) {
         TestUtils.assertThrows(() -> ririValue.setValue(value), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1OctetString> void testOctetStringSuccess(Class<? extends T> clazz, T octetStringValue,
+            byte[] value) {
+        octetStringValue.setValue(value);
+
+        testEncodeDecodeValue((Class<T>) clazz, octetStringValue);
+    }
+
+    public static <T extends ASN1OctetString> void testOctetStringFailure(T octetStringValue, byte[] value) {
+        TestUtils.assertThrows(() -> octetStringValue.setValue(value), ConstraintViolatedException.class);
     }
 
 }

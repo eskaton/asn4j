@@ -54,6 +54,10 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestObjectIdentifier2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestObjectIdentifier3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestObjectIdentifier4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestObjectIdentifier5;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestOctetString1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestOctetString2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestOctetString3;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestOctetString4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestOidIri1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestOidIri3;
@@ -85,6 +89,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testOctetStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testOctetStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
 
@@ -401,6 +407,35 @@ public class TestX680_51_2 {
         testIRISuccess(TestRelativeOidIri5.class, new TestRelativeOidIri5(), "a", "b", "f");
 
         testIRIFailure(new TestRelativeOidIri5(), "a", "b", "e");
+    }
+
+    @Test
+    public void testOctetString1() {
+        testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), new byte[] { 0x50 });
+        testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), new byte[] { 0x37 });
+
+        testOctetStringFailure(new TestOctetString1(), new byte[] { 0x51 });
+    }
+
+    @Test
+    public void testOctetString2() {
+        testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), new byte[] { 0x50 });
+
+        testOctetStringFailure(new TestOctetString2(), new byte[] { 0x37 });
+    }
+
+    @Test
+    public void testOctetString3() {
+        testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), new byte[] { 0x37 });
+
+        testOctetStringFailure(new TestOctetString3(), new byte[] { 0x50 });
+    }
+
+    @Test
+    public void testOctetString4() {
+        testOctetStringSuccess(TestOctetString4.class, new TestOctetString4(), new byte[] { 0x37 });
+
+        testOctetStringFailure(new TestOctetString4(), new byte[] { 0x38 });
     }
 
 }
