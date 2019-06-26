@@ -40,31 +40,31 @@ public class AbstractDateTimeParser {
         SECOND_FRACTION, TIME_ZONE, ACCEPT, ERROR
     }
 
-    protected Integer parseYear(Context ctx) throws IOException, ASN1RuntimeException {
+    protected Integer parseYear(Context ctx) throws IOException {
         return parseComponent(ctx, State.YEAR, 4, null);
     }
 
-    protected Integer parseMonth(Context ctx) throws IOException, ASN1RuntimeException {
+    protected Integer parseMonth(Context ctx) throws IOException {
         return parseComponent(ctx, State.MONTH, 2, month ->
                 new LessEqualVerifiyer("month", 12).verify(month));
     }
 
-    protected Integer parseDay(Context ctx) throws IOException, ASN1RuntimeException {
+    protected Integer parseDay(Context ctx) throws IOException {
         return parseComponent(ctx, State.DAY, 2, day ->
                 new LessEqualVerifiyer("day", 31).verify(day));
     }
 
-    protected Integer parseHour(Context ctx) throws IOException, ASN1RuntimeException {
+    protected Integer parseHour(Context ctx) throws IOException {
         return parseComponent(ctx, State.HOUR, 2, hour ->
                 new LessEqualVerifiyer("hour", 23).verify(hour));
     }
 
-    protected Integer parseMinute(Context ctx) throws IOException, ASN1RuntimeException {
+    protected Integer parseMinute(Context ctx) throws IOException {
         return parseComponent(ctx, State.MINUTE, 2, minute ->
                 new LessEqualVerifiyer("minute", 59).verify(minute));
     }
 
-    protected Integer parseComponent(Context ctx, State targetState, int length, Verifier<Integer> verifier) throws IOException, ASN1RuntimeException {
+    protected Integer parseComponent(Context ctx, State targetState, int length, Verifier<Integer> verifier) throws IOException {
         String component = parseDigits(ctx, length);
 
         if (component != null) {
@@ -171,7 +171,7 @@ public class AbstractDateTimeParser {
 
     protected interface Verifier<T> {
 
-        void verify(T value) throws ASN1RuntimeException;
+        void verify(T value);
 
     }
 
@@ -187,7 +187,7 @@ public class AbstractDateTimeParser {
         }
 
         @Override
-        public void verify(Integer value) throws ASN1RuntimeException {
+        public void verify(Integer value) {
             if (value > threshold) {
                 throw new ASN1RuntimeException("Invalid " + valueName + ": " + value);
             }

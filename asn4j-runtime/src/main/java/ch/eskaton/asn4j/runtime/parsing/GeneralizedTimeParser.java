@@ -36,7 +36,7 @@ public class GeneralizedTimeParser extends AbstractDateTimeParser {
 
     public static final BigDecimal SIXTY = BigDecimal.valueOf(60);
 
-    public DateTime parse(String s) throws ASN1RuntimeException {
+    public DateTime parse(String s) {
         Context ctx = new Context(s);
 
         while (true) {
@@ -119,7 +119,7 @@ public class GeneralizedTimeParser extends AbstractDateTimeParser {
         }
     }
 
-    protected Integer parseSecond(Context ctx) throws IOException, ASN1RuntimeException {
+    protected Integer parseSecond(Context ctx) throws IOException {
         return parseComponent(ctx, State.SECOND_FRACTION, 2, second ->
                 new LessEqualVerifiyer("second", 59).verify(second));
     }
@@ -170,7 +170,7 @@ public class GeneralizedTimeParser extends AbstractDateTimeParser {
         return null;
     }
 
-    private String parseTimeZone(Context ctx) throws IOException, ASN1RuntimeException {
+    private String parseTimeZone(Context ctx) throws IOException {
         StringBuilder sb = new StringBuilder();
         int chr = ctx.read();
 
