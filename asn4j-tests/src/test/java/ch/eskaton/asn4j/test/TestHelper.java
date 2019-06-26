@@ -196,4 +196,14 @@ public class TestHelper {
         TestUtils.assertThrows(() -> octetStringValue.setValue(value), ConstraintViolatedException.class);
     }
 
+    public static byte[] randomBytes(int length) {
+        byte[] value = new byte[length];
+
+        for (int i = 0; i < length; i++) {
+            value[i] = (byte) ((byte) Math.random() * 256);
+        }
+
+        return value;
+    }
+
 }
