@@ -33,7 +33,7 @@ import java.io.IOException;
 
 public class UTCTimeParser extends AbstractDateTimeParser {
 
-    public DateTime parse(String s) throws ASN1RuntimeException {
+    public DateTime parse(String s) {
         Context ctx = new Context(s);
 
         while (true) {
@@ -92,11 +92,11 @@ public class UTCTimeParser extends AbstractDateTimeParser {
         }
     }
 
-    protected Integer parseYear(Context ctx) throws IOException, ASN1RuntimeException {
+    protected Integer parseYear(Context ctx) throws IOException {
         return parseComponent(ctx, State.YEAR, 2, null);
     }
 
-    protected Integer parseSecond(Context ctx) throws IOException, ASN1RuntimeException {
+    protected Integer parseSecond(Context ctx) throws IOException {
         return parseComponent(ctx, State.TIME_ZONE, 2, second ->
                 new LessEqualVerifiyer("second", 59).verify(second));
     }

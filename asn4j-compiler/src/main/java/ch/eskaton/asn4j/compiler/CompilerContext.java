@@ -222,8 +222,6 @@ public class CompilerContext {
 
     private Map<String, JavaStructure> structs = new HashMap<>();
 
-    private Map<String, Set<String>> referencedTypes = new HashMap<>();
-
     private Map<String, ModuleNode> modules = new HashMap<>();
 
     private Deque<ModuleNode> currentModule = new LinkedList<>();
