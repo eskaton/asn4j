@@ -115,7 +115,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     protected Node optimize(Node node) {
-        return node;
+        return new OctetStringConstraintOptimizingVisitor().visit(node);
     }
 
     @Override
