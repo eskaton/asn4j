@@ -30,11 +30,9 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
-import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -58,26 +56,10 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
 
     @Override
     protected BitStringValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Node type = valueAssignment.getType();
-        Node value = valueAssignment.getValue();
+        Type type = (Type) valueAssignment.getType();
+        Value value = (Value) valueAssignment.getValue();
 
-        if (type instanceof BitString) {
-            if (value instanceof AbstractBaseXStringValue) {
-                return ((AbstractBaseXStringValue) value).toBitString();
-            } else if (value instanceof BitStringValue) {
-                return (BitStringValue) value;
-            }
-
-            throw new CompilerException("BIT STRING value expected");
-        } else if (type instanceof TypeReference) {
-            BitStringValue bitStringValue = resolveAmbiguousValue(value, BitStringValue.class);
-
-            if (bitStringValue != null) {
-                return resolve((Type) type, bitStringValue);
-            }
-        }
-
-        throw new CompilerException("Failed to resolve a BIT STRING value");
+        return resolveGeneric(type, value);
     }
 
     @Override
@@ -96,21 +78,19 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
 
     @Override
     public BitStringValue resolveGeneric(Type type, Value value) {
-        BitStringValue bitStringValue = null;
-
-        if (value instanceof AbstractBaseXStringValue) {
-            bitStringValue = ((AbstractBaseXStringValue) value).toBitString();
+        if (value instanceof SimpleDefinedValue) {
+            return ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+        } else if (value instanceof AbstractBaseXStringValue) {
+            return ((AbstractBaseXStringValue) value).toBitString();
         } else {
-            if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-                bitStringValue = ctx.resolveValue(BitStringValue.class,
-                        resolveAmbiguousValue(value, SimpleDefinedValue.class));
-            } else if (resolveAmbiguousValue(value, BitStringValue.class) != null) {
-                bitStringValue = ctx.resolveValue(BitStringValue.class, type,
-                        resolveAmbiguousValue(value, BitStringValue.class));
+            value = resolveAmbiguousValue(value, BitStringValue.class);
+
+            if (value instanceof BitStringValue) {
+                return resolve(type, (BitStringValue) value);
             }
         }
 
-        return bitStringValue;
+        throw new CompilerException("Failed to resolve a BIT STRING value");
     }
 
     private BitStringValue resolveValue(String typeName, Map<String, BigInteger> namedBits,
@@ -126,7 +106,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
         }
 
         bits.sort(Comparator.reverseOrder());
-        
+
         int length = bits.get(0).intValue() / 8 + 1;
         byte[] byteValue = new byte[length];
 

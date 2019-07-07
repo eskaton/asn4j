@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.commons.utils.HexDump;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
@@ -134,7 +135,7 @@ public class BitStringValue extends AbstractValue {
     public String toString() {
         String namedValuesStr = namedValues != null ? StringUtils.join(namedValues, ", ") :
                 String.valueOf(this.value);
-        String valueStr = byteValue != null ? "0x" + new BigInteger(byteValue).toString(16) : namedValuesStr;
+        String valueStr = byteValue != null ? "0x" + HexDump.toHexString(byteValue) : namedValuesStr;
 
         return StringUtils.concat(getClass().getSimpleName() + "[", valueStr, "]");
     }
