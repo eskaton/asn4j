@@ -36,8 +36,6 @@ import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.Optional;
-
 public class OctetStringValueResolver extends AbstractValueResolver<OctetStringValue> {
 
     public OctetStringValueResolver(CompilerContext ctx) {
@@ -55,16 +53,8 @@ public class OctetStringValueResolver extends AbstractValueResolver<OctetStringV
     @Override
     public OctetStringValue resolveGeneric(Type type, Value value) {
         if (value instanceof SimpleDefinedValue) {
-            Optional<ValueOrObjectAssignmentNode> assignment = ctx.tryResolveAllReferences((SimpleDefinedValue) value);
-
-            if (assignment.isPresent()) {
-                value = (Value) assignment.get().getValue();
-            } else {
-                value = null;
-            }
-        }
-
-        if (value instanceof AbstractBaseXStringValue) {
+            return ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+        } else if (value instanceof AbstractBaseXStringValue) {
             return ((AbstractBaseXStringValue) value).toOctetString();
         }
 
