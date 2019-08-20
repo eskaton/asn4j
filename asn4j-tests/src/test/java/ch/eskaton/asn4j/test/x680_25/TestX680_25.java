@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -63,7 +63,7 @@ public class TestX680_25 {
         TestSequence1 a = new TestSequence1();
         a.setA(ASN1Integer.valueOf(4711));
         a.setB(ASN1Boolean.TRUE);
-        a.setC(ASN1OctetString.valueOf("test"));
+        a.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
@@ -78,7 +78,7 @@ public class TestX680_25 {
     public void testOptional() {
         TestSequence2 a = new TestSequence2();
         a.setA(ASN1Integer.valueOf(4711));
-        a.setC(ASN1OctetString.valueOf("test"));
+        a.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
@@ -98,18 +98,17 @@ public class TestX680_25 {
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
 
-        TestSequence3 b = decoder
-                .decode(TestSequence3.class, encoder.encode(a));
+        TestSequence3 b = decoder.decode(TestSequence3.class, encoder.encode(a));
 
         assertEquals(a, b);
-        assert (ASN1OctetString.valueOf("test").equals(b.getC()));
+        assert (ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }).equals(b.getC()));
     }
 
     @Test
     public void testDefaultAtStart() {
         TestSequence4 a = new TestSequence4();
         a.setB(ASN1Boolean.TRUE);
-        a.setC(ASN1OctetString.valueOf("test"));
+        a.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
