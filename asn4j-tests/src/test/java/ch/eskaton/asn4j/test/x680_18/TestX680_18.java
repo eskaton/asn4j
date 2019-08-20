@@ -62,7 +62,7 @@ public class TestX680_18 {
         TestBooleans b = decoder.decode(TestBooleans.class, encoder.encode(a));
 
         assertEquals(a, b);
-        assertEquals(ASN1Boolean.of(true), a.getTestBoolean1());
+        assertEquals(ASN1Boolean.of(true), b.getTestBoolean1());
         assertEquals(ASN1Boolean.of(false), b.getTestBoolean2());
         assertEquals(new TestBoolean(true), b.getTestBoolean3());
         assertEquals(ASN1Boolean.of(false), b.getTestBoolean4());

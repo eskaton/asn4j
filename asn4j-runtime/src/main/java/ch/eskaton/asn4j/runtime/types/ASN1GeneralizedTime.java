@@ -56,7 +56,7 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
 
     private Temporal dateTime;
 
-    public static ASN1GeneralizedTime from(LocalDateTime dateTime) throws ASN1RuntimeException {
+    public static ASN1GeneralizedTime from(LocalDateTime dateTime) {
         ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
 
         instance.setTime(dateTime);
@@ -64,7 +64,7 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
         return instance;
     }
 
-    public static ASN1GeneralizedTime from(OffsetDateTime dateTime) throws ASN1RuntimeException {
+    public static ASN1GeneralizedTime from(OffsetDateTime dateTime) {
         ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
 
         instance.setTime(dateTime);
@@ -72,7 +72,7 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
         return instance;
     }
 
-    public static ASN1GeneralizedTime from(String dateTimeString) throws ASN1RuntimeException {
+    public static ASN1GeneralizedTime from(String dateTimeString) {
         ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
 
         instance.setValue(dateTimeString);
@@ -81,7 +81,7 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
     }
 
     @Override
-    public void setValue(String value) throws ASN1RuntimeException {
+    public void setValue(String value) {
         DateTime dateTime = generalizedTimeParser.parse(value);
         LocalDateTime localDateTime = LocalDateTime.of(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay(), dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond(), dateTime.getNanos());
 
@@ -122,7 +122,7 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
         return date + time + nanos + offset;
     }
 
-    public void setTime(Temporal dateTime) throws ASN1RuntimeException {
+    public void setTime(Temporal dateTime) {
         if (!(dateTime instanceof LocalDateTime || dateTime instanceof OffsetDateTime)) {
             throw new ASN1RuntimeException("Invalid argument. Instance of " +
                     LocalDateTime.class.getSimpleName() + " or " +

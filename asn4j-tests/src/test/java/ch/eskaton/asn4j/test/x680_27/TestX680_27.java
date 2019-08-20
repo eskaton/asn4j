@@ -56,7 +56,7 @@ public class TestX680_27 {
     public void testSet2() {
         TestSet2 a = new TestSet2();
         a.setA(ASN1Integer.valueOf(4711));
-        a.setB(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, 0x7f }));
+        a.setB(ASN1OctetString.valueOf(new byte[] { 0x74, 0x65, 0x73, 0x74 }));
         a.setC(ASN1Integer.valueOf(23));
 
         BEREncoder encoder = new BEREncoder();

@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.parsing.DateTime;
 import ch.eskaton.asn4j.runtime.parsing.UTCTimeParser;
 import ch.eskaton.asn4j.runtime.utils.ToString;
@@ -43,7 +42,7 @@ public class ASN1UTCTime extends ASN1VisibleString {
 
     private DateTime dateTime;
 
-    public static ASN1UTCTime from(String dateTimeString) throws ASN1RuntimeException {
+    public static ASN1UTCTime from(String dateTimeString) {
         ASN1UTCTime instance = new ASN1UTCTime();
 
         instance.setValue(dateTimeString);
@@ -52,7 +51,7 @@ public class ASN1UTCTime extends ASN1VisibleString {
     }
 
     @Override
-    public void setValue(String value) throws ASN1RuntimeException {
+    public void setValue(String value) {
         this.dateTime = utcTimeParser.parse(value);
     }
 

@@ -53,11 +53,11 @@ public class BitStringDefaultCompiler implements DefaultCompiler {
             unusedBits = bitStringValue.getUnusedBits();
         }
 
-        String strValue = BitStringUtils.getInitializerString(bytes);
+        String initializerString = BitStringUtils.getInitializerString(bytes);
         String defaultField = addDefaultField(clazz, typeName, field);
 
         clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName +
-                "();\n\t\t" + defaultField + ".setValue(" + strValue + ", " + unusedBits + ");"));
+                "();\n\t\t" + defaultField + ".setValue(" + initializerString + ", " + unusedBits + ");"));
     }
 
 }

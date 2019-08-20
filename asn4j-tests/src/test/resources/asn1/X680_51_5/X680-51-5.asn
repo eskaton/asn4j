@@ -15,4 +15,18 @@ TestBitStringSize ::= INTEGER (ALL EXCEPT 1)
 TestBitString11 ::= BIT STRING (SIZE (INCLUDES TestBitStringSize))
 TestBitString12 ::= BIT STRING (SIZE (INTEGER EXCEPT 2))
 
+TestOctetString1 ::= OCTET STRING (SIZE(MIN..MAX))
+TestOctetString2 ::= OCTET STRING (SIZE(4..MAX))
+TestOctetString3 ::= OCTET STRING (SIZE(MIN..4))
+TestOctetString4 ::= OCTET STRING (SIZE(2..6))
+TestOctetString5 ::= OCTET STRING (SIZE(4..MAX) | SIZE(2..8))
+TestOctetString6 ::= OCTET STRING (SIZE(4..MAX) ^ SIZE(2..8))
+TestOctetString7 ::= OCTET STRING (SIZE(4..MAX) EXCEPT SIZE(8..16))
+TestOctetString8 ::= OCTET STRING (SIZE(4..MAX)) (SIZE(MIN..8))
+TestOctetString9 ::= OCTET STRING (SIZE(4..12), ..., SIZE(13..16))
+TestOctetString10 ::= OCTET STRING (SIZE (2))
+TestOctetStringSize ::= INTEGER (ALL EXCEPT 1)
+TestOctetString11 ::= OCTET STRING (SIZE (INCLUDES TestOctetStringSize))
+TestOctetString12 ::= OCTET STRING (SIZE (INTEGER EXCEPT 2))
+
 END

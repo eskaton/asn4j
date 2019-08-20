@@ -29,7 +29,10 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.commons.numeric.Hex;
+import ch.eskaton.commons.utils.HexDump;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -40,9 +43,10 @@ public class ASN1OctetString implements ASN1Type {
     private byte[] value;
 
     public ASN1OctetString() {
+        this.value = new byte[] {};
     }
 
-    private ASN1OctetString(byte[] value) {
+    public ASN1OctetString(byte[] value) {
         this.value = value;
     }
 
@@ -55,7 +59,23 @@ public class ASN1OctetString implements ASN1Type {
     }
 
     public void setValue(byte[] value) {
+        if (!checkConstraint(value)) {
+            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint",
+                    HexDump.toHexString(value)));
+        }
+
         this.value = value;
+    }
+
+    public ASN1OctetString value(byte[] value) {
+        setValue(value);
+
+        return this;
+    }
+
+    @SuppressWarnings("squid:S1172")
+    protected boolean checkConstraint(byte[] value) {
+        return true;
     }
 
     @Override

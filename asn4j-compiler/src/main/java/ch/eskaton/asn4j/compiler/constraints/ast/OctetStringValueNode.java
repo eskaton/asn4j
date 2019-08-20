@@ -25,39 +25,16 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+import java.util.List;
 
-public class BooleanDefaultCompiler implements DefaultCompiler {
+public class OctetStringValueNode extends ValueNode<List<OctetStringValue>> {
 
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        BooleanValue booleanValue;
-
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            booleanValue = ctx.resolveValue(BooleanValue.class,
-                    resolveAmbiguousValue(value, SimpleDefinedValue.class));
-        } else if (value instanceof BooleanValue) {
-            booleanValue = (BooleanValue) value;
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
-
-        String defaultField = addDefaultField(clazz, typeName, field);
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-                + "new " + typeName + "("
-                + booleanValue.getValue() + ");"));
+    public OctetStringValueNode(List<OctetStringValue> value) {
+        super(value);
     }
 
 }

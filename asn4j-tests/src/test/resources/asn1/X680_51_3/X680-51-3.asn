@@ -50,4 +50,10 @@ TestRelativeOidIri1 ::= RELATIVE-OID-IRI ("a/b/a" | testRelativeOidIri2)
 TestRelativeOidIri2 ::= RELATIVE-OID-IRI (INCLUDES TestRelativeOidIri1)
 TestRelativeOidIri3 ::= TestRelativeOidIri2 ("a/b/b")
 
+testOctetString1 OCTET STRING ::= '61AD'H
+
+TestOctetString1 ::= OCTET STRING ('0101'B | testOctetString1)
+TestOctetString2 ::= OCTET STRING (INCLUDES TestOctetString1)
+TestOctetString3 ::= TestOctetString2 ('61AD'H)
+
 END

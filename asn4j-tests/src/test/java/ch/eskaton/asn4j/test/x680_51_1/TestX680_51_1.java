@@ -52,11 +52,18 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestInteger9;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestNull1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestNull2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestObjectIdentifier2;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestOctetString1;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestOctetString2;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestOctetString3;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestOctetString5;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestOctetString6;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestOctetString7;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOID2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOidIri2;
 import org.junit.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.randomBytes;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
@@ -71,6 +78,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testOctetStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testOctetStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRIFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
@@ -292,6 +301,69 @@ public class TestX680_51_1 {
         testRelativeIRISuccess(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "b");
 
         testRelativeIRIFailure(new TestRelativeOidIri2(), "a", "b", "a");
+    }
+
+
+    @Test
+    public void testOctetString1() {
+        testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), new byte[] { 0x01, 0x02, 0x02 });
+        testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), new byte[] { 0x01, 0x02, 0x04 });
+
+        testOctetStringFailure(new TestOctetString1(), randomBytes(2));
+        testOctetStringFailure(new TestOctetString1(), randomBytes(4));
+        testOctetStringFailure(new TestOctetString1(), new byte[] { 0x01, 0x02, 0x03 });
+    }
+
+    @Test
+    public void testOctetString2() {
+        testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), new byte[] { 0x01, 0x02, 0x03 });
+        testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), randomBytes(1));
+        testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), randomBytes(2));
+
+        testOctetStringFailure(new TestOctetString2(), new byte[] { 0x01, 0x02, 0x02 });
+        testOctetStringFailure(new TestOctetString2(), new byte[] { 0x01, 0x02, 0x04 });
+        testOctetStringFailure(new TestOctetString2(), new byte[] {});
+        testOctetStringFailure(new TestOctetString2(), randomBytes(3));
+    }
+
+    @Test
+    public void testOctetString3() {
+        testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), new byte[] { 0x01, 0x02, 0x03 });
+        testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), new byte[] { 0x01, 0x02, 0x03 });
+        testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), new byte[] { 0x0A, 0x0B, 0x0C });
+        testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), randomBytes(1));
+        testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), randomBytes(2));
+
+        testOctetStringFailure(new TestOctetString3(), new byte[] { 0x01, 0x02, 0x02 });
+        testOctetStringFailure(new TestOctetString3(), new byte[] { 0x01, 0x02, 0x04 });
+        testOctetStringFailure(new TestOctetString3(), new byte[] {});
+        testOctetStringFailure(new TestOctetString3(), randomBytes(3));
+    }
+
+    @Test
+    public void testOctetString5() {
+        testOctetStringSuccess(TestOctetString5.class, new TestOctetString5(), new byte[] { 0x00 });
+        testOctetStringSuccess(TestOctetString5.class, new TestOctetString5(), new byte[] { 0x0F });
+
+        testOctetStringFailure(new TestOctetString5(), new byte[] { (byte) 0xF0 });
+    }
+
+    @Test
+    public void testOctetString6() {
+        testOctetStringSuccess(TestOctetString6.class, new TestOctetString6(), new byte[] {});
+        testOctetStringSuccess(TestOctetString6.class, new TestOctetString6(), new byte[] { (byte) 0xEF });
+        testOctetStringSuccess(TestOctetString6.class, new TestOctetString6(), new byte[] { (byte) 0xF1 });
+
+        testOctetStringFailure(new TestOctetString6(), new byte[] { (byte) 0xF0 });
+    }
+
+    @Test
+    public void testOctetString7() {
+        testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), new byte[] {});
+        testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), new byte[] { 0x0E });
+        testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), new byte[] { 0x10 });
+
+        testOctetStringFailure(new TestOctetString7(), new byte[] { (byte) 0x0F });
     }
 
 }

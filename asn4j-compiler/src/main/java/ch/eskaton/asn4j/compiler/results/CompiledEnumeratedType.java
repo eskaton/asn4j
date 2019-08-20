@@ -29,8 +29,11 @@ package ch.eskaton.asn4j.compiler.results;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class CompiledEnumeratedType extends CompiledType {
 
@@ -52,6 +55,24 @@ public class CompiledEnumeratedType extends CompiledType {
 
     public EnumerationItems getAdditions() {
         return additions;
+    }
+
+    public Optional<Tuple2<String, Integer>> getElementById(String id) {
+        Optional<Tuple2<String, Integer>> element = findElementById(getRoots(), id);
+
+        if (!element.isPresent()) {
+            element = findElementById(getAdditions(), id);
+        }
+
+        return element;
+    }
+
+    private Optional<Tuple2<String, Integer>> findElementById(EnumerationItems additions, String id) {
+        return additions.getItems().stream().filter(idMatcher(id)).findFirst();
+    }
+
+    private Predicate<Tuple2<String, Integer>> idMatcher(String id) {
+        return t -> t.get_1().equals(id);
     }
 
     @Override

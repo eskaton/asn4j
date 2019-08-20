@@ -41,7 +41,6 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBou
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.invert;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.union;
-import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.junit.Assert.assertEquals;

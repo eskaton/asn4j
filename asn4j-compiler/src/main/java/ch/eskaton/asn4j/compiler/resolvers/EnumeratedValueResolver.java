@@ -25,39 +25,60 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
+package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.commons.collections.Tuple2;
+
+import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
-public class BooleanDefaultCompiler implements DefaultCompiler {
+public class EnumeratedValueResolver extends AbstractValueResolver<Integer> {
 
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        BooleanValue booleanValue;
+    public EnumeratedValueResolver(CompilerContext ctx) {
+        super(ctx);
+    }
 
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            booleanValue = ctx.resolveValue(BooleanValue.class,
-                    resolveAmbiguousValue(value, SimpleDefinedValue.class));
-        } else if (value instanceof BooleanValue) {
-            booleanValue = (BooleanValue) value;
-        } else {
-            throw new CompilerException("Invalid default value");
+    @Override
+    protected Integer resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
+        Type type = (Type) valueAssignment.getType();
+        Value value = (Value) valueAssignment.getValue();
+
+        return resolveGeneric(type, value);
+    }
+
+    @Override
+    public Integer resolveGeneric(Type type, Value value) {
+        if (type instanceof TypeReference && value instanceof SimpleDefinedValue) {
+            CompiledEnumeratedType compiledType = (CompiledEnumeratedType) ctx.getCompiledType(type);
+
+            if (compiledType != null) {
+                Optional<ValueOrObjectAssignmentNode> assignmentNode =
+                        ctx.tryResolveAllReferences((SimpleDefinedValue) value);
+
+                if (assignmentNode.isPresent()) {
+                    value = resolveAmbiguousValue(assignmentNode.get().getValue(), SimpleDefinedValue.class);
+                }
+
+                String ref = ((SimpleDefinedValue) value).getValue();
+
+                Optional<Tuple2<String, Integer>> element = compiledType.getElementById(ref);
+
+                if (element.isPresent()) {
+                    return element.get().get_2();
+                }
+            }
         }
 
-        String defaultField = addDefaultField(clazz, typeName, field);
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-                + "new " + typeName + "("
-                + booleanValue.getValue() + ");"));
+        throw new CompilerException("Failed to resolve an ENUMERATED value");
     }
 
 }

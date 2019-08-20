@@ -20,7 +20,7 @@ public class AbstractBaseXStringValue extends AbstractValue {
     }
 
     public BitStringValue toBitString() {
-        byte[] bytes = new BigInteger(value, base).toByteArray();
+        byte[] bytes = value.length() == 0 ? new byte[] {} : new BigInteger(value, base).toByteArray();
         int unitLength = getUnitLength();
         int length = (int) Math.ceil((float) value.length() / unitLength);
 
@@ -34,7 +34,8 @@ public class AbstractBaseXStringValue extends AbstractValue {
 
     public OctetStringValue toOctetString() {
         int unitLength = getUnitLength();
-        int trailer = unitLength - value.length() % unitLength;
+        int excess = value.length() % unitLength;
+        int trailer = excess != 0 ? unitLength - excess : 0;
 
         if (trailer != 0) {
             value += StringUtils.repeat("0", trailer);

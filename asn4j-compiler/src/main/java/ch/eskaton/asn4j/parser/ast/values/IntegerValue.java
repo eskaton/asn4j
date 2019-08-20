@@ -36,15 +36,7 @@ import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class IntegerValue extends AbstractValue {
 
-    private String ref;
-
     private BigInteger value;
-
-    public IntegerValue(Position position, String ref) {
-        super(position);
-
-        this.ref = ref;
-    }
 
     public IntegerValue(BigInteger value) {
         this(NO_POSITION, value);
@@ -66,21 +58,13 @@ public class IntegerValue extends AbstractValue {
         value = BigInteger.valueOf(l);
     }
 
-    public String getRef() {
-        return ref;
-    }
-
     public BigInteger getValue() {
         return value;
     }
 
-    public boolean isReference() {
-        return ref != null;
-    }
-
     @Override
     public int hashCode() {
-        return Objects.hash(ref, value);
+        return Objects.hash(value);
     }
 
     @Override
@@ -99,13 +83,6 @@ public class IntegerValue extends AbstractValue {
 
         IntegerValue other = (IntegerValue) obj;
 
-        if (ref == null) {
-            if (other.ref != null) {
-                return false;
-            }
-        } else if (!ref.equals(other.ref)) {
-            return false;
-        }
 
         if (value == null) {
             if (other.value != null) {
