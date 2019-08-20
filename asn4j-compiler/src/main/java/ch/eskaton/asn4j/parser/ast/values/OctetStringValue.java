@@ -31,14 +31,14 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class OctetStringValue extends AbstractValue {
 
-    private char[] stringValue;
+    private byte[] byteValue;
 
     private Value value;
 
-    public OctetStringValue(Position position, char[] stringValue) {
+    public OctetStringValue(Position position, byte[] byteValue) {
         super(position);
 
-        this.stringValue = stringValue;
+        this.byteValue = byteValue;
     }
 
     public OctetStringValue(Position position, Value value) {
@@ -47,8 +47,8 @@ public class OctetStringValue extends AbstractValue {
         this.value = value;
     }
 
-    public char[] getStringValue() {
-        return stringValue;
+    public byte[] getByteValue() {
+        return byteValue;
     }
 
     public Value getValue() {
