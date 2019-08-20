@@ -29,11 +29,13 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Arrays;
+
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+
 public class OctetStringValue extends AbstractValue {
 
     private byte[] byteValue;
-
-    private Value value;
 
     public OctetStringValue(Position position, byte[] byteValue) {
         super(position);
@@ -41,18 +43,32 @@ public class OctetStringValue extends AbstractValue {
         this.byteValue = byteValue;
     }
 
-    public OctetStringValue(Position position, Value value) {
-        super(position);
-
-        this.value = value;
+    public OctetStringValue(byte[] byteValue) {
+        this(NO_POSITION, byteValue);
     }
 
     public byte[] getByteValue() {
         return byteValue;
     }
 
-    public Value getValue() {
-        return value;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        OctetStringValue that = (OctetStringValue) obj;
+
+        return Arrays.equals(byteValue, that.byteValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(byteValue);
     }
 
 }

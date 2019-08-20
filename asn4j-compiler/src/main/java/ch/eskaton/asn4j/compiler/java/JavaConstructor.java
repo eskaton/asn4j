@@ -37,7 +37,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.JavaVisibility.PackagePrivate;
-import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 
 public class JavaConstructor implements JavaMethod {

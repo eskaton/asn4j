@@ -86,25 +86,25 @@ public class ASN1BitString implements ASN1Type {
         return this;
     }
 
-    public void setBit(int bit) throws ASN1RuntimeException {
+    public void setBit(int bit) {
         int pos = getPos(bit);
 
         value[pos] = value[pos] |= getBit(bit);
     }
 
-    public void clearBit(int bit) throws ASN1RuntimeException {
+    public void clearBit(int bit) {
         int pos = getPos(bit);
 
         value[pos] = (byte) (value[pos] & ~getBit(bit));
     }
 
-    public boolean testBit(int bit) throws ASN1RuntimeException {
+    public boolean testBit(int bit) {
         int pos = getPos(bit);
 
         return (value[pos] & getBit(bit)) != 0;
     }
 
-    private int getPos(int bit) throws ASN1RuntimeException {
+    private int getPos(int bit) {
         int pos = bit / 8;
 
         if (pos >= value.length) {

@@ -33,15 +33,14 @@ import org.junit.Test;
 
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.*;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.complement;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intValue;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.optSize;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.range;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.size;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intValue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 

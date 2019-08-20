@@ -25,39 +25,33 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
+package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.compiler.constraints.ast.OctetStringValueNode;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValueComparator;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+import java.util.Comparator;
+import java.util.List;
 
-public class BooleanDefaultCompiler implements DefaultCompiler {
+public class OctetStringConstraintOptimizingVisitor
+        extends BaseXStringConstraintOptimizingVisitor<OctetStringValue, OctetStringValueNode> {
 
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        BooleanValue booleanValue;
+    private static final OctetStringValueComparator COMPARATOR = new OctetStringValueComparator();
 
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            booleanValue = ctx.resolveValue(BooleanValue.class,
-                    resolveAmbiguousValue(value, SimpleDefinedValue.class));
-        } else if (value instanceof BooleanValue) {
-            booleanValue = (BooleanValue) value;
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
+    @Override
+    protected OctetStringValueNode createValueNode(List<OctetStringValue> values) {
+        return new OctetStringValueNode(values);
+    }
 
-        String defaultField = addDefaultField(clazz, typeName, field);
+    @Override
+    protected <C extends Comparator<OctetStringValue>> C getComparator() {
+        return (C) COMPARATOR;
+    }
 
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-                + "new " + typeName + "("
-                + booleanValue.getValue() + ");"));
+    @Override
+    protected int getSize(OctetStringValue value) {
+        return value.getByteValue().length;
     }
 
 }

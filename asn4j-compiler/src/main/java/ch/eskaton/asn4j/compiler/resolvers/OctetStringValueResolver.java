@@ -29,16 +29,12 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class OctetStringValueResolver extends AbstractValueResolver<OctetStringValue> {
 
@@ -48,45 +44,21 @@ public class OctetStringValueResolver extends AbstractValueResolver<OctetStringV
 
     @Override
     protected OctetStringValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Node type = valueAssignment.getType();
-        Node value = valueAssignment.getValue();
+        Type type = (Type) valueAssignment.getType();
+        Value value = (Value) valueAssignment.getValue();
 
-        if (type instanceof OctetStringValue) {
-            if (value instanceof AbstractBaseXStringValue) {
-                return ((AbstractBaseXStringValue) value).toOctetString();
-            } else if (value instanceof OctetStringValue) {
-                return (OctetStringValue) value;
-            }
-
-            throw new CompilerException("OCTET STRING value expected");
-        } else if (type instanceof TypeReference) {
-            OctetStringValue octetStringValue = resolveAmbiguousValue(value, OctetStringValue.class);
-
-            if (octetStringValue != null) {
-                return resolve((Type) type, octetStringValue);
-            }
-        }
-
-        throw new CompilerException("Failed to resolve a OCTET STRING value");
+        return resolveGeneric(type, value);
     }
 
     @Override
     public OctetStringValue resolveGeneric(Type type, Value value) {
-        OctetStringValue octetStringValue = null;
-
-        if (value instanceof AbstractBaseXStringValue) {
-            octetStringValue = ((AbstractBaseXStringValue) value).toOctetString();
-        } else {
-            if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-                octetStringValue = ctx.resolveValue(OctetStringValue.class,
-                        resolveAmbiguousValue(value, SimpleDefinedValue.class));
-            } else if (resolveAmbiguousValue(value, OctetStringValue.class) != null) {
-                octetStringValue = ctx.resolveValue(OctetStringValue.class, type,
-                        resolveAmbiguousValue(value, OctetStringValue.class));
-            }
+        if (value instanceof SimpleDefinedValue) {
+            return ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+        } else if (value instanceof AbstractBaseXStringValue) {
+            return ((AbstractBaseXStringValue) value).toOctetString();
         }
 
-        return octetStringValue;
+        throw new CompilerException("Failed to resolve an OCTET STRING value");
     }
 
 }

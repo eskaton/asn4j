@@ -25,39 +25,40 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
+package ch.eskaton.asn4j.parser.ast.values;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import org.junit.Test;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+import static org.junit.Assert.assertEquals;
 
-public class BooleanDefaultCompiler implements DefaultCompiler {
+public class AbstractBaseXStringValueTest {
 
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        BooleanValue booleanValue;
+    @Test
+    public void testToBitString() {
+        assertEquals(new BitStringValue(new byte[] {}, 0),
+                new AbstractBaseXStringValue(NO_POSITION, "", 2).toBitString());
 
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            booleanValue = ctx.resolveValue(BooleanValue.class,
-                    resolveAmbiguousValue(value, SimpleDefinedValue.class));
-        } else if (value instanceof BooleanValue) {
-            booleanValue = (BooleanValue) value;
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
+        assertEquals(new BitStringValue(new byte[] { (byte) 5 }, 4),
+                new AbstractBaseXStringValue(NO_POSITION, "0101", 2).toBitString());
 
-        String defaultField = addDefaultField(clazz, typeName, field);
+        assertEquals(new BitStringValue(new byte[] { (byte) 0xff }, 0),
+                new AbstractBaseXStringValue(NO_POSITION, "11111111", 2).toBitString());
 
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-                + "new " + typeName + "("
-                + booleanValue.getValue() + ");"));
+        assertEquals(new BitStringValue(new byte[] { 0x01, (byte) 0xff }, 7),
+                new AbstractBaseXStringValue(NO_POSITION, "111111111", 2).toBitString());
+    }
+
+    @Test
+    public void testToOctetString() {
+        assertEquals(new OctetStringValue(new byte[] {}),
+                new AbstractBaseXStringValue(NO_POSITION, "", 16).toOctetString());
+
+        assertEquals(new OctetStringValue(new byte[] { (byte) 0xf0 }),
+                new AbstractBaseXStringValue(NO_POSITION, "F", 16).toOctetString());
+
+        assertEquals(new OctetStringValue(new byte[] { 0x74, 0x65, 0x73, 0x74 }),
+                new AbstractBaseXStringValue(NO_POSITION, "74657374", 16).toOctetString());
     }
 
 }

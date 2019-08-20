@@ -69,4 +69,11 @@ TestRelativeOidIri3 ::= OID-IRI (("/a/b/c" | "/a/b/d") ^ "/a/b/c")
 TestRelativeOidIri4 ::= OID-IRI ("/a/b/e")
 TestRelativeOidIri5 ::= OID-IRI (testRelativeOidIri1)
 
+testOctetString1 OCTET STRING ::= '37'H
+
+TestOctetString1 ::= OCTET STRING ('0101'B | '37'H)
+TestOctetString2 ::= OCTET STRING (('0101'B | '37'H) EXCEPT testOctetString1)
+TestOctetString3 ::= OCTET STRING (('0101'B | '37'H) ^ testOctetString1)
+TestOctetString4 ::= OCTET STRING (testOctetString1)
+
 END

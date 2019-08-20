@@ -31,9 +31,9 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.complement;
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.oidValue;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.oidValue;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;

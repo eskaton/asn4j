@@ -25,39 +25,32 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.defaults;
+package ch.eskaton.asn4j.parser.ast.values;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaInitializer;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import java.util.Comparator;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+public class OctetStringValueComparator implements Comparator<OctetStringValue> {
 
-public class BooleanDefaultCompiler implements DefaultCompiler {
+    @Override
+    public int compare(OctetStringValue bitString1, OctetStringValue bitString2) {
+        int result = Integer.compare(bitString1.getByteValue().length, bitString2.getByteValue().length);
 
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        BooleanValue booleanValue;
-
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            booleanValue = ctx.resolveValue(BooleanValue.class,
-                    resolveAmbiguousValue(value, SimpleDefinedValue.class));
-        } else if (value instanceof BooleanValue) {
-            booleanValue = (BooleanValue) value;
-        } else {
-            throw new CompilerException("Invalid default value");
+        if (result != 0) {
+            return result;
         }
 
-        String defaultField = addDefaultField(clazz, typeName, field);
+        byte[] value1 = bitString1.getByteValue();
+        byte[] value2 = bitString2.getByteValue();
 
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-                + "new " + typeName + "("
-                + booleanValue.getValue() + ");"));
+        for (int i = 0; i < value1.length; i++) {
+            result = Integer.compare(value1[i], value2[i]);
+
+            if (result != 0) {
+                return result;
+            }
+        }
+
+        return 0;
     }
 
 }

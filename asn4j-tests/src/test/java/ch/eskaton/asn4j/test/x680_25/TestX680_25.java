@@ -52,8 +52,7 @@ public class TestX680_25 {
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
 
-        TestSequence0 b = decoder
-                .decode(TestSequence0.class, encoder.encode(a));
+        TestSequence0 b = decoder.decode(TestSequence0.class, encoder.encode(a));
 
         assertEquals(a, b);
     }
@@ -68,8 +67,7 @@ public class TestX680_25 {
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
 
-        TestSequence1 b = decoder
-                .decode(TestSequence1.class, encoder.encode(a));
+        TestSequence1 b = decoder.decode(TestSequence1.class, encoder.encode(a));
 
         assertEquals(a, b);
     }
@@ -83,8 +81,7 @@ public class TestX680_25 {
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
 
-        TestSequence2 b = decoder
-                .decode(TestSequence2.class, encoder.encode(a));
+        TestSequence2 b = decoder.decode(TestSequence2.class, encoder.encode(a));
 
         assertEquals(a, b);
     }
@@ -101,7 +98,7 @@ public class TestX680_25 {
         TestSequence3 b = decoder.decode(TestSequence3.class, encoder.encode(a));
 
         assertEquals(a, b);
-        assert (ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }).equals(b.getC()));
+        assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), b.getC());
     }
 
     @Test
@@ -113,11 +110,10 @@ public class TestX680_25 {
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
 
-        TestSequence4 b = decoder
-                .decode(TestSequence4.class, encoder.encode(a));
+        TestSequence4 b = decoder.decode(TestSequence4.class, encoder.encode(a));
 
         assertEquals(a, b);
-        assert (ASN1Integer.valueOf(4711).equals(b.getA()));
+        assertEquals(ASN1Integer.valueOf(4711), b.getA());
     }
 
     @Test
@@ -129,8 +125,7 @@ public class TestX680_25 {
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
 
-        TestSequence6 b = decoder
-                .decode(TestSequence6.class, encoder.encode(a));
+        TestSequence6 b = decoder.decode(TestSequence6.class, encoder.encode(a));
 
         assertEquals(a, b);
     }
@@ -143,11 +138,10 @@ public class TestX680_25 {
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
 
-        TestSequence6 b = decoder
-                .decode(TestSequence6.class, encoder.encode(a));
+        TestSequence6 b = decoder.decode(TestSequence6.class, encoder.encode(a));
 
         assertEquals(a, b);
-        assert (ASN1Integer.valueOf(23).equals(a.getA()));
+        assertEquals(ASN1Integer.valueOf(23), a.getA());
     }
 
 }

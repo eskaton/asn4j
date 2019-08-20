@@ -31,11 +31,11 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.complement;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intValue;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.range;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intValue;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 

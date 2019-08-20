@@ -7,4 +7,14 @@ TestEnumeration ::= ENUMERATED {
 
 testInt INTEGER ::= -3
 
+testEnumerationValue1 TestEnumeration ::= e
+
+testEnumerationValue2 TestEnumeration ::= testEnumerationValue1
+
+TestEnumerations ::= SEQUENCE {
+    testEnumeration1 TestEnumeration DEFAULT m,
+    testEnumeration2 TestEnumeration DEFAULT testEnumerationValue1,
+    testEnumeration3 TestEnumeration DEFAULT testEnumerationValue2
+}
+
 END
