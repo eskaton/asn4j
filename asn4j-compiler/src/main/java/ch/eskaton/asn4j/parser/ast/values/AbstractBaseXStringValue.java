@@ -40,10 +40,10 @@ public class AbstractBaseXStringValue extends AbstractValue {
             value += StringUtils.repeat("0", trailer);
         }
 
-        char[] buf = new char[value.length() / unitLength];
+        byte[] buf = new byte[value.length() / unitLength];
 
         for (int i = 0, pos = 0; pos < value.length(); i++, pos += unitLength) {
-            buf[i] = (char) Short.parseShort(value.substring(pos, pos + unitLength), base);
+            buf[i] = (byte) Short.parseShort(value.substring(pos, pos + unitLength), base);
         }
 
         return new OctetStringValue(getPosition(), buf);
