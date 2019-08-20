@@ -32,7 +32,12 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.java.JavaClass;
 import ch.eskaton.asn4j.compiler.java.JavaInitializer;
+import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
@@ -41,18 +46,21 @@ public class OctetStringDefaultCompiler implements DefaultCompiler {
 
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
             Value value) {
-        value = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
+        byte[] bytes;
 
-        if (!(value instanceof StringValue)) {
-            throw new CompilerException("Invalid default value");
+        if (value instanceof EmptyValue) {
+            bytes = new byte[0];
+        } else {
+            OctetStringValue octetStringValue = ctx.resolveGenericValue(OctetStringValue.class, type, value);
+
+            bytes = octetStringValue.getByteValue();
         }
 
+        String strValue = BitStringUtils.getInitializerString(bytes);
         String defaultField = addDefaultField(clazz, typeName, field);
-        String strValue = ((StringValue) value).getCString();
 
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-                + ASN1OctetString.class.getSimpleName() + ".valueOf(\""
-                + strValue + "\");"));
+        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName +
+                "();\n\t\t" + defaultField + ".setValue(" + strValue  + ");"));
     }
 
 }

@@ -41,7 +41,7 @@ public class TestX680_29 {
     public void testChoice1() {
         TestChoice1 a = new TestChoice1();
 
-        a.setB(ASN1OctetString.valueOf("test"));
+        a.setB(ASN1OctetString.valueOf(new byte[] { (byte)0xff, (byte)0x65 }));
 
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
