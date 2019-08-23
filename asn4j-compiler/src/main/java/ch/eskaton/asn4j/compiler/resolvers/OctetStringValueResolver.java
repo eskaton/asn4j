@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
@@ -40,14 +39,6 @@ public class OctetStringValueResolver extends AbstractValueResolver<OctetStringV
 
     public OctetStringValueResolver(CompilerContext ctx) {
         super(ctx);
-    }
-
-    @Override
-    protected OctetStringValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Type type = (Type) valueAssignment.getType();
-        Value value = (Value) valueAssignment.getValue();
-
-        return resolveGeneric(type, value);
     }
 
     @Override

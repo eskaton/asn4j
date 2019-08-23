@@ -55,14 +55,6 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
     }
 
     @Override
-    protected BitStringValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Type type = (Type) valueAssignment.getType();
-        Value value = (Value) valueAssignment.getValue();
-
-        return resolveGeneric(type, value);
-    }
-
-    @Override
     public BitStringValue resolve(Type type, BitStringValue value) {
         Type base = ctx.getBase(type);
 

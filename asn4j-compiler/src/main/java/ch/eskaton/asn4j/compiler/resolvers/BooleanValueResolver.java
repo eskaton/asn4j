@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -42,14 +41,6 @@ public class BooleanValueResolver extends AbstractValueResolver<BooleanValue> {
 
     public BooleanValueResolver(CompilerContext ctx) {
         super(ctx);
-    }
-
-    @Override
-    protected BooleanValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Type type = (Type) valueAssignment.getType();
-        Value value = (Value) valueAssignment.getValue();
-
-        return resolveGeneric(type, value);
     }
 
     @Override
