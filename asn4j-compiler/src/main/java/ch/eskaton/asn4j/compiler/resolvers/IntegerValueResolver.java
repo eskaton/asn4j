@@ -48,14 +48,6 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
     }
 
     @Override
-    protected BigInteger resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Type type = (Type) valueAssignment.getType();
-        Value value = (Value) valueAssignment.getValue();
-
-        return resolveGeneric(type, value);
-    }
-
-    @Override
     public BigInteger resolveGeneric(Type type, Value value) {
         CompiledType compiledType = ctx.getCompiledType(type);
 

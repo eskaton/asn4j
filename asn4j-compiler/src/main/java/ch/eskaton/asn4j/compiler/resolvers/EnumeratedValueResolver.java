@@ -48,14 +48,6 @@ public class EnumeratedValueResolver extends AbstractValueResolver<Integer> {
     }
 
     @Override
-    protected Integer resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Type type = (Type) valueAssignment.getType();
-        Value value = (Value) valueAssignment.getValue();
-
-        return resolveGeneric(type, value);
-    }
-
-    @Override
     public Integer resolveGeneric(Type type, Value value) {
         if (type instanceof TypeReference && value instanceof SimpleDefinedValue) {
             CompiledEnumeratedType compiledType = (CompiledEnumeratedType) ctx.getCompiledType(type);

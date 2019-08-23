@@ -28,9 +28,12 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public abstract class AbstractValueResolver<V> implements ValueResolver<V> {
 
@@ -45,6 +48,14 @@ public abstract class AbstractValueResolver<V> implements ValueResolver<V> {
         return resolve(ctx.resolveDefinedValue(ref));
     }
 
+    public V resolve(SimpleDefinedValue value) {
+        try {
+            return ctx.tryResolveAllReferences(value).map(this::resolve).orElseThrow(this::error);
+        } catch (Throwable throwable) {
+            throw (RuntimeException) throwable;
+        }
+    }
+
     @Override
     public V resolve(String ref) {
         return resolve(ctx.resolveReference(ref));
@@ -55,6 +66,15 @@ public abstract class AbstractValueResolver<V> implements ValueResolver<V> {
         return value;
     }
 
-    protected abstract V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment);
+    protected V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
+        Type type = (Type) valueAssignment.getType();
+        Value value = (Value) valueAssignment.getValue();
+
+        return resolveGeneric(type, value);
+    }
+
+    protected <T extends RuntimeException> T error() {
+        return (T) new CompilerException("Failed to resolve a value");
+    }
 
 }
