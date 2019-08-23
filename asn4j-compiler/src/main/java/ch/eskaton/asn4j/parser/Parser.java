@@ -3891,7 +3891,7 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public Constraint parse() throws ParserException {
-            return new ChoiceParser<>(generalConstraintParser, subtypeConstraintParser).parse();
+            return new ChoiceParser<>(subtypeConstraintParser, generalConstraintParser).parse();
         }
 
     }

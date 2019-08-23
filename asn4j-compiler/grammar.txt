@@ -703,7 +703,7 @@ SubtypeElements ::=
      |    DurationRange
      |    TimePointRange
      |    RecurrenceRange
-SingleValue    ::= Value
+SingleValue ::= Value
 ContainedSubtype ::= Includes Type
 Includes ::= INCLUDES | empty
 ValueRange ::= LowerEndpoint ".." UpperEndpoint

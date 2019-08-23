@@ -1434,6 +1434,18 @@ public class ParserTest {
 
         testAmbiguousValue(result, CollectionValue.class);
 
+        parser = new Parser(new ByteArrayInputStream("{}".getBytes())).new BuiltinOrReferencedValueParser();
+
+        result = parser.parse();
+
+        assertTrue(result instanceof EmptyValue);
+
+        parser = new Parser(new ByteArrayInputStream("{ 1 }".getBytes())).new BuiltinOrReferencedValueParser();
+
+        result = parser.parse();
+
+        testAmbiguousValue(result, CollectionOfValue.class);
+
         parser = new Parser(new ByteArrayInputStream("{ 1, 2 }".getBytes())).new BuiltinOrReferencedValueParser();
 
         result = parser.parse();
