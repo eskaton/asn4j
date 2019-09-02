@@ -25,20 +25,47 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.java.objs;
 
-public enum JavaType {
-    BYTE("byte"), BYTE_ARRAY("byte[]"), SHORT("short"), INT("int"), LONG("long"), BOOLEAN("boolean");
+import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.commons.utils.StringUtils;
 
-    private final String type;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
-    JavaType(String type) {
-        this.type = type;
+public class JavaGetter implements JavaMethod {
+
+    private String typeName;
+
+    private String name;
+
+    private boolean hasDefault;
+
+    public JavaGetter(String typeName, String name) {
+        this(typeName, name, false);
     }
 
-    @Override
-    public String toString() {
-        return type;
+    public JavaGetter(String typeName, String name, boolean hasDefault) {
+        this.typeName = typeName;
+        this.name = name;
+        this.hasDefault = hasDefault;
+    }
+
+    public void write(BufferedWriter writer, String prefix) throws IOException {
+        writer.write(StringUtils.concat(prefix, "\tpublic ", typeName, " get",
+                StringUtils.initCap(name) + "() {\n"));
+
+        if (hasDefault) {
+            writer.write(StringUtils.concat(prefix, "\t\tif (", name, " != null) {\n"));
+            writer.write(StringUtils.concat(prefix, "\t\t\treturn ", name, ";\n"));
+            writer.write("\t\t}\n\n");
+            writer.write(StringUtils.concat(prefix, "\t\treturn ", CompilerUtils.getDefaultFieldName(name), ";\n"));
+        } else {
+            writer.write(StringUtils.concat(prefix, "\t\treturn ", name, ";\n"));
+        }
+
+        writer.write(prefix);
+        writer.write("\t}\n");
     }
 
 }

@@ -27,13 +27,13 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.java.JavaAnnotation;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
-import ch.eskaton.asn4j.compiler.java.JavaDefinedField;
-import ch.eskaton.asn4j.compiler.java.JavaEnum;
-import ch.eskaton.asn4j.compiler.java.JavaGetter;
-import ch.eskaton.asn4j.compiler.java.JavaTypedSetter;
+import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
+import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
+import ch.eskaton.asn4j.compiler.java.objs.JavaEnum;
+import ch.eskaton.asn4j.compiler.java.objs.JavaGetter;
+import ch.eskaton.asn4j.compiler.java.objs.JavaTypedSetter;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -46,8 +46,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Private;
-import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Private;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 
 public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 

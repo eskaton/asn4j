@@ -27,18 +27,18 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 
 public class SetOfCompiler implements NamedCompiler<SetOfType, CompiledType> {
 
     public CompiledType compile(CompilerContext ctx, String name, SetOfType node) {
-    	JavaClass javaClass = ctx.createClass(name, node, true);
-    	javaClass.setTypeParam(ctx.getTypeName(node.getType()));
-    	ctx.finishClass();
+        JavaClass javaClass = ctx.createClass(name, node, true);
+        javaClass.setTypeParam(ctx.getTypeName(node.getType()));
+        ctx.finishClass();
 
-    	return new CompiledType(node);
+        return new CompiledType(node);
     }
 
 }

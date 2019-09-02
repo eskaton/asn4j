@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
@@ -69,13 +69,6 @@ public class ConstraintCompiler {
                 .put(IRI.class, new IRIConstraintCompiler(ctx))
                 .put(RelativeIRI.class, new RelativeIRIConstraintCompiler(ctx))
 //                .put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver))
-//                .put(Null.class, new NullConstraintCompiler(typeResolver))
-//                .put(SetOfType.class, new SetOfConstraintCompiler(typeResolver))
-//                .put(ObjectIdentifier.class, new ObjectIdentifierConstraintCompiler(typeResolver))
-//                .put(RelativeOID.class, new RelativeOIDConstraintCompiler(typeResolver))
-//                .put(IRI.class, new IRIConstraintCompiler(typeResolver))
-//                .put(RelativeIRI.class, new RelativeIRIConstraintCompiler(typeResolver))
-
                 .build();
     }
 

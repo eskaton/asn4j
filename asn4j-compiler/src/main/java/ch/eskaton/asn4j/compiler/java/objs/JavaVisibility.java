@@ -25,44 +25,20 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.java.objs;
 
-import ch.eskaton.commons.utils.StringUtils;
+public enum JavaVisibility {
+    PackagePrivate(""), Private("private"), Protected("protected"), Public("public");
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+    private final String visibility;
 
-public class JavaEnum implements JavaObject {
-
-    private String name;
-
-    private List<String> enumConstants = new ArrayList<>();
-
-    public JavaEnum(String name) {
-    	this.name = name;
+    JavaVisibility(String visibility) {
+        this.visibility = visibility;
     }
 
-    public void write(BufferedWriter writer, String prefix) throws IOException {
-    	writer.write(StringUtils.concat(prefix, "public enum ", name, " {\n\t"));
-
-    	boolean first = true;
-
-    	for (String ec : enumConstants) {
-    		if (first) {
-    			first = false;
-    		} else {
-    			writer.write(",");
-    		}
-    		writer.write(StringUtils.concat(prefix, ec));
-    	}
-
-    	writer.write(StringUtils.concat("\n", prefix, "};\n\n"));
-    }
-
-    public void addEnumConstant(String enumConstant) {
-    	enumConstants.add(enumConstant);
+    @Override
+    public String toString() {
+        return visibility;
     }
 
 }

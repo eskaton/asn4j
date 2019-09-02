@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- *
+ * 
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- *
+ * 
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,47 +25,8 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.java.objs;
 
-import ch.eskaton.asn4j.compiler.CompilerUtils;
-import ch.eskaton.commons.utils.StringUtils;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-public class JavaGetter implements JavaMethod {
-
-    private String typeName;
-
-    private String name;
-
-    private boolean hasDefault;
-
-    public JavaGetter(String typeName, String name) {
-        this(typeName, name, false);
-    }
-
-    public JavaGetter(String typeName, String name, boolean hasDefault) {
-        this.typeName = typeName;
-        this.name = name;
-        this.hasDefault = hasDefault;
-    }
-
-    public void write(BufferedWriter writer, String prefix) throws IOException {
-        writer.write(StringUtils.concat(prefix, "\tpublic ", typeName, " get",
-                StringUtils.initCap(name) + "() {\n"));
-
-        if (hasDefault) {
-            writer.write(StringUtils.concat(prefix, "\t\tif (", name, " != null) {\n"));
-            writer.write(StringUtils.concat(prefix, "\t\t\treturn ", name, ";\n"));
-            writer.write("\t\t}\n\n");
-            writer.write(StringUtils.concat(prefix, "\t\treturn ", CompilerUtils.getDefaultFieldName(name), ";\n"));
-        } else {
-            writer.write(StringUtils.concat(prefix, "\t\treturn ", name, ";\n"));
-        }
-
-        writer.write(prefix);
-        writer.write("\t}\n");
-    }
-
+public enum JavaModifier {
+    Static, Final, Transient, Volatile
 }

@@ -25,8 +25,19 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.java.objs;
 
-public enum JavaModifier {
-    Static, Final, Transient, Volatile
+public class JavaInitializer {
+
+    private String body;
+
+    public JavaInitializer(String body) {
+    	this.body = body;
+    }
+
+    @Override
+    public String toString() {
+    	return body;
+    }
+
 }

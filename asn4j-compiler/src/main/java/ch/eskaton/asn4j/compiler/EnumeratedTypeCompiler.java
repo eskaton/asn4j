@@ -28,11 +28,11 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaClass.BodyBuilder;
-import ch.eskaton.asn4j.compiler.java.JavaConstructor;
-import ch.eskaton.asn4j.compiler.java.JavaParameter;
-import ch.eskaton.asn4j.compiler.java.JavaVisibility;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
+import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
+import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
+import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.EnumerationItems;
@@ -50,8 +50,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.JavaType.INT;
-import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaType.INT;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Arrays.asList;
 
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, CompiledType> {
