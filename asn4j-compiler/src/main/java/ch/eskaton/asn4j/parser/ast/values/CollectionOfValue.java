@@ -141,4 +141,5 @@ public class CollectionOfValue extends CollectionValue {
     public int hashCode() {
         return Objects.hash(super.hashCode(), isTuple, isQuadruple);
     }
+
 }

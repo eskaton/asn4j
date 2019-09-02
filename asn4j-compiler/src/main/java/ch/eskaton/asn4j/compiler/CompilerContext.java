@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.java.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.CollectionOfValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
@@ -82,6 +83,7 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
@@ -178,6 +180,7 @@ public class CompilerContext {
             .put(IRIValue.class, new DefaultValueResolver<>(CompilerContext.this, IRI.class, IRIValue.class))
             .put(RelativeIRIValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeIRI.class,
                     RelativeIRIValue.class))
+            .put(CollectionOfValue.class, new CollectionOfValueResolver(CompilerContext.this))
             .build();
 
     @SuppressWarnings("serial")
