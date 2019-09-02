@@ -28,11 +28,11 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.java.JavaClass;
-import ch.eskaton.asn4j.compiler.java.JavaConstructor;
-import ch.eskaton.asn4j.compiler.java.JavaParameter;
-import ch.eskaton.asn4j.compiler.java.JavaStaticInitializer;
-import ch.eskaton.asn4j.compiler.java.JavaVisibility;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
+import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
+import ch.eskaton.asn4j.compiler.java.objs.JavaStaticInitializer;
+import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
@@ -43,7 +43,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.java.JavaVisibility.Public;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 

@@ -28,6 +28,11 @@
 package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
+import ch.eskaton.asn4j.compiler.java.objs.JavaInterface;
+import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
+import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -25,13 +25,12 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.java.objs;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 
-public interface JavaObject {
+public interface JavaStructure extends JavaObject {
 
-    void write(BufferedWriter writer, String prefix) throws IOException;
+    void save(String dir) throws IOException;
 
 }

@@ -25,20 +25,13 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.java.objs;
 
-public enum JavaVisibility {
-    PackagePrivate(""), Private("private"), Protected("protected"), Public("public");
+import java.io.BufferedWriter;
+import java.io.IOException;
 
-    private final String visibility;
+public interface JavaObject {
 
-    JavaVisibility(String visibility) {
-        this.visibility = visibility;
-    }
-
-    @Override
-    public String toString() {
-        return visibility;
-    }
+    void write(BufferedWriter writer, String prefix) throws IOException;
 
 }

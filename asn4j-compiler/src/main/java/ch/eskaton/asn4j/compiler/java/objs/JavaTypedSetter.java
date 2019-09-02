@@ -25,65 +25,49 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.java.objs;
 
-import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
-public class JavaDefinedField implements JavaField {
+public class JavaTypedSetter implements JavaMethod {
 
     private String typeName;
 
     private String name;
 
-    private boolean hasDefault;
+    private String typeField;
 
-    private Set<JavaAnnotation> annotations = new HashSet<>();
+    private String typeConstant;
 
-    public JavaDefinedField(String typeName, String name) {
-        this(typeName, name, false);
+    private final String beforeCode;
+
+    public JavaTypedSetter(String typeName, String name, String typeField, String typeConstant) {
+        this(typeName, name, typeField, typeConstant, null);
     }
 
-    public JavaDefinedField(String typeName, String name, boolean hasDefault) {
+    public JavaTypedSetter(String typeName, String name, String typeField, String typeConstant, String beforeCode) {
         this.typeName = typeName;
         this.name = name;
-        this.hasDefault = hasDefault;
-    }
-
-    public void addAnnotation(JavaAnnotation annotation) {
-        annotations.add(annotation);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public boolean hasDefault() {
-        return hasDefault;
+        this.typeField = typeField;
+        this.typeConstant = typeConstant;
+        this.beforeCode = beforeCode;
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {
+        writer.write(StringUtils.concat(prefix, "\tpublic void set", StringUtils
+                .initCap(name) + "(" + typeName + " " + name + ") {\n"));
 
-        for (JavaAnnotation annotation : annotations) {
-            writer.write("\t");
-            annotation.write(writer, prefix);
+        if (beforeCode != null) {
+            writer.write(beforeCode);
         }
 
-        writer.write(StringUtils.concat(prefix, "\tprivate ", typeName, " ", name, ";\n"));
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
+        writer.write(StringUtils.concat(prefix, "\t\tthis.", typeField, " = ", typeConstant, ";\n"));
+        writer.write(StringUtils.concat(prefix, "\t\tthis.", name, " = ", name, ";\n"));
+        writer.write(prefix);
+        writer.write("\t}\n");
     }
 
 }

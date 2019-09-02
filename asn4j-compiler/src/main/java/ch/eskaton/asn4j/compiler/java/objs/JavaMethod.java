@@ -25,12 +25,8 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.java.objs;
 
-import java.io.IOException;
-
-public interface JavaStructure extends JavaObject {
-
-    void save(String dir) throws IOException;
+public interface JavaMethod extends JavaObject {
 
 }

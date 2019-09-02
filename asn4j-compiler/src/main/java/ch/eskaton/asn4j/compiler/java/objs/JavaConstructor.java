@@ -25,7 +25,7 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.java;
+package ch.eskaton.asn4j.compiler.java.objs;
 
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.java.JavaVisibility.PackagePrivate;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PackagePrivate;
 import static java.util.Optional.empty;
 
 public class JavaConstructor implements JavaMethod {
