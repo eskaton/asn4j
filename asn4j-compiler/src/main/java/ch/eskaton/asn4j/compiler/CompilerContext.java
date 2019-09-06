@@ -31,10 +31,10 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
+import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
-import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.CollectionOfValueResolver;
@@ -298,6 +298,16 @@ public class CompilerContext {
 
     public JavaClass getCurrentClass() {
         return currentClass.peek();
+    }
+
+    public Optional<JavaClass> getClass(String className) {
+        JavaStructure struct = structs.get(className);
+
+        if (struct instanceof JavaClass) {
+            return Optional.of((JavaClass) struct);
+        }
+
+        return Optional.empty();
     }
 
     public void pushModule(ModuleNode module) {
