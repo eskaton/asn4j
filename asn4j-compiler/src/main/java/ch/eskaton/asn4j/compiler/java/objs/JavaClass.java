@@ -133,6 +133,10 @@ public class JavaClass implements JavaStructure {
         this.typeParam = typeParam;
     }
 
+    public String getTypeParam() {
+        return typeParam;
+    }
+
     public void addImport(Class<?> clazz) {
         addImport(clazz.getName());
     }

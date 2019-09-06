@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Maps;
@@ -68,6 +69,7 @@ public class ConstraintCompiler {
                 .put(RelativeOID.class, new RelativeOIDConstraintCompiler(ctx))
                 .put(IRI.class, new IRIConstraintCompiler(ctx))
                 .put(RelativeIRI.class, new RelativeIRIConstraintCompiler(ctx))
+                .put(SetOfType.class, new SetOfConstraintCompiler(ctx))
 //                .put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver))
                 .build();
     }

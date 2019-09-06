@@ -25,29 +25,16 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.runtime.Clazz;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 
-import java.util.Objects;
+import java.util.List;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
-public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<T> {
+public class CollectionOfValueNode extends ValueNode<List<CollectionOfValue>> {
 
-    @SuppressWarnings("squid:S1172")
-    protected boolean checkConstraint(ASN1SetOf<T> value) {
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(values);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    public CollectionOfValueNode(List<CollectionOfValue> value) {
+        super(value);
     }
 
 }
