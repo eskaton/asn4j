@@ -32,10 +32,10 @@ import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 
 import java.math.BigInteger;
 
-public class EnumeratedTypeEncoder implements TypeEncoder<ASN1EnumeratedType> {
+public class EnumeratedTypeEncoder extends TypeEncoder<ASN1EnumeratedType> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1EnumeratedType obj) {
+    public byte[] doEncode(Encoder encoder, ASN1EnumeratedType obj) {
         return BigInteger.valueOf(obj.getValue()).toByteArray();
     }
 

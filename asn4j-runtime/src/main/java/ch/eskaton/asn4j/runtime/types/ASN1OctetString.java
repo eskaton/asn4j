@@ -31,14 +31,13 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.utils.ToString;
-import ch.eskaton.commons.numeric.Hex;
 import ch.eskaton.commons.utils.HexDump;
 
 import java.util.Arrays;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 4, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
-public class ASN1OctetString implements ASN1Type {
+public class ASN1OctetString implements ASN1Type, HasConstraint {
 
     private byte[] value;
 
@@ -59,11 +58,6 @@ public class ASN1OctetString implements ASN1Type {
     }
 
     public void setValue(byte[] value) {
-        if (!checkConstraint(value)) {
-            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint",
-                    HexDump.toHexString(value)));
-        }
-
         this.value = value;
     }
 
@@ -73,9 +67,13 @@ public class ASN1OctetString implements ASN1Type {
         return this;
     }
 
-    @SuppressWarnings("squid:S1172")
-    protected boolean checkConstraint(byte[] value) {
-        return true;
+    @Override
+    public void checkConstraint() {
+        if (!doCheckConstraint()) {
+            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint",
+                    HexDump.toHexString(value)));
+        }
+
     }
 
     @Override

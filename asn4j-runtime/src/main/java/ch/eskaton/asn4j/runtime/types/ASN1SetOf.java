@@ -33,11 +33,14 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
-public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<T> {
+public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<T> implements HasConstraint {
 
-    @SuppressWarnings("squid:S1172")
-    protected boolean checkConstraint(ASN1SetOf<T> value) {
-        return true;
+    public ASN1SetOf(T... values) {
+        super(values);
+    }
+
+    @Override
+    public void checkConstraint() {
     }
 
     @Override

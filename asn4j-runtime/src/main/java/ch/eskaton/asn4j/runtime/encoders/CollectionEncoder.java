@@ -38,11 +38,11 @@ import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 
-public abstract class CollectionEncoder<T extends ASN1Type> implements TypeEncoder<T> {
+public abstract class CollectionEncoder<T extends ASN1Type> extends TypeEncoder<T> {
 
     @Override
     @SuppressWarnings("squid:S3011")
-    public byte[] encode(Encoder encoder, T obj) {
+    public byte[] doEncode(Encoder encoder, T obj) {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
         List<Field> compFields = RuntimeUtils.getComponents(obj);

@@ -82,9 +82,9 @@ public class TestX680_51_3 {
         testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x01, 5);
         testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x02, 5);
 
-        testBitStringFailure(new TestBitString2(), 0x03, 5);
-        testBitStringFailure(new TestBitString2(), 0x00, 4);
-        testBitStringFailure(new TestBitString2(), 0x00, 6);
+        testBitStringFailure(TestBitString2.class, new TestBitString2(), 0x03, 5);
+        testBitStringFailure(TestBitString2.class, new TestBitString2(), 0x00, 4);
+        testBitStringFailure(TestBitString2.class, new TestBitString2(), 0x00, 6);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class TestX680_51_3 {
     public void testBoolean2() {
         testBooleanSuccess(TestBoolean2.class, new TestBoolean2(), true);
 
-        testBooleanFailure(new TestBoolean2(), false);
+        testBooleanFailure(TestBoolean2.class, new TestBoolean2(), false);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class TestX680_51_3 {
         testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.C);
         testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.D);
 
-        testEnumeratedFailure(new TestEnumeration2(), TestEnumeration1.A);
+        testEnumeratedFailure(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.A);
     }
 
     @Test
@@ -142,12 +142,12 @@ public class TestX680_51_3 {
 
     @Test
     public void testNull3() {
-        testNullFailure(() -> new TestNull3());
+        testNullFailure(TestNull3.class, () -> new TestNull3());
     }
 
     @Test
     public void testNull4() {
-        testNullFailure(() -> new TestNull4());
+        testNullFailure(TestNull4.class, () -> new TestNull4());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class TestX680_51_3 {
         testObjectIdentifierSuccess(TestObjectIdentifier2.class, new TestObjectIdentifier2(), 0, 3, 6, 1);
         testObjectIdentifierSuccess(TestObjectIdentifier2.class, new TestObjectIdentifier2(), 0, 3, 6, 2);
 
-        testObjectIdentifierFailure(new TestObjectIdentifier2(), 0, 3, 6, 3);
+        testObjectIdentifierFailure(TestObjectIdentifier2.class, new TestObjectIdentifier2(), 0, 3, 6, 3);
     }
 
     @Test
@@ -173,7 +173,7 @@ public class TestX680_51_3 {
         testRelativeOIDSuccess(TestRelativeOID2.class, new TestRelativeOID2(), 7, 3, 6, 1);
         testRelativeOIDSuccess(TestRelativeOID2.class, new TestRelativeOID2(), 7, 3, 6, 2);
 
-        testRelativeOIDFailure(new TestRelativeOID2(), 7, 3, 6, 3);
+        testRelativeOIDFailure(TestRelativeOID2.class, new TestRelativeOID2(), 7, 3, 6, 3);
     }
 
     @Test
@@ -181,7 +181,7 @@ public class TestX680_51_3 {
         testIRISuccess(TestOidIri1.class, new TestOidIri1(), "ISO", "a", "b", "a");
         testIRISuccess(TestOidIri1.class, new TestOidIri1(), "ISO", "a", "b", "b");
 
-        testIRIFailure(new TestOidIri1(), "ISO", "a", "b", "c");
+        testIRIFailure(TestOidIri1.class, new TestOidIri1(), "ISO", "a", "b", "c");
     }
 
     @Test
@@ -189,7 +189,7 @@ public class TestX680_51_3 {
         testIRISuccess(TestOidIri2.class, new TestOidIri2(), "ISO", "a", "b", "a");
         testIRISuccess(TestOidIri2.class, new TestOidIri2(), "ISO", "a", "b", "b");
 
-        testIRIFailure(new TestOidIri2(), "ISO", "a", "b", "c");
+        testIRIFailure(TestOidIri2.class, new TestOidIri2(), "ISO", "a", "b", "c");
     }
 
     @Test
@@ -197,7 +197,7 @@ public class TestX680_51_3 {
         testRelativeIRISuccess(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "a");
         testRelativeIRISuccess(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "b");
 
-        testRelativeIRIFailure(new TestRelativeOidIri1(), "a", "b", "c");
+        testRelativeIRIFailure(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "c");
     }
 
     @Test
@@ -205,14 +205,14 @@ public class TestX680_51_3 {
         testRelativeIRISuccess(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "a");
         testRelativeIRISuccess(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "b");
 
-        testRelativeIRIFailure(new TestRelativeOidIri2(), "a", "b", "c");
+        testRelativeIRIFailure(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "c");
     }
 
     @Test
     public void testRelativeOIDIRI3() {
         testRelativeIRISuccess(TestRelativeOidIri3.class, new TestRelativeOidIri3(), "a", "b", "b");
 
-        testRelativeIRIFailure(new TestRelativeOidIri3(), "a", "b", "a");
+        testRelativeIRIFailure(TestRelativeOidIri3.class, new TestRelativeOidIri3(), "a", "b", "a");
     }
 
     @Test
@@ -220,7 +220,7 @@ public class TestX680_51_3 {
         testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), new byte[] { 0x50 });
         testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), new byte[] { 0x61, (byte) 0xAD });
 
-        testOctetStringFailure(new TestOctetString1(), new byte[] { 0x51 });
+        testOctetStringFailure(TestOctetString1.class, new TestOctetString1(), new byte[] { 0x51 });
     }
 
     @Test
@@ -228,14 +228,14 @@ public class TestX680_51_3 {
         testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), new byte[] { 0x50 });
         testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), new byte[] { 0x61, (byte) 0xAD });
 
-        testOctetStringFailure(new TestOctetString2(), new byte[] { 0x51 });
+        testOctetStringFailure(TestOctetString2.class, new TestOctetString2(), new byte[] { 0x51 });
     }
 
     @Test
     public void testOctetString3() {
         testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), new byte[] { 0x61, (byte) 0xAD });
 
-        testOctetStringFailure(new TestOctetString3(), new byte[] { 0x50 });
+        testOctetStringFailure(TestOctetString3.class, new TestOctetString3(), new byte[] { 0x50 });
     }
 
 }

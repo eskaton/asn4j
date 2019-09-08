@@ -51,7 +51,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Protected;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.singleton;
 
 public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNode>
@@ -94,11 +94,13 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
     @Override
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter("String...", "value")
+        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
+                .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
         javaClass.addImport(Arrays.class);
+
+        builder.append("String[] value = getValue().toArray(new String[] {});");
 
         addConstraintCondition(definition, builder);
 

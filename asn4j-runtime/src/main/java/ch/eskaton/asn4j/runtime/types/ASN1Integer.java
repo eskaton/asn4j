@@ -36,24 +36,15 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 2, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
-public class ASN1Integer implements ASN1Type {
+public class ASN1Integer implements ASN1Type, HasConstraint {
 
     private BigInteger value;
-
-    protected boolean checkConstraint(BigInteger value) {
-        return true;
-    }
 
     public BigInteger getValue() {
         return value;
     }
 
     public void setValue(BigInteger value) {
-        if (!checkConstraint(value)) {
-            throw new ConstraintViolatedException(String.format(
-                    "%d doesn't satisfy a constraint", value));
-        }
-
         this.value = value;
     }
 
@@ -61,6 +52,14 @@ public class ASN1Integer implements ASN1Type {
         ASN1Integer value = new ASN1Integer();
         value.setValue(BigInteger.valueOf(i));
         return value;
+    }
+
+    @Override
+    public void checkConstraint() {
+        if (!doCheckConstraint()) {
+            throw new ConstraintViolatedException(String.format(
+                    "%d doesn't satisfy a constraint", value));
+        }
     }
 
     @Override

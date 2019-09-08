@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -44,9 +45,12 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Protected;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.singletonList;
 
 public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
@@ -95,10 +99,8 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
                     () -> new CompilerException("Failed to resolve parent class: %s", parentName));
         }
 
-        String paramType = String.format("%s<%s>", baseName, parentClass.getTypeParam());
-
-        JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter(paramType, "value")
+        JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
+                .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
         addConstraintCondition(definition, builder);
@@ -110,12 +112,17 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                return Optional.empty();
+                List<CollectionOfValue> values = ((CollectionOfValueNode) node).getValue();
+                return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
             case SIZE:
                 return Optional.empty();
             default:
                 return super.buildExpression(node);
         }
+    }
+
+    private String buildExpression(CollectionOfValue value) {
+        return "true";
     }
 
 }

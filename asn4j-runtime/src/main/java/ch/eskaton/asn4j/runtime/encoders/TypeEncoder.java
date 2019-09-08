@@ -29,9 +29,18 @@ package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.HasConstraint;
 
-public interface TypeEncoder<T extends ASN1Type> {
+public abstract class TypeEncoder<T extends ASN1Type> {
 
-    byte[] encode(Encoder encoder, T obj);
+    public byte[] encode(Encoder encoder, T obj) {
+        if (obj instanceof HasConstraint) {
+            ((HasConstraint) obj).checkConstraint();
+        }
+
+        return doEncode(encoder, obj);
+    }
+
+    protected abstract byte[] doEncode(Encoder encoder, T obj);
 
 }

@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Protected;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
@@ -110,8 +110,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
         javaClass.addImport(BigInteger.class);
 
-        BodyBuilder builder = javaClass.method().annotation(Override.class).modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter("BigInteger", "value")
+        BodyBuilder builder = javaClass.method().annotation(Override.class).modifier(Public)
+                .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
         addConstraintCondition(definition, builder);
@@ -142,14 +142,14 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) == 0)", lower);
+            return String.format("(getValue().compareTo(BigInteger.valueOf(%dL)) == 0)", lower);
         } else if (lower == Long.MIN_VALUE) {
-            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) <= 0)", upper);
+            return String.format("(getValue().compareTo(BigInteger.valueOf(%dL)) <= 0)", upper);
         } else if (upper == Long.MAX_VALUE) {
-            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0)", lower);
+            return String.format("(getValue().compareTo(BigInteger.valueOf(%dL)) >= 0)", lower);
         } else {
-            return String.format("(value.compareTo(BigInteger.valueOf(%dL)) >= 0 && "
-                    + "value.compareTo(BigInteger.valueOf(%dL)) <= 0)", lower, upper);
+            return String.format("(getValue().compareTo(BigInteger.valueOf(%dL)) >= 0 && "
+                    + "getValue().compareTo(BigInteger.valueOf(%dL)) <= 0)", lower, upper);
         }
     }
 

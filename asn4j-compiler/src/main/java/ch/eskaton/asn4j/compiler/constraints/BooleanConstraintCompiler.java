@@ -45,6 +45,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Protected;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 
 public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -78,8 +79,8 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter("Boolean", "value")
+        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
+                .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
         addConstraintCondition(definition, builder);
@@ -91,7 +92,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                return Optional.of("(value == " + ((ValueNode) node).getValue() + ")");
+                return Optional.of("(getValue() == " + ((ValueNode) node).getValue() + ")");
             default:
                 return super.buildExpression(node);
         }
