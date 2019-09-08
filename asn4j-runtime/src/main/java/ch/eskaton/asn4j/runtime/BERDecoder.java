@@ -67,6 +67,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
+import ch.eskaton.asn4j.runtime.types.HasConstraint;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.CollectionUtils;
@@ -246,6 +247,10 @@ public class BERDecoder implements Decoder {
             throw new DecodingException(th);
         } finally {
             state = states.back();
+        }
+
+        if (obj instanceof HasConstraint) {
+            ((HasConstraint) obj).checkConstraint();
         }
 
         return new DecodingResult(state.getTagIds(), obj);
