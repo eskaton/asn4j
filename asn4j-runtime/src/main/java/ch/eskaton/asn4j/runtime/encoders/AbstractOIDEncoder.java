@@ -5,7 +5,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import java.io.ByteArrayOutputStream;
 import java.util.LinkedList;
 
-public abstract class AbstractOIDEncoder<T extends ASN1Type> extends TypeEncoder<T> {
+public abstract class AbstractOIDEncoder<T extends ASN1Type> implements TypeEncoder<T> {
 
     public void writeComponent(ByteArrayOutputStream value, int component) {
         LinkedList<Integer> list = new LinkedList<>();

@@ -30,10 +30,10 @@ package ch.eskaton.asn4j.runtime.encoders;
 import ch.eskaton.asn4j.runtime.Encoder;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 
-public class BitStringEncoder extends TypeEncoder<ASN1BitString> {
+public class BitStringEncoder implements TypeEncoder<ASN1BitString> {
 
     @Override
-    public byte[] doEncode(Encoder encoder, ASN1BitString obj) {
+    public byte[] encode(Encoder encoder, ASN1BitString obj) {
         byte[] value = obj.getValue();
         int unusedBits = obj.getUnusedBits();
         byte[] buf = new byte[value.length + 1];

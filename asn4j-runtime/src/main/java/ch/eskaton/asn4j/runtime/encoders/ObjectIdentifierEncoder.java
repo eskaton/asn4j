@@ -37,7 +37,7 @@ import java.util.List;
 public class ObjectIdentifierEncoder extends AbstractOIDEncoder<ASN1ObjectIdentifier> {
 
     @Override
-    public byte[] doEncode(Encoder encoder, ASN1ObjectIdentifier obj) {
+    public byte[] encode(Encoder encoder, ASN1ObjectIdentifier obj) {
         List<Integer> components = obj.getValue();
         ByteArrayOutputStream value = new ByteArrayOutputStream();
         int component = 0;

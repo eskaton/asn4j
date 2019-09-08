@@ -37,10 +37,10 @@ import ch.eskaton.asn4j.runtime.utils.TLVUtils;
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
 
-public class ChoiceEncoder extends TypeEncoder<ASN1Choice> {
+public class ChoiceEncoder implements TypeEncoder<ASN1Choice> {
 
     @Override
-    public byte[] doEncode(Encoder encoder, ASN1Choice obj) {
+    public byte[] encode(Encoder encoder, ASN1Choice obj) {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
         ASN1Type value = obj.getValue();

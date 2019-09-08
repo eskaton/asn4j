@@ -33,10 +33,10 @@ import ch.eskaton.asn4j.runtime.types.ASN1Real;
 
 import java.math.BigDecimal;
 
-public class RealEncoder extends TypeEncoder<ASN1Real> {
+public class RealEncoder implements TypeEncoder<ASN1Real> {
 
     @Override
-    public byte[] doEncode(Encoder encoder, ASN1Real obj) {
+    public byte[] encode(Encoder encoder, ASN1Real obj) {
         switch (obj.getType()) {
             case NORMAL:
                 break;

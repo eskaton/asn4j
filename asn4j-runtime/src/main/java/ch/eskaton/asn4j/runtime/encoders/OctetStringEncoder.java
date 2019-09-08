@@ -30,10 +30,10 @@ package ch.eskaton.asn4j.runtime.encoders;
 import ch.eskaton.asn4j.runtime.Encoder;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 
-public class OctetStringEncoder extends TypeEncoder<ASN1OctetString> {
+public class OctetStringEncoder implements TypeEncoder<ASN1OctetString> {
 
     @Override
-    public byte[] doEncode(Encoder encoder, ASN1OctetString obj) {
+    public byte[] encode(Encoder encoder, ASN1OctetString obj) {
         return obj.getValue();
     }
 
