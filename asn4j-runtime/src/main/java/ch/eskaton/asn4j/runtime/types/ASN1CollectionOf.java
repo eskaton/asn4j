@@ -29,14 +29,25 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.Arrays.asList;
+
 public abstract class ASN1CollectionOf<T extends ASN1Type> implements ASN1Type {
 
     protected List<T> values = new LinkedList<>();
+
+    public ASN1CollectionOf(T... values) {
+        this.values.clear();
+        this.values.addAll(asList(values));
+    }
+
+    public ASN1CollectionOf(List<T> values) {
+        this.values.clear();
+        this.values.addAll(values);
+    }
 
     public List<T> getValues() {
         return values;
@@ -44,7 +55,7 @@ public abstract class ASN1CollectionOf<T extends ASN1Type> implements ASN1Type {
 
     public void setValues(T... values) {
         this.values.clear();
-        this.values.addAll(Arrays.asList(values));
+        this.values.addAll(asList(values));
     }
 
     public void setValues(List<T> values) {
