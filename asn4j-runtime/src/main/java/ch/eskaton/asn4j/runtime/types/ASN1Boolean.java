@@ -35,7 +35,7 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
-public class ASN1Boolean implements ASN1Type {
+public class ASN1Boolean implements ASN1Type, HasConstraint {
 
     public static final ASN1Boolean TRUE = new ASN1Boolean(true);
 
@@ -59,10 +59,6 @@ public class ASN1Boolean implements ASN1Type {
     }
 
     public void setValue(Boolean value) {
-        if (!checkConstraint(value)) {
-            throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
-        }
-
         this.value = value;
     }
 
@@ -72,9 +68,11 @@ public class ASN1Boolean implements ASN1Type {
         return this;
     }
 
-    @SuppressWarnings("squid:S1172")
-    protected boolean checkConstraint(Boolean value) {
-        return true;
+    @Override
+    public void checkConstraint() {
+        if (!doCheckConstraint()) {
+            throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
+        }
     }
 
     @Override

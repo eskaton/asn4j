@@ -53,8 +53,7 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaType.BYTE_ARRAY;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Protected;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
@@ -104,8 +103,8 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
         javaClass.addImport(Arrays.class);
 
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter(BYTE_ARRAY, "value")
+        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
+                .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
         addConstraintCondition(definition, builder);
@@ -136,7 +135,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private String buildExpression(OctetStringValue value) {
-        return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", value))";
+        return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", getValue()))";
     }
 
     private String buildSizeExpression(IntegerRange range) {
@@ -144,13 +143,13 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return String.format("(value.length == %dL)", lower);
+            return String.format("(getValue().length == %dL)", lower);
         } else if (lower == 0) {
-            return String.format("(value.length <= %dL)", upper);
+            return String.format("(getValue().length <= %dL)", upper);
         } else if (upper == Long.MAX_VALUE) {
-            return String.format("(value.length >= %dL)", lower);
+            return String.format("(getValue().length >= %dL)", lower);
         } else {
-            return String.format("(%dL <= value.length && %dL >= value.length)", lower, upper);
+            return String.format("(%dL <= getValue().length && %dL >= getValue().length)", lower, upper);
         }
     }
 

@@ -9,7 +9,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 
-public abstract class AbstractASN1IRI implements ASN1Type {
+public abstract class AbstractASN1IRI implements ASN1Type, HasConstraint {
 
     protected List<String> components;
 
@@ -18,11 +18,6 @@ public abstract class AbstractASN1IRI implements ASN1Type {
     }
 
     public void setValue(List<String> value) {
-        if (!checkConstraint(value.toArray(new String[] {}))) {
-            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint",
-                    StringUtils.join(value, "/")));
-        }
-
         this.components = new ArrayList<>(value);
     }
 
@@ -30,9 +25,12 @@ public abstract class AbstractASN1IRI implements ASN1Type {
         return components;
     }
 
-    @SuppressWarnings("squid:S1172")
-    protected boolean checkConstraint(String... value) {
-        return true;
+    @Override
+    public void checkConstraint() {
+        if (!doCheckConstraint()) {
+            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint",
+                    StringUtils.join(getValue(), "/")));
+        }
     }
 
     @Override

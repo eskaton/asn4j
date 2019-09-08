@@ -25,31 +25,20 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.encoders;
+package ch.eskaton.asn4j.runtime.types;
 
-import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
-import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
-import java.io.ByteArrayOutputStream;
-import java.util.List;
+public interface HasConstraint {
 
-public class RelativeOIDEncoder extends AbstractOIDEncoder<ASN1RelativeOID> {
-
-    @Override
-    public byte[] doEncode(Encoder encoder, ASN1RelativeOID obj) {
-        List<Integer> components = obj.getValue();
-        ByteArrayOutputStream value = new ByteArrayOutputStream();
-
-        if (components == null) {
-            throw new EncodingException("Invalid Relative OID: " + obj);
+    default void checkConstraint() {
+        if (!doCheckConstraint()) {
+            throw new ConstraintViolatedException("Value doesn't satisfy a constraint");
         }
+    }
 
-        for (int i = 0; i < components.size(); i++) {
-            writeComponent(value, components.get(i));
-        }
-
-        return value.toByteArray();
+    default boolean doCheckConstraint() {
+        return true;
     }
 
 }

@@ -35,10 +35,10 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-public abstract class CollectionOfEncoder<C extends ASN1CollectionOf<T>, T extends ASN1Type> implements TypeEncoder<C> {
+public abstract class CollectionOfEncoder<C extends ASN1CollectionOf<T>, T extends ASN1Type> extends TypeEncoder<C> {
 
     @Override
-    public byte[] encode(Encoder encoder, C obj) {
+    public byte[] doEncode(Encoder encoder, C obj) {
         ByteArrayOutputStream content = new ByteArrayOutputStream();
 
         List<T> values = obj.getValues();

@@ -53,9 +53,7 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaType.BYTE_ARRAY;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaType.INT;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Protected;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
@@ -105,9 +103,8 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
         javaClass.addImport(Arrays.class);
 
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Protected)
-                .returnType(boolean.class).name("checkConstraint").parameter(BYTE_ARRAY, "value")
-                .parameter(INT, "unusedBits")
+        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
+                .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
         addConstraintCondition(definition, builder);
@@ -139,7 +136,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
     private String buildExpression(BitStringValue value) {
         return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) +
-                ", value) && " + value.getUnusedBits() + " == unusedBits)";
+                ", getValue()) && " + value.getUnusedBits() + " == getUnusedBits())";
     }
 
     private String buildSizeExpression(IntegerRange range) {
@@ -147,14 +144,14 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return String.format("(ASN1BitString.getSize(value, unusedBits) == %dL)", lower);
+            return String.format("(ASN1BitString.getSize(getValue(), getUnusedBits()) == %dL)", lower);
         } else if (lower == 0) {
-            return String.format("(ASN1BitString.getSize(value, unusedBits) <= %dL)", upper);
+            return String.format("(ASN1BitString.getSize(getValue(), getUnusedBits()) <= %dL)", upper);
         } else if (upper == Long.MAX_VALUE) {
-            return String.format("(ASN1BitString.getSize(value, unusedBits) >= %dL)", lower);
+            return String.format("(ASN1BitString.getSize(getValue(), getUnusedBits()) >= %dL)", lower);
         } else {
-            return String.format("(%dL <= ASN1BitString.getSize(value, unusedBits) && "
-                    + "%dL >= ASN1BitString.getSize(value, unusedBits))", lower, upper);
+            return String.format("(%dL <= ASN1BitString.getSize(getValue(), getUnusedBits()) && "
+                    + "%dL >= ASN1BitString.getSize(getValue(), getUnusedBits()))", lower, upper);
         }
     }
 

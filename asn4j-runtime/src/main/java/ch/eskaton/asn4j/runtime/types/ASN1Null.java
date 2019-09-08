@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
@@ -37,7 +36,7 @@ import java.util.Objects;
 import static ch.eskaton.asn4j.runtime.types.ASN1Null.Value.NULL;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 5, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
-public class ASN1Null implements ASN1Type {
+public class ASN1Null implements ASN1Type, HasConstraint {
 
     public enum Value {NULL}
 
@@ -52,15 +51,11 @@ public class ASN1Null implements ASN1Type {
     }
 
     public void setValue(Value value) {
-        if (!checkConstraint(value)) {
-            throw new ConstraintViolatedException("Value doesn't satisfy a constraint");
-        }
-
         this.value = value;
     }
 
-    @SuppressWarnings("squid:S1172")
-    protected boolean checkConstraint(Value value) {
+    @Override
+    public boolean doCheckConstraint() {
         return true;
     }
 

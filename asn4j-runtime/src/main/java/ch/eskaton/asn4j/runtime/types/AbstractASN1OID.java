@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public abstract class AbstractASN1OID implements ASN1Type {
+public abstract class AbstractASN1OID implements ASN1Type, HasConstraint {
 
     protected List<Integer> components;
 
@@ -18,11 +18,6 @@ public abstract class AbstractASN1OID implements ASN1Type {
     }
 
     public void setValue(List<Integer> value) {
-        if (!checkConstraint(value.stream().mapToInt(Integer::valueOf).toArray())) {
-            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint",
-                    StringUtils.join(value, " ")));
-        }
-
         this.components = verifiedComponents(new ArrayList<>(value));
     }
 
@@ -32,9 +27,12 @@ public abstract class AbstractASN1OID implements ASN1Type {
 
     protected abstract List<Integer> verifiedComponents(List<Integer> components);
 
-    @SuppressWarnings("squid:S1172")
-    protected boolean checkConstraint(int... value) {
-        return true;
+    @Override
+    public void checkConstraint() {
+        if (!doCheckConstraint()) {
+            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint",
+                    StringUtils.join(getValue(), " ")));
+        }
     }
 
     @Override

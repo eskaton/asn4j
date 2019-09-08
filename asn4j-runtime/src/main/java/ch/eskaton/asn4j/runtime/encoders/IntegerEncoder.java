@@ -30,10 +30,10 @@ package ch.eskaton.asn4j.runtime.encoders;
 import ch.eskaton.asn4j.runtime.Encoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
-public class IntegerEncoder implements TypeEncoder<ASN1Integer> {
+public class IntegerEncoder extends TypeEncoder<ASN1Integer> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1Integer obj) {
+    public byte[] doEncode(Encoder encoder, ASN1Integer obj) {
         return obj.getValue().toByteArray();
     }
 

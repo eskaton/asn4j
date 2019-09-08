@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -36,7 +36,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 9, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
-public class ASN1Real implements ASN1Type {
+public class ASN1Real implements ASN1Type, HasConstraint {
 
     public enum Type {
         NORMAL, PLUS_INFINITY, MINUS_INFINITY, NOT_A_NUMBER, MINUS_ZERO
@@ -61,19 +61,11 @@ public class ASN1Real implements ASN1Type {
         this.type = type;
     }
 
-    protected boolean checkConstraint(BigDecimal value) {
-        return true;
-    }
-
     public BigDecimal getValue() {
         return value;
     }
 
     public void setValue(BigDecimal value) {
-        if (!checkConstraint(value)) {
-            throw new ConstraintViolatedException(String.format("%d doesn't satisfy a constraint", value));
-        }
-
         this.type = Type.NORMAL;
         this.value = value;
     }
@@ -91,6 +83,14 @@ public class ASN1Real implements ASN1Type {
         ASN1Real value = new ASN1Real();
         value.setValue(BigDecimal.valueOf(d).stripTrailingZeros());
         return value;
+    }
+
+    @Override
+    public void checkConstraint() {
+        if (!doCheckConstraint()) {
+            throw new ConstraintViolatedException(String.format("%d doesn't satisfy a constraint", value));
+        }
+
     }
 
     @Override
