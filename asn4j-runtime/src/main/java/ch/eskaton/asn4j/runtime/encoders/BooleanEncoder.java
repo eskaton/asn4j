@@ -30,10 +30,10 @@ package ch.eskaton.asn4j.runtime.encoders;
 import ch.eskaton.asn4j.runtime.Encoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 
-public class BooleanEncoder extends TypeEncoder<ASN1Boolean> {
+public class BooleanEncoder implements TypeEncoder<ASN1Boolean> {
 
     @Override
-    public byte[] doEncode(Encoder encoder, ASN1Boolean obj) {
+    public byte[] encode(Encoder encoder, ASN1Boolean obj) {
         return new byte[] { obj.getValue() ? (byte) 0xFF : (byte) 0x00 };
     }
 

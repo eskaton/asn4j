@@ -31,10 +31,10 @@ import ch.eskaton.asn4j.runtime.Encoder;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.commons.utils.StringUtils;
 
-public class RelativeIRIEncoder extends TypeEncoder<ASN1RelativeIRI> {
+public class RelativeIRIEncoder implements TypeEncoder<ASN1RelativeIRI> {
 
     @Override
-    public byte[] doEncode(Encoder encoder, ASN1RelativeIRI obj) {
+    public byte[] encode(Encoder encoder, ASN1RelativeIRI obj) {
         return (StringUtils.join(obj.getValue(), "/")).getBytes();
     }
 

@@ -64,6 +64,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
+import ch.eskaton.asn4j.runtime.types.HasConstraint;
 import ch.eskaton.asn4j.runtime.utils.TLVUtils;
 import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.HexDump;
@@ -125,6 +126,10 @@ public class BEREncoder implements Encoder {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] buf;
 
+        if (obj instanceof HasConstraint) {
+            ((HasConstraint) obj).checkConstraint();
+        }
+
         if (obj instanceof ASN1Boolean) {
             buf = this.<ASN1Boolean, BooleanEncoder>getEncoder(
                     ASN1Boolean.class).encode(this, (ASN1Boolean) obj);
@@ -163,9 +168,9 @@ public class BEREncoder implements Encoder {
             buf = this.<ASN1Set, SetEncoder>getEncoder(ASN1Set.class).encode(this, (ASN1Set) obj);
         } else if (obj instanceof ASN1SequenceOf) {
             buf = this.<ASN1SequenceOf, SequenceOfEncoder>getEncoder(ASN1SequenceOf.class)
-                    .encode(this, (ASN1SequenceOf<?>) obj);
+                    .encode(this, (ASN1SequenceOf) obj);
         } else if (obj instanceof ASN1SetOf) {
-            buf = this.<ASN1SetOf, SetOfEncoder>getEncoder(ASN1SetOf.class).encode(this, (ASN1SetOf<?>) obj);
+            buf = this.<ASN1SetOf, SetOfEncoder>getEncoder(ASN1SetOf.class).encode(this, (ASN1SetOf) obj);
         } else if (obj instanceof ASN1Choice) {
             buf = this.<ASN1Choice, ChoiceEncoder>getEncoder(ASN1Choice.class).encode(this, (ASN1Choice) obj);
         } else {

@@ -37,7 +37,7 @@ import java.util.List;
 public class RelativeOIDEncoder extends AbstractOIDEncoder<ASN1RelativeOID> {
 
     @Override
-    public byte[] doEncode(Encoder encoder, ASN1RelativeOID obj) {
+    public byte[] encode(Encoder encoder, ASN1RelativeOID obj) {
         List<Integer> components = obj.getValue();
         ByteArrayOutputStream value = new ByteArrayOutputStream();
 

@@ -44,7 +44,6 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Protected;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 
 public class BooleanConstraintCompiler extends AbstractConstraintCompiler {

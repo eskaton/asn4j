@@ -45,7 +45,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Protected;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 
 public class NullConstraintCompiler extends AbstractConstraintCompiler {
