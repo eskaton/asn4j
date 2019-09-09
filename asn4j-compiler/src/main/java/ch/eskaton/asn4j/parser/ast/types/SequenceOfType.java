@@ -29,18 +29,10 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class SequenceOfType extends AbstractType {
-
-    private Type type;
+public class SequenceOfType extends CollectionOfType {
 
     public SequenceOfType(Position position, Type type) {
-        super(position);
-
-    	this.type = type;
-    }
-
-    public Type getType() {
-    	return type;
+        super(position, type);
     }
 
 }
