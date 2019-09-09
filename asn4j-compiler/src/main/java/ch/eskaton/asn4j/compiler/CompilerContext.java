@@ -83,17 +83,24 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
+import ch.eskaton.asn4j.parser.ast.values.RealValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
+import ch.eskaton.asn4j.parser.ast.values.TimeValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
@@ -123,7 +130,6 @@ import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -221,8 +227,26 @@ public class CompilerContext {
 
     private Map<Class<? extends Type>, Class<? extends Value>> types2values =
             Maps.<Class<? extends Type>, Class<? extends Value>>builder()
-            .put(IntegerType.class, IntegerValue.class)
-            .build();
+                    .put(BooleanType.class, BooleanValue.class)
+                    .put(BitString.class, BitStringValue.class)
+                    .put(Choice.class, ChoiceValue.class)
+                    .put(EnumeratedType.class, EnumeratedValue.class)
+                    .put(GeneralizedTime.class, TimeValue.class)
+                    .put(UTCTime.class, TimeValue.class)
+                    .put(IntegerType.class, IntegerValue.class)
+                    .put(Null.class, NullValue.class)
+                    .put(ObjectIdentifier.class, ObjectIdentifierValue.class)
+                    .put(RelativeOID.class, RelativeOIDValue.class)
+                    .put(IRI.class, IRIValue.class)
+                    .put(RelativeIRI.class, RelativeIRIValue.class)
+                    .put(OctetString.class, OctetStringValue.class)
+                    .put(SequenceType.class, CollectionOfValue.class)
+                    .put(SequenceOfType.class, CollectionOfValue.class)
+                    .put(SetType.class, CollectionValue.class)
+                    .put(SetOfType.class, CollectionOfValue.class)
+                    .put(Real.class, RealValue.class)
+                    .put(VisibleString.class, StringValue.class)
+                    .build();
 
     private ConstraintCompiler constraintCompiler = new ConstraintCompiler(this);
 
