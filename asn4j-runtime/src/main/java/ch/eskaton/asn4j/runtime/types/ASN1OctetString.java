@@ -73,7 +73,6 @@ public class ASN1OctetString implements ASN1Type, HasConstraint {
             throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint",
                     HexDump.toHexString(value)));
         }
-
     }
 
     @Override

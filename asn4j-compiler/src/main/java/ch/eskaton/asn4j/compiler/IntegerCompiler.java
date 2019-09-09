@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaStaticInitializer;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.utils.StringUtils;
@@ -65,7 +66,7 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
                 long value;
 
                 if (namedNumber.getRef() != null) {
-                    bigValue = ctx.resolveValue(BigInteger.class, namedNumber.getRef());
+                    bigValue = ctx.resolveValue(IntegerValue.class, namedNumber.getRef()).getValue();
                 } else {
                     bigValue = namedNumber.getValue().getNumber();
                 }

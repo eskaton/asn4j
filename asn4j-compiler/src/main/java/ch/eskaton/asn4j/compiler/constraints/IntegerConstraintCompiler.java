@@ -80,8 +80,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             Value value = ((SingleValueConstraint) elements).getValue();
 
             try {
-                BigInteger intValue = ctx.resolveGenericValue(BigInteger.class, baseType.getType(), value);
-                long longValue = intValue.longValue();
+                IntegerValue intValue = ctx.resolveGenericValue(IntegerValue.class, baseType.getType(), value);
+                long longValue = intValue.getValue().longValue();
 
                 return new IntegerRangeValueNode((singletonList(new IntegerRange(longValue, longValue))));
             } catch (Exception e) {

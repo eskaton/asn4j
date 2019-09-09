@@ -38,8 +38,6 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
-import java.math.BigInteger;
-
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class IntegerDefaultCompiler implements DefaultCompiler {
@@ -50,8 +48,8 @@ public class IntegerDefaultCompiler implements DefaultCompiler {
         long intValue;
 
         if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            intValue = ctx.resolveValue(BigInteger.class,
-                    resolveAmbiguousValue(value, SimpleDefinedValue.class)).longValue();
+            intValue = ctx.resolveValue(IntegerValue.class,
+                    resolveAmbiguousValue(value, SimpleDefinedValue.class)).getValue().longValue();
         } else if (value instanceof IntegerValue) {
             intValue = ((IntegerValue) value).getValue().longValue();
 

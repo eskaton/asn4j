@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.commons.MutableInteger;
 import ch.eskaton.commons.collections.Tuple2;
@@ -172,7 +173,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         Integer number;
 
         if (item.getRef() != null) {
-            BigInteger bigValue = ctx.resolveValue(BigInteger.class, item.getRef());
+            BigInteger bigValue = ctx.resolveValue(IntegerValue.class, item.getRef()).getValue();
 
             if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
                 throw new CompilerException("Value %s too large in type %s", bigValue, name);
