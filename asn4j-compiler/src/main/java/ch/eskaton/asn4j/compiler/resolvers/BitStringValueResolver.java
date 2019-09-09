@@ -32,9 +32,11 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
+import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
@@ -121,7 +123,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
                 BigInteger intValue;
 
                 if (namedBit.getRef() != null) {
-                    intValue = ctx.resolveValue(BigInteger.class, namedBit.getRef());
+                    intValue = ctx.resolveValue(IntegerValue.class, namedBit.getRef()).getValue();
                 } else {
                     intValue = BigInteger.valueOf(namedBit.getNum());
                 }

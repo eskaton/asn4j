@@ -38,26 +38,25 @@ import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
-public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
+public class IntegerValueResolver extends AbstractValueResolver<IntegerValue> {
 
     public IntegerValueResolver(CompilerContext ctx) {
         super(ctx);
     }
 
     @Override
-    public BigInteger resolveGeneric(Type type, Value value) {
+    public IntegerValue resolveGeneric(Type type, Value value) {
         CompiledType compiledType = ctx.getCompiledType(type);
 
         if (value instanceof IntegerValue) {
-            return ((IntegerValue) value).getValue();
+            return (IntegerValue) value;
         }
 
         if (compiledType != null && compiledType.getType() instanceof IntegerType) {
             if (value instanceof IntegerValue) {
-                return ((IntegerValue) value).getValue();
+                return (IntegerValue) value;
             }
 
             Optional<ValueOrObjectAssignmentNode> assignmentNode =
@@ -67,7 +66,7 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
                 value = (Value) assignmentNode.get().getValue();
 
                 if (value instanceof IntegerValue) {
-                    return ((IntegerValue) value).getValue();
+                    return (IntegerValue) value;
                 }
             }
 
@@ -77,14 +76,14 @@ public class IntegerValueResolver extends AbstractValueResolver<BigInteger> {
         throw new CompilerException("Failed to resolve an INTEGER value");
     }
 
-    private BigInteger resolveNamedNumber(SimpleDefinedValue value, CompiledType compiledType) {
+    private IntegerValue resolveNamedNumber(SimpleDefinedValue value, CompiledType compiledType) {
         String reference = value.getValue();
         NamedNumber namedNumber = ((IntegerType) compiledType.getType()).getNamedNumber(reference);
 
         if (namedNumber.getValue() != null) {
-            return namedNumber.getValue().getNumber();
+            return new IntegerValue(namedNumber.getPosition(), namedNumber.getValue().getNumber());
         } else {
-            return ctx.resolveValue(BigInteger.class, namedNumber.getRef());
+            return ctx.resolveValue(IntegerValue.class, namedNumber.getRef());
         }
     }
 

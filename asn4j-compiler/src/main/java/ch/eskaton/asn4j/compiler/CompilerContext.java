@@ -87,6 +87,7 @@ import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
@@ -96,6 +97,7 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
@@ -169,7 +171,7 @@ public class CompilerContext {
 
     private Map<Class<?>, ValueResolver<?>> valueResolvers = Maps.<Class<?>, ValueResolver<?>>builder()
             .put(BooleanValue.class, new BooleanValueResolver(CompilerContext.this))
-            .put(BigInteger.class, new IntegerValueResolver(CompilerContext.this))
+            .put(IntegerValue.class, new IntegerValueResolver(CompilerContext.this))
             .put(Integer.class, new EnumeratedValueResolver(CompilerContext.this))
             .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
             .put(OctetStringValue.class, new OctetStringValueResolver(CompilerContext.this))
@@ -215,6 +217,11 @@ public class CompilerContext {
             .put(SetOfType.class.getSimpleName(), ASN1SetOf.class.getSimpleName())
             .put(Real.class.getSimpleName(), ASN1Real.class.getSimpleName())
             .put(VisibleString.class.getSimpleName(), ASN1VisibleString.class.getSimpleName())
+            .build();
+
+    private Map<Class<? extends Type>, Class<? extends Value>> types2values =
+            Maps.<Class<? extends Type>, Class<? extends Value>>builder()
+            .put(IntegerType.class, IntegerValue.class)
             .build();
 
     private ConstraintCompiler constraintCompiler = new ConstraintCompiler(this);
@@ -498,6 +505,16 @@ public class CompilerContext {
         }
 
         return null;
+    }
+
+    public Class<? extends Value> getValueType(Class<? extends Type> typeClass) {
+        Class<? extends Value> valueClass = types2values.get(typeClass);
+
+        if (valueClass == null) {
+            throw new ASN1RuntimeException(String.format("Value class for type %s not defined", typeClass.getSimpleName()));
+        }
+
+        return valueClass;
     }
 
     public boolean isBuiltin(String name) {

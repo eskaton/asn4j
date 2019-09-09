@@ -84,7 +84,7 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
         DefinedValue definedValue = component.getDefinedValue();
 
         if (definedValue != null) {
-            return ctx.resolveValue(BigInteger.class, definedValue).intValue();
+            return ctx.resolveValue(IntegerValue.class, definedValue).getValue().intValue();
         }
 
         Optional<ValueOrObjectAssignmentNode> assignment = ctx.tryResolveReference(component.getName());
@@ -104,7 +104,7 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
 
         }
 
-        return ctx.resolveValue(BigInteger.class, component.getName()).intValue();
+        return ctx.resolveValue(IntegerValue.class, component.getName()).getValue().intValue();
     }
 
     protected abstract String getTypeName();
