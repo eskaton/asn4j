@@ -43,7 +43,13 @@ public abstract class CollectionOfDecoder<T extends ASN1CollectionOf> implements
 
     @SuppressWarnings("unchecked")
     public void decode(Decoder decoder, DecoderStates states, T obj) {
-        ParameterizedType pt = (ParameterizedType) obj.getClass().getGenericSuperclass();
+        Class parent = obj.getClass();
+
+        while (!(parent.getGenericSuperclass() instanceof ParameterizedType)) {
+            parent = parent.getSuperclass();
+        }
+
+        ParameterizedType pt = (ParameterizedType) parent.getGenericSuperclass();
         Class<ASN1Type> typeParam = (Class<ASN1Type>) pt.getActualTypeArguments()[0];
         List<ASN1Type> elements = new LinkedList<>();
         DecodingResult<ASN1Type> result;

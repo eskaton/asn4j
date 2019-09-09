@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
@@ -39,6 +40,8 @@ import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CollectionOfValueResolver extends AbstractValueResolver<CollectionOfValue> {
 
@@ -67,15 +70,33 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
         } else if (value instanceof AmbiguousValue) {
             collectionOfValue = CompilerUtils.resolveAmbiguousValue(value, CollectionOfValue.class);
         } else if (value instanceof CollectionOfValue) {
-            collectionOfValue =  (CollectionOfValue) value;
+            collectionOfValue = (CollectionOfValue) value;
         }
 
         if (collectionOfValue != null) {
-            // TODO: check elements
+            Type elementType = ((CollectionOfType) type).getType();
+            Class<? extends Value> valueClass = ctx.getValueType(elementType.getClass());
+
+            List<? extends Value> values = collectionOfValue.getValues().stream()
+                    .map(v -> resolveElement(elementType, valueClass, v))
+                    .collect(Collectors.toList());
+
+            collectionOfValue.getValues().clear();
+            collectionOfValue.getValues().addAll(values);
+
             return collectionOfValue;
         }
 
         throw error();
+    }
+
+    private Value resolveElement(Type elementType, Class<? extends Value> valueClass, Value value) {
+        try {
+            return ctx.resolveGenericValue(valueClass, elementType, value);
+        } catch (ClassCastException e) {
+            throw new CompilerException("Failed to resolve a value in a SET OF to type %s: %s",
+                    elementType.getClass().getSimpleName(), value);
+        }
     }
 
     protected CompilerException error() {

@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -120,7 +121,11 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private String buildExpression(CollectionOfValue value) {
-        return "true";
+        String initString = value.getValues().stream()
+                .map(JavaUtils::getInitializerString)
+                .collect(Collectors.joining(", "));
+
+        return "(getValues().equals(Arrays.asList(" + initString + ")))";
     }
 
 }
