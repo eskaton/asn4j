@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.test.x680_51_2;
 
+import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString3;
@@ -73,6 +74,12 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri5;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf3;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf4;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf5;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf6;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -93,6 +100,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testOctetStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testOctetStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 
 public class TestX680_51_2 {
 
@@ -436,6 +445,54 @@ public class TestX680_51_2 {
         testOctetStringSuccess(TestOctetString4.class, new TestOctetString4(), new byte[] { 0x37 });
 
         testOctetStringFailure(TestOctetString4.class, new TestOctetString4(), new byte[] { 0x38 });
+    }
+
+    @Test
+    public void testSetOf1() {
+        testSetOfSuccess(TestSetOf1.class, new TestSetOf1());
+
+        testSetOfFailure(TestSetOf1.class, new TestSetOf1(), ASN1Integer.valueOf(22L));
+    }
+
+    @Test
+    public void testSetOf2() {
+        testSetOfSuccess(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(23L));
+
+        testSetOfFailure(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(22L));
+    }
+
+    @Test
+    public void testSetOf3() {
+        testSetOfSuccess(TestSetOf3.class, new TestSetOf3(), ASN1Integer.valueOf(23L));
+        testSetOfSuccess(TestSetOf3.class, new TestSetOf3(), ASN1Integer.valueOf(47L));
+
+        testSetOfFailure(TestSetOf3.class, new TestSetOf3(), ASN1Integer.valueOf(21L));
+        testSetOfFailure(TestSetOf3.class, new TestSetOf3(), ASN1Integer.valueOf(48L));
+    }
+
+    @Test
+    public void testSetOf4() {
+        testSetOfSuccess(TestSetOf4.class, new TestSetOf4(), ASN1Integer.valueOf(12L));
+        testSetOfSuccess(TestSetOf4.class, new TestSetOf4(), ASN1Integer.valueOf(2L), ASN1Integer.valueOf(3L));
+
+        testSetOfFailure(TestSetOf4.class, new TestSetOf4());
+        testSetOfFailure(TestSetOf4.class, new TestSetOf4(), ASN1Integer.valueOf(23L));
+    }
+
+    @Test
+    public void testSetOf5() {
+        testSetOfSuccess(TestSetOf5.class, new TestSetOf5(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L),
+                ASN1Integer.valueOf(3L));
+
+        testSetOfFailure(TestSetOf5.class, new TestSetOf4(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
+    }
+
+    @Test
+    public void testSetOf6() {
+        testSetOfSuccess(TestSetOf6.class, new TestSetOf6(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L),
+                ASN1Integer.valueOf(3L));
+
+        testSetOfFailure(TestSetOf6.class, new TestSetOf6(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
     }
 
 }

@@ -24,37 +24,29 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package ch.eskaton.asn4j.compiler.java;
 
-package ch.eskaton.asn4j.runtime.types;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
+import ch.eskaton.asn4j.runtime.types.ASN1BitString;
+import org.junit.Test;
 
-import ch.eskaton.asn4j.runtime.Clazz;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import static ch.eskaton.asn4j.compiler.java.JavaUtils.getInitializerString;
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Objects;
+public class JavaUtilsTest {
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
-public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<T> implements HasConstraint {
-
-    public ASN1SetOf(T... values) {
-        super(values);
+    @Test
+    public void testBitStringValue() {
+        assertEquals("new ASN1BitString(new byte[] { (byte) 0x01, (byte) 0x02, (byte) 0x03 }, 5)",
+                JavaUtils.getInitializerString(new BitStringValue(new byte[] { 0x01, 0x02, 0x03 }, 5)));
     }
 
-    @Override
-    public void checkConstraint() {
-        if (!doCheckConstraint()) {
-            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint", this));
-        }
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(values);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    @Test(expected = CompilerException.class)
+    public void testUnsupportedValue() {
+        getInitializerString(new EmptyValue(NO_POSITION));
     }
 
 }
