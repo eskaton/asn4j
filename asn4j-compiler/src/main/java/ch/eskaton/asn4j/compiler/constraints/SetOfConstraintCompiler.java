@@ -30,7 +30,9 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -114,7 +116,8 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
                 List<CollectionOfValue> values = ((CollectionOfValueNode) node).getValue();
                 return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
             case SIZE:
-                return Optional.empty();
+                List<IntegerRange> sizes = ((SizeNode) node).getSize();
+                return Optional.of(sizes.stream().map(this::buildSizeExpression).collect(Collectors.joining(" || ")));
             default:
                 return super.buildExpression(node);
         }
@@ -126,6 +129,21 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
                 .collect(Collectors.joining(", "));
 
         return "(getValues().equals(asHashSet(" + initString + ")))";
+    }
+
+    private String buildSizeExpression(IntegerRange range) {
+        long lower = range.getLower();
+        long upper = range.getUpper();
+
+        if (lower == upper) {
+            return String.format("(getValue().size() == %dL)", lower);
+        } else if (lower == 0) {
+            return String.format("(getValue().size() <= %dL)", upper);
+        } else if (upper == Long.MAX_VALUE) {
+            return String.format("(getValue().size() >= %dL)", lower);
+        } else {
+            return String.format("(%dL <= getValues().size() && %dL >= getValues().size())", lower, upper);
+        }
     }
 
 }
