@@ -43,8 +43,8 @@ import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.commons.utils.CollectionUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -86,7 +86,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
-        javaClass.addImport(Arrays.class);
+        javaClass.addStaticImport(CollectionUtils.class, "asHashSet");
 
         String baseName = ASN1SetOf.class.getSimpleName();
         JavaClass parentClass = javaClass;
@@ -125,7 +125,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
                 .map(JavaUtils::getInitializerString)
                 .collect(Collectors.joining(", "));
 
-        return "(getValues().equals(Arrays.asList(" + initString + ")))";
+        return "(getValues().equals(asHashSet(" + initString + ")))";
     }
 
 }

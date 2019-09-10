@@ -30,14 +30,16 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.commons.utils.CollectionUtils;
 
+import java.util.HashSet;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
-public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<T> implements HasConstraint {
+public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<HashSet<T>, T> implements HasConstraint {
 
     public ASN1SetOf(T... values) {
-        super(values);
+        super(CollectionUtils.asHashSet(values));
     }
 
     @Override
