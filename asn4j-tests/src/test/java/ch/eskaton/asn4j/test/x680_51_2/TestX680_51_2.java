@@ -489,8 +489,8 @@ public class TestX680_51_2 {
 
     @Test
     public void testSetOf6() {
-        testSetOfSuccess(TestSetOf6.class, new TestSetOf6(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L),
-                ASN1Integer.valueOf(3L));
+        testSetOfSuccess(TestSetOf6.class, new TestSetOf6(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(3L),
+                ASN1Integer.valueOf(2L));
 
         testSetOfFailure(TestSetOf6.class, new TestSetOf6(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
     }

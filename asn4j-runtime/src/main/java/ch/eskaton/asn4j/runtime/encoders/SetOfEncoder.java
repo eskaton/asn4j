@@ -30,5 +30,8 @@ package ch.eskaton.asn4j.runtime.encoders;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
-public class SetOfEncoder<T extends ASN1Type> extends CollectionOfEncoder<ASN1SetOf<T>, T> {
+import java.util.HashSet;
+
+public class SetOfEncoder<T extends ASN1Type> extends CollectionOfEncoder<ASN1SetOf<T>, HashSet<T>, T> {
+
 }

@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf1;
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static ch.eskaton.asn4j.test.TestUtils.assertSetEncodingEquals;
 import static org.junit.Assert.assertEquals;
 
 public class TestX690_8_12 {
@@ -44,15 +44,18 @@ public class TestX690_8_12 {
 
         TestSetOf1 a = new TestSetOf1();
 
-        assertArrayEquals(new byte[] { 0x31, 0x00 }, encoder.encode(a));
+        assertSetEncodingEquals(encoder.encode(a));
 
         a.setValues(ASN1Integer.valueOf(4711));
 
-        assertArrayEquals(new byte[] { 0x31, 0x04, 0x02, 0x02, 0x12, 0x67 }, encoder.encode(a));
+        assertSetEncodingEquals(encoder.encode(a), new Byte[] { 0x02, 0x02, 0x12, 0x67 });
 
         a.setValues(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(0), ASN1Integer.valueOf(23));
 
-        assertArrayEquals(new byte[] { 0x31, 0x0a, 0x02, 0x02, 0x12, 0x67, 0x02, 0x01, 0x00, 0x02, 0x01, 0x17 }, encoder.encode(a));
+        assertSetEncodingEquals(encoder.encode(a),
+                new Byte[] { 0x02, 0x02, 0x12, 0x67 },
+                new Byte[] { 0x02, 0x01, 0x00 },
+                new Byte[] { 0x02, 0x01, 0x17 });
     }
 
     @Test
@@ -69,7 +72,8 @@ public class TestX690_8_12 {
 
         a.setValues(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(0), ASN1Integer.valueOf(23));
 
-        assertEquals(a, decoder.decode(TestSetOf1.class, new byte[] { 0x31, 0x0a, 0x02, 0x02, 0x12, 0x67, 0x02, 0x01, 0x00, 0x02, 0x01, 0x17 }));
+        assertEquals(a, decoder.decode(TestSetOf1.class,
+                new byte[] { 0x31, 0x0a, 0x02, 0x02, 0x12, 0x67, 0x02, 0x01, 0x00, 0x02, 0x01, 0x17 }));
     }
 
 }

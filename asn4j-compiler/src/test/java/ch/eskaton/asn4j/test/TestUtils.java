@@ -27,6 +27,16 @@
 
 package ch.eskaton.asn4j.test;
 
+import ch.eskaton.commons.utils.CollectionUtils;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static ch.eskaton.commons.utils.CollectionUtils.asLinkedList;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -51,6 +61,33 @@ public class TestUtils {
         } catch (Exception e) {
             assertTrue(exception.isAssignableFrom(e.getClass()));
         }
+    }
+
+    public static void assertSetEncodingEquals(byte[] encoded, Byte[]... expectedValues) {
+        byte[] header = new byte[2];
+        Set<LinkedList<Byte>> values = new HashSet<>();
+
+        System.arraycopy(encoded, 0, header, 0, 2);
+
+        for (int i = 2; i < encoded.length; ) {
+            int len = encoded[i + 1] + 2; // for simplicity we assume that test values are shorter than 128
+            byte[] value = new byte[len];
+
+            System.arraycopy(encoded, i, value, 0, len);
+
+            values.add(asLinkedList(CollectionUtils.box(value)));
+
+            i += len;
+        }
+
+        Set<LinkedList<Byte>> expected = CollectionUtils.asHashSet(expectedValues).stream()
+                .map(e -> asLinkedList(e)).collect(Collectors.toSet());
+
+        int expectedLen = expected.stream().map(e -> e.stream().collect(Collectors.counting()))
+                .mapToInt(x -> x.intValue()).sum();
+
+        assertArrayEquals(new byte[] { 0x31, (byte) expectedLen }, header);
+        assertEquals(expected, values);
     }
 
 }
