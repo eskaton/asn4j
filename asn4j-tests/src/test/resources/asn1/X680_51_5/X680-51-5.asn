@@ -29,4 +29,7 @@ TestOctetStringSize ::= INTEGER (ALL EXCEPT 1)
 TestOctetString11 ::= OCTET STRING (SIZE (INCLUDES TestOctetStringSize))
 TestOctetString12 ::= OCTET STRING (SIZE (INTEGER EXCEPT 2))
 
+TestSetOf1 ::= SET (SIZE(1..2)) OF INTEGER
+TestSetOf2 ::= SET (SIZE(1) | SIZE(2..3)) OF INTEGER
+
 END
