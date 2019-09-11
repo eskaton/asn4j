@@ -136,11 +136,11 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return String.format("(getValue().size() == %dL)", lower);
+            return String.format("(getValues().size() == %dL)", lower);
         } else if (lower == 0) {
-            return String.format("(getValue().size() <= %dL)", upper);
+            return String.format("(getValues().size() <= %dL)", upper);
         } else if (upper == Long.MAX_VALUE) {
-            return String.format("(getValue().size() >= %dL)", lower);
+            return String.format("(getValues().size() >= %dL)", lower);
         } else {
             return String.format("(%dL <= getValues().size() && %dL >= getValues().size())", lower, upper);
         }
