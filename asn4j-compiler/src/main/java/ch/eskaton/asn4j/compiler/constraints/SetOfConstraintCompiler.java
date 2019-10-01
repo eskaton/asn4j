@@ -54,6 +54,7 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 
 public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -108,6 +109,11 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
         addConstraintCondition(definition, builder);
 
         builder.finish().build();
+    }
+
+    @Override
+    protected Node optimize(Node node) {
+        return new SetOfConstraintOptimizingVisitor().visit(node);
     }
 
     @Override
