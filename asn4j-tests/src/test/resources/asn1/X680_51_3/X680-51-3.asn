@@ -56,4 +56,7 @@ TestOctetString1 ::= OCTET STRING ('0101'B | testOctetString1)
 TestOctetString2 ::= OCTET STRING (INCLUDES TestOctetString1)
 TestOctetString3 ::= TestOctetString2 ('61AD'H)
 
+TestSetOf1 ::= SET ({1} | {2} | {3}) OF INTEGER
+TestSetOf2 ::= SET (INCLUDES TestSetOf1) OF INTEGER
+
 END
