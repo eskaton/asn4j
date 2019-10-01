@@ -51,6 +51,12 @@ import static java.util.stream.Collectors.toList;
 public abstract class BaseXStringConstraintOptimizingVisitor<V extends AbstractValue, N extends ValueNode<List<V>>>
         implements OptimizingVisitor<List<V>> {
 
+    private OrderedSetOperationsStrategy setOperations;
+
+    public BaseXStringConstraintOptimizingVisitor() {
+        setOperations = new OrderedSetOperationsStrategy(getComparator());
+    }
+
     @Override
     public Node visit(BinOpNode node) {
         Node left = node.getLeft().accept(this);
@@ -92,26 +98,11 @@ public abstract class BaseXStringConstraintOptimizingVisitor<V extends AbstractV
 
         switch (node.getType()) {
             case UNION:
-                return createValueNode(Lists.<V>builder()
-                        .addAll(Sets.<V>builder()
-                                .addAll(leftValue)
-                                .addAll(rightValue).build())
-                        .sorted(getComparator())
-                        .build());
+                return createValueNode(setOperations.union(leftValue, rightValue));
             case INTERSECTION:
-                return createValueNode(Lists.<V>builder()
-                        .addAll(Sets.<V>builder()
-                                .addAll(leftValue)
-                                .retainAll(rightValue).build())
-                        .sorted(getComparator())
-                        .build());
+                return createValueNode(setOperations.intersection(leftValue, rightValue));
             case COMPLEMENT:
-                return createValueNode(Lists.<V>builder()
-                        .addAll(Sets.<V>builder()
-                                .addAll(leftValue)
-                                .removeAll(rightValue).build())
-                        .sorted(getComparator())
-                        .build());
+                return createValueNode(setOperations.complement(leftValue, rightValue));
             default:
                 return throwUnimplementedNodeType(node);
         }
