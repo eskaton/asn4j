@@ -474,6 +474,7 @@ public class TestX680_51_2 {
     public void testSetOf4() {
         testSetOfSuccess(TestSetOf4.class, new TestSetOf4(), ASN1Integer.valueOf(12L));
         testSetOfSuccess(TestSetOf4.class, new TestSetOf4(), ASN1Integer.valueOf(2L), ASN1Integer.valueOf(3L));
+        testSetOfSuccess(TestSetOf4.class, new TestSetOf4(), ASN1Integer.valueOf(3L), ASN1Integer.valueOf(2L));
 
         testSetOfFailure(TestSetOf4.class, new TestSetOf4());
         testSetOfFailure(TestSetOf4.class, new TestSetOf4(), ASN1Integer.valueOf(23L));

@@ -29,11 +29,11 @@ package ch.eskaton.asn4j.compiler.constraints.ast;
 
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 
-import java.util.List;
+import java.util.Set;
 
-public class CollectionOfValueNode extends ValueNode<List<CollectionOfValue>> {
+public class CollectionOfValueNode extends ValueNode<Set<CollectionOfValue>> {
 
-    public CollectionOfValueNode(List<CollectionOfValue> value) {
+    public CollectionOfValueNode(Set<CollectionOfValue> value) {
         super(value);
     }
 

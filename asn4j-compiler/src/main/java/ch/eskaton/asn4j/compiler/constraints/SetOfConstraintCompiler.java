@@ -49,10 +49,11 @@ import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.singleton;
 
 public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -71,7 +72,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
                 CollectionOfValue collectionOfValue = ctx.resolveGenericValue(CollectionOfValue.class,
                         baseType.getType(), value);
 
-                return new CollectionOfValueNode(singletonList(collectionOfValue));
+                return new CollectionOfValueNode(singleton(collectionOfValue));
             } catch (Exception e) {
                 throw new CompilerException("Invalid single-value constraint %s for SET OF type", e,
                         value.getClass().getSimpleName());
@@ -113,7 +114,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
     protected Optional<String> buildExpression(Node node) {
         switch (node.getType()) {
             case VALUE:
-                List<CollectionOfValue> values = ((CollectionOfValueNode) node).getValue();
+                Set<CollectionOfValue> values = ((CollectionOfValueNode) node).getValue();
                 return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
             case SIZE:
                 List<IntegerRange> sizes = ((SizeNode) node).getSize();
