@@ -155,7 +155,7 @@ public class SetOfConstraintOptimizingVisitor
 
     private Node transformValueSizeUnion(Set<CollectionOfValue> values, List<IntegerRange> sizes) {
         if (sizes.isEmpty()) {
-            return createValueNode(values);
+            return createNode(values);
         }
 
         values = values.stream()
@@ -166,7 +166,7 @@ public class SetOfConstraintOptimizingVisitor
             return new SizeNode(sizes);
         }
 
-        return new BinOpNode(UNION, createValueNode(values), new SizeNode(sizes));
+        return new BinOpNode(UNION, createNode(values), new SizeNode(sizes));
     }
 
     private Node transformValueSizeIntersection(Set<CollectionOfValue> values, List<IntegerRange> sizes) {
@@ -174,25 +174,20 @@ public class SetOfConstraintOptimizingVisitor
                 .filter(value -> sizes.stream().anyMatch(inRangePredicate(value)))
                 .collect(toSet());
 
-        return createValueNode(values);
+        return createNode(values);
     }
 
     private Node transformValueSizeComplement(Set<CollectionOfValue> values, List<IntegerRange> sizes) {
         values = values.stream()
                 .filter(value -> sizes.stream().noneMatch(inRangePredicate(value))).collect(toSet());
 
-        return createValueNode(values);
+        return createNode(values);
     }
 
     @Override
     protected CollectionOfValueNode createNode(Set<CollectionOfValue> value) {
         return new CollectionOfValueNode(value);
     }
-
-    protected CollectionOfValueNode createValueNode(Set<CollectionOfValue> values) {
-        return new CollectionOfValueNode(values);
-    }
-
 
     private Predicate<IntegerRange> inRangePredicate(CollectionOfValue value) {
         return size -> size.getLower() <= getSize(value) && size.getUpper() >= getSize(value);
