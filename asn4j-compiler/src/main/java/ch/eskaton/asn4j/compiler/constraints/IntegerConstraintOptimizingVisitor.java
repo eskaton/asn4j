@@ -45,7 +45,6 @@ public class IntegerConstraintOptimizingVisitor
                 new ValueNegationTransformer<>(new IntegerRangeSetOperationsStrategy(), this::createNode, true));
     }
 
-    @Override
     protected IntegerRangeValueNode createNode(List<IntegerRange> value) {
         return new IntegerRangeValueNode(value);
     }

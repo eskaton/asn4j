@@ -37,7 +37,7 @@ import java.util.Objects;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
-public class BitStringValue extends AbstractValue {
+public class BitStringValue extends AbstractValue implements HasSize {
 
     private int unusedBits;
 

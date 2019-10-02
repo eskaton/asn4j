@@ -50,7 +50,6 @@ public class SetOfConstraintOptimizingVisitor
         super.configureTransformation(BinOpType.SIZE_VALUE, new SizeValueTransformer<>(this::createNode));
     }
 
-    @Override
     protected CollectionOfValueNode createNode(Set<CollectionOfValue> value) {
         return new CollectionOfValueNode(value);
     }

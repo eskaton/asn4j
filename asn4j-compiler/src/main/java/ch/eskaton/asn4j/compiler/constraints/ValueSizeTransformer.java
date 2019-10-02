@@ -58,7 +58,7 @@ public class ValueSizeTransformer<V extends HasSize, C extends Collection<V>, N 
             case INTERSECTION:
                 return transformValueSizeIntersection(values, sizes);
             case COMPLEMENT:
-                return node;
+                return transformValueSizeComplement(values, sizes);
             default:
                 return throwUnimplementedNodeType(node);
         }

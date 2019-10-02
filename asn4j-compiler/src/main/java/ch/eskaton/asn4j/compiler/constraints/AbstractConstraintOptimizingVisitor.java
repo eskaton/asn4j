@@ -72,6 +72,4 @@ public abstract class AbstractConstraintOptimizingVisitor<V, C extends Collectio
         }
     }
 
-    protected abstract N createNode(C value);
-
 }

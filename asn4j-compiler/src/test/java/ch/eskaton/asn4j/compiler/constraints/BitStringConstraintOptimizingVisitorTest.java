@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+import ch.eskaton.commons.utils.CollectionUtils;
 import org.junit.Test;
 
 import java.util.stream.IntStream;
@@ -42,6 +43,7 @@ import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.range;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.size;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+import static ch.eskaton.commons.utils.CollectionUtils.asLinkedList;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
@@ -246,7 +248,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     private static BitStringValueNode value(BitStringValue... values) {
-        return new BitStringValueNode(asList(values));
+        return new BitStringValueNode(asLinkedList(values));
     }
 
 }

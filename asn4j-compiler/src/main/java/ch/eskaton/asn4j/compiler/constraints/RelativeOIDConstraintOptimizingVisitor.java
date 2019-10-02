@@ -45,7 +45,6 @@ public class RelativeOIDConstraintOptimizingVisitor
                 new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, true));
     }
 
-    @Override
     protected RelativeOIDValueNode createNode(Set<List<Integer>> value) {
         return new RelativeOIDValueNode(value);
     }
