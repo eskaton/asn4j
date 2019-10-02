@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
 
 import java.util.List;
@@ -36,7 +37,12 @@ public class RelativeIRIConstraintOptimizingVisitor
         extends AbstractConstraintOptimizingVisitor<List<String>, Set<List<String>>, RelativeIRIValueNode> {
 
     public RelativeIRIConstraintOptimizingVisitor() {
-        super(new DefaultSetOperationsStrategy<>());
+        super.configureTransformation(BinOpType.VALUE_VALUE,
+                new ValueValueTransformer<>(new DefaultSetOperationsStrategy(), this::createNode));
+        super.configureTransformation(BinOpType.VALUE_NEGATION,
+                new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, false));
+        super.configureTransformation(BinOpType.NEGATION_VALUE,
+                new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, true));
     }
 
     @Override

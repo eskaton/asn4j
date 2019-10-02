@@ -25,29 +25,10 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.parser.ast.values;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
+public interface HasSize {
 
-import java.util.List;
-
-public class IntegerConstraintOptimizingVisitor
-        extends AbstractConstraintOptimizingVisitor<IntegerRange, List<IntegerRange>, IntegerRangeValueNode> {
-
-    public IntegerConstraintOptimizingVisitor() {
-        super.configureTransformation(BinOpType.VALUE_VALUE,
-                new ValueValueTransformer<>(new IntegerRangeSetOperationsStrategy(), this::createNode));
-        super.configureTransformation(BinOpType.VALUE_NEGATION,
-                new ValueNegationTransformer<>(new IntegerRangeSetOperationsStrategy(), this::createNode, false));
-        super.configureTransformation(BinOpType.NEGATION_VALUE,
-                new ValueNegationTransformer<>(new IntegerRangeSetOperationsStrategy(), this::createNode, true));
-    }
-
-    @Override
-    protected IntegerRangeValueNode createNode(List<IntegerRange> value) {
-        return new IntegerRangeValueNode(value);
-    }
+    int getSize();
 
 }

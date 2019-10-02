@@ -28,50 +28,40 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.parser.ast.values.HasSize;
 
 import java.util.Collection;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
+import java.util.function.Function;
 
-public abstract class AbstractConstraintOptimizingVisitor<V, C extends Collection<V>, N extends ValueNode<C>>
-        implements OptimizingVisitor<V> {
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 
-    private Map<BinOpType, BinOpTransformer> transformations = new EnumMap<>(BinOpType.class);
+public class SizeValueTransformer<V extends HasSize, C extends Collection<V>, N extends ValueNode<C>>
+        extends AbstractValueSizeTransformer {
 
-    protected void configureTransformation(BinOpType op, BinOpTransformer transformer) {
-        transformations.put(op, transformer);
+    public SizeValueTransformer(Function<C, N> createNode) {
+        super(createNode);
     }
 
     @Override
-    public Node visit(BinOpNode node) {
-        Node left = node.getLeft().accept(this);
-        Node right = node.getRight().accept(this);
+    public Node transform(BinOpNode node, Node left, Node right) {
+        List<IntegerRange> sizes = ((SizeNode) left).getSize();
+        C values = ((ValueNode<C>) right).getValue();
 
-        BinOpType binOpType = BinOpType.of(left.getType(), right.getType());
-
-        Optional<? extends BinOpTransformer> transformer =
-                Optional.ofNullable(transformations.get(binOpType));
-
-        switch (binOpType) {
-            case VALUE_VALUE: // fall through
-            case VALUE_NEGATION: // fall through
-            case SIZE_SIZE: // fall through
-            case SIZE_NEGATION: // fall through
-            case VALUE_SIZE: // fall through
-            case SIZE_VALUE:
-                return transformer.map(t -> t.transform(node, left, right)).orElse(null);
-            case NEGATION_VALUE: // fall through
-            case NEGATION_SIZE:
-                return transformer.map(t -> t.transform(node, right, left)).orElse(null);
+        switch (node.getType()) {
+            case UNION:
+                return transformValueSizeUnion(values, sizes);
+            case INTERSECTION:
+                return transformValueSizeIntersection(values, sizes);
+            case COMPLEMENT:
+                return transformValueSizeComplement(values, sizes);
             default:
-                return node;
+                return throwUnimplementedNodeType(node);
         }
     }
-
-    protected abstract N createNode(C value);
 
 }

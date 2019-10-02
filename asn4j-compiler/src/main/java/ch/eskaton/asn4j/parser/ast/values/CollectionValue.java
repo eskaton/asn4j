@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.parser.Position;
 import java.util.List;
 import java.util.Objects;
 
-public class CollectionValue extends AbstractValue {
+public class CollectionValue extends AbstractValue implements HasSize {
 
     private List<Value> values;
 
@@ -44,6 +44,11 @@ public class CollectionValue extends AbstractValue {
 
     public List<Value> getValues() {
         return values;
+    }
+
+    @Override
+    public int getSize() {
+        return getValues().size();
     }
 
     @Override
