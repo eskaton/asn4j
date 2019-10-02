@@ -31,27 +31,13 @@ import ch.eskaton.asn4j.compiler.constraints.ast.OctetStringValueNode;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValueComparator;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class OctetStringConstraintOptimizingVisitor
-        extends BaseXStringConstraintOptimizingVisitor<OctetStringValue, OctetStringValueNode> {
+        extends BaseXStringConstraintOptimizingVisitor<OctetStringValue, List<OctetStringValue>, OctetStringValueNode> {
 
-    private static final OctetStringValueComparator COMPARATOR = new OctetStringValueComparator();
-
-    @Override
-    protected OctetStringValueNode createValueNode(List<OctetStringValue> values) {
-        return new OctetStringValueNode(values);
-    }
-
-    @Override
-    protected <C extends Comparator<OctetStringValue>> C getComparator() {
-        return (C) COMPARATOR;
-    }
-
-    @Override
-    protected int getSize(OctetStringValue value) {
-        return value.getByteValue().length;
+    public OctetStringConstraintOptimizingVisitor() {
+        super(new OctetStringValueComparator(), v -> new OctetStringValueNode(v));
     }
 
 }

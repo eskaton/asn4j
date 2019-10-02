@@ -45,7 +45,6 @@ public class ObjectIdentifierConstraintOptimizingVisitor
                 new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, true));
     }
 
-    @Override
     protected ObjectIdentifierValueNode createNode(Set<List<Integer>> value) {
         return new ObjectIdentifierValueNode(value);
     }

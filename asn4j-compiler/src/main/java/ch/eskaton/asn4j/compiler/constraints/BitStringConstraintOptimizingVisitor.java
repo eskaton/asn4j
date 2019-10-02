@@ -31,27 +31,13 @@ import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValueComparator;
 
-import java.util.Comparator;
 import java.util.List;
 
 public class BitStringConstraintOptimizingVisitor
-        extends BaseXStringConstraintOptimizingVisitor<BitStringValue, BitStringValueNode> {
+        extends BaseXStringConstraintOptimizingVisitor<BitStringValue, List<BitStringValue>, BitStringValueNode> {
 
-    private static final BitStringValueComparator COMPARATOR = new BitStringValueComparator();
-
-    @Override
-    protected BitStringValueNode createValueNode(List<BitStringValue> values) {
-        return new BitStringValueNode(values);
-    }
-
-    @Override
-    protected <C extends Comparator<BitStringValue>> C getComparator() {
-        return (C) COMPARATOR;
-    }
-
-    @Override
-    protected int getSize(BitStringValue value) {
-        return value.getSize();
+    public BitStringConstraintOptimizingVisitor() {
+        super(new BitStringValueComparator(), v -> new BitStringValueNode(v));
     }
 
 }

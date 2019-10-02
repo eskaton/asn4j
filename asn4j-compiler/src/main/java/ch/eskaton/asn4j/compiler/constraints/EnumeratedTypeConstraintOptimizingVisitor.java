@@ -44,7 +44,6 @@ public class EnumeratedTypeConstraintOptimizingVisitor
                 new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, true));
     }
 
-    @Override
     protected EnumeratedValueNode createNode(Set<Integer> value) {
         return new EnumeratedValueNode(value);
     }

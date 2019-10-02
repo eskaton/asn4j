@@ -45,7 +45,6 @@ public class IRIConstraintOptimizingVisitor
                 new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, true));
     }
 
-    @Override
     protected IRIValueNode createNode(Set<List<String>> value) {
         return new IRIValueNode(value);
     }

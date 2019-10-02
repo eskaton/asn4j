@@ -41,7 +41,7 @@ import java.util.function.Function;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 
 public class SizeValueTransformer<V extends HasSize, C extends Collection<V>, N extends ValueNode<C>>
-        extends AbstractValueSizeTransformer {
+        extends AbstractValueSizeTransformer<V, C, N> {
 
     public SizeValueTransformer(Function<C, N> createNode) {
         super(createNode);
@@ -58,7 +58,7 @@ public class SizeValueTransformer<V extends HasSize, C extends Collection<V>, N 
             case INTERSECTION:
                 return transformValueSizeIntersection(values, sizes);
             case COMPLEMENT:
-                return transformValueSizeComplement(values, sizes);
+                return node;
             default:
                 return throwUnimplementedNodeType(node);
         }

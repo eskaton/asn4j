@@ -33,7 +33,7 @@ import java.util.Arrays;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
-public class OctetStringValue extends AbstractValue {
+public class OctetStringValue extends AbstractValue implements HasSize {
 
     private byte[] byteValue;
 
@@ -49,6 +49,11 @@ public class OctetStringValue extends AbstractValue {
 
     public byte[] getByteValue() {
         return byteValue;
+    }
+
+    @Override
+    public int getSize() {
+        return byteValue.length;
     }
 
     @Override
