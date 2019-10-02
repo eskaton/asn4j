@@ -28,50 +28,31 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.List;
 
-public abstract class AbstractConstraintOptimizingVisitor<V, C extends Collection<V>, N extends ValueNode<C>>
-        implements OptimizingVisitor<V> {
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 
-    private Map<BinOpType, BinOpTransformer> transformations = new EnumMap<>(BinOpType.class);
-
-    protected void configureTransformation(BinOpType op, BinOpTransformer transformer) {
-        transformations.put(op, transformer);
-    }
+public class SizeSizeTransformer implements BinOpTransformer {
 
     @Override
-    public Node visit(BinOpNode node) {
-        Node left = node.getLeft().accept(this);
-        Node right = node.getRight().accept(this);
+    public SizeNode transform(BinOpNode node, Node left, Node right) {
+        List<IntegerRange> leftSize = ((SizeNode) left).getSize();
+        List<IntegerRange> rightSize = ((SizeNode) right).getSize();
 
-        BinOpType binOpType = BinOpType.of(left.getType(), right.getType());
-
-        Optional<? extends BinOpTransformer> transformer =
-                Optional.ofNullable(transformations.get(binOpType));
-
-        switch (binOpType) {
-            case VALUE_VALUE: // fall through
-            case VALUE_NEGATION: // fall through
-            case SIZE_SIZE: // fall through
-            case SIZE_NEGATION: // fall through
-            case VALUE_SIZE: // fall through
-            case SIZE_VALUE:
-                return transformer.map(t -> t.transform(node, left, right)).orElse(null);
-            case NEGATION_VALUE: // fall through
-            case NEGATION_SIZE:
-                return transformer.map(t -> t.transform(node, right, left)).orElse(null);
+        switch (node.getType()) {
+            case UNION:
+                return new SizeNode(IntegerRange.union(leftSize, rightSize));
+            case INTERSECTION:
+                return new SizeNode(IntegerRange.intersection(leftSize, rightSize));
+            case COMPLEMENT:
+                return new SizeNode(IntegerRange.complement(leftSize, rightSize));
             default:
-                return node;
+                return throwUnimplementedNodeType(node);
         }
     }
-
-    protected abstract N createNode(C value);
 
 }

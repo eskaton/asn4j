@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
 
 import java.util.List;
@@ -36,7 +37,12 @@ public class RelativeOIDConstraintOptimizingVisitor
         extends AbstractConstraintOptimizingVisitor<List<Integer>, Set<List<Integer>>, RelativeOIDValueNode> {
 
     public RelativeOIDConstraintOptimizingVisitor() {
-        super(new DefaultSetOperationsStrategy<>());
+        super.configureTransformation(BinOpType.VALUE_VALUE,
+                new ValueValueTransformer<>(new DefaultSetOperationsStrategy(), this::createNode));
+        super.configureTransformation(BinOpType.VALUE_NEGATION,
+                new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, false));
+        super.configureTransformation(BinOpType.NEGATION_VALUE,
+                new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, true));
     }
 
     @Override

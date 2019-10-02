@@ -28,50 +28,54 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
+import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 
 import java.util.Collection;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.function.Function;
 
-public abstract class AbstractConstraintOptimizingVisitor<V, C extends Collection<V>, N extends ValueNode<C>>
-        implements OptimizingVisitor<V> {
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 
-    private Map<BinOpType, BinOpTransformer> transformations = new EnumMap<>(BinOpType.class);
+public class ValueNegationTransformer<V, C extends Collection<V>, N extends Node>
+        implements BinOpTransformer {
 
-    protected void configureTransformation(BinOpType op, BinOpTransformer transformer) {
-        transformations.put(op, transformer);
+    private SetOperationsStrategy<V, C> setOperations;
+
+    private Function<C, N> createNode;
+
+    private boolean opSwitched;
+
+    public ValueNegationTransformer(SetOperationsStrategy setOperations, Function<C, N> createNode, boolean opSwitched) {
+        this.setOperations = setOperations;
+        this.createNode = createNode;
+        this.opSwitched = opSwitched;
     }
 
     @Override
-    public Node visit(BinOpNode node) {
-        Node left = node.getLeft().accept(this);
-        Node right = node.getRight().accept(this);
+    public N transform(BinOpNode node, Node left, Node right) {
+        Node opNode = ((OpNode) right).getNode();
 
-        BinOpType binOpType = BinOpType.of(left.getType(), right.getType());
+        if (opNode.getType() == NodeType.VALUE) {
+            C leftValue = ((ValueNode<C>) left).getValue();
+            C rightValue = ((ValueNode<C>) opNode).getValue();
 
-        Optional<? extends BinOpTransformer> transformer =
-                Optional.ofNullable(transformations.get(binOpType));
-
-        switch (binOpType) {
-            case VALUE_VALUE: // fall through
-            case VALUE_NEGATION: // fall through
-            case SIZE_SIZE: // fall through
-            case SIZE_NEGATION: // fall through
-            case VALUE_SIZE: // fall through
-            case SIZE_VALUE:
-                return transformer.map(t -> t.transform(node, left, right)).orElse(null);
-            case NEGATION_VALUE: // fall through
-            case NEGATION_SIZE:
-                return transformer.map(t -> t.transform(node, right, left)).orElse(null);
-            default:
-                return node;
+            switch (node.getType()) {
+                case INTERSECTION:
+                    return createNode.apply(setOperations.complement(leftValue, rightValue));
+                case COMPLEMENT:
+                    if (opSwitched) {
+                        return (N) new OpNode(NodeType.NEGATION, createNode.apply(setOperations.union(leftValue, rightValue)));
+                    } else {
+                        return createNode.apply(setOperations.intersection(leftValue, rightValue));
+                    }
+                default:
+                    return throwUnimplementedNodeType(node);
+            }
         }
-    }
 
-    protected abstract N createNode(C value);
+        return (N) node;
+    }
 
 }
