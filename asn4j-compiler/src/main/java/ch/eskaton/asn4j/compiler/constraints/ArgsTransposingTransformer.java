@@ -28,37 +28,19 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 
-import java.util.Collection;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.Optional;
+public class ArgsTransposingTransformer implements BinOpTransformer {
 
-public abstract class AbstractConstraintOptimizingVisitor<V, C extends Collection<V>, N extends ValueNode<C>>
-        implements OptimizingVisitor<V> {
+    private BinOpTransformer transformer;
 
-    private Map<BinOpType, BinOpTransformer> transformations = new EnumMap<>(BinOpType.class);
-
-    protected void configureTransformation(BinOpType op, BinOpTransformer transformer) {
-        if (op == BinOpType.NEGATION_VALUE || op == BinOpType.NEGATION_SIZE) {
-            transformations.put(op, new ArgsTransposingTransformer(transformer));
-        } else {
-            transformations.put(op, transformer);
-        }
+    public ArgsTransposingTransformer(BinOpTransformer transformer) {
+        this.transformer = transformer;
     }
 
     @Override
-    public Node visit(BinOpNode node) {
-        Node left = node.getLeft().accept(this);
-        Node right = node.getRight().accept(this);
-
-        BinOpType binOpType = BinOpType.of(left.getType(), right.getType());
-
-        return Optional.ofNullable(transformations.get(binOpType))
-                .map(t -> t.transform(node, left, right)).orElse(node);
+    public Node transform(BinOpNode node, Node left, Node right) {
+        return transformer.transform(node, right, left);
     }
 
 }
