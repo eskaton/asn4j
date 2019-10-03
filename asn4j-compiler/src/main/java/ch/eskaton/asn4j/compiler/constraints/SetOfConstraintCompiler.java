@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.constraints.optimizer.SetOfConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -54,7 +55,6 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 
 public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 

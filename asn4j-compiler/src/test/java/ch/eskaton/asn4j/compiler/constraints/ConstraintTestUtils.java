@@ -50,83 +50,83 @@ import static java.util.Collections.singletonList;
 
 public class ConstraintTestUtils {
 
-    static BinOpNode union(Node left, Node right) {
+    public static BinOpNode union(Node left, Node right) {
         return new BinOpNode(NodeType.UNION, left, right);
     }
 
-    static BinOpNode intersection(Node left, Node right) {
+    public static BinOpNode intersection(Node left, Node right) {
         return new BinOpNode(NodeType.INTERSECTION, left, right);
     }
 
-    static BinOpNode complement(Node left, Node right) {
+    public static BinOpNode complement(Node left, Node right) {
         return new BinOpNode(NodeType.COMPLEMENT, left, right);
     }
 
-    static OpNode not(Node node) {
+    public static OpNode not(Node node) {
         return new OpNode(NodeType.NEGATION, node);
     }
 
-    static IntegerRange range(long lower, long upper) {
+    public static IntegerRange range(long lower, long upper) {
         return new IntegerRange(lower, upper);
     }
 
-    static SizeNode size() {
+    public static SizeNode size() {
         return new SizeNode(emptyList());
     }
 
-    static SizeNode size(long lower, long upper) {
+    public static SizeNode size(long lower, long upper) {
         return new SizeNode(singletonList(range(lower, upper)));
     }
 
-    static SizeNode size(IntegerRange... ranges) {
+    public static SizeNode size(IntegerRange... ranges) {
         return new SizeNode(asList(ranges));
     }
 
-    static Optional<SizeNode> optSize() {
+    public static Optional<SizeNode> optSize() {
         return Optional.of(new SizeNode(emptyList()));
     }
 
-    static Optional<SizeNode> optSize(long lower, long upper) {
+    public static Optional<SizeNode> optSize(long lower, long upper) {
         return Optional.of(new SizeNode(singletonList(range(lower, upper))));
     }
 
-    static Optional<SizeNode> optSize(IntegerRange... ranges) {
+    public static Optional<SizeNode> optSize(IntegerRange... ranges) {
         return Optional.of(new SizeNode(asList(ranges)));
     }
 
-    static IntegerRangeValueNode intValue() {
+    public static IntegerRangeValueNode intValue() {
         return new IntegerRangeValueNode(emptyList());
     }
 
-    static IntegerRangeValueNode intValue(long lower, long upper) {
+    public static IntegerRangeValueNode intValue(long lower, long upper) {
         return new IntegerRangeValueNode(singletonList(range(lower, upper)));
     }
 
-    static IntegerRangeValueNode intValue(IntegerRange... ranges) {
+    public static IntegerRangeValueNode intValue(IntegerRange... ranges) {
         return new IntegerRangeValueNode(asList(ranges));
     }
 
-    static EnumeratedValueNode enumValue() {
+    public static EnumeratedValueNode enumValue() {
         return new EnumeratedValueNode(emptySet());
     }
 
-    static EnumeratedValueNode enumValue(Integer value) {
+    public static EnumeratedValueNode enumValue(Integer value) {
         return new EnumeratedValueNode(singleton(value));
     }
 
-    static EnumeratedValueNode enumValue(Integer... values) {
+    public static EnumeratedValueNode enumValue(Integer... values) {
         return new EnumeratedValueNode(Sets.<Integer>builder().addAll(asList(values)).build());
     }
 
-    static ObjectIdentifierValueNode oidValue() {
+    public static ObjectIdentifierValueNode oidValue() {
         return new ObjectIdentifierValueNode(emptySet());
     }
 
-    static ObjectIdentifierValueNode oidValue(Integer... value) {
+    public static ObjectIdentifierValueNode oidValue(Integer... value) {
         return new ObjectIdentifierValueNode(singleton(Arrays.asList(value)));
     }
 
-    static ObjectIdentifierValueNode oidValue(List<Integer>... value) {
+    public static ObjectIdentifierValueNode oidValue(List<Integer>... value) {
         return new ObjectIdentifierValueNode(Sets.<List<Integer>>builder().addAll(Arrays.asList(value)).build());
     }
 

@@ -25,51 +25,40 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.optimizer;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
-import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeIRIConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Optional;
 
-public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler<RelativeIRIValueNode> {
+public abstract class AbstractConstraintOptimizingVisitor<V, C extends Collection<V>, N extends ValueNode<C>>
+        implements OptimizingVisitor<V> {
 
-    private static final RelativeIRIValueResolver VALUE_RESOLVER = new RelativeIRIValueResolver();
+    private Map<BinOpType, BinOpTransformer> transformations = new EnumMap<>(BinOpType.class);
 
-    public RelativeIRIConstraintCompiler(CompilerContext ctx) {
-        super(ctx);
+    protected void configureTransformation(BinOpType op, BinOpTransformer transformer) {
+        if (op == BinOpType.NEGATION_VALUE || op == BinOpType.NEGATION_SIZE) {
+            transformations.put(op, new ArgsTransposingTransformer(transformer));
+        } else {
+            transformations.put(op, transformer);
+        }
     }
 
     @Override
-    protected Node optimize(Node node) {
-        return new RelativeIRIConstraintOptimizingVisitor().visit(node);
-    }
+    public Node visit(BinOpNode node) {
+        Node left = node.getLeft().accept(this);
+        Node right = node.getRight().accept(this);
 
-    @Override
-    protected RelativeIRIValueNode createNode(Set<List<String>> value) {
-        return new RelativeIRIValueNode(value);
-    }
+        BinOpType binOpType = BinOpType.of(left.getType(), right.getType());
 
-    @Override
-    protected Class<? extends AbstractIRIValue> getValueClass() {
-        return RelativeIRIValue.class;
-    }
-
-    @Override
-    protected AbstractIRIValueResolver getValueResolver() {
-        return VALUE_RESOLVER;
-    }
-
-    @Override
-    protected String getTypeName() {
-        return "RELATIVE-OID-IRI";
+        return Optional.ofNullable(transformations.get(binOpType))
+                .map(t -> t.transform(node, left, right)).orElse(node);
     }
 
 }

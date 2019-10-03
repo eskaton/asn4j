@@ -25,51 +25,40 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.optimizer;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
-import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeIRIConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.commons.collections.Lists;
+import ch.eskaton.commons.collections.Sets;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler<RelativeIRIValueNode> {
+public class OrderedSetOperationsStrategy<V, C extends Comparator<V>> implements SetOperationsStrategy<V, List<V>> {
 
-    private static final RelativeIRIValueResolver VALUE_RESOLVER = new RelativeIRIValueResolver();
+    private C comparator;
 
-    public RelativeIRIConstraintCompiler(CompilerContext ctx) {
-        super(ctx);
+    public OrderedSetOperationsStrategy(C comparator) {
+        this.comparator = comparator;
     }
 
     @Override
-    protected Node optimize(Node node) {
-        return new RelativeIRIConstraintOptimizingVisitor().visit(node);
+    public List<V> union(List<V> leftValue, List<V> rightValue) {
+        return buildSortedList(Sets.<V>builder().addAll(leftValue).addAll(rightValue).build());
     }
 
     @Override
-    protected RelativeIRIValueNode createNode(Set<List<String>> value) {
-        return new RelativeIRIValueNode(value);
+    public List<V> intersection(List<V> leftValue, List<V> rightValue) {
+        return buildSortedList(Sets.<V>builder().addAll(leftValue).retainAll(rightValue).build());
     }
 
     @Override
-    protected Class<? extends AbstractIRIValue> getValueClass() {
-        return RelativeIRIValue.class;
+    public List<V> complement(List<V> leftValue, List<V> rightValue) {
+        return buildSortedList(Sets.<V>builder().addAll(leftValue).removeAll(rightValue).build());
     }
 
-    @Override
-    protected AbstractIRIValueResolver getValueResolver() {
-        return VALUE_RESOLVER;
-    }
-
-    @Override
-    protected String getTypeName() {
-        return "RELATIVE-OID-IRI";
+    private List<V> buildSortedList(Set<V> set) {
+        return Lists.<V>builder().addAll(set).sorted(comparator).build();
     }
 
 }

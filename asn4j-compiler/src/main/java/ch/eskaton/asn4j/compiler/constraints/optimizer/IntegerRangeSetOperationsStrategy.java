@@ -25,51 +25,27 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.optimizer;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
-import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeIRIConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 
 import java.util.List;
-import java.util.Set;
 
-public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler<RelativeIRIValueNode> {
+public class IntegerRangeSetOperationsStrategy implements SetOperationsStrategy<IntegerRange, List<IntegerRange>> {
 
-    private static final RelativeIRIValueResolver VALUE_RESOLVER = new RelativeIRIValueResolver();
-
-    public RelativeIRIConstraintCompiler(CompilerContext ctx) {
-        super(ctx);
+    @Override
+    public List<IntegerRange> union(List<IntegerRange> leftValue, List<IntegerRange> rightValue) {
+        return IntegerRange.union(leftValue, rightValue);
     }
 
     @Override
-    protected Node optimize(Node node) {
-        return new RelativeIRIConstraintOptimizingVisitor().visit(node);
+    public List<IntegerRange> intersection(List<IntegerRange> leftValue, List<IntegerRange> rightValue) {
+        return IntegerRange.intersection(leftValue, rightValue);
     }
 
     @Override
-    protected RelativeIRIValueNode createNode(Set<List<String>> value) {
-        return new RelativeIRIValueNode(value);
-    }
-
-    @Override
-    protected Class<? extends AbstractIRIValue> getValueClass() {
-        return RelativeIRIValue.class;
-    }
-
-    @Override
-    protected AbstractIRIValueResolver getValueResolver() {
-        return VALUE_RESOLVER;
-    }
-
-    @Override
-    protected String getTypeName() {
-        return "RELATIVE-OID-IRI";
+    public List<IntegerRange> complement(List<IntegerRange> leftValue, List<IntegerRange> rightValue) {
+        return IntegerRange.complement(leftValue, rightValue);
     }
 
 }

@@ -25,51 +25,41 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.optimizer;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
-import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeIRIConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 
-import java.util.List;
-import java.util.Set;
+public interface OptimizingVisitor<V> extends Visitor<Node, V> {
 
-public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler<RelativeIRIValueNode> {
-
-    private static final RelativeIRIValueResolver VALUE_RESOLVER = new RelativeIRIValueResolver();
-
-    public RelativeIRIConstraintCompiler(CompilerContext ctx) {
-        super(ctx);
+    @Override
+    default Node visit(AllValuesNode node) {
+        return node;
     }
 
     @Override
-    protected Node optimize(Node node) {
-        return new RelativeIRIConstraintOptimizingVisitor().visit(node);
+    default Node visit(BinOpNode node) {
+        return node;
     }
 
     @Override
-    protected RelativeIRIValueNode createNode(Set<List<String>> value) {
-        return new RelativeIRIValueNode(value);
+    default Node visit(OpNode node) {
+        return new OpNode(node.getType(), visit(node.getNode()));
     }
 
     @Override
-    protected Class<? extends AbstractIRIValue> getValueClass() {
-        return RelativeIRIValue.class;
+    default Node visit(SizeNode node) {
+        return node;
     }
 
     @Override
-    protected AbstractIRIValueResolver getValueResolver() {
-        return VALUE_RESOLVER;
-    }
-
-    @Override
-    protected String getTypeName() {
-        return "RELATIVE-OID-IRI";
+    default Node visit(ValueNode<V> node) {
+        return node;
     }
 
 }
