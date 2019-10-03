@@ -25,51 +25,43 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.optimizer;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
-import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeIRIConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 
-import java.util.List;
-import java.util.Set;
+import java.util.Collection;
+import java.util.function.Function;
 
-public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler<RelativeIRIValueNode> {
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 
-    private static final RelativeIRIValueResolver VALUE_RESOLVER = new RelativeIRIValueResolver();
+public class ValueValueTransformer<V, C extends Collection<V>, N extends ValueNode<C>> implements BinOpTransformer {
 
-    public RelativeIRIConstraintCompiler(CompilerContext ctx) {
-        super(ctx);
+    private SetOperationsStrategy<V, C> setOperations;
+
+    private Function<C, N> createNode;
+
+    public ValueValueTransformer(SetOperationsStrategy setOperations, Function<C, N> createNode) {
+        this.setOperations = setOperations;
+        this.createNode = createNode;
     }
 
     @Override
-    protected Node optimize(Node node) {
-        return new RelativeIRIConstraintOptimizingVisitor().visit(node);
-    }
+    public N transform(BinOpNode node, Node left, Node right) {
+        C leftValue = ((N) left).getValue();
+        C rightValue = ((N) right).getValue();
 
-    @Override
-    protected RelativeIRIValueNode createNode(Set<List<String>> value) {
-        return new RelativeIRIValueNode(value);
-    }
-
-    @Override
-    protected Class<? extends AbstractIRIValue> getValueClass() {
-        return RelativeIRIValue.class;
-    }
-
-    @Override
-    protected AbstractIRIValueResolver getValueResolver() {
-        return VALUE_RESOLVER;
-    }
-
-    @Override
-    protected String getTypeName() {
-        return "RELATIVE-OID-IRI";
+        switch (node.getType()) {
+            case UNION:
+                return createNode.apply(setOperations.union(leftValue, rightValue));
+            case INTERSECTION:
+                return createNode.apply(setOperations.intersection(leftValue, rightValue));
+            case COMPLEMENT:
+                return createNode.apply(setOperations.complement(leftValue, rightValue));
+            default:
+                return throwUnimplementedNodeType(node);
+        }
     }
 
 }
