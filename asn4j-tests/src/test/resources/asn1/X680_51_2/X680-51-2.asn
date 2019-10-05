@@ -88,9 +88,12 @@ TestSetOf4 ::= SET ({testInteger1} | {2, 3}) OF INTEGER
 TestSetOf5 ::= SET (testSetOf1) OF INTEGER
 TestSetOf6 ::= TestSetOfType1 (testSetOf1)
 
+TestSetOfBitString1 ::= SET ({'0111'B}) OF BIT STRING
+
+TestSetOfBoolean1 ::= SET ({TRUE}) OF BOOLEAN
+
 TestSetOfOctetString1 ::= SET ({'0101'B}) OF OCTET STRING
 TestSetOfOctetString2 ::= SET ({'37'H}) OF TestOctetString1
 
-TestSetOfBitString1 ::= SET ({'0111'B}) OF BIT STRING
 
 END
