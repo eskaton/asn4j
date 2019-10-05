@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
+import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -46,10 +47,15 @@ public class JavaUtils {
 
     public static String getInitializerString(String typeName, Value value) {
         return typeSwitch(typeName, value,
+                typeCase(BooleanValue.class, JavaUtils::getBooleanInitializerString),
                 typeCase(BitStringValue.class, JavaUtils::getBitStringInitializerString),
                 typeCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString),
                 typeCase(IntegerValue.class, JavaUtils::getIntegerInitializerString)
         );
+    }
+
+    private static String getBooleanInitializerString(String typeName, BooleanValue value) {
+        return "new " + typeName + "(" + String.valueOf(value.getValue()) + ")";
     }
 
     private static String getBitStringInitializerString(String typeName, BitStringValue value) {

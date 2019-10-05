@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.test.x680_51_2;
 
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
+import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString1;
@@ -83,6 +84,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf5;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf6;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfBitString1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfBoolean1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString2;
 import org.junit.Test;
@@ -504,6 +506,15 @@ public class TestX680_51_2 {
                 ASN1Integer.valueOf(2L));
 
         testSetOfFailure(TestSetOf6.class, new TestSetOf6(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
+    }
+
+    @Test
+    public void testSetOfBoolean1() {
+        testSetOfSuccess(TestSetOfBoolean1.class, new TestSetOfBoolean1(),
+                new ASN1Boolean(true));
+
+        testSetOfFailure(TestSetOfBoolean1.class, new TestSetOfBoolean1(),
+                new ASN1Boolean(false));
     }
 
     @Test
