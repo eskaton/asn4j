@@ -91,4 +91,6 @@ TestSetOf6 ::= TestSetOfType1 (testSetOf1)
 TestSetOfOctetString1 ::= SET ({'0101'B}) OF OCTET STRING
 TestSetOfOctetString2 ::= SET ({'37'H}) OF TestOctetString1
 
+TestSetOfBitString1 ::= SET ({'0111'B}) OF BIT STRING
+
 END

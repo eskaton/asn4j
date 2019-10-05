@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.test.x680_51_2;
 
+import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString1;
@@ -81,6 +82,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf5;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf6;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString2;
 import org.junit.Test;
@@ -517,6 +519,15 @@ public class TestX680_51_2 {
     public void testSetOfOctetString2() {
         testSetOfSuccess(TestSetOfOctetString2.class, new TestSetOfOctetString2(),
                 new TestOctetString1(new byte[] { 0x37 }));
+
+        testSetOfFailure(TestSetOfOctetString2.class, new TestSetOfOctetString2(),
+                new TestOctetString1(new byte[] { 0x38 }));
+    }
+
+    @Test
+    public void testSetOfBitString1() {
+        testSetOfSuccess(TestSetOfBitString1.class, new TestSetOfBitString1(),
+                new ASN1BitString(new byte[] { 0x07 }, 4));
 
         testSetOfFailure(TestSetOfOctetString2.class, new TestSetOfOctetString2(),
                 new TestOctetString1(new byte[] { 0x38 }));
