@@ -40,6 +40,13 @@ public class ASN1Integer implements ASN1Type, HasConstraint {
 
     private BigInteger value;
 
+    public ASN1Integer() {
+    }
+
+    public ASN1Integer(long value) {
+        this.value = BigInteger.valueOf(value);
+    }
+
     public BigInteger getValue() {
         return value;
     }
@@ -48,10 +55,8 @@ public class ASN1Integer implements ASN1Type, HasConstraint {
         this.value = value;
     }
 
-    public static ASN1Integer valueOf(long i) {
-        ASN1Integer value = new ASN1Integer();
-        value.setValue(BigInteger.valueOf(i));
-        return value;
+    public static ASN1Integer valueOf(long value) {
+        return new ASN1Integer(value);
     }
 
     @Override

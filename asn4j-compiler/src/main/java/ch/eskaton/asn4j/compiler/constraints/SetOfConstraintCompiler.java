@@ -136,6 +136,10 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     protected String getTypeName(Type type) {
+        if (type instanceof TypeReference) {
+            type = (Type) ctx.resolveTypeReference(type);
+        }
+
         Type elementType;
 
         if (type instanceof SetOfType) {
