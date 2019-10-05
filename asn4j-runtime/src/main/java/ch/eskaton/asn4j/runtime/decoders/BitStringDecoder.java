@@ -37,10 +37,10 @@ public class BitStringDecoder implements TypeDecoder<ASN1BitString> {
 
     @Override
     public void decode(DecoderStates states, DecoderState state, ASN1BitString obj) {
-        byte unusedBits = states.buf[2];
+        byte unusedBits = states.buf[state.pos];
 
         if (state.length == 1) {
-            if (states.buf[2] != 0) {
+            if (states.buf[state.pos] != 0) {
                 throw new DecodingException("Unused bits must be 0 if content is empty");
             }
         } else {

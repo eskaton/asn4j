@@ -150,7 +150,7 @@ public class ASN1BitString implements ASN1Type, HasConstraint {
 
     @Override
     public int hashCode() {
-        return Objects.hash(value);
+        return Arrays.hashCode(value);
     }
 
     @Override
