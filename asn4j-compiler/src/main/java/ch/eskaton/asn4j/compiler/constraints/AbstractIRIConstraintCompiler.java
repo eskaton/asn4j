@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -93,7 +94,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     }
 
     @Override
-    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
+    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
         BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
                 .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
@@ -102,13 +103,13 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
         builder.append("String[] value = getValue().toArray(new String[] {});");
 
-        addConstraintCondition(definition, builder);
+        addConstraintCondition(type, definition, builder);
 
         builder.finish().build();
     }
 
     @Override
-    protected Optional<String> buildExpression(Node node) {
+    protected Optional<String> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 String expression = (((N) node).getValue()).stream()
@@ -117,7 +118,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
                 return Optional.of(expression);
             default:
-                return super.buildExpression(node);
+                return super.buildExpression(typeName, node);
         }
     }
 

@@ -34,7 +34,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SetOfConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -42,6 +41,9 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -53,6 +55,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.java.JavaUtils.getInitializerString;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.singleton;
 
@@ -89,7 +92,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
+    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
         javaClass.addStaticImport(CollectionUtils.class, "asHashSet");
 
         String baseName = ASN1SetOf.class.getSimpleName();
@@ -106,7 +109,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
                 .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
-        addConstraintCondition(definition, builder);
+        addConstraintCondition(type, definition, builder);
 
         builder.finish().build();
     }
@@ -117,22 +120,36 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<String> buildExpression(Node node) {
+    protected Optional<String> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 Set<CollectionOfValue> values = ((CollectionOfValueNode) node).getValue();
-                return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
+                return Optional.of(values.stream()
+                        .map(value -> buildExpression(typeName, value)).collect(Collectors.joining(" || ")));
             case SIZE:
                 List<IntegerRange> sizes = ((SizeNode) node).getSize();
                 return Optional.of(sizes.stream().map(this::buildSizeExpression).collect(Collectors.joining(" || ")));
             default:
-                return super.buildExpression(node);
+                return super.buildExpression(typeName, node);
         }
     }
 
-    private String buildExpression(CollectionOfValue value) {
+    @Override
+    protected String getTypeName(Type type) {
+        Type elementType;
+
+        if (type instanceof SetOfType) {
+            elementType = ((SetOfType) type).getType();
+        } else {
+            elementType = type;
+        }
+
+        return super.getTypeName(elementType);
+    }
+
+    private String buildExpression(String typeName, CollectionOfValue value) {
         String initString = value.getValues().stream()
-                .map(JavaUtils::getInitializerString)
+                .map(v -> getInitializerString(typeName, v))
                 .collect(Collectors.joining(", "));
 
         return "(getValues().equals(asHashSet(" + initString + ")))";

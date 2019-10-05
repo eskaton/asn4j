@@ -75,7 +75,7 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
 
         if (collectionOfValue != null) {
             Type elementType = ((CollectionOfType) type).getType();
-            Class<? extends Value> valueClass = ctx.getValueType(elementType.getClass());
+            Class<? extends Value> valueClass = ctx.getValueType(elementType);
 
             List<? extends Value> values = collectionOfValue.getValues().stream()
                     .map(v -> resolveElement(elementType, valueClass, v))

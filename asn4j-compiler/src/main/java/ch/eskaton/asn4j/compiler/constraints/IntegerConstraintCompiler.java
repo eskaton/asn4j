@@ -109,14 +109,14 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
+    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
         javaClass.addImport(BigInteger.class);
 
         BodyBuilder builder = javaClass.method().annotation(Override.class).modifier(Public)
                 .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
-        addConstraintCondition(definition, builder);
+        addConstraintCondition(type, definition, builder);
 
         builder.finish().build();
     }
@@ -127,7 +127,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<String> buildExpression(Node node) {
+    protected Optional<String> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<IntegerRange> range = ((IntegerRangeValueNode) node).getValue();
@@ -135,7 +135,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             case ALL_VALUES:
                 return Optional.empty();
             default:
-                return super.buildExpression(node);
+                return super.buildExpression(typeName, node);
         }
     }
 

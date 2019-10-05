@@ -93,7 +93,7 @@ public class ConstraintCompiler {
         }
 
         if (constraintDef != null) {
-            compiler.addConstraint(javaClass, constraintDef);
+            compiler.addConstraint(node, javaClass, constraintDef);
         }
 
         javaClass.addImport(ConstraintViolatedException.class);
