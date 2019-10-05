@@ -46,6 +46,14 @@ public class ASN1BitString implements ASN1Type, HasConstraint {
 
     protected int unusedBits;
 
+    public ASN1BitString() {
+    }
+
+    public ASN1BitString(byte[] value, int unusedBits) {
+        this.value = value;
+        this.unusedBits = unusedBits;
+    }
+
     public static ASN1BitString of(byte[] value) {
         return of(value, 0);
     }
