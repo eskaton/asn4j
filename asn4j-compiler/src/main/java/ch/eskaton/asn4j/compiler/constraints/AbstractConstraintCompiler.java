@@ -297,17 +297,10 @@ public abstract class AbstractConstraintCompiler {
 
     protected String getTypeName(Type type) {
         if (type instanceof TypeReference) {
-            return ((TypeReference) type).getType();
+            type = (Type) ctx.resolveTypeReference(type);
         }
 
-        String typeName =  ctx.getRuntimeType(type.getClass());
-
-
-        if (typeName==null) {
-            ;
-        }
-
-        return typeName;
+        return ctx.getRuntimeType(type.getClass());
     }
 
     protected Node optimize(Node node) {

@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.java;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.Arrays;
@@ -46,6 +47,7 @@ public class JavaUtils {
     public static String getInitializerString(String typeName, Value value) {
         return typeSwitch(typeName, value,
                 typeCase(BitStringValue.class, JavaUtils::getBitStringInitializerString),
+                typeCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString),
                 typeCase(IntegerValue.class, JavaUtils::getIntegerInitializerString)
         );
     }
@@ -58,8 +60,16 @@ public class JavaUtils {
         return "new " + typeName + "(new byte[] { " + bytesStr + " }, " + value.getUnusedBits() + ")";
     }
 
+    private static String getOctetStringInitializerString(String typeName, OctetStringValue value) {
+        byte[] bytes = value.getByteValue();
+        String bytesStr = IntStream.range(0, bytes.length).boxed().map(
+                i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
+
+        return "new " + typeName + "(new byte[] { " + bytesStr + " })";
+    }
+
     private static String getIntegerInitializerString(String typeName, IntegerValue value) {
-        return "ASN1Integer.valueOf(" + value.getValue().longValue() + "L)";
+        return "new " + typeName + "(" + value.getValue().longValue() + "L)";
     }
 
     public static String typeSwitch(String typeName, Value value, BiFunction<String, Object,
