@@ -274,14 +274,14 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
-    protected abstract void addConstraint(JavaClass javaClass, ConstraintDefinition definition);
+    protected abstract void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition);
 
-    protected void addConstraintCondition(ConstraintDefinition definition, JavaClass.BodyBuilder builder) {
+    protected void addConstraintCondition(Type type, ConstraintDefinition definition, JavaClass.BodyBuilder builder) {
         if (definition.isExtensible()) {
             builder.append("return true;");
         } else {
             Node roots = optimize(definition.getRoots());
-            Optional<String> expression = buildExpression(roots);
+            Optional<String> expression = buildExpression(getTypeName(type), roots);
 
             if (expression.isPresent()) {
                 builder.append("if (" + expression.get() + ") {")
@@ -295,26 +295,41 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
+    protected String getTypeName(Type type) {
+        if (type instanceof TypeReference) {
+            return ((TypeReference) type).getType();
+        }
+
+        String typeName =  ctx.getRuntimeType(type.getClass());
+
+
+        if (typeName==null) {
+            ;
+        }
+
+        return typeName;
+    }
+
     protected Node optimize(Node node) {
         return node;
     }
 
-    protected Optional<String> buildExpression(Node node) {
+    protected Optional<String> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case ALL_VALUES:
                 return Optional.empty();
             case UNION:
-                return OptionalUtils.combine(buildExpression(((BinOpNode) node).getLeft()),
-                        buildExpression(((BinOpNode) node).getRight()), getBinOperation("||"));
+                return OptionalUtils.combine(buildExpression(typeName, ((BinOpNode) node).getLeft()),
+                        buildExpression(typeName, ((BinOpNode) node).getRight()), getBinOperation("||"));
             case INTERSECTION:
-                return OptionalUtils.combine(buildExpression(((BinOpNode) node).getLeft()),
-                        buildExpression(((BinOpNode) node).getRight()), getBinOperation("&&"));
+                return OptionalUtils.combine(buildExpression(typeName, ((BinOpNode) node).getLeft()),
+                        buildExpression(typeName, ((BinOpNode) node).getRight()), getBinOperation("&&"));
             case COMPLEMENT:
-                return OptionalUtils.combine(buildExpression(((BinOpNode) node).getLeft()),
-                        buildExpression(((BinOpNode) node).getRight()).map(this::negate),
+                return OptionalUtils.combine(buildExpression(typeName, ((BinOpNode) node).getLeft()),
+                        buildExpression(typeName, ((BinOpNode) node).getRight()).map(this::negate),
                         getBinOperation("&&"));
             case NEGATION:
-                return buildExpression(((OpNode) node).getNode()).map(this::negate);
+                return buildExpression(typeName, ((OpNode) node).getNode()).map(this::negate);
             default:
                 return throwUnimplementedNodeType(node);
         }

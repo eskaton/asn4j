@@ -41,12 +41,13 @@ public class JavaUtilsTest {
     @Test
     public void testBitStringValue() {
         assertEquals("new ASN1BitString(new byte[] { (byte) 0x01, (byte) 0x02, (byte) 0x03 }, 5)",
-                JavaUtils.getInitializerString(new BitStringValue(new byte[] { 0x01, 0x02, 0x03 }, 5)));
+                JavaUtils.getInitializerString(ASN1BitString.class.getSimpleName(),
+                        new BitStringValue(new byte[] { 0x01, 0x02, 0x03 }, 5)));
     }
 
     @Test(expected = CompilerException.class)
     public void testUnsupportedValue() {
-        getInitializerString(new EmptyValue(NO_POSITION));
+        getInitializerString(null, new EmptyValue(NO_POSITION));
     }
 
 }

@@ -44,6 +44,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -102,14 +103,14 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
+    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
         javaClass.addImport(Arrays.class);
 
         BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
                 .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
-        addConstraintCondition(definition, builder);
+        addConstraintCondition(type, definition, builder);
 
         builder.finish().build();
     }
@@ -120,7 +121,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<String> buildExpression(Node node) {
+    protected Optional<String> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<BitStringValue> values = ((BitStringValueNode) node).getValue();
@@ -132,7 +133,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                 return Optional.of(sizes.stream().map(this::buildSizeExpression).collect(Collectors.joining(" || ")));
 
             default:
-                return super.buildExpression(node);
+                return super.buildExpression(typeName, node);
         }
     }
 

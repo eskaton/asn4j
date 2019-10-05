@@ -531,11 +531,20 @@ public class CompilerContext {
         return null;
     }
 
-    public Class<? extends Value> getValueType(Class<? extends Type> typeClass) {
+    public Class<? extends Value> getValueType(Type type) {
+        Class<?> typeClass;
+
+        if (type instanceof TypeReference) {
+            typeClass = resolveTypeReference(type).getClass();
+        } else {
+            typeClass = type.getClass();
+        }
+
         Class<? extends Value> valueClass = types2values.get(typeClass);
 
         if (valueClass == null) {
-            throw new ASN1RuntimeException(String.format("Value class for type %s not defined", typeClass.getSimpleName()));
+            throw new ASN1RuntimeException(String.format("Value class for type %s not defined",
+                    typeClass.getSimpleName()));
         }
 
         return valueClass;
@@ -860,6 +869,10 @@ public class CompilerContext {
 
     private HashMap<String, CompiledType> getTypesOfCurrentModule() {
         return definedTypes.computeIfAbsent(currentModule.peek().getModuleId().getModuleName(), key -> new HashMap<>());
+    }
+
+    public String getRuntimeType(Class<?> type) {
+        return runtimeTypes.get(type.getSimpleName());
     }
 
 }

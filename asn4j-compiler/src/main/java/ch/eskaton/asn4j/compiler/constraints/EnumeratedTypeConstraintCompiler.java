@@ -111,12 +111,12 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     }
 
     @Override
-    public void addConstraint(JavaClass javaClass, ConstraintDefinition definition) {
+    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
         JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
                 .returnType(boolean.class).name("doCheckConstraint")
                 .exception(ConstraintViolatedException.class).body();
 
-        addConstraintCondition(definition, builder);
+        addConstraintCondition(type, definition, builder);
 
         builder.finish().build();
     }
@@ -127,13 +127,13 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     }
 
     @Override
-    protected Optional<String> buildExpression(Node node) {
+    protected Optional<String> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 Set<Integer> values = ((EnumeratedValueNode) node).getValue();
                 return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
             default:
-                return super.buildExpression(node);
+                return super.buildExpression(typeName, node);
         }
     }
 

@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -43,36 +43,38 @@ public class JavaUtils {
     private JavaUtils() {
     }
 
-    public static String getInitializerString(Value value) {
-        return typeSwitch(value,
+    public static String getInitializerString(String typeName, Value value) {
+        return typeSwitch(typeName, value,
                 typeCase(BitStringValue.class, JavaUtils::getBitStringInitializerString),
                 typeCase(IntegerValue.class, JavaUtils::getIntegerInitializerString)
         );
     }
 
-    private static String getBitStringInitializerString(BitStringValue value) {
+    private static String getBitStringInitializerString(String typeName, BitStringValue value) {
         byte[] bytes = value.getByteValue();
         String bytesStr = IntStream.range(0, bytes.length).boxed().map(
                 i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
 
-        return "new ASN1BitString(new byte[] { " + bytesStr + " }, " + value.getUnusedBits() + ")";
+        return "new " + typeName + "(new byte[] { " + bytesStr + " }, " + value.getUnusedBits() + ")";
     }
 
-    private static String getIntegerInitializerString(IntegerValue value) {
+    private static String getIntegerInitializerString(String typeName, IntegerValue value) {
         return "ASN1Integer.valueOf(" + value.getValue().longValue() + "L)";
     }
 
-    public static String typeSwitch(Value value, Function<Object, Optional<String>>... functions) {
+    public static String typeSwitch(String typeName, Value value, BiFunction<String, Object,
+            Optional<String>>... functions) {
         return Arrays.stream(functions)
-                .map(f -> f.apply(value))
-                .filter(v -> v.isPresent())
+                .map(f -> f.apply(typeName, value))
+                .filter(Optional::isPresent)
                 .findFirst()
                 .orElseThrow(() -> new CompilerException("Failed to get initializer string for type %s",
                         value.getClass())).get();
     }
 
-    private static <T extends Value> Function<Object, Optional<String>> typeCase(Class<T> cls, Function<T, String> fun) {
-        return obj -> cls.isInstance(obj) ? Optional.of(fun.apply(cls.cast(obj))) : Optional.empty();
+    private static <T extends Value> BiFunction<String, Object, Optional<String>> typeCase(Class<T> cls,
+            BiFunction<String, T, String> fun) {
+        return (type, obj) -> cls.isInstance(obj) ? Optional.of(fun.apply(type, cls.cast(obj))) : Optional.empty();
     }
 
 }
