@@ -84,7 +84,7 @@ public class JavaUtils {
 
     private static <T extends Value> BiFunction<String, Object, Optional<String>> typeCase(Class<T> cls,
             BiFunction<String, T, String> fun) {
-        return (type, obj) -> cls.isInstance(obj) ? Optional.of(fun.apply(type, cls.cast(obj))) : Optional.empty();
+        return (typeName, obj) -> cls.isInstance(obj) ? Optional.of(fun.apply(typeName, cls.cast(obj))) : Optional.empty();
     }
 
 }
