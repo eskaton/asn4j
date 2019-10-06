@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.test.x680_51_2;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString2;
@@ -53,6 +54,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestInteger3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestNull1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestNull2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestNull3;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestNull4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestObjectIdentifier1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestObjectIdentifier2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestObjectIdentifier3;
@@ -87,6 +89,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfBoolean1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfEnumeration1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfEnumeration2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfNull1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfNull2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString2;
 import org.junit.Test;
@@ -555,6 +559,20 @@ public class TestX680_51_2 {
 
         testSetOfFailure(TestSetOfEnumeration2.class, new TestSetOfEnumeration2(),
                 TestEnumeration1.A, TestEnumeration1.B);
+    }
+
+    @Test
+    public void testSetOfNull1() {
+        testSetOfSuccess(TestSetOfNull1.class, new TestSetOfNull1());
+
+        testSetOfFailure(TestSetOfNull1.class, new TestSetOfNull1(), new ASN1Null());
+    }
+
+    @Test
+    public void testSetOfNull2() {
+        testSetOfSuccess(TestSetOfNull2.class, new TestSetOfNull2(), new TestNull4());
+
+        testSetOfFailure(TestSetOfNull2.class, new TestSetOfNull2());
     }
 
 }
