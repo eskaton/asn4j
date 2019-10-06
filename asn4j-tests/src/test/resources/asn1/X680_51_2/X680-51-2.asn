@@ -102,4 +102,9 @@ TestSetOfEnumeration2 ::= SET ({a, c}) OF TestEnumeration1
 TestSetOfOctetString1 ::= SET ({'0101'B}) OF OCTET STRING
 TestSetOfOctetString2 ::= SET ({'37'H}) OF TestOctetString1
 
+TestNull4 ::= NULL
+
+TestSetOfNull1 ::= SET ({}) OF NULL
+TestSetOfNull2 ::= SET ({NULL}) OF TestNull4
+
 END
