@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
@@ -50,8 +51,9 @@ public class JavaUtils {
         return typeSwitch(typeName, value,
                 typeCase(BooleanValue.class, JavaUtils::getBooleanInitializerString),
                 typeCase(BitStringValue.class, JavaUtils::getBitStringInitializerString),
-                typeCase(IntegerValue.class, JavaUtils::getIntegerInitializerString),
                 typeCase(EnumeratedValue.class, JavaUtils::getEnumeratedInitializerString),
+                typeCase(IntegerValue.class, JavaUtils::getIntegerInitializerString),
+                typeCase(NullValue.class, JavaUtils::getNullInitializerString),
                 typeCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString)
         );
     }
@@ -68,12 +70,16 @@ public class JavaUtils {
         return "new " + typeName + "(new byte[] { " + bytesStr + " }, " + value.getUnusedBits() + ")";
     }
 
+    private static String getEnumeratedInitializerString(String typeName, EnumeratedValue value) {
+        return typeName + "." + value.getId().toUpperCase();
+    }
+
     private static String getIntegerInitializerString(String typeName, IntegerValue value) {
         return "new " + typeName + "(" + value.getValue().longValue() + "L)";
     }
 
-    private static String getEnumeratedInitializerString(String typeName, EnumeratedValue value) {
-        return typeName + "." + value.getId().toUpperCase();
+    private static String getNullInitializerString(String typeName, NullValue value) {
+        return "new " + typeName + "()";
     }
 
     private static String getOctetStringInitializerString(String typeName, OctetStringValue value) {

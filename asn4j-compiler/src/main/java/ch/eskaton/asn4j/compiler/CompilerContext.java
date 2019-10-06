@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.compiler.resolvers.CollectionOfValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.NullValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.OctetStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -181,6 +182,7 @@ public class CompilerContext {
             .put(EnumeratedValue.class, new EnumeratedValueResolver(CompilerContext.this))
             .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
             .put(OctetStringValue.class, new OctetStringValueResolver(CompilerContext.this))
+            .put(NullValue.class, new NullValueResolver(CompilerContext.this))
             .put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this, ObjectIdentifier.class,
                     ObjectIdentifierValue.class))
             .put(RelativeOIDValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeOID.class,
