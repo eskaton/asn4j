@@ -178,7 +178,6 @@ public class CompilerContext {
     private Map<Class<?>, ValueResolver<?>> valueResolvers = Maps.<Class<?>, ValueResolver<?>>builder()
             .put(BooleanValue.class, new BooleanValueResolver(CompilerContext.this))
             .put(IntegerValue.class, new IntegerValueResolver(CompilerContext.this))
-            .put(Integer.class, new EnumeratedValueResolver(CompilerContext.this))
             .put(EnumeratedValue.class, new EnumeratedValueResolver(CompilerContext.this))
             .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
             .put(OctetStringValue.class, new OctetStringValueResolver(CompilerContext.this))
