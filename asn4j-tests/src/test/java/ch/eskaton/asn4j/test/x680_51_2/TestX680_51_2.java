@@ -85,12 +85,11 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf5;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf6;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfBoolean1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfEnumeration1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString2;
 import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.HashSet;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
@@ -112,8 +111,6 @@ import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
-import static ch.eskaton.commons.utils.CollectionUtils.asHashSet;
-import static org.junit.Assert.assertEquals;
 
 public class TestX680_51_2 {
 
@@ -542,6 +539,22 @@ public class TestX680_51_2 {
 
         testSetOfFailure(TestSetOfOctetString2.class, new TestSetOfOctetString2(),
                 new TestOctetString1(new byte[] { 0x38 }));
+    }
+
+    @Test
+    public void testSetOfEnumeration1() {
+        testSetOfSuccess(TestSetOfEnumeration1.class, new TestSetOfEnumeration1(), TestEnumeration1.A);
+
+        testSetOfFailure(TestSetOfEnumeration1.class, new TestSetOfEnumeration1(), TestEnumeration1.B);
+    }
+
+    @Test
+    public void testSetOfEnumeration2() {
+        testSetOfSuccess(TestSetOfEnumeration2.class, new TestSetOfEnumeration2(),
+                TestEnumeration1.A, TestEnumeration1.C);
+
+        testSetOfFailure(TestSetOfEnumeration2.class, new TestSetOfEnumeration2(),
+                TestEnumeration1.A, TestEnumeration1.B);
     }
 
 }
