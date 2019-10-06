@@ -35,7 +35,7 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public abstract class AbstractValueResolver<V> implements ValueResolver<V> {
+public abstract class AbstractValueResolver<V extends Value> implements ValueResolver<V> {
 
     protected CompilerContext ctx;
 

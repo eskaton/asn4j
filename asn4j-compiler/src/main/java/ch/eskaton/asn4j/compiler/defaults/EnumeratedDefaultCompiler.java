@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -43,10 +44,10 @@ public class EnumeratedDefaultCompiler implements DefaultCompiler {
     @Override
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
             Value value) {
-        Integer enumeratedValue;
+        EnumeratedValue enumeratedValue;
 
         if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            enumeratedValue = ctx.resolveGenericValue(Integer.class, type,
+            enumeratedValue = ctx.resolveGenericValue(EnumeratedValue.class, type,
                     resolveAmbiguousValue(value, SimpleDefinedValue.class));
         } else {
             throw new CompilerException("Invalid default value");
@@ -54,8 +55,8 @@ public class EnumeratedDefaultCompiler implements DefaultCompiler {
 
         String defaultField = addDefaultField(clazz, typeName, field);
 
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new "
-                + typeName + "(" + typeName + ".valueOf(" + enumeratedValue + "));"));
+        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
+                + typeName + "." + enumeratedValue.getId().toUpperCase() + ";"));
 
         clazz.addImport(ConstraintViolatedException.class);
     }

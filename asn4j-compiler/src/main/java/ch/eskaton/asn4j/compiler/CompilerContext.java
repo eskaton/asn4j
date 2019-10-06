@@ -179,6 +179,7 @@ public class CompilerContext {
             .put(BooleanValue.class, new BooleanValueResolver(CompilerContext.this))
             .put(IntegerValue.class, new IntegerValueResolver(CompilerContext.this))
             .put(Integer.class, new EnumeratedValueResolver(CompilerContext.this))
+            .put(EnumeratedValue.class, new EnumeratedValueResolver(CompilerContext.this))
             .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
             .put(OctetStringValue.class, new OctetStringValueResolver(CompilerContext.this))
             .put(ObjectIdentifierValue.class, new DefaultValueResolver<>(CompilerContext.this, ObjectIdentifier.class,

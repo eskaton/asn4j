@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Tuple2;
@@ -41,14 +42,14 @@ import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
-public class EnumeratedValueResolver extends AbstractValueResolver<Integer> {
+public class EnumeratedValueResolver extends AbstractValueResolver<EnumeratedValue> {
 
     public EnumeratedValueResolver(CompilerContext ctx) {
         super(ctx);
     }
 
     @Override
-    public Integer resolveGeneric(Type type, Value value) {
+    public EnumeratedValue resolveGeneric(Type type, Value value) {
         if (type instanceof TypeReference && value instanceof SimpleDefinedValue) {
             CompiledEnumeratedType compiledType = (CompiledEnumeratedType) ctx.getCompiledType(type);
 
@@ -65,7 +66,7 @@ public class EnumeratedValueResolver extends AbstractValueResolver<Integer> {
                 Optional<Tuple2<String, Integer>> element = compiledType.getElementById(ref);
 
                 if (element.isPresent()) {
-                    return element.get().get_2();
+                    return new EnumeratedValue(value.getPosition(), ref, element.get().get_2());
                 }
             }
         }

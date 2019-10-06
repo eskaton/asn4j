@@ -33,14 +33,27 @@ public class EnumeratedValue extends AbstractValue {
 
     private String id;
 
+    private int value;
+
     public EnumeratedValue(Position position, String id) {
         super(position);
 
         this.id = id;
     }
 
+    public EnumeratedValue(Position position, String id, int value) {
+        super(position);
+
+        this.id = id;
+        this.value = value;
+    }
+
     public String getId() {
         return id;
+    }
+
+    public int getValue() {
+        return value;
     }
 
 }
