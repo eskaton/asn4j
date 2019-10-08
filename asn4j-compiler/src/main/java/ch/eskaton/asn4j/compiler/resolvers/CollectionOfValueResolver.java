@@ -92,6 +92,10 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
 
     private Value resolveElement(Type elementType, Class<? extends Value> valueClass, Value value) {
         try {
+            if (value instanceof AmbiguousValue) {
+                value = CompilerUtils.resolveAmbiguousValue(value, valueClass);
+            }
+
             return ctx.resolveGenericValue(valueClass, elementType, value);
         } catch (ClassCastException e) {
             throw new CompilerException("Failed to resolve a value in a SET OF to type %s: %s",
