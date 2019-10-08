@@ -42,7 +42,11 @@ public class ASN1ObjectIdentifier extends AbstractASN1OID {
     }
 
     public ASN1ObjectIdentifier(int... components) {
-        setValue(components);
+        super(components);
+    }
+
+    public ASN1ObjectIdentifier(List<Integer> components) {
+        super(components);
     }
 
     public static ASN1ObjectIdentifier from(int... components) {
@@ -50,11 +54,7 @@ public class ASN1ObjectIdentifier extends AbstractASN1OID {
     }
 
     public static ASN1ObjectIdentifier from(List<Integer> components) {
-        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier();
-
-        oid.setValue(components);
-
-        return oid;
+        return new ASN1ObjectIdentifier(components);
     }
 
     @Override
