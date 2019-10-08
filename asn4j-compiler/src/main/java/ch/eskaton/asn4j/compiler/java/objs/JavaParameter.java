@@ -32,6 +32,7 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 public class JavaParameter implements JavaObject {
 
@@ -39,9 +40,16 @@ public class JavaParameter implements JavaObject {
 
     private String name;
 
+    private Optional<? extends Class<?>> clazz;
+
     public JavaParameter(String type, String name) {
+        this(type, name, null);
+    }
+
+    public JavaParameter(String type, String name, Class<?> clazz) {
         this.type = type;
         this.name = name;
+        this.clazz = Optional.ofNullable(clazz);
     }
 
     public String getType() {
@@ -50,6 +58,10 @@ public class JavaParameter implements JavaObject {
 
     public String getName() {
         return name;
+    }
+
+    public Optional<? extends Class<?>> getClazz() {
+        return clazz;
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {

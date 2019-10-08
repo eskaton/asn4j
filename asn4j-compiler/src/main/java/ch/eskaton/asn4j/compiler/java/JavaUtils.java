@@ -27,18 +27,23 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
+import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
+import ch.eskaton.commons.functional.TriFunction;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -47,22 +52,23 @@ public class JavaUtils {
     private JavaUtils() {
     }
 
-    public static String getInitializerString(String typeName, Value value) {
-        return typeSwitch(typeName, value,
+    public static String getInitializerString(CompilerContext ctx, String typeName, Value value) {
+        return typeSwitch(ctx, typeName, value,
                 typeCase(BooleanValue.class, JavaUtils::getBooleanInitializerString),
                 typeCase(BitStringValue.class, JavaUtils::getBitStringInitializerString),
                 typeCase(EnumeratedValue.class, JavaUtils::getEnumeratedInitializerString),
                 typeCase(IntegerValue.class, JavaUtils::getIntegerInitializerString),
                 typeCase(NullValue.class, JavaUtils::getNullInitializerString),
+                typeCase(ObjectIdentifierValue.class, JavaUtils::getObjectIdentifierInitializerString),
                 typeCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString)
         );
     }
 
-    private static String getBooleanInitializerString(String typeName, BooleanValue value) {
+    private static String getBooleanInitializerString(CompilerContext ctx, String typeName, BooleanValue value) {
         return "new " + typeName + "(" + value.getValue() + ")";
     }
 
-    private static String getBitStringInitializerString(String typeName, BitStringValue value) {
+    private static String getBitStringInitializerString(CompilerContext ctx, String typeName, BitStringValue value) {
         byte[] bytes = value.getByteValue();
         String bytesStr = IntStream.range(0, bytes.length).boxed().map(
                 i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
@@ -70,19 +76,31 @@ public class JavaUtils {
         return "new " + typeName + "(new byte[] { " + bytesStr + " }, " + value.getUnusedBits() + ")";
     }
 
-    private static String getEnumeratedInitializerString(String typeName, EnumeratedValue value) {
+    private static String getEnumeratedInitializerString(CompilerContext ctx, String typeName, EnumeratedValue value) {
         return typeName + "." + value.getId().toUpperCase();
     }
 
-    private static String getIntegerInitializerString(String typeName, IntegerValue value) {
+    private static String getIntegerInitializerString(CompilerContext ctx, String typeName, IntegerValue value) {
         return "new " + typeName + "(" + value.getValue().longValue() + "L)";
     }
 
-    private static String getNullInitializerString(String typeName, NullValue value) {
+    private static String getNullInitializerString(CompilerContext ctx, String typeName, NullValue value) {
         return "new " + typeName + "()";
     }
 
-    private static String getOctetStringInitializerString(String typeName, OctetStringValue value) {
+    private static String getObjectIdentifierInitializerString(CompilerContext ctx, String typeName, ObjectIdentifierValue value) {
+        ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver();
+
+        List<Integer> ids = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, ObjectIdentifierValue.class));
+
+        ObjectIdentifierVerifier.verifyComponents(ids);
+
+        String idsString = ids.stream().map(Object::toString).collect(Collectors.joining(", "));
+
+        return "new " + typeName + "(new int[] { " + idsString + " })";
+    }
+
+    private static String getOctetStringInitializerString(CompilerContext ctx, String typeName, OctetStringValue value) {
         byte[] bytes = value.getByteValue();
         String bytesStr = IntStream.range(0, bytes.length).boxed().map(
                 i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
@@ -90,19 +108,20 @@ public class JavaUtils {
         return "new " + typeName + "(new byte[] { " + bytesStr + " })";
     }
 
-    public static String typeSwitch(String typeName, Value value, BiFunction<String, Object,
+    public static String typeSwitch(CompilerContext ctx, String typeName, Value value, TriFunction<CompilerContext, String, Object,
             Optional<String>>... functions) {
         return Arrays.stream(functions)
-                .map(f -> f.apply(typeName, value))
+                .map(f -> f.apply(ctx, typeName, value))
                 .filter(Optional::isPresent)
                 .findFirst()
                 .orElseThrow(() -> new CompilerException("Failed to get initializer string for type %s",
                         value.getClass())).get();
     }
 
-    private static <T extends Value> BiFunction<String, Object, Optional<String>> typeCase(Class<T> cls,
-            BiFunction<String, T, String> fun) {
-        return (typeName, obj) -> cls.isInstance(obj) ? Optional.of(fun.apply(typeName, cls.cast(obj))) : Optional.empty();
+    private static <T extends Value> TriFunction<CompilerContext, String, Object, Optional<String>> typeCase(
+            Class<T> cls, TriFunction<CompilerContext, String, T, String> fun) {
+        return (ctx, typeName, obj) -> cls.isInstance(obj) ?
+                Optional.of(fun.apply(ctx, typeName, cls.cast(obj))) : Optional.empty();
     }
 
 }

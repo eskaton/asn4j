@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
+import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
@@ -324,9 +325,34 @@ public class CompilerContext {
         JavaClass javaClass = new JavaClass(pkg, className, tag, CompilerUtils
                 .getTaggingMode(getModule(), type), constructed, getTypeName(type));
 
+        addImportsForCtors(type, javaClass);
+
         currentClass.push(javaClass);
 
         return javaClass;
+    }
+
+    private void addImportsForCtors(Type type, JavaClass javaClass) {
+        if (type instanceof TypeReference && !(type instanceof UsefulType)) {
+            // ensure the parent type is compiled
+            getCompiledType(type);
+
+            Optional<JavaClass> parentClass = getClass(formatName(((TypeReference) type).getType()));
+
+            if (!parentClass.isPresent()) {
+                throw new IllegalStateException(
+                        String.format("Type %s is compiled but the class definition couldn't be found", type));
+            }
+
+            parentClass.get().getConstructors().stream()
+                    .forEach(ctor -> ctor.getParameters().stream()
+                            .filter(parameter -> parameter.getClazz().isPresent())
+                            .map(JavaParameter::getClazz)
+                            .map(Optional::get)
+                            .map(clazz -> clazz.isArray() ? clazz.getComponentType() : clazz)
+                            .filter(clazz -> !clazz.isPrimitive())
+                            .forEach(clazz -> javaClass.addImport(clazz)));
+        }
     }
 
     public JavaClass getCurrentClass() {
