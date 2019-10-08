@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,14 +38,15 @@ import java.util.Objects;
 public class ASN1RelativeOID extends AbstractASN1OID {
 
     public ASN1RelativeOID() {
+        components = Collections.emptyList();
     }
 
     public ASN1RelativeOID(int... components) {
-        setValue(components);
+        super(components);
     }
 
     public ASN1RelativeOID(List<Integer> components) {
-        setValue(components);
+        super(components);
     }
 
     public static ASN1RelativeOID from(int... components) {

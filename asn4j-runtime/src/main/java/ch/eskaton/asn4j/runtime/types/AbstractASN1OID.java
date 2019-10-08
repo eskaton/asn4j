@@ -5,6 +5,8 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -12,6 +14,18 @@ import java.util.stream.IntStream;
 public abstract class AbstractASN1OID implements ASN1Type, HasConstraint {
 
     protected List<Integer> components;
+
+    public AbstractASN1OID() {
+        components = Collections.emptyList();
+    }
+
+    public AbstractASN1OID(int... components) {
+        setValue(IntStream.of(components).boxed().collect(Collectors.toList()));
+    }
+
+    public AbstractASN1OID(List<Integer> components) {
+        setValue(components);
+    }
 
     public void setValue(int... components) {
         setValue(IntStream.of(components).boxed().collect(Collectors.toList()));
