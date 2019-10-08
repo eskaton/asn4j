@@ -74,7 +74,7 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
     public V resolveGeneric(Type type, Value value) {
         if (!valueClass.isAssignableFrom(value.getClass())) {
             throw new IllegalStateException("Value class " + value.getClass().getSimpleName() + " is not an instance of "
-                    + valueClass.getClass().getSimpleName()+ ". resolveGeneric() must be overridden." );
+                    + valueClass.getSimpleName()+ ". resolveGeneric() must be overridden." );
         }
 
         return ctx.resolveValue(valueClass, type, (V) value);
