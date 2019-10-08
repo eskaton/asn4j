@@ -26,6 +26,7 @@
  */
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
@@ -39,32 +40,33 @@ import org.junit.Test;
 import static ch.eskaton.asn4j.compiler.java.JavaUtils.getInitializerString;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class JavaUtilsTest {
 
     @Test
     public void testBitStringValue() {
         assertEquals("new ASN1BitString(new byte[] { (byte) 0x01, (byte) 0x02, (byte) 0x03 }, 5)",
-                JavaUtils.getInitializerString(ASN1BitString.class.getSimpleName(),
+                JavaUtils.getInitializerString(mock(CompilerContext.class), ASN1BitString.class.getSimpleName(),
                         new BitStringValue(new byte[] { 0x01, 0x02, 0x03 }, 5)));
     }
 
     @Test
     public void testOctetStringValue() {
         assertEquals("new ASN1OctetString(new byte[] { (byte) 0x01, (byte) 0x02, (byte) 0x03 })",
-                JavaUtils.getInitializerString(ASN1OctetString.class.getSimpleName(),
+                JavaUtils.getInitializerString(mock(CompilerContext.class), ASN1OctetString.class.getSimpleName(),
                         new OctetStringValue(new byte[] { 0x01, 0x02, 0x03 })));
     }
 
     @Test
     public void testIntegerValue() {
-        assertEquals("new ASN1Integer(4711L)", JavaUtils.getInitializerString(ASN1Integer.class.getSimpleName(),
-                        new IntegerValue(4711)));
+        assertEquals("new ASN1Integer(4711L)", JavaUtils.getInitializerString(mock(CompilerContext.class),
+                ASN1Integer.class.getSimpleName(), new IntegerValue(4711)));
     }
 
     @Test(expected = CompilerException.class)
     public void testUnsupportedValue() {
-        getInitializerString(null, new EmptyValue(NO_POSITION));
+        getInitializerString(null, null, new EmptyValue(NO_POSITION));
     }
 
 }

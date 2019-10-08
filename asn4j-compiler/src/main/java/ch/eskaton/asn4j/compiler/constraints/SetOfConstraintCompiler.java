@@ -153,7 +153,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
     private String buildExpression(String typeName, CollectionOfValue value) {
         String initString = value.getValues().stream()
-                .map(v -> getInitializerString(typeName, v))
+                .map(v -> getInitializerString(ctx, typeName, v))
                 .collect(Collectors.joining(", "));
 
         return "(getValues().equals(asHashSet(" + initString + ")))";
