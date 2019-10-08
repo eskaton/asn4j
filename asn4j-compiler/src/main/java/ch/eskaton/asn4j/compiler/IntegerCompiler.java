@@ -45,7 +45,6 @@ import java.util.Collection;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
-import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
@@ -96,8 +95,6 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
         }
 
         javaClass.addImport(BigInteger.class, ConstraintViolatedException.class);
-
-        javaClass.addMethod(new JavaConstructor(Public, name, emptyList(), Optional.of("\t\tsuper();")));
 
         javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, name,
                 singletonList(new JavaParameter("long", "value")),
