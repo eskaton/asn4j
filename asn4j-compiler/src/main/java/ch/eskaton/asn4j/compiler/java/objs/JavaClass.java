@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.commons.MutableInteger;
+import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.utils.CollectionUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -65,6 +66,25 @@ public class JavaClass implements JavaStructure {
     private static final String THROWS = "throws";
 
     private static final String IMPORT = "import";
+
+    private static final Set<Class> primitiveTypes = Sets.<Class>builder()
+            .add(int.class)
+            .add(int[].class)
+            .add(long.class)
+            .add(long[].class)
+            .add(double.class)
+            .add(double[].class)
+            .add(float.class)
+            .add(float[].class)
+            .add(boolean.class)
+            .add(boolean[].class)
+            .add(char.class)
+            .add(char[].class)
+            .add(byte.class)
+            .add(byte[].class)
+            .add(short.class)
+            .add(short[].class)
+            .build();
 
     private List<String> imports = new ArrayList<>();
 
@@ -231,8 +251,12 @@ public class JavaClass implements JavaStructure {
             Class<? super T> parentClazz = (Class<? super T>) currentThread()
                     .getContextClassLoader().loadClass("ch.eskaton.asn4j.runtime.types." + getParent());
 
+            // TODO: figure out a way to match generic parameters in constructors. For now they must be explicitly defined
             Arrays.stream(parentClazz.getConstructors())
-                    .filter(ctor -> !Modifier.isPrivate(ctor.getModifiers()) && !Modifier.isFinal(ctor.getModifiers())).forEach(ctor -> {
+                    .filter(ctor -> !Modifier.isPrivate(ctor.getModifiers())
+                            && !Modifier.isFinal(ctor.getModifiers())
+                            && Arrays.asList(ctor.getGenericParameterTypes())
+                            .stream().filter(type -> !primitiveTypes.contains(type)).collect(Collectors.toList()).isEmpty()).forEach(ctor -> {
                 JavaVisibility visibility = JavaVisibility.PackagePrivate;
 
                 if (Modifier.isPublic(ctor.getModifiers())) {
@@ -250,13 +274,20 @@ public class JavaClass implements JavaStructure {
 
                 javaCtor.getParameters().addAll(parameters);
 
-                String parametersString = parameters.stream()
-                        .map(JavaParameter::getName)
-                        .collect(Collectors.joining(", "));
+                boolean notAvailable = getConstructors().stream().noneMatch(c ->
+                        c.getClazz().equals(javaCtor.getClazz())
+                                && c.getParameters().stream().map(p -> p.getType()).collect(Collectors.toList())
+                                .equals(javaCtor.getParameters().stream().map(p -> p.getType()).collect(Collectors.toList())));
 
-                javaCtor.setBody(Optional.of("super(" + parametersString + ");"));
+                if (notAvailable) {
+                    String parametersString = parameters.stream()
+                            .map(JavaParameter::getName)
+                            .collect(Collectors.joining(", "));
 
-                addMethod(javaCtor);
+                    javaCtor.setBody(Optional.of("super(" + parametersString + ");"));
+
+                    addMethod(javaCtor);
+                }
             });
 
         } catch (ClassNotFoundException e) {

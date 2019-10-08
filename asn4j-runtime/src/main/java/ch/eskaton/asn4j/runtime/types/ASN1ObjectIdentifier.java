@@ -38,12 +38,15 @@ import static ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier.verify
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 6, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1ObjectIdentifier extends AbstractASN1OID {
 
+    public ASN1ObjectIdentifier() {
+    }
+
+    public ASN1ObjectIdentifier(int... components) {
+        setValue(components);
+    }
+
     public static ASN1ObjectIdentifier from(int... components) {
-        ASN1ObjectIdentifier oid = new ASN1ObjectIdentifier();
-
-        oid.setValue(components);
-
-        return oid;
+        return new ASN1ObjectIdentifier(components);
     }
 
     public static ASN1ObjectIdentifier from(List<Integer> components) {
