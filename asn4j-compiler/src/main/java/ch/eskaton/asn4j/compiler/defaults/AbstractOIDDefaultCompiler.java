@@ -47,9 +47,9 @@ public abstract class AbstractOIDDefaultCompiler implements DefaultCompiler {
 
         String defaultField = addDefaultField(clazz, typeName, field);
         String idsString = ids.stream().map(Object::toString).collect(Collectors.joining(", "));
+        String initializerString = "\t\t" + defaultField + " = new " + typeName + "(" + idsString + ");";
 
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
-                + "\t\t" + defaultField + ".setValue(" + idsString + ");"));
+        clazz.addInitializer(new JavaInitializer(initializerString));
     }
 
     public abstract List<Integer> resolveComponents(CompilerContext ctx, Value value);
