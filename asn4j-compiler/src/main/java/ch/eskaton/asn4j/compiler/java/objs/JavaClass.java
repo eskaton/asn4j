@@ -268,8 +268,14 @@ public class JavaClass implements JavaStructure {
                 JavaConstructor javaCtor = new JavaConstructor(visibility, getName());
                 MutableInteger n = new MutableInteger(0);
 
-                List<JavaParameter> parameters = Arrays.stream(ctor.getParameterTypes())
-                        .map(clazz -> new JavaParameter(clazz.getSimpleName(), "arg" + n.increment().getValue()))
+                Class<?>[] parameterTypes = ctor.getParameterTypes();
+
+                Arrays.stream(parameterTypes).map(clazz -> clazz.isArray() ? clazz.getComponentType() : clazz)
+                        .filter(clazz -> !clazz.isPrimitive())
+                        .forEach(this::addImport);
+
+                List<JavaParameter> parameters = Arrays.stream(parameterTypes)
+                        .map(clazz -> new JavaParameter(clazz.getSimpleName(), "arg" + n.increment().getValue(), clazz))
                         .collect(Collectors.toList());
 
                 javaCtor.getParameters().addAll(parameters);
@@ -723,6 +729,5 @@ public class JavaClass implements JavaStructure {
         }
 
     }
-
 
 }
