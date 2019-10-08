@@ -28,29 +28,17 @@
 package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
-import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
-import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 
 import java.io.IOException;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class JavaWriter {
 
-    public void write(Map<String, JavaStructure> structs, String outputDir) {
-        ClassHierarchy hierarchy = buildClassHierarchy(structs);
+    public static final JavaDefaultCtorBuilder JAVA_DEFAULT_CTOR_BUILDER = new JavaDefaultCtorBuilder();
 
-        createDefaultConstructors(null, hierarchy.getJavaClass(), hierarchy.getSubclasses());
+    public void write(Map<String, JavaStructure> structs, String outputDir) {
+        JAVA_DEFAULT_CTOR_BUILDER.build(structs);
 
         // write classes
         for (JavaStructure struct : structs.values()) {
@@ -60,130 +48,6 @@ public class JavaWriter {
                 throw new CompilerException(e);
             }
         }
-    }
-
-    private void createDefaultConstructors(JavaClass parentJavaClass, JavaClass javaClass, Set<ClassHierarchy> subclasses) {
-        if (javaClass != null) {
-            createDefaultConstructors(parentJavaClass, javaClass);
-        }
-
-        for (ClassHierarchy subclass : subclasses) {
-            createDefaultConstructors(javaClass, subclass.getJavaClass(), subclass.getSubclasses());
-        }
-    }
-
-    private void createDefaultConstructors(JavaClass parentJavaClass, JavaClass javaClass) {
-        if (javaClass.getParent().startsWith("ASN1")) {
-            javaClass.generateParentConstructors();
-        } else {
-            List<JavaConstructor> parentCtors = parentJavaClass.getConstructors().stream()
-                    .filter(ctor -> !ctor.getVisibility().equals(JavaVisibility.Private))
-                    .collect(Collectors.toList());
-
-            List<JavaConstructor> childCtors = javaClass.getConstructors();
-
-            for (JavaConstructor parentCtor : parentCtors) {
-                JavaConstructor childCtor = new JavaConstructor(parentCtor.getVisibility(), javaClass.getName(),
-                        parentCtor.getParameters());
-
-                boolean notAvailable = childCtors.stream().noneMatch(ctor ->
-                        ctor.getClazz().equals(childCtor.getClazz())
-                                && ctor.getParameters().equals(childCtor.getParameters())
-                                && ctor.getVisibility().equals(childCtor.getVisibility()));
-
-                if (notAvailable) {
-                    StringBuilder body = new StringBuilder("\t\tsuper(");
-
-                    body.append(childCtor.getParameters().stream().map(JavaParameter::getName)
-                            .collect(Collectors.joining(", ")));
-
-                    body.append(");\n");
-                    childCtor.setBody(Optional.of(body.toString()));
-                    javaClass.addMethod(childCtor);
-                }
-            }
-        }
-    }
-
-    private ClassHierarchy buildClassHierarchy(Map<String, JavaStructure> structs) {
-        ClassHierarchy root = new ClassHierarchy(null);
-
-        for (JavaStructure struct : structs.values()) {
-            if (!(struct instanceof JavaClass)) {
-                throw new ASN1RuntimeException("Support for " + struct + " not implemented.");
-            }
-
-            JavaClass javaClass = (JavaClass) struct;
-
-            Deque<JavaClass> clazzHierarchy = new LinkedList<>();
-
-            clazzHierarchy.push(javaClass);
-
-            String parent = javaClass.getParent();
-
-            while (parent != null && !parent.startsWith("ASN1")) {
-                JavaStructure parentStruct = structs.get(parent);
-
-                if (parentStruct instanceof JavaClass) {
-                    javaClass = (JavaClass) parentStruct;
-                    parent = javaClass.getParent();
-
-                    clazzHierarchy.push(javaClass);
-                } else {
-                    throw new ASN1RuntimeException("Support for " + struct + " not implemented.");
-                }
-            }
-
-            addClassToHierarchy(clazzHierarchy, root.getSubclasses());
-        }
-
-        return root;
-    }
-
-    private void addClassToHierarchy(Deque<JavaClass> clazzHierarchy, Set<ClassHierarchy> subclasses) {
-        if (clazzHierarchy.isEmpty()) {
-            return;
-        }
-
-        JavaClass javaClass;
-
-        subclasses:
-        while (!clazzHierarchy.isEmpty()) {
-            javaClass = clazzHierarchy.pop();
-
-            for (ClassHierarchy subclass : subclasses) {
-                if (subclass.getJavaClass().equals(javaClass)) {
-                    addClassToHierarchy(clazzHierarchy, subclass.getSubclasses());
-                    continue subclasses;
-                }
-            }
-
-            ClassHierarchy subclass = new ClassHierarchy(javaClass);
-
-            subclasses.add(subclass);
-
-            addClassToHierarchy(clazzHierarchy, subclass.getSubclasses());
-        }
-    }
-
-    private static class ClassHierarchy {
-
-        private JavaClass javaClass;
-
-        private Set<ClassHierarchy> subclasses = new HashSet<>();
-
-        public ClassHierarchy(JavaClass javaClass) {
-            this.javaClass = javaClass;
-        }
-
-        public JavaClass getJavaClass() {
-            return javaClass;
-        }
-
-        public Set<ClassHierarchy> getSubclasses() {
-            return subclasses;
-        }
-
     }
 
 }
