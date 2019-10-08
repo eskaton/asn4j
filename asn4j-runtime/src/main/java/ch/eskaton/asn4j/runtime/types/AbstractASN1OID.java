@@ -13,12 +13,12 @@ public abstract class AbstractASN1OID implements ASN1Type, HasConstraint {
 
     protected List<Integer> components;
 
-    public void setValue(int... value) {
-        setValue(IntStream.of(value).boxed().collect(Collectors.toList()));
+    public void setValue(int... components) {
+        setValue(IntStream.of(components).boxed().collect(Collectors.toList()));
     }
 
-    public void setValue(List<Integer> value) {
-        this.components = verifiedComponents(new ArrayList<>(value));
+    public void setValue(List<Integer> components) {
+        this.components = verifiedComponents(new ArrayList<>(components));
     }
 
     public List<Integer> getValue() {

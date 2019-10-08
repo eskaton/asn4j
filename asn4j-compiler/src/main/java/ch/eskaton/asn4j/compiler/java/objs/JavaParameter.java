@@ -68,6 +68,7 @@ public class JavaParameter implements JavaObject {
 
     @Override
     public boolean equals(Object obj) {
+        System.err.println("equals " + this + " <-> " + obj);
         return Objects.equals(this, obj);
     }
 
