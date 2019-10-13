@@ -27,13 +27,10 @@
 
 package ch.eskaton.asn4j.compiler.java.objs;
 
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.commons.MutableInteger;
-import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.utils.CollectionUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -43,48 +40,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.FINAL;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.IMPORT;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.STATIC;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.THROWS;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
-import static java.lang.Thread.currentThread;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public class JavaClass implements JavaStructure {
-
-    private static final String STATIC = "static";
-
-    private static final String FINAL = "final";
-
-    private static final String THROWS = "throws";
-
-    private static final String IMPORT = "import";
-
-    private static final Set<Class> primitiveTypes = Sets.<Class>builder()
-            .add(int.class)
-            .add(int[].class)
-            .add(long.class)
-            .add(long[].class)
-            .add(double.class)
-            .add(double[].class)
-            .add(float.class)
-            .add(float[].class)
-            .add(boolean.class)
-            .add(boolean[].class)
-            .add(char.class)
-            .add(char[].class)
-            .add(byte.class)
-            .add(byte[].class)
-            .add(short.class)
-            .add(short[].class)
-            .build();
 
     private List<String> imports = new ArrayList<>();
 
@@ -244,61 +214,6 @@ public class JavaClass implements JavaStructure {
         }
 
         return constructors;
-    }
-
-    public <T> void generateParentConstructors() {
-        try {
-            Class<? super T> parentClazz = (Class<? super T>) currentThread()
-                    .getContextClassLoader().loadClass("ch.eskaton.asn4j.runtime.types." + getParent());
-
-            // TODO: figure out a way to match generic parameters in constructors. For now they must be explicitly defined
-            Arrays.stream(parentClazz.getConstructors())
-                    .filter(ctor -> !Modifier.isPrivate(ctor.getModifiers())
-                            && !Modifier.isFinal(ctor.getModifiers())
-                            && Arrays.asList(ctor.getGenericParameterTypes())
-                            .stream().filter(type -> !primitiveTypes.contains(type)).collect(Collectors.toList()).isEmpty()).forEach(ctor -> {
-                JavaVisibility visibility = JavaVisibility.PackagePrivate;
-
-                if (Modifier.isPublic(ctor.getModifiers())) {
-                    visibility = JavaVisibility.Public;
-                } else if (Modifier.isProtected(ctor.getModifiers())) {
-                    visibility = JavaVisibility.Protected;
-                }
-
-                JavaConstructor javaCtor = new JavaConstructor(visibility, getName());
-                MutableInteger n = new MutableInteger(0);
-
-                Class<?>[] parameterTypes = ctor.getParameterTypes();
-
-                Arrays.stream(parameterTypes).map(clazz -> clazz.isArray() ? clazz.getComponentType() : clazz)
-                        .filter(clazz -> !clazz.isPrimitive())
-                        .forEach(this::addImport);
-
-                List<JavaParameter> parameters = Arrays.stream(parameterTypes)
-                        .map(clazz -> new JavaParameter(clazz.getSimpleName(), "arg" + n.increment().getValue(), clazz))
-                        .collect(Collectors.toList());
-
-                javaCtor.getParameters().addAll(parameters);
-
-                boolean notAvailable = getConstructors().stream().noneMatch(c ->
-                        c.getClazz().equals(javaCtor.getClazz())
-                                && c.getParameters().stream().map(p -> p.getType()).collect(Collectors.toList())
-                                .equals(javaCtor.getParameters().stream().map(p -> p.getType()).collect(Collectors.toList())));
-
-                if (notAvailable) {
-                    String parametersString = parameters.stream()
-                            .map(JavaParameter::getName)
-                            .collect(Collectors.joining(", "));
-
-                    javaCtor.setBody(Optional.of("super(" + parametersString + ");"));
-
-                    addMethod(javaCtor);
-                }
-            });
-
-        } catch (ClassNotFoundException e) {
-            throw new CompilerException("Failed to resolve builtin type: " + getParent());
-        }
     }
 
     public void save(String dir) throws IOException {
