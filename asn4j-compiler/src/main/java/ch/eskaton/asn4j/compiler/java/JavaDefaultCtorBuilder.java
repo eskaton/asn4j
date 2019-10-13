@@ -27,13 +27,19 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
 import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.commons.MutableInteger;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -42,6 +48,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.PRIMITIVE_TYPES;
+import static java.lang.Thread.currentThread;
 
 public class JavaDefaultCtorBuilder {
 
@@ -63,10 +72,87 @@ public class JavaDefaultCtorBuilder {
 
     private void createDefaultConstructors(JavaClass parentJavaClass, JavaClass javaClass) {
         if (javaClass.getParent().startsWith("ASN1")) {
-            javaClass.generateParentConstructors();
+            generateParentConstructors(javaClass);
         } else {
             createDefaultConstructor(parentJavaClass, javaClass);
         }
+    }
+
+    public <T> void generateParentConstructors(JavaClass javaClass) {
+        try {
+            Class<? super T> parentClazz = (Class<? super T>) currentThread()
+                    .getContextClassLoader().loadClass("ch.eskaton.asn4j.runtime.types." + javaClass.getParent());
+
+            // TODO: figure out a way to match generic parameters in constructors. For now they must be explicitly defined
+            Arrays.stream(parentClazz.getConstructors())
+                    .filter(this::isRelevantConstructor)
+                    .forEach(ctor -> generateParentConstructor(javaClass, ctor));
+
+        } catch (ClassNotFoundException e) {
+            throw new CompilerException("Failed to resolve builtin type: " + javaClass.getParent());
+        }
+    }
+
+    private boolean isRelevantConstructor(Constructor<?> ctor) {
+        return !Modifier.isPrivate(ctor.getModifiers())
+                && !Modifier.isFinal(ctor.getModifiers())
+                && hasNoGenericParameters(ctor);
+    }
+
+    private boolean hasNoGenericParameters(Constructor<?> ctor) {
+        return Arrays.asList(ctor.getGenericParameterTypes())
+                .stream()
+                .filter(type -> !PRIMITIVE_TYPES.contains(type))
+                .collect(Collectors.toList()).isEmpty();
+    }
+
+    private void generateParentConstructor(JavaClass javaClass, Constructor<?> ctor) {
+        JavaConstructor javaCtor = new JavaConstructor(getVisibility(ctor), javaClass.getName());
+        MutableInteger n = new MutableInteger(0);
+
+        Class<?>[] parameterTypes = ctor.getParameterTypes();
+
+        Arrays.stream(parameterTypes).map(clazz -> clazz.isArray() ? clazz.getComponentType() : clazz)
+                .filter(clazz -> !clazz.isPrimitive())
+                .forEach(javaClass::addImport);
+
+        List<JavaParameter> parameters = Arrays.stream(parameterTypes)
+                .map(clazz -> new JavaParameter(clazz.getSimpleName(), "arg" + n.increment().getValue(), clazz))
+                .collect(Collectors.toList());
+
+        javaCtor.getParameters().addAll(parameters);
+
+        if (!isConstructorAvailable(javaClass, javaCtor)) {
+            String parametersString = parameters.stream()
+                    .map(JavaParameter::getName)
+                    .collect(Collectors.joining(", "));
+
+            javaCtor.setBody(Optional.of("super(" + parametersString + ");"));
+
+            javaClass.addMethod(javaCtor);
+        }
+    }
+
+    private boolean isConstructorAvailable(JavaClass javaClass, JavaConstructor javaCtor) {
+        return javaClass.getConstructors().stream()
+                .anyMatch(c -> c.getClazz().equals(javaCtor.getClazz()) &&
+                        getParameterTypes(c).equals(getParameterTypes(javaCtor)));
+    }
+
+    private List<String> getParameterTypes(JavaConstructor javaCtor) {
+        return javaCtor.getParameters().stream().map(p -> p.getType()).collect(Collectors.toList());
+    }
+
+    private JavaVisibility getVisibility(Executable executable) {
+        JavaVisibility visibility = JavaVisibility.PackagePrivate;
+
+        if (Modifier.isPublic(executable.getModifiers())) {
+            visibility = JavaVisibility.Public;
+        } else if (Modifier.isProtected(executable.getModifiers())) {
+            visibility = JavaVisibility.Protected;
+        }
+
+        return visibility;
     }
 
     private void createDefaultConstructor(JavaClass parentJavaClass, JavaClass javaClass) {
