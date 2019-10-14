@@ -39,6 +39,7 @@ import ch.eskaton.commons.MutableInteger;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
@@ -83,7 +84,6 @@ public class JavaDefaultCtorBuilder {
             Class<? super T> parentClazz = (Class<? super T>) currentThread()
                     .getContextClassLoader().loadClass("ch.eskaton.asn4j.runtime.types." + javaClass.getParent());
 
-            // TODO: figure out a way to match generic parameters in constructors. For now they must be explicitly defined
             Arrays.stream(parentClazz.getConstructors())
                     .filter(this::isRelevantConstructor)
                     .forEach(ctor -> generateParentConstructor(javaClass, ctor));
@@ -96,6 +96,8 @@ public class JavaDefaultCtorBuilder {
     private boolean isRelevantConstructor(Constructor<?> ctor) {
         return !Modifier.isPrivate(ctor.getModifiers())
                 && !Modifier.isFinal(ctor.getModifiers())
+                // TODO: figure out a way to match generic parameters in constructors.
+                // For now they must be explicitly defined
                 && hasNoGenericParameters(ctor);
     }
 
@@ -108,7 +110,6 @@ public class JavaDefaultCtorBuilder {
 
     private void generateParentConstructor(JavaClass javaClass, Constructor<?> ctor) {
         JavaConstructor javaCtor = new JavaConstructor(getVisibility(ctor), javaClass.getName());
-        MutableInteger n = new MutableInteger(0);
 
         Class<?>[] parameterTypes = ctor.getParameterTypes();
 
@@ -116,21 +117,36 @@ public class JavaDefaultCtorBuilder {
                 .filter(clazz -> !clazz.isPrimitive())
                 .forEach(javaClass::addImport);
 
-        List<JavaParameter> parameters = Arrays.stream(parameterTypes)
-                .map(clazz -> new JavaParameter(clazz.getSimpleName(), "arg" + n.increment().getValue(), clazz))
-                .collect(Collectors.toList());
+        List<JavaParameter> parameters = getParameters(ctor, parameterTypes);
 
         javaCtor.getParameters().addAll(parameters);
 
         if (!isConstructorAvailable(javaClass, javaCtor)) {
-            String parametersString = parameters.stream()
-                    .map(JavaParameter::getName)
-                    .collect(Collectors.joining(", "));
-
-            javaCtor.setBody(Optional.of("super(" + parametersString + ");"));
-
+            javaCtor.setBody(Optional.of("super(" + getParametersString(parameters) + ");"));
             javaClass.addMethod(javaCtor);
         }
+    }
+
+    private List<JavaParameter> getParameters(Constructor<?> ctor, Class<?>[] parameterTypes) {
+        MutableInteger n = new MutableInteger(0);
+        int parameterCount = parameterTypes.length;
+        List<JavaParameter> parameters = new ArrayList<>(parameterCount);
+
+        for (int i = 0; i < parameterCount; i++) {
+            Class<?> clazz = parameterTypes[i];
+
+            if (i == parameterCount - 1 && ctor.isVarArgs() && clazz.isArray()) {
+                parameters.add(new JavaParameter(clazz.getComponentType() + "...", "arg" + n.increment().getValue(), clazz));
+            } else {
+                parameters.add(new JavaParameter(clazz.getSimpleName(), "arg" + n.increment().getValue(), clazz));
+            }
+        }
+
+        return parameters;
+    }
+
+    private String getParametersString(List<JavaParameter> parameters) {
+        return parameters.stream().map(JavaParameter::getName).collect(Collectors.joining(", "));
     }
 
     private boolean isConstructorAvailable(JavaClass javaClass, JavaConstructor javaCtor) {
@@ -169,8 +185,7 @@ public class JavaDefaultCtorBuilder {
             if (!constructorDefined(childCtors, ctor)) {
                 StringBuilder body = new StringBuilder("\t\tsuper(");
 
-                body.append(ctor.getParameters().stream().map(JavaParameter::getName)
-                        .collect(Collectors.joining(", ")));
+                body.append(getParametersString(ctor.getParameters()));
 
                 body.append(");\n");
                 ctor.setBody(Optional.of(body.toString()));
