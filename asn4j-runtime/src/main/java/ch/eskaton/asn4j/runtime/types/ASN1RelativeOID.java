@@ -38,7 +38,7 @@ import java.util.Objects;
 public class ASN1RelativeOID extends AbstractASN1OID {
 
     public ASN1RelativeOID() {
-        components = Collections.emptyList();
+        super();
     }
 
     public ASN1RelativeOID(int... components) {

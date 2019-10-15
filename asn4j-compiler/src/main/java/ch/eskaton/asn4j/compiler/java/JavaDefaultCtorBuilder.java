@@ -38,7 +38,12 @@ import ch.eskaton.commons.MutableInteger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Deque;
@@ -50,7 +55,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.PRIMITIVE_TYPES;
 import static java.lang.Thread.currentThread;
 
 public class JavaDefaultCtorBuilder {
@@ -104,20 +108,92 @@ public class JavaDefaultCtorBuilder {
     private boolean hasNoGenericParameters(Constructor<?> ctor) {
         return Arrays.asList(ctor.getGenericParameterTypes())
                 .stream()
-                .filter(type -> !PRIMITIVE_TYPES.contains(type))
+                .filter(type -> hasTypeParameter(type))
                 .collect(Collectors.toList()).isEmpty();
+    }
+
+    private static boolean hasTypeParameter(Type type) {
+        if (type instanceof Class) {
+            return false;
+        } else if (type instanceof ParameterizedType) {
+            if (hasTypeParameter(((ParameterizedType) type).getRawType())) {
+                return true;
+            }
+
+            for (Type actualType : ((ParameterizedType) type).getActualTypeArguments()) {
+                if (hasTypeParameter(actualType)) {
+                    return true;
+                }
+            }
+
+            return false;
+        } else if (type instanceof GenericArrayType) {
+            return hasTypeParameter(((GenericArrayType) type).getGenericComponentType());
+        } else if (type instanceof TypeVariable) {
+            return true;
+        } else if (type instanceof WildcardType) {
+            for (Type lowerBound : ((WildcardType) type).getLowerBounds()) {
+                if (hasTypeParameter(lowerBound)) {
+                    return true;
+                }
+            }
+
+            for (Type upperBound : ((WildcardType) type).getUpperBounds()) {
+                if (hasTypeParameter(upperBound)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private static void collectClasses(Set<Class> classes, Type type) {
+        if (type instanceof Class) {
+            Class clazz = (Class) type;
+
+            if (!type.equals(Object.class) && !clazz.isPrimitive()) {
+                if (clazz.isArray()) {
+                    Class componentType = clazz.getComponentType();
+
+                    if (!componentType.isPrimitive()) {
+                        classes.add(componentType);
+                    }
+                } else {
+                    classes.add(clazz);
+                }
+            }
+        } else if (type instanceof ParameterizedType) {
+            collectClasses(classes, ((ParameterizedType) type).getRawType());
+
+            for (Type actualType : ((ParameterizedType) type).getActualTypeArguments()) {
+                collectClasses(classes, actualType);
+            }
+        } else if (type instanceof GenericArrayType) {
+            collectClasses(classes, ((GenericArrayType) type).getGenericComponentType());
+        } else if (type instanceof WildcardType) {
+            for (Type lowerBound : ((WildcardType) type).getLowerBounds()) {
+                collectClasses(classes, lowerBound);
+            }
+
+            for (Type upperBound : ((WildcardType) type).getUpperBounds()) {
+                collectClasses(classes, upperBound);
+            }
+        }
     }
 
     private void generateParentConstructor(JavaClass javaClass, Constructor<?> ctor) {
         JavaConstructor javaCtor = new JavaConstructor(getVisibility(ctor), javaClass.getName());
 
-        Class<?>[] parameterTypes = ctor.getParameterTypes();
+        Set<Class> classes = new HashSet<>();
 
-        Arrays.stream(parameterTypes).map(clazz -> clazz.isArray() ? clazz.getComponentType() : clazz)
-                .filter(clazz -> !clazz.isPrimitive())
-                .forEach(javaClass::addImport);
+        Arrays.stream(ctor.getGenericParameterTypes()).forEach(type -> collectClasses(classes, type));
 
-        List<JavaParameter> parameters = getParameters(ctor, parameterTypes);
+        classes.stream().forEach(javaClass::addImport);
+
+        List<JavaParameter> parameters = getParameters(ctor);
 
         javaCtor.getParameters().addAll(parameters);
 
@@ -127,18 +203,21 @@ public class JavaDefaultCtorBuilder {
         }
     }
 
-    private List<JavaParameter> getParameters(Constructor<?> ctor, Class<?>[] parameterTypes) {
+    private List<JavaParameter> getParameters(Constructor<?> ctor) {
         MutableInteger n = new MutableInteger(0);
+        Class<?>[] parameterClasses = ctor.getParameterTypes();
+        Type[] parameterTypes = ctor.getGenericParameterTypes();
         int parameterCount = parameterTypes.length;
         List<JavaParameter> parameters = new ArrayList<>(parameterCount);
 
         for (int i = 0; i < parameterCount; i++) {
-            Class<?> clazz = parameterTypes[i];
+            Class<?> clazz = parameterClasses[i];
+            Type type = parameterTypes[i];
 
             if (i == parameterCount - 1 && ctor.isVarArgs() && clazz.isArray()) {
-                parameters.add(new JavaParameter(clazz.getComponentType() + "...", "arg" + n.increment().getValue(), clazz));
+                parameters.add(new JavaParameter(clazz.getComponentType().getSimpleName() + "...", "arg" + n.increment().getValue(), clazz));
             } else {
-                parameters.add(new JavaParameter(clazz.getSimpleName(), "arg" + n.increment().getValue(), clazz));
+                parameters.add(new JavaParameter(type.getTypeName(), "arg" + n.increment().getValue(), clazz));
             }
         }
 

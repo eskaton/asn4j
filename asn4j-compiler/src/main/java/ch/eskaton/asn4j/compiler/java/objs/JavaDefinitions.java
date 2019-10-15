@@ -27,10 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.java.objs;
 
-import ch.eskaton.commons.collections.Sets;
-
-import java.util.Set;
-
 public class JavaDefinitions {
 
     public static final String STATIC = "static";
@@ -40,25 +36,6 @@ public class JavaDefinitions {
     public static final String THROWS = "throws";
 
     public static final String IMPORT = "import";
-
-    public static final Set<Class> PRIMITIVE_TYPES = Sets.<Class>builder()
-            .add(int.class)
-            .add(int[].class)
-            .add(long.class)
-            .add(long[].class)
-            .add(double.class)
-            .add(double[].class)
-            .add(float.class)
-            .add(float[].class)
-            .add(boolean.class)
-            .add(boolean[].class)
-            .add(char.class)
-            .add(char[].class)
-            .add(byte.class)
-            .add(byte[].class)
-            .add(short.class)
-            .add(short[].class)
-            .build();
 
     private JavaDefinitions() {
     }

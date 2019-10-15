@@ -39,6 +39,7 @@ import static ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier.verify
 public class ASN1ObjectIdentifier extends AbstractASN1OID {
 
     public ASN1ObjectIdentifier() {
+        super();
     }
 
     public ASN1ObjectIdentifier(int... components) {
