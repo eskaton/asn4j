@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
@@ -40,6 +41,7 @@ import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
@@ -67,7 +69,8 @@ public class JavaUtils {
                 typeCase(NullValue.class, JavaUtils::getNullInitializerString),
                 typeCase(ObjectIdentifierValue.class, JavaUtils::getObjectIdentifierInitializerString),
                 typeCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString),
-                typeCase(RelativeOIDValue.class, JavaUtils::getRelativeOIDInitializerString)
+                typeCase(RelativeOIDValue.class, JavaUtils::getRelativeOIDInitializerString),
+                typeCase(RelativeIRIValue.class, JavaUtils::getRelativeIRIInitializerString)
         );
     }
 
@@ -96,6 +99,18 @@ public class JavaUtils {
 
         List<String> components = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, IRIValue.class));
 
+        return getIRIInitializerString(typeName, components);
+    }
+
+    private static String getRelativeIRIInitializerString(CompilerContext ctx, String typeName, RelativeIRIValue value) {
+        RelativeIRIValueResolver resolver = new RelativeIRIValueResolver();
+
+        List<String> components = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, RelativeIRIValue.class));
+
+        return getIRIInitializerString(typeName, components);
+    }
+
+    private static String getIRIInitializerString(String typeName, List<String> components) {
         String idsString = components.stream().map(str -> StringUtils.wrap(str, "\"")).collect(Collectors.joining(", "));
 
         return "new " + typeName + "(" + idsString + ")";

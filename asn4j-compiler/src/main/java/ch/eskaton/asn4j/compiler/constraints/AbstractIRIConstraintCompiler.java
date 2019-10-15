@@ -35,7 +35,6 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.IRIToken;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
@@ -76,11 +75,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
             AbstractIRIValue iriValue = resolver.resolveValue(ctx, value, getValueClass());
 
             if (iriValue != null) {
-                List<String> components = iriValue.getArcIdentifiers().stream()
-                        .map(IRIToken::getText)
-                        .collect(Collectors.toList());
-
-                return createNode(singleton(components));
+                return createNode(singleton(resolver.resolveComponents(ctx, iriValue)));
             } else {
                 throw new CompilerException("Invalid single-value constraint %s for " + getTypeName() + " type",
                         value.getClass().getSimpleName());

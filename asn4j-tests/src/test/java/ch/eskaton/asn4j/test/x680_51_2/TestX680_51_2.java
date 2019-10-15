@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString2;
@@ -102,6 +103,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOidIri1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOidIri1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOidIri2;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -120,6 +123,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testOctetStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testOctetStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRIFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
@@ -406,38 +411,38 @@ public class TestX680_51_2 {
 
     @Test
     public void testRelativeOIDIRI1() {
-        testIRISuccess(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "c");
-        testIRISuccess(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "d");
+        testRelativeIRISuccess(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "c");
+        testRelativeIRISuccess(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "d");
 
-        testIRIFailure(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "e");
+        testRelativeIRIFailure(TestRelativeOidIri1.class, new TestRelativeOidIri1(), "a", "b", "e");
     }
 
     @Test
     public void testRelativeOIDIRI2() {
-        testIRISuccess(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "d");
+        testRelativeIRISuccess(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "d");
 
-        testIRIFailure(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "c");
+        testRelativeIRIFailure(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "c");
     }
 
     @Test
     public void testRelativeOIDIRI3() {
-        testIRISuccess(TestRelativeOidIri3.class, new TestRelativeOidIri3(), "a", "b", "c");
+        testRelativeIRISuccess(TestRelativeOidIri3.class, new TestRelativeOidIri3(), "a", "b", "c");
 
-        testIRIFailure(TestRelativeOidIri3.class, new TestRelativeOidIri3(), "a", "b", "d");
+        testRelativeIRIFailure(TestRelativeOidIri3.class, new TestRelativeOidIri3(), "a", "b", "d");
     }
 
     @Test
     public void testRelativeOIDIRI4() {
-        testIRISuccess(TestRelativeOidIri4.class, new TestRelativeOidIri4(), "a", "b", "e");
+        testRelativeIRISuccess(TestRelativeOidIri4.class, new TestRelativeOidIri4(), "a", "b", "e");
 
-        testIRIFailure(TestRelativeOidIri4.class, new TestRelativeOidIri4(), "a", "b", "d");
+        testRelativeIRIFailure(TestRelativeOidIri4.class, new TestRelativeOidIri4(), "a", "b", "d");
     }
 
     @Test
     public void testRelativeOIDIRI5() {
-        testIRISuccess(TestRelativeOidIri5.class, new TestRelativeOidIri5(), "a", "b", "f");
+        testRelativeIRISuccess(TestRelativeOidIri5.class, new TestRelativeOidIri5(), "a", "b", "f");
 
-        testIRIFailure(TestRelativeOidIri5.class, new TestRelativeOidIri5(), "a", "b", "e");
+        testRelativeIRIFailure(TestRelativeOidIri5.class, new TestRelativeOidIri5(), "a", "b", "e");
     }
 
     @Test
@@ -628,6 +633,24 @@ public class TestX680_51_2 {
         testSetOfSuccess(TestSetOfOidIri2.class, new TestSetOfOidIri2(), new TestOidIri1("ISO", "a", "b", "c"));
 
         testSetOfFailure(TestSetOfOidIri2.class, new TestSetOfOidIri2(), new TestOidIri1("ISO", "a", "b", "d"));
+    }
+
+    @Test
+    public void testSetOfRelativeOidIri1() {
+        testSetOfSuccess(TestSetOfRelativeOidIri1.class, new TestSetOfRelativeOidIri1(),
+                new ASN1RelativeIRI("a", "b", "d"));
+
+        testSetOfFailure(TestSetOfRelativeOidIri1.class, new TestSetOfRelativeOidIri1(),
+                new ASN1RelativeIRI("a", "b", "c"));
+    }
+
+    @Test
+    public void testSetOfRelativeOidIri2() {
+        testSetOfSuccess(TestSetOfRelativeOidIri2.class, new TestSetOfRelativeOidIri2(),
+                new TestRelativeOidIri1("a", "b", "c"));
+
+        testSetOfFailure(TestSetOfRelativeOidIri2.class, new TestSetOfRelativeOidIri2(),
+                new TestRelativeOidIri1("a", "b", "d"));
     }
 
 }
