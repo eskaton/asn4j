@@ -13,12 +13,24 @@ public abstract class AbstractASN1IRI implements ASN1Type, HasConstraint {
 
     protected List<String> components;
 
-    public void setValue(String... value) {
-        setValue(asList(value));
+    public AbstractASN1IRI() {
+        this.components = new ArrayList<>();
     }
 
-    public void setValue(List<String> value) {
-        this.components = new ArrayList<>(value);
+    public AbstractASN1IRI(String... components) {
+        this.components = asList(components);
+    }
+
+    public AbstractASN1IRI(List<String> components) {
+        this.components = components;
+    }
+
+    public void setValue(String... components) {
+        setValue(asList(components));
+    }
+
+    public void setValue(List<String> components) {
+        this.components = new ArrayList<>(components);
     }
 
     public List<String> getValue() {
