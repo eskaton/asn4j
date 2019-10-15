@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBitString3;
@@ -96,6 +97,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfObjectIdentifier1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfObjectIdentifier2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID2;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -594,6 +597,24 @@ public class TestX680_51_2 {
 
         testSetOfFailure(TestSetOfObjectIdentifier2.class, new TestSetOfObjectIdentifier2(),
                 new TestObjectIdentifier1(1, 3, 6, 1));
+    }
+
+    @Test
+    public void testSetOfRelativeOID1() {
+        testSetOfSuccess(TestSetOfRelativeOID1.class, new TestSetOfRelativeOID1(),
+                new ASN1RelativeOID(4, 1));
+
+        testSetOfFailure(TestSetOfRelativeOID1.class, new TestSetOfRelativeOID1(),
+                new ASN1RelativeOID(4, 2));
+    }
+
+    @Test
+    public void testSetOfRelativeOID2() {
+        testSetOfSuccess(TestSetOfRelativeOID2.class, new TestSetOfRelativeOID2(),
+                new TestRelativeOID1(3, 6, 2));
+
+        testSetOfFailure(TestSetOfRelativeOID2.class, new TestSetOfRelativeOID2(),
+                new TestRelativeOID1(3, 6, 1));
     }
 
 }
