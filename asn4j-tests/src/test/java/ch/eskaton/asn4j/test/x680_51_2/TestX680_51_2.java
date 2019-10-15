@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.test.x680_51_2;
 
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
@@ -97,6 +98,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfObjectIdentifier1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfObjectIdentifier2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOctetString2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOidIri1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID2;
 import org.junit.Test;
@@ -601,20 +604,30 @@ public class TestX680_51_2 {
 
     @Test
     public void testSetOfRelativeOID1() {
-        testSetOfSuccess(TestSetOfRelativeOID1.class, new TestSetOfRelativeOID1(),
-                new ASN1RelativeOID(4, 1));
+        testSetOfSuccess(TestSetOfRelativeOID1.class, new TestSetOfRelativeOID1(), new ASN1RelativeOID(4, 1));
 
-        testSetOfFailure(TestSetOfRelativeOID1.class, new TestSetOfRelativeOID1(),
-                new ASN1RelativeOID(4, 2));
+        testSetOfFailure(TestSetOfRelativeOID1.class, new TestSetOfRelativeOID1(), new ASN1RelativeOID(4, 2));
     }
 
     @Test
     public void testSetOfRelativeOID2() {
-        testSetOfSuccess(TestSetOfRelativeOID2.class, new TestSetOfRelativeOID2(),
-                new TestRelativeOID1(3, 6, 2));
+        testSetOfSuccess(TestSetOfRelativeOID2.class, new TestSetOfRelativeOID2(), new TestRelativeOID1(3, 6, 2));
 
-        testSetOfFailure(TestSetOfRelativeOID2.class, new TestSetOfRelativeOID2(),
-                new TestRelativeOID1(3, 6, 1));
+        testSetOfFailure(TestSetOfRelativeOID2.class, new TestSetOfRelativeOID2(), new TestRelativeOID1(3, 6, 1));
+    }
+
+    @Test
+    public void testSetOfOidIri1() {
+        testSetOfSuccess(TestSetOfOidIri1.class, new TestSetOfOidIri1(), new ASN1IRI("ISO", "a", "b", "f"));
+
+        testSetOfFailure(TestSetOfOidIri1.class, new TestSetOfOidIri1(), new ASN1IRI("ISO", "a", "b", "e"));
+    }
+
+    @Test
+    public void testSetOfOidIri2() {
+        testSetOfSuccess(TestSetOfOidIri2.class, new TestSetOfOidIri2(), new TestOidIri1("ISO", "a", "b", "c"));
+
+        testSetOfFailure(TestSetOfOidIri2.class, new TestSetOfOidIri2(), new TestOidIri1("ISO", "a", "b", "d"));
     }
 
 }

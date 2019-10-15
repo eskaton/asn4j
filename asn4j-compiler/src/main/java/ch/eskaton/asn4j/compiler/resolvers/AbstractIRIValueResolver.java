@@ -29,9 +29,13 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.IRIToken;
 import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
@@ -54,5 +58,9 @@ public abstract class AbstractIRIValueResolver<T extends AbstractIRIValue> {
     }
 
     protected abstract String getTypeName();
+
+    public List<String> resolveComponents(CompilerContext ctx, AbstractIRIValue iriValue) {
+        return iriValue.getArcIdentifiers().stream().map(IRIToken::getText).collect(Collectors.toList());
+    }
 
 }

@@ -36,20 +36,24 @@ import java.util.Objects;
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 35, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1IRI extends AbstractASN1IRI {
 
+    public ASN1IRI() {
+        super();
+    }
+
+    public ASN1IRI(String... components) {
+        super(components);
+    }
+
+    public ASN1IRI(List<String> components) {
+        super(components);
+    }
+
     public static ASN1IRI from(String... components) {
-        ASN1IRI iri = new ASN1IRI();
-
-        iri.setValue(components);
-
-        return iri;
+        return new ASN1IRI(components);
     }
 
     public static ASN1IRI from(List<String> components) {
-        ASN1IRI iri = new ASN1IRI();
-
-        iri.setValue(components);
-
-        return iri;
+        return new ASN1IRI(components);
     }
 
     @Override
