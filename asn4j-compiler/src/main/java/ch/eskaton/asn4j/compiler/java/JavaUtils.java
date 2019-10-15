@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.java;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
@@ -37,6 +38,7 @@ import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
 import ch.eskaton.commons.functional.TriFunction;
@@ -60,7 +62,8 @@ public class JavaUtils {
                 typeCase(IntegerValue.class, JavaUtils::getIntegerInitializerString),
                 typeCase(NullValue.class, JavaUtils::getNullInitializerString),
                 typeCase(ObjectIdentifierValue.class, JavaUtils::getObjectIdentifierInitializerString),
-                typeCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString)
+                typeCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString),
+                typeCase(RelativeOIDValue.class, JavaUtils::getRelativeOIDInitializerString)
         );
     }
 
@@ -95,6 +98,18 @@ public class JavaUtils {
 
         ObjectIdentifierVerifier.verifyComponents(ids);
 
+        return getOIDInitializerString(typeName, ids);
+    }
+
+    private static String getRelativeOIDInitializerString(CompilerContext ctx, String typeName, RelativeOIDValue value) {
+        RelativeOIDValueResolver resolver = new RelativeOIDValueResolver();
+
+        List<Integer> ids = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, RelativeOIDValue.class));
+
+        return getOIDInitializerString(typeName, ids);
+    }
+
+    private static String getOIDInitializerString(String typeName, List<Integer> ids) {
         String idsString = ids.stream().map(Object::toString).collect(Collectors.joining(", "));
 
         return "new " + typeName + "(new int[] { " + idsString + " })";
