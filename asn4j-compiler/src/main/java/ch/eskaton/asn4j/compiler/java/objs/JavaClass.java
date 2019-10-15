@@ -45,6 +45,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.FINAL;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.IMPORT;
@@ -56,9 +58,9 @@ import static java.util.stream.Collectors.toList;
 
 public class JavaClass implements JavaStructure {
 
-    private List<String> imports = new ArrayList<>();
+    private Set<String> imports = new TreeSet<>();
 
-    private List<String> staticImports = new ArrayList<>();
+    private Set<String> staticImports = new TreeSet<>();
 
     private List<JavaField> fields = new ArrayList<>();
 
@@ -205,15 +207,10 @@ public class JavaClass implements JavaStructure {
     }
 
     public List<JavaConstructor> getConstructors() {
-        List<JavaConstructor> constructors = new ArrayList<>();
-
-        for (JavaMethod method : methods) {
-            if (method instanceof JavaConstructor) {
-                constructors.add((JavaConstructor) method);
-            }
-        }
-
-        return constructors;
+        return methods.stream()
+                .filter(m -> m instanceof JavaConstructor)
+                .map(JavaConstructor.class::cast)
+                .collect(Collectors.toList());
     }
 
     public void save(String dir) throws IOException {

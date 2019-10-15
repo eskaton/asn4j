@@ -29,11 +29,13 @@ package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
@@ -42,6 +44,7 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
 import ch.eskaton.commons.functional.TriFunction;
+import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +63,7 @@ public class JavaUtils {
                 typeCase(BitStringValue.class, JavaUtils::getBitStringInitializerString),
                 typeCase(EnumeratedValue.class, JavaUtils::getEnumeratedInitializerString),
                 typeCase(IntegerValue.class, JavaUtils::getIntegerInitializerString),
+                typeCase(IRIValue.class, JavaUtils::getIRIInitializerString),
                 typeCase(NullValue.class, JavaUtils::getNullInitializerString),
                 typeCase(ObjectIdentifierValue.class, JavaUtils::getObjectIdentifierInitializerString),
                 typeCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString),
@@ -85,6 +89,16 @@ public class JavaUtils {
 
     private static String getIntegerInitializerString(CompilerContext ctx, String typeName, IntegerValue value) {
         return "new " + typeName + "(" + value.getValue().longValue() + "L)";
+    }
+
+    private static String getIRIInitializerString(CompilerContext ctx, String typeName, IRIValue value) {
+        IRIValueResolver resolver = new IRIValueResolver();
+
+        List<String> components = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, IRIValue.class));
+
+        String idsString = components.stream().map(str -> StringUtils.wrap(str, "\"")).collect(Collectors.joining(", "));
+
+        return "new " + typeName + "(" + idsString + ")";
     }
 
     private static String getNullInitializerString(CompilerContext ctx, String typeName, NullValue value) {
