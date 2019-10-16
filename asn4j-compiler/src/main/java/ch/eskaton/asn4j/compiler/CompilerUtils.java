@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
@@ -41,7 +42,10 @@ import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode;
+import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
+
+import java.util.stream.Collectors;
 
 public class CompilerUtils {
 
@@ -191,6 +195,21 @@ public class CompilerUtils {
         }
 
         return type.getClass().getSimpleName();
+    }
+
+    public static String formatTypeName(Type type) {
+        return (type instanceof NamedType ? ((NamedType) type).getName() : getTypeName(type));
+    }
+
+    public static String formatValue(Value value) {
+        if (value instanceof AmbiguousValue) {
+            return "Multiple possible value interpretations found: \n" +
+                    StreamsUtils.zipWithIndex(1, ((AmbiguousValue) value).getValues().stream().map(Object::toString))
+                            .map(tuple -> tuple.get_1() + ". " + tuple.get_2()).collect(Collectors.joining("\n"));
+
+        } else {
+            return value.toString();
+        }
     }
 
 }

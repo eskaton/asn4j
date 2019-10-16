@@ -35,7 +35,6 @@ import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
-import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
@@ -47,6 +46,7 @@ import ch.eskaton.commons.collections.Maps;
 
 import java.util.Map;
 
+import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.getTypeName;
 
 public class DefaultsCompiler {
@@ -89,9 +89,7 @@ public class DefaultsCompiler {
         try {
             compiler.compileDefault(ctx, clazz, field, typeName, type, value);
         } catch (CompilerException e) {
-            throw new CompilerException("Error in default for type "
-                    + (type instanceof NamedType ? ((NamedType) type).getName()
-                    : getTypeName(type)) + ": " + e.getMessage(), e);
+            throw new CompilerException("Error in default for type " + formatTypeName(type) + ": " + e.getMessage(), e);
         }
     }
 

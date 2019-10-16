@@ -57,4 +57,8 @@ public class AmbiguousValue extends AbstractValue {
         return null;
     }
 
+    public Set<Value> getValues() {
+        return values;
+    }
+
 }
