@@ -39,7 +39,7 @@ public class ObjectIdentifierDefaultCompiler extends AbstractOIDDefaultCompiler 
 
     @Override
     public List<Integer> resolveComponents(CompilerContext ctx, Value value) {
-        ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver();
+        ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver(ctx);
 
         return resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, ObjectIdentifierValue.class));
     }

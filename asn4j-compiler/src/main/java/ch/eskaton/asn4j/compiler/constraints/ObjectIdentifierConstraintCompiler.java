@@ -41,10 +41,12 @@ import java.util.Set;
 
 public class ObjectIdentifierConstraintCompiler extends AbstractOIDConstraintCompiler<ObjectIdentifierValueNode> {
 
-    private static final ObjectIdentifierValueResolver VALUE_RESOLVER = new ObjectIdentifierValueResolver();
+    private final ObjectIdentifierValueResolver valueResolver;
 
     public ObjectIdentifierConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+
+        valueResolver = new ObjectIdentifierValueResolver(ctx);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class ObjectIdentifierConstraintCompiler extends AbstractOIDConstraintCom
 
     @Override
     protected AbstractOIDValueResolver getValueResolver() {
-        return VALUE_RESOLVER;
+        return valueResolver;
     }
 
     @Override

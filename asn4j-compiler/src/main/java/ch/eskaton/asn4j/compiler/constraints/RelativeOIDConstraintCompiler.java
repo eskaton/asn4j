@@ -40,10 +40,12 @@ import java.util.Set;
 
 public class RelativeOIDConstraintCompiler extends AbstractOIDConstraintCompiler<RelativeOIDValueNode> {
 
-    private static final RelativeOIDValueResolver VALUE_RESOLVER = new RelativeOIDValueResolver();
+    private final RelativeOIDValueResolver valueResolver;
 
     public RelativeOIDConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+
+        valueResolver = new RelativeOIDValueResolver(ctx);
     }
 
     @Override
@@ -58,7 +60,7 @@ public class RelativeOIDConstraintCompiler extends AbstractOIDConstraintCompiler
 
     @Override
     protected AbstractOIDValueResolver getValueResolver() {
-        return VALUE_RESOLVER;
+        return valueResolver;
     }
 
     @Override

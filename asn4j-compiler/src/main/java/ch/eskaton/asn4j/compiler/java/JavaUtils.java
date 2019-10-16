@@ -121,7 +121,7 @@ public class JavaUtils {
     }
 
     private static String getObjectIdentifierInitializerString(CompilerContext ctx, String typeName, ObjectIdentifierValue value) {
-        ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver();
+        ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver(ctx);
 
         List<Integer> ids = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, ObjectIdentifierValue.class));
 
@@ -131,7 +131,7 @@ public class JavaUtils {
     }
 
     private static String getRelativeOIDInitializerString(CompilerContext ctx, String typeName, RelativeOIDValue value) {
-        RelativeOIDValueResolver resolver = new RelativeOIDValueResolver();
+        RelativeOIDValueResolver resolver = new RelativeOIDValueResolver(ctx);
 
         List<Integer> ids = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, RelativeOIDValue.class));
 
