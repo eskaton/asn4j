@@ -95,7 +95,7 @@ public class JavaUtils {
     }
 
     private static String getIRIInitializerString(CompilerContext ctx, String typeName, IRIValue value) {
-        IRIValueResolver resolver = new IRIValueResolver();
+        IRIValueResolver resolver = new IRIValueResolver(ctx);
 
         List<String> components = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, IRIValue.class));
 
@@ -103,7 +103,7 @@ public class JavaUtils {
     }
 
     private static String getRelativeIRIInitializerString(CompilerContext ctx, String typeName, RelativeIRIValue value) {
-        RelativeIRIValueResolver resolver = new RelativeIRIValueResolver();
+        RelativeIRIValueResolver resolver = new RelativeIRIValueResolver(ctx);
 
         List<String> components = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, RelativeIRIValue.class));
 
