@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.IRIToken;
+import ch.eskaton.asn4j.parser.ast.types.AbstractIRI;
 import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -39,13 +40,18 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
-public abstract class AbstractIRIValueResolver<T extends AbstractIRIValue> {
+public abstract class AbstractIRIValueResolver<T extends AbstractIRI, V extends AbstractIRIValue>
+        extends DefaultValueResolver<T, V> {
 
-    public T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
-        T iriValue;
+    public AbstractIRIValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
+        super(ctx, typeClass, valueClass);
+    }
+
+    public V resolveValue(CompilerContext ctx, Value value, Class<V> valueClass) {
+        V iriValue;
 
         if (valueClass.isAssignableFrom(value.getClass())) {
-            iriValue = (T) value;
+            iriValue = (V) value;
         } else if ((iriValue = resolveAmbiguousValue(value, valueClass)) != null) {
             // do nothing
         } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {

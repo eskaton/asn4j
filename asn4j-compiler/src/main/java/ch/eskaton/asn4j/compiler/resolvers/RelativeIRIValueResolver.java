@@ -27,7 +27,15 @@
 
 package ch.eskaton.asn4j.compiler.resolvers;
 
-public class RelativeIRIValueResolver extends AbstractIRIValueResolver {
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
+import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+
+public class RelativeIRIValueResolver extends AbstractIRIValueResolver<RelativeIRI, RelativeIRIValue> {
+
+    public RelativeIRIValueResolver(CompilerContext ctx) {
+        super(ctx, RelativeIRI.class, RelativeIRIValue.class);
+    }
 
     @Override
     protected String getTypeName() {

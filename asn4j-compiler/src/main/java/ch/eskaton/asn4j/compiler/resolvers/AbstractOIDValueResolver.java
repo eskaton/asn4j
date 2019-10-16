@@ -43,7 +43,8 @@ import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
-public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends AbstractOIDValue> extends DefaultValueResolver<T, V> {
+public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends AbstractOIDValue>
+        extends DefaultValueResolver<T, V> {
 
     public AbstractOIDValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
         super(ctx, typeClass, valueClass);

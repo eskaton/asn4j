@@ -41,10 +41,12 @@ import java.util.Set;
 
 public class IRIConstraintCompiler extends AbstractIRIConstraintCompiler<IRIValueNode> {
 
-    private static final IRIValueResolver VALUE_RESOLVER = new IRIValueResolver();
+    private final IRIValueResolver valueResolver;
 
     public IRIConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+
+        valueResolver = new IRIValueResolver(ctx);
     }
 
     @Override
@@ -64,7 +66,7 @@ public class IRIConstraintCompiler extends AbstractIRIConstraintCompiler<IRIValu
 
     @Override
     protected AbstractIRIValueResolver getValueResolver() {
-        return VALUE_RESOLVER;
+        return valueResolver;
     }
 
     @Override

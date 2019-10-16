@@ -30,7 +30,6 @@ package ch.eskaton.asn4j.compiler.defaults;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaInitializer;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
 import ch.eskaton.asn4j.parser.IRIToken;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
@@ -39,21 +38,12 @@ import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.stream.Collectors;
 
-public abstract class AbstractIRIDefaultCompiler<V extends AbstractIRIValue> implements DefaultCompiler {
-
-    private AbstractIRIValueResolver<V> resolver;
-
-    private Class<V> valueClass;
-
-    public AbstractIRIDefaultCompiler(Class<V> valueClass, AbstractIRIValueResolver<V> resolver) {
-        this.valueClass = valueClass;
-        this.resolver = resolver;
-    }
+public abstract class AbstractIRIDefaultCompiler implements DefaultCompiler {
 
     @Override
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
             Value value) {
-        V iriValue = resolver.resolveValue(ctx, value, valueClass);
+        AbstractIRIValue iriValue = resolveValue(ctx, value);
 
         String defaultField = addDefaultField(clazz, typeName, field);
 
@@ -65,5 +55,7 @@ public abstract class AbstractIRIDefaultCompiler<V extends AbstractIRIValue> imp
         clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = new " + typeName + "();\n"
                 + "\t\t" + defaultField + ".setValue(" + valueString + ");"));
     }
+
+    protected abstract AbstractIRIValue resolveValue(CompilerContext ctx, Value value);
 
 }

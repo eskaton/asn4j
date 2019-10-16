@@ -38,12 +38,13 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.CollectionOfValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.DefaultValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.NullValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.OctetStringValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -187,9 +188,8 @@ public class CompilerContext {
             .put(NullValue.class, new NullValueResolver(CompilerContext.this))
             .put(ObjectIdentifierValue.class, new ObjectIdentifierValueResolver(CompilerContext.this))
             .put(RelativeOIDValue.class, new RelativeOIDValueResolver(CompilerContext.this))
-            .put(IRIValue.class, new DefaultValueResolver<>(CompilerContext.this, IRI.class, IRIValue.class))
-            .put(RelativeIRIValue.class, new DefaultValueResolver<>(CompilerContext.this, RelativeIRI.class,
-                    RelativeIRIValue.class))
+            .put(IRIValue.class, new IRIValueResolver(CompilerContext.this))
+            .put(RelativeIRIValue.class, new RelativeIRIValueResolver(CompilerContext.this))
             .put(CollectionOfValue.class, new CollectionOfValueResolver(CompilerContext.this))
             .build();
 
