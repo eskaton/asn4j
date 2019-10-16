@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
@@ -42,6 +43,9 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
+import static ch.eskaton.asn4j.compiler.CompilerUtils.formatValue;
 
 public class CollectionOfValueResolver extends AbstractValueResolver<CollectionOfValue> {
 
@@ -64,6 +68,7 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
         }
 
         CollectionOfValue collectionOfValue = null;
+        String typeName = getTypeName(type);
 
         if (value instanceof EmptyValue) {
             return new CollectionOfValue(value.getPosition(), Collections.emptyList());
@@ -78,7 +83,7 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
             Class<? extends Value> valueClass = ctx.getValueType(elementType);
 
             List<? extends Value> values = collectionOfValue.getValues().stream()
-                    .map(v -> resolveElement(elementType, valueClass, v))
+                    .map(v -> resolveElement(typeName, elementType, valueClass, v))
                     .collect(Collectors.toList());
 
             collectionOfValue.getValues().clear();
@@ -87,24 +92,39 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
             return collectionOfValue;
         }
 
-        throw error();
+        throw error(typeName);
     }
 
-    private Value resolveElement(Type elementType, Class<? extends Value> valueClass, Value value) {
+    private Value resolveElement(String typeName, Type elementType, Class<? extends Value> valueClass, Value value) {
         try {
             if (value instanceof AmbiguousValue) {
-                value = CompilerUtils.resolveAmbiguousValue(value, valueClass);
+                Value resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
+
+                if (resolvedValue != null) {
+                    value = resolvedValue;
+                } else {
+                    throw new CompilerException("Failed to resolve a value in a " + typeName + " to type %s: %s",
+                            formatTypeName(elementType), formatValue(value));
+                }
             }
 
             return ctx.resolveGenericValue(valueClass, elementType, value);
         } catch (ClassCastException e) {
-            throw new CompilerException("Failed to resolve a value in a SET OF to type %s: %s",
-                    elementType.getClass().getSimpleName(), value);
+            throw new CompilerException("Failed to resolve a value in a " + typeName + " to type %s: %s",
+                    formatTypeName(elementType), formatValue(value));
         }
     }
 
-    protected CompilerException error() {
-        return new CompilerException("Failed to resolve a SET OF value");
+    private String getTypeName(Type type) {
+        if (type instanceof SetOfType) {
+            return "SET OF";
+        }
+
+        return "SEQUENCE OF";
+    }
+
+    protected CompilerException error(String typeName) {
+        return new CompilerException("Failed to resolve a " + typeName + " value");
     }
 
 }
