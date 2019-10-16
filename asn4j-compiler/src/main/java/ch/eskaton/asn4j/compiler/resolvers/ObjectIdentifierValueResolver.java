@@ -30,13 +30,17 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
-import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
+import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<ObjectIdentifierValue> {
+public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<ObjectIdentifier, ObjectIdentifierValue> {
+
+    public ObjectIdentifierValueResolver(CompilerContext ctx) {
+        super(ctx, ObjectIdentifier.class, ObjectIdentifierValue.class);
+    }
 
     @Override
     protected String getTypeName() {
@@ -44,7 +48,7 @@ public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<Obje
     }
 
     @Override
-    public List<Integer> resolveComponents(CompilerContext ctx, AbstractOIDValue value) {
+    public List<Integer> resolveComponents(CompilerContext ctx, ObjectIdentifierValue value) {
         List<Integer> ids = new ArrayList<>();
         int componentNum = 1;
 

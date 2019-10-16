@@ -31,25 +31,29 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.AbstractOID;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
-public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
+public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends AbstractOIDValue> extends DefaultValueResolver<T, V> {
 
-    public T resolveValue(CompilerContext ctx, Value value, Class<T> valueClass) {
-        T oidValue;
+    public AbstractOIDValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
+        super(ctx, typeClass, valueClass);
+    }
+
+    public V resolveValue(CompilerContext ctx, Value value, Class<V> valueClass) {
+        V oidValue;
 
         if (valueClass.isAssignableFrom(value.getClass())) {
-            oidValue = (T) value;
+            oidValue = (V) value;
         } else if ((oidValue = resolveAmbiguousValue(value, valueClass)) != null) {
             // do nothing
         } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
@@ -62,8 +66,8 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
     }
 
     public void resolveOIDReference(CompilerContext ctx, List<Integer> ids, OIDComponentNode component,
-            Class<T> valueClass) {
-        T referencedOidValue;
+            Class<V> valueClass) {
+        V referencedOidValue;
 
         try {
             referencedOidValue = ctx.resolveValue(valueClass, component.getName());
@@ -109,6 +113,6 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOIDValue> {
 
     protected abstract String getTypeName();
 
-    public abstract List<Integer> resolveComponents(CompilerContext ctx, AbstractOIDValue value);
+    public abstract List<Integer> resolveComponents(CompilerContext ctx, V value);
 
 }
