@@ -71,7 +71,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
         } else if (elements instanceof SingleValueConstraint) {
             AbstractOIDValueResolver resolver = getValueResolver();
             Value value = ((SingleValueConstraint) elements).getValue();
-            AbstractOIDValue oidValue = resolver.resolveValue(ctx, value, getValueClass());
+            AbstractOIDValue oidValue = (AbstractOIDValue) resolver.resolveValue(ctx, value, getValueClass());
 
             if (oidValue != null) {
                 return createNode(singleton(resolver.resolveComponents(ctx, oidValue)));

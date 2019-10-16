@@ -29,50 +29,35 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
-import ch.eskaton.asn4j.parser.ast.types.AbstractOID;
-import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.List;
+import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
-public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends AbstractOIDValue>
-        extends AbstractOIDOrIRIValueResolver<T, V> {
+public abstract class AbstractOIDOrIRIValueResolver<T extends Type, V extends Value>
+        extends DefaultValueResolver<T, V> {
 
-    public AbstractOIDValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
+    public AbstractOIDOrIRIValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
         super(ctx, typeClass, valueClass);
     }
 
-    public void resolveOIDReference(CompilerContext ctx, List<Integer> ids, OIDComponentNode component,
-            Class<V> valueClass) {
-        V referencedOidValue;
+    public V resolveValue(CompilerContext ctx, Value value, Class<V> valueClass) {
+        V idValue;
 
-        try {
-            referencedOidValue = ctx.resolveValue(valueClass, component.getName());
-        } catch (CompilerException e2) {
-            referencedOidValue = ctx.resolveValue(valueClass, component.getDefinedValue());
+        if (valueClass.isAssignableFrom(value.getClass())) {
+            idValue = (V) value;
+        } else if ((idValue = resolveAmbiguousValue(value, valueClass)) != null) {
+            // do nothing
+        } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
+            idValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
+        } else {
+            throw new CompilerException("Invalid " + getTypeName() + " value: " + value);
         }
 
-        ids.addAll(resolveComponents(ctx, referencedOidValue));
+        return idValue;
     }
 
-    protected Integer getComponentId(CompilerContext ctx, OIDComponentNode component) {
-        Integer id = component.getId();
-
-        if (id != null) {
-            return id;
-        }
-
-        DefinedValue definedValue = component.getDefinedValue();
-
-        if (definedValue != null) {
-            return ctx.resolveValue(IntegerValue.class, definedValue).getValue().intValue();
-        }
-
-        return ctx.resolveValue(IntegerValue.class, component.getName()).getValue().intValue();
-    }
-
-    public abstract List<Integer> resolveComponents(CompilerContext ctx, V value);
+    protected abstract String getTypeName();
 
 }

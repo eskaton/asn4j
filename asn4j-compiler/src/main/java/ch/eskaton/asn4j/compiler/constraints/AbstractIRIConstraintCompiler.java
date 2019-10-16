@@ -72,7 +72,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
         } else if (elements instanceof SingleValueConstraint) {
             AbstractIRIValueResolver resolver = getValueResolver();
             Value value = ((SingleValueConstraint) elements).getValue();
-            AbstractIRIValue iriValue = resolver.resolveValue(ctx, value, getValueClass());
+            AbstractIRIValue iriValue = (AbstractIRIValue) resolver.resolveValue(ctx, value, getValueClass());
 
             if (iriValue != null) {
                 return createNode(singleton(resolver.resolveComponents(ctx, iriValue)));
