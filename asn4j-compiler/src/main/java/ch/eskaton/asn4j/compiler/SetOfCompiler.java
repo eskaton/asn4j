@@ -30,14 +30,18 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+
+import java.util.LinkedList;
 
 public class SetOfCompiler implements NamedCompiler<SetOfType, CompiledType> {
 
     public CompiledType compile(CompilerContext ctx, String name, SetOfType node) {
         JavaClass javaClass = ctx.createClass(name, node, true);
 
-        javaClass.setTypeParam(ctx.getTypeName(node.getType()));
+        javaClass.setTypeParam(getTypeParameter(ctx, node));
 
         ConstraintDefinition constraintDef = null;
 
@@ -48,6 +52,28 @@ public class SetOfCompiler implements NamedCompiler<SetOfType, CompiledType> {
         ctx.finishClass();
 
         return new CompiledType(node, constraintDef);
+    }
+
+    private String getTypeParameter(CompilerContext ctx, SetOfType node) {
+        LinkedList<String> typeNames = new LinkedList<>();
+        Type type = node;
+
+        while (type instanceof CollectionOfType) {
+            type = ((CollectionOfType) type).getType();
+            typeNames.push(ctx.getTypeName(type));
+        }
+
+        String parameterizedTypeName = null;
+
+        while (!typeNames.isEmpty()) {
+            if (parameterizedTypeName == null) {
+                parameterizedTypeName = typeNames.pop();
+            } else {
+                parameterizedTypeName = typeNames.pop() + "<" + parameterizedTypeName + ">";
+            }
+        }
+
+        return parameterizedTypeName;
     }
 
 }
