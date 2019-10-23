@@ -39,6 +39,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +48,7 @@ import java.util.stream.Collectors;
 public class SetDecoder implements CollectionDecoder<ASN1Set> {
 
     @SuppressWarnings("squid:S3011")
-    public void decode(Decoder decoder, DecoderStates states, ASN1Set obj) {
+    public void decode(Decoder decoder, DecoderStates states, Type type, ASN1Set obj) {
         FieldMetaData metaData = new FieldMetaData(obj, ASN1Component.class);
         Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = metaData.getTagsToTypes();
         DecodingResult<? extends ASN1Type> result;

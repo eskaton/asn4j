@@ -30,8 +30,10 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 
+import java.lang.reflect.Type;
+
 public interface CollectionDecoder<T> {
 
-    void decode(Decoder decoder, DecoderStates states, T obj);
+    void decode(Decoder decoder, DecoderStates states, Type type, T obj);
 
 }

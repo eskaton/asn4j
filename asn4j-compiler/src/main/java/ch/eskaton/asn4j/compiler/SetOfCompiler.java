@@ -41,7 +41,9 @@ public class SetOfCompiler implements NamedCompiler<SetOfType, CompiledType> {
     public CompiledType compile(CompilerContext ctx, String name, SetOfType node) {
         JavaClass javaClass = ctx.createClass(name, node, true);
 
-        javaClass.setTypeParam(getTypeParameter(ctx, node));
+        String parameterizedTypeName = getTypeParameter(ctx, node);
+
+        javaClass.setTypeParam(parameterizedTypeName);
 
         ConstraintDefinition constraintDef = null;
 

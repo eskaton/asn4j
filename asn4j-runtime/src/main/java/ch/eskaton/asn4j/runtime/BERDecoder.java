@@ -76,6 +76,8 @@ import ch.eskaton.commons.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -150,23 +152,36 @@ public class BERDecoder implements Decoder {
         return null;
     }
 
-    public <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states, ASN1Tag tag,
+    public <T extends ASN1Type> DecodingResult<T> decode(Type type, DecoderStates states, ASN1Tag tag,
             boolean optional) {
         List<ASN1Tag> tags;
 
-        if (ReflectionUtils.extendsClazz(type, ASN1Choice.class)) {
-            return decodeChoice(type, states);
+        Class clazz = toClass(type);
+
+        if (ReflectionUtils.extendsClazz(clazz, ASN1Choice.class)) {
+            return decodeChoice(clazz, states);
         }
 
-        tags = RuntimeUtils.getTags(type, tag);
+        tags = RuntimeUtils.getTags(clazz, tag);
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace(StringUtils.concat("Expecting: javatype=", type.getSimpleName(), ", tags=(", StringUtils
+            LOGGER.trace(StringUtils.concat("Expecting: javatype=", clazz.getSimpleName(), ", tags=(", StringUtils
                     .join(CollectionUtils.map(tags, value -> StringUtils
                             .concat("tag=", value.tag(), ", class=", value.clazz())), ", "), ")"));
         }
 
         return decodeState(type, states, consumeTags(states, tags, optional));
+    }
+
+    private Class toClass(Type type) {
+        Class clazz = null;
+
+        if (type instanceof ParameterizedType) {
+            clazz = (Class) ((ParameterizedType) type).getRawType();
+        } else if (type instanceof Class) {
+            clazz = (Class) type;
+        }
+        return clazz;
     }
 
     private <T extends ASN1Type> DecodingResult<T> decodeChoice(Class<T> type, DecoderStates states) {
@@ -194,7 +209,7 @@ public class BERDecoder implements Decoder {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private <T> DecodingResult<T> decodeState(Class<T> type, DecoderStates states, DecoderState state) {
+    private <T> DecodingResult<T> decodeState(Type type, DecoderStates states, DecoderState state) {
         if (state == null) {
             return null;
         }
@@ -202,7 +217,9 @@ public class BERDecoder implements Decoder {
         T obj;
 
         try {
-            obj = type.newInstance();
+            Class<T> clazz = toClass(type);
+
+            obj = clazz.newInstance();
 
             if (obj instanceof ASN1Boolean) {
                 getDecoder(ASN1Boolean.class).decode(states, state, (ASN1Boolean) obj);
@@ -213,14 +230,14 @@ public class BERDecoder implements Decoder {
             } else if (obj instanceof ASN1Null) {
                 // nothing to do
             } else if (obj instanceof ASN1Sequence) {
-                sequenceDecoder.decode(this, states, (ASN1Sequence) obj);
+                sequenceDecoder.decode(this, states, type, (ASN1Sequence) obj);
             } else if (obj instanceof ASN1SequenceOf) {
-                sequenceOfDecoder.decode(this, states, (ASN1SequenceOf) obj);
+                sequenceOfDecoder.decode(this, states, type, (ASN1SequenceOf) obj);
             } else if (obj instanceof ASN1Set) {
-                setDecoder.decode(this, states, (ASN1Set) obj);
+                setDecoder.decode(this, states, type, (ASN1Set) obj);
             } else if (obj instanceof ASN1SetOf) {
-                setOfDecoder.decode(this, states, (ASN1SetOf) obj);
-            } else if (obj instanceof ASN1Integer || ReflectionUtils.extendsClazz(type, ASN1NamedInteger.class)) {
+                setOfDecoder.decode(this, states, type, (ASN1SetOf) obj);
+            } else if (obj instanceof ASN1Integer || ReflectionUtils.extendsClazz(clazz, ASN1NamedInteger.class)) {
                 getDecoder(ASN1Integer.class).decode(states, state, (ASN1Integer) obj);
             } else if (obj instanceof ASN1Real) {
                 getDecoder(ASN1Real.class).decode(states, state, (ASN1Real) obj);

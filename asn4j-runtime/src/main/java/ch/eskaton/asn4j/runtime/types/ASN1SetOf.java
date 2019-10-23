@@ -38,6 +38,10 @@ import java.util.Objects;
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
 public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<HashSet<T>, T> implements HasConstraint {
 
+    public ASN1SetOf() {
+        super(new HashSet<>());
+    }
+
     public ASN1SetOf(T... values) {
         super(CollectionUtils.asHashSet(values));
     }
