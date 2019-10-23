@@ -39,12 +39,13 @@ import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class SequenceDecoder implements CollectionDecoder<ASN1Sequence> {
 
     @SuppressWarnings("squid:S3011")
-    public void decode(Decoder decoder, DecoderStates states, ASN1Sequence obj) {
+    public void decode(Decoder decoder, DecoderStates states, Type type, ASN1Sequence obj) {
         List<Field> compFields = RuntimeUtils.getComponents(obj);
 
         for (Field compField : compFields) {

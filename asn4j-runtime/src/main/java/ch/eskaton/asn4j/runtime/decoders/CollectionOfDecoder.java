@@ -32,30 +32,41 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1CollectionOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 
 public abstract class CollectionOfDecoder<T extends ASN1CollectionOf> implements CollectionDecoder<T> {
 
     @SuppressWarnings("unchecked")
-    public void decode(Decoder decoder, DecoderStates states, T obj) {
-        Class parent = obj.getClass();
+    public void decode(Decoder decoder, DecoderStates states, Type type, T obj) {
+        Type paramType;
 
-        while (!(parent.getGenericSuperclass() instanceof ParameterizedType)) {
-            parent = parent.getSuperclass();
+        if (type instanceof ParameterizedType) {
+            paramType = ((ParameterizedType) type).getActualTypeArguments()[0];
+        } else if (type instanceof Class) {
+            Class parent = (Class) type;
+
+            while (!(parent.getGenericSuperclass() instanceof ParameterizedType)) {
+                parent = parent.getSuperclass();
+            }
+
+            ParameterizedType pt = (ParameterizedType) parent.getGenericSuperclass();
+            paramType = pt.getActualTypeArguments()[0];
+        } else {
+            throw new ASN1RuntimeException("Unsupported paramType");
         }
 
-        ParameterizedType pt = (ParameterizedType) parent.getGenericSuperclass();
-        Class<ASN1Type> typeParam = (Class<ASN1Type>) pt.getActualTypeArguments()[0];
         List<ASN1Type> elements = new LinkedList<>();
         DecodingResult<ASN1Type> result;
 
         do {
-            result = decoder.decode(typeParam, states, null, true);
+            result = decoder.decode(paramType, states, null, true);
 
             if (result != null) {
                 ASN1Type element = result.getObj();
