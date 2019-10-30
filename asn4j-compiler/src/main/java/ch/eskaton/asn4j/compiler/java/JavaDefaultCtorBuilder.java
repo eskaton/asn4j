@@ -35,6 +35,8 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.commons.MutableInteger;
+import ch.eskaton.commons.utils.StringUtils;
+import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -42,7 +44,6 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -98,56 +99,7 @@ public class JavaDefaultCtorBuilder {
     }
 
     private boolean isRelevantConstructor(Constructor<?> ctor) {
-        return !Modifier.isPrivate(ctor.getModifiers())
-                && !Modifier.isFinal(ctor.getModifiers())
-                // TODO: figure out a way to match generic parameters in constructors.
-                // For now they must be explicitly defined
-                && hasNoGenericParameters(ctor);
-    }
-
-    private boolean hasNoGenericParameters(Constructor<?> ctor) {
-        return Arrays.asList(ctor.getGenericParameterTypes())
-                .stream()
-                .filter(type -> hasTypeParameter(type))
-                .collect(Collectors.toList()).isEmpty();
-    }
-
-    private static boolean hasTypeParameter(Type type) {
-        if (type instanceof Class) {
-            return false;
-        } else if (type instanceof ParameterizedType) {
-            if (hasTypeParameter(((ParameterizedType) type).getRawType())) {
-                return true;
-            }
-
-            for (Type actualType : ((ParameterizedType) type).getActualTypeArguments()) {
-                if (hasTypeParameter(actualType)) {
-                    return true;
-                }
-            }
-
-            return false;
-        } else if (type instanceof GenericArrayType) {
-            return hasTypeParameter(((GenericArrayType) type).getGenericComponentType());
-        } else if (type instanceof TypeVariable) {
-            return true;
-        } else if (type instanceof WildcardType) {
-            for (Type lowerBound : ((WildcardType) type).getLowerBounds()) {
-                if (hasTypeParameter(lowerBound)) {
-                    return true;
-                }
-            }
-
-            for (Type upperBound : ((WildcardType) type).getUpperBounds()) {
-                if (hasTypeParameter(upperBound)) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        return false;
+        return !Modifier.isPrivate(ctor.getModifiers()) && !Modifier.isFinal(ctor.getModifiers());
     }
 
     private static void collectClasses(Set<Class> classes, Type type) {
@@ -193,7 +145,7 @@ public class JavaDefaultCtorBuilder {
 
         classes.stream().forEach(javaClass::addImport);
 
-        List<JavaParameter> parameters = getParameters(ctor);
+        List<JavaParameter> parameters = getParameters(ctor, javaClass.getTypeParam());
 
         javaCtor.getParameters().addAll(parameters);
 
@@ -203,7 +155,7 @@ public class JavaDefaultCtorBuilder {
         }
     }
 
-    private List<JavaParameter> getParameters(Constructor<?> ctor) {
+    private List<JavaParameter> getParameters(Constructor<?> ctor, String typeParam) {
         MutableInteger n = new MutableInteger(0);
         Class<?>[] parameterClasses = ctor.getParameterTypes();
         Type[] parameterTypes = ctor.getGenericParameterTypes();
@@ -211,17 +163,53 @@ public class JavaDefaultCtorBuilder {
         List<JavaParameter> parameters = new ArrayList<>(parameterCount);
 
         for (int i = 0; i < parameterCount; i++) {
+            boolean isVarArgs = i == parameterCount - 1 && ctor.isVarArgs();
             Class<?> clazz = parameterClasses[i];
             Type type = parameterTypes[i];
+            String typeName = getTypeName(type, typeParam, isVarArgs);
 
-            if (i == parameterCount - 1 && ctor.isVarArgs() && clazz.isArray()) {
-                parameters.add(new JavaParameter(clazz.getComponentType().getSimpleName() + "...", "arg" + n.increment().getValue(), clazz));
-            } else {
-                parameters.add(new JavaParameter(type.getTypeName(), "arg" + n.increment().getValue(), clazz));
-            }
+            parameters.add(new JavaParameter(typeName, "arg" + n.increment().getValue(), clazz));
         }
 
         return parameters;
+    }
+
+    private String getTypeName(Type type, String typeParam, boolean isVarArgs) {
+        return getTypeNameAux(type, typeParam, isVarArgs, 1);
+    }
+
+    private String getTypeNameAux(Type type, String typeParam, boolean isVarArgs, int level) {
+        if (type instanceof GenericArrayType) {
+            Type componentType = ((GenericArrayType) type).getGenericComponentType();
+            String typeName = getTypeNameAux(componentType, typeParam, isVarArgs, level + 1);
+
+            return getArrayTypeName(isVarArgs, level, typeName);
+        } else if (type instanceof TypeVariableImpl) {
+            if ("T".equals(((TypeVariableImpl) type).getName()) && !StringUtils.isEmpty(typeParam)) {
+                return typeParam;
+            }
+
+            return ((TypeVariableImpl) type).getName();
+        } else if (type instanceof ParameterizedType) {
+            String typeParameters = Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
+                    .map(t -> getTypeNameAux(t, typeParam, isVarArgs, level + 1)).collect(Collectors.joining(", "));
+
+            return ((ParameterizedType) type).getRawType().getTypeName() + "<" + typeParameters + ">";
+        } else if (type instanceof Class && ((Class) type).isArray()) {
+            String typeName = getTypeNameAux(((Class) type).getComponentType(), typeParam, isVarArgs, level + 1);
+
+            return getArrayTypeName(isVarArgs, level, typeName);
+        }
+
+        return type.getTypeName();
+    }
+
+    private String getArrayTypeName(boolean isVarArgs, int level, String typeName) {
+        if (level == 1 & isVarArgs) {
+            return typeName + "...";
+        } else {
+            return typeName + "[]";
+        }
     }
 
     private String getParametersString(List<JavaParameter> parameters) {
