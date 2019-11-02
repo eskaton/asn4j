@@ -30,7 +30,11 @@ package ch.eskaton.asn4j.test.x680_28;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf1;
+import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf2;
+import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf3;
+import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf4;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -38,7 +42,7 @@ import static org.junit.Assert.assertEquals;
 public class TestX680_28 {
 
     @Test
-    public void testSetOf() {
+    public void testSetOf1() {
         TestSetOf1 a = new TestSetOf1();
         a.setValues(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23));
 
@@ -46,6 +50,49 @@ public class TestX680_28 {
         BERDecoder decoder = new BERDecoder();
 
         TestSetOf1 b = decoder.decode(TestSetOf1.class, encoder.encode(a));
+
+        assertEquals(a, b);
+    }
+
+    @Test
+    public void testSetOf2() {
+        TestSetOf2 a = new TestSetOf2();
+
+        a.setValues(new ASN1SetOf(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23)));
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        TestSetOf2 b = decoder.decode(TestSetOf2.class, encoder.encode(a));
+
+        assertEquals(a, b);
+    }
+
+    @Test
+    public void testSetOf3() {
+        TestSetOf3 a = new TestSetOf3();
+
+        a.setValues(new ASN1SetOf(new ASN1SetOf(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23)),
+                new ASN1SetOf(ASN1Integer.valueOf(4478), ASN1Integer.valueOf(-13))));
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        TestSetOf3 b = decoder.decode(TestSetOf3.class, encoder.encode(a));
+
+        assertEquals(a, b);
+    }
+
+    @Test
+    public void testSetOf4() {
+        TestSetOf4 a = new TestSetOf4();
+
+        a.setValues(new TestSetOf1(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23)));
+
+        BEREncoder encoder = new BEREncoder();
+        BERDecoder decoder = new BERDecoder();
+
+        TestSetOf4 b = decoder.decode(TestSetOf4.class, encoder.encode(a));
 
         assertEquals(a, b);
     }
