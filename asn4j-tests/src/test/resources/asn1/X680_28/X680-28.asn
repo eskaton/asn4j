@@ -3,4 +3,10 @@ BEGIN
 
 TestSetOf1 ::= SET OF INTEGER
 
+TestSetOf2 ::= SET OF SET OF INTEGER
+
+TestSetOf3 ::= SET OF SET OF SET OF INTEGER
+
+TestSetOf4 ::= SET OF TestSetOf1
+
 END
