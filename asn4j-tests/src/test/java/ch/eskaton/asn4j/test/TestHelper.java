@@ -44,14 +44,77 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 import java.math.BigInteger;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class TestHelper {
 
     private TestHelper() {
+    }
+
+    public static <T extends ASN1Type> void assertWithType(Class<T> type, Consumer<T> consumer) {
+        try {
+            T value = type.newInstance();
+            consumer.accept(value);
+        } catch (InstantiationException | IllegalAccessException e) {
+            fail("Failed to instantiate type " + type.getSimpleName());
+        }
+    }
+
+    public static <T extends ASN1Type> void assertDecodable(Class<T> type) {
+        assertWithType(type, value -> assertValueDecodable(type, value));
+    }
+
+    public static <T extends ASN1Type> void assertDecodable(Class<T> type, Consumer<T> consumer) {
+        assertWithType(type, value -> {
+            consumer.accept(value);
+            assertValueDecodable(type, value);
+        });
+    }
+
+    public static <T extends ASN1Type> void assertDecodableVerifyAfter(Class<T> type, Consumer<T> consumer,
+            Consumer<T> after) {
+        assertWithType(type, value -> {
+            consumer.accept(value);
+            assertValueDecodable(type, value);
+            after.accept(value);
+        });
+    }
+
+    public static <T extends ASN1Type> void assertDecodableVerifyAround(Class<T> type, Consumer<T> consumer,
+            Consumer<T> before, Consumer<T> after) {
+        assertWithType(type, value -> {
+            consumer.accept(value);
+            before.accept(value);
+            assertValueDecodable(type, value);
+            after.accept(value);
+        });
+    }
+
+    public static <T extends ASN1Type> void assertDecodableVerifyAfter(Class<T> type, Consumer<T> after) {
+        assertWithType(type, value -> {
+            assertValueDecodable(type, value);
+            after.accept(value);
+        });
+    }
+
+    public static <T extends ASN1Type> void assertDecodableVerifyAround(Class<T> type, Consumer<T> before,
+            Consumer<T> after) {
+        assertWithType(type, value -> {
+            before.accept(value);
+            assertValueDecodable(type, value);
+            after.accept(value);
+        });
+    }
+
+    public static <T extends ASN1Type> void assertValueDecodable(Class<T> type, ASN1Type value) {
+        T decoded = new BERDecoder().decode(type, new BEREncoder().encode(value));
+
+        assertEquals(value, decoded);
     }
 
     public static <T extends ASN1BitString> void testBitStringSuccess(Class<? extends T> clazz, T bitString, long value,

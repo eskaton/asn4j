@@ -27,56 +27,27 @@
 
 package ch.eskaton.asn4j.test.x680_47;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.test.modules.x680_47.TestUTCTime;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 
 public class TestX680_47 {
 
     @Test
     public void testUTCTimeLocal() throws ASN1RuntimeException {
-        TestUTCTime a = new TestUTCTime();
-
-        a.setValue("1812311507");
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestUTCTime b = decoder.decode(TestUTCTime.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestUTCTime.class, value -> value.setValue("1812311507"));
     }
 
     @Test
     public void testUTCTimeZulu() throws ASN1RuntimeException {
-        TestUTCTime a = new TestUTCTime();
-
-        a.setValue("181231150703Z");
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestUTCTime b = decoder.decode(TestUTCTime.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestUTCTime.class, value -> value.setValue("181231150703Z"));
     }
 
     @Test
     public void testUTCTimeOffset() throws ASN1RuntimeException {
-        TestUTCTime a = new TestUTCTime();
-
-        a.setValue("181231150703-1230");
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestUTCTime b = decoder.decode(TestUTCTime.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestUTCTime.class, value -> value.setValue("181231150703-1230"));
     }
 
 }

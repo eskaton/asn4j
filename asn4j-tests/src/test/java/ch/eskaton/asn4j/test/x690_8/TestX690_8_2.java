@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -39,28 +39,20 @@ public class TestX690_8_2 {
 
     @Test
     public void testEncode() {
-    	BEREncoder encoder = new BEREncoder();
+        BEREncoder encoder = new BEREncoder();
 
-    	assertArrayEquals(new byte[] { 0x01, 0x01, 0x00 },
-    			encoder.encode(ASN1Boolean.FALSE));
-    	assertArrayEquals(new byte[] { 0x01, 0x01, (byte) 0xFF },
-    			encoder.encode(ASN1Boolean.TRUE));
-    	assertArrayEquals(new byte[] { 0x01, 0x01, (byte) 0x00 },
-    			encoder.encode(ASN1Boolean.FALSE));
+        assertArrayEquals(new byte[] { 0x01, 0x01, 0x00 }, encoder.encode(ASN1Boolean.FALSE));
+        assertArrayEquals(new byte[] { 0x01, 0x01, (byte) 0xFF }, encoder.encode(ASN1Boolean.TRUE));
+        assertArrayEquals(new byte[] { 0x01, 0x01, (byte) 0x00 }, encoder.encode(ASN1Boolean.FALSE));
     }
 
     @Test
     public void testDecode() {
-    	BERDecoder decoder = new BERDecoder();
+        BERDecoder decoder = new BERDecoder();
 
-    	assertEquals(ASN1Boolean.FALSE, decoder.decode(ASN1Boolean.class,
-    			new byte[] { 0x01, 0x01, 0x00 }));
-    	assertEquals(ASN1Boolean.TRUE, decoder.decode(ASN1Boolean.class,
-    			new byte[] { 0x01, 0x01, 0x01 }));
-    	assertEquals(
-    			ASN1Boolean.TRUE,
-    			decoder.decode(ASN1Boolean.class, new byte[] { 0x01, 0x01,
-    					(byte) 0xFF }));
+        assertEquals(ASN1Boolean.FALSE, decoder.decode(ASN1Boolean.class, new byte[] { 0x01, 0x01, 0x00 }));
+        assertEquals(ASN1Boolean.TRUE, decoder.decode(ASN1Boolean.class, new byte[] { 0x01, 0x01, 0x01 }));
+        assertEquals(ASN1Boolean.TRUE, decoder.decode(ASN1Boolean.class, new byte[] { 0x01, 0x01, (byte) 0xFF }));
     }
 
 }

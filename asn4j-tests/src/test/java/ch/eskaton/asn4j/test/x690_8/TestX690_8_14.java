@@ -76,8 +76,8 @@ public class TestX690_8_14 {
 
         type6.setValue("test");
 
-        assertArrayEquals(new byte[] { (byte) 0x6b, 0x08, (byte) 0xa2, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder
-                .encode(type6));
+        assertArrayEquals(new byte[] { (byte) 0x6b, 0x08, (byte) 0xa2, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 },
+                encoder.encode(type6));
     }
 
     @Test
@@ -100,8 +100,8 @@ public class TestX690_8_14 {
 
         type3.setValues(ASN1VisibleString.fromString("test"));
 
-        assertArrayEquals(new byte[] { (byte) 0xa0, 0x08, 0x61, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder
-                .encode(type3));
+        assertArrayEquals(new byte[] { (byte) 0xa0, 0x08, 0x61, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 },
+                encoder.encode(type3));
     }
 
 }

@@ -53,8 +53,7 @@ public class TestX690_8_7 {
 
         assertEquals(ASN1OctetString.valueOf(new byte[] {}), decoder.decode(
                 ASN1OctetString.class, new byte[] { 0x04, 0x00 }));
-        assertEquals(
-                ASN1OctetString.valueOf(new byte[] { 0x31, 0x32, 0x33 }),
+        assertEquals(ASN1OctetString.valueOf(new byte[] { 0x31, 0x32, 0x33 }),
                 decoder.decode(ASN1OctetString.class, new byte[] { 0x04, 0x03, 0x31, 0x32, 0x33 }));
     }
 

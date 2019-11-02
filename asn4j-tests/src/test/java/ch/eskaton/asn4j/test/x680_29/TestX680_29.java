@@ -27,28 +27,18 @@
 
 package ch.eskaton.asn4j.test.x680_29;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.test.modules.x680_29.TestChoice1;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 
 public class TestX680_29 {
 
     @Test
     public void testChoice1() {
-        TestChoice1 a = new TestChoice1();
-
-        a.setB(ASN1OctetString.valueOf(new byte[] { (byte)0xff, (byte)0x65 }));
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestChoice1 b = decoder.decode(TestChoice1.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestChoice1.class,
+                value -> value.setB(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x65 })));
     }
 
 }

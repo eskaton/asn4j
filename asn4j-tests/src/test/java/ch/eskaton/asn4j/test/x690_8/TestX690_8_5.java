@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -41,64 +41,42 @@ public class TestX690_8_5 {
     public void testEncode() {
         BEREncoder encoder = new BEREncoder();
 
-        assertArrayEquals(new byte[] { 0x09, 0x01, 0x40 },
-                encoder.encode(ASN1Real.PLUS_INFINITY));
-        assertArrayEquals(new byte[] { 0x09, 0x01, 0x41 },
-                encoder.encode(ASN1Real.MINUS_INFINITY));
-        assertArrayEquals(new byte[] { 0x09, 0x01, 0x42 },
-                encoder.encode(ASN1Real.NOT_A_NUMBER));
-        assertArrayEquals(new byte[] { 0x09, 0x01, 0x43 },
-                encoder.encode(ASN1Real.MINUS_ZERO));
+        assertArrayEquals(new byte[] { 0x09, 0x01, 0x40 }, encoder.encode(ASN1Real.PLUS_INFINITY));
+        assertArrayEquals(new byte[] { 0x09, 0x01, 0x41 }, encoder.encode(ASN1Real.MINUS_INFINITY));
+        assertArrayEquals(new byte[] { 0x09, 0x01, 0x42 }, encoder.encode(ASN1Real.NOT_A_NUMBER));
+        assertArrayEquals(new byte[] { 0x09, 0x01, 0x43 }, encoder.encode(ASN1Real.MINUS_ZERO));
 
-        assertArrayEquals(new byte[] { 0x09, 0x00 },
-                encoder.encode(ASN1Real.valueOf(0)));
+        assertArrayEquals(new byte[] { 0x09, 0x00 }, encoder.encode(ASN1Real.valueOf(0)));
 
-        assertArrayEquals(new byte[] { 0x09, 0x03, 0x01, 0x20, 0x31 },
-                encoder.encode(ASN1Real.valueOf(1)));
+        assertArrayEquals(new byte[] { 0x09, 0x03, 0x01, 0x20, 0x31 }, encoder.encode(ASN1Real.valueOf(1)));
 
-        assertArrayEquals(new byte[] { 0x09, 0x03, 0x01, 0x2D, 0x31 },
-                encoder.encode(ASN1Real.valueOf(-1)));
+        assertArrayEquals(new byte[] { 0x09, 0x03, 0x01, 0x2D, 0x31 }, encoder.encode(ASN1Real.valueOf(-1)));
 
-        assertArrayEquals(new byte[] { 0x09, 0x06, 0x02, 0x20, 0x31, 0x2E,
-                0x32, 0x35 }, encoder.encode(ASN1Real.valueOf(1.25)));
-        assertArrayEquals(new byte[] { 0x09, 0x06, 0x02, 0x20, 0x30, 0x2E,
-                0x32, 0x35 }, encoder.encode(ASN1Real.valueOf(0.25)));
+        assertArrayEquals(new byte[] { 0x09, 0x06, 0x02, 0x20, 0x31, 0x2E, 0x32, 0x35 },
+                encoder.encode(ASN1Real.valueOf(1.25)));
+        assertArrayEquals(new byte[] { 0x09, 0x06, 0x02, 0x20, 0x30, 0x2E, 0x32, 0x35 },
+                encoder.encode(ASN1Real.valueOf(0.25)));
     }
 
     @Test
     public void testDecode() {
         BERDecoder decoder = new BERDecoder();
 
-        assertEquals(ASN1Real.PLUS_INFINITY,
-                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x01, 0x40 }));
-        assertEquals(ASN1Real.MINUS_INFINITY,
-                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x01, 0x41 }));
-        assertEquals(ASN1Real.NOT_A_NUMBER,
-                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x01, 0x42 }));
-        assertEquals(ASN1Real.MINUS_ZERO,
-                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x01, 0x43 }));
+        assertEquals(ASN1Real.PLUS_INFINITY, decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x01, 0x40 }));
+        assertEquals(ASN1Real.MINUS_INFINITY, decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x01, 0x41 }));
+        assertEquals(ASN1Real.NOT_A_NUMBER, decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x01, 0x42 }));
+        assertEquals(ASN1Real.MINUS_ZERO, decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x01, 0x43 }));
 
-        assertEquals(ASN1Real.valueOf(0),
-                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x00 }));
+        assertEquals(ASN1Real.valueOf(0), decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x00 }));
 
-        assertEquals(
-                ASN1Real.valueOf(1),
-                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x03, 0x01,
-                        0x20, 0x31 }));
+        assertEquals(ASN1Real.valueOf(1), decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x03, 0x01, 0x20, 0x31 }));
 
-        assertEquals(
-                ASN1Real.valueOf(-1),
-                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x03, 0x01,
-                        0x2D, 0x31 }));
+        assertEquals(ASN1Real.valueOf(-1), decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x03, 0x01, 0x2D, 0x31 }));
 
-        assertEquals(
-                ASN1Real.valueOf(1.25),
-                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x06, 0x02,
-                        0x20, 0x31, 0x2E, 0x32, 0x35 }));
-        assertEquals(
-                ASN1Real.valueOf(0.25),
-                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x06, 0x02,
-                        0x20, 0x30, 0x2E, 0x32, 0x35 }));
+        assertEquals(ASN1Real.valueOf(1.25),
+                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x06, 0x02, 0x20, 0x31, 0x2E, 0x32, 0x35 }));
+        assertEquals(ASN1Real.valueOf(0.25),
+                decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x06, 0x02, 0x20, 0x30, 0x2E, 0x32, 0x35 }));
     }
 
 }
