@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.test.x680_19;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.test.modules.x680_19.TestInteger;
 import ch.eskaton.asn4j.test.modules.x680_19.TestNamedInteger;
 import ch.eskaton.asn4j.test.modules.x680_19.TestNamedInteger3;
@@ -37,6 +35,8 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
+import static ch.eskaton.asn4j.test.TestHelper.assertValueDecodable;
 import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -44,55 +44,27 @@ public class TestX680_19 {
 
     @Test
     public void test1() {
-        TestInteger a = new TestInteger();
-
-        a.setValue(BigInteger.valueOf(17));
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestInteger b = decoder.decode(TestInteger.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestInteger.class, value -> value.setValue(BigInteger.valueOf(17)));
     }
 
     @Test
     public void test2() {
-        TestNamedInteger a = TestNamedInteger.VALUE3;
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestNamedInteger b = decoder.decode(TestNamedInteger.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertValueDecodable(TestNamedInteger.class, TestNamedInteger.VALUE3);
     }
 
     @Test
     public void test3() {
-        TestNamedInteger a = new TestNamedInteger();
-        a.setValue(BigInteger.valueOf(13));
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestNamedInteger b = decoder.decode(TestNamedInteger.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestNamedInteger.class, value -> value.setValue(BigInteger.valueOf(13)));
     }
 
     @Test
     public void testEquality() {
-        TestNamedInteger3 a = new TestNamedInteger3();
-        TestNamedInteger3 b = new TestNamedInteger3();
-        assertEquals(a, b);
+        assertEquals(new TestNamedInteger3(), new TestNamedInteger3());
     }
 
     @Test
     public void testInequality() {
-        TestNamedInteger3 a = new TestNamedInteger3();
-        TestNamedInteger5 b = new TestNamedInteger5();
-        assertNotEquals(a, b);
+        assertNotEquals(new TestNamedInteger3(), new TestNamedInteger5());
     }
 
 }

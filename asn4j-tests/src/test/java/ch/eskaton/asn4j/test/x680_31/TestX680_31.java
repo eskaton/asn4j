@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.test.x680_31;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType1;
@@ -41,21 +39,17 @@ import org.junit.Test;
 
 import java.util.function.Supplier;
 
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.test.TestHelper.assertValueDecodable;
 
 public class TestX680_31 {
 
     private <T extends ASN1VisibleString> void testPrefixedType(Supplier<T> prefixedType, String value)
             throws ASN1RuntimeException {
         T a = prefixedType.get();
+
         a.setValue(value);
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        T b = decoder.decode((Class<T>) a.getClass(), encoder.encode(a));
-
-        assertEquals(a, b);
+        assertValueDecodable(a.getClass(), a);
     }
 
     @Test

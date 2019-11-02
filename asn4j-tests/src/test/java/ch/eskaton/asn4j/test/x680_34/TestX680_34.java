@@ -27,66 +27,55 @@
 
 package ch.eskaton.asn4j.test.x680_34;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.test.modules.x680_34.TestOidIris;
 import org.junit.Test;
 
+import java.util.function.Consumer;
+
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAround;
 import static org.junit.Assert.assertEquals;
 
 public class TestX680_34 {
 
     @Test
     public void testIRIsWithDefaults() {
-        TestOidIris a = new TestOidIris();
         ASN1IRI testOidIri1 = createIRI(new ASN1IRI(), "ISO", "Registration-Authority", "19785.CBEFF", "Organizations");
         ASN1IRI testOidIri2 = createIRI(new ASN1IRI(), "ISO", "Registration-Authority", "Test");
         ASN1IRI testOidIri3 = createIRI(new ASN1IRI(), "ISO", "Registration-Authority", "19785.CBEFF");
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
+        Consumer<TestOidIris> verifier = value -> {
+            assertEquals(testOidIri1, value.getTestOidIri1());
+            assertEquals(testOidIri2, value.getTestOidIri2());
+            assertEquals(testOidIri3, value.getTestOidIri3());
 
-        TestOidIris b = decoder.decode(TestOidIris.class, encoder.encode(a));
+        };
 
-        assertEquals(a, b);
-        assertEquals(testOidIri1, a.getTestOidIri1());
-        assertEquals(testOidIri2, a.getTestOidIri2());
-        assertEquals(testOidIri3, a.getTestOidIri3());
-
-        assertEquals(testOidIri1, b.getTestOidIri1());
-        assertEquals(testOidIri2, b.getTestOidIri2());
-        assertEquals(testOidIri3, b.getTestOidIri3());
+        assertDecodableVerifyAround(TestOidIris.class, verifier, verifier);
     }
 
     @Test
     public void testIRIsWithoutDefaults() {
-        TestOidIris a = new TestOidIris();
         ASN1IRI testOidIri1 = createIRI(new ASN1IRI(), "ISO", "Registration-Authority", "123", "Test");
         ASN1IRI testOidIri2 = createIRI(new ASN1IRI(), "ISO", "Registration-Authority", "456");
         ASN1IRI testOidIri3 = createIRI(new ASN1IRI(), "ISO", "Registration-Authority", "Test");
 
-        a.setTestOidIri1(testOidIri1);
-        a.setTestOidIri2(testOidIri2);
-        a.setTestOidIri3(testOidIri3);
+        Consumer<TestOidIris> verifier = value -> {
+            assertEquals(testOidIri1, value.getTestOidIri1());
+            assertEquals(testOidIri2, value.getTestOidIri2());
+            assertEquals(testOidIri3, value.getTestOidIri3());
+        };
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestOidIris b = decoder.decode(TestOidIris.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(testOidIri1, a.getTestOidIri1());
-        assertEquals(testOidIri2, a.getTestOidIri2());
-        assertEquals(testOidIri3, a.getTestOidIri3());
-
-        assertEquals(testOidIri1, b.getTestOidIri1());
-        assertEquals(testOidIri2, b.getTestOidIri2());
-        assertEquals(testOidIri3, b.getTestOidIri3());
+        assertDecodableVerifyAround(TestOidIris.class, value -> {
+            value.setTestOidIri1(testOidIri1);
+            value.setTestOidIri2(testOidIri2);
+            value.setTestOidIri3(testOidIri3);
+        }, verifier, verifier);
     }
 
     public <T extends ASN1IRI> T createIRI(ASN1IRI iri, String... components) {
         iri.setValue(components);
+
         return (T) iri;
     }
 

@@ -27,47 +27,30 @@
 
 package ch.eskaton.asn4j.test.x680_23;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
-import ch.eskaton.asn4j.test.modules.x680_20.TestEnumeration;
 import ch.eskaton.asn4j.test.modules.x680_23.TestOctetString;
 import ch.eskaton.asn4j.test.modules.x680_23.TestOctetStrings;
 import org.junit.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static org.junit.Assert.assertEquals;
 
 public class TestX680_23 {
 
     @Test
     public void test1() {
-        TestOctetString a = new TestOctetString();
-
-        a.setValue("test".getBytes());
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestOctetString b = decoder.decode(TestOctetString.class,
-                encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestOctetString.class, value -> value.setValue("test".getBytes()));
     }
 
     @Test
     public void testOctetStringDefault() {
-        TestOctetStrings a = new TestOctetStrings();
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestOctetStrings b = decoder.decode(TestOctetStrings.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(new ASN1OctetString(new byte[] { 0x01, (byte) 0xAF }), b.getTestOctetString1());
-        assertEquals(new TestOctetString(new byte[] { 0x01, (byte) 0xAF }), b.getTestOctetString2());
-        assertEquals(new TestOctetString(new byte[] { 0x01, (byte) 0xAF }), b.getTestOctetString3());
-        assertEquals(new TestOctetString(new byte[] { 0x50 }), b.getTestOctetString4());
+        assertDecodableVerifyAfter(TestOctetStrings.class, value -> {
+            assertEquals(new ASN1OctetString(new byte[] { 0x01, (byte) 0xAF }), value.getTestOctetString1());
+            assertEquals(new TestOctetString(new byte[] { 0x01, (byte) 0xAF }), value.getTestOctetString2());
+            assertEquals(new TestOctetString(new byte[] { 0x01, (byte) 0xAF }), value.getTestOctetString3());
+            assertEquals(new TestOctetString(new byte[] { 0x50 }), value.getTestOctetString4());
+        });
     }
 
 }

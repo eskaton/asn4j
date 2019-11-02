@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.test.modules.x680_20.TestEnumeration;
 import ch.eskaton.asn4j.test.modules.x680_20.TestEnumerations;
 import org.junit.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static org.junit.Assert.assertEquals;
 
 public class TestX680_20 {
@@ -84,28 +85,22 @@ public class TestX680_20 {
 
     @Test
     public void testEnumerationDefault() {
-        TestEnumerations a = new TestEnumerations();
+        assertDecodableVerifyAfter(TestEnumerations.class, value -> {
+            assertEquals(TestEnumeration.M, value.getTestEnumeration1());
+            assertEquals(TestEnumeration.E, value.getTestEnumeration2());
+            assertEquals(TestEnumeration.E, value.getTestEnumeration3());
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestEnumerations b = decoder.decode(TestEnumerations.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(TestEnumeration.M, b.getTestEnumeration1());
-        assertEquals(TestEnumeration.E, b.getTestEnumeration2());
-        assertEquals(TestEnumeration.E, b.getTestEnumeration3());
+        });
     }
 
-    private void testEnumeration(TestEnumeration a, int value) {
+    private void testEnumeration(TestEnumeration a, int enumValue) {
         BEREncoder encoder = new BEREncoder();
         BERDecoder decoder = new BERDecoder();
 
-        TestEnumeration b = decoder.decode(TestEnumeration.class,
-                encoder.encode(a));
+        TestEnumeration b = decoder.decode(TestEnumeration.class, encoder.encode(a));
 
         assertEquals(a, b);
-        assertEquals(value, b.getValue());
+        assertEquals(enumValue, b.getValue());
     }
 
 }

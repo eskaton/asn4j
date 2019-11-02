@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -43,42 +43,34 @@ public class TestX690_8_6 {
     public void testEncode() {
         BEREncoder encoder = new BEREncoder();
 
-        assertArrayEquals(new byte[]{0x03, 0x01, 0x00},
-                encoder.encode(ASN1BitString.of(new byte[]{})));
-        assertArrayEquals(new byte[]{0x03, 0x02, 0x07, (byte) 0x80},
-                encoder.encode(ASN1BitString.of(new byte[]{(byte) 0x80}, 7)));
-        assertArrayEquals(new byte[]{0x03, 0x03, 0x07, (byte) 0xAA, (byte) 0x80},
-                encoder.encode(ASN1BitString.of(new byte[]{(byte) 0xAA, (byte) 0x80}, 7)));
+        assertArrayEquals(new byte[] { 0x03, 0x01, 0x00 },
+                encoder.encode(ASN1BitString.of(new byte[] {})));
+        assertArrayEquals(new byte[] { 0x03, 0x02, 0x07, (byte) 0x80 },
+                encoder.encode(ASN1BitString.of(new byte[] { (byte) 0x80 }, 7)));
+        assertArrayEquals(new byte[] { 0x03, 0x03, 0x07, (byte) 0xAA, (byte) 0x80 },
+                encoder.encode(ASN1BitString.of(new byte[] { (byte) 0xAA, (byte) 0x80 }, 7)));
     }
 
     @Test
     public void testDecode() {
         BERDecoder decoder = new BERDecoder();
 
-        assertEquals(
-                ASN1BitString.of(new byte[]{}),
-                decoder.decode(ASN1BitString.class, new byte[]{0x03, 0x01,
-                        0x00}));
-        assertEquals(
-                ASN1BitString.of(new byte[]{(byte) 0x80}, 7),
-                decoder.decode(ASN1BitString.class, new byte[]{0x03, 0x02,
-                        0x07, (byte) 0x80}));
-        assertEquals(
-                ASN1BitString.of(new byte[]{0x55, 0x00}, 7),
-                decoder.decode(ASN1BitString.class, new byte[]{0x03, 0x03,
-                        0x07, 0x55, 0x00}));
+        assertEquals(ASN1BitString.of(new byte[] {}),
+                decoder.decode(ASN1BitString.class, new byte[] { 0x03, 0x01, 0x00 }));
+        assertEquals(ASN1BitString.of(new byte[] { (byte) 0x80 }, 7),
+                decoder.decode(ASN1BitString.class, new byte[] { 0x03, 0x02, 0x07, (byte) 0x80 }));
+        assertEquals(ASN1BitString.of(new byte[] { 0x55, 0x00 }, 7),
+                decoder.decode(ASN1BitString.class, new byte[] { 0x03, 0x03, 0x07, 0x55, 0x00 }));
     }
 
     @Test(expected = DecodingException.class)
     public void testDecodeUnusedBitsFailure() {
-        new BERDecoder().decode(ASN1BitString.class, new byte[]{0x03, 0x01,
-                0x01});
+        new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x01, 0x01 });
     }
 
     @Test(expected = PrematureEndOfInputException.class)
     public void testDecodeLengthFailure() {
-        new BERDecoder().decode(ASN1BitString.class, new byte[]{0x03, 0x02,
-                0x00});
+        new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x02, 0x00 });
     }
 
 }

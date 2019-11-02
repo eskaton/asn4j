@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,25 +27,16 @@
 
 package ch.eskaton.asn4j.test.x680_24;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 
 public class TestX680_24 {
 
     @Test
     public void test1() {
-    	ASN1Null a = new ASN1Null();
-
-    	BEREncoder encoder = new BEREncoder();
-    	BERDecoder decoder = new BERDecoder();
-
-    	ASN1Null b = decoder.decode(ASN1Null.class, encoder.encode(a));
-
-    	assertEquals(a, b);
+        assertDecodable(ASN1Null.class);
     }
 
 }

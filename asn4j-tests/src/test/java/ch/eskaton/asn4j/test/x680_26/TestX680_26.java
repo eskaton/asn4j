@@ -27,27 +27,18 @@
 
 package ch.eskaton.asn4j.test.x680_26;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf1;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 
 public class TestX680_26 {
 
     @Test
     public void testSequenceOf() {
-        TestSequenceOf1 a = new TestSequenceOf1();
-        a.setValues(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23));
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestSequenceOf1 b = decoder.decode(TestSequenceOf1.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestSequenceOf1.class,
+                value -> value.setValues(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23)));
     }
 
 }

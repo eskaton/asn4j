@@ -27,59 +27,51 @@
 
 package ch.eskaton.asn4j.test.x680_33;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.test.modules.x680_33.TestRelativeObjectIdentifiers;
 import org.junit.Test;
 
+import java.util.function.Consumer;
+
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAround;
 import static org.junit.Assert.assertEquals;
 
 public class TestX680_33 {
 
     @Test
-    public void TestRelativeObjectIdentifiersWithDefaults() {
-        TestRelativeObjectIdentifiers a = new TestRelativeObjectIdentifiers();
+    public void testRelativeObjectIdentifiersWithDefaults() {
         ASN1RelativeOID testRelativeObjectIdentifier1 = createRelativeOID(new ASN1RelativeOID(), 3);
         ASN1RelativeOID testRelativeObjectIdentifier2 = createRelativeOID(new ASN1RelativeOID(), 3, 6, 1);
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
+        Consumer<TestRelativeObjectIdentifiers> verifier = value -> {
+            assertEquals(testRelativeObjectIdentifier1, value.getTestRelativeObjectIdentifier1());
+            assertEquals(testRelativeObjectIdentifier2, value.getTestRelativeObjectIdentifier2());
+        };
 
-        TestRelativeObjectIdentifiers b = decoder.decode(TestRelativeObjectIdentifiers.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(testRelativeObjectIdentifier1, a.getTestRelativeObjectIdentifier1());
-        assertEquals(testRelativeObjectIdentifier2, a.getTestRelativeObjectIdentifier2());
-
-        assertEquals(testRelativeObjectIdentifier1, b.getTestRelativeObjectIdentifier1());
-        assertEquals(testRelativeObjectIdentifier2, b.getTestRelativeObjectIdentifier2());
+        assertDecodableVerifyAround(TestRelativeObjectIdentifiers.class, verifier, verifier);
     }
 
     @Test
-    public void TestRelativeObjectIdentifiersWithoutDefaults() {
-        TestRelativeObjectIdentifiers a = new TestRelativeObjectIdentifiers();
-        ASN1RelativeOID testObjectIdentifier1 = createRelativeOID(new ASN1RelativeOID(), 2, 3);
-        ASN1RelativeOID testObjectIdentifier2 = createRelativeOID(new ASN1RelativeOID(), 0, 7, 1, 1);
+    public void testRelativeObjectIdentifiersWithoutDefaults() {
+        ASN1RelativeOID testRelativeObjectIdentifier1 = createRelativeOID(new ASN1RelativeOID(), 2, 3);
+        ASN1RelativeOID testRelativeObjectIdentifier2 = createRelativeOID(new ASN1RelativeOID(), 0, 7, 1, 1);
 
-        a.setTestRelativeObjectIdentifier1(testObjectIdentifier1);
-        a.setTestRelativeObjectIdentifier2(testObjectIdentifier2);
+        Consumer<TestRelativeObjectIdentifiers> verifier = value -> {
+            assertEquals(testRelativeObjectIdentifier1, value.getTestRelativeObjectIdentifier1());
+            assertEquals(testRelativeObjectIdentifier2, value.getTestRelativeObjectIdentifier2());
+        };
 
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestRelativeObjectIdentifiers b = decoder.decode(TestRelativeObjectIdentifiers.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(testObjectIdentifier1, a.getTestRelativeObjectIdentifier1());
-        assertEquals(testObjectIdentifier2, a.getTestRelativeObjectIdentifier2());
-
-        assertEquals(testObjectIdentifier1, b.getTestRelativeObjectIdentifier1());
-        assertEquals(testObjectIdentifier2, b.getTestRelativeObjectIdentifier2());
+        assertDecodableVerifyAround(TestRelativeObjectIdentifiers.class,
+                value -> {
+                    value.setTestRelativeObjectIdentifier1(testRelativeObjectIdentifier1);
+                    value.setTestRelativeObjectIdentifier2(testRelativeObjectIdentifier2);
+                },
+                verifier, verifier);
     }
 
     public <T extends ASN1RelativeOID> T createRelativeOID(ASN1RelativeOID oid, int... components) {
         oid.setValue(components);
+
         return (T) oid;
     }
 

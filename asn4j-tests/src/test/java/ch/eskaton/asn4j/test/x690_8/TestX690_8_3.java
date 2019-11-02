@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -41,44 +41,28 @@ public class TestX690_8_3 {
     public void testEncode() {
         BEREncoder encoder = new BEREncoder();
 
-        assertArrayEquals(new byte[] { 0x02, 0x01, 0x00 },
-                encoder.encode(ASN1Integer.valueOf(0)));
-        assertArrayEquals(new byte[] { 0x02, 0x01, 0x7F },
-                encoder.encode(ASN1Integer.valueOf(127)));
-        assertArrayEquals(new byte[] { 0x02, 0x02, 0x00, (byte) 0x80 },
-                encoder.encode(ASN1Integer.valueOf(128)));
-        assertArrayEquals(new byte[] { 0x02, 0x02, 0x00, (byte) 0xFF },
-                encoder.encode(ASN1Integer.valueOf(255)));
-        assertArrayEquals(new byte[] { 0x02, 0x02, 0x01, 0x00 },
-                encoder.encode(ASN1Integer.valueOf(256)));
-        assertArrayEquals(new byte[] { 0x02, 0x02, 0x12, 0x67 },
-                encoder.encode(ASN1Integer.valueOf(4711)));
+        assertArrayEquals(new byte[] { 0x02, 0x01, 0x00 }, encoder.encode(ASN1Integer.valueOf(0)));
+        assertArrayEquals(new byte[] { 0x02, 0x01, 0x7F }, encoder.encode(ASN1Integer.valueOf(127)));
+        assertArrayEquals(new byte[] { 0x02, 0x02, 0x00, (byte) 0x80 }, encoder.encode(ASN1Integer.valueOf(128)));
+        assertArrayEquals(new byte[] { 0x02, 0x02, 0x00, (byte) 0xFF }, encoder.encode(ASN1Integer.valueOf(255)));
+        assertArrayEquals(new byte[] { 0x02, 0x02, 0x01, 0x00 }, encoder.encode(ASN1Integer.valueOf(256)));
+        assertArrayEquals(new byte[] { 0x02, 0x02, 0x12, 0x67 }, encoder.encode(ASN1Integer.valueOf(4711)));
     }
 
     @Test
     public void testDecode() {
         BERDecoder decoder = new BERDecoder();
 
-        assertEquals(ASN1Integer.valueOf(0), decoder.decode(ASN1Integer.class,
-                new byte[] { 0x02, 0x01, 0x00 }));
-        assertEquals(ASN1Integer.valueOf(127), decoder.decode(
-                ASN1Integer.class, new byte[] { 0x02, 0x01, 0x7F }));
-        assertEquals(
-                ASN1Integer.valueOf(128),
-                decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x02,
-                        0x00, (byte) 0x80 }));
-        assertEquals(
-                ASN1Integer.valueOf(255),
-                decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x02,
-                        0x00, (byte) 0xFF }));
-        assertEquals(
-                ASN1Integer.valueOf(256),
-                decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x02,
-                        0x01, 0x00 }));
-        assertEquals(
-                ASN1Integer.valueOf(4711),
-                decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x02,
-                        0x12, 0x67 }));
+        assertEquals(ASN1Integer.valueOf(0), decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x01, 0x00 }));
+        assertEquals(ASN1Integer.valueOf(127), decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x01, 0x7F }));
+        assertEquals(ASN1Integer.valueOf(128),
+                decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x02, 0x00, (byte) 0x80 }));
+        assertEquals(ASN1Integer.valueOf(255),
+                decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x02, 0x00, (byte) 0xFF }));
+        assertEquals(ASN1Integer.valueOf(256),
+                decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x02, 0x01, 0x00 }));
+        assertEquals(ASN1Integer.valueOf(4711),
+                decoder.decode(ASN1Integer.class, new byte[] { 0x02, 0x02, 0x12, 0x67 }));
     }
 
 }

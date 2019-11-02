@@ -27,11 +27,10 @@
 
 package ch.eskaton.asn4j.test.x680_25;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.test.TestHelper;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence0;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence2;
@@ -40,108 +39,67 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequence4;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence6;
 import org.junit.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static org.junit.Assert.assertEquals;
 
 public class TestX680_25 {
 
     @Test
     public void testSequence0() {
-        TestSequence0 a = new TestSequence0();
-        a.setA(ASN1Boolean.TRUE);
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestSequence0 b = decoder.decode(TestSequence0.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestSequence0.class, value -> value.setA(ASN1Boolean.TRUE));
     }
 
     @Test
     public void testSequence1() {
-        TestSequence1 a = new TestSequence1();
-        a.setA(ASN1Integer.valueOf(4711));
-        a.setB(ASN1Boolean.TRUE);
-        a.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestSequence1 b = decoder.decode(TestSequence1.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestSequence1.class, value -> {
+            value.setA(ASN1Integer.valueOf(4711));
+            value.setB(ASN1Boolean.TRUE);
+            value.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
+        });
     }
 
     @Test
     public void testOptional() {
-        TestSequence2 a = new TestSequence2();
-        a.setA(ASN1Integer.valueOf(4711));
-        a.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestSequence2 b = decoder.decode(TestSequence2.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestSequence2.class, value -> {
+            value.setA(ASN1Integer.valueOf(4711));
+            value.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
+        });
     }
 
     @Test
     public void testDefaultAtEnd() {
-        TestSequence3 a = new TestSequence3();
-        a.setA(ASN1Integer.valueOf(4711));
-        a.setB(ASN1Boolean.TRUE);
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestSequence3 b = decoder.decode(TestSequence3.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), b.getC());
+        TestHelper.assertDecodableVerifyAfter(TestSequence3.class,
+                value -> {
+                    value.setA(ASN1Integer.valueOf(4711));
+                    value.setB(ASN1Boolean.TRUE);
+                },
+                value -> assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), value.getC()));
     }
 
     @Test
     public void testDefaultAtStart() {
-        TestSequence4 a = new TestSequence4();
-        a.setB(ASN1Boolean.TRUE);
-        a.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestSequence4 b = decoder.decode(TestSequence4.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(ASN1Integer.valueOf(4711), b.getA());
+        TestHelper.assertDecodableVerifyAfter(TestSequence4.class,
+                value -> {
+                    value.setB(ASN1Boolean.TRUE);
+                    value.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
+                },
+                value -> assertEquals(ASN1Integer.valueOf(4711), value.getA()));
     }
 
     @Test
     public void testComponentsOf() {
-        TestSequence6 a = new TestSequence6();
-        a.setA(ASN1Integer.valueOf(4711));
-        a.setB(ASN1Boolean.TRUE);
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestSequence6 b = decoder.decode(TestSequence6.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestSequence6.class, value -> {
+            value.setA(ASN1Integer.valueOf(4711));
+            value.setB(ASN1Boolean.TRUE);
+        });
     }
 
     @Test
     public void testComponentsOfDefault() {
-        TestSequence6 a = new TestSequence6();
-        a.setB(ASN1Boolean.TRUE);
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestSequence6 b = decoder.decode(TestSequence6.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(ASN1Integer.valueOf(23), a.getA());
+        TestHelper.assertDecodableVerifyAfter(TestSequence6.class,
+                value -> value.setB(ASN1Boolean.TRUE),
+                value -> assertEquals(ASN1Integer.valueOf(23), value.getA()));
     }
 
 }

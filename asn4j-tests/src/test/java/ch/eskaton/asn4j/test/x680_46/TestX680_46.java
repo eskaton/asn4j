@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.test.x680_46;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.test.modules.x680_46.TestGeneralizedTime;
 import org.junit.Test;
@@ -36,52 +34,23 @@ import org.junit.Test;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
-import static org.junit.Assert.assertEquals;
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 
 public class TestX680_46 {
 
     @Test
     public void testGeneralizedTimeLocal() throws ASN1RuntimeException {
-        TestGeneralizedTime a = new TestGeneralizedTime();
-        LocalDateTime now = LocalDateTime.now();
-
-        a.setTime(now);
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestGeneralizedTime b = decoder.decode(TestGeneralizedTime.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestGeneralizedTime.class, value -> value.setTime(LocalDateTime.now()));
     }
 
     @Test
     public void testGeneralizedTimeOffset() throws ASN1RuntimeException {
-        TestGeneralizedTime a = new TestGeneralizedTime();
-        OffsetDateTime now = OffsetDateTime.now();
-
-        a.setTime(now);
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestGeneralizedTime b = decoder.decode(TestGeneralizedTime.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestGeneralizedTime.class, value -> value.setTime(OffsetDateTime.now()));
     }
 
     @Test
     public void testGeneralizedTimeFromString() throws ASN1RuntimeException {
-        TestGeneralizedTime a = new TestGeneralizedTime();
-
-        a.setValue("2016101923.1234567-0130");
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestGeneralizedTime b = decoder.decode(TestGeneralizedTime.class, encoder.encode(a));
-
-        assertEquals(a, b);
+        assertDecodable(TestGeneralizedTime.class, value -> value.setValue("2016101923.1234567-0130"));
     }
 
 }
