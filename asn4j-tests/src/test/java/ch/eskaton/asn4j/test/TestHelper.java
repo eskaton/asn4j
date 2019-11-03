@@ -121,14 +121,14 @@ public class TestHelper {
             int unusedBits) {
         setBitStringValue(bitString, value, unusedBits);
 
-        testEncodeDecodeValue((Class<T>) clazz, bitString);
+        assertValueDecodable(clazz, bitString);
     }
 
     public static <T extends ASN1BitString> void testBitStringFailure(Class<? extends T> clazz, T bitString, long value,
             int unusedBits) {
         setBitStringValue(bitString, value, unusedBits);
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, bitString), ConstraintViolatedException.class);
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, bitString), ConstraintViolatedException.class);
     }
 
     private static <T extends ASN1BitString> void setBitStringValue(T bitString, long value, int unusedBits) {
@@ -151,34 +151,34 @@ public class TestHelper {
             boolean value) {
         booleanValue.setValue(value);
 
-        testEncodeDecodeValue((Class<T>) clazz, booleanValue);
+        assertValueDecodable((Class<T>) clazz, booleanValue);
     }
 
     public static <T extends ASN1Boolean> void testBooleanFailure(Class<? extends T> clazz, T booleanValue,
             boolean value) {
         booleanValue.setValue(value);
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, booleanValue), ConstraintViolatedException.class);
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, booleanValue), ConstraintViolatedException.class);
     }
 
     public static <T extends ASN1EnumeratedType> void testEnumeratedSuccess(Class<? extends T> clazz, T enumValue,
             T value) {
         enumValue.setValue(value);
 
-        testEncodeDecodeValue((Class<T>) clazz, enumValue);
+        assertValueDecodable((Class<T>) clazz, enumValue);
     }
 
     public static <T extends ASN1EnumeratedType> void testEnumeratedFailure(Class<? extends T> clazz, T enumValue,
             T value) {
         enumValue.setValue(value);
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, enumValue), ConstraintViolatedException.class);
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, enumValue), ConstraintViolatedException.class);
     }
 
     public static <T extends ASN1Integer> void testIntegerSuccess(Class<? extends T> clazz, T intValue, long value) {
         intValue.setValue(BigInteger.valueOf(value));
 
-        testEncodeDecodeValue((Class<T>) clazz, intValue);
+        assertValueDecodable((Class<T>) clazz, intValue);
     }
 
     public static <T extends ASN1Integer> void testIntegerSuccess(Class<? extends T> clazz, long... values)
@@ -191,7 +191,7 @@ public class TestHelper {
     public static <T extends ASN1Integer> void testIntegerFailure(Class<? extends T> clazz, T intValue, long value) {
         intValue.setValue(BigInteger.valueOf(value));
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, intValue), ConstraintViolatedException.class,
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, intValue), ConstraintViolatedException.class,
                 "Value: " + value);
     }
 
@@ -205,105 +205,96 @@ public class TestHelper {
     public static <T extends ASN1Null> void testNullSuccess(Class<? extends T> clazz, Supplier<T> nullSupplier) {
         T nullValue = nullSupplier.get();
 
-        testEncodeDecodeValue((Class<T>) clazz, nullValue);
+        assertValueDecodable((Class<T>) clazz, nullValue);
     }
 
     public static <T extends ASN1Null> void testNullFailure(Class<? extends T> clazz, Supplier<T> nullSupplier) {
         T nullValue = nullSupplier.get();
 
         assertThrows(
-                () -> testEncodeDecodeValue((Class<T>) clazz, nullValue), ConstraintViolatedException.class);
+                () -> assertValueDecodable((Class<T>) clazz, nullValue), ConstraintViolatedException.class);
     }
 
     public static <T extends ASN1ObjectIdentifier> void testObjectIdentifierSuccess(Class<? extends T> clazz,
             T oidValue, int... value) {
         oidValue.setValue(value);
 
-        testEncodeDecodeValue((Class<T>) clazz, oidValue);
+        assertValueDecodable((Class<T>) clazz, oidValue);
     }
 
     public static <T extends ASN1ObjectIdentifier> void testObjectIdentifierFailure(Class<? extends T> clazz,
             T oidValue, int... value) {
         oidValue.setValue(value);
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, oidValue), ConstraintViolatedException.class);
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, oidValue), ConstraintViolatedException.class);
     }
 
     public static <T extends ASN1RelativeOID> void testRelativeOIDSuccess(Class<? extends T> clazz,
             T roidValue, int... value) {
         roidValue.setValue(value);
 
-        testEncodeDecodeValue((Class<T>) clazz, roidValue);
+        assertValueDecodable((Class<T>) clazz, roidValue);
     }
 
     public static <T extends ASN1RelativeOID> void testRelativeOIDFailure(Class<? extends T> clazz, T roidValue,
             int... value) {
         roidValue.setValue(value);
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, roidValue), ConstraintViolatedException.class);
-    }
-
-    private static <T extends ASN1Type> void testEncodeDecodeValue(Class<T> clazz, T value) {
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        T result = decoder.decode(clazz, encoder.encode(value));
-
-        assertEquals(value, result);
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, roidValue), ConstraintViolatedException.class);
     }
 
     public static <T extends ASN1IRI> void testIRISuccess(Class<? extends T> clazz, T iriValue, String... value) {
         iriValue.setValue(value);
 
-        testEncodeDecodeValue((Class<T>) clazz, iriValue);
+        assertValueDecodable((Class<T>) clazz, iriValue);
     }
 
     public static <T extends ASN1IRI> void testIRIFailure(Class<? extends T> clazz, T iriValue, String... value) {
         iriValue.setValue(value);
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, iriValue), ConstraintViolatedException.class);
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, iriValue), ConstraintViolatedException.class);
     }
 
     public static <T extends ASN1RelativeIRI> void testRelativeIRISuccess(Class<? extends T> clazz, T ririValue,
             String... value) {
         ririValue.setValue(value);
 
-        testEncodeDecodeValue((Class<T>) clazz, ririValue);
+        assertValueDecodable((Class<T>) clazz, ririValue);
     }
 
     public static <T extends ASN1RelativeIRI> void testRelativeIRIFailure(Class<? extends T> clazz, T ririValue,
             String... value) {
         ririValue.setValue(value);
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, ririValue), ConstraintViolatedException.class);
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, ririValue), ConstraintViolatedException.class);
     }
 
     public static <T extends ASN1OctetString> void testOctetStringSuccess(Class<? extends T> clazz, T octetStringValue,
             byte[] value) {
         octetStringValue.setValue(value);
 
-        testEncodeDecodeValue((Class<T>) clazz, octetStringValue);
+        assertValueDecodable((Class<T>) clazz, octetStringValue);
     }
 
     public static <T extends ASN1OctetString> void testOctetStringFailure(Class<? extends T> clazz, T octetStringValue,
             byte[] value) {
         octetStringValue.setValue(value);
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, octetStringValue), ConstraintViolatedException.class);
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, octetStringValue), ConstraintViolatedException.class);
     }
 
     public static <V extends ASN1Type, T extends ASN1SetOf> void testSetOfSuccess(Class<? extends T> clazz, T setOfValue,
             V... values) {
         setOfValue.setValues(values);
 
-        testEncodeDecodeValue((Class<T>) clazz, setOfValue);
+        assertValueDecodable((Class<T>) clazz, setOfValue);
     }
 
     public static <V extends ASN1Type, T extends ASN1SetOf> void testSetOfFailure(Class<? extends T> clazz, T setOfValue,
             V... values) {
         setOfValue.setValues(values);
 
-        assertThrows(() -> testEncodeDecodeValue((Class<T>) clazz, setOfValue), ConstraintViolatedException.class);
+        assertThrows(() -> assertValueDecodable((Class<T>) clazz, setOfValue), ConstraintViolatedException.class);
     }
 
     public static byte[] randomBytes(int length) {
