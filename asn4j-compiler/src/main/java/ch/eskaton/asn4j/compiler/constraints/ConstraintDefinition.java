@@ -40,6 +40,10 @@ public class ConstraintDefinition {
 
     private boolean extensible;
 
+    public ConstraintDefinition(Node roots) {
+        this(roots, null, false);
+    }
+
     public ConstraintDefinition(Node roots, Node extensions) {
         this(roots, extensions, false);
     }

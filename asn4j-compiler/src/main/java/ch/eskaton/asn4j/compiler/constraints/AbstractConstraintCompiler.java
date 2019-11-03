@@ -37,13 +37,16 @@ import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
+import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.commons.functional.TriFunction;
 import ch.eskaton.commons.utils.OptionalUtils;
 
 import java.util.ArrayDeque;
@@ -67,8 +70,9 @@ public abstract class AbstractConstraintCompiler {
         this.ctx = ctx;
     }
 
-    public ConstraintDefinition compileConstraint(CompiledType baseType, SetSpecsNode setSpecs,
+    public ConstraintDefinition compileConstraint(CompiledType baseType, SubtypeConstraint subtypeConstraint,
             Optional<Bounds> bounds) {
+        ElementSetSpecsNode setSpecs = subtypeConstraint.getElementSetSpecs();
         Node root = compileConstraint(baseType, setSpecs.getRootElements(), bounds);
         Node extension = null;
 
@@ -77,6 +81,11 @@ public abstract class AbstractConstraintCompiler {
         }
 
         return new ConstraintDefinition(root, extension).extensible(setSpecs.hasExtensionMarker());
+    }
+
+    protected ConstraintDefinition compileConstraint(CompiledType baseType, SizeConstraint sizeConstraint,
+            Optional<Bounds> bounds) {
+        return new ConstraintDefinition(calculateElements(baseType, sizeConstraint, bounds));
     }
 
     ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
@@ -132,18 +141,28 @@ public abstract class AbstractConstraintCompiler {
 
         for (Constraint constraint : constraints) {
             if (constraint instanceof SubtypeConstraint) {
-                SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
-
-                if (constraintDef == null) {
-                    constraintDef = compileConstraint(baseType, setSpecs, bounds);
-                } else {
-                    constraintDef = constraintDef.serialApplication(compileConstraint(baseType, setSpecs,
-                            getBounds(Optional.of(constraintDef))));
-                }
+                constraintDef = getConstraintDefinition(baseType, bounds, constraintDef, (SubtypeConstraint) constraint,
+                        this::compileConstraint);
+            } else if (constraint instanceof SizeConstraint) {
+                constraintDef = getConstraintDefinition(baseType, bounds, constraintDef, (SizeConstraint) constraint,
+                        this::compileConstraint);
             } else {
                 throw new CompilerException("Constraints of type %s not yet supported",
                         constraint.getClass().getSimpleName());
             }
+        }
+
+        return constraintDef;
+    }
+
+    private <C extends Constraint> ConstraintDefinition getConstraintDefinition(CompiledType baseType,
+            Optional<Bounds> bounds, ConstraintDefinition constraintDef, C constraint,
+            TriFunction<CompiledType, C, Optional<Bounds>, ConstraintDefinition> compile) {
+        if (constraintDef == null) {
+            constraintDef = compile.apply(baseType, constraint, bounds);
+        } else {
+            constraintDef = constraintDef.serialApplication(compile.apply(baseType, constraint,
+                    getBounds(Optional.of(constraintDef))));
         }
 
         return constraintDef;
@@ -249,8 +268,7 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
-    protected SizeNode calculateSize(CompiledType baseType, Constraint constraint,
-            Optional<Bounds> bounds) {
+    protected SizeNode calculateSize(CompiledType baseType, Constraint constraint, Optional<Bounds> bounds) {
         if (constraint instanceof SubtypeConstraint) {
             SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
