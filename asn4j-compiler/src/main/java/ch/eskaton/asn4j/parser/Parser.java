@@ -3232,7 +3232,7 @@ public class Parser {
         public Type parse() throws ParserException {
             return super.parse(new ChoiceParser<>(
                     new SequenceParser(new ChoiceParser<Token>(TokenType.SET_KW, TokenType.SEQUENCE_KW),
-                            sizeConstraintParser, TokenType.OF_KW,typeOrNamedTypeParser),
+                            sizeConstraintParser, TokenType.OF_KW, typeOrNamedTypeParser),
                     new SequenceParser(new ChoiceParser<Token>(TokenType.SET_KW,TokenType.SEQUENCE_KW),
                             constraintParser, TokenType.OF_KW, typeOrNamedTypeParser)), a -> {
                 Type type;
