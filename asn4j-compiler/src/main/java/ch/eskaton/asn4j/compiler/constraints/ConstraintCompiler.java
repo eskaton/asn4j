@@ -47,6 +47,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Maps;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class ConstraintCompiler {
 
@@ -76,15 +77,14 @@ public class ConstraintCompiler {
 
     public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) {
         CompiledType compiledType = ctx.getCompiledBaseType(node);
+        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
+        ConstraintDefinition constraintDef;
 
-        if (!compilers.containsKey(compiledType.getType().getClass())) {
-            //throw new CompilerException("Constraints for type %s not yet supported", base.getClass().getSimpleName());
+        if (!maybeCompiler.isPresent()) {
             return null;
         }
 
-        AbstractConstraintCompiler compiler = compilers.get(compiledType.getType().getClass());
-
-        ConstraintDefinition constraintDef;
+        AbstractConstraintCompiler compiler = maybeCompiler.get();
 
         try {
             constraintDef = compiler.compileConstraints(node, compiledType);
@@ -99,6 +99,31 @@ public class ConstraintCompiler {
         javaClass.addImport(ConstraintViolatedException.class);
 
         return constraintDef;
+    }
+
+    public ConstraintDefinition compileConstraint(Type node) {
+        CompiledType compiledType = ctx.getCompiledBaseType(node);
+        Optional<AbstractConstraintCompiler> compiler = getCompiler(compiledType);
+
+        if (compiler.isPresent()) {
+            try {
+                return compiler.get().compileConstraints(node, compiledType);
+            } catch (CompilerException e) {
+                throw new CompilerException("Error in constraint: %s", e, e.getMessage());
+            }
+        }
+
+        return null;
+    }
+
+    private Optional<AbstractConstraintCompiler> getCompiler(CompiledType compiledType) {
+        if (!compilers.containsKey(compiledType.getType().getClass())) {
+//            throw new CompilerException("Constraints for type %s not yet supported",
+//                    compiledType.getType().getClass().getSimpleName());
+            return Optional.empty();
+        }
+
+        return Optional.of(compilers.get(compiledType.getType().getClass()));
     }
 
 }

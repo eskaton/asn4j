@@ -40,6 +40,8 @@ public class ConstraintDefinition {
 
     private boolean extensible;
 
+    private ConstraintDefinition elementConstraint;
+
     public ConstraintDefinition(Node roots) {
         this(roots, null, false);
     }
@@ -96,12 +98,26 @@ public class ConstraintDefinition {
         return this;
     }
 
+    public ConstraintDefinition getElementConstraint() {
+        return elementConstraint;
+    }
+
+    public void setElementConstraint(ConstraintDefinition elementConstraint) {
+        this.elementConstraint = elementConstraint;
+    }
+
+    public ConstraintDefinition elementConstraint(ConstraintDefinition elementConstraint) {
+        setElementConstraint(elementConstraint);
+
+        return this;
+    }
+
     public ConstraintDefinition serialApplication(ConstraintDefinition other) {
         Node roots = new BinOpNode(INTERSECTION, getRoots(), other.getRoots());
         Node extensions = other.getExtensions();
         boolean extensible = other.isExtensible();
 
-        return new ConstraintDefinition(roots, extensions, extensible);
+        return new ConstraintDefinition(roots, extensions, extensible).elementConstraint(elementConstraint);
     }
 
 }

@@ -36,11 +36,13 @@ import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SetOfConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -63,6 +65,19 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
     public SetOfConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+    }
+
+    ConstraintDefinition compileConstraints(CompiledType baseType, List<Constraint> constraints,
+            Optional<Bounds> bounds) {
+        ConstraintDefinition constraintDef = super.compileConstraints(baseType, constraints, bounds);
+
+        Type elementType = ((CollectionOfType) baseType.getType()).getType();
+
+        if (elementType.hasConstraint()) {
+            constraintDef.setElementConstraint(ctx.compileConstraint(elementType));
+        }
+
+        return constraintDef;
     }
 
     @Override
