@@ -28,6 +28,8 @@
 package ch.eskaton.asn4j.runtime;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -35,18 +37,26 @@ import java.util.LinkedList;
 @SuppressWarnings("squid:ClassVariableVisibilityCheck")
 public class DecoderStates {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecoderStates.class);
+
     public byte[] buf;
 
     private Deque<DecoderState> states = new LinkedList<>();
 
     public DecoderState push(DecoderState state) {
+        LOGGER.trace("Pushing state: {}", state);
+
         states.push(state);
 
         return state;
     }
 
     public DecoderState pop() {
-        return states.pop();
+        DecoderState state = states.pop();
+
+        LOGGER.trace("Popping state: {}", state);
+
+        return state;
     }
 
     public DecoderState peek() {
@@ -61,11 +71,20 @@ public class DecoderStates {
         DecoderState removedState = pop();
         int nextTlv = removedState.tlv.nextTlv;
 
-        if (size() > 0 && nextTlv != -1) {
-            DecoderState currentState = peek();
-            currentState.length -= nextTlv - currentState.pos;
-            currentState.pos = nextTlv;
+        if (size() > 0) {
+            if (nextTlv != -1) {
+                DecoderState currentState = peek();
+                currentState.length -= nextTlv - currentState.pos;
+                currentState.pos = nextTlv;
+
+                LOGGER.trace("Modified state: {}", currentState);
+            } else {
+                DecoderState currentState = peek();
+                currentState.pos += currentState.length;
+                currentState.length = -1;
+            }
         }
+
 
         return removedState;
     }
