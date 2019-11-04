@@ -719,6 +719,10 @@ public class CompilerContext {
         return constraintCompiler.compileConstraint(javaClass, name, node);
     }
 
+    public ConstraintDefinition compileConstraint(Type node) {
+        return constraintCompiler.compileConstraint(node);
+    }
+
     public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value) {
         defaultsCompiler.compileDefault(javaClass, field, typeName, type, value);
     }
