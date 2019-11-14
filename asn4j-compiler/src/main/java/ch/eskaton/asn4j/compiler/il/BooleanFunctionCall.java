@@ -29,15 +29,43 @@ package ch.eskaton.asn4j.compiler.il;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.Optional;
+
 public class BooleanFunctionCall extends FunctionCall implements BooleanExpression {
 
-    public BooleanFunctionCall(ILType returnType, String object, String function, Expression... arguments) {
-        super(ILType.BOOLEAN, object, function, arguments);
+    public BooleanFunctionCall(Optional<String> function, Expression... arguments) {
+        super(function, ILType.BOOLEAN, arguments);
     }
 
     @Override
     public String toString() {
         return ToString.get(this);
+    }
+
+    public static class ArrayEquals extends BooleanFunctionCall {
+
+        public ArrayEquals(Expression argument1, Expression argument2) {
+            super(Optional.empty(), argument1, argument2);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
+    }
+
+    public static class SetEquals extends BooleanFunctionCall {
+
+        public SetEquals(Expression argument1, Expression argument2) {
+            super(Optional.empty(), argument1, argument2);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
     }
 
 }

@@ -50,32 +50,40 @@ public class Function {
         this.statements = statements;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public List<Statement> getStatements() {
-        return statements;
-    }
-
-    public void setStatements(List<Statement> statements) {
-        this.statements = statements;
+    public String getName() {
+        return name;
     }
 
     public void addStatement(Statement statement) {
         statements.add(statement);
     }
 
-    public void addParameter(Parameter parameter) {
-        parameters.add(parameter);
+    public void setStatements(List<Statement> statements) {
+        this.statements = statements;
+    }
+
+    public List<Statement> getStatements() {
+        return statements;
     }
 
     public void setReturnType(ILType returnType) {
         this.returnType = returnType;
+    }
+
+    public ILType getReturnType() {
+        return returnType;
+    }
+
+    public void addParameter(Parameter parameter) {
+        parameters.add(parameter);
+    }
+
+    public List<Parameter> getParameters() {
+        return parameters;
     }
 
     @Override

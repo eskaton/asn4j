@@ -35,6 +35,11 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
@@ -294,21 +299,30 @@ public abstract class AbstractConstraintCompiler {
 
     protected abstract void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition);
 
-    protected void addConstraintCondition(Type type, ConstraintDefinition definition, JavaClass.BodyBuilder builder) {
+    protected void addConstraintCondition(Type type, ConstraintDefinition definition, FunctionBuilder builder) {
         if (definition.isExtensible()) {
-            builder.append("return true;");
+            builder.statement().returnValue(Boolean.TRUE);
         } else {
             Node roots = optimize(definition.getRoots());
-            Optional<String> expression = buildExpression(getTypeName(type), roots);
+            Optional<BooleanExpression> expression = buildExpression(getTypeName(type), roots);
 
             if (expression.isPresent()) {
-                builder.append("if (" + expression.get() + ") {")
-                        .append("\treturn true;")
-                        .append("} else {")
-                        .append("\treturn false;")
-                        .append("}");
+                // @formatter:off
+                builder.conditions()
+                        .condition(expression.get())
+                            .statements()
+                                .returnValue(Boolean.TRUE)
+                                .build()
+                            .build()
+                        .condition()
+                            .statements()
+                                .returnValue(Boolean.FALSE)
+                                .build()
+                            .build()
+                    .build();
+                // @formatter:on
             } else {
-                builder.append("return true;");
+                builder.statement().returnValue(Boolean.TRUE);
             }
         }
     }
@@ -325,20 +339,25 @@ public abstract class AbstractConstraintCompiler {
         return node;
     }
 
-    protected Optional<String> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case ALL_VALUES:
                 return Optional.empty();
             case UNION:
-                return OptionalUtils.combine(buildExpression(typeName, ((BinOpNode) node).getLeft()),
-                        buildExpression(typeName, ((BinOpNode) node).getRight()), getBinOperation("||"));
+                return OptionalUtils.combine(
+                        buildExpression(typeName, ((BinOpNode) node).getLeft()),
+                        buildExpression(typeName, ((BinOpNode) node).getRight()),
+                        getBinOperation(BinaryOperator.OR));
             case INTERSECTION:
-                return OptionalUtils.combine(buildExpression(typeName, ((BinOpNode) node).getLeft()),
-                        buildExpression(typeName, ((BinOpNode) node).getRight()), getBinOperation("&&"));
+                return OptionalUtils.combine(
+                        buildExpression(typeName, ((BinOpNode) node).getLeft()),
+                        buildExpression(typeName, ((BinOpNode) node).getRight()),
+                        getBinOperation(BinaryOperator.AND));
             case COMPLEMENT:
-                return OptionalUtils.combine(buildExpression(typeName, ((BinOpNode) node).getLeft()),
+                return OptionalUtils.combine(
+                        buildExpression(typeName, ((BinOpNode) node).getLeft()),
                         buildExpression(typeName, ((BinOpNode) node).getRight()).map(this::negate),
-                        getBinOperation("&&"));
+                        getBinOperation(BinaryOperator.AND));
             case NEGATION:
                 return buildExpression(typeName, ((OpNode) node).getNode()).map(this::negate);
             default:
@@ -346,12 +365,12 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
-    private String negate(String expr) {
-        return "(!(" + expr + "))";
+    private BooleanExpression negate(BooleanExpression expr) {
+        return new NegationExpression(expr);
     }
 
-    private BiFunction<String, String, String> getBinOperation(String operator) {
-        return (String a, String b) -> "(" + a + " " + operator + " " + b + ")";
+    private BiFunction<BooleanExpression, BooleanExpression, BooleanExpression> getBinOperation(BinaryOperator operator) {
+        return (BooleanExpression a, BooleanExpression b) -> new BinaryBooleanExpression(operator, a, b);
     }
 
 }

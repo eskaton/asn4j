@@ -27,7 +27,11 @@
 
 package ch.eskaton.asn4j.compiler.java.objs;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.il.Function;
+import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.java.IL2JavaTranslator;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
@@ -130,7 +134,7 @@ public class JavaClass implements JavaStructure {
     }
 
     public void addImport(Class<?> clazz) {
-        addImport(clazz.getName());
+        addImport(formatInnerClass(clazz));
     }
 
     public void addImport(Class<?>... clazz) {
@@ -142,7 +146,11 @@ public class JavaClass implements JavaStructure {
     }
 
     public void addStaticImport(Class<?> clazz, String symbol) {
-        addStaticImport(clazz.getName().replace("$", ".") + "." + symbol);
+        addStaticImport(formatInnerClass(clazz) + "." + symbol);
+    }
+
+    private String formatInnerClass(Class<?> clazz) {
+        return clazz.getName().replace("$", ".");
     }
 
     public void addStaticImport(String imp) {
@@ -199,7 +207,16 @@ public class JavaClass implements JavaStructure {
         if (this.initializers == null) {
             this.initializers = new ArrayList<>();
         }
+
         this.initializers.add(initializer);
+    }
+
+    public void addModule(CompilerContext ctx, Module module) {
+        IL2JavaTranslator translator = new IL2JavaTranslator();
+
+        for (Function function : module.getFunctions()) {
+            translator.translateFunction(ctx, this, function);
+        }
     }
 
     public List<JavaMethod> getMethods() {

@@ -34,6 +34,15 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerValueBoundsVisitor;
+import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.FunctionCall.BigIntegerCompare;
+import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -45,7 +54,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -110,15 +118,26 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        javaClass.addImport(BigInteger.class);
-
         BodyBuilder builder = javaClass.method().annotation(Override.class).modifier(Public)
                 .returnType(boolean.class).name("doCheckConstraint")
-                .exception(ConstraintViolatedException.class).body();
+                .body();
 
-        addConstraintCondition(type, definition, builder);
+        builder.append("return checkConstraintValue(getValue());");
 
         builder.finish().build();
+
+        Module module = new Module();
+
+        FunctionBuilder function = module.function()
+                .name("checkConstraintValue")
+                .returnType(ILType.BOOLEAN)
+                .parameter(ILType.BIG_INTEGER, "value");
+
+        addConstraintCondition(type, definition, function);
+
+        function.build();
+
+        javaClass.addModule(ctx, module.build());
     }
 
     @Override
@@ -127,11 +146,18 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<String> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<IntegerRange> range = ((IntegerRangeValueNode) node).getValue();
-                return Optional.of(range.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
+                Optional<List<BooleanExpression>> maybeExpressions =
+                        Optional.of(range.stream().map(this::buildExpression).collect(Collectors.toList()));
+
+                if (maybeExpressions.isPresent()) {
+                    return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, maybeExpressions.get()));
+                }
+
+                return Optional.empty();
             case ALL_VALUES:
                 return Optional.empty();
             default:
@@ -139,20 +165,28 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
-    private String buildExpression(IntegerRange range) {
+    private BinaryBooleanExpression buildExpression(IntegerRange range) {
         long lower = range.getLower();
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return String.format("(getValue().compareTo(BigInteger.valueOf(%dL)) == 0)", lower);
+            return buildExpression(lower, BinaryOperator.EQ);
         } else if (lower == Long.MIN_VALUE) {
-            return String.format("(getValue().compareTo(BigInteger.valueOf(%dL)) <= 0)", upper);
+            return buildExpression(upper, BinaryOperator.LE);
         } else if (upper == Long.MAX_VALUE) {
-            return String.format("(getValue().compareTo(BigInteger.valueOf(%dL)) >= 0)", lower);
+            return buildExpression(lower, BinaryOperator.GE);
         } else {
-            return String.format("(getValue().compareTo(BigInteger.valueOf(%dL)) >= 0 && "
-                    + "getValue().compareTo(BigInteger.valueOf(%dL)) <= 0)", lower, upper);
+            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
+            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
+
+            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
         }
+    }
+
+    private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
+        return new BinaryBooleanExpression(operator,
+                new BigIntegerCompare(new Variable("value"), new ILValue(BigInteger.valueOf(value))),
+                new ILValue(0));
     }
 
 }

@@ -35,12 +35,12 @@ public class ConditionBuilder implements Builder<ConditionsBuilder>, HasStatemen
 
     private Condition condition;
 
-    public ConditionBuilder(ConditionsBuilder builder, Expression expression) {
+    public ConditionBuilder(ConditionsBuilder builder, BooleanExpression expression) {
         this.builder = builder;
         this.condition = new Condition();
 
         if (expression != null) {
-            condition.setCondition(expression);
+            condition.setExpression(expression);
         }
     }
 
@@ -48,8 +48,8 @@ public class ConditionBuilder implements Builder<ConditionsBuilder>, HasStatemen
         this(builder, null);
     }
 
-    public ConditionBuilder check(Expression expression) {
-        condition.setCondition(expression);
+    public ConditionBuilder check(BooleanExpression expression) {
+        condition.setExpression(expression);
 
         return this;
     }

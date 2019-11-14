@@ -34,6 +34,16 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SetOfConstraintOptimizingVisitor;
+import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.SetEquals;
+import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.FunctionCall.SetSize;
+import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
@@ -48,7 +58,6 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.commons.utils.CollectionUtils;
 
@@ -57,7 +66,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.JavaUtils.getInitializerString;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.singleton;
 
@@ -122,11 +130,24 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
         JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
                 .returnType(boolean.class).name("doCheckConstraint")
-                .exception(ConstraintViolatedException.class).body();
+                .body();
 
-        addConstraintCondition(type, definition, builder);
+        builder.append("return checkConstraintValue(getValues());");
 
         builder.finish().build();
+
+        Module module = new Module();
+
+        FunctionBuilder function = module.function()
+                .name("checkConstraintValue")
+                .returnType(ILType.BOOLEAN)
+                .parameter(ILType.SET, "value");
+
+        addConstraintCondition(type, definition, function);
+
+        function.build();
+
+        javaClass.addModule(ctx, module.build());
     }
 
     @Override
@@ -135,15 +156,21 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<String> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 Set<CollectionOfValue> values = ((CollectionOfValueNode) node).getValue();
-                return Optional.of(values.stream()
-                        .map(value -> buildExpression(typeName, value)).collect(Collectors.joining(" || ")));
+                List<BooleanExpression> valueArguments = values.stream()
+                        .map(value -> buildExpression(typeName, value))
+                        .collect(Collectors.toList());
+
+                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
             case SIZE:
                 List<IntegerRange> sizes = ((SizeNode) node).getSize();
-                return Optional.of(sizes.stream().map(this::buildSizeExpression).collect(Collectors.joining(" || ")));
+                List<BooleanExpression> sizeArguments = sizes.stream().map(this::buildSizeExpression)
+                        .collect(Collectors.toList());
+
+                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
             default:
                 return super.buildExpression(typeName, node);
         }
@@ -166,27 +193,30 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
         return super.getTypeName(elementType);
     }
 
-    private String buildExpression(String typeName, CollectionOfValue value) {
-        String initString = value.getValues().stream()
-                .map(v -> getInitializerString(ctx, typeName, v))
-                .collect(Collectors.joining(", "));
-
-        return "(getValues().equals(asHashSet(" + initString + ")))";
+    private BooleanExpression buildExpression(String typeName, CollectionOfValue value) {
+        return new SetEquals(new Variable("value"), new ILValue(typeName, value));
     }
 
-    private String buildSizeExpression(IntegerRange range) {
+    private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
         long lower = range.getLower();
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return String.format("(getValues().size() == %dL)", lower);
-        } else if (lower == 0) {
-            return String.format("(getValues().size() <= %dL)", upper);
+            return buildExpression(lower, BinaryOperator.EQ);
+        } else if (lower == Long.MIN_VALUE) {
+            return buildExpression(upper, BinaryOperator.LE);
         } else if (upper == Long.MAX_VALUE) {
-            return String.format("(getValues().size() >= %dL)", lower);
+            return buildExpression(lower, BinaryOperator.GE);
         } else {
-            return String.format("(%dL <= getValues().size() && %dL >= getValues().size())", lower, upper);
+            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
+            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
+
+            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
         }
+    }
+
+    private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
+        return new BinaryBooleanExpression(operator, new SetSize(new Variable("value")), new ILValue(value));
     }
 
 }

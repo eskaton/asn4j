@@ -31,6 +31,14 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -41,7 +49,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 
 import java.util.Optional;
@@ -81,22 +88,34 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
+        BodyBuilder builder = javaClass.method().annotation(Override.class).modifier(Public)
                 .returnType(boolean.class).name("doCheckConstraint")
-                .exception(ConstraintViolatedException.class).body();
+                .body();
 
-        javaClass.addStaticImport(ch.eskaton.asn4j.runtime.types.ASN1Null.Value.class, "NULL");
-
-        addConstraintCondition(type, definition, builder);
+        builder.append("return checkConstraintValue(getValue());");
 
         builder.finish().build();
+
+        Module module = new Module();
+
+        FunctionBuilder function = module.function()
+                .name("checkConstraintValue")
+                .returnType(ILType.BOOLEAN)
+                .parameter(ILType.NULL, "value");
+
+        addConstraintCondition(type, definition, function);
+
+        function.build();
+
+        javaClass.addModule(ctx, module.build());
     }
 
     @Override
-    protected Optional<String> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
-                return Optional.of("(getValue() == " + ((ValueNode) node).getValue() + ")");
+                return Optional.of(new BinaryBooleanExpression(BinaryOperator.EQ, new Variable("value"),
+                        new ILValue(typeName, ((ValueNode) node).getValue())));
             default:
                 return super.buildExpression(typeName, node);
         }

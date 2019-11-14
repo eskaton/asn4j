@@ -27,9 +27,23 @@
 
 package ch.eskaton.asn4j.compiler.il;
 
-public class IfStatement implements Statement {
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
+public class Variable implements Expression {
 
+    private String name;
 
+    public Variable(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
+    }
 
 }

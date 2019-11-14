@@ -29,12 +29,25 @@ package ch.eskaton.asn4j.compiler.il;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class ILValue implements BooleanExpression{
+import java.util.Optional;
+
+public class ILValue implements Expression {
+
+    private Optional<String> typeName = Optional.empty();
 
     private Object value;
 
     public ILValue(Object value) {
         this.value = value;
+    }
+
+    public ILValue(String typeName, Object value) {
+        this.typeName = Optional.of(typeName);
+        this.value = value;
+    }
+
+    public Optional<String> getTypeName() {
+        return typeName;
     }
 
     public Object getValue() {

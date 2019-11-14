@@ -43,7 +43,7 @@ public class ConditionsBuilder implements Builder<FunctionBuilder> {
         this.builder = builder;
     }
 
-    public ConditionBuilder condition(Expression expression) {
+    public ConditionBuilder condition(BooleanExpression expression) {
         return new ConditionBuilder(this, expression);
     }
 

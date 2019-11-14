@@ -35,10 +35,18 @@ import ch.eskaton.asn4j.compiler.constraints.ast.OctetStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.OctetStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
+import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
+import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
@@ -47,7 +55,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +63,7 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
+import static ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -108,11 +116,24 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
         BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
                 .returnType(boolean.class).name("doCheckConstraint")
-                .exception(ConstraintViolatedException.class).body();
+                .body();
 
-        addConstraintCondition(type, definition, builder);
+        builder.append("return checkConstraintValue(getValue());");
 
         builder.finish().build();
+
+        Module module = new Module();
+
+        FunctionBuilder function = module.function()
+                .name("checkConstraintValue")
+                .returnType(ILType.BOOLEAN)
+                .parameter(ILType.BYTE_ARRAY, "value");
+
+        addConstraintCondition(type, definition, function);
+
+        function.build();
+
+        javaClass.addModule(ctx, module.build());
     }
 
     @Override
@@ -121,39 +142,51 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<String> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<OctetStringValue> values = ((OctetStringValueNode) node).getValue();
-                return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
+                List<BooleanExpression> valueExpressions = values.stream().map(this::buildExpression2)
+                        .collect(Collectors.toList());
+
+                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueExpressions));
             case ALL_VALUES:
                 return Optional.empty();
             case SIZE:
                 List<IntegerRange> sizes = ((SizeNode) node).getSize();
-                return Optional.of(sizes.stream().map(this::buildSizeExpression).collect(Collectors.joining(" || ")));
+                List<BooleanExpression> sizeExpressions = sizes.stream().map(this::buildSizeExpression)
+                        .collect(Collectors.toList());
 
+                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeExpressions));
             default:
                 return super.buildExpression(typeName, node);
         }
     }
 
-    private String buildExpression(OctetStringValue value) {
-        return "(Arrays.equals(" + BitStringUtils.getInitializerString(value.getByteValue()) + ", getValue()))";
+    private BooleanExpression buildExpression2(OctetStringValue value) {
+        return new ArrayEquals(new ILValue(value.getByteValue()), new Variable("value"));
     }
 
-    private String buildSizeExpression(IntegerRange range) {
+    private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
         long lower = range.getLower();
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return String.format("(getValue().length == %dL)", lower);
-        } else if (lower == 0) {
-            return String.format("(getValue().length <= %dL)", upper);
+            return buildExpression(lower, BinaryOperator.EQ);
+        } else if (lower == Long.MIN_VALUE) {
+            return buildExpression(upper, BinaryOperator.LE);
         } else if (upper == Long.MAX_VALUE) {
-            return String.format("(getValue().length >= %dL)", lower);
+            return buildExpression(lower, BinaryOperator.GE);
         } else {
-            return String.format("(%dL <= getValue().length && %dL >= getValue().length)", lower, upper);
+            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
+            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
+
+            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
         }
+    }
+
+    private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
+        return new BinaryBooleanExpression(operator, new ArrayLength(new Variable("value")), new ILValue(value));
     }
 
 }

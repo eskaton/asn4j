@@ -31,6 +31,15 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractOIDValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
+import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
@@ -42,7 +51,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -89,37 +97,47 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
-                .returnType(boolean.class).name("doCheckConstraint")
-                .exception(ConstraintViolatedException.class).body();
-
         javaClass.addImport(Arrays.class);
 
-        builder.append("int[] value = getValue().stream().mapToInt(Integer::valueOf).toArray();");
+        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
+                .returnType(boolean.class).name("doCheckConstraint")
+                .body();
 
-        addConstraintCondition(type, definition, builder);
+        builder.append("return checkConstraintValue(getValue().stream().mapToInt(Integer::intValue).toArray());");
 
         builder.finish().build();
+
+        Module module = new Module();
+
+        FunctionBuilder function = module.function()
+                .name("checkConstraintValue")
+                .returnType(ILType.BOOLEAN)
+                .parameter(ILType.INTEGER_ARRAY, "value");
+
+        addConstraintCondition(type, definition, function);
+
+        function.build();
+
+        javaClass.addModule(ctx, module.build());
     }
 
     @Override
-    protected Optional<String> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
-                String expression = (((N) node).getValue()).stream()
-                        .map(this::buildExpression)
-                        .collect(Collectors.joining(" || "));
+                List<BooleanExpression> arguments = (((N) node).getValue()).stream()
+                        .map(this::buildExpression2)
+                        .collect(Collectors.toList());
 
-                return Optional.of(expression);
+                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
             default:
                 return super.buildExpression(typeName, node);
         }
     }
 
-    protected String buildExpression(List<Integer> value) {
-        String stringValue = value.stream().map(Object::toString).collect(Collectors.joining(", "));
-
-        return "(Arrays.equals(value, new int[] { " + stringValue + " }))";
+    protected BooleanExpression buildExpression2(List<Integer> value) {
+        return new BooleanFunctionCall.ArrayEquals(new Variable("value"),
+                new ILValue(value.stream().mapToInt(Integer::intValue).toArray()));
     }
 
     protected abstract N createNode(Set<List<Integer>> value);
