@@ -34,20 +34,20 @@ import java.util.List;
 
 public class BinaryBooleanExpression implements BooleanExpression {
 
-    private List<BooleanExpression> expressions;
+    private List<? extends Expression> expressions;
 
     private BinaryOperator operator;
 
-    public BinaryBooleanExpression(BinaryOperator operator, List<BooleanExpression> expressions) {
+    public BinaryBooleanExpression(BinaryOperator operator, List<? extends Expression> expressions) {
         this.operator = operator;
         this.expressions = expressions;
     }
 
-    public BinaryBooleanExpression(BinaryOperator operator, BooleanExpression left, BooleanExpression right) {
+    public BinaryBooleanExpression(BinaryOperator operator, Expression left, Expression right) {
         this(operator, Arrays.asList(left, right));
     }
 
-    public List<BooleanExpression> getExpressions() {
+    public List<? extends Expression> getExpressions() {
         return expressions;
     }
 

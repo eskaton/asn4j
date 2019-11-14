@@ -44,6 +44,10 @@ public class Module implements Builder<Module> {
         functions.add(function);
     }
 
+    public List<Function> getFunctions() {
+        return functions;
+    }
+
     @Override
     public Module build() {
         return this;

@@ -31,21 +31,19 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class FunctionCall implements Expression {
 
-    private final ILType returnType;
+    private Optional<String> function;
 
-    public String object;
+    private ILType returnType;
 
-    public String function;
+    private List<Expression> arguments;
 
-    public List<Expression> arguments;
-
-    public FunctionCall(ILType returnType, String object, String function, Expression... arguments) {
-        this.returnType = returnType;
-        this.object = object;
+    public FunctionCall(Optional<String> function, ILType returnType, Expression... arguments) {
         this.function = function;
+        this.returnType = returnType;
         this.arguments = Arrays.asList(arguments);
     }
 
@@ -53,11 +51,7 @@ public class FunctionCall implements Expression {
         return returnType;
     }
 
-    public String getObject() {
-        return object;
-    }
-
-    public String getFunction() {
+    public Optional<String> getFunction() {
         return function;
     }
 
@@ -68,6 +62,58 @@ public class FunctionCall implements Expression {
     @Override
     public String toString() {
         return ToString.get(this);
+    }
+
+    public static class BigIntegerCompare extends FunctionCall {
+
+        public BigIntegerCompare(Expression... arguments) {
+            super(Optional.empty(), ILType.INTEGER, arguments);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
+    }
+
+    public static class ArrayLength extends FunctionCall {
+
+        public ArrayLength(Expression argument) {
+            super(Optional.empty(), ILType.INTEGER, argument);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
+    }
+
+    public static class BitStringSize extends FunctionCall {
+
+        public BitStringSize(Expression argument1, Expression argument2) {
+            super(Optional.empty(), ILType.INTEGER, argument1, argument2);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
+    }
+
+    public static class SetSize extends FunctionCall {
+
+        public SetSize(Expression argument) {
+            super(Optional.empty(), ILType.INTEGER, argument);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
     }
 
 }

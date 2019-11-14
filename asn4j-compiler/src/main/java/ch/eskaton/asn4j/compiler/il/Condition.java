@@ -34,7 +34,7 @@ import java.util.List;
 
 public class Condition {
 
-    private Expression condition;
+    private BooleanExpression expression;
 
     private List<Statement> statements;
 
@@ -42,12 +42,12 @@ public class Condition {
         this.statements = new LinkedList<>();
     }
 
-    public Expression getCondition() {
-        return condition;
+    public BooleanExpression getExpression() {
+        return expression;
     }
 
-    public void setCondition(Expression condition) {
-        this.condition = condition;
+    public void setExpression(BooleanExpression expression) {
+        this.expression = expression;
     }
 
     public List<Statement> getStatements() {

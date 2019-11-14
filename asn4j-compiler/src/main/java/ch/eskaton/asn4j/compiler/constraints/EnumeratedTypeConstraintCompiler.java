@@ -33,6 +33,14 @@ import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.EnumeratedTypeConstraintOptimizingVisitor;
+import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -45,10 +53,10 @@ import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -114,11 +122,24 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
         JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
                 .returnType(boolean.class).name("doCheckConstraint")
-                .exception(ConstraintViolatedException.class).body();
+                .body();
 
-        addConstraintCondition(type, definition, builder);
+        builder.append("return checkConstraintValue(getValue());");
 
         builder.finish().build();
+
+        Module module = new Module();
+
+        FunctionBuilder function = module.function()
+                .name("checkConstraintValue")
+                .returnType(ILType.BOOLEAN)
+                .parameter(ILType.INTEGER, "value");
+
+        addConstraintCondition(type, definition, function);
+
+        function.build();
+
+        javaClass.addModule(ctx, module.build());
     }
 
     @Override
@@ -127,18 +148,21 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     }
 
     @Override
-    protected Optional<String> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 Set<Integer> values = ((EnumeratedValueNode) node).getValue();
-                return Optional.of(values.stream().map(this::buildExpression).collect(Collectors.joining(" || ")));
+                List<BinaryBooleanExpression> arguments = values.stream().map(this::buildExpression)
+                        .collect(Collectors.toList());
+
+                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
             default:
                 return super.buildExpression(typeName, node);
         }
     }
 
-    private String buildExpression(Integer enumValue) {
-        return "(getValue() == " + enumValue + ")";
+    private BinaryBooleanExpression buildExpression(Integer enumValue) {
+        return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable("value"), new ILValue(enumValue));
     }
 
 }

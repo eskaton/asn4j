@@ -126,4 +126,17 @@ public class ConstraintCompiler {
         return Optional.of(compilers.get(compiledType.getType().getClass()));
     }
 
+    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
+        CompiledType compiledType = ctx.getCompiledBaseType(type);
+        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
+
+        if (!maybeCompiler.isPresent()) {
+            return;
+        }
+
+        AbstractConstraintCompiler compiler = maybeCompiler.get();
+
+        compiler.addConstraint(type, javaClass, definition);
+    }
+
 }
