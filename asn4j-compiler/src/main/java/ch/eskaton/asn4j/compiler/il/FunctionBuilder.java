@@ -46,6 +46,18 @@ public class FunctionBuilder implements Builder<Module>, HasStatements {
         return this;
     }
 
+    public FunctionBuilder overriden(boolean overriden) {
+        function.setOverriden(overriden);
+
+        return this;
+    }
+
+    public FunctionBuilder visibility(ILVisibility visibility) {
+        function.setVisibility(visibility);
+
+        return this;
+    }
+
     public StatementBuilder statement() {
         return new StatementBuilder(this);
     }

@@ -37,22 +37,28 @@ public class FunctionCall implements Expression {
 
     private Optional<String> function;
 
-    private ILType returnType;
+    private Optional<Expression> object;
 
     private List<Expression> arguments;
 
-    public FunctionCall(Optional<String> function, ILType returnType, Expression... arguments) {
+    public FunctionCall(Optional<String> function, Optional<Expression> object, Expression... arguments) {
         this.function = function;
-        this.returnType = returnType;
+        this.object = object;
         this.arguments = Arrays.asList(arguments);
     }
 
-    public ILType getReturnType() {
-        return returnType;
+    public FunctionCall(Optional<String> function, Expression... arguments) {
+        this.function = function;
+        this.object = Optional.empty();
+        this.arguments = Arrays.asList(arguments);
     }
 
     public Optional<String> getFunction() {
         return function;
+    }
+
+    public Optional<Expression> getObject() {
+        return object;
     }
 
     public List<Expression> getArguments() {
@@ -67,7 +73,7 @@ public class FunctionCall implements Expression {
     public static class BigIntegerCompare extends FunctionCall {
 
         public BigIntegerCompare(Expression... arguments) {
-            super(Optional.empty(), ILType.INTEGER, arguments);
+            super(Optional.empty(), arguments);
         }
 
         @Override
@@ -80,7 +86,7 @@ public class FunctionCall implements Expression {
     public static class ArrayLength extends FunctionCall {
 
         public ArrayLength(Expression argument) {
-            super(Optional.empty(), ILType.INTEGER, argument);
+            super(Optional.empty(), argument);
         }
 
         @Override
@@ -93,7 +99,7 @@ public class FunctionCall implements Expression {
     public static class BitStringSize extends FunctionCall {
 
         public BitStringSize(Expression argument1, Expression argument2) {
-            super(Optional.empty(), ILType.INTEGER, argument1, argument2);
+            super(Optional.empty(), argument1, argument2);
         }
 
         @Override
@@ -106,7 +112,29 @@ public class FunctionCall implements Expression {
     public static class SetSize extends FunctionCall {
 
         public SetSize(Expression argument) {
-            super(Optional.empty(), ILType.INTEGER, argument);
+            //super(Optional.empty(), ILType.INTEGER, argument);
+            super(Optional.empty(), argument);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
+    }
+
+    public static class ToArray extends FunctionCall {
+
+        private ILType type;
+
+        public ToArray(ILType type, Expression object) {
+            super(Optional.empty(), Optional.of(object));
+
+            this.type = type;
+        }
+
+        public ILType getType() {
+            return type;
         }
 
         @Override

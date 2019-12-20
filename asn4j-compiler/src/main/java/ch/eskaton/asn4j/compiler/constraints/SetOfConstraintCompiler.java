@@ -66,7 +66,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 import static java.util.Collections.singleton;
 
 public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
@@ -128,7 +128,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
                     () -> new CompilerException("Failed to resolve parent class: %s", parentName));
         }
 
-        JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
+        JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(PUBLIC)
                 .returnType(boolean.class).name("doCheckConstraint")
                 .body();
 
@@ -148,6 +148,12 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
         function.build();
 
         javaClass.addModule(ctx, module.build());
+
+        ConstraintDefinition elementDefinition = definition.getElementConstraint();
+
+        if (elementDefinition != null) {
+            ctx.addConstraint(((SetOfType) type).getType(), javaClass, elementDefinition);
+        }
     }
 
     @Override

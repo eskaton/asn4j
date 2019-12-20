@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PackagePrivate;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PACKAGE_PRIVATE;
 import static java.util.Optional.empty;
 
 public class JavaConstructor implements JavaMethod {
@@ -97,7 +97,7 @@ public class JavaConstructor implements JavaMethod {
         int paramCount = 0;
 
         writer.write(StringUtils.concat(prefix, "\t",
-                (visibility == PackagePrivate ? "" : visibility.toString().toLowerCase()), " ", clazz, "("));
+                (visibility == PACKAGE_PRIVATE ? "" : visibility.toString().toLowerCase()), " ", clazz, "("));
 
         for (JavaParameter parameter : parameters) {
             if (paramCount++ > 0) {

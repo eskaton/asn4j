@@ -35,12 +35,13 @@ import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.ILVisibility;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -53,7 +54,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
+import static java.util.Optional.of;
 
 public class NullConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -88,15 +89,19 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        BodyBuilder builder = javaClass.method().annotation(Override.class).modifier(Public)
-                .returnType(boolean.class).name("doCheckConstraint")
-                .body();
-
-        builder.append("return checkConstraintValue(getValue());");
-
-        builder.finish().build();
-
         Module module = new Module();
+
+        // @formatter:off
+        module.function()
+                .name("doCheckConstraint")
+                .overriden(true)
+                .visibility(ILVisibility.PUBLIC)
+                .returnType(ILType.BOOLEAN)
+                .statement()
+                    .returnExpression(new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValue"))))
+                    .build()
+                .build();
+        // @formatter:on
 
         FunctionBuilder function = module.function()
                 .name("checkConstraintValue")

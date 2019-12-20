@@ -40,12 +40,13 @@ import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
 import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.ILVisibility;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -64,9 +65,9 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
 import static ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.Optional.of;
 
 public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -114,15 +115,19 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
         javaClass.addImport(Arrays.class);
 
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
-                .returnType(boolean.class).name("doCheckConstraint")
-                .body();
-
-        builder.append("return checkConstraintValue(getValue());");
-
-        builder.finish().build();
-
         Module module = new Module();
+
+        // @formatter:off
+        module.function()
+                .name("doCheckConstraint")
+                .overriden(true)
+                .visibility(ILVisibility.PUBLIC)
+                .returnType(ILType.BOOLEAN)
+                .statement()
+                    .returnExpression(new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValue"))))
+                    .build()
+                .build();
+        // @formatter:on
 
         FunctionBuilder function = module.function()
                 .name("checkConstraintValue")

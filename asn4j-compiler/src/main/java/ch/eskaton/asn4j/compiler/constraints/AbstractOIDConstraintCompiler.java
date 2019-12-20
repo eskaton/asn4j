@@ -36,12 +36,13 @@ import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.ILVisibility;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -58,8 +59,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
 import static java.util.Collections.singleton;
+import static java.util.Optional.of;
 
 public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNode>
         extends AbstractConstraintCompiler {
@@ -99,15 +100,20 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
         javaClass.addImport(Arrays.class);
 
-        BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
-                .returnType(boolean.class).name("doCheckConstraint")
-                .body();
-
-        builder.append("return checkConstraintValue(getValue().stream().mapToInt(Integer::intValue).toArray());");
-
-        builder.finish().build();
-
         Module module = new Module();
+
+        // @formatter:off
+        module.function()
+                .name("doCheckConstraint")
+                .overriden(true)
+                .visibility(ILVisibility.PUBLIC)
+                .returnType(ILType.BOOLEAN)
+                .statement()
+                    .returnExpression(new FunctionCall(of("checkConstraintValue"),
+                                new FunctionCall.ToArray(ILType.INTEGER,  new FunctionCall(of("getValue")))))
+                    .build()
+                .build();
+        // @formatter:on
 
         FunctionBuilder function = module.function()
                 .name("checkConstraintValue")
