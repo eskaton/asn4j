@@ -39,6 +39,7 @@ import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.SetEquals;
 import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.SetSize;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
@@ -66,8 +67,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 import static java.util.Collections.singleton;
+import static java.util.Optional.of;
 
 public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -128,15 +129,9 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
                     () -> new CompilerException("Failed to resolve parent class: %s", parentName));
         }
 
-        JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(PUBLIC)
-                .returnType(boolean.class).name("doCheckConstraint")
-                .body();
-
-        builder.append("return checkConstraintValue(getValues());");
-
-        builder.finish().build();
-
         Module module = new Module();
+
+        generateDoCheckConstraint(module);
 
         FunctionBuilder function = module.function()
                 .name("checkConstraintValue")
@@ -154,6 +149,10 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
         if (elementDefinition != null) {
             ctx.addConstraint(((SetOfType) type).getType(), javaClass, elementDefinition);
         }
+    }
+
+    protected FunctionCall generateCheckConstraintCall() {
+        return new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValues")));
     }
 
     @Override

@@ -89,17 +89,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
         Module module = new Module();
 
-        // @formatter:off
-        module.function()
-                .name("doCheckConstraint")
-                .overriden(true)
-                .visibility(ILVisibility.PUBLIC)
-                .returnType(ILType.BOOLEAN)
-                .statement()
-                    .returnExpression(new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValue"))))
-                    .build()
-                .build();
-        // @formatter:on
+        generateDoCheckConstraint(module);
 
         FunctionBuilder function = module.function()
                 .name("checkConstraintValue")

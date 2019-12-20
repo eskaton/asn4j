@@ -117,17 +117,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
         Module module = new Module();
 
-        // @formatter:off
-        module.function()
-                .name("doCheckConstraint")
-                .overriden(true)
-                .visibility(ILVisibility.PUBLIC)
-                .returnType(ILType.BOOLEAN)
-                .statement()
-                    .returnExpression(new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValue"))))
-                    .build()
-                .build();
-        // @formatter:on
+        generateDoCheckConstraint(module);
 
         FunctionBuilder function = module.function()
                 .name("checkConstraintValue")
