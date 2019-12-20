@@ -97,8 +97,6 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        javaClass.addImport(Arrays.class);
-
         Module module = new Module();
 
         generateDoCheckConstraint(module);

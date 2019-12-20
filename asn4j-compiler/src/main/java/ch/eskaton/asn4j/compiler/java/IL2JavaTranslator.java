@@ -58,6 +58,7 @@ import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.commons.utils.CollectionUtils;
 import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -175,6 +176,8 @@ public class IL2JavaTranslator {
                         .map(v -> getInitializerString(ctx, ((ILValue) expression).getTypeName().get(), v))
                         .collect(Collectors.joining(", "));
 
+                javaClass.addStaticImport(CollectionUtils.class, "asHashSet");
+
                 return "asHashSet(" + initString + ")";
             }
 
@@ -278,6 +281,8 @@ public class IL2JavaTranslator {
                 String arguments = functionCall.getArguments().stream()
                         .map(expr -> translateExpression(ctx, javaClass, expr))
                         .collect(joining(", "));
+
+                javaClass.addImport(Arrays.class);
 
                 return "Arrays.equals(" + arguments + ")";
             } else if (functionCall instanceof SetEquals) {

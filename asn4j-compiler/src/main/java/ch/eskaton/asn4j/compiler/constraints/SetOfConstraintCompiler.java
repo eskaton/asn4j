@@ -117,8 +117,6 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        javaClass.addStaticImport(CollectionUtils.class, "asHashSet");
-
         String baseName = ASN1SetOf.class.getSimpleName();
         JavaClass parentClass = javaClass;
 

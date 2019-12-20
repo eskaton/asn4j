@@ -112,8 +112,6 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        javaClass.addImport(Arrays.class);
-
         Module module = new Module();
 
         generateDoCheckConstraint(module);

@@ -98,8 +98,6 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        javaClass.addImport(Arrays.class);
-
         Module module = new Module();
 
         generateDoCheckConstraint(module);
