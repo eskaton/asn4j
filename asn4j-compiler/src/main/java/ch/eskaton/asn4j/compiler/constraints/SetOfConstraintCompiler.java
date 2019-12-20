@@ -117,16 +117,6 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        String baseName = ASN1SetOf.class.getSimpleName();
-        JavaClass parentClass = javaClass;
-
-        while (!parentClass.getParent().equals(baseName)) {
-            final String parentName = parentClass.getParent();
-
-            parentClass = ctx.getClass(parentName).orElseThrow(
-                    () -> new CompilerException("Failed to resolve parent class: %s", parentName));
-        }
-
         Module module = new Module();
 
         generateDoCheckConstraint(module);
