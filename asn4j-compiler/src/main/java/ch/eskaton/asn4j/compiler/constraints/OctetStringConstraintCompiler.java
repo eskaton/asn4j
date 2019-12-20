@@ -40,10 +40,8 @@ import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
 import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
-import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.ILVisibility;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
@@ -57,7 +55,6 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,7 +64,6 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBou
 import static ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.Optional.of;
 
 public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -113,8 +109,6 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        javaClass.addImport(Arrays.class);
-
         Module module = new Module();
 
         generateDoCheckConstraint(module);
