@@ -39,6 +39,10 @@ import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.FunctionCall;
+import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILVisibility;
+import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -66,6 +70,7 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
+import static java.util.Optional.of;
 
 public abstract class AbstractConstraintCompiler {
 
@@ -337,6 +342,24 @@ public abstract class AbstractConstraintCompiler {
 
     protected Node optimize(Node node) {
         return node;
+    }
+
+    protected void generateDoCheckConstraint(Module module) {
+        // @formatter:off
+        module.function()
+                .name("doCheckConstraint")
+                .overriden(true)
+                .visibility(ILVisibility.PUBLIC)
+                .returnType(ILType.BOOLEAN)
+                .statement()
+                    .returnExpression(generateCheckConstraintCall())
+                    .build()
+                .build();
+        // @formatter:on
+    }
+
+    protected FunctionCall generateCheckConstraintCall() {
+        return new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValue")));
     }
 
     protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {

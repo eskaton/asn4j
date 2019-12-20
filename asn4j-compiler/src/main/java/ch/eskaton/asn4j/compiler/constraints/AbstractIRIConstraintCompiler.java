@@ -40,7 +40,6 @@ import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.ILVisibility;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
@@ -103,18 +102,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
         Module module = new Module();
 
-        // @formatter:off
-        module.function()
-                .name("doCheckConstraint")
-                .overriden(true)
-                .visibility(ILVisibility.PUBLIC)
-                .returnType(ILType.BOOLEAN)
-                .statement()
-                    .returnExpression(new FunctionCall(of("checkConstraintValue"),
-                                new ToArray(ILType.STRING,  new FunctionCall(of("getValue")))))
-                    .build()
-                .build();
-        // @formatter:on
+        generateDoCheckConstraint(module);
 
         FunctionBuilder function = module.function()
                 .name("checkConstraintValue")
@@ -126,6 +114,12 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
         function.build();
 
         javaClass.addModule(ctx, module.build());
+    }
+
+    @Override
+    protected FunctionCall generateCheckConstraintCall() {
+        return new FunctionCall(of("checkConstraintValue"),
+                new ToArray(ILType.STRING, new FunctionCall(of("getValue"))));
     }
 
     @Override
