@@ -37,8 +37,10 @@ import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.ILVisibility;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
@@ -61,7 +63,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
+import static java.util.Optional.of;
 
 public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -120,15 +122,19 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
 
     @Override
     public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        JavaClass.BodyBuilder builder = javaClass.method().annotation("@Override").modifier(Public)
-                .returnType(boolean.class).name("doCheckConstraint")
-                .body();
-
-        builder.append("return checkConstraintValue(getValue());");
-
-        builder.finish().build();
-
         Module module = new Module();
+
+        // @formatter:off
+        module.function()
+                .name("doCheckConstraint")
+                .overriden(true)
+                .visibility(ILVisibility.PUBLIC)
+                .returnType(ILType.BOOLEAN)
+                .statement()
+                    .returnExpression(new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValue"))))
+                    .build()
+                .build();
+        // @formatter:on
 
         FunctionBuilder function = module.function()
                 .name("checkConstraintValue")

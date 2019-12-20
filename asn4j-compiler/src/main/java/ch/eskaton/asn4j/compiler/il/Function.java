@@ -31,10 +31,17 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+
+import static ch.eskaton.asn4j.compiler.il.ILVisibility.PRIVATE;
 
 public class Function {
 
     private String name;
+
+    private boolean overriden;
+
+    private Optional<ILVisibility> visibility = Optional.empty();
 
     private ILType returnType;
 
@@ -56,6 +63,26 @@ public class Function {
 
     public String getName() {
         return name;
+    }
+
+    public void setOverriden(boolean overriden) {
+        this.overriden = overriden;
+    }
+
+    public boolean isOverriden() {
+        return overriden;
+    }
+
+    public void setVisibility(ILVisibility visibility) {
+        this.visibility = Optional.ofNullable(visibility);
+    }
+
+    public ILVisibility getVisibility() {
+        return visibility.orElse(PRIVATE);
+    }
+
+    public void setParameters(List<Parameter> parameters) {
+        this.parameters = parameters;
     }
 
     public void addStatement(Statement statement) {
@@ -90,5 +117,4 @@ public class Function {
     public String toString() {
         return ToString.get(this);
     }
-
 }

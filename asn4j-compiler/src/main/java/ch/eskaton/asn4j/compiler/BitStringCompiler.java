@@ -37,7 +37,7 @@ import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import java.math.BigInteger;
 import java.util.Collection;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 
 public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
@@ -71,12 +71,12 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
                 msb = value > msb ? value : msb;
 
-                javaClass.field().modifier(Public).asStatic().asFinal().type(int.class).name(fieldName)
+                javaClass.field().modifier(PUBLIC).asStatic().asFinal().type(int.class).name(fieldName)
                         .initializer(String.valueOf(value)).build();
             }
         }
 
-        javaClass.method().modifier(Public).name(name).build();
+        javaClass.method().modifier(PUBLIC).name(name).build();
 
         ConstraintDefinition constraintDef = null;
 

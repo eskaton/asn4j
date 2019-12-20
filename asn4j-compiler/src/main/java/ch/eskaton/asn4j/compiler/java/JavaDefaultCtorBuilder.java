@@ -227,12 +227,12 @@ public class JavaDefaultCtorBuilder {
     }
 
     private JavaVisibility getVisibility(Executable executable) {
-        JavaVisibility visibility = JavaVisibility.PackagePrivate;
+        JavaVisibility visibility = JavaVisibility.PACKAGE_PRIVATE;
 
         if (Modifier.isPublic(executable.getModifiers())) {
-            visibility = JavaVisibility.Public;
+            visibility = JavaVisibility.PUBLIC;
         } else if (Modifier.isProtected(executable.getModifiers())) {
-            visibility = JavaVisibility.Protected;
+            visibility = JavaVisibility.PROTECTED;
         }
 
         return visibility;
@@ -240,7 +240,7 @@ public class JavaDefaultCtorBuilder {
 
     private void createDefaultConstructor(JavaClass parentJavaClass, JavaClass javaClass) {
         List<JavaConstructor> parentCtors = parentJavaClass.getConstructors().stream()
-                .filter(ctor -> !ctor.getVisibility().equals(JavaVisibility.Private))
+                .filter(ctor -> !ctor.getVisibility().equals(JavaVisibility.PRIVATE))
                 .collect(Collectors.toList());
 
         List<JavaConstructor> childCtors = javaClass.getConstructors();

@@ -52,7 +52,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaType.INT;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 import static java.util.Arrays.asList;
 
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, CompiledType> {
@@ -76,14 +76,14 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
             cases.put(value, fieldName);
 
-            javaClass.field().modifier(Public).asStatic().asFinal().type(typeName).name(fieldName)
+            javaClass.field().modifier(PUBLIC).asStatic().asFinal().type(typeName).name(fieldName)
                     .initializer("new " + typeName + "(" + value + ")").build();
         });
 
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, typeName));
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.Protected, typeName,
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, typeName));
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.PROTECTED, typeName,
                 asList(new JavaParameter("int", "value")), Optional.of("\t\tsuper.setValue(value);")));
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.Public, typeName,
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, typeName,
                 asList(new JavaParameter(typeName, "value")), Optional.of("\t\tsuper.setValue(value.getValue());")));
 
         BodyBuilder builder = javaClass.method().asStatic().returnType(typeName).name("valueOf")

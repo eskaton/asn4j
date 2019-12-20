@@ -56,7 +56,7 @@ import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.FINAL;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.IMPORT;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.STATIC;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaDefinitions.THROWS;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -367,7 +367,7 @@ public class JavaClass implements JavaStructure {
 
         protected List<String> annotations = new ArrayList<>();
 
-        protected JavaVisibility visibility = Public;
+        protected JavaVisibility visibility = PUBLIC;
 
         protected boolean isStatic;
 

@@ -27,35 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.il;
 
-import ch.eskaton.asn4j.runtime.utils.ToString;
-
-public class StatementBuilder<B extends Builder & HasStatements> implements Builder<B> {
-
-    private final B builder;
-
-    public StatementBuilder(B builder) {
-        this.builder = builder;
-    }
-
-    public StatementBuilder<B> returnValue(Object value) {
-        builder.addStatement(new ReturnStatement(new ILValue(value)));
-
-        return this;
-    }
-
-    public StatementBuilder<B> returnExpression(Expression expression) {
-        builder.addStatement(new ReturnStatement(expression));
-
-        return this;
-    }
-
-    public B build() {
-        return builder;
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
-    }
-
+public enum ILVisibility {
+    PRIVATE, PROTECTED, PUBLIC
 }

@@ -42,14 +42,18 @@ import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BigIntegerCompare;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BitStringSize;
+import ch.eskaton.asn4j.compiler.il.FunctionCall.SetSize;
+import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.ILVisibility;
 import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.ReturnStatement;
 import ch.eskaton.asn4j.compiler.il.Statement;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -60,21 +64,41 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static ch.eskaton.asn4j.compiler.il.ILType.*;
+import static ch.eskaton.asn4j.compiler.il.ILType.INTEGER;
 import static ch.eskaton.asn4j.compiler.java.JavaUtils.getInitializerString;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Private;
+import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
 
 public class IL2JavaTranslator {
 
+    public JavaVisibility translateVisibility(ILVisibility visibility) {
+        switch (visibility) {
+            case PRIVATE:
+                return JavaVisibility.PRIVATE;
+            case PROTECTED:
+                return JavaVisibility.PROTECTED;
+            case PUBLIC:
+                return JavaVisibility.PUBLIC;
+            default:
+                throw new CompilerException("Unimplemented case: " + visibility);
+        }
+    }
+
     public void translateFunction(CompilerContext ctx, JavaClass javaClass, Function function) {
         JavaClass.MethodBuilder method = javaClass.method()
-                .modifier(Private)
+                .modifier(translateVisibility(function.getVisibility()))
                 .name(function.getName())
                 .returnType(toJavaType(javaClass, function.getReturnType()));
+
+        if (function.isOverriden()) {
+            method.annotation(Override.class);
+        }
 
         for (Parameter parameter : function.getParameters()) {
             method.parameter(toJavaType(javaClass, parameter.getType()), parameter.getName());
@@ -158,34 +182,54 @@ public class IL2JavaTranslator {
         } else if (expression instanceof FunctionCall) {
             FunctionCall functionCall = (FunctionCall) expression;
             String function;
-            String object;
+            Optional<String> object;
             String arguments = "";
 
             if (functionCall instanceof BigIntegerCompare) {
                 function = "compareTo";
-                object = translateArg(ctx, javaClass, functionCall, 0);
+                object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
                 arguments = "BigInteger.valueOf(" + translateArg(ctx, javaClass, functionCall, 1) + ")";
             } else if (functionCall instanceof ArrayLength) {
-                object = translateArg(ctx, javaClass, functionCall, 0);
+                object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
 
-                return object + ".length";
+                return object.get() + ".length";
             } else if (functionCall instanceof BitStringSize) {
                 return "ASN1BitString.getSize(" + translateArg(ctx, javaClass, functionCall, 0) + ", " +
                         translateArg(ctx, javaClass, functionCall, 1) + ")";
-            } else if (functionCall instanceof FunctionCall.SetSize) {
-                object = translateArg(ctx, javaClass, functionCall, 0);
+            } else if (functionCall instanceof SetSize) {
+                object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
                 function = "size";
+            } else if (functionCall instanceof ToArray) {
+                object = ofNullable(translateExpression(ctx, javaClass, functionCall.getObject().get()));
+                function = "toArray";
+                ILType type = ((ToArray) functionCall).getType();
+                String javaType = toJavaType(javaClass, type);
+
+                switch(type) {
+                    case INTEGER:
+                        function = "stream().mapToInt(Integer::intValue)." + function;
+                        break;
+                    case STRING:
+                        arguments = "new " + javaType + "[] {}";
+                        break;
+                    default:
+                        throw new CompilerException("Unsupported type %s in ToString function");
+                }
+
+
+                //getValue().stream().mapToInt(Integer::intValue).toArray()
             } else {
                 function = functionCall.getFunction()
                         .orElseThrow(() -> new CompilerException("Undefined function of type %s",
                                 functionCall.getClass().getSimpleName()));
-                object = translateArg(ctx, javaClass, functionCall, 0);
-                arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 1)
+                object = functionCall.getObject().map(o -> translateExpression(ctx, javaClass, o));
+
+                arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
                         .map(expr -> translateExpression(ctx, javaClass, expr))
                         .collect(joining(", "));
             }
 
-            return object + "." + function + "(" + arguments + ")";
+            return object.map(o -> o + ".").orElse("") + function + "(" + arguments + ")";
         } else {
             throw new CompilerException("Unhandled expression type: %s",
                     expression.getClass().getSimpleName());
@@ -275,6 +319,8 @@ public class IL2JavaTranslator {
                 return int[].class.getSimpleName();
             case SET:
                 return typeWithImport(javaClass, Set.class);
+            case STRING:
+                return String.class.getSimpleName();
             case STRING_ARRAY:
                 return String[].class.getSimpleName();
             default:

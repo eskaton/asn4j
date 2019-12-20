@@ -46,8 +46,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Private;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.Public;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PRIVATE;
+import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 
 public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
@@ -63,7 +63,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         List<String> fieldNames = new ArrayList<>();
         JavaEnum typeEnum = new JavaEnum(CHOICE_ENUM);
 
-        BodyBuilder builder = javaClass.method().modifier(Public).annotation("@Override")
+        BodyBuilder builder = javaClass.method().modifier(PUBLIC).annotation("@Override")
                 .returnType(ASN1Type.class.getSimpleName()).name("getValue").body();
 
         String clearFields = "\t\t" + CLEAR_FIELDS + "();\n";
@@ -116,7 +116,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
     }
 
     private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
-        javaClass.method().modifier(Private).name(CLEAR_FIELDS).body()
+        javaClass.method().modifier(PRIVATE).name(CLEAR_FIELDS).body()
                 .append(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).finish().build();
     }
 

@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.compiler.java.objs;
 
 public enum JavaVisibility {
-    PackagePrivate(""), Private("private"), Protected("protected"), Public("public");
+    PACKAGE_PRIVATE(""), PRIVATE("private"), PROTECTED("protected"), PUBLIC("public");
 
     private final String visibility;
 
