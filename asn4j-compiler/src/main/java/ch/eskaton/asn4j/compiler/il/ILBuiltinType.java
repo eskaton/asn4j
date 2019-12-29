@@ -25,23 +25,8 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.il;
 
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
-
-public class SequenceOfCompiler implements NamedCompiler<SequenceOfType, CompiledType> {
-
-    @Override
-    public CompiledType compile(CompilerContext ctx, String name, SequenceOfType node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
-
-        javaClass.typeParameter(ctx.getTypeParameter(node));
-
-        ctx.finishClass();
-
-        return new CompiledType(node);
-    }
-
+public enum ILBuiltinType {
+    BOOLEAN, BIG_INTEGER, BYTE_ARRAY, INTEGER, INTEGER_ARRAY, NULL, SET, STRING, STRING_ARRAY, CUSTOM
 }

@@ -25,37 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.il;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.runtime.utils.ToString;
+import org.junit.Test;
 
-public class StatementBuilder<B extends Builder & HasStatements> implements Builder<B> {
+import java.util.Arrays;
+import java.util.Collections;
 
-    private final B builder;
+import static org.junit.Assert.assertEquals;
 
-    public StatementBuilder(B builder) {
-        this.builder = builder;
-    }
+public class CompilerUtilsTest {
 
-    public StatementBuilder<B> returnValue(Object value) {
-        builder.addStatement(new ReturnStatement(new ILValue(value)));
-
-        return this;
-    }
-
-    public StatementBuilder<B> returnExpression(Expression expression) {
-        builder.addStatement(new ReturnStatement(expression));
-
-        return this;
-    }
-
-    public B build() {
-        return builder;
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
+    @Test
+    public void testGetTypeParameterString() {
+        assertEquals("", CompilerUtils.getTypeParameterString(Collections.emptyList()));
+        assertEquals("a", CompilerUtils.getTypeParameterString(Arrays.asList("a")));
+        assertEquals("a<b>", CompilerUtils.getTypeParameterString(Arrays.asList("a", "b")));
+        assertEquals("a<b<c>>", CompilerUtils.getTypeParameterString(Arrays.asList("a", "b", "c")));
+        assertEquals("a<b<c<d>>>", CompilerUtils.getTypeParameterString(Arrays.asList("a", "b", "c", "d")));
     }
 
 }

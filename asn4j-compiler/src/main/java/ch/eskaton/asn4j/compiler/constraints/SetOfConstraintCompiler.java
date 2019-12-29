@@ -38,14 +38,15 @@ import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.SetEquals;
-import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.SetSize;
-import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.NegationExpression;
+import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -53,20 +54,21 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
-import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.CUSTOM;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.SET;
 import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 
@@ -116,31 +118,90 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        Module module = new Module();
-
-        generateDoCheckConstraint(module);
-
-        FunctionBuilder function = module.function()
-                .name("checkConstraintValue")
-                .returnType(ILType.BOOLEAN)
-                .parameter(ILType.SET, "value");
-
-        addConstraintCondition(type, definition, function);
-
-        function.build();
-
-        javaClass.addModule(ctx, module.build());
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
+        generateDoCheckConstraint(module, level);
 
         ConstraintDefinition elementDefinition = definition.getElementConstraint();
 
         if (elementDefinition != null) {
-            ctx.addConstraint(((SetOfType) type).getType(), javaClass, elementDefinition);
+            ctx.addConstraint(((SetOfType) type).getType(), module, elementDefinition, level + 1);
+        }
+
+        List<String> typeParameter = ctx.getTypeParameter((Type) ctx.resolveTypeReference(type));
+
+        FunctionBuilder builder = generateCheckConstraintValue(module, level,
+                new Parameter(ILParameterizedType.of(SET, typeParameter), "value"));
+
+        addConstraintCondition(type, typeParameter, definition, builder, level + 1);
+
+        builder.build();
+
+    }
+
+    protected void addConstraintCondition(Type type, List<String> typeParameter, ConstraintDefinition definition,
+            FunctionBuilder builder, int level) {
+        String functionName = "checkConstraintValue_" + level;
+
+        if (definition.isExtensible()) {
+            builder.statements().returnValue(Boolean.TRUE);
+        } else if (!builder.getModule().getFunctions().stream().filter(f -> f.getName().equals(functionName)).findAny()
+                .isPresent()) {
+            addConstraintCondition(type, definition, builder);
+        } else {
+            Node roots = optimize(definition.getRoots());
+            Optional<BooleanExpression> expression = buildExpression(getTypeName(type), roots);
+            Type elementType = ((SetOfType) type).getType();
+            BooleanExpression condition;
+
+            if (elementType instanceof SetOfType) {
+                condition = new NegationExpression(
+                        new FunctionCall(of(functionName), new FunctionCall(of("getValues"), of(new ILValue("obj")))));
+            } else if (elementType instanceof BitString) {
+                condition = new NegationExpression(
+                        new FunctionCall(of(functionName),
+                                new FunctionCall(of("getValue"), of(new ILValue("obj"))),
+                                new FunctionCall(of("getUnusedBits"), of(new ILValue("obj")))));
+            } else {
+                condition = new NegationExpression(
+                        new FunctionCall(of(functionName), new FunctionCall(of("getValue"), of(new ILValue("obj")))));
+            }
+
+            if (expression.isPresent()) {
+                // @formatter:off
+                builder.statements()
+                        .conditions()
+                            .condition(expression.get())
+                                .statements()
+                                    .foreach(new ILParameterizedType(CUSTOM, typeParameter), new Variable("obj"), new Variable("value"))
+                                        .statements()
+                                            .conditions()
+                                                .condition(condition)
+                                                    .statements()
+                                                        .returnValue(Boolean.FALSE)
+                                                        .build()
+                                                    .build()
+                                                .build()
+                                            .build()
+                                        .build()
+                                    .returnValue(Boolean.TRUE)
+                                    .build()
+                                .build()
+                            .condition()
+                                .statements()
+                                    .returnValue(Boolean.FALSE)
+                                    .build()
+                                .build()
+                        .build()
+                    .build();
+                // @formatter:on
+            } else {
+                builder.statements().returnValue(Boolean.TRUE);
+            }
         }
     }
 
-    protected FunctionCall generateCheckConstraintCall() {
-        return new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValues")));
+    protected FunctionCall generateCheckConstraintCall(int level) {
+        return new FunctionCall(of("checkConstraintValue_" + level), new FunctionCall(of("getValues")));
     }
 
     @Override

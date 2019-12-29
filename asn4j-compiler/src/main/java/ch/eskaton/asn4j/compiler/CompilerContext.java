@@ -31,6 +31,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
+import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
@@ -62,6 +63,7 @@ import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
+import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
@@ -724,8 +726,8 @@ public class CompilerContext {
     }
 
 
-    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        constraintCompiler.addConstraint(type, javaClass, definition);
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
+        constraintCompiler.addConstraint(type, module, definition, level);
     }
 
     public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value) {
@@ -884,6 +886,18 @@ public class CompilerContext {
 
     public String getRuntimeType(Class<?> type) {
         return runtimeTypes.get(type.getSimpleName());
+    }
+
+    public List<String> getTypeParameter(Type node) {
+        LinkedList<String> typeNames = new LinkedList<>();
+        Type type = node;
+
+        while (type instanceof CollectionOfType) {
+            type = ((CollectionOfType) type).getType();
+            typeNames.add(getTypeName(type));
+        }
+
+        return typeNames;
     }
 
 }

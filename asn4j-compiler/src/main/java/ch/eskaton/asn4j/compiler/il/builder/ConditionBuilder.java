@@ -25,23 +25,49 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.il.builder;
 
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.Condition;
+import ch.eskaton.asn4j.compiler.il.Statement;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class SequenceOfCompiler implements NamedCompiler<SequenceOfType, CompiledType> {
+public class ConditionBuilder<B extends Builder & HasStatements> implements Builder<ConditionsBuilder>, HasStatements {
+
+    private Condition condition;
+
+    private ConditionsBuilder<B> builder;
+
+    public ConditionBuilder(ConditionsBuilder<B> builder) {
+        this(builder, null);
+    }
+
+    public ConditionBuilder(ConditionsBuilder<B> builder, BooleanExpression expression) {
+        this.builder = builder;
+        this.condition = new Condition();
+
+        condition.setExpression(expression);
+    }
+
+    public StatementBuilder<ConditionBuilder<B>> statements() {
+        return new StatementBuilder<>(this);
+    }
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, SequenceOfType node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
+    public void addStatement(Statement statement) {
+        condition.getStatements().add(statement);
+    }
 
-        javaClass.typeParameter(ctx.getTypeParameter(node));
+    @Override
+    public ConditionsBuilder<B> build() {
+        builder.getConditions().add(condition);
 
-        ctx.finishClass();
+        return builder;
+    }
 
-        return new CompiledType(node);
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

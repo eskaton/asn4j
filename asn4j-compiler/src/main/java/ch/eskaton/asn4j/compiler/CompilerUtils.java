@@ -45,6 +45,12 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode;
 import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CompilerUtils {
@@ -199,6 +205,18 @@ public class CompilerUtils {
 
     public static String formatTypeName(Type type) {
         return (type instanceof NamedType ? ((NamedType) type).getName() : getTypeName(type));
+    }
+
+    public static String getTypeParameterString(Optional<List<String>> typeNames) {
+        return typeNames.map(CompilerUtils::getTypeParameterString).orElse("");
+    }
+
+    public static String getTypeParameterString(List<String> typeNames) {
+        ArrayList<String> reversedTypeNames = new ArrayList<>(typeNames);
+
+        Collections.reverse(reversedTypeNames);
+
+        return reversedTypeNames.stream().reduce("", (s1, s2) -> s1.isEmpty() ? s2 : s2 + "<" + s1 + ">");
     }
 
     public static String formatValue(Value value) {

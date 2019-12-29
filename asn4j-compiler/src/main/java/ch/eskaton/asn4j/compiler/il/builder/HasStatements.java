@@ -25,10 +25,12 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.il;
+package ch.eskaton.asn4j.compiler.il.builder;
+
+import ch.eskaton.asn4j.compiler.il.Statement;
 
 public interface HasStatements {
 
-    HasStatements addStatement(Statement statement);
+    void addStatement(Statement statement);
 
 }

@@ -1,4 +1,4 @@
-package ch.eskaton.asn4j.compiler.il;/*
+/*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
  *
@@ -25,10 +25,10 @@ package ch.eskaton.asn4j.compiler.il;/*
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-public class ConditionStatementBuilder extends StatementBuilder<ConditionBuilder> {
+package ch.eskaton.asn4j.compiler.il.builder;
 
-    public ConditionStatementBuilder(ConditionBuilder builder) {
-        super(builder);
-    }
+public interface Builder<B extends Builder> {
+
+    B build();
 
 }

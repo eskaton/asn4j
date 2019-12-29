@@ -123,7 +123,7 @@ public class ASN1BitString implements ASN1Type, HasConstraint {
         return getSize(value, unusedBits);
     }
 
-    protected static long getSize(byte[] value, int unusedBits) {
+    public static long getSize(byte[] value, int unusedBits) {
         return value.length * 8L - unusedBits;
     }
 

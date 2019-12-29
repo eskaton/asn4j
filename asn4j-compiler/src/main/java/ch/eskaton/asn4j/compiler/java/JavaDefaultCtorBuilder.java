@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
 import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
@@ -145,7 +146,7 @@ public class JavaDefaultCtorBuilder {
 
         classes.stream().forEach(javaClass::addImport);
 
-        List<JavaParameter> parameters = getParameters(ctor, javaClass.getTypeParam());
+        List<JavaParameter> parameters = getParameters(ctor, javaClass.getTypeParameter());
 
         javaCtor.getParameters().addAll(parameters);
 
@@ -155,7 +156,7 @@ public class JavaDefaultCtorBuilder {
         }
     }
 
-    private List<JavaParameter> getParameters(Constructor<?> ctor, String typeParam) {
+    private List<JavaParameter> getParameters(Constructor<?> ctor, Optional<List<String>> typeParameter) {
         MutableInteger n = new MutableInteger(0);
         Class<?>[] parameterClasses = ctor.getParameterTypes();
         Type[] parameterTypes = ctor.getGenericParameterTypes();
@@ -166,7 +167,7 @@ public class JavaDefaultCtorBuilder {
             boolean isVarArgs = i == parameterCount - 1 && ctor.isVarArgs();
             Class<?> clazz = parameterClasses[i];
             Type type = parameterTypes[i];
-            String typeName = getTypeName(type, typeParam, isVarArgs);
+            String typeName = getTypeName(type, typeParameter, isVarArgs);
 
             parameters.add(new JavaParameter(typeName, "arg" + n.increment().getValue(), clazz));
         }
@@ -174,29 +175,29 @@ public class JavaDefaultCtorBuilder {
         return parameters;
     }
 
-    private String getTypeName(Type type, String typeParam, boolean isVarArgs) {
-        return getTypeNameAux(type, typeParam, isVarArgs, 1);
+    private String getTypeName(Type type, Optional<List<String>> typeParameter, boolean isVarArgs) {
+        return getTypeNameAux(type, CompilerUtils.getTypeParameterString(typeParameter), isVarArgs, 1);
     }
 
-    private String getTypeNameAux(Type type, String typeParam, boolean isVarArgs, int level) {
+    private String getTypeNameAux(Type type, String typeParameter, boolean isVarArgs, int level) {
         if (type instanceof GenericArrayType) {
             Type componentType = ((GenericArrayType) type).getGenericComponentType();
-            String typeName = getTypeNameAux(componentType, typeParam, isVarArgs, level + 1);
+            String typeName = getTypeNameAux(componentType, typeParameter, isVarArgs, level + 1);
 
             return getArrayTypeName(isVarArgs, level, typeName);
         } else if (type instanceof TypeVariableImpl) {
-            if ("T".equals(((TypeVariableImpl) type).getName()) && !StringUtils.isEmpty(typeParam)) {
-                return typeParam;
+            if ("T".equals(((TypeVariableImpl) type).getName()) && !StringUtils.isEmpty(typeParameter)) {
+                return typeParameter;
             }
 
             return ((TypeVariableImpl) type).getName();
         } else if (type instanceof ParameterizedType) {
             String typeParameters = Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
-                    .map(t -> getTypeNameAux(t, typeParam, isVarArgs, level + 1)).collect(Collectors.joining(", "));
+                    .map(t -> getTypeNameAux(t, typeParameter, isVarArgs, level + 1)).collect(Collectors.joining(", "));
 
             return ((ParameterizedType) type).getRawType().getTypeName() + "<" + typeParameters + ">";
         } else if (type instanceof Class && ((Class) type).isArray()) {
-            String typeName = getTypeNameAux(((Class) type).getComponentType(), typeParam, isVarArgs, level + 1);
+            String typeName = getTypeNameAux(((Class) type).getComponentType(), typeParameter, isVarArgs, level + 1);
 
             return getArrayTypeName(isVarArgs, level, typeName);
         }

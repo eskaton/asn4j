@@ -25,46 +25,58 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.il;
+package ch.eskaton.asn4j.compiler.il.builder;
 
+import ch.eskaton.asn4j.compiler.il.Expression;
+import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.ReturnStatement;
+import ch.eskaton.asn4j.compiler.il.Statement;
+import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.Objects;
+public class StatementBuilder<B extends Builder & HasStatements> implements Builder<B>, HasStatements {
 
-public class ILType {
+    protected final B builder;
 
-    private ILBuiltinType baseType;
-
-    public ILType(ILBuiltinType baseType) {
-        this.baseType = baseType;
+    public StatementBuilder(B builder) {
+        this.builder = builder;
     }
 
-    public static ILType of(ILBuiltinType baseType) {
-        return new ILType(baseType);
+    public StatementBuilder<B> returnValue(Object value) {
+        builder.addStatement(new ReturnStatement(new ILValue(value)));
+
+        return this;
     }
 
-    public ILBuiltinType getBaseType() {
-        return baseType;
+    public StatementBuilder<B> returnExpression(Expression expression) {
+        builder.addStatement(new ReturnStatement(expression));
+
+        return this;
+    }
+
+    public ForeachBuilder<StatementBuilder<B>> foreach(ILType type, Variable variable, Variable value) {
+        return new ForeachBuilder<>(this, type, variable, value);
+    }
+
+    public ConditionsBuilder<StatementBuilder<B>> conditions() {
+        return new ConditionsBuilder(this);
+    }
+
+    public StatementBuilder<B> statement(Statement statement) {
+        builder.addStatement(statement);
+
+        return this;
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        ILType ilType = (ILType) o;
-
-        return baseType == ilType.baseType;
+    public void addStatement(Statement statement) {
+        builder.addStatement(statement);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(baseType);
+    public B build() {
+        return builder;
     }
 
     @Override

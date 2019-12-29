@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
@@ -93,7 +94,11 @@ public class ConstraintCompiler {
         }
 
         if (constraintDef != null) {
-            compiler.addConstraint(node, javaClass, constraintDef);
+            Module module = new Module();
+
+            compiler.addConstraint(node, module, constraintDef, 1);
+
+            javaClass.addModule(ctx, module);
         }
 
         javaClass.addImport(ConstraintViolatedException.class);
@@ -126,7 +131,7 @@ public class ConstraintCompiler {
         return Optional.of(compilers.get(compiledType.getType().getClass()));
     }
 
-    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
         CompiledType compiledType = ctx.getCompiledBaseType(type);
         Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
 
@@ -136,7 +141,7 @@ public class ConstraintCompiler {
 
         AbstractConstraintCompiler compiler = maybeCompiler.get();
 
-        compiler.addConstraint(type, javaClass, definition);
+        compiler.addConstraint(type, module, definition, level);
     }
 
 }

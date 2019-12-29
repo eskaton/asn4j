@@ -29,46 +29,50 @@ package ch.eskaton.asn4j.compiler.il;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class ConditionBuilder implements Builder<ConditionsBuilder>, HasStatements {
+import java.util.Deque;
+import java.util.List;
+import java.util.Objects;
 
-    private ConditionsBuilder builder;
+public class ILParameterizedType extends ILType {
 
-    private Condition condition;
+    private List<String> typeParameter;
 
-    public ConditionBuilder(ConditionsBuilder builder, BooleanExpression expression) {
-        this.builder = builder;
-        this.condition = new Condition();
+    public ILParameterizedType(ILBuiltinType baseType, List<String> typeParameter) {
+        super(baseType);
 
-        if (expression != null) {
-            condition.setExpression(expression);
-        }
+        this.typeParameter = typeParameter;
     }
 
-    public ConditionBuilder(ConditionsBuilder builder) {
-        this(builder, null);
+    public static ILParameterizedType of(ILBuiltinType baseType, List<String> typeParameter) {
+        return new ILParameterizedType(baseType, typeParameter);
     }
 
-    public ConditionBuilder check(BooleanExpression expression) {
-        condition.setExpression(expression);
-
-        return this;
-    }
-
-    public StatementBuilder<ConditionBuilder> statements() {
-        return new StatementBuilder<>(this);
+    public List<String> getTypeParameter() {
+        return typeParameter;
     }
 
     @Override
-    public ConditionBuilder addStatement(Statement statement) {
-        condition.getStatements().add(statement);
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
 
-        return this;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        ILParameterizedType that = (ILParameterizedType) o;
+
+        return Objects.equals(typeParameter, that.typeParameter);
     }
 
-    public ConditionsBuilder build() {
-        builder.conditions.add(condition);
-
-        return builder;
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), typeParameter);
     }
 
     @Override

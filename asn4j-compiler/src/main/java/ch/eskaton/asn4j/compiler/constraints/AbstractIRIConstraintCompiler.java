@@ -35,14 +35,15 @@ import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
-import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
+import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -53,12 +54,12 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING_ARRAY;
 import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 
@@ -97,27 +98,21 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     }
 
     @Override
-    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        Module module = new Module();
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
+        generateDoCheckConstraint(module, level);
 
-        generateDoCheckConstraint(module);
+        FunctionBuilder builder = generateCheckConstraintValue(module, level,
+                new Parameter(ILType.of(STRING_ARRAY), "value"));
 
-        FunctionBuilder function = module.function()
-                .name("checkConstraintValue")
-                .returnType(ILType.BOOLEAN)
-                .parameter(ILType.STRING_ARRAY, "value");
+        addConstraintCondition(type, definition, builder);
 
-        addConstraintCondition(type, definition, function);
-
-        function.build();
-
-        javaClass.addModule(ctx, module.build());
+        builder.build();
     }
 
     @Override
-    protected FunctionCall generateCheckConstraintCall() {
-        return new FunctionCall(of("checkConstraintValue"),
-                new ToArray(ILType.STRING, new FunctionCall(of("getValue"))));
+    protected FunctionCall generateCheckConstraintCall(int level) {
+        return new FunctionCall(of("checkConstraintValue_" + level),
+                new ToArray(ILType.of(ILBuiltinType.STRING), new FunctionCall(of("getValue"))));
     }
 
     @Override
