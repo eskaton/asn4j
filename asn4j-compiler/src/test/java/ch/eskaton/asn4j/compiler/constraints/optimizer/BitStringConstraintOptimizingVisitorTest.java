@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
-import ch.eskaton.asn4j.compiler.constraints.optimizer.BitStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import org.junit.Test;
 
@@ -41,7 +40,6 @@ import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.compleme
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.range;
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.size;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static ch.eskaton.commons.utils.CollectionUtils.asLinkedList;

@@ -5,7 +5,6 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;

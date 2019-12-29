@@ -74,10 +74,15 @@ import static java.util.Optional.of;
 
 public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
+    private static final String VALUE = "value";
+
+    private static final String OBJ = "obj";
+
     public SetOfConstraintCompiler(CompilerContext ctx) {
         super(ctx);
     }
 
+    @Override
     ConstraintDefinition compileConstraints(CompiledType baseType, List<Constraint> constraints,
             Optional<Bounds> bounds) {
         ConstraintDefinition constraintDef = super.compileConstraints(baseType, constraints, bounds);
@@ -130,7 +135,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
         List<String> typeParameter = ctx.getTypeParameter((Type) ctx.resolveTypeReference(type));
 
         FunctionBuilder builder = generateCheckConstraintValue(module, level,
-                new Parameter(ILParameterizedType.of(SET, typeParameter), "value"));
+                new Parameter(ILParameterizedType.of(SET, typeParameter), VALUE));
 
         addConstraintCondition(type, typeParameter, definition, builder, level + 1);
 
@@ -144,8 +149,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
         if (definition.isExtensible()) {
             builder.statements().returnValue(Boolean.TRUE);
-        } else if (!builder.getModule().getFunctions().stream().filter(f -> f.getName().equals(functionName)).findAny()
-                .isPresent()) {
+        } else if (builder.getModule().getFunctions().stream().noneMatch(f -> f.getName().equals(functionName))) {
             addConstraintCondition(type, definition, builder);
         } else {
             Node roots = optimize(definition.getRoots());
@@ -155,15 +159,15 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
 
             if (elementType instanceof SetOfType) {
                 condition = new NegationExpression(
-                        new FunctionCall(of(functionName), new FunctionCall(of("getValues"), of(new ILValue("obj")))));
+                        new FunctionCall(of(functionName), new FunctionCall(of("getValues"), of(new ILValue(OBJ)))));
             } else if (elementType instanceof BitString) {
                 condition = new NegationExpression(
                         new FunctionCall(of(functionName),
-                                new FunctionCall(of("getValue"), of(new ILValue("obj"))),
-                                new FunctionCall(of("getUnusedBits"), of(new ILValue("obj")))));
+                                new FunctionCall(of("getValue"), of(new ILValue(OBJ))),
+                                new FunctionCall(of("getUnusedBits"), of(new ILValue(OBJ)))));
             } else {
                 condition = new NegationExpression(
-                        new FunctionCall(of(functionName), new FunctionCall(of("getValue"), of(new ILValue("obj")))));
+                        new FunctionCall(of(functionName), new FunctionCall(of("getValue"), of(new ILValue(OBJ)))));
             }
 
             if (expression.isPresent()) {
@@ -172,7 +176,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
                         .conditions()
                             .condition(expression.get())
                                 .statements()
-                                    .foreach(new ILParameterizedType(CUSTOM, typeParameter), new Variable("obj"), new Variable("value"))
+                                    .foreach(new ILParameterizedType(CUSTOM, typeParameter), new Variable(OBJ), new Variable(VALUE))
                                         .statements()
                                             .conditions()
                                                 .condition(condition)
@@ -200,6 +204,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
+    @Override
     protected FunctionCall generateCheckConstraintCall(int level) {
         return new FunctionCall(of("checkConstraintValue_" + level), new FunctionCall(of("getValues")));
     }
@@ -248,7 +253,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private BooleanExpression buildExpression(String typeName, CollectionOfValue value) {
-        return new SetEquals(new Variable("value"), new ILValue(typeName, value));
+        return new SetEquals(new Variable(VALUE), new ILValue(typeName, value));
     }
 
     private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
@@ -270,7 +275,7 @@ public class SetOfConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        return new BinaryBooleanExpression(operator, new SetSize(new Variable("value")), new ILValue(value));
+        return new BinaryBooleanExpression(operator, new SetSize(new Variable(VALUE)), new ILValue(value));
     }
 
 }

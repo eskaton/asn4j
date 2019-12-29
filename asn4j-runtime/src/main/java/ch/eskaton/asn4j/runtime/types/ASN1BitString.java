@@ -36,7 +36,6 @@ import ch.eskaton.commons.utils.HexDump;
 import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)

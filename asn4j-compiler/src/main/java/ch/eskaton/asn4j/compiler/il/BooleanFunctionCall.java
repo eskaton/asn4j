@@ -34,7 +34,6 @@ import java.util.Optional;
 public class BooleanFunctionCall extends FunctionCall implements BooleanExpression {
 
     public BooleanFunctionCall(Optional<String> function, Expression... arguments) {
-        //super(function, ILType.BOOLEAN, arguments);
         super(function, arguments);
     }
 

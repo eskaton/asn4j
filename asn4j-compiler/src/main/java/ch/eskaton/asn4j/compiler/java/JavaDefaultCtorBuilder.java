@@ -206,7 +206,7 @@ public class JavaDefaultCtorBuilder {
     }
 
     private String getArrayTypeName(boolean isVarArgs, int level, String typeName) {
-        if (level == 1 & isVarArgs) {
+        if (level == 1 && isVarArgs) {
             return typeName + "...";
         } else {
             return typeName + "[]";
@@ -224,7 +224,7 @@ public class JavaDefaultCtorBuilder {
     }
 
     private List<String> getParameterTypes(JavaConstructor javaCtor) {
-        return javaCtor.getParameters().stream().map(p -> p.getType()).collect(Collectors.toList());
+        return javaCtor.getParameters().stream().map(JavaParameter::getType).collect(Collectors.toList());
     }
 
     private JavaVisibility getVisibility(Executable executable) {

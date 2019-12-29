@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.il;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.Deque;
 import java.util.List;
 import java.util.Objects;
 

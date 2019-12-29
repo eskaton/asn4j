@@ -174,14 +174,13 @@ public class BERDecoder implements Decoder {
     }
 
     private Class toClass(Type type) {
-        Class clazz = null;
-
         if (type instanceof ParameterizedType) {
-            clazz = (Class) ((ParameterizedType) type).getRawType();
+            return (Class) ((ParameterizedType) type).getRawType();
         } else if (type instanceof Class) {
-            clazz = (Class) type;
+            return (Class) type;
+        } else {
+            throw new DecodingException("Unsupported type: " + type);
         }
-        return clazz;
     }
 
     private <T extends ASN1Type> DecodingResult<T> decodeChoice(Class<T> type, DecoderStates states) {

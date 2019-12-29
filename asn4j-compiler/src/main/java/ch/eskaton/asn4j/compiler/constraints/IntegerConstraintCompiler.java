@@ -37,13 +37,13 @@ import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerValueBoundsVisitor
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BigIntegerCompare;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -140,7 +140,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
                 Optional<List<BooleanExpression>> maybeExpressions =
                         Optional.of(range.stream().map(this::buildExpression).collect(Collectors.toList()));
 
-                if (maybeExpressions.isPresent()) {
+                if (!maybeExpressions.get().isEmpty()) {
                     return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, maybeExpressions.get()));
                 }
 
