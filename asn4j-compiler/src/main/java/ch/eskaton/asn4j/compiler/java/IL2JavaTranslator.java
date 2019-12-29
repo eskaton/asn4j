@@ -215,9 +215,7 @@ public class IL2JavaTranslator {
                 object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
                 arguments = "BigInteger.valueOf(" + translateArg(ctx, javaClass, functionCall, 1) + ")";
             } else if (functionCall instanceof ArrayLength) {
-                object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
-
-                return object.get() + ".length";
+                return translateArg(ctx, javaClass, functionCall, 0) + ".length";
             } else if (functionCall instanceof BitStringSize) {
                 return "ASN1BitString.getSize(" + translateArg(ctx, javaClass, functionCall, 0) + ", " +
                         translateArg(ctx, javaClass, functionCall, 1) + ")";
@@ -225,7 +223,8 @@ public class IL2JavaTranslator {
                 object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
                 function = "size";
             } else if (functionCall instanceof ToArray) {
-                object = ofNullable(translateExpression(ctx, javaClass, functionCall.getObject().get()));
+                object = ofNullable(translateExpression(ctx, javaClass,
+                        functionCall.getObject().orElseThrow(() -> new CompilerException("object must not be null"))));
                 function = "toArray";
                 ILType type = ((ToArray) functionCall).getType();
                 String javaType = toJavaType(javaClass, type);

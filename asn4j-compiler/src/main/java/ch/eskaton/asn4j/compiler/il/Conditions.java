@@ -33,7 +33,7 @@ import java.util.List;
 
 public class Conditions implements Statement {
 
-    public List<Condition> conditions;
+    protected List<Condition> conditions;
 
     public Conditions(List<Condition> conditions) {
         this.conditions = conditions;

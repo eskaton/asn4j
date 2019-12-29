@@ -29,11 +29,9 @@ package ch.eskaton.asn4j.compiler.constraints.optimizer;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
-import ch.eskaton.asn4j.compiler.constraints.optimizer.EnumeratedTypeConstraintOptimizingVisitor;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.complement;
-import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.enumValue;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;

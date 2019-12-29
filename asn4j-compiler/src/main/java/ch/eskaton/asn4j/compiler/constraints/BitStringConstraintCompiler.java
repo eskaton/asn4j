@@ -38,7 +38,6 @@ import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BitStringSize;
 import ch.eskaton.asn4j.compiler.il.ILType;
@@ -46,6 +45,7 @@ import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -72,6 +72,10 @@ import static java.util.Optional.of;
 public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
     private static final SizeBoundsVisitor BOUNDS_VISITOR = new SizeBoundsVisitor();
+
+    private static final String UNUSED_BITS = "unusedBits";
+
+    private static final String VALUE = "value";
 
     public BitStringConstraintCompiler(CompilerContext ctx) {
         super(ctx);
@@ -117,7 +121,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         generateDoCheckConstraint(module, level);
 
         FunctionBuilder function = generateCheckConstraintValue(module, level,
-                new Parameter(ILType.of(BYTE_ARRAY), "value"), new Parameter(ILType.of(INTEGER), "unusedBits"));
+                new Parameter(ILType.of(BYTE_ARRAY), VALUE), new Parameter(ILType.of(INTEGER), UNUSED_BITS));
 
         addConstraintCondition(type, definition, function);
 
@@ -159,13 +163,13 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private BooleanExpression buildExpression(BitStringValue value) {
-        new ArrayEquals(new ILValue(value.getByteValue()), new Variable("value"));
-        new BinaryBooleanExpression(BinaryOperator.EQ, new ILValue(value.getUnusedBits()), new Variable("unusedBits"));
+        new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VALUE));
+        new BinaryBooleanExpression(BinaryOperator.EQ, new ILValue(value.getUnusedBits()), new Variable(UNUSED_BITS));
 
         return new BinaryBooleanExpression(BinaryOperator.AND,
-                new ArrayEquals(new ILValue(value.getByteValue()), new Variable("value")),
+                new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VALUE)),
                 new BinaryBooleanExpression(BinaryOperator.EQ, new ILValue(value.getUnusedBits()),
-                        new Variable("unusedBits")));
+                        new Variable(UNUSED_BITS)));
     }
 
     private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
@@ -188,7 +192,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
     private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
         return new BinaryBooleanExpression(operator,
-                new BitStringSize(new Variable("value"), new Variable("unusedBits")), new ILValue(value));
+                new BitStringSize(new Variable(VALUE), new Variable(UNUSED_BITS)), new ILValue(value));
     }
 
 }

@@ -39,12 +39,12 @@ import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
-import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -69,6 +69,8 @@ import static java.util.Collections.singletonList;
 public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
     private static final SizeBoundsVisitor BOUNDS_VISITOR = new SizeBoundsVisitor();
+
+    private static final String VALUE = "value";
 
     public OctetStringConstraintCompiler(CompilerContext ctx) {
         super(ctx);
@@ -113,7 +115,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         generateDoCheckConstraint(module, level);
 
         FunctionBuilder builder = generateCheckConstraintValue(module, level,
-                new Parameter(ILType.of(BYTE_ARRAY), "value"));
+                new Parameter(ILType.of(BYTE_ARRAY), VALUE));
 
         addConstraintCondition(type, definition, builder);
 
@@ -148,7 +150,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private BooleanExpression buildExpression2(OctetStringValue value) {
-        return new ArrayEquals(new ILValue(value.getByteValue()), new Variable("value"));
+        return new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VALUE));
     }
 
     private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
@@ -170,7 +172,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        return new BinaryBooleanExpression(operator, new ArrayLength(new Variable("value")), new ILValue(value));
+        return new BinaryBooleanExpression(operator, new ArrayLength(new Variable(VALUE)), new ILValue(value));
     }
 
 }

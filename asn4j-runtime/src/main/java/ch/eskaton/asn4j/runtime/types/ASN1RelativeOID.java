@@ -30,7 +30,6 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 

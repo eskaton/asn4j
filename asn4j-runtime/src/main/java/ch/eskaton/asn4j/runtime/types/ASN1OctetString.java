@@ -34,7 +34,6 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.utils.HexDump;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 4, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1OctetString implements ASN1Type, HasConstraint {
