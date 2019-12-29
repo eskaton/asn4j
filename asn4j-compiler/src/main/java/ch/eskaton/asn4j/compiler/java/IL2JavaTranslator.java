@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
@@ -36,7 +37,9 @@ import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.SetEquals;
 import ch.eskaton.asn4j.compiler.il.Condition;
 import ch.eskaton.asn4j.compiler.il.Conditions;
+import ch.eskaton.asn4j.compiler.il.Declaration;
 import ch.eskaton.asn4j.compiler.il.Expression;
+import ch.eskaton.asn4j.compiler.il.Foreach;
 import ch.eskaton.asn4j.compiler.il.Function;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
@@ -44,6 +47,7 @@ import ch.eskaton.asn4j.compiler.il.FunctionCall.BigIntegerCompare;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BitStringSize;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.SetSize;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
+import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.ILVisibility;
@@ -70,8 +74,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static ch.eskaton.asn4j.compiler.il.ILType.*;
-import static ch.eskaton.asn4j.compiler.il.ILType.INTEGER;
 import static ch.eskaton.asn4j.compiler.java.JavaUtils.getInitializerString;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.joining;
@@ -129,7 +131,8 @@ public class IL2JavaTranslator {
                 }
 
                 if (condition.getExpression() != null) {
-                    code.append("if (").append(translateBooleanExpression(ctx, javaClass, condition.getExpression())).append(") {");
+                    code.append("if (").append(translateBooleanExpression(ctx, javaClass, condition.getExpression()))
+                            .append(") {");
                 } else {
                     code.append("{");
                 }
@@ -142,8 +145,27 @@ public class IL2JavaTranslator {
             }
 
             return code.toString();
+        } else if (statement instanceof Foreach) {
+            Foreach foreach = (Foreach) statement;
+            Declaration declaration = foreach.getDeclaration();
+            Expression expression = foreach.getExpresssion();
+            StringBuilder code = new StringBuilder();
+
+            code.append("for (")
+                    .append(toJavaType(javaClass, declaration.getType()))
+                    .append(" ")
+                    .append(declaration.getVariable().getName())
+                    .append(" : ")
+                    .append(translateExpression(ctx, javaClass, expression))
+                    .append(") {");
+
+            foreach.getStatements().stream().forEach(stmt -> code.append(translateStatement(ctx, javaClass, stmt)));
+
+            code.append("}");
+
+            return code.toString();
         } else {
-            throw new CompilerException("Unhandled statement type: %s",
+            throw new CompilerException("Unhandled statements type: %s",
                     statement.getClass().getSimpleName());
         }
     }
@@ -208,7 +230,7 @@ public class IL2JavaTranslator {
                 ILType type = ((ToArray) functionCall).getType();
                 String javaType = toJavaType(javaClass, type);
 
-                switch(type) {
+                switch (type.getBaseType()) {
                     case INTEGER:
                         function = "stream().mapToInt(Integer::intValue)." + function;
                         break;
@@ -218,9 +240,6 @@ public class IL2JavaTranslator {
                     default:
                         throw new CompilerException("Unsupported type %s in ToString function");
                 }
-
-
-                //getValue().stream().mapToInt(Integer::intValue).toArray()
             } else {
                 function = functionCall.getFunction()
                         .orElseThrow(() -> new CompilerException("Undefined function of type %s",
@@ -273,7 +292,8 @@ public class IL2JavaTranslator {
                     .map(expr -> translateExpression(ctx, javaClass, expr))
                     .collect(Collectors.joining(operator)) + ")";
         } else if (booleanExpression instanceof NegationExpression) {
-            return "(!(" + translateExpression(ctx, javaClass, ((NegationExpression) booleanExpression).getExpression()) + "))";
+            return "(!(" + translateExpression(ctx, javaClass,
+                    ((NegationExpression) booleanExpression).getExpression()) + "))";
         } else if (booleanExpression instanceof BooleanFunctionCall) {
             BooleanFunctionCall functionCall = (BooleanFunctionCall) booleanExpression;
 
@@ -309,7 +329,7 @@ public class IL2JavaTranslator {
     }
 
     private String toJavaType(JavaClass javaClass, ILType type) {
-        switch (type) {
+        switch (type.getBaseType()) {
             case BOOLEAN:
                 return boolean.class.getSimpleName();
             case BIG_INTEGER:
@@ -323,14 +343,25 @@ public class IL2JavaTranslator {
             case INTEGER_ARRAY:
                 return int[].class.getSimpleName();
             case SET:
-                return typeWithImport(javaClass, Set.class);
+                return typeWithImport(javaClass, Set.class) + getTypeParameter(type);
             case STRING:
                 return String.class.getSimpleName();
             case STRING_ARRAY:
                 return String[].class.getSimpleName();
+            case CUSTOM:
+                return getTypeString((ILParameterizedType) type);
             default:
                 throw new CompilerException("Unimplemented case: " + type);
         }
+    }
+
+    private String getTypeParameter(ILType type) {
+        return type instanceof ILParameterizedType ?
+                "<" + getTypeString((ILParameterizedType) type) + ">" : "";
+    }
+
+    private String getTypeString(ILParameterizedType type) {
+        return CompilerUtils.getTypeParameterString(type.getTypeParameter());
     }
 
     private String typeWithImport(JavaClass javaClass, Class<?> clazz) {

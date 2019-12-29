@@ -36,14 +36,12 @@ import ch.eskaton.asn4j.compiler.constraints.optimizer.EnumeratedTypeConstraintO
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
-import ch.eskaton.asn4j.compiler.il.FunctionCall;
+import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.ILVisibility;
 import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.EnumerationItems;
@@ -63,7 +61,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.of;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER;
 
 public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -121,21 +119,15 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     }
 
     @Override
-    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        Module module = new Module();
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
+        generateDoCheckConstraint(module, level);
 
-        generateDoCheckConstraint(module);
+        FunctionBuilder builder = generateCheckConstraintValue(module, level,
+                new Parameter(ILType.of(INTEGER), "value"));
 
-        FunctionBuilder function = module.function()
-                .name("checkConstraintValue")
-                .returnType(ILType.BOOLEAN)
-                .parameter(ILType.INTEGER, "value");
+        addConstraintCondition(type, definition, builder);
 
-        addConstraintCondition(type, definition, function);
-
-        function.build();
-
-        javaClass.addModule(ctx, module.build());
+        builder.build();
     }
 
     @Override

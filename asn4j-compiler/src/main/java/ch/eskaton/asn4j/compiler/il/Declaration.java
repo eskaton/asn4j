@@ -25,23 +25,32 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.il;
 
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class SequenceOfCompiler implements NamedCompiler<SequenceOfType, CompiledType> {
+public class Declaration implements Statement {
+
+    private ILType type;
+
+    private Variable variable;
+
+    public Declaration(ILType type, Variable variable) {
+        this.type = type;
+        this.variable = variable;
+    }
+
+    public ILType getType() {
+        return type;
+    }
+
+    public Variable getVariable() {
+        return variable;
+    }
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, SequenceOfType node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
-
-        javaClass.typeParameter(ctx.getTypeParameter(node));
-
-        ctx.finishClass();
-
-        return new CompiledType(node);
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

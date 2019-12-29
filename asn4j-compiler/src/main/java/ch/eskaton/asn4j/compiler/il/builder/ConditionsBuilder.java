@@ -25,74 +25,48 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.il;
+package ch.eskaton.asn4j.compiler.il.builder;
 
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.Condition;
+import ch.eskaton.asn4j.compiler.il.Conditions;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class FunctionBuilder implements Builder<Module>, HasStatements {
+import java.util.LinkedList;
+import java.util.List;
 
-    private final Module module;
+public class ConditionsBuilder<B extends Builder & HasStatements> implements Builder<B> {
 
-    private Function function;
+    private B builder;
 
-    public FunctionBuilder(Module module) {
-        this.module = module;
-        this.function = new Function();
+    private List<Condition> conditions = new LinkedList<>();
+
+    public ConditionsBuilder(B builder) {
+        this.builder = builder;
     }
 
-    public FunctionBuilder name(String name) {
-        function.setName(name);
-
-        return this;
+    public ConditionBuilder<B> condition() {
+        return condition(null);
     }
 
-    public FunctionBuilder overriden(boolean overriden) {
-        function.setOverriden(overriden);
-
-        return this;
+    public ConditionBuilder<B> condition(BooleanExpression expression) {
+        return new ConditionBuilder<>(this, expression);
     }
 
-    public FunctionBuilder visibility(ILVisibility visibility) {
-        function.setVisibility(visibility);
-
-        return this;
-    }
-
-    public StatementBuilder statement() {
-        return new StatementBuilder(this);
+    List<Condition> getConditions() {
+        return conditions;
     }
 
     @Override
-    public Module build() {
-        module.addFunction(function);
+    public B build() {
+        builder.addStatement(new Conditions(conditions));
 
-        return module;
-    }
-
-    public FunctionBuilder returnType(ILType type) {
-        function.setReturnType(type);
-
-        return this;
-    }
-
-    public FunctionBuilder parameter(ILType type, String name) {
-        function.addParameter(new Parameter(type, name));
-
-        return this;
-    }
-
-    public FunctionBuilder addStatement(Statement statement) {
-        function.addStatement(statement);
-
-        return this;
-    }
-
-    public ConditionsBuilder conditions() {
-        return new ConditionsBuilder(this);
+        return builder;
     }
 
     @Override
     public String toString() {
         return ToString.get(this);
     }
+
 }

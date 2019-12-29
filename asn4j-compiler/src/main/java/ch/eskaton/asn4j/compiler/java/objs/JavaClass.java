@@ -46,8 +46,11 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -94,7 +97,7 @@ public class JavaClass implements JavaStructure {
 
     private boolean constructed;
 
-    private String typeParam;
+    private Optional<List<String>> typeParameter = Optional.empty();
 
     public JavaClass(String pkg, String name, Tag tag, ASN1Tag.Mode mode, boolean constructed, String parent) {
         this.pkg = pkg;
@@ -125,12 +128,12 @@ public class JavaClass implements JavaStructure {
         this.interf = interf;
     }
 
-    public void setTypeParam(String typeParam) {
-        this.typeParam = typeParam;
+    public void typeParameter(List<String> typeParameter) {
+        this.typeParameter = Optional.ofNullable(typeParameter);
     }
 
-    public String getTypeParam() {
-        return typeParam;
+    public Optional<List<String>> getTypeParameter() {
+        return typeParameter.map(LinkedList::new);
     }
 
     public void addImport(Class<?> clazz) {
@@ -305,8 +308,8 @@ public class JavaClass implements JavaStructure {
 
         clazzDeclaration.add("class");
         clazzDeclaration.add(name);
-        clazzDeclaration.add(parent != null ? "extends " + parent +
-                (typeParam != null ? "<" + typeParam + ">" : "") : "");
+        clazzDeclaration.add(parent != null ? "extends " + parent + typeParameter
+                .map(p -> "<" + CompilerUtils.getTypeParameterString(p) + ">").orElse("") : "");
 
         writer.write(StringUtils.concat(StringUtils.join(clazzDeclaration, " "),
                 (interf != null ? " implements " + interf : ""), " {\n\n"));

@@ -25,23 +25,41 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.il;
 
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class SequenceOfCompiler implements NamedCompiler<SequenceOfType, CompiledType> {
+import java.util.List;
+
+public class Foreach implements Statement {
+
+    private Declaration declaration;
+
+    private Expression expresssion;
+
+    private List<Statement> statements;
+
+    public Foreach(Declaration declaration, Expression expression, List<Statement> statements) {
+        this.declaration = declaration;
+        this.expresssion = expression;
+        this.statements = statements;
+    }
+
+    public Declaration getDeclaration() {
+        return declaration;
+    }
+
+    public Expression getExpresssion() {
+        return expresssion;
+    }
+
+    public List<Statement> getStatements() {
+        return statements;
+    }
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, SequenceOfType node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
-
-        javaClass.typeParameter(ctx.getTypeParameter(node));
-
-        ctx.finishClass();
-
-        return new CompiledType(node);
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

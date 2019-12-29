@@ -38,14 +38,14 @@ import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BitStringSize;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -56,7 +56,6 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,6 +63,8 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
 import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BYTE_ARRAY;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
@@ -93,7 +94,8 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
             try {
                 // TODO: implement a more convenient resolver
-                BitStringValue bitStringValue = ctx.resolveGenericValue(BitStringValue.class, baseType.getType(), value);
+                BitStringValue bitStringValue = ctx
+                        .resolveGenericValue(BitStringValue.class, baseType.getType(), value);
 
                 return new BitStringValueNode(singletonList(bitStringValue));
             } catch (Exception e) {
@@ -111,27 +113,20 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(Type type, JavaClass javaClass, ConstraintDefinition definition) {
-        Module module = new Module();
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
+        generateDoCheckConstraint(module, level);
 
-        generateDoCheckConstraint(module);
-
-        FunctionBuilder function = module.function()
-                .name("checkConstraintValue")
-                .returnType(ILType.BOOLEAN)
-                .parameter(ILType.BYTE_ARRAY, "value")
-                .parameter(ILType.INTEGER, "unusedBits");
+        FunctionBuilder function = generateCheckConstraintValue(module, level,
+                new Parameter(ILType.of(BYTE_ARRAY), "value"), new Parameter(ILType.of(INTEGER), "unusedBits"));
 
         addConstraintCondition(type, definition, function);
 
         function.build();
-
-        javaClass.addModule(ctx, module.build());
     }
 
     @Override
-    protected FunctionCall generateCheckConstraintCall() {
-        return new FunctionCall(of("checkConstraintValue"),
+    protected FunctionCall generateCheckConstraintCall(int level) {
+        return new FunctionCall(of("checkConstraintValue_" + 1),
                 new FunctionCall(of("getValue")), new FunctionCall(of("getUnusedBits")));
     }
 

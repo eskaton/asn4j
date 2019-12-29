@@ -112,7 +112,6 @@ public class FunctionCall implements Expression {
     public static class SetSize extends FunctionCall {
 
         public SetSize(Expression argument) {
-            //super(Optional.empty(), ILType.INTEGER, argument);
             super(Optional.empty(), argument);
         }
 

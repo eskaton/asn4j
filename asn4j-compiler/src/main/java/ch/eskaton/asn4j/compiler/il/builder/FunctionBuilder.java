@@ -25,36 +25,81 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.il;
+package ch.eskaton.asn4j.compiler.il.builder;
 
+import ch.eskaton.asn4j.compiler.il.Function;
+import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.ILVisibility;
+import ch.eskaton.asn4j.compiler.il.Module;
+import ch.eskaton.asn4j.compiler.il.Parameter;
+import ch.eskaton.asn4j.compiler.il.Statement;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.LinkedList;
-import java.util.List;
+public class FunctionBuilder implements Builder<Module>, HasStatements {
 
-public class ConditionsBuilder implements Builder<FunctionBuilder> {
+    private Module module;
 
-    private FunctionBuilder builder;
+    private Function function;
 
-    public List<Condition> conditions;
-
-    public ConditionsBuilder(FunctionBuilder builder) {
-        this.conditions = new LinkedList<>();
-        this.builder = builder;
+    public FunctionBuilder(Module module) {
+        this.module = module;
+        this.function = new Function();
     }
 
-    public ConditionBuilder condition(BooleanExpression expression) {
-        return new ConditionBuilder(this, expression);
+    public Module getModule() {
+        return module;
     }
 
-    public ConditionBuilder condition() {
-        return new ConditionBuilder(this);
+    public FunctionBuilder name(String name) {
+        function.setName(name);
+
+        return this;
+    }
+
+    public FunctionBuilder overriden(boolean overriden) {
+        function.setOverriden(overriden);
+
+        return this;
+    }
+
+    public FunctionBuilder visibility(ILVisibility visibility) {
+        function.setVisibility(visibility);
+
+        return this;
+    }
+
+    public FunctionBuilder returnType(ILType type) {
+        function.setReturnType(type);
+
+        return this;
+    }
+
+    public FunctionBuilder parameter(ILType type, String name) {
+        function.addParameter(new Parameter(type, name));
+
+        return this;
+    }
+
+    public FunctionBuilder parameter(Parameter parameter) {
+        function.addParameter(parameter);
+
+        return this;
+    }
+
+    public StatementBuilder<FunctionBuilder> statements() {
+        return new StatementBuilder(this);
     }
 
     @Override
-    public FunctionBuilder build() {
-        builder.addStatement(new Conditions(conditions));
-        return builder;
+    public void addStatement(Statement statement) {
+        function.addStatement(statement);
+    }
+
+    @Override
+    public Module build() {
+        module.addFunction(function);
+
+        return module;
     }
 
     @Override

@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.il;
 
+import ch.eskaton.asn4j.compiler.il.builder.Builder;
+import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.LinkedList;
