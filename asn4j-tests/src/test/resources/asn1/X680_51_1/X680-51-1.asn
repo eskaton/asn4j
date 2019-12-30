@@ -67,7 +67,7 @@ TestOctetString6 ::= OCTET STRING (INCLUDES OCTET STRING EXCEPT 'F0'H)
 TestOctetString7 ::= OCTET STRING (ALL EXCEPT testOctetString1)
 
 TestSetOf1 ::= SET (ALL EXCEPT {1}) OF INTEGER
-TestSetOf2 ::= SET (({1}) | SIZE(2))  OF INTEGER
+TestSetOf2 ::= SET (({1}) | SIZE(2)) OF INTEGER
 TestSetOf3 ::= SET (INCLUDES TestSetOf2 EXCEPT {1}) OF INTEGER
 
 END
