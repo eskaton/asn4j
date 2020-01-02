@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.utils.ToString;
@@ -34,19 +35,26 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import java.math.BigInteger;
 import java.util.Objects;
 
-public class EndpointNode {
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+
+public class EndpointNode extends AbstractNode {
 
     private Value value;
 
     private boolean inclusive;
 
-    public EndpointNode(Value value, boolean inclusive) {
+    public EndpointNode(Position position, Value value, boolean inclusive) {
+        super(position);
+
         this.value = value;
         this.inclusive = inclusive;
     }
 
-    public EndpointNode(Value value) {
-        this(value, true);
+    public EndpointNode(Value value, boolean inclusive) {
+        super(NO_POSITION);
+
+        this.value = value;
+        this.inclusive = inclusive;
     }
 
     public Value getValue() {

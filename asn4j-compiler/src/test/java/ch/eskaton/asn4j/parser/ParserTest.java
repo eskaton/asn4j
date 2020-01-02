@@ -342,6 +342,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.PatternConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PermittedAlphabetConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PropertySettingsConstraint;
+import ch.eskaton.asn4j.parser.ast.constraints.SingleTypeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
@@ -4522,7 +4523,7 @@ public class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof SubtypeConstraint);
+        assertTrue(result instanceof SingleTypeConstraint);
     }
 
     @Test
