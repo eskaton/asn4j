@@ -27,28 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 
-public class SetOfCompiler implements NamedCompiler<SetOfType, CompiledType> {
-
-    @Override
-    public CompiledType compile(CompilerContext ctx, String name, SetOfType node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
-
-        javaClass.typeParameter(ctx.getTypeParameter(node));
-
-        ConstraintDefinition constraintDef = null;
-
-        if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, node);
-        }
-
-        ctx.finishClass();
-
-        return new CompiledType(node, constraintDef);
-    }
-
+public class SetOfCompiler extends CollectionOfCompiler<SetOfType> {
 }

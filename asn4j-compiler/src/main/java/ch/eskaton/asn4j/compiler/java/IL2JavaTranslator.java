@@ -341,6 +341,8 @@ public class IL2JavaTranslator {
                 return int.class.getSimpleName();
             case INTEGER_ARRAY:
                 return int[].class.getSimpleName();
+            case LIST:
+                return typeWithImport(javaClass, List.class) + getTypeParameter(type);
             case SET:
                 return typeWithImport(javaClass, Set.class) + getTypeParameter(type);
             case STRING:

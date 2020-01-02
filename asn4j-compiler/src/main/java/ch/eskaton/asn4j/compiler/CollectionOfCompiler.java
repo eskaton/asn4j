@@ -25,34 +25,30 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.runtime.Clazz;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.commons.utils.CollectionUtils;
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 
-import java.util.HashSet;
-import java.util.Objects;
-
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
-public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<HashSet<T>, T> {
-
-    public ASN1SetOf() {
-        super(new HashSet<>());
-    }
-
-    public ASN1SetOf(T... values) {
-        super(CollectionUtils.asHashSet(values));
-    }
+public abstract class CollectionOfCompiler<T extends CollectionOfType> implements NamedCompiler<T, CompiledType> {
 
     @Override
-    public int hashCode() {
-        return Objects.hash(values);
-    }
+    public CompiledType compile(CompilerContext ctx, String name, T node) {
+        JavaClass javaClass = ctx.createClass(name, node, true);
 
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+        javaClass.typeParameter(ctx.getTypeParameter(node));
+
+        ConstraintDefinition constraintDef = null;
+
+        if (node.hasConstraint()) {
+            constraintDef = ctx.compileConstraint(javaClass, name, node);
+        }
+
+        ctx.finishClass();
+
+        return new CompiledType(node, constraintDef);
     }
 
 }

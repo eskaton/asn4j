@@ -29,13 +29,15 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 import static java.util.Arrays.asList;
 
-public abstract class ASN1CollectionOf<C extends Collection<T>, T extends ASN1Type> implements ASN1Type {
+public abstract class ASN1CollectionOf<C extends Collection<T>, T extends ASN1Type> implements ASN1Type, HasConstraint {
 
     protected C values;
 
@@ -55,6 +57,13 @@ public abstract class ASN1CollectionOf<C extends Collection<T>, T extends ASN1Ty
     public void setValues(List<T> values) {
         this.values.clear();
         this.values.addAll(values);
+    }
+
+    @Override
+    public void checkConstraint() {
+        if (!doCheckConstraint()) {
+            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint", this));
+        }
     }
 
     @Override

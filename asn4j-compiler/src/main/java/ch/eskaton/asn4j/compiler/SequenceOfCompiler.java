@@ -27,21 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 
-public class SequenceOfCompiler implements NamedCompiler<SequenceOfType, CompiledType> {
-
-    @Override
-    public CompiledType compile(CompilerContext ctx, String name, SequenceOfType node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
-
-        javaClass.typeParameter(ctx.getTypeParameter(node));
-
-        ctx.finishClass();
-
-        return new CompiledType(node);
-    }
-
+public class SequenceOfCompiler extends CollectionOfCompiler<SequenceOfType> {
 }
