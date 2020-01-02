@@ -33,10 +33,10 @@ import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 
 import java.util.Set;
 
-public class SetOfConstraintOptimizingVisitor
+public class CollectionOfConstraintOptimizingVisitor
         extends AbstractConstraintOptimizingVisitor<CollectionOfValue, Set<CollectionOfValue>, CollectionOfValueNode> {
 
-    public SetOfConstraintOptimizingVisitor() {
+    public CollectionOfConstraintOptimizingVisitor() {
         super.configureTransformation(BinOpType.VALUE_VALUE,
                 new ValueValueTransformer<>(new DefaultSetOperationsStrategy(), this::createNode));
         super.configureTransformation(BinOpType.VALUE_NEGATION,

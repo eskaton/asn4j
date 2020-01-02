@@ -25,34 +25,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.runtime.Clazz;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.commons.utils.CollectionUtils;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
 
-import java.util.HashSet;
-import java.util.Objects;
+public class SequenceOfConstraintCompiler extends AbstractCollectionOfCompiler {
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
-public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<HashSet<T>, T> {
-
-    public ASN1SetOf() {
-        super(new HashSet<>());
-    }
-
-    public ASN1SetOf(T... values) {
-        super(CollectionUtils.asHashSet(values));
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(values);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
+    public SequenceOfConstraintCompiler(CompilerContext ctx) {
+        super(ctx, "SEQUENCE OF", ILBuiltinType.LIST);
     }
 
 }
