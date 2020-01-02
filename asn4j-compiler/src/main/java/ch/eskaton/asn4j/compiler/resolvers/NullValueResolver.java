@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -48,7 +49,7 @@ public class NullValueResolver extends AbstractValueResolver<NullValue> {
             return (NullValue) value;
         }
 
-        throw new CompilerException("Failed to resolve an NULL value");
+        throw new CompilerException("Failed to resolve an %s value", TypeName.NULL);
     }
 
 }

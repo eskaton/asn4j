@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractIRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -86,14 +87,14 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
             if (iriValue != null) {
                 return createNode(singleton(resolver.resolveComponents(ctx, iriValue)));
             } else {
-                throw new CompilerException("Invalid single-value constraint %s for " + getTypeName() + " type",
-                        value.getClass().getSimpleName());
+                throw new CompilerException("Invalid single-value constraint %s for %s type",
+                        value.getClass().getSimpleName(), getTypeName());
             }
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(((ContainedSubtype) elements).getType());
         } else {
-            throw new CompilerException("Invalid constraint %s for " + getTypeName() + " type",
-                    elements.getClass().getSimpleName());
+            throw new CompilerException("Invalid constraint %s for %s type",
+                    elements.getClass().getSimpleName(), getTypeName());
         }
     }
 
@@ -139,6 +140,6 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
     protected abstract AbstractIRIValueResolver getValueResolver();
 
-    protected abstract String getTypeName();
+    protected abstract TypeName getTypeName();
 
 }

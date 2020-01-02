@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractOIDValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -139,6 +140,6 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
 
     protected abstract AbstractOIDValueResolver getValueResolver();
 
-    protected abstract String getTypeName();
+    protected abstract TypeName getTypeName();
 
 }

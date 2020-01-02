@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -74,14 +75,14 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
             if (value instanceof NullValue) {
                 return new ValueNode<>(ASN1Null.Value.NULL);
             } else {
-                throw new CompilerException("Invalid single-value constraint %s for BOOLEAN type",
-                        value.getClass().getSimpleName());
+                throw new CompilerException("Invalid single-value constraint %s for %s type",
+                        value.getClass().getSimpleName(), TypeName.NULL);
             }
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(((ContainedSubtype) elements).getType());
         } else {
-            throw new CompilerException("Invalid constraint %s for BOOLEAN type",
-                    elements.getClass().getSimpleName());
+            throw new CompilerException("Invalid constraint %s for %s type",
+                    elements.getClass().getSimpleName(), TypeName.NULL);
         }
     }
 

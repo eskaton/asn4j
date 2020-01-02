@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
@@ -43,8 +44,8 @@ public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<Obje
     }
 
     @Override
-    protected String getTypeName() {
-        return "OBJECT IDENTIFIER";
+    protected TypeName getTypeName() {
+        return TypeName.OBJECT_IDENTIFIER;
     }
 
     @Override
@@ -70,7 +71,7 @@ public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<Obje
                     }
                 }
             } catch (CompilerException e) {
-                throw new CompilerException("Failed to resolve component of object identifier value", e);
+                throw new CompilerException("Failed to resolve component of %s value", e, getTypeName());
             }
 
             componentNum++;

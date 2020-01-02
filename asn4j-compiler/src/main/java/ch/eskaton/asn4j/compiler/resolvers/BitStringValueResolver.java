@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -65,7 +66,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
             return resolveValue(getTypeName(type), namedBits, value);
         }
 
-        throw new CompilerException("Failed to resolve a BIT STRING value");
+        throw new CompilerException("Failed to resolve a %s value", TypeName.BIT_STRING);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
             }
         }
 
-        throw new CompilerException("Failed to resolve a BIT STRING value");
+        throw new CompilerException("Failed to resolve a %s value", TypeName.BIT_STRING);
     }
 
     private BitStringValue resolveValue(String typeName, Map<String, BigInteger> namedBits,

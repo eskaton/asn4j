@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeIRIConstraintOptimizingVisitor;
@@ -70,8 +71,8 @@ public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler
     }
 
     @Override
-    protected String getTypeName() {
-        return "RELATIVE-OID-IRI";
+    protected TypeName getTypeName() {
+        return TypeName.RELATIVE_OID_IRI;
     }
 
 }

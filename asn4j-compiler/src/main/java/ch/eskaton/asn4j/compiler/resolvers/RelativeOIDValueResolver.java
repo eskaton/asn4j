@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
@@ -43,8 +44,8 @@ public class RelativeOIDValueResolver extends AbstractOIDValueResolver<RelativeO
     }
 
     @Override
-    protected String getTypeName() {
-        return "RELATIVE OID";
+    protected TypeName getTypeName() {
+        return TypeName.RELATIVE_OID;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class RelativeOIDValueResolver extends AbstractOIDValueResolver<RelativeO
                     resolveOIDReference(ctx, ids, component, RelativeOIDValue.class);
                 }
             } catch (CompilerException e) {
-                throw new CompilerException("Failed to resolve component of object identifier value", e);
+                throw new CompilerException("Failed to resolve component of %s value", e, getTypeName());
             }
         }
 

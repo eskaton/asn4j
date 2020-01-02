@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.EnumeratedTypeConstraintOptimizingVisitor;
@@ -98,8 +99,8 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
 
                 return new EnumeratedValueNode(Sets.<Integer>builder().add(enumValue).build());
             } catch (Exception e) {
-                throw new CompilerException("Invalid single-value constraint %s for ENUMERATED type", e,
-                        value.getClass().getSimpleName());
+                throw new CompilerException("Invalid single-value constraint %s for %s type", e,
+                        value.getClass().getSimpleName(), TypeName.ENUMERATED);
             }
         } else if (elements instanceof ContainedSubtype) {
             Type type = ((ContainedSubtype) elements).getType();
@@ -113,8 +114,8 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
-            throw new CompilerException("Invalid constraint %s for ENUMERATED type",
-                    elements.getClass().getSimpleName());
+            throw new CompilerException("Invalid constraint %s for %s type",
+                    elements.getClass().getSimpleName(), TypeName.ENUMERATED);
         }
     }
 

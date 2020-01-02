@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.ObjectIdentifierConstraintOptimizingVisitor;
@@ -70,8 +71,8 @@ public class ObjectIdentifierConstraintCompiler extends AbstractOIDConstraintCom
     }
 
     @Override
-    protected String getTypeName() {
-        return "OBJECT IDENTIFIER";
+    protected TypeName getTypeName() {
+        return TypeName.OBJECT_IDENTIFIER;
     }
 
 }

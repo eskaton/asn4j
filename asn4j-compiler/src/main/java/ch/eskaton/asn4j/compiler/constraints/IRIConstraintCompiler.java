@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IRIConstraintOptimizingVisitor;
@@ -70,8 +71,8 @@ public class IRIConstraintCompiler extends AbstractIRIConstraintCompiler<IRIValu
     }
 
     @Override
-    protected String getTypeName() {
-        return "OID-IRI";
+    protected TypeName getTypeName() {
+        return TypeName.OID_IRI;
     }
 
 }

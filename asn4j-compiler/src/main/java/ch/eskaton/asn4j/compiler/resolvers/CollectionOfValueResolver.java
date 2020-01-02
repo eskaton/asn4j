@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
@@ -117,10 +118,10 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
 
     private String getTypeName(Type type) {
         if (type instanceof SetOfType) {
-            return "SET OF";
+            return TypeName.SET_OF.name();
         }
 
-        return "SEQUENCE OF";
+        return TypeName.SEQUENCE_OF.name();
     }
 
     protected CompilerException error(String typeName) {

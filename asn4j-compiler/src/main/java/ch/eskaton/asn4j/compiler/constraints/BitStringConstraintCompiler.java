@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
@@ -103,16 +104,16 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
                 return new BitStringValueNode(singletonList(bitStringValue));
             } catch (Exception e) {
-                throw new CompilerException("Invalid single-value constraint %s for BIT STRING type", e,
-                        value.getClass().getSimpleName());
+                throw new CompilerException("Invalid single-value constraint %s for %s type", e,
+                        value.getClass().getSimpleName(), TypeName.BIT_STRING);
             }
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
-            throw new CompilerException("Invalid constraint %s for BIT STRING type",
-                    elements.getClass().getSimpleName());
+            throw new CompilerException("Invalid constraint %s for %s type",
+                    elements.getClass().getSimpleName(), TypeName.BIT_STRING);
         }
     }
 

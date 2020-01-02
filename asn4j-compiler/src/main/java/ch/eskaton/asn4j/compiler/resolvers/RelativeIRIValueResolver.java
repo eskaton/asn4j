@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 
@@ -38,8 +39,8 @@ public class RelativeIRIValueResolver extends AbstractIRIValueResolver<RelativeI
     }
 
     @Override
-    protected String getTypeName() {
-        return "RELATIVE-OID-IRI";
+    protected TypeName getTypeName() {
+        return TypeName.RELATIVE_OID_IRI;
     }
 
 }

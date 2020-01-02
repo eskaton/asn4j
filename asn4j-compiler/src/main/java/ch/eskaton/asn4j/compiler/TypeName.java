@@ -25,16 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.TypeName;
-import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
+public enum TypeName {
 
-public class SetOfConstraintCompiler extends AbstractCollectionOfCompiler {
+    BIT_STRING("BIT STRING"), BOOLEAN("BOOLEAN"), ENUMERATED("ENUMERATED"), INTEGER("INTEGER"), NULL("NULL"),
+    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"), OCTET_STRING("OCTET STRING"), OID_IRI("OID-IRI"),
+    RELATIVE_OID("RELATIVE OID"), RELATIVE_OID_IRI("RELATIVE-OID-IRI"), SEQUENCE_OF("SEQUENCE OF"), SET_OF("SET OF");
 
-    public SetOfConstraintCompiler(CompilerContext ctx) {
-        super(ctx, TypeName.SET_OF, ILBuiltinType.SET);
+    private final String name;
+
+    TypeName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 
 }
