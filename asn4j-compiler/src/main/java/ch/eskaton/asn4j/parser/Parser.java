@@ -132,6 +132,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.PatternConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PermittedAlphabetConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PropertySettingsConstraint;
+import ch.eskaton.asn4j.parser.ast.constraints.SingleTypeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
@@ -3573,7 +3574,7 @@ public class Parser {
 
         public LowerEndpointNode parse() throws ParserException {
             return super.parse(new SequenceParser(new boolean[] { true, false }, lowerEndValueParser,
-                    TokenType.LT), a -> new LowerEndpointNode(a.n0(), a.n1() == null));
+                    TokenType.LT), a -> new LowerEndpointNode(a.P(), a.n0(), a.n1() == null));
         }
 
     }
@@ -3583,7 +3584,7 @@ public class Parser {
 
         public UpperEndpointNode parse() throws ParserException {
             return super.parse(new SequenceParser(new boolean[] { false, true }, TokenType.LT, upperEndValueParser),
-                    a -> new UpperEndpointNode(a.n1(), a.n0() == null));
+                    a -> new UpperEndpointNode(a.P(), a.n1(), a.n0() == null));
         }
 
     }
@@ -3652,7 +3653,15 @@ public class Parser {
             return super.parse(new SequenceParser(TokenType.WITH_KW,
                             new ChoiceParser<Object>(new SequenceParser(TokenType.COMPONENT_KW, constraintParser),
                                     new SequenceParser(TokenType.COMPONENTS_KW, multipleTypeConstraintsParser))),
-                    a -> (Constraint) ((List<Object>) a.n1()).get(1));
+                    a -> {
+                        Constraint constraint = (Constraint) ((List<Object>) a.n1()).get(1);
+
+                        if (constraint instanceof MultipleTypeConstraints) {
+                            return constraint;
+                        }
+
+                        return new SingleTypeConstraint(a.P(), constraint);
+                    });
         }
 
     }

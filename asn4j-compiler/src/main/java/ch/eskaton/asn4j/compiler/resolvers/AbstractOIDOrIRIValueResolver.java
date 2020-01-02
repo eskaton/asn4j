@@ -53,7 +53,7 @@ public abstract class AbstractOIDOrIRIValueResolver<T extends Type, V extends Va
         } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
             idValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
         } else {
-            throw new CompilerException("Invalid " + getTypeName() + " value: " + value);
+            throw new CompilerException("Invalid %s value: %s", getTypeName(), value);
         }
 
         return idValue;

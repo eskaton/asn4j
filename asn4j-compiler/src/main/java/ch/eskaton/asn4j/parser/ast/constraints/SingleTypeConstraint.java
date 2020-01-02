@@ -25,15 +25,28 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.parser.ast.constraints;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class UpperEndpointNode extends EndpointNode {
+public class SingleTypeConstraint extends AbstractConstraint {
 
-    public UpperEndpointNode(Position position, Value value, boolean inclusive) {
-        super(position, value, inclusive);
+    private final Constraint constraint;
+
+    public SingleTypeConstraint(Position position, Constraint constraint) {
+        super(position);
+
+        this.constraint = constraint;
+    }
+
+    public Constraint getConstraint() {
+        return constraint;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }
