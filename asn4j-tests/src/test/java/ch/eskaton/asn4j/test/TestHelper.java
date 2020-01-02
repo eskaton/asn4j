@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
+import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
@@ -295,6 +296,20 @@ public class TestHelper {
         setOfValue.setValues(values);
 
         assertThrows(() -> assertValueDecodable(clazz, setOfValue), ConstraintViolatedException.class);
+    }
+
+    public static <V extends ASN1Type, T extends ASN1SequenceOf> void testSequenceOfSuccess(Class<? extends T> clazz,
+            T sequenceOfValue, V... values) {
+        sequenceOfValue.setValues(values);
+
+        assertValueDecodable(clazz, sequenceOfValue);
+    }
+
+    public static <V extends ASN1Type, T extends ASN1SequenceOf> void testSequenceOfFailure(Class<? extends T> clazz,
+            T sequenceOfValue, V... values) {
+        sequenceOfValue.setValues(values);
+
+        assertThrows(() -> assertValueDecodable(clazz, sequenceOfValue), ConstraintViolatedException.class);
     }
 
     public static byte[] randomBytes(int length) {
