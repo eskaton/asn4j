@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeOIDConstraintOptimizingVisitor;
@@ -64,8 +65,8 @@ public class RelativeOIDConstraintCompiler extends AbstractOIDConstraintCompiler
     }
 
     @Override
-    protected String getTypeName() {
-        return "RELATIVE OID";
+    protected TypeName getTypeName() {
+        return TypeName.RELATIVE_OID;
     }
 
     @Override

@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
@@ -76,11 +77,11 @@ public abstract class AbstractCollectionOfCompiler extends AbstractConstraintCom
 
     private static final String OBJ = "obj";
 
-    private final String typeName;
+    private final TypeName typeName;
 
     private final ILBuiltinType collectionType;
 
-    public AbstractCollectionOfCompiler(CompilerContext ctx, String typeName, ILBuiltinType collectionType) {
+    public AbstractCollectionOfCompiler(CompilerContext ctx, TypeName typeName, ILBuiltinType collectionType) {
         super(ctx);
 
         this.typeName = typeName;

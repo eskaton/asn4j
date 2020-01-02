@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 
@@ -38,8 +39,8 @@ public class IRIValueResolver extends AbstractIRIValueResolver<IRI, IRIValue> {
     }
 
     @Override
-    protected String getTypeName() {
-        return "OID-IRI";
+    protected TypeName getTypeName() {
+        return TypeName.OID_IRI;
     }
 
 }

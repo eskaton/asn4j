@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -58,6 +59,6 @@ public abstract class AbstractOIDOrIRIValueResolver<T extends Type, V extends Va
         return idValue;
     }
 
-    protected abstract String getTypeName();
+    protected abstract TypeName getTypeName();
 
 }

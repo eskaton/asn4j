@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
@@ -94,8 +95,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
 
                 return new IntegerRangeValueNode((singletonList(new IntegerRange(longValue, longValue))));
             } catch (Exception e) {
-                throw new CompilerException("Invalid single-value constraint %s for INTEGER type", e,
-                        value.getClass().getSimpleName());
+                throw new CompilerException("Invalid single-value constraint %s for %s type", e,
+                        value.getClass().getSimpleName(), TypeName.INTEGER);
             }
         } else if (elements instanceof ContainedSubtype) {
             Type type = ((ContainedSubtype) elements).getType();
@@ -110,8 +111,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             return new IntegerRangeValueNode(singletonList(new IntegerRange(lower.getValue().longValue(), upper
                     .getValue().longValue())));
         } else {
-            throw new CompilerException("Invalid constraint %s for INTEGER type",
-                    elements.getClass().getSimpleName());
+            throw new CompilerException("Invalid constraint %s for %s type", elements.getClass().getSimpleName(),
+                    TypeName.INTEGER);
         }
     }
 

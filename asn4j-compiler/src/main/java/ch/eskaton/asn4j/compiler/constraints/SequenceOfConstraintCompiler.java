@@ -28,12 +28,13 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
 
 public class SequenceOfConstraintCompiler extends AbstractCollectionOfCompiler {
 
     public SequenceOfConstraintCompiler(CompilerContext ctx) {
-        super(ctx, "SEQUENCE OF", ILBuiltinType.LIST);
+        super(ctx, TypeName.SEQUENCE_OF, ILBuiltinType.LIST);
     }
 
 }

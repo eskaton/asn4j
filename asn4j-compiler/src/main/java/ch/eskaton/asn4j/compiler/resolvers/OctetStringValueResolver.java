@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
@@ -49,7 +50,7 @@ public class OctetStringValueResolver extends AbstractValueResolver<OctetStringV
             return ((AbstractBaseXStringValue) value).toOctetString();
         }
 
-        throw new CompilerException("Failed to resolve an OCTET STRING value");
+        throw new CompilerException("Failed to resolve an %s value", TypeName.OCTET_STRING);
     }
 
 }
