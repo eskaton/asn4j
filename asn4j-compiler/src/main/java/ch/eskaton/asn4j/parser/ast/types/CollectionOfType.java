@@ -28,6 +28,9 @@
 package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.commons.utils.StreamsUtils;
+
+import java.util.Iterator;
 
 public class CollectionOfType extends AbstractType {
 
@@ -35,11 +38,44 @@ public class CollectionOfType extends AbstractType {
 
     public CollectionOfType(Position position, Type type) {
         super(position);
+
         this.type = type;
     }
 
     public Type getType() {
         return type;
+    }
+
+    public boolean hasAnyConstraint() {
+        return StreamsUtils.of(new ElementTypeIterator(this)).anyMatch(Type::hasConstraint);
+    }
+
+    public boolean hasElementConstraint() {
+        return StreamsUtils.of(new ElementTypeIterator(getType())).anyMatch(Type::hasConstraint);
+    }
+
+    public static class ElementTypeIterator implements Iterator<Type> {
+
+        private Type type;
+
+        public ElementTypeIterator(Type type) {
+            this.type = type;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return type != null;
+        }
+
+        @Override
+        public Type next() {
+            Type oldType = type;
+
+            type = type instanceof CollectionOfType ? ((CollectionOfType) type).getType() : null;
+
+            return oldType;
+        }
+
     }
 
 }

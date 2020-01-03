@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 
+import java.util.function.Function;
+
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 
 public class ConstraintDefinition {
@@ -41,6 +43,10 @@ public class ConstraintDefinition {
     private boolean extensible;
 
     private ConstraintDefinition elementConstraint;
+
+    public ConstraintDefinition() {
+        this(null, null, false);
+    }
 
     public ConstraintDefinition(Node roots) {
         this(roots, null, false);
@@ -118,6 +124,12 @@ public class ConstraintDefinition {
         boolean extensible = other.isExtensible();
 
         return new ConstraintDefinition(roots, extensions, extensible).elementConstraint(elementConstraint);
+    }
+
+    public void optimize(Function<Node, Node> optimizer) {
+        if (this.roots != null) {
+            this.roots = optimizer.apply(roots);
+        }
     }
 
 }
