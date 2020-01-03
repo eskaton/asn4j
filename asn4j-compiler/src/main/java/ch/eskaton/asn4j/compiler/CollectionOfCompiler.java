@@ -42,7 +42,7 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
         ConstraintDefinition constraintDef = null;
 
-        if (node.hasConstraint()) {
+        if (node.hasAnyConstraint()) {
             constraintDef = ctx.compileConstraint(javaClass, name, node);
         }
 

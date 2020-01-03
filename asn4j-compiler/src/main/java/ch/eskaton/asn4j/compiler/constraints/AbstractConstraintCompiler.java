@@ -103,6 +103,7 @@ public abstract class AbstractConstraintCompiler {
     ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
         LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
         Optional<List<Constraint>> constraint = Optional.ofNullable(node.getConstraints());
+        ConstraintDefinition definition = null;
         CompiledType compiledType;
 
         do {
@@ -121,7 +122,7 @@ public abstract class AbstractConstraintCompiler {
         });
 
         if (definitions.size() == 1) {
-            return definitions.pop();
+            definition = definitions.pop();
         } else if (definitions.size() > 1) {
             ConstraintDefinition op1 = definitions.pop();
             ConstraintDefinition op2 = definitions.pop();
@@ -136,10 +137,14 @@ public abstract class AbstractConstraintCompiler {
                 op2 = definitions.pop();
             } while (true);
 
-            return op1;
+            definition = op1;
         }
 
-        return null;
+        if (definition != null) {
+            definition.optimize(this::optimize);
+        }
+
+        return definition;
     }
 
     @SuppressWarnings("squid:S1172")
@@ -310,7 +315,7 @@ public abstract class AbstractConstraintCompiler {
         if (definition.isExtensible()) {
             builder.statements().returnValue(Boolean.TRUE);
         } else {
-            Node roots = optimize(definition.getRoots());
+            Node roots = definition.getRoots();
             Optional<BooleanExpression> expression = buildExpression(getTypeName(type), roots);
 
             if (expression.isPresent()) {

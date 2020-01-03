@@ -49,7 +49,6 @@ import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
@@ -71,7 +70,7 @@ import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.CUSTOM;
 import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 
-public abstract class AbstractCollectionOfCompiler extends AbstractConstraintCompiler {
+public abstract class AbstractCollectionOfConstraintCompiler extends AbstractConstraintCompiler {
 
     private static final String VALUE = "value";
 
@@ -81,7 +80,7 @@ public abstract class AbstractCollectionOfCompiler extends AbstractConstraintCom
 
     private final ILBuiltinType collectionType;
 
-    public AbstractCollectionOfCompiler(CompilerContext ctx, TypeName typeName, ILBuiltinType collectionType) {
+    public AbstractCollectionOfConstraintCompiler(CompilerContext ctx, TypeName typeName, ILBuiltinType collectionType) {
         super(ctx);
 
         this.typeName = typeName;
@@ -89,14 +88,16 @@ public abstract class AbstractCollectionOfCompiler extends AbstractConstraintCom
     }
 
     @Override
-    ConstraintDefinition compileConstraints(CompiledType baseType, List<Constraint> constraints,
-            Optional<Bounds> bounds) {
-        ConstraintDefinition constraintDef = super.compileConstraints(baseType, constraints, bounds);
+    ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
+        ConstraintDefinition constraintDef = super.compileConstraints(node, baseType);
+        CollectionOfType collectionOfType = (CollectionOfType) baseType.getType();
 
-        Type elementType = ((CollectionOfType) baseType.getType()).getType();
+        if (collectionOfType.hasElementConstraint()) {
+            if (constraintDef == null) {
+                constraintDef = new ConstraintDefinition();
+            }
 
-        if (elementType.hasConstraint()) {
-            constraintDef.setElementConstraint(ctx.compileConstraint(elementType));
+            constraintDef.setElementConstraint(ctx.compileConstraint(collectionOfType.getType()));
         }
 
         return constraintDef;
@@ -158,7 +159,7 @@ public abstract class AbstractCollectionOfCompiler extends AbstractConstraintCom
         } else if (builder.getModule().getFunctions().stream().noneMatch(f -> f.getName().equals(functionName))) {
             addConstraintCondition(type, definition, builder);
         } else {
-            Node roots = optimize(definition.getRoots());
+            Node roots = definition.getRoots();
             Optional<BooleanExpression> expression = buildExpression(getTypeName(type), roots);
             Type elementType = ((CollectionOfType) type).getType();
             BooleanExpression condition;
@@ -201,11 +202,26 @@ public abstract class AbstractCollectionOfCompiler extends AbstractConstraintCom
                                     .returnValue(Boolean.FALSE)
                                     .build()
                                 .build()
-                        .build()
-                    .build();
+                            .build()
+                        .build();
                 // @formatter:on
             } else {
-                builder.statements().returnValue(Boolean.TRUE);
+                // @formatter:off
+                builder.statements()
+                        .foreach(new ILParameterizedType(CUSTOM, typeParameter), new Variable(OBJ), new Variable(VALUE))
+                            .statements()
+                                .conditions()
+                                    .condition(condition)
+                                        .statements()
+                                            .returnValue(Boolean.FALSE)
+                                            .build()
+                                        .build()
+                                    .build()
+                                .build()
+                            .build()
+                        .returnValue(Boolean.TRUE)
+                        .build();
+                // @formatter:on
             }
         }
     }
@@ -222,6 +238,10 @@ public abstract class AbstractCollectionOfCompiler extends AbstractConstraintCom
 
     @Override
     protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
+        if (node == null) {
+            return Optional.empty();
+        }
+
         switch (node.getType()) {
             case VALUE:
                 Set<CollectionOfValue> values = ((CollectionOfValueNode) node).getValue();
