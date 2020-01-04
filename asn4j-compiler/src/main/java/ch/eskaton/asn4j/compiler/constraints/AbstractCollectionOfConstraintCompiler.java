@@ -134,17 +134,18 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         generateDoCheckConstraint(module, level);
 
         ConstraintDefinition elementDefinition = definition.getElementConstraint();
+        CollectionOfType referencedType = (CollectionOfType) ctx.resolveTypeReference(type);
 
         if (elementDefinition != null) {
-            ctx.addConstraint(((CollectionOfType) type).getType(), module, elementDefinition, level + 1);
+            ctx.addConstraint(referencedType.getType(), module, elementDefinition, level + 1);
         }
 
-        List<String> typeParameter = ctx.getTypeParameter((Type) ctx.resolveTypeReference(type));
+        List<String> typeParameter = ctx.getTypeParameter(referencedType);
 
         FunctionBuilder builder = generateCheckConstraintValue(module, level,
                 new Parameter(ILParameterizedType.of(collectionType, typeParameter), VALUE));
 
-        addConstraintCondition(type, typeParameter, definition, builder, level + 1);
+        addConstraintCondition(referencedType, typeParameter, definition, builder, level + 1);
 
         builder.build();
 
