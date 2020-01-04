@@ -65,6 +65,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOID2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequenceOf1;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf10;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf2;
@@ -520,6 +521,29 @@ public class TestX680_51_1 {
                 new ASN1SetOf<>(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)),
                 new ASN1SetOf<>());
         testSequenceOfFailure(TestSequenceOf1.class, new TestSequenceOf1(),
+                new ASN1SetOf<>(),
+                new ASN1SetOf<>(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)));
+    }
+
+    @Test
+    public void TestSequenceOf2() {
+        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(),
+                new ASN1SetOf<>(ASN1Integer.valueOf(1L)),
+                new ASN1SetOf<>(ASN1Integer.valueOf(2L)));
+        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(),
+                new ASN1SetOf<>(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)),
+                new ASN1SetOf<>(ASN1Integer.valueOf(3L), ASN1Integer.valueOf(4L)));
+        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(),
+                new ASN1SetOf<>(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)),
+                new ASN1SetOf<>(ASN1Integer.valueOf(3L)));
+
+        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(), new ASN1SetOf<>(), new ASN1SetOf<>());
+        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(),
+                new ASN1SetOf<>(ASN1Integer.valueOf(4710L), ASN1Integer.valueOf(4711L)));
+        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(),
+                new ASN1SetOf<>(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)),
+                new ASN1SetOf<>());
+        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(),
                 new ASN1SetOf<>(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)));
     }
