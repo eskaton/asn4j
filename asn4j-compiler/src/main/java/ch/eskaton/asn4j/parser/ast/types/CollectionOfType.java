@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class CollectionOfType extends AbstractType {
 
@@ -69,6 +70,10 @@ public class CollectionOfType extends AbstractType {
 
         @Override
         public Type next() {
+            if (type == null) {
+                throw new NoSuchElementException();
+            }
+
             Type oldType = type;
 
             type = type instanceof CollectionOfType ? ((CollectionOfType) type).getType() : null;
