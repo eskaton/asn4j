@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionOfConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
@@ -42,6 +43,7 @@ import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
 import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
+import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.NegationExpression;
@@ -52,6 +54,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
+import ch.eskaton.asn4j.parser.ast.constraints.SingleTypeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
@@ -60,6 +63,8 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.types.ASN1BitString;
+import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
 import java.util.List;
 import java.util.Optional;
@@ -67,12 +72,20 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.CUSTOM;
+import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 
 public abstract class AbstractCollectionOfConstraintCompiler extends AbstractConstraintCompiler {
 
     private static final String VALUE = "value";
+
+    private static final String VALUES = "values";
+
+    public static final String GET_VALUES = "getValues";
+
+    public static final String GET_VALUE = "getValue";
 
     private static final String OBJ = "obj";
 
@@ -89,18 +102,30 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
     @Override
     ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
-        ConstraintDefinition constraintDef = super.compileConstraints(node, baseType);
+        ConstraintDefinition constraintDefinition = super.compileConstraints(node, baseType);
         CollectionOfType collectionOfType = (CollectionOfType) baseType.getType();
 
         if (collectionOfType.hasElementConstraint()) {
-            if (constraintDef == null) {
-                constraintDef = new ConstraintDefinition();
+            if (constraintDefinition == null) {
+                constraintDefinition = new ConstraintDefinition();
             }
 
-            constraintDef.setElementConstraint(ctx.compileConstraint(collectionOfType.getType()));
+            ConstraintDefinition componentDefinition = ctx.compileConstraint(collectionOfType.getType());
+
+            if (componentDefinition.getRoots() != null) {
+                componentDefinition
+                        .setRoots(new WithComponentNode(collectionOfType.getType(), componentDefinition.getRoots()));
+            }
+
+            if (componentDefinition.getExtensions() != null) {
+                componentDefinition.setExtensions(
+                        new WithComponentNode(collectionOfType.getType(), componentDefinition.getRoots()));
+            }
+
+            constraintDefinition = constraintDefinition.serialApplication(componentDefinition);
         }
 
-        return constraintDef;
+        return constraintDefinition;
     }
 
     @Override
@@ -123,6 +148,15 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
             return calculateContainedSubtype(((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
+        } else if (elements instanceof SingleTypeConstraint) {
+            Type componentType = ((CollectionOfType) baseType.getType()).getType();
+
+            ConstraintDefinition definition = ctx.compileConstraint(componentType);
+
+            definition = definition.serialApplication(
+                    ctx.compileConstraint(componentType, ((SingleTypeConstraint) elements).getConstraint()));
+
+            return new WithComponentNode(componentType, definition.getRoots());
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), typeName);
@@ -130,30 +164,23 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
-        generateDoCheckConstraint(module, level);
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
+        generateDoCheckConstraint(module);
 
-        ConstraintDefinition elementDefinition = definition.getElementConstraint();
         CollectionOfType referencedType = (CollectionOfType) ctx.resolveTypeReference(type);
-
-        if (elementDefinition != null) {
-            ctx.addConstraint(referencedType.getType(), module, elementDefinition, level + 1);
-        }
-
         List<String> typeParameter = ctx.getTypeParameter(referencedType);
 
-        FunctionBuilder builder = generateCheckConstraintValue(module, level,
+        FunctionBuilder builder = generateCheckConstraintValue(module,
                 new Parameter(ILParameterizedType.of(collectionType, typeParameter), VALUE));
 
-        addConstraintCondition(referencedType, typeParameter, definition, builder, level + 1);
+        addConstraintCondition(referencedType, typeParameter, definition, builder, module);
 
         builder.build();
-
     }
 
     protected void addConstraintCondition(Type type, List<String> typeParameter, ConstraintDefinition definition,
-            FunctionBuilder builder, int level) {
-        String functionName = "checkConstraintValue_" + level;
+            FunctionBuilder builder, Module module) {
+        String functionName = "checkConstraintValue";
 
         if (definition.isExtensible()) {
             builder.statements().returnValue(Boolean.TRUE);
@@ -161,21 +188,21 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
             addConstraintCondition(type, definition, builder);
         } else {
             Node roots = definition.getRoots();
-            Optional<BooleanExpression> expression = buildExpression(getTypeName(type), roots);
+            Optional<BooleanExpression> expression = buildExpression(module, getTypeName(type), roots);
             Type elementType = ((CollectionOfType) type).getType();
             BooleanExpression condition;
 
             if (elementType instanceof CollectionOfType) {
                 condition = new NegationExpression(
-                        new FunctionCall(of(functionName), new FunctionCall(of("getValues"), of(new ILValue(OBJ)))));
+                        new FunctionCall(of(functionName), new FunctionCall(of(GET_VALUES), of(new ILValue(OBJ)))));
             } else if (elementType instanceof BitString) {
                 condition = new NegationExpression(
                         new FunctionCall(of(functionName),
-                                new FunctionCall(of("getValue"), of(new ILValue(OBJ))),
+                                new FunctionCall(of(GET_VALUE), of(new ILValue(OBJ))),
                                 new FunctionCall(of("getUnusedBits"), of(new ILValue(OBJ)))));
             } else {
                 condition = new NegationExpression(
-                        new FunctionCall(of(functionName), new FunctionCall(of("getValue"), of(new ILValue(OBJ)))));
+                        new FunctionCall(of(functionName), new FunctionCall(of(GET_VALUE), of(new ILValue(OBJ)))));
             }
 
             if (expression.isPresent()) {
@@ -184,17 +211,6 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                         .conditions()
                             .condition(expression.get())
                                 .statements()
-                                    .foreach(new ILParameterizedType(CUSTOM, typeParameter), new Variable(OBJ), new Variable(VALUE))
-                                        .statements()
-                                            .conditions()
-                                                .condition(condition)
-                                                    .statements()
-                                                        .returnValue(Boolean.FALSE)
-                                                        .build()
-                                                    .build()
-                                                .build()
-                                            .build()
-                                        .build()
                                     .returnValue(Boolean.TRUE)
                                     .build()
                                 .build()
@@ -228,8 +244,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    protected FunctionCall generateCheckConstraintCall(int level) {
-        return new FunctionCall(of("checkConstraintValue_" + level), new FunctionCall(of("getValues")));
+    protected FunctionCall generateCheckConstraintCall() {
+        return new FunctionCall(of("checkConstraintValue"), new FunctionCall(of(GET_VALUES)));
     }
 
     @Override
@@ -238,7 +254,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
         if (node == null) {
             return Optional.empty();
         }
@@ -257,8 +273,85 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                         .collect(Collectors.toList());
 
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
+            case WITH_COMPONENT:
+                WithComponentNode componentNode = (WithComponentNode) node;
+                Optional<BooleanExpression> expression = ctx
+                        .buildExpression(module, componentNode.getComponentType(), componentNode.getConstraint());
+
+                String expressionSym = module.generateSymbol("_expression");
+
+                List<String> parameterizedType = ctx.getParameterizedType(componentNode.getComponentType());
+                List<String> typeParameters = parameterizedType.stream().skip(1).collect(Collectors.toList());
+                List<Parameter> parameters;
+
+                if (typeParameters.isEmpty()) {
+                    if (parameterizedType.get(0).equals(ASN1Integer.class.getSimpleName())) {
+                        parameters = singletonList(new Parameter(ILType.of(ILBuiltinType.BIG_INTEGER), VALUE));
+                    } else if (parameterizedType.get(0).equals(ASN1BitString.class.getSimpleName())) {
+                        parameters = asList(new Parameter(ILType.of(ILBuiltinType.BYTE_ARRAY), VALUE),
+                                new Parameter(ILType.of(ILBuiltinType.INTEGER), "unusedBits"));
+                    } else {
+                        throw new CompilerException("Unsupported type %s", parameterizedType.get(0));
+                    }
+                } else {
+                    parameters = singletonList(
+                            new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameters), VALUES));
+                }
+
+                // @formatter:off
+                module.function()
+                        .returnType(ILType.of(ILBuiltinType.BOOLEAN))
+                        .name(expressionSym)
+                        .parameters(parameters)
+                        .statements()
+                            .returnExpression(expression.get())
+                            .build()
+                        .build();
+                // @formatter:on
+
+                String checkSym = module.generateSymbol("_checkConstraint");
+                BooleanFunctionCall functionCall;
+
+                if (typeParameters.isEmpty()) {
+                    if (parameterizedType.get(0).equals(ASN1BitString.class.getSimpleName())) {
+                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
+                                new FunctionCall(Optional.of(GET_VALUE), Optional.of(new Variable(VALUE))),
+                                new FunctionCall(Optional.of("getUnusedBits"),
+                                        Optional.of(new Variable(VALUE))));
+                    } else {
+                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
+                                new FunctionCall(Optional.of(GET_VALUE), Optional.of(new Variable(VALUE))));
+                    }
+                } else {
+                    functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
+                            new FunctionCall(Optional.of(GET_VALUES), Optional.of(new Variable(VALUE))));
+                }
+
+                // @formatter:off
+                module.function()
+                        .returnType(ILType.of(ILBuiltinType.BOOLEAN))
+                        .name(checkSym)
+                        .parameter(new Parameter(new ILParameterizedType(ILBuiltinType.LIST, parameterizedType), VALUES))
+                        .statements()
+                            .foreach(new ILParameterizedType(CUSTOM, parameterizedType), new Variable(VALUE), new Variable(VALUES))
+                                .statements()
+                                    .conditions()
+                                        .condition(new NegationExpression(functionCall))
+                                            .statements()
+                                                .returnValue(Boolean.FALSE)
+                                                .build()
+                                            .build()
+                                        .build()
+                                    .build()
+                                .build()
+                            .returnValue(Boolean.TRUE)
+                            .build()
+                        .build();
+                // @formatter:on
+
+                return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), new Variable(VALUES)));
             default:
-                return super.buildExpression(typeName, node);
+                return super.buildExpression(module, typeName, node);
         }
     }
 
@@ -302,7 +395,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        return new BinaryBooleanExpression(operator, new FunctionCall.SetSize(new Variable(VALUE)), new ILValue(value));
+        return new BinaryBooleanExpression(operator, new FunctionCall.GetSize(new Variable(VALUES)),
+                new ILValue(value));
     }
 
 }

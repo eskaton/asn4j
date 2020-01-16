@@ -31,10 +31,14 @@ import ch.eskaton.asn4j.compiler.il.builder.Builder;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class Module implements Builder<Module> {
+
+    private Map<String, Integer> symbolIds = new HashMap<>();
 
     private List<Function> functions = new LinkedList<>();
 
@@ -48,6 +52,14 @@ public class Module implements Builder<Module> {
 
     public List<Function> getFunctions() {
         return functions;
+    }
+
+    public String generateSymbol(String prefix) {
+        int symbolId = symbolIds.getOrDefault(prefix, 1);
+
+        symbolIds.put(prefix, symbolId + 1);
+
+        return prefix + symbolId++;
     }
 
     @Override

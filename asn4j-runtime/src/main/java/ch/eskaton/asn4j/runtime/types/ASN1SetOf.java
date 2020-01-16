@@ -31,18 +31,19 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.commons.utils.CollectionUtils;
 
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
-public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<HashSet<T>, T> {
+public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<List<T>, T> {
 
     public ASN1SetOf() {
-        super(new HashSet<>());
+        super(new LinkedList<>());
     }
 
     public ASN1SetOf(T... values) {
-        super(CollectionUtils.asHashSet(values));
+        super(CollectionUtils.asLinkedList(values));
     }
 
     @Override

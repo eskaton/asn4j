@@ -309,14 +309,14 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
-    protected abstract void addConstraint(Type type, Module module, ConstraintDefinition definition, int level);
+    protected abstract void addConstraint(Type type, Module module, ConstraintDefinition definition);
 
     protected void addConstraintCondition(Type type, ConstraintDefinition definition, FunctionBuilder builder) {
         if (definition.isExtensible()) {
             builder.statements().returnValue(Boolean.TRUE);
         } else {
             Node roots = definition.getRoots();
-            Optional<BooleanExpression> expression = buildExpression(getTypeName(type), roots);
+            Optional<BooleanExpression> expression = buildExpression(builder.getModule(), getTypeName(type), roots);
 
             if (expression.isPresent()) {
                 // @formatter:off
@@ -349,9 +349,9 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
-    protected FunctionBuilder generateCheckConstraintValue(Module module, int level, Parameter... parameters) {
+    protected FunctionBuilder generateCheckConstraintValue(Module module, Parameter... parameters) {
         FunctionBuilder builder = module.function()
-                .name("checkConstraintValue_" + level)
+                .name("checkConstraintValue")
                 .returnType(ILType.of(BOOLEAN));
 
         Arrays.stream(parameters).forEach(builder::parameter);
@@ -363,11 +363,7 @@ public abstract class AbstractConstraintCompiler {
         return node;
     }
 
-    protected void generateDoCheckConstraint(Module module, int level) {
-        if (level != 1) {
-            return;
-        }
-
+    protected void generateDoCheckConstraint(Module module) {
         // @formatter:off
         module.function()
                 .name("doCheckConstraint")
@@ -375,37 +371,37 @@ public abstract class AbstractConstraintCompiler {
                 .visibility(ILVisibility.PUBLIC)
                 .returnType(ILType.of(BOOLEAN))
                 .statements()
-                    .returnExpression(generateCheckConstraintCall(level))
+                    .returnExpression(generateCheckConstraintCall())
                     .build()
                 .build();
         // @formatter:on
     }
 
-    protected FunctionCall generateCheckConstraintCall(int level) {
-        return new FunctionCall(of("checkConstraintValue_" + level), new FunctionCall(of("getValue")));
+    protected FunctionCall generateCheckConstraintCall() {
+        return new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValue")));
     }
 
-    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
         switch (node.getType()) {
             case ALL_VALUES:
                 return Optional.empty();
             case UNION:
                 return OptionalUtils.combine(
-                        buildExpression(typeName, ((BinOpNode) node).getLeft()),
-                        buildExpression(typeName, ((BinOpNode) node).getRight()),
+                        buildExpression(module, typeName, ((BinOpNode) node).getLeft()),
+                        buildExpression(module, typeName, ((BinOpNode) node).getRight()),
                         getBinOperation(BinaryOperator.OR));
             case INTERSECTION:
                 return OptionalUtils.combine(
-                        buildExpression(typeName, ((BinOpNode) node).getLeft()),
-                        buildExpression(typeName, ((BinOpNode) node).getRight()),
+                        buildExpression(module, typeName, ((BinOpNode) node).getLeft()),
+                        buildExpression(module, typeName, ((BinOpNode) node).getRight()),
                         getBinOperation(BinaryOperator.AND));
             case COMPLEMENT:
                 return OptionalUtils.combine(
-                        buildExpression(typeName, ((BinOpNode) node).getLeft()),
-                        buildExpression(typeName, ((BinOpNode) node).getRight()).map(this::negate),
+                        buildExpression(module, typeName, ((BinOpNode) node).getLeft()),
+                        buildExpression(module, typeName, ((BinOpNode) node).getRight()).map(this::negate),
                         getBinOperation(BinaryOperator.AND));
             case NEGATION:
-                return buildExpression(typeName, ((OpNode) node).getNode()).map(this::negate);
+                return buildExpression(module, typeName, ((OpNode) node).getNode()).map(this::negate);
             default:
                 return throwUnimplementedNodeType(node);
         }

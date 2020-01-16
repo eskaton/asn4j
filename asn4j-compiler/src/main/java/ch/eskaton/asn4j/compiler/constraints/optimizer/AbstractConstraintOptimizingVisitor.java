@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpType;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
 
 import java.util.Collection;
 import java.util.EnumMap;
@@ -59,6 +60,11 @@ public abstract class AbstractConstraintOptimizingVisitor<V, C extends Collectio
 
         return Optional.ofNullable(transformations.get(binOpType))
                 .map(t -> t.transform(node, left, right)).orElse(node);
+    }
+
+    @Override
+    public Node visit(WithComponentNode node) {
+        return node;
     }
 
 }

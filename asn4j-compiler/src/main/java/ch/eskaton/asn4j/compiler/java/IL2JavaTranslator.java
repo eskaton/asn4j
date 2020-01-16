@@ -45,7 +45,7 @@ import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BigIntegerCompare;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BitStringSize;
-import ch.eskaton.asn4j.compiler.il.FunctionCall.SetSize;
+import ch.eskaton.asn4j.compiler.il.FunctionCall.GetSize;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
 import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
@@ -198,9 +198,9 @@ public class IL2JavaTranslator {
                         .map(v -> getInitializerString(ctx, ((ILValue) expression).getTypeName().get(), v))
                         .collect(Collectors.joining(", "));
 
-                javaClass.addStaticImport(CollectionUtils.class, "asHashSet");
+                javaClass.addStaticImport(Arrays.class, "asList");
 
-                return "asHashSet(" + initString + ")";
+                return "asList(" + initString + ")";
             }
 
             return String.valueOf(value);
@@ -219,7 +219,7 @@ public class IL2JavaTranslator {
             } else if (functionCall instanceof BitStringSize) {
                 return "ASN1BitString.getSize(" + translateArg(ctx, javaClass, functionCall, 0) + ", " +
                         translateArg(ctx, javaClass, functionCall, 1) + ")";
-            } else if (functionCall instanceof SetSize) {
+            } else if (functionCall instanceof GetSize) {
                 object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
                 function = "size";
             } else if (functionCall instanceof ToArray) {
@@ -297,9 +297,7 @@ public class IL2JavaTranslator {
             BooleanFunctionCall functionCall = (BooleanFunctionCall) booleanExpression;
 
             if (functionCall instanceof ArrayEquals) {
-                String arguments = functionCall.getArguments().stream()
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
+                String arguments = argumentsToString(ctx, javaClass, functionCall);
 
                 javaClass.addImport(Arrays.class);
 
@@ -314,17 +312,21 @@ public class IL2JavaTranslator {
                 String function = functionCall.getFunction()
                         .orElseThrow(() -> new CompilerException("Undefined function of type %s",
                                 functionCall.getClass().getSimpleName()));
-                String object = translateArg(ctx, javaClass, functionCall, 0);
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 1)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
+                Optional<String> object = functionCall.getObject().map(obj -> translateExpression(ctx, javaClass, obj));
+                String arguments = argumentsToString(ctx, javaClass, functionCall);
 
-                return object + "." + function + "(" + arguments + ")";
+                return object.map(obj -> obj + ".").orElse("") + function + "(" + arguments + ")";
             }
         } else {
             throw new CompilerException("Unhandled boolean expression type: %s",
                     booleanExpression.getClass().getSimpleName());
         }
+    }
+
+    private String argumentsToString(CompilerContext ctx, JavaClass javaClass, BooleanFunctionCall functionCall) {
+        return functionCall.getArguments().stream()
+                .map(expr -> translateExpression(ctx, javaClass, expr))
+                .collect(joining(", "));
     }
 
     private String toJavaType(JavaClass javaClass, ILType type) {

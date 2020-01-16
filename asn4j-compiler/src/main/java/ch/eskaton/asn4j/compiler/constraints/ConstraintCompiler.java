@@ -29,9 +29,12 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
@@ -50,6 +53,8 @@ import ch.eskaton.commons.collections.Maps;
 
 import java.util.Map;
 import java.util.Optional;
+
+import static java.util.Collections.singletonList;
 
 public class ConstraintCompiler {
 
@@ -90,7 +95,7 @@ public class ConstraintCompiler {
         if (definition != null) {
             Module module = new Module();
 
-            addConstraint(node, module, definition, 1);
+            addConstraint(node, module, definition);
 
             javaClass.addModule(ctx, module);
         }
@@ -125,7 +130,7 @@ public class ConstraintCompiler {
         return Optional.of(compilers.get(compiledType.getType().getClass()));
     }
 
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
         CompiledType compiledType = ctx.getCompiledBaseType(type);
         Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
 
@@ -133,9 +138,29 @@ public class ConstraintCompiler {
             return;
         }
 
-        AbstractConstraintCompiler compiler = maybeCompiler.get();
+        maybeCompiler.get().addConstraint(type, module, definition);
+    }
 
-        compiler.addConstraint(type, module, definition, level);
+    public ConstraintDefinition compileConstraint(Type type, Constraint constraint) {
+        CompiledType compiledType = ctx.getCompiledBaseType(type);
+        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
+
+        if (!maybeCompiler.isPresent()) {
+            return null;
+        }
+
+        return maybeCompiler.get().compileConstraints(compiledType, singletonList(constraint), Optional.empty());
+    }
+
+    public Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
+        CompiledType compiledType = ctx.getCompiledBaseType(type);
+        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
+
+        if (!maybeCompiler.isPresent()) {
+            return null;
+        }
+
+        return maybeCompiler.get().buildExpression(module, "", node);
     }
 
 }
