@@ -43,7 +43,7 @@
                 <artifactId>asn4j-maven-plugin</artifactId>
                 <version>${project.version}</version>
                 <executions>
-                    <execution>
+                   <execution>
                         <id>X680_13</id>
                         <phase>generate-sources</phase>
                         <goals>
@@ -429,6 +429,21 @@
                             <pkg>ch.eskaton.asn4j.test.modules.x680_51_5</pkg>
                             <includePaths>
                                 <includePath>src/test/resources/asn1/X680_51_5</includePath>
+                            </includePaths>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>X680_51_8</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>asn4j</goal>
+                        </goals>
+                        <configuration>
+                            <module>X680-51-8</module>
+                            <pkg>ch.eskaton.asn4j.test.modules.x680_51_8</pkg>
+                            <includePaths>
+                                <includePath>src/test/resources/asn1/X680_51_8</includePath>
                             </includePaths>
                         </configuration>
                     </execution>

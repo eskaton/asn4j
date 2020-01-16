@@ -118,10 +118,10 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
-        generateDoCheckConstraint(module, level);
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
+        generateDoCheckConstraint(module);
 
-        FunctionBuilder function = generateCheckConstraintValue(module, level,
+        FunctionBuilder function = generateCheckConstraintValue(module,
                 new Parameter(ILType.of(BYTE_ARRAY), VALUE), new Parameter(ILType.of(INTEGER), UNUSED_BITS));
 
         addConstraintCondition(type, definition, function);
@@ -130,8 +130,8 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected FunctionCall generateCheckConstraintCall(int level) {
-        return new FunctionCall(of("checkConstraintValue_" + 1),
+    protected FunctionCall generateCheckConstraintCall() {
+        return new FunctionCall(of("checkConstraintValue"),
                 new FunctionCall(of("getValue")), new FunctionCall(of("getUnusedBits")));
     }
 
@@ -141,7 +141,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<BitStringValue> values = ((BitStringValueNode) node).getValue();
@@ -159,7 +159,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                 return of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
 
             default:
-                return super.buildExpression(typeName, node);
+                return super.buildExpression(module, typeName, node);
         }
     }
 

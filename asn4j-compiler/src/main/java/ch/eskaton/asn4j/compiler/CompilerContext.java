@@ -31,6 +31,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
@@ -59,6 +60,7 @@ import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
@@ -717,17 +719,26 @@ public class CompilerContext {
         }
     }
 
-    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) {
-        return constraintCompiler.compileConstraint(javaClass, name, node);
+
+    public Optional<BooleanExpression> buildExpression(Module module, Type type, ch.eskaton.asn4j.compiler.constraints.ast.Node node) {
+        return constraintCompiler.buildExpression(module, type, node);
     }
 
-    public ConstraintDefinition compileConstraint(Type node) {
-        return constraintCompiler.compileConstraint(node);
+    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type type) {
+        return constraintCompiler.compileConstraint(javaClass, name, type);
+    }
+
+    public ConstraintDefinition compileConstraint(Type type) {
+        return constraintCompiler.compileConstraint(type);
+    }
+
+    public ConstraintDefinition compileConstraint(Type type, Constraint constraint) {
+        return constraintCompiler.compileConstraint(type, constraint);
     }
 
 
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
-        constraintCompiler.addConstraint(type, module, definition, level);
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
+        constraintCompiler.addConstraint(type, module, definition);
     }
 
     public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value) {
@@ -896,6 +907,23 @@ public class CompilerContext {
             type = ((CollectionOfType) type).getType();
             typeNames.add(getTypeName(type));
         }
+
+        return typeNames;
+    }
+
+    public List<String> getParameterizedType(Type node) {
+        LinkedList<String> typeNames = new LinkedList<>();
+        Type type = node;
+
+        do {
+            typeNames.add(getTypeName(type));
+
+            if (type instanceof CollectionOfType) {
+                type = ((CollectionOfType) type).getType();
+            } else {
+                break;
+            }
+        } while (true);
 
         return typeNames;
     }

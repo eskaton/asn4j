@@ -109,9 +109,9 @@ public class FunctionCall implements Expression {
 
     }
 
-    public static class SetSize extends FunctionCall {
+    public static class GetSize extends FunctionCall {
 
-        public SetSize(Expression argument) {
+        public GetSize(Expression argument) {
             super(Optional.empty(), argument);
         }
 

@@ -35,6 +35,8 @@ import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Statement;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.List;
+
 public class FunctionBuilder implements Builder<Module>, HasStatements {
 
     private Module module;
@@ -86,6 +88,12 @@ public class FunctionBuilder implements Builder<Module>, HasStatements {
         return this;
     }
 
+    public FunctionBuilder parameters(List<Parameter> parameters) {
+        parameters.forEach(this::parameter);
+
+        return this;
+    }
+
     public StatementBuilder<FunctionBuilder> statements() {
         return new StatementBuilder(this);
     }
@@ -106,5 +114,4 @@ public class FunctionBuilder implements Builder<Module>, HasStatements {
     public String toString() {
         return ToString.get(this);
     }
-
 }

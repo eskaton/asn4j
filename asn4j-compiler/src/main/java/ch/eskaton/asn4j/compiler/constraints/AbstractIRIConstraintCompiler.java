@@ -99,11 +99,10 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     }
 
     @Override
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
-        generateDoCheckConstraint(module, level);
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
+        generateDoCheckConstraint(module);
 
-        FunctionBuilder builder = generateCheckConstraintValue(module, level,
-                new Parameter(ILType.of(STRING_ARRAY), "value"));
+        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(STRING_ARRAY), "value"));
 
         addConstraintCondition(type, definition, builder);
 
@@ -111,13 +110,13 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     }
 
     @Override
-    protected FunctionCall generateCheckConstraintCall(int level) {
-        return new FunctionCall(of("checkConstraintValue_" + level),
+    protected FunctionCall generateCheckConstraintCall() {
+        return new FunctionCall(of("checkConstraintValue"),
                 new ToArray(ILType.of(ILBuiltinType.STRING), new FunctionCall(of("getValue"))));
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<BooleanExpression> arguments = (((N) node).getValue()).stream()
@@ -126,7 +125,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
             default:
-                return super.buildExpression(typeName, node);
+                return super.buildExpression(module, typeName, node);
         }
     }
 

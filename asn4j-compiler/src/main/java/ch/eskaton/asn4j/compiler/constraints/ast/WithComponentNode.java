@@ -25,13 +25,31 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.encoders;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
-import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
-import java.util.List;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.WITH_COMPONENT;
 
-public class SetOfEncoder<T extends ASN1Type> extends CollectionOfEncoder<ASN1SetOf<T>, List<T>, T> {
+public class WithComponentNode extends AbstractNode {
+
+    private final Type componentType;
+
+    private final Node constraint;
+
+    public WithComponentNode(Type elementType, Node constraint) {
+        super(WITH_COMPONENT);
+
+        this.componentType = elementType;
+        this.constraint = constraint;
+    }
+
+    public Type getComponentType() {
+        return componentType;
+    }
+
+    public Node getConstraint() {
+        return constraint;
+    }
 
 }

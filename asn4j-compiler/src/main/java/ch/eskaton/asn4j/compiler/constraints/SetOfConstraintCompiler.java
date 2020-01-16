@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
 public class SetOfConstraintCompiler extends AbstractCollectionOfConstraintCompiler {
 
     public SetOfConstraintCompiler(CompilerContext ctx) {
-        super(ctx, TypeName.SET_OF, ILBuiltinType.SET);
+        super(ctx, TypeName.SET_OF, ILBuiltinType.LIST);
     }
 
 }

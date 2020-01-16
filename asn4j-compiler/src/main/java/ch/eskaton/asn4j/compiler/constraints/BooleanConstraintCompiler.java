@@ -85,11 +85,10 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition, int level) {
-        generateDoCheckConstraint(module, level);
+    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
+        generateDoCheckConstraint(module);
 
-        FunctionBuilder builder = generateCheckConstraintValue(module, level,
-                new Parameter(ILType.of(BOOLEAN), "value"));
+        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(BOOLEAN), "value"));
 
         addConstraintCondition(type, definition, builder);
 
@@ -97,13 +96,13 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
         switch (node.getType()) {
             case VALUE:
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.EQ, new Variable("value"),
                         new ILValue(typeName, ((ValueNode) node).getValue())));
             default:
-                return super.buildExpression(typeName, node);
+                return super.buildExpression(module, typeName, node);
         }
     }
 
