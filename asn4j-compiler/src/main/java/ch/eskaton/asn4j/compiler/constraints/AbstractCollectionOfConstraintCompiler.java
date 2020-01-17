@@ -153,8 +153,12 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
             ConstraintDefinition definition = ctx.compileConstraint(componentType);
 
-            definition = definition.serialApplication(
-                    ctx.compileConstraint(componentType, ((SingleTypeConstraint) elements).getConstraint()));
+            if (definition != null) {
+                definition = definition.serialApplication(
+                        ctx.compileConstraint(componentType, ((SingleTypeConstraint) elements).getConstraint()));
+            } else {
+                definition = ctx.compileConstraint(componentType, ((SingleTypeConstraint) elements).getConstraint());
+            }
 
             return new WithComponentNode(componentType, definition.getRoots());
         } else {
