@@ -387,10 +387,31 @@ public class CompilerContext {
         return module;
     }
 
-    public TypeAssignmentNode getTypeAssignment(TypeReference type) {
+    public Type getBase(String typeName) {
         // TODO: what to do if the type isn't known in the current module
-        return (TypeAssignmentNode) getModule().getBody().getAssignments(type.getType());
+        while (true) {
+            // Check for implicitly defined types
+            if (GeneralizedTime.class.getSimpleName().equals(typeName) ||
+                    UTCTime.class.getSimpleName().equals(typeName)) {
+                return new VisibleString(NO_POSITION);
+            }
+
+            TypeAssignmentNode assignment = getTypeAssignment(typeName);
+
+            if (assignment == null) {
+                throw new CompilerException("Failed to resolve a type: " + typeName);
+            }
+
+            Type base = assignment.getType();
+
+            if (base instanceof TypeReference) {
+                typeName = ((TypeReference) base).getType();
+            } else {
+                return base;
+            }
+        }
     }
+
 
     public Type getBase(Type type) {
         if (type instanceof TypeReference) {
@@ -411,7 +432,7 @@ public class CompilerContext {
                 return new VisibleString(NO_POSITION);
             }
 
-            TypeAssignmentNode assignment = (TypeAssignmentNode) getModule().getBody().getAssignments(typeName);
+            TypeAssignmentNode assignment = getTypeAssignment(typeName);
 
             if (assignment == null) {
                 throw new CompilerException(type.getPosition(), "Failed to resolve a type: " + typeName);
@@ -497,7 +518,7 @@ public class CompilerContext {
             typeName = CompilerUtils.formatTypeName(name);
             compileType(type, typeName, name);
         } else {
-            String runtimeClass = runtimeTypes.get(type.getClass().getSimpleName());
+            String runtimeClass = getRuntimeType(type.getClass());
 
             if (runtimeClass == null) {
                 throw new CompilerException("No runtime class available for type " + type);
@@ -514,6 +535,12 @@ public class CompilerContext {
 
         addType(name, compiledType);
     }
+
+
+    private TypeAssignmentNode getTypeAssignment(String type) {
+        return getTypeAssignment(type, null);
+    }
+
 
     public TypeAssignmentNode getTypeAssignment(String typeName, String moduleName) {
         ModuleNode module;
@@ -598,10 +625,6 @@ public class CompilerContext {
         }
 
         return type;
-    }
-
-    private TypeAssignmentNode getTypeAssignment(String type) {
-        return getTypeAssignment(type, null);
     }
 
     public ValueOrObjectAssignmentNode resolveDefinedValue(DefinedValue ref) {
