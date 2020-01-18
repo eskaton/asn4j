@@ -289,13 +289,15 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                 List<Parameter> parameters;
 
                 if (typeParameters.isEmpty()) {
-                    if (parameterizedType.get(0).equals(ASN1Integer.class.getSimpleName())) {
+                    String type = ctx.getRuntimeType(ctx.getBase(parameterizedType.get(0)).getClass());
+
+                    if (type.equals(ASN1Integer.class.getSimpleName())) {
                         parameters = singletonList(new Parameter(ILType.of(ILBuiltinType.BIG_INTEGER), VALUE));
-                    } else if (parameterizedType.get(0).equals(ASN1BitString.class.getSimpleName())) {
+                    } else if (type.equals(ASN1BitString.class.getSimpleName())) {
                         parameters = asList(new Parameter(ILType.of(ILBuiltinType.BYTE_ARRAY), VALUE),
                                 new Parameter(ILType.of(ILBuiltinType.INTEGER), "unusedBits"));
                     } else {
-                        throw new CompilerException("Unsupported type %s", parameterizedType.get(0));
+                        throw new CompilerException("Unsupported type %s", type);
                     }
                 } else {
                     parameters = singletonList(
