@@ -412,7 +412,6 @@ public class CompilerContext {
         }
     }
 
-
     public Type getBase(Type type) {
         if (type instanceof TypeReference) {
             return getBase((TypeReference) type);
@@ -920,6 +919,16 @@ public class CompilerContext {
 
     public String getRuntimeType(Class<?> type) {
         return runtimeTypes.get(type.getSimpleName());
+    }
+
+    public String getRuntimeType(String typeName) {
+        try {
+            Type type = getBase(typeName);
+
+            return getRuntimeType(type.getClass());
+        } catch(CompilerException e) {
+            return typeName;
+        }
     }
 
     public List<String> getTypeParameter(Type node) {

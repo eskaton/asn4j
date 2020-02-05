@@ -64,14 +64,29 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
+import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
+import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BIG_INTEGER;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BYTE_ARRAY;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.CUSTOM;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER_ARRAY;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.NULL;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING_ARRAY;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
@@ -286,27 +301,11 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
                 List<String> parameterizedType = ctx.getParameterizedType(componentNode.getComponentType());
                 List<String> typeParameters = parameterizedType.stream().skip(1).collect(Collectors.toList());
-                List<Parameter> parameters;
-
-                if (typeParameters.isEmpty()) {
-                    String type = ctx.getRuntimeType(ctx.getBase(parameterizedType.get(0)).getClass());
-
-                    if (type.equals(ASN1Integer.class.getSimpleName())) {
-                        parameters = singletonList(new Parameter(ILType.of(ILBuiltinType.BIG_INTEGER), VALUE));
-                    } else if (type.equals(ASN1BitString.class.getSimpleName())) {
-                        parameters = asList(new Parameter(ILType.of(ILBuiltinType.BYTE_ARRAY), VALUE),
-                                new Parameter(ILType.of(ILBuiltinType.INTEGER), "unusedBits"));
-                    } else {
-                        throw new CompilerException("Unsupported type %s", type);
-                    }
-                } else {
-                    parameters = singletonList(
-                            new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameters), VALUES));
-                }
+                List<Parameter> parameters = getParameters(parameterizedType, typeParameters);
 
                 // @formatter:off
                 module.function()
-                        .returnType(ILType.of(ILBuiltinType.BOOLEAN))
+                        .returnType(ILType.of(BOOLEAN))
                         .name(expressionSym)
                         .parameters(parameters)
                         .statements()
@@ -320,13 +319,19 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
                 if (typeParameters.isEmpty()) {
                     if (parameterizedType.get(0).equals(ASN1BitString.class.getSimpleName())) {
+                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym), getGetValueCall(),
+                                new FunctionCall(Optional.of("getUnusedBits"), Optional.of(new Variable(VALUE))));
+                    } else if (parameterizedType.get(0).equals(ASN1ObjectIdentifier.class.getSimpleName()) ||
+                            parameterizedType.get(0).equals(ASN1RelativeOID.class.getSimpleName())) {
                         functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
-                                new FunctionCall(Optional.of(GET_VALUE), Optional.of(new Variable(VALUE))),
-                                new FunctionCall(Optional.of("getUnusedBits"),
-                                        Optional.of(new Variable(VALUE))));
+                                new FunctionCall.ToArray(ILType.of(INTEGER), getGetValueCall()));
+                    } else if (parameterizedType.get(0).equals(ASN1IRI.class.getSimpleName()) ||
+                            parameterizedType.get(0).equals(ASN1RelativeIRI.class.getSimpleName())) {
+                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
+                                new FunctionCall.ToArray(ILType.of(ILBuiltinType.STRING),
+                                        getGetValueCall()));
                     } else {
-                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
-                                new FunctionCall(Optional.of(GET_VALUE), Optional.of(new Variable(VALUE))));
+                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym), getGetValueCall());
                     }
                 } else {
                     functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
@@ -335,7 +340,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
                 // @formatter:off
                 module.function()
-                        .returnType(ILType.of(ILBuiltinType.BOOLEAN))
+                        .returnType(ILType.of(BOOLEAN))
                         .name(checkSym)
                         .parameter(new Parameter(new ILParameterizedType(ILBuiltinType.LIST, parameterizedType), VALUES))
                         .statements()
@@ -359,6 +364,50 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
             default:
                 return super.buildExpression(module, typeName, node);
         }
+    }
+
+    private FunctionCall getGetValueCall() {
+        return new FunctionCall(Optional.of(GET_VALUE), Optional.of(new Variable(VALUE)));
+    }
+
+    private List<Parameter> getParameters(List<String> parameterizedType, List<String> typeParameters) {
+        List<Parameter> parameters;
+
+        if (typeParameters.isEmpty()) {
+            String runtimeType = ctx.getRuntimeType(parameterizedType.get(0));
+
+            if (runtimeType.equals(ASN1Integer.class.getSimpleName())) {
+                parameters = getParameter(BIG_INTEGER);
+            } else if (runtimeType.equals(ASN1Boolean.class.getSimpleName())) {
+                parameters = getParameter(BOOLEAN);
+            } else if (runtimeType.equals(ASN1EnumeratedType.class.getSimpleName())) {
+                parameters = getParameter(INTEGER);
+            } else if (runtimeType.equals(ASN1Null.class.getSimpleName())) {
+                parameters = getParameter(NULL);
+            } else if (runtimeType.equals(ASN1ObjectIdentifier.class.getSimpleName()) ||
+                    runtimeType.equals(ASN1RelativeOID.class.getSimpleName())) {
+                parameters = getParameter(INTEGER_ARRAY);
+            } else if (runtimeType.equals(ASN1IRI.class.getSimpleName()) ||
+                    runtimeType.equals(ASN1RelativeIRI.class.getSimpleName())) {
+                parameters = getParameter(STRING_ARRAY);
+            } else if (runtimeType.equals(ASN1BitString.class.getSimpleName())) {
+                parameters = asList(new Parameter(ILType.of(BYTE_ARRAY), VALUE),
+                        new Parameter(ILType.of(INTEGER), "unusedBits"));
+            } else if (runtimeType.equals(ASN1OctetString.class.getSimpleName())) {
+                parameters = getParameter(BYTE_ARRAY);
+            } else {
+                throw new CompilerException("Unsupported runtimeType %s", runtimeType);
+            }
+        } else {
+            parameters = singletonList(
+                    new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameters), VALUES));
+        }
+
+        return parameters;
+    }
+
+    private List<Parameter> getParameter(ILBuiltinType builtinType) {
+        return singletonList(new Parameter(ILType.of(builtinType), VALUE));
     }
 
     @Override
