@@ -280,90 +280,105 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
         switch (node.getType()) {
             case VALUE:
-                Set<CollectionOfValue> values = ((CollectionOfValueNode) node).getValue();
-                List<BooleanExpression> valueArguments = values.stream()
-                        .map(value -> buildExpression(typeName, value))
-                        .collect(Collectors.toList());
-
-                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
+                return getValueExpression(typeName, (CollectionOfValueNode) node);
             case SIZE:
-                List<IntegerRange> sizes = ((SizeNode) node).getSize();
-                List<BooleanExpression> sizeArguments = sizes.stream().map(this::buildSizeExpression)
-                        .collect(Collectors.toList());
-
-                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
+                return getSizeExpression((SizeNode) node);
             case WITH_COMPONENT:
-                WithComponentNode componentNode = (WithComponentNode) node;
-                Optional<BooleanExpression> expression = ctx
-                        .buildExpression(module, componentNode.getComponentType(), componentNode.getConstraint());
-
-                String expressionSym = module.generateSymbol("_expression");
-
-                List<String> parameterizedType = ctx.getParameterizedType(componentNode.getComponentType());
-                List<String> typeParameters = parameterizedType.stream().skip(1).collect(Collectors.toList());
-                List<Parameter> parameters = getParameters(parameterizedType, typeParameters);
-
-                // @formatter:off
-                module.function()
-                        .returnType(ILType.of(BOOLEAN))
-                        .name(expressionSym)
-                        .parameters(parameters)
-                        .statements()
-                            .returnExpression(expression.get())
-                            .build()
-                        .build();
-                // @formatter:on
-
-                String checkSym = module.generateSymbol("_checkConstraint");
-                BooleanFunctionCall functionCall;
-
-                if (typeParameters.isEmpty()) {
-                    if (parameterizedType.get(0).equals(ASN1BitString.class.getSimpleName())) {
-                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym), getGetValueCall(),
-                                new FunctionCall(Optional.of("getUnusedBits"), Optional.of(new Variable(VALUE))));
-                    } else if (parameterizedType.get(0).equals(ASN1ObjectIdentifier.class.getSimpleName()) ||
-                            parameterizedType.get(0).equals(ASN1RelativeOID.class.getSimpleName())) {
-                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
-                                new FunctionCall.ToArray(ILType.of(INTEGER), getGetValueCall()));
-                    } else if (parameterizedType.get(0).equals(ASN1IRI.class.getSimpleName()) ||
-                            parameterizedType.get(0).equals(ASN1RelativeIRI.class.getSimpleName())) {
-                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
-                                new FunctionCall.ToArray(ILType.of(ILBuiltinType.STRING),
-                                        getGetValueCall()));
-                    } else {
-                        functionCall = new BooleanFunctionCall(Optional.of(expressionSym), getGetValueCall());
-                    }
-                } else {
-                    functionCall = new BooleanFunctionCall(Optional.of(expressionSym),
-                            new FunctionCall(Optional.of(GET_VALUES), Optional.of(new Variable(VALUE))));
-                }
-
-                // @formatter:off
-                module.function()
-                        .returnType(ILType.of(BOOLEAN))
-                        .name(checkSym)
-                        .parameter(new Parameter(new ILParameterizedType(ILBuiltinType.LIST, parameterizedType), VALUES))
-                        .statements()
-                            .foreach(new ILParameterizedType(CUSTOM, parameterizedType), new Variable(VALUE), new Variable(VALUES))
-                                .statements()
-                                    .conditions()
-                                        .condition(new NegationExpression(functionCall))
-                                            .statements()
-                                                .returnValue(Boolean.FALSE)
-                                                .build()
-                                            .build()
-                                        .build()
-                                    .build()
-                                .build()
-                            .returnValue(Boolean.TRUE)
-                            .build()
-                        .build();
-                // @formatter:on
-
-                return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), new Variable(VALUES)));
+                return getWithComponentExpression(module, (WithComponentNode) node);
             default:
                 return super.buildExpression(module, typeName, node);
         }
+    }
+
+    private Optional<BooleanExpression> getValueExpression(String typeName, CollectionOfValueNode node) {
+        Set<CollectionOfValue> values = node.getValue();
+        List<BooleanExpression> valueArguments = values.stream()
+                .map(value -> buildExpression(typeName, value))
+                .collect(Collectors.toList());
+
+        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
+    }
+
+    private Optional<BooleanExpression> getSizeExpression(SizeNode node) {
+        List<IntegerRange> sizes = node.getSize();
+        List<BooleanExpression> sizeArguments = sizes.stream().map(this::buildSizeExpression)
+                .collect(Collectors.toList());
+
+        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
+    }
+
+    private Optional<BooleanExpression> getWithComponentExpression(Module module, WithComponentNode node) {
+        WithComponentNode componentNode = node;
+        Optional<BooleanExpression> expression = ctx
+                .buildExpression(module, componentNode.getComponentType(), componentNode.getConstraint());
+
+        String expressionSym = module.generateSymbol("_expression");
+
+        List<String> parameterizedType = ctx.getParameterizedType(componentNode.getComponentType());
+        List<String> typeParameters = parameterizedType.stream().skip(1).collect(Collectors.toList());
+        List<Parameter> parameters = getParameters(parameterizedType, typeParameters);
+
+        // @formatter:off
+        module.function()
+                .returnType(ILType.of(BOOLEAN))
+                .name(expressionSym)
+                .parameters(parameters)
+                .statements()
+                    .returnExpression(expression.get())
+                    .build()
+                .build();
+        // @formatter:on
+
+        String checkSym = module.generateSymbol("_checkConstraint");
+        BooleanFunctionCall functionCall = getExprFunctionCall(Optional.of(expressionSym), parameterizedType,
+                typeParameters);
+
+        // @formatter:off
+        module.function()
+                .returnType(ILType.of(BOOLEAN))
+                .name(checkSym)
+                .parameter(new Parameter(new ILParameterizedType(ILBuiltinType.LIST, parameterizedType), VALUES))
+                .statements()
+                    .foreach(new ILParameterizedType(CUSTOM, parameterizedType), new Variable(VALUE), new Variable(VALUES))
+                        .statements()
+                            .conditions()
+                                .condition(new NegationExpression(functionCall))
+                                    .statements()
+                                        .returnValue(Boolean.FALSE)
+                                        .build()
+                                    .build()
+                                .build()
+                            .build()
+                        .build()
+                    .returnValue(Boolean.TRUE)
+                    .build()
+                .build();
+        // @formatter:on
+
+        return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), new Variable(VALUES)));
+    }
+
+    private BooleanFunctionCall getExprFunctionCall(Optional<String> expressionSym, List<String> parameterizedType,
+            List<String> typeParameters) {
+        if (typeParameters.isEmpty()) {
+            if (parameterizedType.get(0).equals(ASN1BitString.class.getSimpleName())) {
+                return new BooleanFunctionCall(expressionSym, getGetValueCall(),
+                        new FunctionCall(Optional.of("getUnusedBits"), Optional.of(new Variable(VALUE))));
+            } else if (parameterizedType.get(0).equals(ASN1ObjectIdentifier.class.getSimpleName()) ||
+                    parameterizedType.get(0).equals(ASN1RelativeOID.class.getSimpleName())) {
+                return new BooleanFunctionCall(expressionSym,
+                        new FunctionCall.ToArray(ILType.of(INTEGER), getGetValueCall()));
+            } else if (parameterizedType.get(0).equals(ASN1IRI.class.getSimpleName()) ||
+                    parameterizedType.get(0).equals(ASN1RelativeIRI.class.getSimpleName())) {
+                return new BooleanFunctionCall(expressionSym,
+                        new FunctionCall.ToArray(ILType.of(ILBuiltinType.STRING), getGetValueCall()));
+            } else {
+                return new BooleanFunctionCall(expressionSym, getGetValueCall());
+            }
+        }
+
+        return new BooleanFunctionCall(expressionSym,
+                new FunctionCall(Optional.of(GET_VALUES), Optional.of(new Variable(VALUE))));
     }
 
     private FunctionCall getGetValueCall() {
