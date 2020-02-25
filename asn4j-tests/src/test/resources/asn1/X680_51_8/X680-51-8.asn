@@ -10,4 +10,23 @@ TestSetOf6 ::= TestSetOf3 (WITH COMPONENT (SIZE (2) | (WITH COMPONENT (1..2))))
 TestSetOf7 ::= TestSetOf3 (WITH COMPONENT (SIZE (2) ^ (WITH COMPONENT (1..2))))
 TestSetOf8 ::= TestSetOf3 (WITH COMPONENT (SIZE (2) EXCEPT (WITH COMPONENT (1..2))))
 
+-- Test all types
+TestSetOf9 ::= SET OF BOOLEAN
+TestSetOf10 ::= TestSetOf9 (WITH COMPONENT (TRUE))
+TestEnumerated1 ::= ENUMERATED {a, b, c}
+TestSetOf11 ::= SET OF TestEnumerated1
+TestSetOf12 ::= TestSetOf11 (WITH COMPONENT (a))
+TestSetOf13 ::= SET OF NULL
+TestSetOf14 ::= TestSetOf13 (WITH COMPONENT (NULL))
+TestSetOf15 ::= SET OF OBJECT IDENTIFIER
+TestSetOf16 ::= TestSetOf15 (WITH COMPONENT ({ 0 3 6 3 }))
+TestSetOf17 ::= SET OF RELATIVE-OID
+TestSetOf18 ::= TestSetOf17 (WITH COMPONENT ({ 3 6 3 }))
+TestSetOf19 ::= SET OF OID-IRI
+TestSetOf20 ::= TestSetOf19 (WITH COMPONENT ("/ISO/a/b/e"))
+TestSetOf21 ::= SET OF RELATIVE-OID-IRI
+TestSetOf22 ::= TestSetOf21 (WITH COMPONENT ("a/b/e"))
+TestSetOf23 ::= SET OF OCTET STRING
+TestSetOf24 ::= TestSetOf23 (WITH COMPONENT ('0101'B))
+
 END
