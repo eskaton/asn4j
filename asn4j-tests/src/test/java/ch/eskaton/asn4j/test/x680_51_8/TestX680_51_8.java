@@ -37,6 +37,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestEnumerated1;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf1;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf10;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf12;
@@ -55,6 +57,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf7;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf8;
 import org.junit.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 
@@ -219,4 +223,23 @@ public class TestX680_51_8 {
         testSetOfFailure(TestSetOf24.class, new TestSetOf24(), ASN1OctetString.valueOf(new byte[] { 0x51 }));
     }
 
+    @Test
+    public void testSequenceOf1() {
+        testSequenceOfSuccess(TestSequenceOf1.class, new TestSequenceOf1(), ASN1Integer.valueOf(0));
+        testSequenceOfSuccess(TestSequenceOf1.class, new TestSequenceOf1(), ASN1Integer.valueOf(4));
+
+        testSequenceOfFailure(TestSequenceOf1.class, new TestSequenceOf1(), ASN1Integer.valueOf(-1));
+        testSequenceOfFailure(TestSequenceOf1.class, new TestSequenceOf1(), ASN1Integer.valueOf(5));
+    }
+
+    @Test
+    public void testSequenceOf2() {
+        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(1));
+        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(2));
+
+        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(0));
+        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(3));
+    }
+
+    
 }

@@ -29,4 +29,7 @@ TestSetOf22 ::= TestSetOf21 (WITH COMPONENT ("a/b/e"))
 TestSetOf23 ::= SET OF OCTET STRING
 TestSetOf24 ::= TestSetOf23 (WITH COMPONENT ('0101'B))
 
+TestSequenceOf1 ::= SEQUENCE SIZE (1) OF INTEGER (0..4)
+TestSequenceOf2 ::= TestSequenceOf1 (WITH COMPONENT (1..2))
+
 END
