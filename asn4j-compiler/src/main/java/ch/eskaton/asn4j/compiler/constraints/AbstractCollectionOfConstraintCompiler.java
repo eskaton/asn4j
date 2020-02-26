@@ -73,6 +73,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
+import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
+import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 
 import java.util.List;
 import java.util.Optional;
@@ -361,17 +363,22 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     private BooleanFunctionCall getExprFunctionCall(Optional<String> expressionSym, List<String> parameterizedType,
             List<String> typeParameters) {
         if (typeParameters.isEmpty()) {
-            if (parameterizedType.get(0).equals(ASN1BitString.class.getSimpleName())) {
+            String runtimeType = ctx.getRuntimeType(parameterizedType.get(0));
+
+            if (runtimeType.equals(ASN1BitString.class.getSimpleName())) {
                 return new BooleanFunctionCall(expressionSym, getGetValueCall(),
                         new FunctionCall(Optional.of("getUnusedBits"), Optional.of(new Variable(VALUE))));
-            } else if (parameterizedType.get(0).equals(ASN1ObjectIdentifier.class.getSimpleName()) ||
-                    parameterizedType.get(0).equals(ASN1RelativeOID.class.getSimpleName())) {
+            } else if (runtimeType.equals(ASN1ObjectIdentifier.class.getSimpleName()) ||
+                    runtimeType.equals(ASN1RelativeOID.class.getSimpleName())) {
                 return new BooleanFunctionCall(expressionSym,
                         new FunctionCall.ToArray(ILType.of(INTEGER), getGetValueCall()));
-            } else if (parameterizedType.get(0).equals(ASN1IRI.class.getSimpleName()) ||
-                    parameterizedType.get(0).equals(ASN1RelativeIRI.class.getSimpleName())) {
+            } else if (runtimeType.equals(ASN1IRI.class.getSimpleName()) ||
+                    runtimeType.equals(ASN1RelativeIRI.class.getSimpleName())) {
                 return new BooleanFunctionCall(expressionSym,
                         new FunctionCall.ToArray(ILType.of(ILBuiltinType.STRING), getGetValueCall()));
+            } else if (runtimeType.equals(ASN1SequenceOf.class.getSimpleName()) ||
+                    runtimeType.equals(ASN1SetOf.class.getSimpleName())) {
+                return new BooleanFunctionCall(expressionSym, getGetValuesCall());
             } else {
                 return new BooleanFunctionCall(expressionSym, getGetValueCall());
             }
@@ -383,6 +390,11 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
     private FunctionCall getGetValueCall() {
         return new FunctionCall(Optional.of(GET_VALUE), Optional.of(new Variable(VALUE)));
+    }
+
+
+    private FunctionCall getGetValuesCall() {
+        return new FunctionCall(Optional.of(GET_VALUES), Optional.of(new Variable(VALUE)));
     }
 
     private List<Parameter> getParameters(List<String> parameterizedType, List<String> typeParameters) {
@@ -410,6 +422,13 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                         new Parameter(ILType.of(INTEGER), "unusedBits"));
             } else if (runtimeType.equals(ASN1OctetString.class.getSimpleName())) {
                 parameters = getParameter(BYTE_ARRAY);
+            } else if (runtimeType.equals(ASN1SequenceOf.class.getSimpleName()) ||
+                    runtimeType.equals(ASN1SetOf.class.getSimpleName())) {
+                List<String> typeParameter = ctx.getParameterizedType(ctx.getBase(parameterizedType.get(0))).stream()
+                        .skip(1).collect(Collectors.toList());
+
+                parameters = singletonList(
+                        new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameter), VALUES));
             } else {
                 throw new CompilerException("Unsupported runtimeType %s", runtimeType);
             }
