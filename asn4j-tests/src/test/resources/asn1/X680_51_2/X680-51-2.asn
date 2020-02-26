@@ -119,4 +119,7 @@ TestSetOfOidIri2 ::= SET ({"/ISO/a/b/c"}) OF TestOidIri1
 TestSetOfRelativeOidIri1 ::= SET ({"a/b/d"}) OF RELATIVE-OID-IRI
 TestSetOfRelativeOidIri2 ::= SET ({"a/b/c"}) OF TestRelativeOidIri1
 
+TestSequenceOfEnumeration1 ::= SEQUENCE ({a}) OF TestEnumeration1
+TestSequenceOfEnumeration2 ::= SEQUENCE ({a, c}) OF TestEnumeration1
+
 END

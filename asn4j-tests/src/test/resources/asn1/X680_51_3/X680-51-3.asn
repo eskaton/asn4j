@@ -59,4 +59,7 @@ TestOctetString3 ::= TestOctetString2 ('61AD'H)
 TestSetOf1 ::= SET ({1} | {2} | {3}) OF INTEGER
 TestSetOf2 ::= SET (INCLUDES TestSetOf1) OF INTEGER
 
+TestSequenceOf1 ::= SEQUENCE ({1} | {2} | {3}) OF INTEGER
+TestSequenceOf2 ::= SEQUENCE (INCLUDES TestSetOf1) OF INTEGER
+
 END

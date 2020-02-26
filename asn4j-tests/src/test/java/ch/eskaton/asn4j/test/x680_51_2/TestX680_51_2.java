@@ -83,6 +83,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri5;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequenceOfEnumeration1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequenceOfEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf3;
@@ -127,6 +129,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRIFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 
@@ -655,6 +659,22 @@ public class TestX680_51_2 {
 
         testSetOfFailure(TestSetOfRelativeOidIri2.class, new TestSetOfRelativeOidIri2(),
                 new TestRelativeOidIri1("a", "b", "d"));
+    }
+
+    @Test
+    public void testSequenceOfEnumeration1() {
+        testSequenceOfSuccess(TestSequenceOfEnumeration1.class, new TestSequenceOfEnumeration1(), TestEnumeration1.A);
+
+        testSequenceOfFailure(TestSequenceOfEnumeration1.class, new TestSequenceOfEnumeration1(), TestEnumeration1.B);
+    }
+
+    @Test
+    public void testSequenceOfEnumeration2() {
+        testSequenceOfSuccess(TestSequenceOfEnumeration2.class, new TestSequenceOfEnumeration2(),
+                TestEnumeration1.A, TestEnumeration1.C);
+
+        testSequenceOfFailure(TestSequenceOfEnumeration2.class, new TestSequenceOfEnumeration2(),
+                TestEnumeration1.A, TestEnumeration1.B);
     }
 
 }
