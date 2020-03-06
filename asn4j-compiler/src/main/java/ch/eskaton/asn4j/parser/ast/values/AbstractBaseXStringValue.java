@@ -5,6 +5,7 @@ import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class AbstractBaseXStringValue extends AbstractValue {
 
@@ -52,6 +53,27 @@ public class AbstractBaseXStringValue extends AbstractValue {
 
     private int getUnitLength() {
         return (int) (Math.log(256) / Math.log(base));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AbstractBaseXStringValue that = (AbstractBaseXStringValue) o;
+
+        return base == that.base &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(base, value);
     }
 
 }

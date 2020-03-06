@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Objects;
+
 public class NamedNumber extends AbstractValue {
 
     private String id;
@@ -61,6 +63,28 @@ public class NamedNumber extends AbstractValue {
 
     public SignedNumber getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        NamedNumber that = (NamedNumber) o;
+
+        return Objects.equals(id, that.id) &&
+                Objects.equals(ref, that.ref) &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, ref, value);
     }
 
 }

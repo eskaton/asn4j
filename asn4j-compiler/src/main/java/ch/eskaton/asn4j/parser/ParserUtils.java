@@ -53,6 +53,8 @@ public class ParserUtils {
             return ((Token) item).getPosition();
         } else if (item instanceof Node) {
             return ((Node) item).getPosition();
+        } else if (item instanceof List) {
+            return getPosition((List) item);
         }
 
         return NO_POSITION;

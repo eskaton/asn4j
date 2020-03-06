@@ -31,6 +31,8 @@ import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.StringToken;
 
+import java.util.Objects;
+
 public class StringValue extends AbstractValue {
 
     private String cString;
@@ -143,6 +145,33 @@ public class StringValue extends AbstractValue {
     	}
 
     	return new TimeValue(getPosition(), tString);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        StringValue that = (StringValue) o;
+
+        return flags == that.flags &&
+                Objects.equals(cString, that.cString) &&
+                Objects.equals(simpleString, that.simpleString) &&
+                Objects.equals(tString, that.tString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), cString, simpleString, tString, flags);
     }
 
 }

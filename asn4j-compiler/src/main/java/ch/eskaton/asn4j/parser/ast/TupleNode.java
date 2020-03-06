@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 
+import java.util.Objects;
+
 public class TupleNode extends AbstractValue {
 
     private short column;
@@ -49,6 +51,27 @@ public class TupleNode extends AbstractValue {
 
     public short getRow() {
     	return row;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        TupleNode tupleNode = (TupleNode) o;
+
+        return column == tupleNode.column &&
+                row == tupleNode.row;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(column, row);
     }
 
 }

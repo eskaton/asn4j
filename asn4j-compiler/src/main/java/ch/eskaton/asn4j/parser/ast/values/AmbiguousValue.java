@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class AmbiguousValue extends AbstractValue {
@@ -59,6 +60,26 @@ public class AmbiguousValue extends AbstractValue {
 
     public Set<Value> getValues() {
         return values;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AmbiguousValue that = (AmbiguousValue) o;
+
+        return Objects.equals(values, that.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(values);
     }
 
 }

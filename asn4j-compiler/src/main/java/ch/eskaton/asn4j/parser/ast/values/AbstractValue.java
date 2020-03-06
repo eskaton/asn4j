@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.parser.ast.values;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.Objects;
+
 public class AbstractValue implements Value {
 
     private Position position;
@@ -46,6 +48,26 @@ public class AbstractValue implements Value {
     @Override
     public String toString() {
         return ToString.get(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AbstractValue that = (AbstractValue) o;
+
+        return Objects.equals(position, that.position);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(position);
     }
 
 }

@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Objects;
+
 public class ContainingStringValue extends AbstractValue {
 
     private Value value;
@@ -41,6 +43,26 @@ public class ContainingStringValue extends AbstractValue {
 
     public Value getValue() {
     	return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ContainingStringValue that = (ContainingStringValue) o;
+
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
 }
