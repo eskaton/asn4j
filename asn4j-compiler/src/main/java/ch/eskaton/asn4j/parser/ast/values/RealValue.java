@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.parser.ast.values;
 import ch.eskaton.asn4j.parser.Position;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class RealValue extends AbstractValue {
 
@@ -87,6 +88,30 @@ public class RealValue extends AbstractValue {
 
     public Type getType() {
     	return type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        RealValue realValue = (RealValue) o;
+
+        return type == realValue.type &&
+                Objects.equals(value, realValue.value) &&
+                Objects.equals(mantissa, realValue.mantissa) &&
+                Objects.equals(base, realValue.base) &&
+                Objects.equals(exponent, realValue.exponent);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, value, mantissa, base, exponent);
     }
 
 }

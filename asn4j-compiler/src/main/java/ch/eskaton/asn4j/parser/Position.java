@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.parser;
 import ch.eskaton.asn4j.parser.ast.SourcePosition;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.Objects;
+
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class Position {
@@ -70,6 +72,28 @@ public class Position {
 
     public void decrementPosition() {
         position--;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Position position1 = (Position) o;
+
+        return line == position1.line &&
+                position == position1.position &&
+                Objects.equals(file, position1.file);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(file, line, position);
     }
 
     @Override

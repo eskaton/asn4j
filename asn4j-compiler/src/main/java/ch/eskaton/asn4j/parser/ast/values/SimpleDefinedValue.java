@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SimpleDefinedValue extends DefinedValue implements	ParameterizedNode {
 
@@ -70,6 +71,28 @@ public class SimpleDefinedValue extends DefinedValue implements	ParameterizedNod
     	ObjectReferenceNode ref = new ObjectReferenceNode(getPosition(), value);
     	ref.setParameters(parameters);
     	return ref;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SimpleDefinedValue that = (SimpleDefinedValue) o;
+
+        return Objects.equals(value, that.value) &&
+                Objects.equals(parameters, that.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(value, parameters);
     }
 
 }

@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Objects;
+
 public class EnumeratedValue extends AbstractValue {
 
     private String id;
@@ -54,6 +56,27 @@ public class EnumeratedValue extends AbstractValue {
 
     public int getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        EnumeratedValue that = (EnumeratedValue) o;
+
+        return value == that.value &&
+                Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, value);
     }
 
 }

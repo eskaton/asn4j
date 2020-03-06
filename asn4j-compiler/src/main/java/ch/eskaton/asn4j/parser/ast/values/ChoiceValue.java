@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Objects;
+
 public class ChoiceValue extends AbstractValue {
 
     private String id;
@@ -48,6 +50,27 @@ public class ChoiceValue extends AbstractValue {
 
     public Value getValue() {
     	return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ChoiceValue that = (ChoiceValue) o;
+
+        return Objects.equals(id, that.id) &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, value);
     }
 
 }

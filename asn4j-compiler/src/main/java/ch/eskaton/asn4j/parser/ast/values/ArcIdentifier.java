@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Objects;
+
 public class ArcIdentifier extends AbstractValue {
 
     private String identifier;
@@ -41,6 +43,26 @@ public class ArcIdentifier extends AbstractValue {
 
     public String getIdentifier() {
         return identifier;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ArcIdentifier that = (ArcIdentifier) o;
+
+        return Objects.equals(identifier, that.identifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier);
     }
 
 }

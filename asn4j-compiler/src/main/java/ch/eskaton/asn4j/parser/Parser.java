@@ -2649,7 +2649,7 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public Value parse() throws ParserException {
-            return new ChoiceParser<>(restrictedCharacterStringValueParser,    unrestrictedCharacterStringValue).parse();
+            return new ChoiceParser<>(restrictedCharacterStringValueParser, unrestrictedCharacterStringValue).parse();
         }
 
     }
@@ -3074,7 +3074,8 @@ public class Parser {
             return super.parse(new ChoiceParser<>(
                     new SequenceParser(TokenType.L_BRACE, namedValueListParser, TokenType.R_BRACE),
                     new SequenceParser(TokenType.L_BRACE, valueListParser, TokenType.R_BRACE)), a ->
-                    a.l().n0() instanceof NamedValue ? new CollectionValue(a.P(), (List<Value>) a.l().n1()) :
+                    ((List) a.l().n1()).stream().filter(e -> e instanceof NamedValue).findFirst().isPresent() ?
+                            new CollectionValue(a.P(), (List<Value>) a.l().n1()) :
                             new CollectionOfValue(a.P(), (List<Value>) a.l().n1())
             );
         }

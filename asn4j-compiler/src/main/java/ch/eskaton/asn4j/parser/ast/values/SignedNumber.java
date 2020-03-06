@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.parser.ast.values;
 import ch.eskaton.asn4j.parser.Position;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 public class SignedNumber extends AbstractValue {
 
@@ -43,6 +44,26 @@ public class SignedNumber extends AbstractValue {
 
     public BigInteger getNumber() {
         return number;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SignedNumber that = (SignedNumber) o;
+
+        return Objects.equals(number, that.number);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number);
     }
 
 }

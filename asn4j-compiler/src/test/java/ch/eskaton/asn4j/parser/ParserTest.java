@@ -4330,6 +4330,15 @@ public class ParserTest {
 
         assertNotNull(result);
         assertTrue(result.getValue() instanceof IntegerValue);
+
+        parser = new Parser(new ByteArrayInputStream(
+                "{a 1, b TRUE}".getBytes())).new SingleValueParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result.getValue() instanceof CollectionValue);
+        assertEquals(2, ((CollectionValue) result.getValue()).getSize());
     }
 
     @Test
@@ -4735,7 +4744,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testReccurrenceRangeParser() {
+    public void testRecurrenceRangeParser() {
         // TODO: implement
     }
 

@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.parser.IRIToken;
 import ch.eskaton.asn4j.parser.Position;
 
 import java.util.List;
+import java.util.Objects;
 
 public class AbstractIRIValue extends AbstractValue {
 
@@ -44,6 +45,26 @@ public class AbstractIRIValue extends AbstractValue {
 
     public List<IRIToken> getArcIdentifiers() {
         return arcIdentifiers;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AbstractIRIValue that = (AbstractIRIValue) o;
+
+        return Objects.equals(arcIdentifiers, that.arcIdentifiers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(arcIdentifiers);
     }
 
 }

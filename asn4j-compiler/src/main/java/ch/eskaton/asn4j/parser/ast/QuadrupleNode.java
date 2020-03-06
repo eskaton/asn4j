@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 
+import java.util.Objects;
+
 public class QuadrupleNode extends AbstractValue {
 
     private short group;
@@ -63,6 +65,29 @@ public class QuadrupleNode extends AbstractValue {
 
     public short getCell() {
     	return cell;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        QuadrupleNode that = (QuadrupleNode) o;
+
+        return group == that.group &&
+                plane == that.plane &&
+                row == that.row &&
+                cell == that.cell;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(group, plane, row, cell);
     }
 
 }
