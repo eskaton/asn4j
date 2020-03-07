@@ -35,7 +35,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
 
-public class CollectionOfValue extends CollectionValue {
+public class CollectionOfValue extends AbstractValue implements HasSize {
 
     private static final BigInteger[] MAX_TUPLE_VALUES = {
             BigInteger.valueOf(7), BigInteger.valueOf(15)
@@ -50,8 +50,21 @@ public class CollectionOfValue extends CollectionValue {
 
     private Boolean isQuadruple = null;
 
+    private List<Value> values;
+
     public CollectionOfValue(Position position, List<Value> values) {
-        super(position, values);
+        super(position);
+
+        this.values = values;
+    }
+
+    public List<Value> getValues() {
+        return values;
+    }
+
+    @Override
+    public int getSize() {
+        return getValues().size();
     }
 
     public boolean isTuple() {
@@ -134,12 +147,13 @@ public class CollectionOfValue extends CollectionValue {
         CollectionOfValue that = (CollectionOfValue) o;
 
         return Objects.equals(isTuple, that.isTuple) &&
-                Objects.equals(isQuadruple, that.isQuadruple);
+                Objects.equals(isQuadruple, that.isQuadruple) &&
+                Objects.equals(values, that.values);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), isTuple, isQuadruple);
+        return Objects.hash(super.hashCode(), isTuple, isQuadruple, values);
     }
 
 }

@@ -2903,7 +2903,7 @@ public class Parser {
                 if (rule instanceof Token) {
                     return new RealValue(a.P(), new BigDecimal(a.s()));
                 } else if (rule instanceof CollectionValue) {
-                    List<Value> values = ((CollectionValue) rule).getValues();
+                    List<NamedValue> values = ((CollectionValue) rule).getValues();
                     BigInteger mantissa = getValue(values, 0, "mantissa");
                     BigInteger base = getValue(values, 1, "base");
                     BigInteger exponent = getValue(values, 2, "exponent");
@@ -2930,21 +2930,21 @@ public class Parser {
 
                     return new RealValue(values.get(0).getPosition(), mantissa.longValue(), base.longValue(),
                             exponent.longValue());
-                } else {
+                } else if (rule instanceof List) {
                     return new RealValue(((Token) ((List<Object>) rule).get(1)).getPosition(),
                             new BigDecimal("-" + ((Token) ((List<Object>) rule).get(1)).getText()));
                 }
+
+                return null;
             });
         }
 
-        private BigInteger getValue(List<Value> values, int i, String name) {
+        private BigInteger getValue(List<NamedValue> values, int i, String name) {
             if (values.size() > i) {
-                Value value = values.get(i);
+                NamedValue value = values.get(i);
 
-                if (value instanceof NamedValue
-                        && name.equals(((NamedValue) value).getName())
-                        && ((NamedValue) value).getValue() instanceof IntegerValue) {
-                    return ((IntegerValue) ((NamedValue) value).getValue()).getValue();
+                if (name.equals(value.getName())  && value.getValue() instanceof IntegerValue) {
+                    return ((IntegerValue) value.getValue()).getValue();
                 }
             }
 
@@ -3075,7 +3075,7 @@ public class Parser {
                     new SequenceParser(TokenType.L_BRACE, namedValueListParser, TokenType.R_BRACE),
                     new SequenceParser(TokenType.L_BRACE, valueListParser, TokenType.R_BRACE)), a ->
                     ((List) a.l().n1()).stream().filter(e -> e instanceof NamedValue).findFirst().isPresent() ?
-                            new CollectionValue(a.P(), (List<Value>) a.l().n1()) :
+                            new CollectionValue(a.P(), (List<NamedValue>) a.l().n1()) :
                             new CollectionOfValue(a.P(), (List<Value>) a.l().n1())
             );
         }

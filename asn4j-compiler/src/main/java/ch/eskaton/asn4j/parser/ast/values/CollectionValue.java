@@ -34,15 +34,15 @@ import java.util.Objects;
 
 public class CollectionValue extends AbstractValue implements HasSize {
 
-    private List<Value> values;
+    private List<NamedValue> values;
 
-    public CollectionValue(Position position, List<Value> values) {
+    public CollectionValue(Position position, List<NamedValue> values) {
         super(position);
 
         this.values = values;
     }
 
-    public List<Value> getValues() {
+    public List<NamedValue> getValues() {
         return values;
     }
 

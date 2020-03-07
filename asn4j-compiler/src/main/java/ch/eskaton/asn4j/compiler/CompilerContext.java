@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.CollectionOfValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.CollectionValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
@@ -194,6 +195,7 @@ public class CompilerContext {
             .put(RelativeOIDValue.class, new RelativeOIDValueResolver(CompilerContext.this))
             .put(IRIValue.class, new IRIValueResolver(CompilerContext.this))
             .put(RelativeIRIValue.class, new RelativeIRIValueResolver(CompilerContext.this))
+            .put(CollectionValue.class, new CollectionValueResolver(CompilerContext.this))
             .put(CollectionOfValue.class, new CollectionOfValueResolver(CompilerContext.this))
             .build();
 
