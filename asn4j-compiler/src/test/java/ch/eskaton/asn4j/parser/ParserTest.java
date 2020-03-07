@@ -2455,7 +2455,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof CollectionOfValue);
-        assertEquals(2, ((CollectionValue) result).getValues().size());
+        assertEquals(2, ((CollectionOfValue) result).getValues().size());
     }
 
     @Test
