@@ -37,7 +37,6 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.commons.MutableInteger;
 import ch.eskaton.commons.utils.StringUtils;
-import sun.reflect.generics.reflectiveObjects.TypeVariableImpl;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -45,6 +44,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -185,12 +185,12 @@ public class JavaDefaultCtorBuilder {
             String typeName = getTypeNameAux(componentType, typeParameter, isVarArgs, level + 1);
 
             return getArrayTypeName(isVarArgs, level, typeName);
-        } else if (type instanceof TypeVariableImpl) {
-            if ("T".equals(((TypeVariableImpl) type).getName()) && !StringUtils.isEmpty(typeParameter)) {
+        } else if (type instanceof TypeVariable) {
+            if ("T".equals(((TypeVariable) type).getName()) && !StringUtils.isEmpty(typeParameter)) {
                 return typeParameter;
             }
 
-            return ((TypeVariableImpl) type).getName();
+            return ((TypeVariable) type).getName();
         } else if (type instanceof ParameterizedType) {
             String typeParameters = Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
                     .map(t -> getTypeNameAux(t, typeParameter, isVarArgs, level + 1)).collect(Collectors.joining(", "));
