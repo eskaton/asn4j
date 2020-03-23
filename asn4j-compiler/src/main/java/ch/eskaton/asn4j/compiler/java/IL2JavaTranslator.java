@@ -47,6 +47,7 @@ import ch.eskaton.asn4j.compiler.il.FunctionCall.BigIntegerCompare;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BitStringSize;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.GetSize;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
+import ch.eskaton.asn4j.compiler.il.ILListValue;
 import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
@@ -60,9 +61,10 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
+import ch.eskaton.asn4j.parser.ast.values.NamedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
-import ch.eskaton.commons.utils.CollectionUtils;
 import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -190,7 +192,7 @@ public class IL2JavaTranslator {
             } else if (value instanceof ASN1Null.Value && ASN1Null.Value.NULL.equals(value)) {
                 javaClass.addStaticImport(ASN1Null.Value.class, "NULL");
             } else if (value instanceof Long || value instanceof BigInteger) {
-                return String.valueOf(value) + "L";
+                return value + "L";
             } else if (value instanceof CollectionOfValue) {
                 List<Value> values = ((CollectionOfValue) value).getValues();
 
@@ -201,9 +203,28 @@ public class IL2JavaTranslator {
                 javaClass.addStaticImport(Arrays.class, "asList");
 
                 return "asList(" + initString + ")";
+            } else if (value instanceof CollectionValue) {
+                List<NamedValue> values = ((CollectionValue) value).getValues();
+
+
+                String initString = values.stream()
+                        .map(v -> getInitializerString(ctx, ((ILValue) expression).getTypeName().get(), v.getValue()))
+                        .collect(Collectors.joining(", "));
+
+                javaClass.addStaticImport(Arrays.class, "asList");
+
+                return "asList(" + initString + ")";
             }
 
             return String.valueOf(value);
+        } else if (expression instanceof ILListValue) {
+            var values = ((ILListValue) expression).getValue();
+            var initString = values.stream().map(expr -> translateExpression(ctx, javaClass, expr))
+                    .collect(joining(", "));
+
+            javaClass.addStaticImport(Arrays.class, "asList");
+
+            return "asList(" + initString + ")";
         } else if (expression instanceof FunctionCall) {
             FunctionCall functionCall = (FunctionCall) expression;
             String function;

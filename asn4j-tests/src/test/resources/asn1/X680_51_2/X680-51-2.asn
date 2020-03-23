@@ -122,4 +122,9 @@ TestSetOfRelativeOidIri2 ::= SET ({"a/b/c"}) OF TestRelativeOidIri1
 TestSequenceOfEnumeration1 ::= SEQUENCE ({a}) OF TestEnumeration1
 TestSequenceOfEnumeration2 ::= SEQUENCE ({a, c}) OF TestEnumeration1
 
+TestSequence1 ::= SEQUENCE {
+	a INTEGER,
+	b BOOLEAN
+} ({a testInteger1, b TRUE})
+
 END
