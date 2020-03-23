@@ -40,7 +40,6 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequence6;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
-import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static org.junit.Assert.assertEquals;
 
 public class TestX680_25 {

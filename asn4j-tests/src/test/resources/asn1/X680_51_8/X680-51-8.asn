@@ -10,6 +10,9 @@ TestSetOf6 ::= TestSetOf3 (WITH COMPONENT (SIZE (2) | (WITH COMPONENT (1..2))))
 TestSetOf7 ::= TestSetOf3 (WITH COMPONENT (SIZE (2) ^ (WITH COMPONENT (1..2))))
 TestSetOf8 ::= TestSetOf3 (WITH COMPONENT (SIZE (2) EXCEPT (WITH COMPONENT (1..2))))
 
+TestSequenceOf1 ::= SEQUENCE SIZE (1) OF INTEGER (0..4)
+TestSequenceOf2 ::= TestSequenceOf1 (WITH COMPONENT (1..2))
+
 -- Test all types
 TestSetOf9 ::= SET OF BOOLEAN
 TestSetOf10 ::= TestSetOf9 (WITH COMPONENT (TRUE))
@@ -28,8 +31,7 @@ TestSetOf21 ::= SET OF RELATIVE-OID-IRI
 TestSetOf22 ::= TestSetOf21 (WITH COMPONENT ("a/b/e"))
 TestSetOf23 ::= SET OF OCTET STRING
 TestSetOf24 ::= TestSetOf23 (WITH COMPONENT ('0101'B))
-
-TestSequenceOf1 ::= SEQUENCE SIZE (1) OF INTEGER (0..4)
-TestSequenceOf2 ::= TestSequenceOf1 (WITH COMPONENT (1..2))
+TestSetOf25 ::= SET OF TestSequenceOf2
+TestSetOf26 ::= TestSetOf25 (WITH COMPONENT (WITH COMPONENT (1)))
 
 END
