@@ -71,4 +71,10 @@ TestSequence7 ::= SEQUENCE {
 	b INTEGER
 }
 
+TestSequence8 ::= SEQUENCE {
+    childSequence SEQUENCE {
+       a INTEGER
+   }
+}
+
 END
