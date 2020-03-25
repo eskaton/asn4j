@@ -37,10 +37,10 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence4;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence6;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequence8;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
-import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static org.junit.Assert.assertEquals;
 
 public class TestX680_25 {
@@ -100,6 +100,15 @@ public class TestX680_25 {
         TestHelper.assertDecodableVerifyAfter(TestSequence6.class,
                 value -> value.setB(ASN1Boolean.TRUE),
                 value -> assertEquals(ASN1Integer.valueOf(23), value.getA()));
+    }
+
+    @Test
+    public void testSequence8() {
+        var childValue = new TestSequence8.ChildSequence();
+
+        childValue.setA(ASN1Integer.valueOf(4711L));
+
+        assertDecodable(TestSequence8.class, value -> value.setChildSequence(childValue));
     }
 
 }
