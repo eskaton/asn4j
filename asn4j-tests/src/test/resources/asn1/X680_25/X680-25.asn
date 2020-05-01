@@ -77,4 +77,8 @@ TestSequence8 ::= SEQUENCE {
    }
 }
 
+TestSequence9 ::= SEQUENCE {
+    childEnumerated ENUMERATED {a, b, c}
+}
+
 END
