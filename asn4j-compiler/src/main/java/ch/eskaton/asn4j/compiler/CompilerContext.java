@@ -475,7 +475,7 @@ public class CompilerContext {
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof EnumeratedType) {
-            typeName = ASN1EnumeratedType.class.getSimpleName();
+            typeName = defineType(type, name, true);
         } else if (type instanceof IntegerType) {
             typeName = defineType(type, name, ((IntegerType) type).getNamedNumbers() != null);
         } else if (type instanceof BitString) {
