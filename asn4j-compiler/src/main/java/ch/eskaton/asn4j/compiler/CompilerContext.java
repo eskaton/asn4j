@@ -479,11 +479,11 @@ public class CompilerContext {
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof EnumeratedType) {
-            typeName = defineType(type, name, true);
+            typeName = defineType(type, name, isSubtypeNeeded(type));
         } else if (type instanceof IntegerType) {
-            typeName = defineType(type, name, ((IntegerType) type).getNamedNumbers() != null);
+            typeName = defineType(type, name, isSubtypeNeeded(type));
         } else if (type instanceof BitString) {
-            typeName = defineType(type, name, ((BitString) type).getNamedBits() != null);
+            typeName = defineType(type, name, isSubtypeNeeded(type));
         } else if (type instanceof SequenceType
                 || type instanceof SequenceOfType
                 || type instanceof SetType
@@ -947,14 +947,28 @@ public class CompilerContext {
         while (type instanceof CollectionOfType) {
             type = ((CollectionOfType) type).getType();
 
-            if (parentName.isPresent() && type instanceof EnumeratedType) {
-                typeNames.add(parentName.get() + "." + getTypeName(type, "ContentType"));
-            } else {
-                typeNames.add(getTypeName(type));
-            }
+            typeNames.add(getContentType(type, parentName).orElse(getTypeName(type)));
         }
 
         return typeNames;
+    }
+
+    public Optional<String> getContentType(Type type, Optional<String> parentName) {
+        if (parentName.isPresent() && isSubtypeNeeded(type)) {
+            return Optional.of(parentName.get() + "." + getTypeName(type, "ContentType"));
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean isSubtypeNeeded(Type type) {
+        if (type instanceof EnumeratedType ||
+                type instanceof IntegerType && ((IntegerType) type).getNamedNumbers() != null ||
+                type instanceof BitString && ((BitString) type).getNamedBits() != null) {
+            return true;
+        }
+
+        return false;
     }
 
     public List<String> getParameterizedType(Type node) {
