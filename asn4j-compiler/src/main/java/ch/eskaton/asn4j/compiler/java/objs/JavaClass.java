@@ -192,6 +192,10 @@ public class JavaClass implements JavaStructure {
         imports.addAll(innerClass.imports);
     }
 
+    public List<JavaClass> getInnerClasses() {
+        return innerClasses;
+    }
+
     public void addEnum(JavaEnum anEnum) {
         enums.add(anEnum);
     }
