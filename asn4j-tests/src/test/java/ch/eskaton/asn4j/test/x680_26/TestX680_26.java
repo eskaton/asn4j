@@ -31,6 +31,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf2;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf3;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf4;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
@@ -46,6 +48,22 @@ public class TestX680_26 {
     @Test
     public void testSequenceOf2() {
         assertDecodable(TestSequenceOf2.class, value -> value.setValues(new ASN1SetOf<>(TestSequenceOf2.ContentType.A)));
+    }
+
+    @Test
+    public void testSequenceOf3() {
+        assertDecodable(TestSequenceOf3.class, value -> value.setValues(TestSequenceOf3.ContentType.ONE));
+    }
+
+    @Test
+    public void testSequenceOf4() {
+        assertDecodable(TestSequenceOf4.class, value -> {
+            var bitString = new TestSequenceOf4.ContentType(new byte[] { 0x00 }, 0);
+
+            bitString.setBit(TestSequenceOf4.ContentType.A);
+
+            value.setValues(bitString);
+        });
     }
 
 }
