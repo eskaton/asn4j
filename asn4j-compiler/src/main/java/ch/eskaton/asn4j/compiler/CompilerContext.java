@@ -450,7 +450,6 @@ public class CompilerContext {
     }
 
     public String getTypeName(Type type) {
-        String typeName;
         String name = null;
 
         if (type instanceof NamedType) {
@@ -458,6 +457,11 @@ public class CompilerContext {
             type = ((NamedType) type).getType();
         }
 
+        return getTypeName(type, name);
+    }
+
+    public String getTypeName(Type type, String name) {
+        String typeName;
         if (type instanceof TypeReference) {
             if (type instanceof UsefulType) {
                 typeName = ((UsefulType) type).getType();
@@ -928,18 +932,26 @@ public class CompilerContext {
             Type type = getBase(typeName);
 
             return getRuntimeType(type.getClass());
-        } catch(CompilerException e) {
+        } catch (CompilerException e) {
             return typeName;
         }
     }
 
-    public List<String> getTypeParameter(Type node) {
+    public List<String> getTypeParameter(Type type) {
+        return getTypeParameter(type, Optional.empty());
+    }
+
+    public List<String> getTypeParameter(Type type, Optional<String> parentName) {
         LinkedList<String> typeNames = new LinkedList<>();
-        Type type = node;
 
         while (type instanceof CollectionOfType) {
             type = ((CollectionOfType) type).getType();
-            typeNames.add(getTypeName(type));
+
+            if (parentName.isPresent() && type instanceof EnumeratedType) {
+                typeNames.add(parentName.get() + "." + getTypeName(type, "ContentType"));
+            } else {
+                typeNames.add(getTypeName(type));
+            }
         }
 
         return typeNames;

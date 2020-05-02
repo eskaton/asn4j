@@ -3,4 +3,6 @@ BEGIN
 
 TestSequenceOf1 ::= SEQUENCE OF INTEGER
 
+TestSequenceOf2 ::= SEQUENCE OF SET OF ENUMERATED {a, b, c}
+
 END
