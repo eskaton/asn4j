@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.parser.Position;
 
 import java.nio.file.Paths;
+import java.util.Optional;
 
 @SuppressWarnings("serial")
 public class CompilerException extends RuntimeException {

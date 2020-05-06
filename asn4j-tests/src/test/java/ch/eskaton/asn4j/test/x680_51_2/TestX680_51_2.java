@@ -83,6 +83,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri5;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequence1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequenceOfEnumeration1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequenceOfEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf1;
@@ -129,8 +130,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRIFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 
@@ -675,6 +678,26 @@ public class TestX680_51_2 {
 
         testSequenceOfFailure(TestSequenceOfEnumeration2.class, new TestSequenceOfEnumeration2(),
                 TestEnumeration1.A, TestEnumeration1.B);
+    }
+
+    @Test
+    public void testSequence1() {
+        TestSequence1 testSequence1 = new TestSequence1();
+
+        testSequence1.setA(new ASN1Integer(12));
+        testSequence1.setB(ASN1Boolean.TRUE);
+
+        testSequenceSuccess(TestSequence1.class, testSequence1);
+
+        testSequence1.setA(new ASN1Integer(12));
+        testSequence1.setB(ASN1Boolean.FALSE);
+
+        testSequenceFailure(TestSequence1.class, testSequence1);
+
+        testSequence1.setA(new ASN1Integer(23));
+        testSequence1.setB(ASN1Boolean.TRUE);
+
+        testSequenceFailure(TestSequence1.class, testSequence1);
     }
 
 }

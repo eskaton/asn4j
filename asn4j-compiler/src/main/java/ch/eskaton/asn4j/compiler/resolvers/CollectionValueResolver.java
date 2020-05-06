@@ -47,6 +47,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
@@ -89,9 +90,7 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
                     .collect(Collectors.toMap(NamedType::getName, NamedType::getType));
 
             List<? extends NamedValue> values = collectionValue.getValues().stream()
-                    .map(v -> new NamedValue(v.getPosition(), v.getName(),
-                            resolveElement(typeName, elementTypes.get(v.getName()),
-                                    ctx.getValueType(elementTypes.get(v.getName())), v.getValue())))
+                    .map(v -> new NamedValue(v.getPosition(), v.getName(), getValue(typeName, elementTypes, v)))
                     .collect(Collectors.toList());
 
             collectionValue.getValues().clear();
@@ -103,7 +102,27 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
         throw error(typeName);
     }
 
-    private Value resolveElement(String typeName, Type elementType, Class<? extends Value> valueClass, Value value) {
+    private Value getValue(String typeName, Map<String, Type> elementTypes, NamedValue value) {
+        var elementType = getElementType(elementTypes, value);
+        var valueType = ctx.getValueType(elementType);
+
+        return resolveElement(typeName, elementType, valueType, value);
+    }
+
+    private Type getElementType(Map<String, Type> elementTypes, NamedValue value) {
+        Type elementType = elementTypes.get(value.getName());
+
+        if (elementType == null) {
+            throw new CompilerException(value.getPosition(), "SEQUENCE value contains a component '%s' which isn't defined. Must be one of [%s]",
+                    value.getName(), elementTypes.keySet().stream().collect(Collectors.joining(", ")));
+        }
+
+        return elementType;
+    }
+
+    private Value resolveElement(String typeName, Type elementType, Class<? extends Value> valueClass, NamedValue namedValue) {
+        var value = namedValue.getValue();
+
         try {
             if (value instanceof AmbiguousValue) {
                 Value resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
@@ -111,15 +130,13 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
                 if (resolvedValue != null) {
                     value = resolvedValue;
                 } else {
-                    throw new CompilerException("Failed to resolve a value in a " + typeName + " to type %s: %s",
-                            formatTypeName(elementType), formatValue(value));
+                    return resolveError(typeName, elementType, namedValue, value, Optional.empty());
                 }
             }
 
             return ctx.resolveGenericValue(valueClass, elementType, value);
-        } catch (ClassCastException e) {
-            throw new CompilerException("Failed to resolve a value in a " + typeName + " to type %s: %s",
-                    formatTypeName(elementType), formatValue(value));
+        } catch (ClassCastException | CompilerException e) {
+            return resolveError(typeName, elementType, namedValue, value, Optional.of(e));
         }
     }
 
@@ -131,8 +148,18 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
         return TypeName.SEQUENCE.name();
     }
 
+    private Value resolveError(String typeName, Type elementType, NamedValue namedValue, Value value, Optional<Exception> e) {
+        final var message = "Failed to resolve value for component '%s' in a %s to type %s: %s";
+
+        if (e.isPresent()) {
+            throw new CompilerException(message, e.get(), namedValue.getName(), typeName, formatTypeName(elementType), formatValue(value));
+        } else {
+            throw new CompilerException(message, namedValue.getName(), typeName, formatTypeName(elementType), formatValue(value));
+        }
+    }
+
     protected CompilerException error(String typeName) {
-        return new CompilerException("Failed to resolve a " + typeName + " value");
+        return new CompilerException("Failed to resolve a %s value", typeName);
     }
 
 }

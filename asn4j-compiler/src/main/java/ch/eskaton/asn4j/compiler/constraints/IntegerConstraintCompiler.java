@@ -133,7 +133,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<IntegerRange> range = ((IntegerRangeValueNode) node).getValue();
@@ -148,7 +148,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             case ALL_VALUES:
                 return Optional.empty();
             default:
-                return super.buildExpression(module, typeName, node);
+                return super.buildExpression(module, type, node);
         }
     }
 

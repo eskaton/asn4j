@@ -59,8 +59,10 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
+import ch.eskaton.asn4j.parser.ast.values.NamedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
@@ -102,8 +104,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
             Value value = ((SingleValueConstraint) elements).getValue();
 
             try {
-                CollectionValue collectionValue = ctx.resolveGenericValue(CollectionValue.class,
-                        baseType.getType(), value);
+                CollectionValue collectionValue = ctx.resolveGenericValue(CollectionValue.class, baseType.getType(), value);
 
                 return new CollectionValueNode(singleton(collectionValue));
             } catch (Exception e) {
@@ -140,8 +141,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                 .visibility(ILVisibility.PUBLIC)
                 .returnType(ILType.of(BOOLEAN))
                 .statements()
-                .returnExpression(generateCheckConstraintCall(type))
-                .build()
+                    .returnExpression(generateCheckConstraintCall(type))
+                    .build()
                 .build();
         // @formatter:on
     }
@@ -165,7 +166,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
             addConstraintCondition(type, definition, builder);
         } else {
             Node roots = definition.getRoots();
-            Optional<BooleanExpression> expression = buildExpression(module, getTypeName(type), roots);
+            Optional<BooleanExpression> expression = buildExpression(module, type, roots);
             Type elementType = ((CollectionOfType) type).getType();
             BooleanExpression condition;
 
@@ -186,33 +187,33 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                 // @formatter:off
                 builder.statements()
                         .conditions()
-                        .condition(expression.get())
-                        .statements()
-                        .returnValue(Boolean.TRUE)
-                        .build()
-                        .build()
-                        .condition()
-                        .statements()
-                        .returnValue(Boolean.FALSE)
-                        .build()
-                        .build()
-                        .build()
+                            .condition(expression.get())
+                                .statements()
+                                    .returnValue(Boolean.TRUE)
+                                    .build()
+                                .build()
+                            .condition()
+                                .statements()
+                                    .returnValue(Boolean.FALSE)
+                                    .build()
+                                .build()
+                            .build()
                         .build();
                 // @formatter:on
             } else {
                 // @formatter:off
                 builder.statements()
                         .foreach(new ILParameterizedType(CUSTOM, typeParameter), new Variable(OBJ), new Variable(VALUE))
-                        .statements()
-                        .conditions()
-                        .condition(condition)
-                        .statements()
-                        .returnValue(Boolean.FALSE)
-                        .build()
-                        .build()
-                        .build()
-                        .build()
-                        .build()
+                            .statements()
+                                .conditions()
+                                    .condition(condition)
+                                        .statements()
+                                            .returnValue(Boolean.FALSE)
+                                            .build()
+                                        .build()
+                                    .build()
+                                .build()
+                            .build()
                         .returnValue(Boolean.TRUE)
                         .build();
                 // @formatter:on
@@ -226,23 +227,23 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
         if (node == null) {
             return Optional.empty();
         }
 
         switch (node.getType()) {
             case VALUE:
-                return getValueExpression(typeName, (CollectionValueNode) node);
+                return getValueExpression(type, (CollectionValueNode) node);
             default:
-                return super.buildExpression(module, typeName, node);
+                return super.buildExpression(module, type, node);
         }
     }
 
-    private Optional<BooleanExpression> getValueExpression(String typeName, CollectionValueNode node) {
+    private Optional<BooleanExpression> getValueExpression(Type type, CollectionValueNode node) {
         Set<CollectionValue> values = node.getValue();
         List<BooleanExpression> valueArguments = values.stream()
-                .map(value -> buildExpression(typeName, value))
+                .map(value -> buildExpression(type, value))
                 .collect(Collectors.toList());
 
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
@@ -266,12 +267,12 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         return super.getTypeName(elementType);
     }
 
-    private BooleanExpression buildExpression(String typeName, CollectionValue value) {
-        var values = value.getValues().stream().map(namedValue -> new ILValue(namedValue.getValue()))
-                .collect(Collectors.toList());
+    private BooleanExpression buildExpression(Type type, CollectionValue collectionValue) {
+        var typeStream = ((SequenceType) type).getAllComponents().stream().map(componentType -> ctx.getTypeName(Optional.ofNullable(componentType.getType()).orElse(componentType.getNamedType().getType())));
+        var valueStream = collectionValue.getValues().stream().map(NamedValue::getValue);
+        var values = StreamsUtils.zip(typeStream, valueStream, (typeName, value) -> new ILValue(typeName, value)).collect(Collectors.toList());
 
-        // return new BooleanFunctionCall.SetEquals(new Variable(VALUES), new ILListValue(values));
-        return new BooleanFunctionCall.SetEquals(new Variable(VALUES), new ILValue(typeName, value));
+        return new BooleanFunctionCall.SetEquals(new Variable(VALUES), new ILListValue(values));
     }
 
 }

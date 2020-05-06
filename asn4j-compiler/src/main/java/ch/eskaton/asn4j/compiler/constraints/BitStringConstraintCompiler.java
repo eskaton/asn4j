@@ -141,7 +141,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<BitStringValue> values = ((BitStringValueNode) node).getValue();
@@ -159,7 +159,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                 return of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
 
             default:
-                return super.buildExpression(module, typeName, node);
+                return super.buildExpression(module, type, node);
         }
     }
 

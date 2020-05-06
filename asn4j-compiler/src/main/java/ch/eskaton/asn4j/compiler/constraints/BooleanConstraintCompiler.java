@@ -96,13 +96,13 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
         switch (node.getType()) {
             case VALUE:
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.EQ, new Variable("value"),
-                        new ILValue(typeName, ((ValueNode) node).getValue())));
+                        new ILValue(getTypeName(type), ((ValueNode) node).getValue())));
             default:
-                return super.buildExpression(module, typeName, node);
+                return super.buildExpression(module, type, node);
         }
     }
 
