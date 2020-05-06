@@ -464,8 +464,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     private BooleanExpression buildExpression(Type type, CollectionOfValue collectionOfValue) {
-        var typeName = getTypeName(type);
-        var values = collectionOfValue.getValues().stream().map(value -> new ILValue(typeName, value)).collect(Collectors.toList());
+        var values = collectionOfValue.getValues().stream().map(value -> new ILValue(getTypeName(type), value)).collect(Collectors.toList());
 
         return new BooleanFunctionCall.SetEquals(new Variable(VALUE), new ILListValue(values));
     }

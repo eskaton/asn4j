@@ -270,7 +270,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     private BooleanExpression buildExpression(Type type, CollectionValue collectionValue) {
         var typeStream = ((SequenceType) type).getAllComponents().stream().map(componentType -> ctx.getTypeName(Optional.ofNullable(componentType.getType()).orElse(componentType.getNamedType().getType())));
         var valueStream = collectionValue.getValues().stream().map(NamedValue::getValue);
-        var values = StreamsUtils.zip(typeStream, valueStream, (typeName, value) -> new ILValue(typeName, value)).collect(Collectors.toList());
+        var values = StreamsUtils.zip(typeStream, valueStream, ILValue::new).collect(Collectors.toList());
 
         return new BooleanFunctionCall.SetEquals(new Variable(VALUES), new ILListValue(values));
     }

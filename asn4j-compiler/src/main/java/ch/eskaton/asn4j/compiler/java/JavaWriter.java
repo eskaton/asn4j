@@ -41,11 +41,10 @@ public class JavaWriter {
     public void write(Map<String, JavaStructure> structs, String outputDir) {
         JAVA_DEFAULT_CTOR_BUILDER.build(structs);
 
-        structs.values().stream().filter(JavaClass.class::isInstance).forEach(struct -> {
-            ((JavaClass) struct).getInnerClasses().forEach(innerClass -> {
-                JAVA_DEFAULT_CTOR_BUILDER.build(Map.of(innerClass.getName(), innerClass));
-            });
-        });
+        structs.values().stream().
+                filter(JavaClass.class::isInstance)
+                .forEach(struct -> ((JavaClass) struct).getInnerClasses()
+                        .forEach(innerClass -> JAVA_DEFAULT_CTOR_BUILDER.build(Map.of(innerClass.getName(), innerClass))));
 
         // write classes
         for (JavaStructure struct : structs.values()) {
