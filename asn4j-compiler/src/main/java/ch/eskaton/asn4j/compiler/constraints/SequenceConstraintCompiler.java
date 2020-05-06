@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.TypeName;
-import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
+
 
 public class SequenceConstraintCompiler extends AbstractCollectionConstraintCompiler {
 

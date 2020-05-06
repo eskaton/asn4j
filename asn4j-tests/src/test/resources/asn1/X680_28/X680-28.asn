@@ -9,4 +9,10 @@ TestSetOf3 ::= SET OF SET OF SET OF INTEGER
 
 TestSetOf4 ::= SET OF TestSetOf1
 
+TestSetOf5 ::= SET OF ENUMERATED {a, b, c}
+
+TestSetOf6 ::= SET OF SET OF ENUMERATED {d, e, f}
+
+TestSetOf7 ::= SET OF SEQUENCE OF ENUMERATED {g, h, i}
+
 END

@@ -450,7 +450,6 @@ public class CompilerContext {
     }
 
     public String getTypeName(Type type) {
-        String typeName;
         String name = null;
 
         if (type instanceof NamedType) {
@@ -458,6 +457,11 @@ public class CompilerContext {
             type = ((NamedType) type).getType();
         }
 
+        return getTypeName(type, name);
+    }
+
+    public String getTypeName(Type type, String name) {
+        String typeName;
         if (type instanceof TypeReference) {
             if (type instanceof UsefulType) {
                 typeName = ((UsefulType) type).getType();
@@ -475,11 +479,11 @@ public class CompilerContext {
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof EnumeratedType) {
-            typeName = ASN1EnumeratedType.class.getSimpleName();
+            typeName = defineType(type, name, isSubtypeNeeded(type));
         } else if (type instanceof IntegerType) {
-            typeName = defineType(type, name, ((IntegerType) type).getNamedNumbers() != null);
+            typeName = defineType(type, name, isSubtypeNeeded(type));
         } else if (type instanceof BitString) {
-            typeName = defineType(type, name, ((BitString) type).getNamedBits() != null);
+            typeName = defineType(type, name, isSubtypeNeeded(type));
         } else if (type instanceof SequenceType
                 || type instanceof SequenceOfType
                 || type instanceof SetType
@@ -928,21 +932,43 @@ public class CompilerContext {
             Type type = getBase(typeName);
 
             return getRuntimeType(type.getClass());
-        } catch(CompilerException e) {
+        } catch (CompilerException e) {
             return typeName;
         }
     }
 
-    public List<String> getTypeParameter(Type node) {
+    public List<String> getTypeParameter(Type type) {
+        return getTypeParameter(type, Optional.empty());
+    }
+
+    public List<String> getTypeParameter(Type type, Optional<String> parentName) {
         LinkedList<String> typeNames = new LinkedList<>();
-        Type type = node;
 
         while (type instanceof CollectionOfType) {
             type = ((CollectionOfType) type).getType();
-            typeNames.add(getTypeName(type));
+
+            typeNames.add(getContentType(type, parentName).orElse(getTypeName(type)));
         }
 
         return typeNames;
+    }
+
+    public Optional<String> getContentType(Type type, Optional<String> parentName) {
+        if (parentName.isPresent() && isSubtypeNeeded(type)) {
+            return Optional.of(parentName.get() + "." + getTypeName(type, "ContentType"));
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean isSubtypeNeeded(Type type) {
+        if (type instanceof EnumeratedType ||
+                type instanceof IntegerType && ((IntegerType) type).getNamedNumbers() != null ||
+                type instanceof BitString && ((BitString) type).getNamedBits() != null) {
+            return true;
+        }
+
+        return false;
     }
 
     public List<String> getParameterizedType(Type node) {
