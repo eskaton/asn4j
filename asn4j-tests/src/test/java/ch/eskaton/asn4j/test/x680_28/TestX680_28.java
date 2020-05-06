@@ -28,11 +28,15 @@
 package ch.eskaton.asn4j.test.x680_28;
 
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf2;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf3;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf4;
+import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf5;
+import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf6;
+import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf7;
 import org.junit.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
@@ -56,14 +60,28 @@ public class TestX680_28 {
         assertDecodable(TestSetOf3.class,
                 value -> value.setValues(new ASN1SetOf(
                         new ASN1SetOf(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23)),
-                        new ASN1SetOf(ASN1Integer.valueOf(4478), ASN1Integer.valueOf(-13))))
-        );
+                        new ASN1SetOf(ASN1Integer.valueOf(4478), ASN1Integer.valueOf(-13)))));
     }
 
     @Test
     public void testSetOf4() {
         assertDecodable(TestSetOf4.class,
                 value -> value.setValues(new TestSetOf1(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23))));
+    }
+
+    @Test
+    public void testSetOf5() {
+        assertDecodable(TestSetOf5.class, value -> value.setValues(TestSetOf5.ContentType.A));
+    }
+
+    @Test
+    public void testSetOf6() {
+        assertDecodable(TestSetOf6.class, value -> value.setValues(new ASN1SetOf<>(TestSetOf6.ContentType.D)));
+    }
+
+    @Test
+    public void testSetOf7() {
+        assertDecodable(TestSetOf7.class, value -> value.setValues(new ASN1SequenceOf<>(TestSetOf7.ContentType.G)));
     }
 
 }

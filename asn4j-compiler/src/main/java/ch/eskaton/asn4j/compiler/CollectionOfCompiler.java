@@ -32,13 +32,15 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 
+import java.util.Optional;
+
 public abstract class CollectionOfCompiler<T extends CollectionOfType> implements NamedCompiler<T, CompiledType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, T node) {
         JavaClass javaClass = ctx.createClass(name, node, true);
 
-        javaClass.typeParameter(ctx.getTypeParameter(node));
+        javaClass.typeParameter(ctx.getTypeParameter(node, Optional.of(name)));
 
         ConstraintDefinition constraintDef = null;
 

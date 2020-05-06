@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 
 import java.io.IOException;
@@ -39,6 +40,12 @@ public class JavaWriter {
 
     public void write(Map<String, JavaStructure> structs, String outputDir) {
         JAVA_DEFAULT_CTOR_BUILDER.build(structs);
+
+        structs.values().stream().filter(JavaClass.class::isInstance).forEach(struct -> {
+            ((JavaClass) struct).getInnerClasses().forEach(innerClass -> {
+                JAVA_DEFAULT_CTOR_BUILDER.build(Map.of(innerClass.getName(), innerClass));
+            });
+        });
 
         // write classes
         for (JavaStructure struct : structs.values()) {

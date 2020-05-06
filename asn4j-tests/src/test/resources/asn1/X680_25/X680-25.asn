@@ -71,4 +71,14 @@ TestSequence7 ::= SEQUENCE {
 	b INTEGER
 }
 
+TestSequence8 ::= SEQUENCE {
+    childSequence SEQUENCE {
+       a INTEGER
+   }
+}
+
+TestSequence9 ::= SEQUENCE {
+    childEnumerated ENUMERATED {a, b, c}
+}
+
 END
