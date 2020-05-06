@@ -747,7 +747,6 @@ public class CompilerContext {
         }
     }
 
-
     public Optional<BooleanExpression> buildExpression(Module module, Type type, ch.eskaton.asn4j.compiler.constraints.ast.Node node) {
         return constraintCompiler.buildExpression(module, type, node);
     }
@@ -962,13 +961,9 @@ public class CompilerContext {
     }
 
     private boolean isSubtypeNeeded(Type type) {
-        if (type instanceof EnumeratedType ||
+        return (type instanceof EnumeratedType ||
                 type instanceof IntegerType && ((IntegerType) type).getNamedNumbers() != null ||
-                type instanceof BitString && ((BitString) type).getNamedBits() != null) {
-            return true;
-        }
-
-        return false;
+                type instanceof BitString && ((BitString) type).getNamedBits() != null);
     }
 
     public List<String> getParameterizedType(Type node) {
