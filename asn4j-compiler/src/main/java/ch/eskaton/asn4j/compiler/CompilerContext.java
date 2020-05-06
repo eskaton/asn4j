@@ -315,7 +315,7 @@ public class CompilerContext {
             structs.put(javaClass.getName(), javaClass);
         } else {
             currentClass.peek().addInnerClass(javaClass);
-            javaClass.addModifier(JavaModifier.Static);
+            javaClass.addModifier(JavaModifier.STATIC);
         }
     }
 

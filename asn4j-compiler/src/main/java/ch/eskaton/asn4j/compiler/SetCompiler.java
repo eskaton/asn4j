@@ -88,7 +88,7 @@ public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
                 // fall through
             case NAMED_TYPE_OPT:
                 return namedFunction.apply(component);
-            case Type:
+            case TYPE:
                 return function.apply(component);
             default:
                 throw new CompilerException("Unexpected component type: " + component.getCompType());

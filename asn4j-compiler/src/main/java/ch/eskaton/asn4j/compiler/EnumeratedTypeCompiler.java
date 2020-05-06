@@ -57,6 +57,8 @@ import static java.util.Arrays.asList;
 
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, CompiledType> {
 
+    public static final String VALUE_PARAMETER = "value";
+
     @Override
     public CompiledType compile(CompilerContext ctx, String typeName, EnumeratedType node) {
         JavaClass javaClass = ctx.createClass(typeName, node, true);
@@ -82,12 +84,12 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, typeName));
         javaClass.addMethod(new JavaConstructor(JavaVisibility.PROTECTED, typeName,
-                asList(new JavaParameter("int", "value")), Optional.of("\t\tsuper.setValue(value);")));
+                asList(new JavaParameter("int", VALUE_PARAMETER)), Optional.of("\t\tsuper.setValue(value);")));
         javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, typeName,
-                asList(new JavaParameter(typeName, "value")), Optional.of("\t\tsuper.setValue(value.getValue());")));
+                asList(new JavaParameter(typeName, VALUE_PARAMETER)), Optional.of("\t\tsuper.setValue(value.getValue());")));
 
         BodyBuilder builder = javaClass.method().asStatic().returnType(typeName).name("valueOf")
-                .parameter(INT, "value").exception(ASN1RuntimeException.class).body();
+                .parameter(INT, VALUE_PARAMETER).exception(ASN1RuntimeException.class).body();
 
         builder.append("switch(value) {");
 

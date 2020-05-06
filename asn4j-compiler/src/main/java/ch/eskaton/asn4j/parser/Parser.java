@@ -2147,7 +2147,7 @@ public class Parser {
                         return new ComponentType(P(), ComponentType.CompType.NAMED_TYPE_OPT, (NamedType) rule.get(0));
                     case 3:
                         if (rule.get(0) instanceof Token) {
-                            return new ComponentType(P(), ComponentType.CompType.Type, (Type) rule.get(2));
+                            return new ComponentType(P(), ComponentType.CompType.TYPE, (Type) rule.get(2));
                         } else {
                             return new ComponentType(P(), ComponentType.CompType.NAMED_TYPE_DEF, (NamedType) rule.get(0),
                                     (Value) rule.get(2));
@@ -2814,13 +2814,13 @@ public class Parser {
             }
 
             if (idExpected) {
-                if (iriToken.getType() == IRIToken.Type.Solidus) {
+                if (iriToken.getType() == IRIToken.Type.SOLIDUS) {
                     throw new ParserException("(non-)integerUnicodeLabel expected");
                 }
 
                 iriTokens.add(iriToken);
             } else {
-                if (iriToken.getType() != IRIToken.Type.Solidus) {
+                if (iriToken.getType() != IRIToken.Type.SOLIDUS) {
                     throw new ParserException("Solidus expected");
                 }
             }

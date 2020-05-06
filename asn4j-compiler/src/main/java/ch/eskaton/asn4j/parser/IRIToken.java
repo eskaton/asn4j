@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 public class IRIToken {
 
     public enum Type {
-        Solidus, IntegerUnicodeLabel, NonIntegerUnicodeLabel
+        SOLIDUS, INTEGER_UNICODE_LABEL, NON_INTEGER_UNICODE_LABEL
     }
 
     private Type type;

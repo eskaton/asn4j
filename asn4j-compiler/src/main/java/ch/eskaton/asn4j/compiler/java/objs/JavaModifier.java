@@ -28,5 +28,5 @@
 package ch.eskaton.asn4j.compiler.java.objs;
 
 public enum JavaModifier {
-    Static, Final, Transient, Volatile
+    STATIC, FINAL, TRANSIENT, VOLATILE
 }
