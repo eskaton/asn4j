@@ -313,12 +313,18 @@ public class TestHelper {
         assertThrows(() -> assertValueDecodable(clazz, sequenceOfValue), ConstraintViolatedException.class);
     }
 
-    public static <T extends ASN1Sequence> void testSequenceSuccess(Class<? extends T> clazz, T sequenceValue) {
+    public static <T extends ASN1Sequence> void testSequenceSuccess(Class<? extends T> clazz, T sequenceValue,
+            Consumer<T> consumer) {
+        consumer.accept(sequenceValue);
+
         assertValueDecodable(clazz, sequenceValue);
     }
 
-    public static <T extends ASN1Sequence> void testSequenceFailure(Class<? extends T> clazz, T sequenceOfValue) {
-        assertThrows(() -> assertValueDecodable(clazz, sequenceOfValue), ConstraintViolatedException.class);
+    public static <T extends ASN1Sequence> void testSequenceFailure(Class<? extends T> clazz, T sequenceValue,
+            Consumer<T> consumer) {
+        consumer.accept(sequenceValue);
+
+        assertThrows(() -> assertValueDecodable(clazz, sequenceValue), ConstraintViolatedException.class);
     }
 
     public static byte[] randomBytes(int length) {

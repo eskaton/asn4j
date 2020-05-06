@@ -682,22 +682,20 @@ public class TestX680_51_2 {
 
     @Test
     public void testSequence1() {
-        TestSequence1 testSequence1 = new TestSequence1();
+        testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1Integer(12));
+            s.setB(ASN1Boolean.TRUE);
+        });
 
-        testSequence1.setA(new ASN1Integer(12));
-        testSequence1.setB(ASN1Boolean.TRUE);
+        testSequenceFailure(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1Integer(12));
+            s.setB(ASN1Boolean.FALSE);
+        });
 
-        testSequenceSuccess(TestSequence1.class, testSequence1);
-
-        testSequence1.setA(new ASN1Integer(12));
-        testSequence1.setB(ASN1Boolean.FALSE);
-
-        testSequenceFailure(TestSequence1.class, testSequence1);
-
-        testSequence1.setA(new ASN1Integer(23));
-        testSequence1.setB(ASN1Boolean.TRUE);
-
-        testSequenceFailure(TestSequence1.class, testSequence1);
+        testSequenceFailure(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1Integer(23));
+            s.setB(ASN1Boolean.TRUE);
+        });
     }
 
 }
