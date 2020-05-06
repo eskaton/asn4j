@@ -116,7 +116,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<BooleanExpression> arguments = (((N) node).getValue()).stream()
@@ -125,7 +125,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
             default:
-                return super.buildExpression(module, typeName, node);
+                return super.buildExpression(module, type, node);
         }
     }
 

@@ -162,7 +162,7 @@ public class ConstraintCompiler {
             return null;
         }
 
-        return maybeCompiler.get().buildExpression(module, "", node);
+        return maybeCompiler.get().buildExpression(module, null, node);
     }
 
 }

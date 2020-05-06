@@ -42,6 +42,7 @@ import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
+import ch.eskaton.asn4j.compiler.il.ILListValue;
 import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
@@ -209,7 +210,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
             addConstraintCondition(type, definition, builder);
         } else {
             Node roots = definition.getRoots();
-            Optional<BooleanExpression> expression = buildExpression(module, getTypeName(type), roots);
+            Optional<BooleanExpression> expression = buildExpression(module, type, roots);
             Type elementType = ((CollectionOfType) type).getType();
             BooleanExpression condition;
 
@@ -275,27 +276,27 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, String typeName, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
         if (node == null) {
             return Optional.empty();
         }
 
         switch (node.getType()) {
             case VALUE:
-                return getValueExpression(typeName, (CollectionOfValueNode) node);
+                return getValueExpression(type, (CollectionOfValueNode) node);
             case SIZE:
                 return getSizeExpression((SizeNode) node);
             case WITH_COMPONENT:
                 return getWithComponentExpression(module, (WithComponentNode) node);
             default:
-                return super.buildExpression(module, typeName, node);
+                return super.buildExpression(module, type, node);
         }
     }
 
-    private Optional<BooleanExpression> getValueExpression(String typeName, CollectionOfValueNode node) {
+    private Optional<BooleanExpression> getValueExpression(Type type, CollectionOfValueNode node) {
         Set<CollectionOfValue> values = node.getValue();
         List<BooleanExpression> valueArguments = values.stream()
-                .map(value -> buildExpression(typeName, value))
+                .map(value -> buildExpression(type, value))
                 .collect(Collectors.toList());
 
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
@@ -461,8 +462,11 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         return super.getTypeName(elementType);
     }
 
-    private BooleanExpression buildExpression(String typeName, CollectionOfValue value) {
-        return new BooleanFunctionCall.SetEquals(new Variable(VALUE), new ILValue(typeName, value));
+    private BooleanExpression buildExpression(Type type, CollectionOfValue collectionOfValue) {
+        var typeName = getTypeName(type);
+        var values = collectionOfValue.getValues().stream().map(value -> new ILValue(typeName, value)).collect(Collectors.toList());
+
+        return new BooleanFunctionCall.SetEquals(new Variable(VALUE), new ILListValue(values));
     }
 
     private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
@@ -470,20 +474,20 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         long upper = range.getUpper();
 
         if (lower == upper) {
-            return buildExpression(lower, BinaryOperator.EQ);
+            return buildSizeExpression(lower, BinaryOperator.EQ);
         } else if (lower == Long.MIN_VALUE) {
-            return buildExpression(upper, BinaryOperator.LE);
+            return buildSizeExpression(upper, BinaryOperator.LE);
         } else if (upper == Long.MAX_VALUE) {
-            return buildExpression(lower, BinaryOperator.GE);
+            return buildSizeExpression(lower, BinaryOperator.GE);
         } else {
-            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
-            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
+            BinaryBooleanExpression expr1 = buildSizeExpression(lower, BinaryOperator.GE);
+            BinaryBooleanExpression expr2 = buildSizeExpression(upper, BinaryOperator.LE);
 
             return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
         }
     }
 
-    private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
+    private BinaryBooleanExpression buildSizeExpression(long value, BinaryOperator operator) {
         return new BinaryBooleanExpression(operator, new FunctionCall.GetSize(new Variable(VALUES)),
                 new ILValue(value));
     }

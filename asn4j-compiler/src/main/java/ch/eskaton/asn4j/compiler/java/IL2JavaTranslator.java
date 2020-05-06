@@ -178,7 +178,8 @@ public class IL2JavaTranslator {
         } else if (expression instanceof Variable) {
             return ((Variable) expression).getName();
         } else if (expression instanceof ILValue) {
-            Object value = ((ILValue) expression).getValue();
+            ILValue ilValue = (ILValue) expression;
+            Object value = ilValue.getValue();
 
             if (value instanceof byte[]) {
                 return BitStringUtils.getInitializerString((byte[]) value);
@@ -193,34 +194,14 @@ public class IL2JavaTranslator {
                 javaClass.addStaticImport(ASN1Null.Value.class, "NULL");
             } else if (value instanceof Long || value instanceof BigInteger) {
                 return value + "L";
-            } else if (value instanceof CollectionOfValue) {
-                List<Value> values = ((CollectionOfValue) value).getValues();
-
-                String initString = values.stream()
-                        .map(v -> getInitializerString(ctx, ((ILValue) expression).getTypeName().get(), v))
-                        .collect(Collectors.joining(", "));
-
-                javaClass.addStaticImport(Arrays.class, "asList");
-
-                return "asList(" + initString + ")";
-            } else if (value instanceof CollectionValue) {
-                List<NamedValue> values = ((CollectionValue) value).getValues();
-
-
-                String initString = values.stream()
-                        .map(v -> getInitializerString(ctx, ((ILValue) expression).getTypeName().get(), v.getValue()))
-                        .collect(Collectors.joining(", "));
-
-                javaClass.addStaticImport(Arrays.class, "asList");
-
-                return "asList(" + initString + ")";
+            } else if (value instanceof Value) {
+                return getInitializerString(ctx, ilValue.getTypeName().get(), (Value) value);
             }
 
             return String.valueOf(value);
         } else if (expression instanceof ILListValue) {
             var values = ((ILListValue) expression).getValue();
-            var initString = values.stream().map(expr -> translateExpression(ctx, javaClass, expr))
-                    .collect(joining(", "));
+            var initString = values.stream().map(expr -> translateExpression(ctx, javaClass, expr)).collect(joining(", "));
 
             javaClass.addStaticImport(Arrays.class, "asList");
 
