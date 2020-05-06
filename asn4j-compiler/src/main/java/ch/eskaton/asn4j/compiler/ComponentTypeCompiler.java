@@ -64,7 +64,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             case NAMED_TYPE:
                 compileComponentNamedType(ctx, node, node.getNamedType());
                 break;
-            case Type:
+            case TYPE:
                 compileComponentType(ctx, mode, node.getType());
                 return;
             default:

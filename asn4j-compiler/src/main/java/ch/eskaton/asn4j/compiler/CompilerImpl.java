@@ -52,6 +52,10 @@ import java.util.Optional;
 
 public class CompilerImpl {
 
+    public static final String ASN_1_EXTENSION = ".asn1";
+
+    public static final String ASN_EXTENSION = ".asn";
+
     private String module;
 
     private String[] includePath;
@@ -176,9 +180,9 @@ public class CompilerImpl {
 
         for (String path : includePath) {
             String file = StringUtils.concat(path, File.separator, moduleName);
-            if (new File(file + ".asn1").exists()) {
-                moduleFile = file + ".asn1";
-            } else if (new File(file + ".asn").exists()) {
+            if (new File(file + ASN_1_EXTENSION).exists()) {
+                moduleFile = file + ASN_1_EXTENSION;
+            } else if (new File(file + ASN_EXTENSION).exists()) {
                 moduleFile = file + ".asn";
             }
         }

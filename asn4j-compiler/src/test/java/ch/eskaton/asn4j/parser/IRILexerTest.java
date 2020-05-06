@@ -38,7 +38,7 @@ public class IRILexerTest {
     public void testSolidus() throws ParserException {
     	IRILexer lexer = new IRILexer("/");
 
-    	assertEquals(IRIToken.Type.Solidus, lexer.nextToken().getType());
+    	assertEquals(IRIToken.Type.SOLIDUS, lexer.nextToken().getType());
     }
 
     @Test
@@ -47,14 +47,14 @@ public class IRILexerTest {
 
     	IRIToken token = lexer.nextToken();
 
-    	assertEquals(IRIToken.Type.IntegerUnicodeLabel, token.getType());
+    	assertEquals(IRIToken.Type.INTEGER_UNICODE_LABEL, token.getType());
     	assertEquals("0", token.getText());
 
     	lexer = new IRILexer("1234567890");
 
     	token = lexer.nextToken();
 
-    	assertEquals(IRIToken.Type.IntegerUnicodeLabel, token.getType());
+    	assertEquals(IRIToken.Type.INTEGER_UNICODE_LABEL, token.getType());
     	assertEquals("1234567890", token.getText());
 
     	lexer = new IRILexer("01");
@@ -72,7 +72,7 @@ public class IRILexerTest {
 
     	IRIToken token = lexer.nextToken();
 
-    	assertEquals(IRIToken.Type.NonIntegerUnicodeLabel, token.getType());
+    	assertEquals(IRIToken.Type.NON_INTEGER_UNICODE_LABEL, token.getType());
     	assertEquals("abc\ud841\udf0e", token.getText());
 
     	lexer = new IRILexer("-invalid");

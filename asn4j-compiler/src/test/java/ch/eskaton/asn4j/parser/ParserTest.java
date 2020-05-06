@@ -2379,7 +2379,7 @@ public class ParserTest {
 
         assertNotNull(result);
 
-        assertEquals(ComponentType.CompType.Type, result.getCompType());
+        assertEquals(ComponentType.CompType.TYPE, result.getCompType());
 
         Type type = result.getType();
 

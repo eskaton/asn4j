@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 public class ComponentType extends AbstractType {
 
     public enum CompType {
-        NAMED_TYPE, NAMED_TYPE_OPT, NAMED_TYPE_DEF, Type
+        NAMED_TYPE, NAMED_TYPE_OPT, NAMED_TYPE_DEF, TYPE
     }
 
     private CompType compType;

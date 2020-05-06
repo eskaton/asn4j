@@ -59,7 +59,7 @@ public class IRILexer {
     		if (c == -1) {
     			eof = true;
     		} else if (c == '/') {
-    			return new IRIToken(Type.Solidus, pos);
+    			return new IRIToken(Type.SOLIDUS, pos);
     		} else if (c == '-') {
     			throw new ParserException("A non-integerUnicodeLabel must not start with a hyphen");
     		} else {
@@ -158,13 +158,13 @@ public class IRILexer {
     					throw new ParserException("A non-integerUnicodeLabel must not end with a hyphen");
     				}
 
-    				return new IRIToken(Type.NonIntegerUnicodeLabel, pos, sb.toString());
+    				return new IRIToken(Type.NON_INTEGER_UNICODE_LABEL, pos, sb.toString());
     			} else {
     				if (sb.length() > 1 && sb.charAt(0) == '0') {
     					throw new ParserException("Invalid integerUnicodeLabel: " + sb.toString());
     				}
 
-    				return new IRIToken(Type.IntegerUnicodeLabel, pos, sb.toString());
+    				return new IRIToken(Type.INTEGER_UNICODE_LABEL, pos, sb.toString());
     			}
     		}
     	} catch (IOException e) {
