@@ -60,9 +60,6 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
-import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
-import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
-import ch.eskaton.asn4j.parser.ast.values.NamedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.commons.utils.StreamsUtils;
@@ -195,7 +192,9 @@ public class IL2JavaTranslator {
             } else if (value instanceof Long || value instanceof BigInteger) {
                 return value + "L";
             } else if (value instanceof Value) {
-                return getInitializerString(ctx, ilValue.getTypeName().get(), (Value) value);
+                String typeName = ilValue.getTypeName().orElseThrow(() -> new CompilerException("Type name expected for value: %s", ilValue.getValue()));
+
+                return getInitializerString(ctx, typeName, (Value) value);
             }
 
             return String.valueOf(value);

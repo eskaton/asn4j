@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
@@ -159,7 +160,7 @@ public class ConstraintCompiler {
         Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
 
         if (!maybeCompiler.isPresent()) {
-            return null;
+            throw new IllegalCompilerStateException("Compiler for type %s is missing", type);
         }
 
         return maybeCompiler.get().buildExpression(module, null, node);

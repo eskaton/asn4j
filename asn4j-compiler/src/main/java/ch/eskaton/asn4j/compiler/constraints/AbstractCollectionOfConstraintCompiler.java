@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
@@ -327,7 +328,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                 .name(expressionSym)
                 .parameters(parameters)
                 .statements()
-                    .returnExpression(expression.get())
+                    .returnExpression(expression.orElseThrow(() -> new IllegalCompilerStateException("Expected expression in %s")))
                     .build()
                 .build();
         // @formatter:on
