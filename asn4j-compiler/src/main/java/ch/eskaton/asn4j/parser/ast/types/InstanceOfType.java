@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -43,52 +43,61 @@ public class InstanceOfType extends AbstractType {
     public InstanceOfType(Position position, ObjectClassReferenceNode objectClass) {
         super(position);
 
-    	this.objectClass = objectClass;
+        this.objectClass = objectClass;
     }
 
+    @Override
     public Tag getTag() {
-    	// TODO Auto-generated method stub
-    	return null;
+        // TODO Auto-generated method stub
+        return null;
     }
 
+    @Override
     public void setTag(Tag tag) {
-    	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
+    @Override
     public TaggingMode getTaggingMode() {
-    	// TODO Auto-generated method stub
-    	return null;
+        // TODO Auto-generated method stub
+        return null;
     }
 
+    @Override
     public void setTaggingMode(TaggingMode mode) {
-    	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
+    @Override
     public void setConstraints(List<Constraint> constraints) {
-    	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
+    @Override
     public List<Constraint> getConstraints() {
-    	// TODO Auto-generated method stub
-    	return null;
+        // TODO Auto-generated method stub
+        return null;
     }
 
+    @Override
     public boolean hasConstraint() {
-    	// TODO Auto-generated method stub
-    	return false;
+        // TODO Auto-generated method stub
+        return false;
     }
 
+    @Override
     public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
-    	// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
+    @Override
     public EncodingPrefixNode getEncodingPrefix() {
-    	// TODO Auto-generated method stub
-    	return null;
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
