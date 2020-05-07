@@ -203,7 +203,7 @@ public class CompilerImpl {
     }
 
     private String stripExtension(String module) {
-        if (module.endsWith(".asn1")) {
+        if (module.endsWith(ASN_1_EXTENSION)) {
             module = module.substring(0, module.length() - 5);
         } else if (module.endsWith(".asn")) {
             module = module.substring(0, module.length() - 4);
