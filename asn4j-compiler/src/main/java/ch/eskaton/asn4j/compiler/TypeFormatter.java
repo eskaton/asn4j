@@ -38,19 +38,23 @@ import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.runtime.types.Names.BOOLEAN;
+import static ch.eskaton.asn4j.runtime.types.Names.INTEGER;
+import static ch.eskaton.asn4j.runtime.types.Names.SEQUENCE;
+
 public class TypeFormatter {
 
     public static String formatType(Type type) {
         if (type instanceof SequenceType) {
-            return "SEQUENCE[" + ((SequenceType) type).getAllComponents().stream()
+            return SEQUENCE + "[" + ((SequenceType) type).getAllComponents().stream()
                     .map(TypeFormatter::formatComponentType)
                     .collect(Collectors.joining(", ")) + "]";
         } else if (type instanceof TypeReference) {
             return ((TypeReference) type).getType();
         } else if (type instanceof BooleanType) {
-            return "BOOLEAN";
-        }else if (type instanceof IntegerType) {
-            return "INTEGER";
+            return BOOLEAN.getName();
+        } else if (type instanceof IntegerType) {
+            return INTEGER.getName();
         }
 
         throw new ASN1RuntimeException("Formatter for type %s not defined", type.getClass());
