@@ -110,13 +110,19 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
                 throw new CompilerException("Invalid type in contained subtype constraint: " + type);
             }
 
-            return calculateContainedSubtype(type);
+            return calculateContainedSubtype(baseType, type);
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), TypeName.ENUMERATED);
         }
+    }
+
+    @Override
+    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
+        // TODO implement
+        return true;
     }
 
     @Override

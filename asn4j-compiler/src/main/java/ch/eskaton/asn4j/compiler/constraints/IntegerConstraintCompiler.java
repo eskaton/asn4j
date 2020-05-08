@@ -100,7 +100,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             }
         } else if (elements instanceof ContainedSubtype) {
             Type type = ((ContainedSubtype) elements).getType();
-            return calculateContainedSubtype(type);
+            return calculateContainedSubtype(baseType, type);
         } else if (elements instanceof RangeNode) {
             long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
             long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
@@ -114,6 +114,12 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             throw new CompilerException("Invalid constraint %s for %s type", elements.getClass().getSimpleName(),
                     TypeName.INTEGER);
         }
+    }
+
+    @Override
+    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
+        // TODO implement
+        return true;
     }
 
     @Override

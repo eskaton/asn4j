@@ -91,7 +91,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
                         value.getClass().getSimpleName(), getTypeName());
             }
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), getTypeName());

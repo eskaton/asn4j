@@ -77,11 +77,17 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
                         value.getClass().getSimpleName(), TypeName.BOOLEAN);
             }
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), TypeName.BOOLEAN);
         }
+    }
+
+    @Override
+    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
+        // TODO implement
+        return true;
     }
 
     @Override

@@ -154,7 +154,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         } else if (elements instanceof SingleValueConstraint) {
             return calculateSingleValueConstraint(baseType, (SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else if (elements instanceof SingleTypeConstraint) {
@@ -192,6 +192,12 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
             throw new CompilerException("Invalid single-value constraint %s for %s type", e,
                     value.getClass().getSimpleName(), typeName);
         }
+    }
+
+    @Override
+    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
+        // TODO implement
+        return true;
     }
 
     @Override
