@@ -139,7 +139,6 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     private Map<String, Class<? extends ch.eskaton.asn4j.parser.ast.Node>> getElementTypes(CompiledType compiledType) {
-
         return ((Collection) compiledType.getType()).getAllComponents().stream()
                 .map(ComponentType::getNamedType)
                 .collect(Collectors.toMap(NamedType::getName, nt -> ctx.resolveTypeReference(nt.getType()).getClass()));

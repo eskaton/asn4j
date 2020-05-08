@@ -27,46 +27,56 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.TypeName.SEQUENCE_OF;
+import static ch.eskaton.asn4j.compiler.TypeName.SET_OF;
 import static ch.eskaton.asn4j.runtime.types.Names.BOOLEAN;
 import static ch.eskaton.asn4j.runtime.types.Names.INTEGER;
 import static ch.eskaton.asn4j.runtime.types.Names.SEQUENCE;
 
 public class TypeFormatter {
 
-    public static String formatType(Type type) {
+    public static String formatType(CompilerContext ctx, Node type) {
         if (type instanceof SequenceType) {
             return SEQUENCE + "[" + ((SequenceType) type).getAllComponents().stream()
-                    .map(TypeFormatter::formatComponentType)
+                    .map(t -> formatComponentType(ctx, t))
                     .collect(Collectors.joining(", ")) + "]";
+        } else if (type instanceof SequenceOfType) {
+            return SEQUENCE_OF + "(" + formatType(ctx, ((SequenceOfType) type).getType()) + ")";
+        } else if (type instanceof SetOfType) {
+            return SET_OF + "(" + formatType(ctx, ((SetOfType) type).getType()) + ")";
         } else if (type instanceof TypeReference) {
             return ((TypeReference) type).getType();
         } else if (type instanceof BooleanType) {
             return BOOLEAN.getName();
         } else if (type instanceof IntegerType) {
             return INTEGER.getName();
+        } else if (type instanceof TypeReference) {
+            return formatType(ctx, ctx.resolveTypeReference(type));
         }
 
         throw new ASN1RuntimeException("Formatter for type %s not defined", type.getClass());
     }
 
-    private static String formatComponentType(ComponentType component) {
+    private static String formatComponentType(CompilerContext ctx, ComponentType component) {
         if (component.getType() != null) {
-            return "[" + formatType(component.getType()) + "]";
+            return "[" + formatType(ctx, component.getType()) + "]";
         } else if (component.getNamedType() != null) {
             NamedType namedType = component.getNamedType();
 
-            return "[" + namedType.getName() + ": " + formatType(namedType.getType()) + "]";
+            return "[" + namedType.getName() + ": " + formatType(ctx, namedType.getType()) + "]";
         }
 
         throw new IllegalCompilerStateException("Component type %s not handled", component);
