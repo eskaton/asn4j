@@ -66,6 +66,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import static ch.eskaton.asn4j.compiler.TypeFormatter.formatType;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
@@ -257,7 +258,7 @@ public abstract class AbstractConstraintCompiler {
 
             if (!isAssignable(compiledType, compiledParentType)) {
                 throw new CompilerException("Type %s can't be used in INCLUDES constraint of type %s",
-                        compiledParentType.getType(), compiledType);
+                        formatType(compiledParentType.getType()), formatType(compiledType.getType()));
             }
 
             if (compiledParentType.getConstraintDefinition() != null) {

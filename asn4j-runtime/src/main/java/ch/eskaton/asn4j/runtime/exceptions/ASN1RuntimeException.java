@@ -42,4 +42,8 @@ public class ASN1RuntimeException extends RuntimeException {
         super(message, e);
     }
 
+    public ASN1RuntimeException(String format, Object... args) {
+        super(String.format(format, args));
+    }
+
 }
