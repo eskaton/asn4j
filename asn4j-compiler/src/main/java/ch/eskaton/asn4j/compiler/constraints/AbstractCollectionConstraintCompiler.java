@@ -55,7 +55,10 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
+import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
+import ch.eskaton.asn4j.parser.ast.types.ComponentType;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -67,6 +70,8 @@ import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -104,7 +109,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         } else if (elements instanceof SingleValueConstraint) {
             return calculateSingleValueConstraint(baseType, (SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), typeName);
@@ -122,6 +127,22 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
             throw new CompilerException("Invalid single-value constraint %s for %s type", e,
                     value.getClass().getSimpleName(), typeName);
         }
+    }
+
+    @Override
+    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
+        if (!compiledType.getType().getClass().isAssignableFrom(compiledParentType.getType().getClass())) {
+            return false;
+        }
+
+        return Objects.equals(getElementTypes(compiledType), getElementTypes(compiledParentType));
+    }
+
+    private Map<String, Class<? extends ch.eskaton.asn4j.parser.ast.Node>> getElementTypes(CompiledType compiledType) {
+
+        return ((Collection) compiledType.getType()).getAllComponents().stream()
+                .map(ComponentType::getNamedType)
+                .collect(Collectors.toMap(NamedType::getName, nt -> ctx.resolveTypeReference(nt.getType()).getClass()));
     }
 
     @Override

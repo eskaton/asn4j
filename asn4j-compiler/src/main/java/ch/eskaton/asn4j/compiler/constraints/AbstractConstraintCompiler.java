@@ -248,19 +248,23 @@ public abstract class AbstractConstraintCompiler {
     protected abstract Node calculateElements(CompiledType baseType, Elements elements,
             Optional<Bounds> bounds);
 
-    protected Node calculateContainedSubtype(Type type) {
-        Type parent = type;
-        CompiledType compiledType;
+    protected Node calculateContainedSubtype(CompiledType compiledType, Type parent) {
+        CompiledType compiledParentType;
         Deque<Node> constraints = new ArrayDeque<>();
 
         do {
-            compiledType = ctx.getCompiledType(parent);
+            compiledParentType = ctx.getCompiledType(parent);
 
-            if (compiledType.getConstraintDefinition() != null) {
-                constraints.push(compiledType.getConstraintDefinition().getRoots());
+            if (!isAssignable(compiledType, compiledParentType)) {
+                throw new CompilerException("Type %s can't be used in INCLUDES constraint of type %s",
+                        compiledParentType.getType(), compiledType);
             }
 
-            parent = compiledType.getType();
+            if (compiledParentType.getConstraintDefinition() != null) {
+                constraints.push(compiledParentType.getConstraintDefinition().getRoots());
+            }
+
+            parent = compiledParentType.getType();
         } while (parent instanceof TypeReference);
 
         if (constraints.isEmpty()) {
@@ -284,6 +288,8 @@ public abstract class AbstractConstraintCompiler {
             return node1;
         }
     }
+
+    protected abstract boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType);
 
     protected SizeNode calculateSize(CompiledType baseType, Constraint constraint, Optional<Bounds> bounds) {
         if (constraint instanceof SubtypeConstraint) {

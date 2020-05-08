@@ -90,7 +90,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
                         value.getClass().getSimpleName());
             }
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else {
             throw new CompilerException("Invalid constraint %s for " + getTypeName() + " type",
                     elements.getClass().getSimpleName());

@@ -108,13 +108,19 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                         value.getClass().getSimpleName(), TypeName.BIT_STRING);
             }
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), TypeName.BIT_STRING);
         }
+    }
+
+    @Override
+    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
+        // TODO implement
+        return true;
     }
 
     @Override

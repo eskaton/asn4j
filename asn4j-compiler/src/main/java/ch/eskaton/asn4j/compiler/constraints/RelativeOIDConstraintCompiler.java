@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeOIDConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 
 import java.util.List;
@@ -47,6 +48,12 @@ public class RelativeOIDConstraintCompiler extends AbstractOIDConstraintCompiler
         super(ctx);
 
         valueResolver = new RelativeOIDValueResolver(ctx);
+    }
+
+    @Override
+    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
+        // TODO implement
+        return true;
     }
 
     @Override
