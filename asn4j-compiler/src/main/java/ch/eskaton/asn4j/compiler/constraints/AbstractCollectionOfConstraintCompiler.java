@@ -61,6 +61,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
@@ -196,7 +197,12 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
     @Override
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        // TODO implement
+        if (!compiledType.getType().getClass().isAssignableFrom(compiledParentType.getType().getClass())) {
+            return false;
+        } else if (!compiledParentType.getType().getClass().isAssignableFrom(compiledParentType.getType().getClass())) {
+            return false;
+        }
+
         return true;
     }
 

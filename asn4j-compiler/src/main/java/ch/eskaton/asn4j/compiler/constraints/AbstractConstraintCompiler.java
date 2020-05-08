@@ -258,7 +258,7 @@ public abstract class AbstractConstraintCompiler {
 
             if (!isAssignable(compiledType, compiledParentType)) {
                 throw new CompilerException("Type %s can't be used in INCLUDES constraint of type %s",
-                        formatType(compiledParentType.getType()), formatType(compiledType.getType()));
+                        formatType(ctx, compiledParentType.getType()), formatType(ctx, compiledType.getType()));
             }
 
             if (compiledParentType.getConstraintDefinition() != null) {
