@@ -27,7 +27,10 @@
 
 package ch.eskaton.asn4j.test.x680_51_3;
 
+import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequence1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf1;
@@ -78,8 +81,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRIFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 
@@ -285,6 +290,40 @@ public class TestX680_51_3 {
 
         testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(0));
         testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(4));
+    }
+
+    @Test
+    public void testSequence1() {
+        testSequenceSuccess(TestSequence1.class, new TestSequence1(), seq -> {
+            seq.setA(ASN1Integer.valueOf(12));
+            seq.setB(ASN1Boolean.FALSE);
+        });
+
+        testSequenceFailure(TestSequence1.class, new TestSequence1(), seq -> {
+            seq.setA(ASN1Integer.valueOf(32));
+            seq.setB(ASN1Boolean.FALSE);
+        });
+        testSequenceFailure(TestSequence1.class, new TestSequence1(), seq -> {
+            seq.setA(ASN1Integer.valueOf(12));
+            seq.setB(ASN1Boolean.TRUE);
+        });
+    }
+
+    @Test
+    public void testSequence2() {
+        testSequenceSuccess(TestSequence2.class, new TestSequence2(), seq -> {
+            seq.setA(ASN1Integer.valueOf(12));
+            seq.setB(ASN1Boolean.FALSE);
+        });
+
+        testSequenceFailure(TestSequence2.class, new TestSequence2(), seq -> {
+            seq.setA(ASN1Integer.valueOf(32));
+            seq.setB(ASN1Boolean.FALSE);
+        });
+        testSequenceFailure(TestSequence2.class, new TestSequence2(), seq -> {
+            seq.setA(ASN1Integer.valueOf(12));
+            seq.setB(ASN1Boolean.TRUE);
+        });
     }
 
 }

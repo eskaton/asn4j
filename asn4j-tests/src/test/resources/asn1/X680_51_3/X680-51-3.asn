@@ -62,4 +62,14 @@ TestSetOf2 ::= SET (INCLUDES TestSetOf1) OF INTEGER
 TestSequenceOf1 ::= SEQUENCE ({1} | {2} | {3}) OF INTEGER
 TestSequenceOf2 ::= SEQUENCE (INCLUDES TestSetOf1) OF INTEGER
 
+TestSequence1 ::= SEQUENCE {
+    a INTEGER,
+    b BOOLEAN
+} ({a 12, b FALSE})
+
+TestSequence2 ::= SEQUENCE {
+    a INTEGER,
+    b BOOLEAN
+} (TestSequence1)
+
 END

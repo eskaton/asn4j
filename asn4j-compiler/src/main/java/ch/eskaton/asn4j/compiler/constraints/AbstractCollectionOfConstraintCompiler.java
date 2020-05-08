@@ -152,37 +152,45 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            Value value = ((SingleValueConstraint) elements).getValue();
-
-            try {
-                CollectionOfValue collectionOfValue = ctx.resolveGenericValue(CollectionOfValue.class,
-                        baseType.getType(), value);
-
-                return new CollectionOfValueNode(singleton(collectionOfValue));
-            } catch (Exception e) {
-                throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                        value.getClass().getSimpleName(), typeName);
-            }
+            return calculateSingleValueConstraint(baseType, (SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else if (elements instanceof SingleTypeConstraint) {
-            Type componentType = ((CollectionOfType) baseType.getType()).getType();
-
-            ConstraintDefinition definition = ctx.compileConstraint(componentType);
-
-            if (definition != null) {
-                definition = definition.serialApplication(
-                        ctx.compileConstraint(componentType, ((SingleTypeConstraint) elements).getConstraint()));
-            } else {
-                definition = ctx.compileConstraint(componentType, ((SingleTypeConstraint) elements).getConstraint());
-            }
-
-            return new WithComponentNode(componentType, definition.getRoots());
+            return calculateSingleTypeConstraint(baseType, (SingleTypeConstraint) elements);
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), typeName);
+        }
+    }
+
+    private Node calculateSingleTypeConstraint(CompiledType baseType, SingleTypeConstraint elements) {
+        Type componentType = ((CollectionOfType) baseType.getType()).getType();
+
+        ConstraintDefinition definition = ctx.compileConstraint(componentType);
+
+        if (definition != null) {
+            definition = definition.serialApplication(
+                    ctx.compileConstraint(componentType, elements.getConstraint()));
+        } else {
+            definition = ctx.compileConstraint(componentType, elements.getConstraint());
+        }
+
+        return new WithComponentNode(componentType, definition.getRoots());
+    }
+
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements) {
+        Value value = elements.getValue();
+
+        try {
+            CollectionOfValue collectionOfValue = ctx.resolveGenericValue(CollectionOfValue.class,
+                    baseType.getType(), value);
+
+            return new CollectionOfValueNode(singleton(collectionOfValue));
+        } catch (Exception e) {
+            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
+                    value.getClass().getSimpleName(), typeName);
         }
     }
 

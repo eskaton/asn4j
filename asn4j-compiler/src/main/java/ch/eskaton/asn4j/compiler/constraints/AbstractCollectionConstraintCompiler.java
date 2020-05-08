@@ -50,6 +50,7 @@ import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
@@ -101,19 +102,25 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            Value value = ((SingleValueConstraint) elements).getValue();
-
-            try {
-                CollectionValue collectionValue = ctx.resolveGenericValue(CollectionValue.class, baseType.getType(), value);
-
-                return new CollectionValueNode(singleton(collectionValue));
-            } catch (Exception e) {
-                throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                        value.getClass().getSimpleName(), typeName);
-            }
+            return calculateSingleValueConstraint(baseType, (SingleValueConstraint) elements);
+        } else if (elements instanceof ContainedSubtype) {
+            return calculateContainedSubtype(((ContainedSubtype) elements).getType());
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), typeName);
+        }
+    }
+
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements) {
+        Value value = elements.getValue();
+
+        try {
+            CollectionValue collectionValue = ctx.resolveGenericValue(CollectionValue.class, baseType.getType(), value);
+
+            return new CollectionValueNode(singleton(collectionValue));
+        } catch (Exception e) {
+            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
+                    value.getClass().getSimpleName(), typeName);
         }
     }
 
