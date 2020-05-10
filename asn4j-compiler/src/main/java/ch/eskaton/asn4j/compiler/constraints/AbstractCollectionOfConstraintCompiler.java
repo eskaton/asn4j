@@ -61,7 +61,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
-import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
@@ -80,6 +79,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -199,11 +199,19 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
         if (!compiledType.getType().getClass().isAssignableFrom(compiledParentType.getType().getClass())) {
             return false;
-        } else if (!compiledParentType.getType().getClass().isAssignableFrom(compiledParentType.getType().getClass())) {
-            return false;
         }
 
-        return true;
+        return Objects.equals(getComponentClass(compiledType), getComponentClass(compiledParentType));
+    }
+
+    private Optional<Class<?>> getComponentClass(CompiledType compiledType) {
+        var type = compiledType.getType();
+
+        if (!(type instanceof CollectionOfType)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(ctx.resolveTypeReference(((CollectionOfType) type).getType()).getClass());
     }
 
     @Override
