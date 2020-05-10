@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.commons.utils.CollectionUtils.asLinkedList;
+import static ch.eskaton.commons.utils.Utils.rootCause;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -50,7 +51,7 @@ public class TestUtils {
             action.execute();
             fail(exception.getSimpleName() + " expected");
         } catch (Exception e) {
-            assertTrue(exception.isAssignableFrom(e.getClass()));
+            assertTrue(exception.isAssignableFrom(rootCause(e).getClass()));
         }
     }
 

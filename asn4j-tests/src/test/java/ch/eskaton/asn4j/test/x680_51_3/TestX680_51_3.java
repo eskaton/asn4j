@@ -287,12 +287,17 @@ public class TestX680_51_3 {
 
     @Test
     public void testSequenceOf2() {
-        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(1L));
-        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(2L));
-        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(3L));
+        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(),
+                with(new TestInteger1(), obj -> obj.setValue(BigInteger.ONE)));
+        testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(),
+                with(new TestInteger1(), obj -> obj.setValue(BigInteger.TWO)));
 
-        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(0));
-        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(4));
+        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(),
+                with(new TestInteger1(), obj -> obj.setValue(BigInteger.ZERO)));
+        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(),
+                with(new TestInteger1(), obj -> obj.setValue(BigInteger.valueOf(3L))));
+        testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(),
+                with(new TestInteger1(), obj -> obj.setValue(BigInteger.valueOf(4L))));
     }
 
     @Test
