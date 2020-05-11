@@ -87,33 +87,40 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            Value value = ((SingleValueConstraint) elements).getValue();
-
-            try {
-                IntegerValue intValue = ctx.resolveGenericValue(IntegerValue.class, baseType.getType(), value);
-                long longValue = intValue.getValue().longValue();
-
-                return new IntegerRangeValueNode((singletonList(new IntegerRange(longValue, longValue))));
-            } catch (Exception e) {
-                throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                        value.getClass().getSimpleName(), TypeName.INTEGER);
-            }
+            return calculateSingleValueConstraint(baseType, (SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
-            Type type = ((ContainedSubtype) elements).getType();
-            return calculateContainedSubtype(baseType, type);
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else if (elements instanceof RangeNode) {
-            long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
-            long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
-
-            IntegerValue lower = ((RangeNode) elements).getLower().getLowerEndPointValue(min);
-            IntegerValue upper = ((RangeNode) elements).getUpper().getUpperEndPointValue(max);
-
-            return new IntegerRangeValueNode(singletonList(new IntegerRange(lower.getValue().longValue(), upper
-                    .getValue().longValue())));
+            return calculateRangeNode((RangeNode) elements, bounds);
         } else {
             throw new CompilerException("Invalid constraint %s for %s type", elements.getClass().getSimpleName(),
                     TypeName.INTEGER);
         }
+    }
+
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements) {
+        Value value = elements.getValue();
+
+        try {
+            IntegerValue intValue = ctx.resolveGenericValue(IntegerValue.class, baseType.getType(), value);
+            long longValue = intValue.getValue().longValue();
+
+            return new IntegerRangeValueNode((singletonList(new IntegerRange(longValue, longValue))));
+        } catch (Exception e) {
+            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
+                    value.getClass().getSimpleName(), TypeName.INTEGER);
+        }
+    }
+
+    private Node calculateRangeNode(RangeNode elements, Optional<Bounds> bounds) {
+        long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
+        long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
+
+        IntegerValue lower = elements.getLower().getLowerEndPointValue(min);
+        IntegerValue upper = elements.getUpper().getUpperEndPointValue(max);
+
+        return new IntegerRangeValueNode(singletonList(new IntegerRange(lower.getValue().longValue(), upper
+                .getValue().longValue())));
     }
 
     @Override

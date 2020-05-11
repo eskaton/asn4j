@@ -80,7 +80,7 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
         } else if (elements instanceof SingleValueConstraint) {
             return calculateSingleValueConstraint((CompiledEnumeratedType) baseType, (SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, (ContainedSubtype) elements);
+            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
@@ -119,15 +119,15 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
         }
     }
 
-    private Node calculateContainedSubtype(CompiledType baseType, ContainedSubtype elements) {
-        Type type = elements.getType();
-        CompiledType compiledType = ctx.getCompiledBaseType(type);
+    @Override
+    protected Node calculateContainedSubtype(CompiledType baseType, Type parent) {
+        CompiledType compiledType = ctx.getCompiledBaseType(parent);
 
         if (!baseType.getType().getClass().equals(compiledType.getType().getClass())) {
-            throw new CompilerException("Invalid type in contained subtype constraint: " + type);
+            throw new CompilerException("Invalid parent in contained subtype constraint: " + parent);
         }
 
-        return super.calculateContainedSubtype(baseType, type);
+        return super.calculateContainedSubtype(baseType, parent);
     }
 
     @Override
