@@ -25,8 +25,10 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.utils;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
@@ -36,7 +38,6 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 
 import java.util.stream.Collectors;
 
@@ -57,8 +58,6 @@ public class TypeFormatter {
             return SEQUENCE_OF + "(" + formatType(ctx, ((SequenceOfType) type).getType()) + ")";
         } else if (type instanceof SetOfType) {
             return SET_OF + "(" + formatType(ctx, ((SetOfType) type).getType()) + ")";
-        } else if (type instanceof TypeReference) {
-            return ((TypeReference) type).getType();
         } else if (type instanceof BooleanType) {
             return BOOLEAN.getName();
         } else if (type instanceof IntegerType) {
@@ -67,7 +66,7 @@ public class TypeFormatter {
             return formatType(ctx, ctx.resolveTypeReference(type));
         }
 
-        throw new ASN1RuntimeException("Formatter for type %s not defined", type.getClass());
+        throw new IllegalCompilerStateException("Formatter for type %s not defined", type.getClass());
     }
 
     private static String formatComponentType(CompilerContext ctx, ComponentType component) {
