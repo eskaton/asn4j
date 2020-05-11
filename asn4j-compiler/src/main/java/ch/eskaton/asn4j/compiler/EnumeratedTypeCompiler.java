@@ -106,15 +106,17 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
 
-        ConstraintDefinition constraintDef = null;
+        CompiledEnumeratedType compiledType = new CompiledEnumeratedType(node, rootItems, additionalItems);
+        ConstraintDefinition constraintDef;
 
         if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, typeName, node);
+            constraintDef = ctx.compileConstraint(javaClass, typeName, compiledType);
+            compiledType.setConstraintDefinition(constraintDef);
         }
 
         ctx.finishClass(false);
 
-        return new CompiledEnumeratedType(node, rootItems, additionalItems, constraintDef);
+        return compiledType;
     }
 
     EnumerationItems getRootItems(CompilerContext ctx, String typeName, List<EnumerationItemNode> nodes) {

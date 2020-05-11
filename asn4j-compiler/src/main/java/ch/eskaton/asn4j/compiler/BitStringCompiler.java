@@ -78,15 +78,18 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
         javaClass.method().modifier(PUBLIC).name(name).build();
 
-        ConstraintDefinition constraintDef = null;
+        CompiledType compiledType = new CompiledType(node);
+        ConstraintDefinition constraintDef;
 
         if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, node);
+            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+
+            compiledType.setConstraintDefinition(constraintDef);
         }
 
         ctx.finishClass(false);
 
-        return new CompiledType(node, constraintDef);
+        return compiledType;
     }
 
 }

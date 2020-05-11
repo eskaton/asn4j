@@ -130,7 +130,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                 constraintDefinition = new ConstraintDefinition();
             }
 
-            ConstraintDefinition componentDefinition = ctx.compileConstraint(collectionOfType.getType());
+            ConstraintDefinition componentDefinition = ctx.compileConstraint(ctx.getCompiledType(((CollectionOfType) baseType.getType()).getType()));
 
             if (componentDefinition.getRoots() != null) {
                 componentDefinition
@@ -169,7 +169,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     private Node calculateSingleTypeConstraint(CompiledType baseType, SingleTypeConstraint elements) {
         Type componentType = ((CollectionOfType) baseType.getType()).getType();
 
-        ConstraintDefinition definition = ctx.compileConstraint(componentType);
+        ConstraintDefinition definition = ctx.compileConstraint(ctx.getCompiledType(componentType));
 
         if (definition != null) {
             definition = definition.serialApplication(

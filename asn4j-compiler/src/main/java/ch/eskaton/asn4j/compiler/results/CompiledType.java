@@ -56,6 +56,10 @@ public class CompiledType implements CompilationResult {
         return constraintDefinition;
     }
 
+    public void setConstraintDefinition(ConstraintDefinition constraintDefinition) {
+        this.constraintDefinition = constraintDefinition;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

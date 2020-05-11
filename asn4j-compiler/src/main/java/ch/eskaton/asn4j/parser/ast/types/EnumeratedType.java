@@ -41,6 +41,8 @@ public class EnumeratedType extends AbstractType {
 
     private List<EnumerationItemNode> additionalEnum;
 
+    private boolean extensible = false;
+
     public EnumeratedType(Position position, List<EnumerationItemNode> rootEnum) {
         super(position);
 
@@ -53,6 +55,7 @@ public class EnumeratedType extends AbstractType {
 
     	this.rootEnum = rootEnum;
     	this.exceptionSpec = exceptionSpec;
+    	this.extensible = true;
     }
 
     public EnumeratedType(Position position, List<EnumerationItemNode> rootEnum,
@@ -62,6 +65,7 @@ public class EnumeratedType extends AbstractType {
     	this.rootEnum = rootEnum;
     	this.exceptionSpec = exceptionSpec;
     	this.additionalEnum = additionalEnum;
+        this.extensible = true;
     }
 
     public List<EnumerationItemNode> getRootEnum() {
@@ -74,6 +78,10 @@ public class EnumeratedType extends AbstractType {
 
     public List<EnumerationItemNode> getAdditionalEnum() {
     	return additionalEnum;
+    }
+
+    public boolean isExtensible() {
+        return extensible;
     }
 
 }

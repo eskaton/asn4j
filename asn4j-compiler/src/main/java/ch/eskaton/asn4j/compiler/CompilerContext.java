@@ -751,12 +751,12 @@ public class CompilerContext {
         return constraintCompiler.buildExpression(module, type, node);
     }
 
-    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type type) {
-        return constraintCompiler.compileConstraint(javaClass, name, type);
+    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, CompiledType compiledType) {
+        return constraintCompiler.compileConstraint(javaClass, name, compiledType);
     }
 
-    public ConstraintDefinition compileConstraint(Type type) {
-        return constraintCompiler.compileConstraint(type);
+    public ConstraintDefinition compileConstraint(CompiledType compiledType) {
+        return constraintCompiler.compileConstraint(compiledType);
     }
 
     public ConstraintDefinition compileConstraint(Type type, Constraint constraint) {
@@ -764,8 +764,8 @@ public class CompilerContext {
     }
 
 
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
-        constraintCompiler.addConstraint(type, module, definition);
+    public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {
+        constraintCompiler.addConstraint(compiledType, module, definition);
     }
 
     public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value) {
@@ -902,20 +902,50 @@ public class CompilerContext {
         return false;
     }
 
-    public CompiledType getCompiledType(Type type) {
-        return getCompiledType(type, false).orElse(new CompiledType(type));
+    /**
+     * Resolves the compiled base type for compiledType. If it already is a base
+     * type it is returned as is.
+     *
+     * @param compiledType a compiled type
+     * @return a compiled type
+     */
+    public CompiledType getCompiledBaseType(CompiledType compiledType) {
+        if (compiledType.getType() instanceof TypeReference ||
+                compiledType.getType() instanceof ExternalTypeReference) {
+            return getCompiledBaseType(compiledType.getType());
+        }
+
+        return compiledType;
     }
 
-    public CompiledType getCompiledBaseType(Type node) {
+    /**
+     * Resolves the compiled base type for type.
+     *
+     * @param type a type
+     * @return a compiled type
+     */
+    public CompiledType getCompiledBaseType(Type type) {
         CompiledType compiledType;
 
         do {
-            compiledType = getCompiledType(node);
+            compiledType = getCompiledType(type);
 
-            node = compiledType.getType();
-        } while (node instanceof TypeReference);
+            type = compiledType.getType();
+        } while (type instanceof TypeReference);
 
         return compiledType;
+    }
+
+    /**
+     * Looks up the compiled type for the given type. Type may be compiled if it isn't already.
+     * If no compiled type can be found, it is assumed that type is a builtin type which is
+     * wrapped in a compiled type.
+     *
+     * @param type a type
+     * @return a compiled type
+     */
+    public CompiledType getCompiledType(Type type) {
+        return getCompiledType(type, false).orElse(new CompiledType(type));
     }
 
     private HashMap<String, CompiledType> getTypesOfCurrentModule() {

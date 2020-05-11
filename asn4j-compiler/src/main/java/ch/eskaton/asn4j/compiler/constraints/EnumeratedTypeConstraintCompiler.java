@@ -51,13 +51,16 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -75,42 +78,9 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            Value value = ((SingleValueConstraint) elements).getValue();
-
-            try {
-                SimpleDefinedValue definedValue = CompilerUtils.resolveAmbiguousValue(value, SimpleDefinedValue.class);
-                Integer enumValue;
-
-                if (definedValue != null) {
-                    CompiledEnumeratedType compiledEnumeratedType = (CompiledEnumeratedType) baseType;
-                    EnumerationItems allItems = compiledEnumeratedType.getRoots().copy()
-                            .addAll(compiledEnumeratedType.getAdditions().getItems());
-                    Optional<Tuple2<String, Integer>> enumItem = allItems.getItems().stream()
-                            .filter(t -> t.get_1().equals(definedValue.getValue())).findAny();
-
-                    if (enumItem.isPresent()) {
-                        enumValue = enumItem.get().get_2();
-                    } else {
-                        throw new CompilerException("Failed to resolve enum value: " + definedValue.getValue());
-                    }
-                } else {
-                    throw new CompilerException("Failed to resolve value: ", value.getClass().getSimpleName());
-                }
-
-                return new EnumeratedValueNode(Sets.<Integer>builder().add(enumValue).build());
-            } catch (Exception e) {
-                throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                        value.getClass().getSimpleName(), TypeName.ENUMERATED);
-            }
+            return calculateSingleValueConstraint((CompiledEnumeratedType) baseType, (SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
-            Type type = ((ContainedSubtype) elements).getType();
-            CompiledType compiledType = ctx.getCompiledBaseType(type);
-
-            if (!baseType.getType().equals(compiledType.getType())) {
-                throw new CompilerException("Invalid type in contained subtype constraint: " + type);
-            }
-
-            return calculateContainedSubtype(baseType, type);
+            return calculateContainedSubtype(baseType, (ContainedSubtype) elements);
         } else if (elements instanceof SizeConstraint) {
             return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
         } else {
@@ -119,10 +89,66 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
         }
     }
 
+    private Node calculateSingleValueConstraint(CompiledEnumeratedType baseType, SingleValueConstraint elements) {
+        Value value = elements.getValue();
+
+        try {
+            SimpleDefinedValue definedValue = CompilerUtils.resolveAmbiguousValue(value, SimpleDefinedValue.class);
+            Integer enumValue;
+
+            if (definedValue != null) {
+                CompiledEnumeratedType compiledEnumeratedType = baseType;
+                EnumerationItems allItems = compiledEnumeratedType.getRoots().copy()
+                        .addAll(compiledEnumeratedType.getAdditions().getItems());
+                Optional<Tuple2<String, Integer>> enumItem = allItems.getItems().stream()
+                        .filter(t -> t.get_1().equals(definedValue.getValue())).findAny();
+
+                if (enumItem.isPresent()) {
+                    enumValue = enumItem.get().get_2();
+                } else {
+                    throw new CompilerException("Failed to resolve enum value: " + definedValue.getValue());
+                }
+            } else {
+                throw new CompilerException("Failed to resolve value: ", value.getClass().getSimpleName());
+            }
+
+            return new EnumeratedValueNode(Sets.<Integer>builder().add(enumValue).build());
+        } catch (Exception e) {
+            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
+                    value.getClass().getSimpleName(), TypeName.ENUMERATED);
+        }
+    }
+
+    private Node calculateContainedSubtype(CompiledType baseType, ContainedSubtype elements) {
+        Type type = elements.getType();
+        CompiledType compiledType = ctx.getCompiledBaseType(type);
+
+        if (!baseType.getType().getClass().equals(compiledType.getType().getClass())) {
+            throw new CompilerException("Invalid type in contained subtype constraint: " + type);
+        }
+
+        return super.calculateContainedSubtype(baseType, type);
+    }
+
     @Override
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        // TODO implement
-        return true;
+        return Objects.equals(getItems(compiledType), getItems(compiledParentType));
+    }
+
+    private Object getItems(CompiledType compiledType) {
+        if (compiledType instanceof CompiledEnumeratedType) {
+            return getItemsAux(compiledType);
+        }
+
+        return getItemsAux(ctx.getCompiledBaseType(compiledType.getType()));
+    }
+
+    private Object getItemsAux(CompiledType compiledType) {
+        EnumerationItems roots = ((CompiledEnumeratedType) compiledType).getRoots();
+        EnumerationItems additions = ((CompiledEnumeratedType) compiledType).getAdditions();
+
+        return new Tuple2<>(((EnumeratedType) compiledType.getType()).isExtensible(),
+                new HashSet<>(roots.copy().addAll(additions.getItems()).getItems()));
     }
 
     @Override

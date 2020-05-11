@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString4;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBoolean2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration3;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull1;
@@ -128,11 +129,19 @@ public class TestX680_51_3 {
 
     @Test
     public void testEnumeration2() {
-        testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.B);
-        testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.C);
-        testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.D);
+        testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration2.B);
+        testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration2.C);
+        testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration2.D);
 
-        testEnumeratedFailure(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.A);
+        testEnumeratedFailure(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration2.A);
+    }
+
+    @Test
+    public void testEnumeration3() {
+        testEnumeratedSuccess(TestEnumeration3.class, new TestEnumeration3(), TestEnumeration3.A);
+        testEnumeratedSuccess(TestEnumeration3.class, new TestEnumeration3(), TestEnumeration3.B);
+        testEnumeratedSuccess(TestEnumeration3.class, new TestEnumeration3(), TestEnumeration3.C);
+        testEnumeratedSuccess(TestEnumeration3.class, new TestEnumeration3(), TestEnumeration3.D);
     }
 
     @Test

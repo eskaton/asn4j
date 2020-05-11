@@ -42,15 +42,17 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
         javaClass.typeParameter(ctx.getTypeParameter(node, Optional.of(name)));
 
-        ConstraintDefinition constraintDef = null;
+        CompiledType compiledType = new CompiledType(node);
+        ConstraintDefinition constraintDef;
 
         if (node.hasAnyConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, node);
+            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            compiledType.setConstraintDefinition(constraintDef);
         }
 
         ctx.finishClass();
 
-        return new CompiledType(node, constraintDef);
+        return compiledType;
     }
 
 }

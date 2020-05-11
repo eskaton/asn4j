@@ -108,7 +108,11 @@ public abstract class AbstractConstraintCompiler {
         CompiledType compiledType;
 
         do {
-            compiledType = ctx.getCompiledType(node);
+            if (node.equals(baseType.getType())) {
+                compiledType = baseType;
+            } else {
+                compiledType = ctx.getCompiledType(node);
+            }
 
             if (compiledType.getConstraintDefinition() != null) {
                 definitions.addLast(compiledType.getConstraintDefinition());

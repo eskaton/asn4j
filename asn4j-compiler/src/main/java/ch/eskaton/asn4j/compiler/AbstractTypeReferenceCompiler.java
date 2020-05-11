@@ -41,14 +41,18 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
     public CompiledType compile(CompilerContext ctx, String name, T node) {
         JavaClass javaClass = ctx.createClass(name, node, isConstructed(ctx, name));
 
-        ConstraintDefinition constraintDef = ctx.compileConstraint(javaClass, name, node);
+        CompiledType compiledType = new CompiledType(node);
+        ConstraintDefinition constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+
+        compiledType.setConstraintDefinition(constraintDef);
+
         ctx.finishClass();
 
         if (node.getParameters() != null) {
             throw new CompilerException("ParameterizedTypeReference not yet supported");
         }
 
-        return new CompiledType(node, constraintDef);
+        return compiledType;
     }
 
     protected boolean isConstructed(CompilerContext ctx, String type) {
