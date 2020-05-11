@@ -86,11 +86,11 @@ public class ConstraintCompiler {
                 .build();
     }
 
-    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, Type node) {
+    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, CompiledType compiledType) {
         ConstraintDefinition definition;
 
         try {
-            definition = compileConstraintAux(node);
+            definition = compileConstraintAux(compiledType);
         } catch (CompilerException e) {
             throw new CompilerException("Error in constraints for type %s: %s", e, name, e.getMessage());
         }
@@ -98,7 +98,7 @@ public class ConstraintCompiler {
         if (definition != null) {
             Module module = new Module();
 
-            addConstraint(node, module, definition);
+            addConstraint(compiledType, module, definition);
 
             javaClass.addModule(ctx, module);
         }
@@ -108,16 +108,16 @@ public class ConstraintCompiler {
         return definition;
     }
 
-    private ConstraintDefinition compileConstraintAux(Type node) {
-        CompiledType compiledType = ctx.getCompiledBaseType(node);
-        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
+    private ConstraintDefinition compileConstraintAux(CompiledType compiledType) {
+        CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType);
+        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
 
-        return maybeCompiler.map(c -> c.compileConstraints(node, compiledType)).orElse(null);
+        return maybeCompiler.map(c -> c.compileConstraints(compiledType.getType(), compiledBaseType)).orElse(null);
     }
 
-    public ConstraintDefinition compileConstraint(Type node) {
+    public ConstraintDefinition compileConstraint(CompiledType compiledType) {
         try {
-            return compileConstraintAux(node);
+            return compileConstraintAux(compiledType);
         } catch (CompilerException e) {
             throw new CompilerException("Error in constraint: %s", e, e.getMessage());
         }
@@ -133,15 +133,15 @@ public class ConstraintCompiler {
         return Optional.of(compilers.get(compiledType.getType().getClass()));
     }
 
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
-        CompiledType compiledType = ctx.getCompiledBaseType(type);
-        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
+    public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {
+        CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType);
+        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
 
         if (!maybeCompiler.isPresent()) {
             return;
         }
 
-        maybeCompiler.get().addConstraint(type, module, definition);
+        maybeCompiler.get().addConstraint(compiledType.getType(), module, definition);
     }
 
     public ConstraintDefinition compileConstraint(Type type, Constraint constraint) {

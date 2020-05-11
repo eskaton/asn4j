@@ -69,13 +69,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            Value value = ((SingleValueConstraint) elements).getValue();
-            if (value instanceof BooleanValue) {
-                return new ValueNode<>(((BooleanValue) value).getValue());
-            } else {
-                throw new CompilerException("Invalid single-value constraint %s for %s type",
-                        value.getClass().getSimpleName(), TypeName.BOOLEAN);
-            }
+            return calculateSingleValueConstraint((SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else {
@@ -84,10 +78,20 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
+    private Node calculateSingleValueConstraint(SingleValueConstraint elements) {
+        Value value = elements.getValue();
+
+        if (value instanceof BooleanValue) {
+            return new ValueNode<>(((BooleanValue) value).getValue());
+        } else {
+            throw new CompilerException("Invalid single-value constraint %s for %s type",
+                    value.getClass().getSimpleName(), TypeName.BOOLEAN);
+        }
+    }
+
     @Override
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        // TODO implement
-        return true;
+       return compiledType.getType().getClass().isAssignableFrom(compiledParentType.getType().getClass());
     }
 
     @Override

@@ -41,9 +41,8 @@ public class CompiledEnumeratedType extends CompiledType {
 
     private EnumerationItems additions;
 
-    public CompiledEnumeratedType(Type type, EnumerationItems roots, EnumerationItems additions,
-            ConstraintDefinition constraintDefinition) {
-        super(type, constraintDefinition);
+    public CompiledEnumeratedType(Type type, EnumerationItems roots, EnumerationItems additions) {
+        super(type);
 
         this.roots = roots;
         this.additions = additions;

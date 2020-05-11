@@ -10,10 +10,14 @@ TestBoolean1 ::= BOOLEAN (TRUE)
 TestBoolean2 ::= BOOLEAN (INCLUDES TestBoolean1)
 
 TestEnumeration1 ::= ENUMERATED {
-        a, b, c, d
+        a, b, c, d, ...
 }
 
 TestEnumeration2 ::= TestEnumeration1 (TestEnumeration1 EXCEPT a)
+
+TestEnumeration3 ::= ENUMERATED {
+        a, b, c, ..., d
+} (TestEnumeration1)
 
 TestInteger1 ::= INTEGER (1 | 2 | 4)
 TestInteger2 ::= INTEGER (INCLUDES TestInteger1)
