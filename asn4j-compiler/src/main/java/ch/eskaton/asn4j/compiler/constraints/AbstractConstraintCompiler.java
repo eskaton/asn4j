@@ -53,6 +53,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.commons.functional.TriFunction;
@@ -66,13 +67,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import static ch.eskaton.asn4j.compiler.utils.TypeFormatter.formatType;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
+import static ch.eskaton.asn4j.compiler.utils.TypeFormatter.formatType;
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static java.util.Optional.of;
 
 public abstract class AbstractConstraintCompiler {
@@ -301,9 +303,9 @@ public abstract class AbstractConstraintCompiler {
             SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
             Node node = new IntegerConstraintCompiler(ctx).calculateElements(
-                    baseType, setSpecs.getRootElements(), Optional.of(bounds.map(b ->
-                            new IntegerValueBounds(Math.max(0, ((SizeBounds) b).getMinSize()),
-                                    ((SizeBounds) b).getMaxSize()))
+                    ctx.getCompiledBaseType(new IntegerType(NO_POSITION)), setSpecs.getRootElements(),
+                    Optional.of(bounds.map(b -> new IntegerValueBounds(Math.max(0, ((SizeBounds) b).getMinSize()),
+                            ((SizeBounds) b).getMaxSize()))
                             .orElse(new IntegerValueBounds(0L, Long.MAX_VALUE))));
 
             Optional<SizeNode> maybeSizes = new SizeVisitor().visit(node);
