@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
+import ch.eskaton.asn4j.runtime.types.TypeName;
 
 public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledType> {
 

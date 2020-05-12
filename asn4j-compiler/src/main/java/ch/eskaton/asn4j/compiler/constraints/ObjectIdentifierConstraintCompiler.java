@@ -28,7 +28,6 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.ObjectIdentifierConstraintOptimizingVisitor;
@@ -37,6 +36,7 @@ import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
 import java.util.Set;

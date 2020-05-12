@@ -28,7 +28,6 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeOIDConstraintOptimizingVisitor;
@@ -36,6 +35,7 @@ import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
 import java.util.Set;
