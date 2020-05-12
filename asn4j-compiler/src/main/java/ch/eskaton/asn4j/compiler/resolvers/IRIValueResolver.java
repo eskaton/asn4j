@@ -28,9 +28,9 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.TypeName;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
 
 public class IRIValueResolver extends AbstractIRIValueResolver<IRI, IRIValue> {
 

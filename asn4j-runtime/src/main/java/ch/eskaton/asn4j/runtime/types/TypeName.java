@@ -27,16 +27,35 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-public enum Names {
-    SEQUENCE("SEQUENCE"), SEQUENCE_OF("SEQUENCE OF"), SET("SET"), SET_OF("SET OF"), BOOLEAN("BOOLEAN"), INTEGER("INTEGER"), ENUMERATED("ENUMERATED");
+public enum TypeName {
+
+    BIT_STRING("BIT STRING"),
+    BOOLEAN("BOOLEAN"),
+    ENUMERATED("ENUMERATED"),
+    INTEGER("INTEGER"),
+    NULL("NULL"),
+    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
+    OCTET_STRING("OCTET STRING"),
+    OID_IRI("OID-IRI"),
+    RELATIVE_OID("RELATIVE OID"),
+    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
+    SEQUENCE("SEQUENCE"),
+    SEQUENCE_OF("SEQUENCE OF"),
+    SET("SET"),
+    SET_OF("SET OF");
 
     private final String name;
 
-    Names(String name) {
+    TypeName(String name) {
         this.name = name;
     }
 
     public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
         return name;
     }
 

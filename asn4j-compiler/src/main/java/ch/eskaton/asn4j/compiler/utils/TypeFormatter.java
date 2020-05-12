@@ -44,12 +44,13 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.TypeName.SEQUENCE_OF;
-import static ch.eskaton.asn4j.compiler.TypeName.SET_OF;
-import static ch.eskaton.asn4j.runtime.types.Names.BOOLEAN;
-import static ch.eskaton.asn4j.runtime.types.Names.ENUMERATED;
-import static ch.eskaton.asn4j.runtime.types.Names.INTEGER;
-import static ch.eskaton.asn4j.runtime.types.Names.SEQUENCE;
+import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
+import static ch.eskaton.asn4j.runtime.types.TypeName.ENUMERATED;
+import static ch.eskaton.asn4j.runtime.types.TypeName.INTEGER;
+import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE;
+import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE_OF;
+import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
 
 public class TypeFormatter {
 
