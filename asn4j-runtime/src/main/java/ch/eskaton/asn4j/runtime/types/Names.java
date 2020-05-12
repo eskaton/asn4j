@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.runtime.types;
 
 public enum Names {
-    SEQUENCE("SEQUENCE"), SEQUENCE_OF("SEQUENCE OF"), SET("SET"), SET_OF("SET OF"), BOOLEAN("BOOLEAN"), INTEGER("INTEGER");
+    SEQUENCE("SEQUENCE"), SEQUENCE_OF("SEQUENCE OF"), SET("SET"), SET_OF("SET OF"), BOOLEAN("BOOLEAN"), INTEGER("INTEGER"), ENUMERATED("ENUMERATED");
 
     private final String name;
 
