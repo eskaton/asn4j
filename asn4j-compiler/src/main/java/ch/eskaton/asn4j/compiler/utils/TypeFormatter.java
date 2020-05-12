@@ -29,9 +29,11 @@ package ch.eskaton.asn4j.compiler.utils;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
+import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
@@ -39,11 +41,13 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.TypeName.SEQUENCE_OF;
 import static ch.eskaton.asn4j.compiler.TypeName.SET_OF;
 import static ch.eskaton.asn4j.runtime.types.Names.BOOLEAN;
+import static ch.eskaton.asn4j.runtime.types.Names.ENUMERATED;
 import static ch.eskaton.asn4j.runtime.types.Names.INTEGER;
 import static ch.eskaton.asn4j.runtime.types.Names.SEQUENCE;
 
@@ -62,11 +66,28 @@ public class TypeFormatter {
             return BOOLEAN.getName();
         } else if (type instanceof IntegerType) {
             return INTEGER.getName();
+        } else if (type instanceof EnumeratedType) {
+            return ENUMERATED.getName() + "(" + formatItems((EnumeratedType) type) + ")";
         } else if (type instanceof TypeReference) {
             return formatType(ctx, ctx.resolveTypeReference(type));
         }
 
         throw new IllegalCompilerStateException("Formatter for type %s not defined", type.getClass());
+    }
+
+    private static String formatItems(EnumeratedType type) {
+        var rootItems = type.getRootEnum();
+        var additionalItems = type.getAdditionalEnum();
+
+        if (!additionalItems.isEmpty()) {
+            return formatItems(rootItems) + ", " + formatItems(additionalItems);
+        }
+
+        return formatItems(rootItems);
+    }
+
+    private static String formatItems(List<EnumerationItemNode> items) {
+        return items.stream().map(item -> item.getName()).collect(Collectors.joining(", "));
     }
 
     private static String formatComponentType(CompilerContext ctx, ComponentType component) {
