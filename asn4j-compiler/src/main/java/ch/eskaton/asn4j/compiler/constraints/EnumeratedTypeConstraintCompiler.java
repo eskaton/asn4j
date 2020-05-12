@@ -120,18 +120,11 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     }
 
     @Override
-    protected Node calculateContainedSubtype(CompiledType baseType, Type parent) {
-        CompiledType compiledType = ctx.getCompiledBaseType(parent);
-
-        if (!baseType.getType().getClass().equals(compiledType.getType().getClass())) {
-            throw new CompilerException("Invalid parent in contained subtype constraint: " + parent);
+    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
+        if (!compiledType.getType().getClass().isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass())) {
+            return false;
         }
 
-        return super.calculateContainedSubtype(baseType, parent);
-    }
-
-    @Override
-    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
         return Objects.equals(getItems(compiledType), getItems(compiledParentType));
     }
 
