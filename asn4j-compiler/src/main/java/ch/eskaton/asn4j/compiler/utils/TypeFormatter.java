@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
@@ -42,6 +43,7 @@ import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
@@ -69,11 +71,21 @@ public class TypeFormatter {
             return INTEGER.getName();
         } else if (type instanceof EnumeratedType) {
             return ENUMERATED.getName() + "(" + formatItems((EnumeratedType) type) + ")";
+        } else if (type instanceof BitString) {
+            return BIT_STRING.getName() + "(" + formatItems((BitString) type) + ")";
         } else if (type instanceof TypeReference) {
             return formatType(ctx, ctx.resolveTypeReference(type));
         }
 
         throw new IllegalCompilerStateException("Formatter for type %s not defined", type.getClass());
+    }
+
+    private static String formatItems(BitString type) {
+        return Optional.ofNullable(type.getNamedBits())
+                .map(items -> items.stream()
+                        .map(item -> item.getId())
+                        .collect(Collectors.joining(", ")))
+                .orElse("");
     }
 
     private static String formatItems(EnumeratedType type) {
@@ -87,8 +99,12 @@ public class TypeFormatter {
         return formatItems(rootItems);
     }
 
-    private static String formatItems(List<EnumerationItemNode> items) {
-        return items.stream().map(item -> item.getName()).collect(Collectors.joining(", "));
+    private static String formatItems(List<EnumerationItemNode> enumerationItems) {
+        return Optional.ofNullable(enumerationItems)
+                .map(items -> items.stream()
+                        .map(item -> item.getName()).
+                                collect(Collectors.joining(", ")))
+                .orElse("");
     }
 
     private static String formatComponentType(CompilerContext ctx, ComponentType component) {
