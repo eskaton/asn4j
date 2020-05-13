@@ -90,11 +90,6 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-       return compiledType.getType().getClass().isAssignableFrom(compiledParentType.getType().getClass());
-    }
-
-    @Override
     public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 

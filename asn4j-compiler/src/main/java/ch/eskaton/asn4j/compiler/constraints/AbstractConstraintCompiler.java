@@ -296,7 +296,10 @@ public abstract class AbstractConstraintCompiler {
         }
     }
 
-    protected abstract boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType);
+    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
+        return compiledType.getType().getClass()
+                .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
+    }
 
     protected SizeNode calculateSize(CompiledType baseType, Constraint constraint, Optional<Bounds> bounds) {
         if (constraint instanceof SubtypeConstraint) {

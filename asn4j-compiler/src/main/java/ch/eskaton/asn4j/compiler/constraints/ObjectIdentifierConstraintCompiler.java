@@ -33,7 +33,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.ObjectIdentifierConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -49,12 +48,6 @@ public class ObjectIdentifierConstraintCompiler extends AbstractOIDConstraintCom
         super(ctx);
 
         valueResolver = new ObjectIdentifierValueResolver(ctx);
-    }
-
-    @Override
-    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        return compiledType.getType().getClass()
-                .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
     }
 
     @Override

@@ -116,12 +116,6 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        return compiledType.getType().getClass()
-                .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
-    }
-
-    @Override
     public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 

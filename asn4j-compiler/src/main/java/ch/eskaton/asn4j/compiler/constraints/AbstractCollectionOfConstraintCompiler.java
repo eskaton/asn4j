@@ -130,7 +130,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                 constraintDefinition = new ConstraintDefinition();
             }
 
-            ConstraintDefinition componentDefinition = ctx.compileConstraint(ctx.getCompiledType(((CollectionOfType) baseType.getType()).getType()));
+            ConstraintDefinition componentDefinition = ctx
+                    .compileConstraint(ctx.getCompiledType(((CollectionOfType) baseType.getType()).getType()));
 
             if (componentDefinition.getRoots() != null) {
                 componentDefinition
@@ -197,11 +198,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
     @Override
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        if (!compiledType.getType().getClass().isAssignableFrom(compiledParentType.getType().getClass())) {
-            return false;
-        }
-
-        return Objects.equals(getComponentClass(compiledType), getComponentClass(compiledParentType));
+        return super.isAssignable(compiledType, compiledParentType) && Objects
+                .equals(getComponentClass(compiledType), getComponentClass(compiledParentType));
     }
 
     private Optional<Class<?>> getComponentClass(CompiledType compiledType) {
@@ -492,7 +490,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     private BooleanExpression buildExpression(Type type, CollectionOfValue collectionOfValue) {
-        var values = collectionOfValue.getValues().stream().map(value -> new ILValue(getTypeName(type), value)).collect(Collectors.toList());
+        var values = collectionOfValue.getValues().stream().map(value -> new ILValue(getTypeName(type), value))
+                .collect(Collectors.toList());
 
         return new BooleanFunctionCall.SetEquals(new Variable(VALUE), new ILListValue(values));
     }

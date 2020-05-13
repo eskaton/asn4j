@@ -33,7 +33,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IRIConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -49,12 +48,6 @@ public class IRIConstraintCompiler extends AbstractIRIConstraintCompiler<IRIValu
         super(ctx);
 
         valueResolver = new IRIValueResolver(ctx);
-    }
-
-    @Override
-    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        return compiledType.getType().getClass()
-                .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
     }
 
     @Override
