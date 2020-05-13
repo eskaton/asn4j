@@ -44,7 +44,9 @@ import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,6 +82,10 @@ public class CompilerImpl {
         compilerContext = new CompilerContext(this, pkg, outputDir);
     }
 
+    CompilerImpl() {
+        compilerContext = new CompilerContext(this, "", "");
+    }
+
     public void run() throws IOException, ParserException {
         long begin = System.currentTimeMillis();
 
@@ -95,16 +101,24 @@ public class CompilerImpl {
 
     void loadAndCompileModule(String moduleName) throws IOException, ParserException {
         load(moduleName);
+        compileModule(moduleName);
+    }
 
+    void loadAndCompileModule(String moduleName, InputStream moduleInputStream) throws IOException, ParserException {
+        parseModule(moduleName, moduleInputStream);
+        compileModule(moduleName);
+    }
+
+    private void compileModule(String moduleName) throws IOException, ParserException {
         try {
             compilerContext.pushModule(compilerContext.getModule(moduleName));
-            compileModule(moduleName);
+            compileModuleAux(moduleName);
         } finally {
             compilerContext.popModule();
         }
     }
 
-    private void compileModule(String moduleName) throws IOException, ParserException {
+    private void compileModuleAux(String moduleName) throws IOException, ParserException {
         System.out.println("Compiling module " + moduleName + "...");
 
         ModuleNode module = compilerContext.getModule(moduleName);
@@ -173,9 +187,27 @@ public class CompilerImpl {
         }
     }
 
-    public void load(String moduleName) throws IOException, ParserException {
+    void load(String moduleName) throws IOException, ParserException {
         System.out.println("Loading module " + moduleName + "...");
 
+        var moduleInputStream = getModuleInputStream(moduleName);
+
+        parseModule(moduleName, moduleInputStream);
+    }
+
+    void parseModule(String moduleName, InputStream moduleInputStream) throws IOException, ParserException {
+        Parser parser = new Parser(moduleInputStream);
+
+        try {
+            ModuleNode module = parser.parse();
+            compilerContext.addModule(moduleName, module);
+            System.out.println("Loaded module " + moduleName);
+        } catch (ParserException e) {
+            throw new ParserException("Failed to load module " + moduleName, e);
+        }
+    }
+
+    private FileInputStream getModuleInputStream(String moduleName) throws IOException {
         String moduleFile = null;
 
         for (String path : includePath) {
@@ -191,15 +223,7 @@ public class CompilerImpl {
             throw new IOException("Module " + moduleName + " not found in include path");
         }
 
-        Parser parser = new Parser(moduleFile);
-
-        try {
-            ModuleNode module = parser.parse();
-            compilerContext.addModule(moduleName, module);
-            System.out.println("Loaded module " + moduleName);
-        } catch (ParserException e) {
-            throw new ParserException("Failed to load module " + moduleName, e);
-        }
+        return new FileInputStream(moduleFile);
     }
 
     private String stripExtension(String module) {

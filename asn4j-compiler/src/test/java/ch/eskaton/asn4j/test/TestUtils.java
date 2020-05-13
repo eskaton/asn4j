@@ -31,6 +31,7 @@ import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,22 +47,30 @@ public class TestUtils {
     private TestUtils() {
     }
 
-    public static void assertThrows(ExceptionAction action, Class<? extends Exception> exception) {
+    public static Optional<Exception> assertThrows(ExceptionAction action, Class<? extends Exception> exception) {
         try {
             action.execute();
             fail(exception.getSimpleName() + " expected");
         } catch (Exception e) {
             assertTrue(exception.isAssignableFrom(rootCause(e).getClass()));
+
+            return Optional.of(e);
         }
+
+        return Optional.empty();
     }
 
-    public static void assertThrows(ExceptionAction action, Class<? extends Exception> exception, String message) {
+    public static Optional<Exception> assertThrows(ExceptionAction action, Class<? extends Exception> exception, String message) {
         try {
             action.execute();
             fail(exception.getSimpleName() + " expected. " + message);
         } catch (Exception e) {
             assertTrue(exception.isAssignableFrom(e.getClass()));
+
+            return Optional.of(e);
         }
+
+        return Optional.empty();
     }
 
     public static void assertSetEncodingEquals(byte[] encoded, Byte[]... expectedValues) {
