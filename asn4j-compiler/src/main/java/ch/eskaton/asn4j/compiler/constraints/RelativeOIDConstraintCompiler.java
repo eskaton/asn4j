@@ -52,8 +52,8 @@ public class RelativeOIDConstraintCompiler extends AbstractOIDConstraintCompiler
 
     @Override
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        // TODO implement
-        return true;
+        return compiledType.getType().getClass()
+                .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
     }
 
     @Override
