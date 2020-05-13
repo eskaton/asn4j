@@ -131,11 +131,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
     @Override
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        if (!compiledType.getType().getClass().isAssignableFrom(compiledParentType.getType().getClass())) {
-            return false;
-        }
-
-        return Objects.equals(getElementTypes(compiledType), getElementTypes(compiledParentType));
+        return super.isAssignable(compiledType, compiledParentType) && Objects
+                .equals(getElementTypes(compiledType), getElementTypes(compiledParentType));
     }
 
     private Map<String, Class<? extends ch.eskaton.asn4j.parser.ast.Node>> getElementTypes(CompiledType compiledType) {
@@ -295,7 +292,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     private BooleanExpression buildExpression(Type type, CollectionValue collectionValue) {
-        var typeStream = ((SequenceType) type).getAllComponents().stream().map(componentType -> ctx.getTypeName(Optional.ofNullable(componentType.getType()).orElse(componentType.getNamedType().getType())));
+        var typeStream = ((SequenceType) type).getAllComponents().stream().map(componentType -> ctx.getTypeName(
+                Optional.ofNullable(componentType.getType()).orElse(componentType.getNamedType().getType())));
         var valueStream = collectionValue.getValues().stream().map(NamedValue::getValue);
         var values = StreamsUtils.zip(typeStream, valueStream, ILValue::new).collect(Collectors.toList());
 

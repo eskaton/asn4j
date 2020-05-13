@@ -80,21 +80,25 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            AbstractIRIValueResolver resolver = getValueResolver();
-            Value value = ((SingleValueConstraint) elements).getValue();
-            AbstractIRIValue iriValue = (AbstractIRIValue) resolver.resolveValue(ctx, value, getValueClass());
-
-            if (iriValue != null) {
-                return createNode(singleton(resolver.resolveComponents(ctx, iriValue)));
-            } else {
-                throw new CompilerException("Invalid single-value constraint %s for %s type",
-                        value.getClass().getSimpleName(), getTypeName());
-            }
+            return calculateSingleValueConstraint((SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), getTypeName());
+        }
+    }
+
+    private Node calculateSingleValueConstraint(SingleValueConstraint elements) {
+        AbstractIRIValueResolver resolver = getValueResolver();
+        Value value = elements.getValue();
+        AbstractIRIValue iriValue = (AbstractIRIValue) resolver.resolveValue(ctx, value, getValueClass());
+
+        if (iriValue != null) {
+            return createNode(singleton(resolver.resolveComponents(ctx, iriValue)));
+        } else {
+            throw new CompilerException("Invalid single-value constraint %s for %s type",
+                    value.getClass().getSimpleName(), getTypeName());
         }
     }
 

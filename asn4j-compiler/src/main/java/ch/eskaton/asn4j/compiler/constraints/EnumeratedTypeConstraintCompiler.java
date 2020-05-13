@@ -121,11 +121,8 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
 
     @Override
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        if (!compiledType.getType().getClass().isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass())) {
-            return false;
-        }
-
-        return Objects.equals(getItems(compiledType), getItems(compiledParentType));
+        return super.isAssignable(compiledType, compiledParentType) && Objects
+                .equals(getItems(compiledType), getItems(compiledParentType));
     }
 
     private Object getItems(CompiledType compiledType) {
