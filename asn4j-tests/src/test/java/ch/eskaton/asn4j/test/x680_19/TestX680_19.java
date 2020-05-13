@@ -31,14 +31,14 @@ import ch.eskaton.asn4j.test.modules.x680_19.TestInteger;
 import ch.eskaton.asn4j.test.modules.x680_19.TestNamedInteger;
 import ch.eskaton.asn4j.test.modules.x680_19.TestNamedInteger3;
 import ch.eskaton.asn4j.test.modules.x680_19.TestNamedInteger5;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 import static ch.eskaton.asn4j.test.TestHelper.assertValueDecodable;
-import static junit.framework.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class TestX680_19 {
 

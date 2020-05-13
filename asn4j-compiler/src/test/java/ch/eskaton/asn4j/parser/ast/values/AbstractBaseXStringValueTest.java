@@ -27,10 +27,10 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AbstractBaseXStringValueTest {
 

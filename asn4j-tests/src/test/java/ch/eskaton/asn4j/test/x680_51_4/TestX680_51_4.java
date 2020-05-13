@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger4;
 import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger5;
 import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger6;
 import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger7;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;

@@ -108,7 +108,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOidIri1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOidIri2;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;

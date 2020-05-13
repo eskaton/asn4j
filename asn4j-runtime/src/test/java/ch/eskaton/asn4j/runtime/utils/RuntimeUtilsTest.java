@@ -28,12 +28,12 @@
 package ch.eskaton.asn4j.runtime.utils;
 
 import ch.eskaton.asn4j.runtime.objects.TestSetA;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class RuntimeUtilsTest {
 

@@ -35,11 +35,12 @@ import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.compiler.java.JavaUtils.getInitializerString;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 public class JavaUtilsTest {
@@ -64,9 +65,9 @@ public class JavaUtilsTest {
                 ASN1Integer.class.getSimpleName(), new IntegerValue(4711)));
     }
 
-    @Test(expected = CompilerException.class)
+    @Test
     public void testUnsupportedValue() {
-        getInitializerString(null, null, new EmptyValue(NO_POSITION));
+        assertThrows(CompilerException.class, () -> getInitializerString(null, null, new EmptyValue(NO_POSITION)));
     }
 
 }

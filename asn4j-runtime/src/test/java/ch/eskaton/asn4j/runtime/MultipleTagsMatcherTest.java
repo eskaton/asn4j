@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,27 +29,30 @@ package ch.eskaton.asn4j.runtime;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testEmptyTags() {
-        new BERDecoder.MultipleTagsMatcher(Collections.emptyList());
+        assertThrows(IllegalArgumentException.class,
+                () -> new BERDecoder.MultipleTagsMatcher(Collections.emptyList()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testEmptyTagsList() {
-        new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1a.class), Collections.emptyList()));
+        assertThrows(IllegalArgumentException.class,
+                () -> new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1a.class), Collections.emptyList())));
     }
 
     @Test
@@ -148,18 +151,22 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
     @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
     private static class TestTag1a implements ASN1Type {
+
     }
 
     @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
     private static class TestTag1b extends TestTag1a {
+
     }
 
     @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
     private static class TestTag2a implements ASN1Type {
+
     }
 
     @ASN1Tag(clazz = Clazz.APPLICATION, tag = 4, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
     private static class TestTag2b extends TestTag2a {
+
     }
 
 }

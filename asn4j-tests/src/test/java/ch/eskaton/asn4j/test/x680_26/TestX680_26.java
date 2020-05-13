@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf3;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf4;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 

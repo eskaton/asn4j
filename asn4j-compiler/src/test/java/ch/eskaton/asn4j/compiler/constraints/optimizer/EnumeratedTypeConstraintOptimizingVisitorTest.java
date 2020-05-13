@@ -29,14 +29,14 @@ package ch.eskaton.asn4j.compiler.constraints.optimizer;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.complement;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.intersection;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.not;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class EnumeratedTypeConstraintOptimizingVisitorTest {
 

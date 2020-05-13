@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.test.x680_24;
 
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 

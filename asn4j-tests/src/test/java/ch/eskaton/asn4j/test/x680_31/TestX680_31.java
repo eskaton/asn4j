@@ -35,7 +35,7 @@ import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType3;
 import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType4;
 import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType5;
 import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType6;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.function.Supplier;
 

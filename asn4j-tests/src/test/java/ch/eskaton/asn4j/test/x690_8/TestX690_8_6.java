@@ -32,10 +32,11 @@ import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.exceptions.PrematureEndOfInputException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestX690_8_6 {
 
@@ -63,14 +64,16 @@ public class TestX690_8_6 {
                 decoder.decode(ASN1BitString.class, new byte[] { 0x03, 0x03, 0x07, 0x55, 0x00 }));
     }
 
-    @Test(expected = DecodingException.class)
+    @Test
     public void testDecodeUnusedBitsFailure() {
-        new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x01, 0x01 });
+        assertThrows(DecodingException.class,
+                () -> new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x01, 0x01 }));
     }
 
-    @Test(expected = PrematureEndOfInputException.class)
+    @Test
     public void testDecodeLengthFailure() {
-        new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x02, 0x00 });
+        assertThrows(PrematureEndOfInputException.class,
+                () -> new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x02, 0x00 }));
     }
 
 }

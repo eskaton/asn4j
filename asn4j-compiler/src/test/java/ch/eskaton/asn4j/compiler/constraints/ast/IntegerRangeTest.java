@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
 import ch.eskaton.asn4j.parser.ast.RangeNode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
@@ -43,8 +43,8 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.invert;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.union;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class IntegerRangeTest {
 

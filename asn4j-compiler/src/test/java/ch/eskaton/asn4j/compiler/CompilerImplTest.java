@@ -27,14 +27,15 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CompilerImplTest {
 

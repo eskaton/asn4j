@@ -35,11 +35,11 @@ import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.test.TestHelper;
 import ch.eskaton.asn4j.test.modules.x680_22.TestBitString1;
 import ch.eskaton.asn4j.test.modules.x680_22.TestBitString2;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestX680_22 {
 
