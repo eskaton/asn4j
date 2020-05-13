@@ -13,11 +13,12 @@ before_install:
      cd eskaton/commons
      mvn -B clean install
      cd -
+     export MAVEN_OPTS="--enable-preview"
 
 install: true
 
 script:
-   - MAVEN_OPTS='--enable-preview' mvn -e -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install jacoco:report sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=eskaton_asn4j
+   - mvn -e -B clean org.jacoco:jacoco-maven-plugin:prepare-agent install jacoco:report sonar:sonar -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=eskaton_asn4j
 
 cache:
    directories:
