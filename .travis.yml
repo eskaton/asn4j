@@ -1,9 +1,12 @@
 language: java
 sudo: false
 
-jdk: oraclejdk14
+jdk: openjdk14
 
 addons:
+  apt:
+    packages:
+      - openjdk-14-jdk
    sonarcloud:
       organization: eskaton-github
 
