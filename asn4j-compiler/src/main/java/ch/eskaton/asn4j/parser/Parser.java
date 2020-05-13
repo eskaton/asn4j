@@ -2152,6 +2152,8 @@ public class Parser {
                             return new ComponentType(P(), ComponentType.CompType.NAMED_TYPE_DEF, (NamedType) rule.get(0),
                                     (Value) rule.get(2));
                         }
+                    default:
+                        throw new ParserException("Invalid rule");
                 }
             }
 
@@ -3404,6 +3406,8 @@ public class Parser {
                         case 5:
                             return new SetSpecsNode(a.l().P0(), (ElementSet) a.l().n0(), true,
                                     (ElementSet) a.l().n4());
+                        default:
+                            throw new ParserException("Invalid rule");
                     }
                 } else {
                     if (a.p() instanceof Token) {
@@ -3412,8 +3416,6 @@ public class Parser {
                         return new SetSpecsNode((ElementSet) a.n());
                     }
                 }
-
-                return null;
             });
         }
 
@@ -4032,6 +4034,8 @@ public class Parser {
                         return new PrimitiveFieldNameNode(rule.getPosition(), reference, TokenType.TYPE_FIELD_REFERENCE);
                     case VALUE_FIELD_REFERENCE:
                         return new PrimitiveFieldNameNode(rule.getPosition(), reference, TokenType.VALUE_FIELD_REFERENCE);
+                    default:
+                        throw new ParserException("Unexpected type: " + rule.getType());
                 }
             }
 
@@ -4886,6 +4890,8 @@ public class Parser {
 
                     case 5:
                         return new ContentsConstraint(position, (Type) rule.get(1), (Value) rule.get(4));
+                    default:
+                        throw new ParserException("Invalid rule");
                 }
             }
 

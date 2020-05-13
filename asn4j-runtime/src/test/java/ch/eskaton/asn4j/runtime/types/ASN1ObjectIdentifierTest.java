@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Supplier;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class ASN1ObjectIdentifierTest {
@@ -21,12 +22,12 @@ public class ASN1ObjectIdentifierTest {
 
     @Test
     public void testValidObjectIdentifiers() {
-        ASN1ObjectIdentifier.from(0, 1);
-        ASN1ObjectIdentifier.from(1, 1);
-        ASN1ObjectIdentifier.from(2, 1);
-        ASN1ObjectIdentifier.from(0, 39);
-        ASN1ObjectIdentifier.from(1, 39);
-        ASN1ObjectIdentifier.from(2, 40);
+        assertDoesNotThrow(() -> ASN1ObjectIdentifier.from(0, 1));
+        assertDoesNotThrow(() -> ASN1ObjectIdentifier.from(1, 1));
+        assertDoesNotThrow(() -> ASN1ObjectIdentifier.from(2, 1));
+        assertDoesNotThrow(() -> ASN1ObjectIdentifier.from(0, 39));
+        assertDoesNotThrow(() -> ASN1ObjectIdentifier.from(1, 39));
+        assertDoesNotThrow(() -> ASN1ObjectIdentifier.from(2, 40));
     }
 
     private void testInvalidIdentifier(Supplier<ASN1ObjectIdentifier> supplier) {
