@@ -27,7 +27,6 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.commons.collections.Tuple2;
 

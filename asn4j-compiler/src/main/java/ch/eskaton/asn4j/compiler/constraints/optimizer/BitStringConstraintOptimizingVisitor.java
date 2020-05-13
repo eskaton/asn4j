@@ -37,7 +37,7 @@ public class BitStringConstraintOptimizingVisitor
         extends BaseXStringConstraintOptimizingVisitor<BitStringValue, List<BitStringValue>, BitStringValueNode> {
 
     public BitStringConstraintOptimizingVisitor() {
-        super(new BitStringValueComparator(), v -> new BitStringValueNode(v));
+        super(new BitStringValueComparator(), BitStringValueNode::new);
     }
 
 }
