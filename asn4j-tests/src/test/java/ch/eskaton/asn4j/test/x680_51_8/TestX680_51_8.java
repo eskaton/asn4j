@@ -55,7 +55,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf5;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf6;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf7;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf8;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;

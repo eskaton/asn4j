@@ -38,9 +38,9 @@ import ch.eskaton.asn4j.test.modules.X690_8.Type3;
 import ch.eskaton.asn4j.test.modules.X690_8.Type4;
 import ch.eskaton.asn4j.test.modules.X690_8.Type5;
 import ch.eskaton.asn4j.test.modules.X690_8.Type6;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class TestX690_8_14 {
 

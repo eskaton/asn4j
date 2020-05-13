@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.test.x680_47;
 
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.test.modules.x680_47.TestUTCTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 

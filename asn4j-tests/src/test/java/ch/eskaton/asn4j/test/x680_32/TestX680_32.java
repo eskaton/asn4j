@@ -32,9 +32,9 @@ import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.test.modules.x680_32.TestObjectIdentifierRootArcs;
 import ch.eskaton.asn4j.test.modules.x680_32.TestObjectIdentifiers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestX680_32 {
 

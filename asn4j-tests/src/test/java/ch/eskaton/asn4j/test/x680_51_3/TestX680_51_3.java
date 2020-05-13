@@ -60,7 +60,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf2;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 

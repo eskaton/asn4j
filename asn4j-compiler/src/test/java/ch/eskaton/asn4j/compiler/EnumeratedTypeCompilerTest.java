@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.results.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StreamsUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,10 +41,10 @@ import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.junit.matchers.JUnitMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
 public class EnumeratedTypeCompilerTest {

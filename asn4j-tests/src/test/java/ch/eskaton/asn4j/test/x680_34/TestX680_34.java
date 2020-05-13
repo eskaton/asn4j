@@ -29,12 +29,12 @@ package ch.eskaton.asn4j.test.x680_34;
 
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.test.modules.x680_34.TestOidIris;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.function.Consumer;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAround;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestX680_34 {
 

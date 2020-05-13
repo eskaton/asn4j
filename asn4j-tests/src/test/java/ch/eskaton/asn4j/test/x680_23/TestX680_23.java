@@ -30,11 +30,11 @@ package ch.eskaton.asn4j.test.x680_23;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.test.modules.x680_23.TestOctetString;
 import ch.eskaton.asn4j.test.modules.x680_23.TestOctetStrings;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestX680_23 {
 

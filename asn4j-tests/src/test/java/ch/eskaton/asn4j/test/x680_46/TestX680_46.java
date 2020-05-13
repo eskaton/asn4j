@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.test.x680_46;
 
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.test.modules.x680_46.TestGeneralizedTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;

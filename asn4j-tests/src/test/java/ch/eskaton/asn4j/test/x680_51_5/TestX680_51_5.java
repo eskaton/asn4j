@@ -57,7 +57,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_5.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestSetOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestSetOf3;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.randomBytes;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;

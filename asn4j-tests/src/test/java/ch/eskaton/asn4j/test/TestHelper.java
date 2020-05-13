@@ -50,8 +50,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestHelper {
 

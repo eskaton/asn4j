@@ -39,10 +39,10 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequence4;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence6;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence8;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence9;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestX680_25 {
 

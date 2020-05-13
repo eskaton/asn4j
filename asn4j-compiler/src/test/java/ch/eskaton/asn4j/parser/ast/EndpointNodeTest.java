@@ -29,11 +29,11 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.parser.ast.EndpointNode.canonicalizeLowerEndpoint;
 import static ch.eskaton.asn4j.parser.ast.EndpointNode.canonicalizeUpperEndpoint;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EndpointNodeTest {
 

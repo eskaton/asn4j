@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
@@ -46,7 +46,7 @@ import static ch.eskaton.commons.utils.CollectionUtils.asLinkedList;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class BitStringConstraintOptimizingVisitorTest {
 

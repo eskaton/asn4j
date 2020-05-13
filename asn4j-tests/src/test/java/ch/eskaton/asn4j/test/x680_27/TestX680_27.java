@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.test.modules.x680_27.TestSet1;
 import ch.eskaton.asn4j.test.modules.x680_27.TestSet2;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 
