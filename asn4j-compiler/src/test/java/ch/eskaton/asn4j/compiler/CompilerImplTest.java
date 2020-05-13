@@ -27,30 +27,46 @@
 
 package ch.eskaton.asn4j.compiler;
 
-
-import org.junit.jupiter.api.Test;
+import org.hamcrest.text.MatchesPattern;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
-import java.util.Optional;
+import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CompilerImplTest {
 
-    @Test
-    public void testInvalidSizeConstraint() {
-        String body = """
-                    InvalidSizeType ::= BIT STRING
-                    BitString ::= BIT STRING (SIZE (InvalidSizeType))
-                """;
-        String module = module("TEST-MODULE", body);
+    public static final String MODULE_NAME = "TEST-MODULE";
 
-        Optional<Exception> exception = assertThrows(() -> new CompilerImpl()
-                .loadAndCompileModule("TEST-MODULE", new ByteArrayInputStream(module.getBytes())), CompilerException.class);
+    @SuppressWarnings("unused")
+    @ParameterizedTest(name = "[{index}] {3}")
+    @MethodSource("provideInvalidTypesInConstraintsArguments")
+    public void testInvalidTypesInConstraints(String body, Class<? extends Exception> expected, String message, String description) {
+        var module = module("TEST-MODULE", body);
+        var exception = assertThrows(() -> new CompilerImpl()
+                        .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())),
+                expected);
 
-        exception.ifPresent(e -> assertThat(e.getMessage(), containsString("can't be used in INCLUDES constraint of type INTEGER")));
+        exception.ifPresent(e -> assertThat(e.getMessage(), MatchesPattern.matchesPattern(".*" + message + ".*")));
+    }
+
+    private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {
+        return Stream.of(
+                Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            Boolean ::= BOOLEAN (INCLUDES Integer)
+                        """, CompilerException.class, "can't be used in INCLUDES constraint of type BOOLEAN",
+                        "Contained subtype must be derived of the same built-in type as the parent type"),
+                Arguments.of("""
+                            InvalidSizeType ::= BIT STRING
+                            BitString ::= BIT STRING (SIZE (InvalidSizeType))
+                        """, CompilerException.class, "can't be used in INCLUDES constraint of type INTEGER",
+                        "Contained subtype in SIZE constraint must be of type INTEGER")
+        );
     }
 
     public String module(String name, String body) {
