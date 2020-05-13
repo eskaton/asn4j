@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -45,6 +46,7 @@ public class Lexer {
         NORMAL, ENCODING, OBJECT_CLASS, SYNTAX, TYPE_FIELD, VALUE_FIELD, LEVEL, PROPERTY_SETTINGS
     }
 
+    // @formatter:off
     public static final String ABSENT_LIT = "ABSENT";
     public static final String ABSTRACT_SYNTAX_LIT = "ABSTRACT-SYNTAX";
     public static final String ALL_LIT = "ALL";
@@ -136,7 +138,8 @@ public class Lexer {
     public static final String VIDEOTEXSTRING_LIT = "VideotexString";
     public static final String VISIBLESTRING_LIT = "VisibleString";
     public static final String WITH_LIT = "WITH";
-
+    // @formatter:on
+    
     /*
      * @formatter:off
      * typereference: 1-n / letters, digits, hyphens / InitCap / !-$ && !--
@@ -265,15 +268,15 @@ public class Lexer {
     private LinkedList<Token> tokens = new LinkedList<>();
 
     public Lexer(InputStream is) throws IOException {
-    	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    	byte[] buf = new byte[8192];
-    	int n;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buf = new byte[8192];
+        int n;
 
-    	while ((n = is.read(buf)) > 0) {
-    		baos.write(buf, 0, n);
-    	}
+        while ((n = is.read(buf)) > 0) {
+            baos.write(buf, 0, n);
+        }
 
-    	this.is = new LexerInputStream(baos.toString("UTF-8").toCharArray());
+        this.is = new LexerInputStream(baos.toString(StandardCharsets.UTF_8).toCharArray());
     }
 
     public Lexer(String moduleFile) throws IOException {
@@ -282,226 +285,228 @@ public class Lexer {
     }
 
     public Token nextToken(Context ctx) throws ParserException {
-    	int c, offset;
-    	Token token;
+        int c, offset;
+        Token token;
 
-    	if (!tokens.isEmpty()) {
-    		if (tokens.peek().getContext() == ctx) {
-    			return tokens.pop();
-    		} else {
-    			token = tokens.pop();
-    			is.seek(token.getOffset());
-    			pos = token.getPosition().getPosition() - 1;
-    			line = token.getPosition().getLine();
-    			tokens.clear();
-    			eof = false;
-    		}
-    	}
+        if (!tokens.isEmpty()) {
+            if (tokens.peek().getContext() == ctx) {
+                return tokens.pop();
+            } else {
+                token = tokens.pop();
+                is.seek(token.getOffset());
+                pos = token.getPosition().getPosition() - 1;
+                line = token.getPosition().getLine();
+                tokens.clear();
+                eof = false;
+            }
+        }
 
-    	try {
-    		loop: while (!eof) {
-    			offset = is.getPos();
-    			c = is.read();
-    			pos++;
+        try {
+            loop:
+            while (!eof) {
+                offset = is.getPos();
+                c = is.read();
+                pos++;
 
-    			switch (c) {
-    				case -1:
-    					eof = true;
-    					return null;
-    				case ' ': // fall through
-    				case '\t':
-    					break;
-    				case '\r': // fall through
-    					if (is.read() != '\n') {
-    						is.unread();
-    					}
-    				case 0x0b: // vertical tab
-    				case '\f':
-    				case '\n':
-    					line++;
-    					pos = 0;
-    					break;
-    				case '(':
-    					return new Token(ctx, TokenType.L_PAREN, offset, position(line, pos));
-    				case ')':
-    					return new Token(ctx, TokenType.R_PAREN, offset, position(line, pos));
-    				case '{':
-    					return new Token(ctx, TokenType.L_BRACE, offset, position(line, pos));
-    				case '}':
-    					return new Token(ctx, TokenType.R_BRACE, offset, position(line, pos));
-    				case '[':
-    					if (ctx == Context.SYNTAX) {
-    						return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
-    					}
+                switch (c) {
+                    case -1:
+                        eof = true;
+                        return null;
+                    case ' ': // fall through
+                    case '\t':
+                        break;
+                    case '\r': // fall through
+                        if (is.read() != '\n') {
+                            is.unread();
+                        }
+                    case 0x0b: // vertical tab
+                    case '\f':
+                    case '\n':
+                        line++;
+                        pos = 0;
+                        break;
+                    case '(':
+                        return new Token(ctx, TokenType.L_PAREN, offset, position(line, pos));
+                    case ')':
+                        return new Token(ctx, TokenType.R_PAREN, offset, position(line, pos));
+                    case '{':
+                        return new Token(ctx, TokenType.L_BRACE, offset, position(line, pos));
+                    case '}':
+                        return new Token(ctx, TokenType.R_BRACE, offset, position(line, pos));
+                    case '[':
+                        if (ctx == Context.SYNTAX) {
+                            return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
+                        }
 
-    					if (is.read() == '[') {
-    						pos++;
-    						return new Token(ctx, TokenType.L_VERSION_BRACKETS, offset, position(line, pos - 1));
-    					} else {
-    						is.unread();
-    						return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
-    					}
-    				case ']':
-    					if (ctx == Context.SYNTAX) {
-    						return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos));
-    					}
+                        if (is.read() == '[') {
+                            pos++;
+                            return new Token(ctx, TokenType.L_VERSION_BRACKETS, offset, position(line, pos - 1));
+                        } else {
+                            is.unread();
+                            return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
+                        }
+                    case ']':
+                        if (ctx == Context.SYNTAX) {
+                            return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos));
+                        }
 
-    					if (is.read() == ']') {
-    						pos++;
-    						return new Token(ctx, TokenType.R_VERSION_BRACKETS, offset, position(line, pos - 1));
-    					} else {
-    						is.unread();
-    						return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos));
-    					}
-    				case ':':
-    					switch (is.read()) {
-    						case ':':
-    							switch (is.read()) {
-    								case '=':
-    									pos += 2;
-    									return new Token(ctx, TokenType.ASSIGN, offset, position(line, pos - 2));
-    								default:
-    									is.unread();
-    							} // fall through
-    						default:
-    							is.unread();
-    					}
-    					return new Token(ctx, TokenType.COLON, offset, position(line, pos));
-    				case ';':
-    					return new Token(ctx, TokenType.SEMICOLON, offset, position(line, pos));
-    				case ',':
-    					return new Token(ctx, TokenType.COMMA, offset, position(line, pos));
-    				case '|':
-    					return new Token(ctx, TokenType.PIPE, offset, position(line, pos));
-    				case '!':
-    					return new Token(ctx, TokenType.EXCLAMATION, offset,position(line, pos));
-    				case '*':
-    					return new Token(ctx, TokenType.ASTERISK, offset, position(line, pos));
-    				case '-':
-    					if (is.read() == '-') {
-    						pos++;
-    						skipComment();
-    					} else {
-    						is.unread();
-    						return new Token(ctx, TokenType.MINUS, offset, position(line, pos));
-    					}
-    					break;
-    				case '/':
-    					if (is.read() == '*') {
-    						pos++;
-    						skipMLComment();
-    					} else {
-    						is.unread();
-    						return new Token(ctx, TokenType.SOLIDUS, offset, position(line, pos));
-    					}
-    					break;
-    				case '&':
-    					switch (ctx) {
-    						case TYPE_FIELD:
-    							return parseFieldReference(Context.NORMAL, TokenType.TYPE_REFERENCE,
-    									TokenType.TYPE_FIELD_REFERENCE);
-    						case VALUE_FIELD:
-    							return parseFieldReference(Context.NORMAL,TokenType.IDENTIFIER,
-    									TokenType.VALUE_FIELD_REFERENCE);
-    						default:
-    							return new Token(ctx, TokenType.AMPERSAND, offset, position(line, pos));
-    					}
-    				case '^':
-    					return new Token(ctx, TokenType.CIRCUMFLEX, offset, position(line, pos));
-    				case '@':
-    					return new Token(ctx, TokenType.AT, offset, position(line, pos));
-    				case '<':
-    					return new Token(ctx, TokenType.LT, offset, position(line, pos));
-    				case '>':
-    					return new Token(ctx, TokenType.GT, offset, position(line, pos));
-    				case '=':
-    					return new Token(ctx, TokenType.EQUALS, offset, position(line, pos));
-    				case '\'':
-    					if ((token = parseNumString(ctx)) != null) {
-    						return token;
-    					}
+                        if (is.read() == ']') {
+                            pos++;
+                            return new Token(ctx, TokenType.R_VERSION_BRACKETS, offset, position(line, pos - 1));
+                        } else {
+                            is.unread();
+                            return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos));
+                        }
+                    case ':':
+                        switch (is.read()) {
+                            case ':':
+                                switch (is.read()) {
+                                    case '=':
+                                        pos += 2;
+                                        return new Token(ctx, TokenType.ASSIGN, offset, position(line, pos - 2));
+                                    default:
+                                        is.unread();
+                                } // fall through
+                            default:
+                                is.unread();
+                        }
+                        return new Token(ctx, TokenType.COLON, offset, position(line, pos));
+                    case ';':
+                        return new Token(ctx, TokenType.SEMICOLON, offset, position(line, pos));
+                    case ',':
+                        return new Token(ctx, TokenType.COMMA, offset, position(line, pos));
+                    case '|':
+                        return new Token(ctx, TokenType.PIPE, offset, position(line, pos));
+                    case '!':
+                        return new Token(ctx, TokenType.EXCLAMATION, offset, position(line, pos));
+                    case '*':
+                        return new Token(ctx, TokenType.ASTERISK, offset, position(line, pos));
+                    case '-':
+                        if (is.read() == '-') {
+                            pos++;
+                            skipComment();
+                        } else {
+                            is.unread();
+                            return new Token(ctx, TokenType.MINUS, offset, position(line, pos));
+                        }
+                        break;
+                    case '/':
+                        if (is.read() == '*') {
+                            pos++;
+                            skipMLComment();
+                        } else {
+                            is.unread();
+                            return new Token(ctx, TokenType.SOLIDUS, offset, position(line, pos));
+                        }
+                        break;
+                    case '&':
+                        switch (ctx) {
+                            case TYPE_FIELD:
+                                return parseFieldReference(Context.NORMAL, TokenType.TYPE_REFERENCE,
+                                        TokenType.TYPE_FIELD_REFERENCE);
+                            case VALUE_FIELD:
+                                return parseFieldReference(Context.NORMAL, TokenType.IDENTIFIER,
+                                        TokenType.VALUE_FIELD_REFERENCE);
+                            default:
+                                return new Token(ctx, TokenType.AMPERSAND, offset, position(line, pos));
+                        }
+                    case '^':
+                        return new Token(ctx, TokenType.CIRCUMFLEX, offset, position(line, pos));
+                    case '@':
+                        return new Token(ctx, TokenType.AT, offset, position(line, pos));
+                    case '<':
+                        return new Token(ctx, TokenType.LT, offset, position(line, pos));
+                    case '>':
+                        return new Token(ctx, TokenType.GT, offset, position(line, pos));
+                    case '=':
+                        return new Token(ctx, TokenType.EQUALS, offset, position(line, pos));
+                    case '\'':
+                        if ((token = parseNumString(ctx)) != null) {
+                            return token;
+                        }
 
-    					return new Token(ctx, TokenType.APOSTROPHE, offset, position(line, pos));
-    				case '"':
-    					if (ctx != Context.PROPERTY_SETTINGS && (token = parseCharString(ctx)) != null) {
-    						return token;
-    					}
+                        return new Token(ctx, TokenType.APOSTROPHE, offset, position(line, pos));
+                    case '"':
+                        if (ctx != Context.PROPERTY_SETTINGS && (token = parseCharString(ctx)) != null) {
+                            return token;
+                        }
 
-    					return new Token(ctx, TokenType.QUOTATION, offset, position(line, pos));
-    				case '.':
-    					if (ctx != Context.LEVEL) {
-    						if (is.read() == '.') {
-    							pos++;
-    							offset++;
-    							if (is.read() == '.') {
-    								pos++;
-    								offset++;
-    								return new Token(ctx, TokenType.ELLIPSIS,offset - 2,
+                        return new Token(ctx, TokenType.QUOTATION, offset, position(line, pos));
+                    case '.':
+                        if (ctx != Context.LEVEL) {
+                            if (is.read() == '.') {
+                                pos++;
+                                offset++;
+                                if (is.read() == '.') {
+                                    pos++;
+                                    offset++;
+                                    return new Token(ctx, TokenType.ELLIPSIS, offset - 2,
                                             position(line, pos - 2));
-    							} else {
-    								is.unread();
-    								return new Token(ctx, TokenType.RANGE, offset - 1,
-                                            position(line, pos -1 ));
-    							}
-    						}
+                                } else {
+                                    is.unread();
+                                    return new Token(ctx, TokenType.RANGE, offset - 1,
+                                            position(line, pos - 1));
+                                }
+                            }
 
-    						is.unread();
-    					}
+                            is.unread();
+                        }
 
-    					return new Token(ctx, TokenType.DOT, offset, position(line, pos));
+                        return new Token(ctx, TokenType.DOT, offset, position(line, pos));
 
-    				default:
-    					if ('0' <= c && c <= '9') {
-    						if ((token = parseNumber(ctx, c)) != null) {
-    							return token;
-    						}
-    					}
+                    default:
+                        if ('0' <= c && c <= '9') {
+                            if ((token = parseNumber(ctx, c)) != null) {
+                                return token;
+                            }
+                        }
 
-    					is.unread();
-    					pos--;
+                        is.unread();
+                        pos--;
 
-    					if ((token = parseOther(ctx)) != null) {
-    						return token;
-    					}
+                        if ((token = parseOther(ctx)) != null) {
+                            return token;
+                        }
 
-    					break loop;
-    			}
-    		}
-    	} catch (IOException e) {
-    		throw new ParserException("Error at line " + line + ", position " + pos, e);
-    	}
+                        break loop;
+                }
+            }
+        } catch (IOException e) {
+            throw new ParserException("Error at line " + line + ", position " + pos, e);
+        }
 
-    	if (!eof) {
-    		StringBuilder sb = new StringBuilder();
+        if (!eof) {
+            StringBuilder sb = new StringBuilder();
 
-    		is.mark();
+            is.mark();
 
-    		try {
-    			outer: while ((c = is.read()) != -1) {
-    				switch (c) {
-    					case '\r':
-    					case '\n':
-    					case '\t':
-    					case 0x0b: // vertical tab
-    					case '\f':
-    					case ' ':
-    						break outer;
-    					default:
-    						sb.append((char) c);
-    				}
+            try {
+                outer:
+                while ((c = is.read()) != -1) {
+                    switch (c) {
+                        case '\r':
+                        case '\n':
+                        case '\t':
+                        case 0x0b: // vertical tab
+                        case '\f':
+                        case ' ':
+                            break outer;
+                        default:
+                            sb.append((char) c);
+                    }
 
-    			}
+                }
 
-    			throw new ParserException("Invalid token '" + sb.toString() + "' at line " + line +
+                throw new ParserException("Invalid token '" + sb.toString() + "' at line " + line +
                         ", position " + (pos + 1));
-    		} catch (IOException e) {
-    			throw new ParserException("Invalid token at line " + line + ", position " + (pos + 1));
-    		} finally {
-    			is.reset();
-    		}
-    	}
+            } catch (IOException e) {
+                throw new ParserException("Invalid token at line " + line + ", position " + (pos + 1));
+            } finally {
+                is.reset();
+            }
+        }
 
-    	return null;
+        return null;
     }
 
     private Token parseFieldReference(Context parseCtx, TokenType expected, TokenType actual) throws IOException {
@@ -521,466 +526,469 @@ public class Lexer {
     }
 
     private Token parseCharString(Context ctx) throws IOException {
-    	StringBuilder sb = new StringBuilder();
-    	int c, cn;
-    	int beginOffset = is.getPos() - 1;
-    	int beginPos = pos;
-    	int beginLine = line;
-    	int tmpPos = pos;
-    	int tmpLine = line;
-    	int flags = StringToken.CSTRING | StringToken.TSTRING | StringToken.SIMPLE_STRING;
-    	is.mark();
+        StringBuilder sb = new StringBuilder();
+        int c, cn;
+        int beginOffset = is.getPos() - 1;
+        int beginPos = pos;
+        int beginLine = line;
+        int tmpPos = pos;
+        int tmpLine = line;
+        int flags = StringToken.CSTRING | StringToken.TSTRING | StringToken.SIMPLE_STRING;
+        is.mark();
 
-    	loop: while (!eof) {
-    		c = is.read();
-    		tmpPos++;
+        loop:
+        while (!eof) {
+            c = is.read();
+            tmpPos++;
 
-    		switch (c) {
-    			case -1:
-    				break loop;
-    			case 0x0b: // vertical tab
-    			case '\f':
-    			case '\r':
-    			case '\n':
-    				sb.append((char) c);
-    				tmpLine++;
-    				tmpPos = 0;
-    				flags &= ~StringToken.TSTRING;
-    				break;
-    			case ' ':
-    			case '\t':
-    				sb.append((char) c);
-    				flags &= ~StringToken.TSTRING;
-    				break;
-    			case '"':
-    				if ((cn = is.read()) == '"') {
-    					sb.append('"');
-    					tmpPos++;
-    					flags = StringToken.CSTRING;
-    					break;
-    				} else if (cn != -1) {
-    					is.unread();
-    				}
+            switch (c) {
+                case -1:
+                    break loop;
+                case 0x0b: // vertical tab
+                case '\f':
+                case '\r':
+                case '\n':
+                    sb.append((char) c);
+                    tmpLine++;
+                    tmpPos = 0;
+                    flags &= ~StringToken.TSTRING;
+                    break;
+                case ' ':
+                case '\t':
+                    sb.append((char) c);
+                    flags &= ~StringToken.TSTRING;
+                    break;
+                case '"':
+                    if ((cn = is.read()) == '"') {
+                        sb.append('"');
+                        tmpPos++;
+                        flags = StringToken.CSTRING;
+                        break;
+                    } else if (cn != -1) {
+                        is.unread();
+                    }
 
-    				if (sb.length() == 0) {
-    					flags &= ~(StringToken.SIMPLE_STRING | StringToken.TSTRING);
-    				}
+                    if (sb.length() == 0) {
+                        flags &= ~(StringToken.SIMPLE_STRING | StringToken.TSTRING);
+                    }
 
-    				pos = tmpPos;
-    				line = tmpLine;
-    				return new StringToken(ctx, TokenType.C_STRING, beginOffset, position(beginLine, beginPos),
-    						sb.toString(), flags);
-    			default:
-    				if (c < 32 || c > 126) {
-    					flags &= ~StringToken.SIMPLE_STRING;
-    				}
+                    pos = tmpPos;
+                    line = tmpLine;
+                    return new StringToken(ctx, TokenType.C_STRING, beginOffset, position(beginLine, beginPos),
+                            sb.toString(), flags);
+                default:
+                    if (c < 32 || c > 126) {
+                        flags &= ~StringToken.SIMPLE_STRING;
+                    }
 
-    				switch (c) {
-    					default:
-    						flags &= ~StringToken.TSTRING;
-    						break;
-    					case '0':
-    					case '1':
-    					case '2':
-    					case '3':
-    					case '4':
-    					case '5':
-    					case '6':
-    					case '7':
-    					case '8':
-    					case '9':
-    					case '+':
-    					case '-':
-    					case ':':
-    					case '.':
-    					case ',':
-    					case '/':
-    					case 'C':
-    					case 'D':
-    					case 'H':
-    					case 'M':
-    					case 'R':
-    					case 'P':
-    					case 'S':
-    					case 'T':
-    					case 'W':
-    					case 'Y':
-    					case 'Z':
-    						break;
-    				}
+                    switch (c) {
+                        default:
+                            flags &= ~StringToken.TSTRING;
+                            break;
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '9':
+                        case '+':
+                        case '-':
+                        case ':':
+                        case '.':
+                        case ',':
+                        case '/':
+                        case 'C':
+                        case 'D':
+                        case 'H':
+                        case 'M':
+                        case 'R':
+                        case 'P':
+                        case 'S':
+                        case 'T':
+                        case 'W':
+                        case 'Y':
+                        case 'Z':
+                            break;
+                    }
 
-    				sb.append((char) c);
-    				break;
+                    sb.append((char) c);
+                    break;
 
-    		}
-    	}
+            }
+        }
 
-    	is.reset();
-    	return null;
+        is.reset();
+        return null;
     }
 
     private Token parseNumber(Context ctx, int c) throws IOException {
-    	StringBuilder sb = new StringBuilder();
-    	TokenType type = TokenType.NUMBER;
-    	int beginOffset = is.getPos() - 1;
-    	int beginPos = pos;
-    	int tmpPos = pos;
-    	int fractional = -1, exp = -1;
-    	int cn;
-    	is.mark();
+        StringBuilder sb = new StringBuilder();
+        TokenType type = TokenType.NUMBER;
+        int beginOffset = is.getPos() - 1;
+        int beginPos = pos;
+        int tmpPos = pos;
+        int fractional = -1, exp = -1;
+        int cn;
+        is.mark();
 
-    	sb.append((char) c);
+        sb.append((char) c);
 
-    	loop: while (!eof) {
-    		c = is.read();
-    		tmpPos++;
+        loop:
+        while (!eof) {
+            c = is.read();
+            tmpPos++;
 
-    		switch (c) {
-    			case 'e':
-    			case 'E':
-    				if (exp != -1) {
-    					break loop;
-    				}
+            switch (c) {
+                case 'e':
+                case 'E':
+                    if (exp != -1) {
+                        break loop;
+                    }
 
-    				type = TokenType.REAL_NUMBER;
-    				exp = 0;
-    				sb.append((char) c);
-    				cn = is.read();
+                    type = TokenType.REAL_NUMBER;
+                    exp = 0;
+                    sb.append((char) c);
+                    cn = is.read();
 
-    				switch (cn) {
-    					case '-':
-    					case '+':
-    						tmpPos++;
-    						sb.append((char) cn);
-    						break;
-    					default:
-    						is.unread();
-    						break;
-    				}
-    				break;
-    			case '.':
-    				cn = is.read();
-    				is.unread();
+                    switch (cn) {
+                        case '-':
+                        case '+':
+                            tmpPos++;
+                            sb.append((char) cn);
+                            break;
+                        default:
+                            is.unread();
+                            break;
+                    }
+                    break;
+                case '.':
+                    cn = is.read();
+                    is.unread();
 
-    				if (cn == '.') {
-    					// fall through
-    				} else {
-    					if (fractional != -1) {
-    						break loop;
-    					}
+                    if (cn == '.') {
+                        // fall through
+                    } else {
+                        if (fractional != -1) {
+                            break loop;
+                        }
 
-    					type = TokenType.REAL_NUMBER;
-    					fractional = 0;
-    					sb.append((char) c);
-    					break;
-    				}
-    			default:
-    				if (c >= '0' && c <= '9') {
-    					if (exp >= 0) {
-    						if (exp == 1 && sb.charAt(sb.length() - 1) == '0') {
-    							break loop;
-    						}
-    						exp++;
-    					}
-    					sb.append((char) c);
-    				} else {
-    					if (exp == 0) {
-    						break loop;
-    					}
+                        type = TokenType.REAL_NUMBER;
+                        fractional = 0;
+                        sb.append((char) c);
+                        break;
+                    }
+                default:
+                    if (c >= '0' && c <= '9') {
+                        if (exp >= 0) {
+                            if (exp == 1 && sb.charAt(sb.length() - 1) == '0') {
+                                break loop;
+                            }
+                            exp++;
+                        }
+                        sb.append((char) c);
+                    } else {
+                        if (exp == 0) {
+                            break loop;
+                        }
 
-    					if (type == TokenType.NUMBER && sb.length() != 1 && sb.charAt(0) == '0') {
-    						type = TokenType.REAL_NUMBER;
-    					}
+                        if (type == TokenType.NUMBER && sb.length() != 1 && sb.charAt(0) == '0') {
+                            type = TokenType.REAL_NUMBER;
+                        }
 
-    					if (c != -1) {
-    						is.unread();
-    					}
+                        if (c != -1) {
+                            is.unread();
+                        }
 
-    					pos = tmpPos - 1;
+                        pos = tmpPos - 1;
 
-    					return new Token(ctx, type, beginOffset, position(line, beginPos), sb.toString());
-    				}
-    		}
-    	}
+                        return new Token(ctx, type, beginOffset, position(line, beginPos), sb.toString());
+                    }
+            }
+        }
 
-    	is.reset();
-    	return null;
+        is.reset();
+        return null;
     }
 
     private Token parseNumString(Context ctx) throws IOException {
-    	StringBuilder sb = new StringBuilder();
-    	int c, cn;
-    	int beginOffset = is.getPos() - 1;
-    	int beginPos = pos;
-    	int tmpPos = pos;
-    	TokenType type = TokenType.B_STRING;
+        StringBuilder sb = new StringBuilder();
+        int c, cn;
+        int beginOffset = is.getPos() - 1;
+        int beginPos = pos;
+        int tmpPos = pos;
+        TokenType type = TokenType.B_STRING;
 
-    	is.mark();
+        is.mark();
 
-    	loop: while (!eof) {
-    		c = is.read();
-    		tmpPos++;
+        loop:
+        while (!eof) {
+            c = is.read();
+            tmpPos++;
 
-    		switch (c) {
-    			case -1:
-    				break loop;
-    			case ' ':
-    			case '\t':
-    			case '\r':
-    			case '\n':
-    			case '\f':
-    			case 0x0b:
-    				break;
-    			case '\'':
-    				cn = is.read();
-    				if (cn == 'H' || cn == 'B' && type == TokenType.B_STRING) {
-    					pos = tmpPos + 1;
-    					return new Token(ctx, cn == 'H' ? TokenType.H_STRING : type, beginOffset,
+            switch (c) {
+                case -1:
+                    break loop;
+                case ' ':
+                case '\t':
+                case '\r':
+                case '\n':
+                case '\f':
+                case 0x0b:
+                    break;
+                case '\'':
+                    cn = is.read();
+                    if (cn == 'H' || cn == 'B' && type == TokenType.B_STRING) {
+                        pos = tmpPos + 1;
+                        return new Token(ctx, cn == 'H' ? TokenType.H_STRING : type, beginOffset,
                                 position(line, beginPos), sb.toString());
-    				}
-    				break loop;
-    			default:
-    				if (c >= 'A' && c <= 'F' || c >= '0' && c <= '9') {
-    					if (c != '0' && c != '1') {
-    						type = TokenType.H_STRING;
-    					}
+                    }
+                    break loop;
+                default:
+                    if (c >= 'A' && c <= 'F' || c >= '0' && c <= '9') {
+                        if (c != '0' && c != '1') {
+                            type = TokenType.H_STRING;
+                        }
 
-    					sb.append((char) c);
-    				} else {
-    					break loop;
-    				}
-    		}
+                        sb.append((char) c);
+                    } else {
+                        break loop;
+                    }
+            }
 
-    	}
+        }
 
-    	is.reset();
+        is.reset();
 
-    	return null;
+        return null;
     }
 
     private Token parseOther(Context ctx) throws IOException {
-    	StringBuilder sb = new StringBuilder();
-    	TokenType type;
-    	int beginOffset = is.getPos();
-    	int beginPos = pos + 1;
-    	int tmpPos = pos;
-    	int c, cn;
-    	boolean allUc = true;
-    	boolean digits = false;
-    	is.mark();
+        StringBuilder sb = new StringBuilder();
+        TokenType type;
+        int beginOffset = is.getPos();
+        int beginPos = pos + 1;
+        int tmpPos = pos;
+        int c, cn;
+        boolean allUc = true;
+        boolean digits = false;
+        is.mark();
 
-    	// is.unread();
+        // is.unread();
 
-    	while (!eof) {
-    		c = is.read();
-    		tmpPos++;
+        while (!eof) {
+            c = is.read();
+            tmpPos++;
 
-    		if (c >= 'a' && c <= 'z') {
-    			allUc = false;
-    			sb.append((char) c);
-    			continue;
-    		} else if (c >= 'A' && c <= 'Z') {
-    			sb.append((char) c);
-    			continue;
-    		} else if (c >= '0' && c <= '9') {
-    			digits = true;
-    			sb.append((char) c);
-    			continue;
-    		} else if (c == '-') {
-    			cn = is.read();
-    			if (cn == '-') {
-    				is.unread();
-    				is.unread();
-    			} else {
-    				if (cn != -1) {
-    					is.unread();
-    				}
+            if (c >= 'a' && c <= 'z') {
+                allUc = false;
+                sb.append((char) c);
+                continue;
+            } else if (c >= 'A' && c <= 'Z') {
+                sb.append((char) c);
+                continue;
+            } else if (c >= '0' && c <= '9') {
+                digits = true;
+                sb.append((char) c);
+                continue;
+            } else if (c == '-') {
+                cn = is.read();
+                if (cn == '-') {
+                    is.unread();
+                    is.unread();
+                } else {
+                    if (cn != -1) {
+                        is.unread();
+                    }
 
-    				sb.append((char) c);
-    				continue;
-    			}
-    		} else if (c != -1) {
-    			is.unread();
-    		}
+                    sb.append((char) c);
+                    continue;
+                }
+            } else if (c != -1) {
+                is.unread();
+            }
 
-    		if (sb.length() == 0) {
-    			throw new IOException(String.format("Unexpected token '%c'", is.read()));
-    		}
+            if (sb.length() == 0) {
+                throw new IOException(String.format("Unexpected token '%c'", is.read()));
+            }
 
-    		int fc = sb.charAt(0);
+            int fc = sb.charAt(0);
 
-    		if (fc >= 'A' && fc <= 'Z') {
-    			type = TokenType.TYPE_REFERENCE;
-    		} else if (fc >= 'a' && fc <= 'z') {
-    			type = TokenType.IDENTIFIER;
-    		} else {
-    			break;
-    		}
+            if (fc >= 'A' && fc <= 'Z') {
+                type = TokenType.TYPE_REFERENCE;
+            } else if (fc >= 'a' && fc <= 'z') {
+                type = TokenType.IDENTIFIER;
+            } else {
+                break;
+            }
 
-    		if (sb.charAt(sb.length() - 1) == '-') {
-    			break;
-    		}
+            if (sb.charAt(sb.length() - 1) == '-') {
+                break;
+            }
 
-    		String str = sb.toString();
+            String str = sb.toString();
 
-    		if (ctx != Context.SYNTAX) {
-    			Token.TokenType kwType = keywords.get(str);
+            if (ctx != Context.SYNTAX) {
+                Token.TokenType kwType = keywords.get(str);
 
-    			if (kwType != null) {
-    				pos = tmpPos - 1;
-    				return new Token(ctx, kwType, beginOffset, position(line, beginPos));
-    			}
-    		}
+                if (kwType != null) {
+                    pos = tmpPos - 1;
+                    return new Token(ctx, kwType, beginOffset, position(line, beginPos));
+                }
+            }
 
-    		switch (ctx) {
-    			case ENCODING:
-    				if (type == TokenType.TYPE_REFERENCE && ModuleNode.getEncoding(str) != null) {
-    					type = TokenType.ENCODING_REFERENCE;
-    					break;
-    				}
+            switch (ctx) {
+                case ENCODING:
+                    if (type == TokenType.TYPE_REFERENCE && ModuleNode.getEncoding(str) != null) {
+                        type = TokenType.ENCODING_REFERENCE;
+                        break;
+                    }
 
-    				is.reset();
-    				return null;
+                    is.reset();
+                    return null;
 
-    			case OBJECT_CLASS:
-    				if (type == TokenType.TYPE_REFERENCE && allUc) {
-    					type = TokenType.OBJECT_CLASS_REFERENCE;
-    					break;
-    				}
+                case OBJECT_CLASS:
+                    if (type == TokenType.TYPE_REFERENCE && allUc) {
+                        type = TokenType.OBJECT_CLASS_REFERENCE;
+                        break;
+                    }
 
-    				is.reset();
-    				return null;
+                    is.reset();
+                    return null;
 
-    			case SYNTAX:
-    				if (type == TokenType.TYPE_REFERENCE && allUc && !digits) {
-    					type = TokenType.WORD;
-    					break;
-    				}
+                case SYNTAX:
+                    if (type == TokenType.TYPE_REFERENCE && allUc && !digits) {
+                        type = TokenType.WORD;
+                        break;
+                    }
 
-    				is.reset();
-    				return null;
-    		}
+                    is.reset();
+                    return null;
+            }
 
-    		String value = sb.toString();
+            String value = sb.toString();
 
-    		if (type == TokenType.TYPE_REFERENCE) {
-    			if (PLUS_INFINITY_LIT.equals(value)) {
-    				type = Token.TokenType.PLUS_INFINITY_KW;
-    			} else if (MINUS_INFINITY_LIT.equals(value)) {
-    				type = Token.TokenType.MINUS_INFINITY_KW;
-    			} else if (NOT_A_NUMBER_LIT.equals(value)) {
-    				type = Token.TokenType.NOT_A_NUMBER_KW;
-    			}
-    		}
+            if (type == TokenType.TYPE_REFERENCE) {
+                if (PLUS_INFINITY_LIT.equals(value)) {
+                    type = Token.TokenType.PLUS_INFINITY_KW;
+                } else if (MINUS_INFINITY_LIT.equals(value)) {
+                    type = Token.TokenType.MINUS_INFINITY_KW;
+                } else if (NOT_A_NUMBER_LIT.equals(value)) {
+                    type = Token.TokenType.NOT_A_NUMBER_KW;
+                }
+            }
 
-    		pos = tmpPos - 1;
-    		return new Token(ctx, type, beginOffset, position(line, beginPos), value);
-    	}
+            pos = tmpPos - 1;
+            return new Token(ctx, type, beginOffset, position(line, beginPos), value);
+        }
 
-    	is.reset();
-    	return null;
+        is.reset();
+        return null;
     }
 
     private void skipMLComment() throws IOException {
-    	int c;
-    	int level = 1;
+        int c;
+        int level = 1;
 
-    	while (!eof) {
-    		c = is.read();
-    		pos++;
+        while (!eof) {
+            c = is.read();
+            pos++;
 
-    		switch (c) {
-    			case -1:
-    				eof = true;
-    				throw new IOException("Premature end-of-file in multi-line comment");
-    			case '\r':
-    				if (is.read() != '\n') {
-    					is.unread();
-    				}
+            switch (c) {
+                case -1:
+                    eof = true;
+                    throw new IOException("Premature end-of-file in multi-line comment");
+                case '\r':
+                    if (is.read() != '\n') {
+                        is.unread();
+                    }
 
-    				line++;
-    				pos = 0;
-    				break;
-    			case 0x0b: // vertical tab
-    			case '\f':
-    			case '\n':
-    				line++;
-    				pos = 0;
-    				break;
-    			case '/':
-    				if (is.read() == '*') {
-    					pos++;
-    					level++;
-    				} else {
-    					is.unread();
-    				}
-    				break;
-    			case '*':
-    				if (is.read() == '/') {
-    					pos++;
-    					level--;
+                    line++;
+                    pos = 0;
+                    break;
+                case 0x0b: // vertical tab
+                case '\f':
+                case '\n':
+                    line++;
+                    pos = 0;
+                    break;
+                case '/':
+                    if (is.read() == '*') {
+                        pos++;
+                        level++;
+                    } else {
+                        is.unread();
+                    }
+                    break;
+                case '*':
+                    if (is.read() == '/') {
+                        pos++;
+                        level--;
 
-    					if (level == 0) {
-    						return;
-    					}
-    				} else {
-    					is.unread();
-    				}
-    				break;
+                        if (level == 0) {
+                            return;
+                        }
+                    } else {
+                        is.unread();
+                    }
+                    break;
                 default:
                     unexpectedTokenError(c);
                     return;
             }
-    	}
+        }
     }
 
     private void skipComment() throws IOException {
-    	int c;
+        int c;
 
-    	while (!eof) {
-    		c = is.read();
-    		pos++;
+        while (!eof) {
+            c = is.read();
+            pos++;
 
-    		switch (c) {
-    			case -1:
-    				eof = true;
-    				return;
-    			case '-':
-    				if (is.read() == '-') {
-    					pos++;
-    					return;
-    				} else {
-    					is.unread();
-    				}
-    				break;
-    			case '\r':
-    				if (is.read() != '\n') {
-    					is.unread();
-    				}
+            switch (c) {
+                case -1:
+                    eof = true;
+                    return;
+                case '-':
+                    if (is.read() == '-') {
+                        pos++;
+                        return;
+                    } else {
+                        is.unread();
+                    }
+                    break;
+                case '\r':
+                    if (is.read() != '\n') {
+                        is.unread();
+                    }
 
-    				line++;
-    				pos = 0;
-    				return;
-    			case 0x0b: // vertical tab
-    			case '\f':
-    			case '\n':
-    				line++;
-    				pos = 0;
-    				return;
+                    line++;
+                    pos = 0;
+                    return;
+                case 0x0b: // vertical tab
+                case '\f':
+                case '\n':
+                    line++;
+                    pos = 0;
+                    return;
             }
-    	}
+        }
     }
 
     public void pushBack(Token token) {
-    	tokens.push(token);
+        tokens.push(token);
     }
 
     public boolean isEOF() {
-    	return eof;
+        return eof;
     }
 
     public int getOffset() {
-    	return is.getPos();
+        return is.getPos();
     }
 
     private Position position(int line, int pos) {

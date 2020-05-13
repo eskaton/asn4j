@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-public class ObjectIdentifierEncoder extends AbstractOIDEncoder<ASN1ObjectIdentifier> {
+public class ObjectIdentifierEncoder implements AbstractOIDEncoder<ASN1ObjectIdentifier> {
 
     @Override
     public byte[] encode(Encoder encoder, ASN1ObjectIdentifier obj) {

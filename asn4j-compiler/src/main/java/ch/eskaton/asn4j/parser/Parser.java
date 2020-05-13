@@ -2394,7 +2394,7 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public List<ExtensionAdditionAlternativeNode> parse() throws ParserException {
             return super.parse(new SequenceParser(TokenType.COMMA, extensionAdditionAlternativesListParser),
-                    a -> a.n1());
+                    ListAccessor::n1);
         }
 
     }
@@ -2853,7 +2853,7 @@ public class Parser {
             return super.parse(new SingleTokenParser(TokenType.C_STRING), a -> {
                 List<IRIToken> iriTokens = parseArcIdSequence(a.s(),false);
 
-                if (iriTokens.size() == 0) {
+                if (iriTokens.isEmpty()) {
                     throw new ParserException("Empty IRIValue");
                 }
 
@@ -2997,7 +2997,7 @@ public class Parser {
             return super.parse(new SingleTokenParser(TokenType.C_STRING), a -> {
                 List<IRIToken> iriTokens = parseArcIdSequence(a.s(), true);
 
-                if (iriTokens.size() == 0) {
+                if (iriTokens.isEmpty()) {
                     throw new ParserException("Empty RelativeIRIValue");
                 }
 

@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-public class RelativeOIDEncoder extends AbstractOIDEncoder<ASN1RelativeOID> {
+public class RelativeOIDEncoder implements AbstractOIDEncoder<ASN1RelativeOID> {
 
     @Override
     public byte[] encode(Encoder encoder, ASN1RelativeOID obj) {

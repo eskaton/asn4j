@@ -37,7 +37,7 @@ public class OctetStringConstraintOptimizingVisitor
         extends BaseXStringConstraintOptimizingVisitor<OctetStringValue, List<OctetStringValue>, OctetStringValueNode> {
 
     public OctetStringConstraintOptimizingVisitor() {
-        super(new OctetStringValueComparator(), v -> new OctetStringValueNode(v));
+        super(new OctetStringValueComparator(), OctetStringValueNode::new);
     }
 
 }

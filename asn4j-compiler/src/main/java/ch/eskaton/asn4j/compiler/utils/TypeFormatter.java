@@ -30,8 +30,8 @@ package ch.eskaton.asn4j.compiler.utils;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
+import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.Node;
-import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
@@ -108,7 +108,7 @@ public class TypeFormatter {
     private static String formatItems(BitString type) {
         return Optional.ofNullable(type.getNamedBits())
                 .map(items -> items.stream()
-                        .map(item -> item.getId())
+                        .map(NamedBitNode::getId)
                         .collect(Collectors.joining(", ")))
                 .orElse("");
     }
@@ -127,7 +127,7 @@ public class TypeFormatter {
     private static String formatItems(List<EnumerationItemNode> enumerationItems) {
         return Optional.ofNullable(enumerationItems)
                 .map(items -> items.stream()
-                        .map(item -> item.getName()).
+                        .map(EnumerationItemNode::getName).
                                 collect(Collectors.joining(", ")))
                 .orElse("");
     }
