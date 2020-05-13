@@ -16,7 +16,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.sources>src/main/java</sonar.sources>
-        <sonar.tests>src/main/test</sonar.tests>
+        <sonar.tests>src/test/java</sonar.tests>
     </properties>
 
     <dependencyManagement>
