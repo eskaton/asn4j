@@ -70,14 +70,7 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            Value value = ((SingleValueConstraint) elements).getValue();
-
-            if (value instanceof NullValue) {
-                return new ValueNode<>(ASN1Null.Value.NULL);
-            } else {
-                throw new CompilerException("Invalid single-value constraint %s for %s type",
-                        value.getClass().getSimpleName(), TypeName.NULL);
-            }
+            return calculateSingleValueConstraints((SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else {
@@ -86,10 +79,21 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
+    private Node calculateSingleValueConstraints(SingleValueConstraint elements) {
+        Value value = elements.getValue();
+
+        if (value instanceof NullValue) {
+            return new ValueNode<>(ASN1Null.Value.NULL);
+        } else {
+            throw new CompilerException("Invalid single-value constraint %s for %s type",
+                    value.getClass().getSimpleName(), TypeName.NULL);
+        }
+    }
+
     @Override
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        // TODO implement
-        return true;
+        return compiledType.getType().getClass()
+                .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
     }
 
     @Override

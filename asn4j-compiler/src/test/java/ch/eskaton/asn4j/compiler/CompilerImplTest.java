@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.runtime.types.TypeName;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -35,6 +36,20 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.ByteArrayInputStream;
 import java.util.stream.Stream;
 
+import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
+import static ch.eskaton.asn4j.runtime.types.TypeName.ENUMERATED;
+import static ch.eskaton.asn4j.runtime.types.TypeName.INTEGER;
+import static ch.eskaton.asn4j.runtime.types.TypeName.NULL;
+import static ch.eskaton.asn4j.runtime.types.TypeName.OCTET_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.OID;
+import static ch.eskaton.asn4j.runtime.types.TypeName.OID_IRI;
+import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID;
+import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID_IRI;
+import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE;
+import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE_OF;
+import static ch.eskaton.asn4j.runtime.types.TypeName.SET;
+import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -55,18 +70,90 @@ public class CompilerImplTest {
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {
+        // @formatter:off
         return Stream.of(
                 Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             Boolean ::= BOOLEAN (INCLUDES Integer)
-                        """, CompilerException.class, "can't be used in INCLUDES constraint of type BOOLEAN",
-                        "Contained subtype must be derived of the same built-in type as the parent type"),
-                Arguments.of("""
+                        """, CompilerException.class, getContainedSubtypeError(BOOLEAN),
+                        getContainedSubtypeMessage(BOOLEAN)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            BitString ::= BIT STRING (INCLUDES Integer)
+                        """, CompilerException.class, getContainedSubtypeError(BIT_STRING),
+                        getContainedSubtypeMessage(BIT_STRING)),
+               Arguments.of("""
+                            BitString ::= BIT STRING
+                            Integer ::= INTEGER (INCLUDES BitString)
+                        """, CompilerException.class, getContainedSubtypeError(INTEGER),
+                        getContainedSubtypeMessage(INTEGER)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            Enumeration ::= ENUMERATED { a, b } (INCLUDES Integer)
+                        """, CompilerException.class, getContainedSubtypeError(ENUMERATED),
+                        getContainedSubtypeMessage(ENUMERATED)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            OctetString ::= OCTET STRING (INCLUDES Integer)
+                        """, CompilerException.class, getContainedSubtypeError(OCTET_STRING),
+                        getContainedSubtypeMessage(OCTET_STRING)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            Null ::= NULL (INCLUDES Integer)
+                        """, CompilerException.class, getContainedSubtypeError(NULL),
+                        getContainedSubtypeMessage(NULL)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            RelativeOID ::= RELATIVE-OID (INCLUDES Integer)
+                        """, CompilerException.class, getContainedSubtypeError(RELATIVE_OID),
+                        getContainedSubtypeMessage(RELATIVE_OID)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            Oid ::= OBJECT IDENTIFIER (INCLUDES Integer)
+                        """, CompilerException.class, getContainedSubtypeError(OID),
+                        getContainedSubtypeMessage(OID)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            RelativeOidIri ::= RELATIVE-OID-IRI (INCLUDES Integer)
+                        """, CompilerException.class, getContainedSubtypeError(RELATIVE_OID_IRI),
+                        getContainedSubtypeMessage(RELATIVE_OID_IRI)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            OidIri ::= OID-IRI (INCLUDES Integer)
+                        """, CompilerException.class, getContainedSubtypeError(OID_IRI),
+                        getContainedSubtypeMessage(OID_IRI)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            Sequence ::= SEQUENCE { a INTEGER } (INCLUDES Integer)
+                        """, CompilerException.class, getContainedSubtypeError(SEQUENCE),
+                        getContainedSubtypeMessage(SEQUENCE)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            SequenceOf ::= SEQUENCE (INCLUDES Integer) OF INTEGER
+                        """, CompilerException.class, getContainedSubtypeError(SEQUENCE_OF),
+                        getContainedSubtypeMessage(SEQUENCE_OF)),
+               Arguments.of("""
+                            Integer ::= INTEGER (1 | 2)
+                            Set ::= SET (INCLUDES Integer) OF INTEGER
+                        """, CompilerException.class, getContainedSubtypeError(SET_OF),
+                        getContainedSubtypeMessage(SET_OF)),
+
+               Arguments.of("""
                             InvalidSizeType ::= BIT STRING
                             BitString ::= BIT STRING (SIZE (InvalidSizeType))
-                        """, CompilerException.class, "can't be used in INCLUDES constraint of type INTEGER",
+                        """, CompilerException.class, getContainedSubtypeError(INTEGER),
                         "Contained subtype in SIZE constraint must be of type INTEGER")
         );
+        // @formatter:on
+    }
+
+    private static String getContainedSubtypeError(TypeName type) {
+        return "can't be used in INCLUDES constraint of type %s".formatted(type);
+    }
+
+    private static String getContainedSubtypeMessage(TypeName type) {
+        return "Contained subtype for %s must be derived of the same built-in type as the parent type"
+                .formatted(type);
     }
 
     public String module(String name, String body) {

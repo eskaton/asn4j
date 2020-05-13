@@ -31,12 +31,19 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
+import ch.eskaton.asn4j.parser.ast.types.OctetString;
+import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
+import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
@@ -46,11 +53,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
 import static ch.eskaton.asn4j.runtime.types.TypeName.ENUMERATED;
 import static ch.eskaton.asn4j.runtime.types.TypeName.INTEGER;
+import static ch.eskaton.asn4j.runtime.types.TypeName.NULL;
+import static ch.eskaton.asn4j.runtime.types.TypeName.OCTET_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.OID;
+import static ch.eskaton.asn4j.runtime.types.TypeName.OID_IRI;
+import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID;
+import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID_IRI;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE;
-import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE_OF;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
 
@@ -73,6 +86,18 @@ public class TypeFormatter {
             return ENUMERATED.getName() + "(" + formatItems((EnumeratedType) type) + ")";
         } else if (type instanceof BitString) {
             return BIT_STRING.getName() + "(" + formatItems((BitString) type) + ")";
+        } else if (type instanceof OctetString) {
+            return OCTET_STRING.getName();
+        } else if (type instanceof Null) {
+            return NULL.getName();
+        } else if (type instanceof ObjectIdentifier) {
+            return OID.getName();
+        } else if (type instanceof RelativeOID) {
+            return RELATIVE_OID.getName();
+        } else if (type instanceof IRI) {
+            return OID_IRI.getName();
+        } else if (type instanceof RelativeIRI) {
+            return RELATIVE_OID_IRI.getName();
         } else if (type instanceof TypeReference) {
             return formatType(ctx, ctx.resolveTypeReference(type));
         }
@@ -92,7 +117,7 @@ public class TypeFormatter {
         var rootItems = type.getRootEnum();
         var additionalItems = type.getAdditionalEnum();
 
-        if (!additionalItems.isEmpty()) {
+        if (additionalItems != null && !additionalItems.isEmpty()) {
             return formatItems(rootItems) + ", " + formatItems(additionalItems);
         }
 

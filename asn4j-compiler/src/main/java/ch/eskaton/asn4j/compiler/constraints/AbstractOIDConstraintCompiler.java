@@ -79,21 +79,25 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            AbstractOIDValueResolver resolver = getValueResolver();
-            Value value = ((SingleValueConstraint) elements).getValue();
-            AbstractOIDValue oidValue = (AbstractOIDValue) resolver.resolveValue(ctx, value, getValueClass());
-
-            if (oidValue != null) {
-                return createNode(singleton(resolver.resolveComponents(ctx, oidValue)));
-            } else {
-                throw new CompilerException("Invalid single-value constraint %s for " + getTypeName() + " type",
-                        value.getClass().getSimpleName());
-            }
+            return calculateSingleValueConstraints((SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else {
             throw new CompilerException("Invalid constraint %s for " + getTypeName() + " type",
                     elements.getClass().getSimpleName());
+        }
+    }
+
+    private Node calculateSingleValueConstraints(SingleValueConstraint elements) {
+        AbstractOIDValueResolver resolver = getValueResolver();
+        Value value = elements.getValue();
+        AbstractOIDValue oidValue = (AbstractOIDValue) resolver.resolveValue(ctx, value, getValueClass());
+
+        if (oidValue != null) {
+            return createNode(singleton(resolver.resolveComponents(ctx, oidValue)));
+        } else {
+            throw new CompilerException("Invalid single-value constraint %s for " + getTypeName() + " type",
+                    value.getClass().getSimpleName());
         }
     }
 

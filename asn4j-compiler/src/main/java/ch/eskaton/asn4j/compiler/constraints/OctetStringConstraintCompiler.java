@@ -90,17 +90,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         if (elements instanceof ElementSet) {
             return compileConstraint(baseType, (ElementSet) elements, bounds);
         } else if (elements instanceof SingleValueConstraint) {
-            Value value = ((SingleValueConstraint) elements).getValue();
-
-            try {
-                OctetStringValue octetStringValue = ctx
-                        .resolveGenericValue(OctetStringValue.class, baseType.getType(), value);
-
-                return new OctetStringValueNode(singletonList(octetStringValue));
-            } catch (Exception e) {
-                throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                        value.getClass().getSimpleName(), TypeName.OCTET_STRING);
-            }
+            return calculateSingleValueConstraints(baseType, (SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else if (elements instanceof SizeConstraint) {
@@ -111,10 +101,24 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
+    private Node calculateSingleValueConstraints(CompiledType baseType, SingleValueConstraint elements) {
+        Value value = elements.getValue();
+
+        try {
+            OctetStringValue octetStringValue = ctx
+                    .resolveGenericValue(OctetStringValue.class, baseType.getType(), value);
+
+            return new OctetStringValueNode(singletonList(octetStringValue));
+        } catch (Exception e) {
+            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
+                    value.getClass().getSimpleName(), TypeName.OCTET_STRING);
+        }
+    }
+
     @Override
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        // TODO: implement
-        return true;
+        return compiledType.getType().getClass()
+                .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
     }
 
     @Override
