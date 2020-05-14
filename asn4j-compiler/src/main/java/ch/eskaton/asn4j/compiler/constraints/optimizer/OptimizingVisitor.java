@@ -34,6 +34,8 @@ import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 
 public interface OptimizingVisitor<V> extends Visitor<Node, V> {
 
@@ -59,6 +61,16 @@ public interface OptimizingVisitor<V> extends Visitor<Node, V> {
 
     @Override
     default Node visit(ValueNode<V> node) {
+        return node;
+    }
+
+    @Override
+    default Node visit(WithComponentNode node) {
+        return node;
+    }
+
+    @Override
+    default Node visit(WithComponentsNode node) {
         return node;
     }
 

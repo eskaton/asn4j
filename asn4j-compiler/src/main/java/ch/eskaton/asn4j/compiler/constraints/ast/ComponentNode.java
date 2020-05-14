@@ -25,29 +25,38 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
 
-public class NamedConstraint extends AbstractConstraint {
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPONENT;
+
+public class ComponentNode extends AbstractNode {
 
     private String name;
 
-    private ComponentConstraint constraint;
+    private Node constraint;
 
-    public NamedConstraint(Position position, String name, ComponentConstraint constraint) {
-        super(position);
+    private PresenceType presenceType;
+
+    public ComponentNode(String name, Node constraint, PresenceType presenceType) {
+        super(COMPONENT);
 
         this.name = name;
         this.constraint = constraint;
+        this.presenceType = presenceType;
     }
 
     public String getName() {
         return name;
     }
 
-    public ComponentConstraint getConstraint() {
+    public Node getConstraint() {
         return constraint;
+    }
+
+    public PresenceType getPresenceType() {
+        return presenceType;
     }
 
 }

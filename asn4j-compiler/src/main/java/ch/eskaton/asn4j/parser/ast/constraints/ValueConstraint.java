@@ -39,4 +39,8 @@ public class ValueConstraint extends AbstractConstraint {
         this.constraint = constraint;
     }
 
+    public Constraint getConstraint() {
+        return constraint;
+    }
+
 }

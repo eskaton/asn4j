@@ -3753,11 +3753,11 @@ public class Parser {
                     a -> {
                         switch (a.$()) {
                             case PRESENT_KW:
-                                return new PresenceConstraint(a.P(), PresenceConstraint.Type.PRESENT);
+                                return new PresenceConstraint(a.P(), PresenceConstraint.PresenceType.PRESENT);
                             case ABSENT_KW:
-                                return new PresenceConstraint(a.P(), PresenceConstraint.Type.ABSENT);
+                                return new PresenceConstraint(a.P(), PresenceConstraint.PresenceType.ABSENT);
                             case OPTIONAL_KW:
-                                return new PresenceConstraint(a.P(), PresenceConstraint.Type.OPTIONAL);
+                                return new PresenceConstraint(a.P(), PresenceConstraint.PresenceType.OPTIONAL);
                         }
 
                         return null;

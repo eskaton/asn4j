@@ -47,6 +47,8 @@ public interface Visitor<T, V> {
                 return visit((AllValuesNode) node);
             case WITH_COMPONENT:
                 return visit((WithComponentNode) node);
+            case WITH_COMPONENTS:
+                return visit((WithComponentsNode) node);
             default:
                 return throwUnimplementedNodeType(node);
         }
@@ -63,5 +65,7 @@ public interface Visitor<T, V> {
     T visit(ValueNode<V> node);
 
     T visit(WithComponentNode node);
+
+    T visit(WithComponentsNode node);
 
 }

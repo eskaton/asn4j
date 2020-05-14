@@ -25,29 +25,25 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.constraints;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.parser.Position;
+import java.util.Set;
 
-public class NamedConstraint extends AbstractConstraint {
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.WITH_COMPONENT;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.WITH_COMPONENTS;
 
-    private String name;
+public class WithComponentsNode extends AbstractNode {
 
-    private ComponentConstraint constraint;
+    Set<ComponentNode> components;
 
-    public NamedConstraint(Position position, String name, ComponentConstraint constraint) {
-        super(position);
+    public WithComponentsNode(Set<ComponentNode> components) {
+        super(WITH_COMPONENTS);
 
-        this.name = name;
-        this.constraint = constraint;
+        this.components = components;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public ComponentConstraint getConstraint() {
-        return constraint;
+    public Set<ComponentNode> getComponents() {
+        return components;
     }
 
 }

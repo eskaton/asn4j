@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 
 import java.util.List;
 import java.util.Optional;
@@ -97,6 +98,12 @@ public class SizeVisitor implements Visitor<Optional<SizeNode>, List<IntegerRang
     public Optional<SizeNode> visit(WithComponentNode node) {
         return Optional.empty();
     }
+
+    @Override
+    public Optional<SizeNode> visit(WithComponentsNode node) {
+        return Optional.empty();
+    }
+
 
     private Optional<SizeNode> createInvertedSizeNode(Optional<List<IntegerRange>> maybeRanges) {
         return maybeRanges.map(IntegerRange::invert)

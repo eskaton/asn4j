@@ -30,7 +30,10 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
@@ -52,6 +55,9 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
+import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
+import ch.eskaton.asn4j.parser.ast.constraints.NamedConstraint;
+import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
@@ -81,6 +87,7 @@ import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.CUSTOM;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
+import static java.util.function.Function.identity;
 
 public abstract class AbstractCollectionConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -110,10 +117,40 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
             return calculateSingleValueConstraint(baseType, (SingleValueConstraint) elements);
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
+        } else if (elements instanceof MultipleTypeConstraints) {
+            return calculateMultipleTypeConstraint(baseType, (MultipleTypeConstraints) elements);
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), typeName);
         }
+    }
+
+    private Node calculateMultipleTypeConstraint(CompiledType baseType, MultipleTypeConstraints elements) {
+        var componentTypes = ((Collection) baseType.getType()).getAllComponents().stream()
+                .map(ComponentType::getNamedType)
+                .collect(Collectors.toMap(NamedType::getName, identity()));
+        var components = elements.getConstraints().stream()
+                .map(constraint -> calculateComponentConstraint(componentTypes, constraint))
+                .collect(Collectors.toSet());
+
+        return new WithComponentsNode(components);
+    }
+
+    private ComponentNode calculateComponentConstraint(Map<String, NamedType> componentTypes, NamedConstraint namedConstraint) {
+        var name = namedConstraint.getName();
+        var constraint = namedConstraint.getConstraint();
+        var presence = Optional.ofNullable(constraint.getPresence()).map(PresenceConstraint::getType).orElse(null);
+        var valueConstraint = constraint.getValue().getConstraint();
+        var componentType = componentTypes.get(name).getType();
+        var definition = ctx.compileConstraint(ctx.getCompiledType(componentType));
+
+        if (definition != null) {
+            definition = definition.serialApplication(ctx.compileConstraint(componentType, valueConstraint));
+        } else {
+            definition = ctx.compileConstraint(componentType, valueConstraint);
+        }
+
+        return new ComponentNode(name, definition.getRoots(), presence);
     }
 
     private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements) {
@@ -172,7 +209,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     protected FunctionCall generateCheckConstraintCall(Type type) {
-        List<FunctionCall> getters = ((SequenceType) type).getRootComponents().stream()
+        List<FunctionCall> getters = ((SequenceType) ctx.resolveTypeReference(type)).getRootComponents().stream()
                 .map(c -> "get" + StringUtils.initCap(c.getNamedType().getName()))
                 .map(f -> new FunctionCall(of(f)))
                 .collect(Collectors.toList());
@@ -259,6 +296,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         switch (node.getType()) {
             case VALUE:
                 return getValueExpression(type, (CollectionValueNode) node);
+            case WITH_COMPONENTS:
+                return getWithComponentsExpression(module, (WithComponentsNode) node);
             default:
                 return super.buildExpression(module, type, node);
         }
@@ -272,7 +311,6 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
     }
-
 
     @Override
     protected String getTypeName(Type type) {
@@ -298,6 +336,11 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         var values = StreamsUtils.zip(typeStream, valueStream, ILValue::new).collect(Collectors.toList());
 
         return new BooleanFunctionCall.SetEquals(new Variable(VALUES), new ILListValue(values));
+    }
+
+    private Optional<BooleanExpression> getWithComponentsExpression(Module module, WithComponentsNode node) {
+        // TODO implement
+        return Optional.empty();
     }
 
 }
