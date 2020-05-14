@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Visitor;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,11 @@ public interface BoundsVisitor<V> extends Visitor<Optional<List<IntegerRange>>, 
 
     @Override
     default Optional<List<IntegerRange>> visit(WithComponentNode node) {
+        return Optional.empty();
+    }
+
+    @Override
+    default Optional<List<IntegerRange>> visit(WithComponentsNode node) {
         return Optional.empty();
     }
 

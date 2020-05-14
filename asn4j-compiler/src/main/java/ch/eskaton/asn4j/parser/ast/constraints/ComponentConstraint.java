@@ -31,18 +31,18 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class ComponentConstraint extends AbstractConstraint {
 
-    private Constraint value;
+    private ValueConstraint value;
 
     private PresenceConstraint presence;
 
-    public ComponentConstraint(Position position, Constraint value, PresenceConstraint presence) {
+    public ComponentConstraint(Position position, ValueConstraint value, PresenceConstraint presence) {
         super(position);
 
         this.value = value;
         this.presence = presence;
     }
 
-    public Constraint getValue() {
+    public ValueConstraint getValue() {
         return value;
     }
 

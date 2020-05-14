@@ -31,19 +31,19 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class PresenceConstraint extends AbstractConstraint {
 
-    public enum Type {
+    public enum PresenceType {
         PRESENT, ABSENT, OPTIONAL
     }
 
-    private Type type;
+    private PresenceType type;
 
-    public PresenceConstraint(Position position, Type type) {
+    public PresenceConstraint(Position position, PresenceType type) {
         super(position);
 
     	this.type = type;
     }
 
-    public Type getType() {
+    public PresenceType getType() {
     	return type;
     }
 

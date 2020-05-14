@@ -38,7 +38,7 @@ import static ch.eskaton.asn4j.compiler.constraints.ConstraintTestUtils.union;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class EnumeratedTypeConstraintOptimizingVisitorTest {
+public class EnumeratedPresenceTypeConstraintOptimizingVisitorTest {
 
     @Test
     public void testVisitBinOpNodeUnion() {

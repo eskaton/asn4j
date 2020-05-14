@@ -4627,7 +4627,7 @@ public class ParserTest {
 
         assertNotNull(result);
         assertNotNull(result.getValue());
-        assertEquals(PresenceConstraint.Type.OPTIONAL, result.getPresence()
+        assertEquals(PresenceConstraint.PresenceType.OPTIONAL, result.getPresence()
                 .getType());
     }
 
@@ -4650,21 +4650,21 @@ public class ParserTest {
         PresenceConstraint result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(PresenceConstraint.Type.PRESENT, result.getType());
+        assertEquals(PresenceConstraint.PresenceType.PRESENT, result.getType());
 
         parser = new Parser(new ByteArrayInputStream("ABSENT".getBytes())).new PresenceConstraintParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(PresenceConstraint.Type.ABSENT, result.getType());
+        assertEquals(PresenceConstraint.PresenceType.ABSENT, result.getType());
 
         parser = new Parser(new ByteArrayInputStream("OPTIONAL".getBytes())).new PresenceConstraintParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(PresenceConstraint.Type.OPTIONAL, result.getType());
+        assertEquals(PresenceConstraint.PresenceType.OPTIONAL, result.getType());
     }
 
     @Test
