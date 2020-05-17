@@ -57,12 +57,14 @@ TestSequence4 ::= SEQUENCE {
 TestSequence5 ::= SEQUENCE {
 	a INTEGER DEFAULT 23,
 	...,
-	z INTEGER
+	z INTEGER,
+	...,
+	b BOOLEAN
 }
 
 TestSequence6 ::= SEQUENCE {
 	COMPONENTS OF TestSequence5,
-	b BOOLEAN
+	c BOOLEAN
 }
 
 TestSequence7 ::= SEQUENCE {
@@ -82,6 +84,23 @@ TestSequence8 ::= SEQUENCE {
 
 TestSequence9 ::= SEQUENCE {
     childEnumerated ENUMERATED {a, b, c}
+}
+
+TestSequence10 ::= SEQUENCE {
+	a INTEGER,
+	...,
+	[[c INTEGER,
+	  d BOOLEAN]],
+	...,
+	b INTEGER
+}
+
+TestSequence11 ::= SEQUENCE {
+    childSequence SEQUENCE {
+       a INTEGER,
+       ...,
+       b BOOLEAN
+   }
 }
 
 END
