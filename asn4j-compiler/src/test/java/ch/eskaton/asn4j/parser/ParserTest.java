@@ -441,6 +441,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -2053,8 +2054,8 @@ public class ParserTest {
 
         SequenceType seq = (SequenceType) result;
 
-        assertNotNull(seq.getExtAndEx());
-        assertNotNull(seq.getOptExtMarker());
+        assertNotNull(seq.getExtensionAndException());
+        assertNotNull(seq.getOptionalExtensionMarker());
 
         // | SEQUENCE "{" ComponentTypeLists "}"
         parser = new Parser(new ByteArrayInputStream(
@@ -2106,10 +2107,10 @@ public class ParserTest {
         assertNotNull(result.getRootComponents());
         assertEquals(1, result.getRootComponents().size());
 
-        assertNull(result.getExtAndEx());
-        assertNull(result.getExtAdditions());
-        assertFalse(result.getExtEndMarker());
-        assertNull(result.getExtRootComponents());
+        assertNull(result.getExtensionAndException());
+        assertNull(result.getExtensionAdditions());
+        assertFalse(result.getOptionalExtensionMarker());
+        assertNull(result.getExtensionRootComponents());
 
         // RootComponentTypeList "," ExtensionAndException ExtensionAdditions
         // OptionalExtensionMarker
@@ -2124,10 +2125,10 @@ public class ParserTest {
         assertNotNull(result.getRootComponents());
         assertEquals(1, result.getRootComponents().size());
 
-        assertNotNull(result.getExtAndEx());
-        assertNotNull(result.getExtAdditions());
-        assertTrue(result.getExtEndMarker());
-        assertNull(result.getExtRootComponents());
+        assertNotNull(result.getExtensionAndException());
+        assertNotNull(result.getExtensionAdditions());
+        assertTrue(result.getOptionalExtensionMarker());
+        assertNull(result.getExtensionRootComponents());
 
         // RootComponentTypeList "," ExtensionAndException ExtensionAdditions
         // OptionalExtensionMarker
@@ -2142,10 +2143,10 @@ public class ParserTest {
         assertNotNull(result.getRootComponents());
         assertEquals(1, result.getRootComponents().size());
 
-        assertNotNull(result.getExtAndEx());
-        assertNotNull(result.getExtAdditions());
-        assertFalse(result.getExtEndMarker());
-        assertNull(result.getExtRootComponents());
+        assertNotNull(result.getExtensionAndException());
+        assertNotNull(result.getExtensionAdditions());
+        assertFalse(result.getOptionalExtensionMarker());
+        assertNull(result.getExtensionRootComponents());
 
         // RootComponentTypeList "," ExtensionAndException ExtensionAdditions
         // ExtensionEndMarker "," RootComponentTypeList
@@ -2162,10 +2163,10 @@ public class ParserTest {
         assertNotNull(result.getRootComponents());
         assertEquals(1, result.getRootComponents().size());
 
-        assertNotNull(result.getExtAndEx());
-        assertNotNull(result.getExtAdditions());
-        assertFalse(result.getExtEndMarker());
-        assertNotNull(result.getExtRootComponents());
+        assertNotNull(result.getExtensionAndException());
+        assertNotNull(result.getExtensionAdditions());
+        assertFalse(result.getOptionalExtensionMarker());
+        assertNotNull(result.getExtensionRootComponents());
 
         // ExtensionAndException ExtensionAdditions OptionalExtensionMarker
         parser = new Parser(new ByteArrayInputStream(
@@ -2176,10 +2177,10 @@ public class ParserTest {
         assertNotNull(result);
 
         assertNull(result.getRootComponents());
-        assertNotNull(result.getExtAndEx());
-        assertNotNull(result.getExtAdditions());
-        assertTrue(result.getExtEndMarker());
-        assertNull(result.getExtRootComponents());
+        assertNotNull(result.getExtensionAndException());
+        assertNotNull(result.getExtensionAdditions());
+        assertTrue(result.getOptionalExtensionMarker());
+        assertNull(result.getExtensionRootComponents());
 
         // ExtensionAndException ExtensionAdditions ExtensionEndMarker ","
         // RootComponentTypeList
@@ -2192,10 +2193,10 @@ public class ParserTest {
         assertNotNull(result);
 
         assertNull(result.getRootComponents());
-        assertNotNull(result.getExtAndEx());
-        assertNotNull(result.getExtAdditions());
-        assertTrue(result.getExtEndMarker());
-        assertNotNull(result.getExtRootComponents());
+        assertNotNull(result.getExtensionAndException());
+        assertNotNull(result.getExtensionAdditions());
+        assertTrue(result.getOptionalExtensionMarker());
+        assertNotNull(result.getExtensionRootComponents());
     }
 
     @Test
@@ -2273,7 +2274,7 @@ public class ParserTest {
         ExtensionAdditionGroup result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(1, (int) result.getVersion());
+        assertEquals(1, result.getVersion().get());
         assertEquals(2, result.getComponents().size());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -2282,7 +2283,7 @@ public class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertNull(result.getVersion());
+        assertEquals(Optional.empty(), result.getVersion());
         assertEquals(1, result.getComponents().size());
     }
 
@@ -2512,8 +2513,8 @@ public class ParserTest {
 
         SetType seq = (SetType) result;
 
-        assertNotNull(seq.getExtAndEx());
-        assertNotNull(seq.getOptExtMarker());
+        assertNotNull(seq.getExtensionAndException());
+        assertNotNull(seq.getOptionalExtensionMarker());
 
         // | SET "{" ComponentTypeLists "}"
         parser = new Parser(new ByteArrayInputStream(

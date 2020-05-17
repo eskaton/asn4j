@@ -68,6 +68,9 @@ TestSequence6 ::= SEQUENCE {
 TestSequence7 ::= SEQUENCE {
 	a INTEGER,
 	...,
+	[[1: c INTEGER]],
+	[[2: d BOOLEAN]],
+	...,
 	b INTEGER
 }
 

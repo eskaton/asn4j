@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
+import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
 
 public class SequenceType extends Collection {
 
@@ -40,7 +41,7 @@ public class SequenceType extends Collection {
         super(position, compTypes);
     }
 
-    public SequenceType(Position position, Object extAndEx, Object optExtMarker) {
+    public SequenceType(Position position, ExtensionAndExceptionNode extAndEx, Boolean optExtMarker) {
         super(position, extAndEx, optExtMarker);
     }
 

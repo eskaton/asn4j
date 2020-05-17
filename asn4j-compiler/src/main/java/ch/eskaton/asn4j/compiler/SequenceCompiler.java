@@ -40,7 +40,7 @@ public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledTyp
     public CompiledType compile(CompilerContext ctx, String name, SequenceType node) {
         JavaClass javaClass = ctx.createClass(name, node, true);
 
-        for (ComponentType component : node.getAllComponents()) {
+        for (ComponentType component : node.getAllRootComponents()) {
             try {
                 ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class).compile(ctx, component);
             } catch (CompilerException e) {

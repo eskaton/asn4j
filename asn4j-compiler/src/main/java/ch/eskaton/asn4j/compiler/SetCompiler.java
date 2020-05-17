@@ -45,7 +45,7 @@ public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
 
         ctx.createClass(name, node, true);
 
-        for (ComponentType component : node.getAllComponents()) {
+        for (ComponentType component : node.getAllRootComponents()) {
             TagId tagId = getTagId(ctx, component);
             ComponentType seenComponent = seenTags.get(tagId);
 

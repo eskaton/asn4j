@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
+import ch.eskaton.asn4j.parser.ast.types.ExtensionAdditionGroup;
 
 import java.util.List;
 
@@ -36,34 +37,35 @@ public class ComponentTypeListsNode extends AbstractNode {
 
     private List<ComponentType> rootComponents;
 
-    private List<ComponentType> extRootComponents;
+    private List<ComponentType> extensionRootComponents;
 
-    private ExtensionAndExceptionNode extAndEx;
+    private ExtensionAndExceptionNode extensionAndException;
 
-    private Object extAdditions;
+    private List<ExtensionAdditionGroup> extensionAdditions;
 
-    private Boolean extEndMarker = false;
+    private Boolean optionalExtensionMarker = false;
 
     public ComponentTypeListsNode(Position position, List<ComponentType> rootComponents,
-            ExtensionAndExceptionNode extAndEx, Object extAdditions, Boolean extEndMarker) {
+            ExtensionAndExceptionNode extensionAndException, List<ExtensionAdditionGroup> extensionAdditions,
+            Boolean extensionEndMark) {
         super(position);
 
         this.rootComponents = rootComponents;
-        this.extAndEx = extAndEx;
-        this.extAdditions = extAdditions;
-        this.extEndMarker = extEndMarker;
+        this.extensionAndException = extensionAndException;
+        this.extensionAdditions = extensionAdditions;
+        this.optionalExtensionMarker = extensionEndMark;
     }
 
     public ComponentTypeListsNode(Position position, List<ComponentType> rootComponents,
-            ExtensionAndExceptionNode extAndEx, Object extAdditions, Boolean optExtMarker,
-            List<ComponentType> extRootComponents) {
+            ExtensionAndExceptionNode extensionAndException, List<ExtensionAdditionGroup> extensionAdditions,
+            Boolean optionalExtensionMarker, List<ComponentType> extensionRootComponents) {
         super(position);
 
         this.rootComponents = rootComponents;
-        this.extAndEx = extAndEx;
-        this.extAdditions = extAdditions;
-        this.extEndMarker = optExtMarker;
-        this.extRootComponents = extRootComponents;
+        this.extensionAndException = extensionAndException;
+        this.extensionAdditions = extensionAdditions;
+        this.optionalExtensionMarker = optionalExtensionMarker;
+        this.extensionRootComponents = extensionRootComponents;
     }
 
     public ComponentTypeListsNode(Position position, List<ComponentType> rootComponents) {
@@ -76,20 +78,20 @@ public class ComponentTypeListsNode extends AbstractNode {
         return rootComponents;
     }
 
-    public List<ComponentType> getExtRootComponents() {
-        return extRootComponents;
+    public List<ComponentType> getExtensionRootComponents() {
+        return extensionRootComponents;
     }
 
-    public ExtensionAndExceptionNode getExtAndEx() {
-        return extAndEx;
+    public ExtensionAndExceptionNode getExtensionAndException() {
+        return extensionAndException;
     }
 
-    public Object getExtAdditions() {
-        return extAdditions;
+    public List<ExtensionAdditionGroup> getExtensionAdditions() {
+        return extensionAdditions;
     }
 
-    public Boolean getExtEndMarker() {
-        return extEndMarker;
+    public Boolean getOptionalExtensionMarker() {
+        return optionalExtensionMarker;
     }
 
 }
