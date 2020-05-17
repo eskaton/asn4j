@@ -133,9 +133,9 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         List<ComponentType> componentTypes;
 
         if (referencedType instanceof SetType) {
-            componentTypes = ((SetType) referencedType).getAllComponents();
+            componentTypes = ((SetType) referencedType).getAllRootComponents();
         } else if (referencedType instanceof SequenceType) {
-            componentTypes = ((SequenceType) referencedType).getAllComponents();
+            componentTypes = ((SequenceType) referencedType).getAllRootComponents();
         } else {
             throw new CompilerException("Components of type %s not supported", referencedType);
         }

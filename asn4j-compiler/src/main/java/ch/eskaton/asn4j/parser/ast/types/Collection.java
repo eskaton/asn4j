@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
+import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -38,13 +39,13 @@ public abstract class Collection extends AbstractType {
 
     private List<ComponentType> rootComponents;
 
-    private List<ComponentType> extRootComponents;
+    private List<ComponentType> extensionRootComponents;
 
-    private Object extAndEx;
+    private ExtensionAndExceptionNode extensionAndException;
 
-    private Object optExtMarker;
+    private Boolean optionalExtensionMarker;
 
-    private Object extAdditions;
+    private List<ExtensionAdditionGroup> extensionAdditions;
 
     public Collection(Position position) {
         super(position);
@@ -53,94 +54,114 @@ public abstract class Collection extends AbstractType {
     public Collection(Position position, ComponentTypeListsNode compTypes) {
         super(position);
 
-    	this.rootComponents = compTypes.getRootComponents();
-    	this.extAndEx = compTypes.getExtAndEx();
-    	this.extAdditions = compTypes.getExtAdditions();
-    	this.optExtMarker = compTypes.getExtEndMarker();
-    	this.extRootComponents = compTypes.getExtRootComponents();
+        this.rootComponents = compTypes.getRootComponents();
+        this.extensionAndException = compTypes.getExtensionAndException();
+        this.extensionAdditions = compTypes.getExtensionAdditions();
+        this.optionalExtensionMarker = compTypes.getOptionalExtensionMarker();
+        this.extensionRootComponents = compTypes.getExtensionRootComponents();
     }
 
-    public Collection(Position position, Object extAndEx, Object optExtMarker) {
+    public Collection(Position position, ExtensionAndExceptionNode extensionAndException, Boolean optionalExtensionMarker) {
         super(position);
 
-    	this.extAndEx = extAndEx;
-    	this.optExtMarker = optExtMarker;
+        this.extensionAndException = extensionAndException;
+        this.optionalExtensionMarker = optionalExtensionMarker;
+    }
+
+    public List<ComponentType> getAllRootComponents() {
+        List<ComponentType> components = new ArrayList<>();
+
+        if (rootComponents != null) {
+            components.addAll(rootComponents);
+        }
+
+        if (extensionRootComponents != null) {
+            components.addAll(extensionRootComponents);
+        }
+
+        return components;
     }
 
     public List<ComponentType> getAllComponents() {
-    	List<ComponentType> components = new ArrayList<>(2);
-    	if (rootComponents != null) {
-    		components.addAll(rootComponents);
-    	}
+        List<ComponentType> components = new ArrayList<>();
 
-    	if (extRootComponents != null) {
-    		components.addAll(extRootComponents);
-    	}
+        if (rootComponents != null) {
+            components.addAll(rootComponents);
+        }
 
-    	return components;
+        if (extensionAdditions != null) {
+            extensionAdditions.stream().map(extension -> extension.getComponents()).forEach(components::addAll);
+        }
+
+        if (extensionRootComponents != null) {
+            components.addAll(extensionRootComponents);
+        }
+
+        return components;
     }
+
 
     public List<ComponentType> getRootComponents() {
-    	return rootComponents;
+        return rootComponents;
     }
 
-    public List<ComponentType> getExtRootComponents() {
-    	return extRootComponents;
+    public List<ComponentType> getExtensionRootComponents() {
+        return extensionRootComponents;
     }
 
-    public Object getExtAndEx() {
-    	return extAndEx;
+    public Object getExtensionAndException() {
+        return extensionAndException;
     }
 
-    public Object getOptExtMarker() {
-    	return optExtMarker;
+    public Boolean getOptionalExtensionMarker() {
+        return optionalExtensionMarker;
     }
 
-    public Object getExtAdditions() {
-    	return extAdditions;
+    public Object getExtensionAdditions() {
+        return extensionAdditions;
     }
 
     protected abstract String getType();
 
     @Override
     public String toString() {
-    	StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-    	if (rootComponents != null) {
-    		sb.append("(").append(StringUtils.join(rootComponents, ","))
-    				.append(")");
-    	}
+        if (rootComponents != null) {
+            sb.append("(").append(StringUtils.join(rootComponents, ","))
+                    .append(")");
+        }
 
-    	if (extAndEx != null) {
-    		if (sb.length() > 0) {
-    			sb.append(", ");
-    		}
-    		sb.append(extAndEx);
-    	}
+        if (extensionAndException != null) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(extensionAndException);
+        }
 
-    	if (extAdditions != null) {
-    		if (sb.length() > 0) {
-    			sb.append(", ");
-    		}
-    		sb.append(extAdditions);
-    	}
+        if (extensionAdditions != null) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(extensionAdditions);
+        }
 
-    	if (optExtMarker != null) {
-    		if (sb.length() > 0) {
-    			sb.append(", ");
-    		}
-    		sb.append(optExtMarker);
-    	}
+        if (optionalExtensionMarker != null) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(optionalExtensionMarker);
+        }
 
-    	if (extRootComponents != null) {
-    		if (sb.length() > 0) {
-    			sb.append(", ");
-    		}
-    		sb.append("(").append(StringUtils.join(extRootComponents, ","))
-    				.append(")");
-    	}
+        if (extensionRootComponents != null) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append("(").append(StringUtils.join(extensionRootComponents, ","))
+                    .append(")");
+        }
 
-    	return StringUtils.concat(getType() + "[", sb.toString(), "]");
+        return StringUtils.concat(getType() + "[", sb.toString(), "]");
     }
 
 }

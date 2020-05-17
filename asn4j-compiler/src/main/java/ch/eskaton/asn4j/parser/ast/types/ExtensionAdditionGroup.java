@@ -31,21 +31,29 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.AbstractNode;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ExtensionAdditionGroup extends AbstractNode {
 
-    private Integer version;
+    private Optional<Integer> version;
 
     private List<ComponentType> components;
+
+    public ExtensionAdditionGroup(Position position, List<ComponentType> components) {
+        super(position);
+
+        this.version = Optional.empty();
+        this.components = components;
+    }
 
     public ExtensionAdditionGroup(Position position, Integer version, List<ComponentType> components) {
         super(position);
 
-        this.version = version;
+        this.version = Optional.ofNullable(version);
         this.components = components;
     }
 
-    public Integer getVersion() {
+    public Optional<Integer> getVersion() {
         return version;
     }
 

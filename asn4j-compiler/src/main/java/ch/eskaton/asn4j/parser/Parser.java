@@ -237,6 +237,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -1796,8 +1797,8 @@ public class Parser {
                                             new SetType(position, (ComponentTypeListsNode) ruleList.get(0));
                                 } else {
                                     type = token.getType() == TokenType.SEQUENCE_KW ?
-                                            new SequenceType(position, ruleList.get(0), ruleList.get(1)):
-                                            new SetType(position, ruleList.get(0), ruleList.get(1));
+                                            new SequenceType(position, (ExtensionAndExceptionNode) ruleList.get(0), (Boolean) ruleList.get(1)):
+                                            new SetType(position, (ExtensionAndExceptionNode) ruleList.get(0), (Boolean) ruleList.get(1));
                                 }
                             }
                         }
@@ -2016,14 +2017,14 @@ public class Parser {
                             // ExtensionAdditions OptionalExtensionMarker
                             return new ComponentTypeListsNode(position, componentTypes,
                                     (ExtensionAndExceptionNode) extList.get(1),
-                                    extList.get(2), (Boolean) extList.get(3));
+                                    toExtensionAdditionGroup(extList.get(2)), (Boolean) extList.get(3));
                         } else {
                             // RootComponentTypeList "," ExtensionAndException
                             // ExtensionAdditions ExtensionEndMarker ","
                             // RootComponentTypeList
                             return new ComponentTypeListsNode(position, componentTypes,
                                     (ExtensionAndExceptionNode) extList.get(1),
-                                    extList.get(2),false,
+                                    toExtensionAdditionGroup(extList.get(2)), false,
                                     (List<ComponentType>) ((List<Object>) extList.get(3)).get(2));
                         }
                     } else {
@@ -2039,18 +2040,39 @@ public class Parser {
                         // ExtensionAndException ExtensionAdditions
                         // OptionalExtensionMarker
                         return new ComponentTypeListsNode(position, null,extensionAndExceptionNode,
-                                rule.get(1), (Boolean) obj);
+                                toExtensionAdditionGroup(rule.get(1)), (Boolean) obj);
                     } else {
                         // ExtensionAndException ExtensionAdditions
                         // ExtensionEndMarker "," RootComponentTypeList
                         return new ComponentTypeListsNode(position, null, extensionAndExceptionNode,
-                                rule.get(1), true,
+                                toExtensionAdditionGroup(rule.get(1)), true,
                                 (List<ComponentType>) ((List<Object>) obj).get(2));
                     }
                 }
             }
 
             return null;
+        }
+
+        private List<ExtensionAdditionGroup> toExtensionAdditionGroup(Object rule) {
+            if (rule == null) {
+                return null;
+            }
+
+            if (rule instanceof List) {
+                return (List<ExtensionAdditionGroup>) ((List) rule).stream().map(element -> {
+                    if (element instanceof ComponentType) {
+                        return new ExtensionAdditionGroup(((ComponentType) element).getPosition(),
+                                List.of((ComponentType)element));
+                    } else if (element instanceof ExtensionAdditionGroup) {
+                        return element;
+                    }
+
+                    throw new IllegalStateException("Unhandled element: " + element);
+                }).collect(Collectors.toList());
+            }
+
+            throw new IllegalStateException("Unhandled rule: " + rule);
         }
 
     }
