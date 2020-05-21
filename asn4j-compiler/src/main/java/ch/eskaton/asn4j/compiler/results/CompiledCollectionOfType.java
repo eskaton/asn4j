@@ -25,51 +25,54 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.Optional;
+import java.util.Objects;
 
-public abstract class CollectionOfCompiler<T extends CollectionOfType> implements NamedCompiler<T, CompiledType> {
+public class CompiledCollectionOfType extends CompiledType {
 
-    @Override
-    public CompiledType compile(CompilerContext ctx, String name, T node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
+    private CompiledType contentType;
 
-        javaClass.typeParameter(ctx.getTypeParameter(node, Optional.of(name)));
+    public CompiledCollectionOfType(Type type, CompiledType contentType) {
+        super(type);
 
-        var contentType = compileContentType(ctx, node);
-
-        CompiledType compiledType = new CompiledCollectionOfType(node, contentType);
-        ConstraintDefinition constraintDef;
-
-        if (node.hasAnyConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
-            compiledType.setConstraintDefinition(constraintDef);
-        }
-
-        ctx.finishClass();
-
-        return compiledType;
+        this.contentType = contentType;
     }
 
-    private CompiledType compileContentType(CompilerContext ctx, T node) {
-        var type = node.getType();
+    public CompiledType getContentType() {
+        return contentType;
+    }
 
-        while (type instanceof CollectionOfType) {
-            type = ((CollectionOfType) type).getType();
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
 
-        if (ctx.isSubtypeNeeded(type)) {
-            return ctx.defineType(type, "ContentType");
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
         }
 
-        return ctx.getCompiledType(type);
+        if (!super.equals(obj)) {
+            return false;
+        }
+
+        CompiledCollectionOfType that = (CompiledCollectionOfType) obj;
+
+        return Objects.equals(contentType, that.contentType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), contentType);
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

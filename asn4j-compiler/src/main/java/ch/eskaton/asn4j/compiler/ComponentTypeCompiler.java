@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.ModuleNode.TagMode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
@@ -43,16 +44,17 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
+import ch.eskaton.commons.collections.Maps;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
-    public void compile(CompilerContext ctx, ComponentType node) {
+    public Map<String, CompiledType> compile(CompilerContext ctx, ComponentType node) {
 
         TagMode mode = ctx.getModule().getTagMode();
 
@@ -62,23 +64,22 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             case NAMED_TYPE_DEF:
                 // fall through
             case NAMED_TYPE:
-                compileComponentNamedType(ctx, node, node.getNamedType());
-                break;
+                return compileComponentNamedType(ctx, node, node.getNamedType());
             case TYPE:
-                compileComponentType(ctx, mode, node.getType());
-                return;
+                return compileComponentType(ctx, mode, node.getType());
             default:
                 throw new CompilerException("Unsupported ComponentType: " + node.getCompType());
         }
     }
 
-    private void compileComponentNamedType(CompilerContext ctx, ComponentType component, NamedType namedType) {
+    private Map<String, CompiledType> compileComponentNamedType(CompilerContext ctx, ComponentType component, NamedType namedType) {
         JavaClass javaClass = ctx.getCurrentClass();
         Type type = namedType.getType();
         TaggingMode taggingMode = type.getTaggingMode();
         Tag tag = ctx.resolveType(type).getTag();
         JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
         boolean hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
+        CompiledType compiledType = ctx.defineType(namedType);
         String typeName = ctx.getTypeName(namedType);
         JavaDefinedField field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
 
@@ -96,9 +97,11 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         }
 
         javaClass.addField(field);
+
+        return Maps.<String, CompiledType>builder().put(namedType.getName(), compiledType).build();
     }
 
-    private Collection<String> compileComponentType(CompilerContext ctx, TagMode mode, Type type) {
+    private Map<String, CompiledType> compileComponentType(CompilerContext ctx, TagMode mode, Type type) {
         TypeAssignmentNode assignment;
 
         if (type instanceof TypeReference) {
@@ -140,15 +143,16 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             throw new CompilerException("Components of type %s not supported", referencedType);
         }
 
-        List<String> fieldNames = new ArrayList<>();
+        var components = new HashMap<String, CompiledType>();
 
         for (ComponentType referencedComponent : componentTypes) {
-            ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class).compile(ctx, referencedComponent);
+            components.putAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
+                    .compile(ctx, referencedComponent));
         }
 
         ctx.popModule();
 
-        return fieldNames;
+        return components;
     }
 
 }
