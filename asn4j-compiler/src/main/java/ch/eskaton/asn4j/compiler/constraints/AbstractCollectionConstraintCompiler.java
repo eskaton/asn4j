@@ -396,7 +396,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     private List<Expression> getParameters(ComponentNode component, String runtimeType) {
-        var typeName = ctx.getTypeName(component.getComponentType(), component.getName(), false);
+        var typeName = ctx.getTypeName(component.getComponentType(), component.getName());
         var accessor = new FunctionCall.GetMapValue(Variable.of(VALUES),
                 ILValue.of(component.getName()),
                 ILParameterizedType.of(CUSTOM, singletonList(typeName)));

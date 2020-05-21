@@ -28,21 +28,25 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
+import java.util.HashMap;
+
 public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, SequenceType node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
+        var javaClass = ctx.createClass(name, node, true);
+        var components = new HashMap<String, CompiledType>();
 
         for (ComponentType component : node.getAllComponents()) {
             try {
-                ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class).compile(ctx, component);
+                components.putAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
+                        .compile(ctx, component));
             } catch (CompilerException e) {
                 if (component.getNamedType() != null) {
                     throw new CompilerException("Failed to compile component %s in %s %s",
@@ -54,7 +58,7 @@ public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledTyp
             }
         }
 
-        CompiledType compiledType = new CompiledType(node);
+        CompiledType compiledType = new CompiledCollectionType(node, components);
         ConstraintDefinition constraintDef;
 
         if (node.hasConstraint()) {

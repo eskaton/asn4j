@@ -461,11 +461,8 @@ public class CompilerContext {
     }
 
     public String getTypeName(Type type, String name) {
-        return getTypeName(type, name, true);
-    }
-
-    public String getTypeName(Type type, String name, boolean defineType) {
         String typeName;
+
         if (type instanceof TypeReference) {
             if (type instanceof UsefulType) {
                 typeName = ((UsefulType) type).getType();
@@ -483,22 +480,22 @@ public class CompilerContext {
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof EnumeratedType) {
-            typeName = defineType(type, name, isSubtypeNeeded(type), defineType);
+            typeName = getTypeName(type, name, isSubtypeNeeded(type));
         } else if (type instanceof IntegerType) {
-            typeName = defineType(type, name, isSubtypeNeeded(type), defineType);
+            typeName = getTypeName(type, name, isSubtypeNeeded(type));
         } else if (type instanceof BitString) {
-            typeName = defineType(type, name, isSubtypeNeeded(type), defineType);
+            typeName = getTypeName(type, name, isSubtypeNeeded(type));
         } else if (type instanceof SequenceType
                 || type instanceof SequenceOfType
                 || type instanceof SetType
                 || type instanceof SetOfType
                 || type instanceof Choice) {
-            typeName = defineType(type, name, true, defineType);
+            typeName = getTypeName(type, name, true);
         } else if (type instanceof ObjectIdentifier
                 || type instanceof RelativeOID
                 || type instanceof IRI
                 || type instanceof RelativeIRI) {
-            typeName = defineType(type, name, defineType);
+            typeName = getTypeName(type, name, false);
         } else if (type instanceof SelectionType) {
             SelectionType selectionType = (SelectionType) type;
             Type selectedType = resolveType(type);
@@ -516,19 +513,11 @@ public class CompilerContext {
         return typeName;
     }
 
-    private String defineType(Type type, String name, boolean defineType) {
-        return defineType(type, name, false, defineType);
-    }
-
-    private String defineType(Type type, String name, boolean newType, boolean defineType) {
+    private String getTypeName(Type type, String name, boolean newType) {
         String typeName;
 
         if (newType && name != null) {
             typeName = CompilerUtils.formatTypeName(name);
-
-            if (defineType) {
-                compileType(type, typeName, name);
-            }
         } else {
             typeName = getRuntimeType(type.getClass());
 
@@ -540,10 +529,50 @@ public class CompilerContext {
         return typeName;
     }
 
-    private void compileType(Type type, String typeName, String name) {
-        CompiledType compiledType = this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
+    public CompiledType defineType(Type type) {
+        String name = null;
 
-        addType(name, compiledType);
+        if (type instanceof NamedType) {
+            name = ((NamedType) type).getName();
+            type = ((NamedType) type).getType();
+        }
+
+        return defineType(type, name);
+    }
+
+    public CompiledType defineType(Type type, String name) {
+        if (type instanceof EnumeratedType) {
+            return defineType(type, name, isSubtypeNeeded(type));
+        } else if (type instanceof IntegerType) {
+            return defineType(type, name, isSubtypeNeeded(type));
+        } else if (type instanceof BitString) {
+            return defineType(type, name, isSubtypeNeeded(type));
+        } else if (type instanceof SequenceType
+                || type instanceof SequenceOfType
+                || type instanceof SetType
+                || type instanceof SetOfType
+                || type instanceof Choice) {
+            return defineType(type, name, true);
+        } else if (type instanceof ObjectIdentifier
+                || type instanceof RelativeOID
+                || type instanceof IRI
+                || type instanceof RelativeIRI) {
+            return defineType(type, name, false);
+        }
+
+        return getCompiledType(type);
+    }
+
+    private CompiledType defineType(Type type, String name, boolean newType) {
+        if (newType && name != null) {
+            return compileType(type, getTypeName(type, name));
+        }
+
+        return getCompiledType(type);
+    }
+
+    private CompiledType compileType(Type type, String typeName) {
+        return this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
     }
 
     private TypeAssignmentNode getTypeAssignment(String type) {
@@ -997,7 +1026,7 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    private boolean isSubtypeNeeded(Type type) {
+    public boolean isSubtypeNeeded(Type type) {
         return (type instanceof EnumeratedType ||
                 type instanceof IntegerType && ((IntegerType) type).getNamedNumbers() != null ||
                 type instanceof BitString && ((BitString) type).getNamedBits() != null);
