@@ -54,20 +54,12 @@ public class CompilerException extends RuntimeException {
         super(String.format(format, args), cause);
     }
 
-    public CompilerException(Position position, String format, Throwable cause, Object... args) {
-        super(formatMessage(position, String.format(format, args)), cause);
-    }
-
     public CompilerException(Throwable cause) {
         super(cause);
     }
 
     public CompilerException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    public CompilerException(Position position, String message, Throwable cause) {
-        super(formatMessage(position, message), cause);
     }
 
     public static String formatMessage(Position position, String message) {

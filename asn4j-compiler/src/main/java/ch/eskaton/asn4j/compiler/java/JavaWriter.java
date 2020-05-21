@@ -46,14 +46,17 @@ public class JavaWriter {
                 .forEach(struct -> ((JavaClass) struct).getInnerClasses()
                         .forEach(innerClass -> JAVA_DEFAULT_CTOR_BUILDER.build(Map.of(innerClass.getName(), innerClass))));
 
-        // write classes
-        for (JavaStructure struct : structs.values()) {
+        writeClasses(structs, outputDir);
+    }
+
+    private void writeClasses(Map<String, JavaStructure> structs, String outputDir) {
+        structs.values().forEach(struct -> {
             try {
                 struct.save(outputDir);
             } catch (IOException e) {
                 throw new CompilerException(e);
             }
-        }
+        });
     }
 
 }

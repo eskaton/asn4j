@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.constraints.ast;
 
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPONENT;
 
@@ -35,20 +36,27 @@ public class ComponentNode extends AbstractNode {
 
     private String name;
 
+    private Type componentType;
+
     private Node constraint;
 
     private PresenceType presenceType;
 
-    public ComponentNode(String name, Node constraint, PresenceType presenceType) {
+    public ComponentNode(String name, Type componentType, Node constraint, PresenceType presenceType) {
         super(COMPONENT);
 
         this.name = name;
+        this.componentType = componentType;
         this.constraint = constraint;
         this.presenceType = presenceType;
     }
 
     public String getName() {
         return name;
+    }
+
+    public Type getComponentType() {
+        return componentType;
     }
 
     public Node getConstraint() {

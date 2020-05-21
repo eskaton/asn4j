@@ -29,25 +29,26 @@ package ch.eskaton.asn4j.compiler.il;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class ILParameterizedType extends ILType {
 
-    private List<String> typeParameter;
+    private List<List<String>> typeParameters;
 
-    public ILParameterizedType(ILBuiltinType baseType, List<String> typeParameter) {
+    public ILParameterizedType(ILBuiltinType baseType, List<String>... typeParameters) {
         super(baseType);
 
-        this.typeParameter = typeParameter;
+        this.typeParameters = Arrays.asList(typeParameters);
     }
 
-    public static ILParameterizedType of(ILBuiltinType baseType, List<String> typeParameter) {
-        return new ILParameterizedType(baseType, typeParameter);
+    public static ILParameterizedType of(ILBuiltinType baseType, List<String>... typeParameters) {
+        return new ILParameterizedType(baseType, typeParameters);
     }
 
-    public List<String> getTypeParameter() {
-        return typeParameter;
+    public List<List<String>> getTypeParameters() {
+        return typeParameters;
     }
 
     @Override
@@ -66,12 +67,12 @@ public class ILParameterizedType extends ILType {
 
         ILParameterizedType that = (ILParameterizedType) o;
 
-        return Objects.equals(typeParameter, that.typeParameter);
+        return Objects.equals(typeParameters, that.typeParameters);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), typeParameter);
+        return Objects.hash(super.hashCode(), typeParameters);
     }
 
     @Override

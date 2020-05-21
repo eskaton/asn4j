@@ -331,29 +331,9 @@ public abstract class AbstractConstraintCompiler {
         if (definition.isExtensible()) {
             builder.statements().returnValue(Boolean.TRUE);
         } else {
-            Node roots = definition.getRoots();
-            Optional<BooleanExpression> expression = buildExpression(builder.getModule(), type, roots);
-
-            if (expression.isPresent()) {
-                // @formatter:off
-                builder.statements()
-                            .conditions()
-                                .condition(expression.get())
-                                    .statements()
-                                        .returnValue(Boolean.TRUE)
-                                        .build()
-                                    .build()
-                                .condition()
-                                    .statements()
-                                        .returnValue(Boolean.FALSE)
-                                        .build()
-                                    .build()
-                            .build()
-                        .build();
-                // @formatter:on
-            } else {
-                builder.statements().returnValue(Boolean.TRUE);
-            }
+            buildExpression(builder.getModule(), type, definition.getRoots()).ifPresentOrElse(
+                    e -> builder.statements().returnExpression(e),
+                    () -> builder.statements().returnValue(Boolean.TRUE));
         }
     }
 

@@ -29,11 +29,16 @@ package ch.eskaton.asn4j.compiler.il;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.List;
 import java.util.Optional;
 
 public class BooleanFunctionCall extends FunctionCall implements BooleanExpression {
 
     public BooleanFunctionCall(Optional<String> function, Expression... arguments) {
+        super(function, arguments);
+    }
+
+    public BooleanFunctionCall(Optional<String> function, List<Expression> arguments) {
         super(function, arguments);
     }
 
@@ -58,6 +63,19 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
     public static class SetEquals extends BooleanFunctionCall {
 
         public SetEquals(Expression argument1, Expression argument2) {
+            super(Optional.empty(), argument1, argument2);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
+    }
+
+    public static class MapEquals extends BooleanFunctionCall {
+
+        public MapEquals(Expression argument1, Expression argument2) {
             super(Optional.empty(), argument1, argument2);
         }
 

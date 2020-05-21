@@ -25,25 +25,42 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints.ast;
+package ch.eskaton.asn4j.compiler.il;
 
-import java.util.Set;
+import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.commons.collections.Tuple2;
 
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.WITH_COMPONENT;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.WITH_COMPONENTS;
+import java.util.Collection;
 
-public class WithComponentsNode extends AbstractNode {
+public class ILMapValue implements Expression {
 
-    private Set<ComponentNode> components;
+    private ILType keyType;
 
-    public WithComponentsNode(Set<ComponentNode> components) {
-        super(WITH_COMPONENTS);
+    private ILType valueType;
 
-        this.components = components;
+    private Collection<Tuple2<Expression, Expression>> value;
+
+    public ILMapValue(ILType keyType, ILType valueType, Collection<Tuple2<Expression, Expression>> value) {
+        this.keyType = keyType;
+        this.valueType = valueType;
+        this.value = value;
     }
 
-    public Set<ComponentNode> getComponents() {
-        return components;
+    public ILType getKeyType() {
+        return keyType;
+    }
+
+    public ILType getValueType() {
+        return valueType;
+    }
+
+    public Collection<Tuple2<Expression, Expression>> getValue() {
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

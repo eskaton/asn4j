@@ -53,6 +53,12 @@ public class FunctionCall implements Expression {
         this.arguments = Arrays.asList(arguments);
     }
 
+    public FunctionCall(Optional<String> function, List<Expression> arguments) {
+        this.function = function;
+        this.object = Optional.empty();
+        this.arguments = arguments;
+    }
+
     public Optional<String> getFunction() {
         return function;
     }
@@ -128,6 +134,27 @@ public class FunctionCall implements Expression {
 
         public ToArray(ILType type, Expression object) {
             super(Optional.empty(), Optional.of(object));
+
+            this.type = type;
+        }
+
+        public ILType getType() {
+            return type;
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
+    }
+
+    public static class GetMapValue extends FunctionCall {
+
+        private ILType type;
+
+        public GetMapValue(Expression map, ILValue key, ILType type) {
+            super(Optional.empty(), Optional.of(map), key);
 
             this.type = type;
         }

@@ -37,6 +37,9 @@ import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestEnumerated1;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence2;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence3;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence4;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf1;
@@ -57,10 +60,13 @@ import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf7;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf8;
 import org.junit.jupiter.api.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
+import static ch.eskaton.commons.utils.Utils.with;
 
 public class TestX680_51_8 {
 
@@ -241,5 +247,91 @@ public class TestX680_51_8 {
         testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(3));
     }
 
-    
+    @Test
+    public void testSequence2() {
+        testSequenceSuccess(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(ASN1Integer.valueOf(1));
+            s.setB(ASN1Boolean.TRUE);
+        });
+        testSequenceSuccess(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(ASN1Integer.valueOf(2));
+            s.setB(ASN1Boolean.TRUE);
+        });
+
+        testSequenceFailure(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(ASN1Integer.valueOf(0));
+            s.setB(ASN1Boolean.TRUE);
+        });
+        testSequenceFailure(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(ASN1Integer.valueOf(1));
+            s.setB(ASN1Boolean.FALSE);
+        });
+    }
+
+    @Test
+    public void testSequence3() {
+        testSequenceSuccess(TestSequence3.class, new TestSequence3(), s -> {
+            s.setC(with(new TestSequence2(), s2 -> {
+                s2.setA(ASN1Integer.valueOf(1));
+                s2.setB(ASN1Boolean.TRUE);
+            }));
+            s.setD(ASN1Boolean.FALSE);
+        });
+
+        testSequenceFailure(TestSequence3.class, new TestSequence3(), s -> {
+            s.setC(with(new TestSequence2(), s2 -> {
+                s2.setA(ASN1Integer.valueOf(2));
+                s2.setB(ASN1Boolean.TRUE);
+            }));
+            s.setD(ASN1Boolean.FALSE);
+        });
+        testSequenceFailure(TestSequence3.class, new TestSequence3(), s -> {
+            s.setC(with(new TestSequence2(), s2 -> {
+                s2.setA(ASN1Integer.valueOf(1));
+                s2.setB(ASN1Boolean.FALSE);
+            }));
+            s.setD(ASN1Boolean.FALSE);
+        });
+        testSequenceFailure(TestSequence3.class, new TestSequence3(), s -> {
+            s.setC(with(new TestSequence2(), s2 -> {
+                s2.setA(ASN1Integer.valueOf(1));
+                s2.setB(ASN1Boolean.TRUE);
+            }));
+            s.setD(ASN1Boolean.TRUE);
+        });
+    }
+
+    @Test
+    public void testSequence4() {
+        testSequenceSuccess(TestSequence4.class, new TestSequence4(), s -> {
+            s.setC(with(new TestSequence4.C(), s2 -> {
+                s2.setA(ASN1Integer.valueOf(1));
+                s2.setB(ASN1Boolean.TRUE);
+            }));
+            s.setD(ASN1Boolean.FALSE);
+        });
+
+        testSequenceFailure(TestSequence4.class, new TestSequence4(), s -> {
+            s.setC(with(new TestSequence4.C(), s2 -> {
+                s2.setA(ASN1Integer.valueOf(2));
+                s2.setB(ASN1Boolean.TRUE);
+            }));
+            s.setD(ASN1Boolean.FALSE);
+        });
+        testSequenceFailure(TestSequence4.class, new TestSequence4(), s -> {
+            s.setC(with(new TestSequence4.C(), s2 -> {
+                s2.setA(ASN1Integer.valueOf(1));
+                s2.setB(ASN1Boolean.FALSE);
+            }));
+            s.setD(ASN1Boolean.FALSE);
+        });
+        testSequenceFailure(TestSequence4.class, new TestSequence4(), s -> {
+            s.setC(with(new TestSequence4.C(), s2 -> {
+                s2.setA(ASN1Integer.valueOf(1));
+                s2.setB(ASN1Boolean.TRUE);
+            }));
+            s.setD(ASN1Boolean.TRUE);
+        });
+    }
+
 }

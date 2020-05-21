@@ -46,6 +46,14 @@ public class ILValue implements Expression {
         this.value = value;
     }
 
+    public static ILValue of(Object value) {
+        return new ILValue(value);
+    }
+
+    public static ILValue of(String typeName, Object value) {
+        return new ILValue(typeName, value);
+    }
+
     public Optional<String> getTypeName() {
         return typeName;
     }
