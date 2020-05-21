@@ -461,6 +461,10 @@ public class CompilerContext {
     }
 
     public String getTypeName(Type type, String name) {
+        return getTypeName(type, name, true);
+    }
+
+    public String getTypeName(Type type, String name, boolean defineType) {
         String typeName;
         if (type instanceof TypeReference) {
             if (type instanceof UsefulType) {
@@ -479,22 +483,22 @@ public class CompilerContext {
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof EnumeratedType) {
-            typeName = defineType(type, name, isSubtypeNeeded(type));
+            typeName = defineType(type, name, isSubtypeNeeded(type), defineType);
         } else if (type instanceof IntegerType) {
-            typeName = defineType(type, name, isSubtypeNeeded(type));
+            typeName = defineType(type, name, isSubtypeNeeded(type), defineType);
         } else if (type instanceof BitString) {
-            typeName = defineType(type, name, isSubtypeNeeded(type));
+            typeName = defineType(type, name, isSubtypeNeeded(type), defineType);
         } else if (type instanceof SequenceType
                 || type instanceof SequenceOfType
                 || type instanceof SetType
                 || type instanceof SetOfType
                 || type instanceof Choice) {
-            typeName = defineType(type, name, true);
+            typeName = defineType(type, name, true, defineType);
         } else if (type instanceof ObjectIdentifier
                 || type instanceof RelativeOID
                 || type instanceof IRI
                 || type instanceof RelativeIRI) {
-            typeName = defineType(type, name);
+            typeName = defineType(type, name, defineType);
         } else if (type instanceof SelectionType) {
             SelectionType selectionType = (SelectionType) type;
             Type selectedType = resolveType(type);
@@ -512,24 +516,25 @@ public class CompilerContext {
         return typeName;
     }
 
-    private String defineType(Type type, String name) {
-        return defineType(type, name, false);
+    private String defineType(Type type, String name, boolean defineType) {
+        return defineType(type, name, false, defineType);
     }
 
-    private String defineType(Type type, String name, boolean newType) {
+    private String defineType(Type type, String name, boolean newType, boolean defineType) {
         String typeName;
 
         if (newType && name != null) {
             typeName = CompilerUtils.formatTypeName(name);
-            compileType(type, typeName, name);
-        } else {
-            String runtimeClass = getRuntimeType(type.getClass());
 
-            if (runtimeClass == null) {
+            if (defineType) {
+                compileType(type, typeName, name);
+            }
+        } else {
+            typeName = getRuntimeType(type.getClass());
+
+            if (typeName == null) {
                 throw new CompilerException("No runtime class available for type " + type);
             }
-
-            typeName = runtimeClass;
         }
 
         return typeName;
@@ -541,11 +546,9 @@ public class CompilerContext {
         addType(name, compiledType);
     }
 
-
     private TypeAssignmentNode getTypeAssignment(String type) {
         return getTypeAssignment(type, null);
     }
-
 
     public TypeAssignmentNode getTypeAssignment(String typeName, String moduleName) {
         ModuleNode module;
@@ -964,6 +967,10 @@ public class CompilerContext {
         } catch (CompilerException e) {
             return typeName;
         }
+    }
+
+    public String getRuntimeType(Type type) {
+        return getRuntimeType(resolveTypeReference(type).getClass());
     }
 
     public List<String> getTypeParameter(Type type) {

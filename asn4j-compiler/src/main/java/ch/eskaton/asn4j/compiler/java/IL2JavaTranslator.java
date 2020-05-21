@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.MapEquals;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.SetEquals;
 import ch.eskaton.asn4j.compiler.il.Condition;
 import ch.eskaton.asn4j.compiler.il.Conditions;
@@ -45,9 +46,11 @@ import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BigIntegerCompare;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.BitStringSize;
+import ch.eskaton.asn4j.compiler.il.FunctionCall.GetMapValue;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.GetSize;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
 import ch.eskaton.asn4j.compiler.il.ILListValue;
+import ch.eskaton.asn4j.compiler.il.ILMapValue;
 import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
@@ -62,12 +65,14 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -192,19 +197,32 @@ public class IL2JavaTranslator {
             } else if (value instanceof Long || value instanceof BigInteger) {
                 return value + "L";
             } else if (value instanceof Value) {
-                String typeName = ilValue.getTypeName().orElseThrow(() -> new CompilerException("Type name expected for value: %s", ilValue.getValue()));
+                String typeName = ilValue.getTypeName().orElseThrow(
+                        () -> new CompilerException("Type name expected for value: %s", ilValue.getValue()));
 
                 return getInitializerString(ctx, typeName, (Value) value);
+            } else if (value instanceof String) {
+                return StringUtils.dquote((String) value);
             }
 
             return String.valueOf(value);
         } else if (expression instanceof ILListValue) {
             var values = ((ILListValue) expression).getValue();
-            var initString = values.stream().map(expr -> translateExpression(ctx, javaClass, expr)).collect(joining(", "));
+            var initString = values.stream().map(expr -> translateExpression(ctx, javaClass, expr))
+                    .collect(joining(", "));
 
             javaClass.addStaticImport(Arrays.class, "asList");
 
             return "asList(" + initString + ")";
+        } else if (expression instanceof ILMapValue) {
+            var keyType = toJavaType(javaClass, ((ILMapValue) expression).getKeyType());
+            var valueType = toJavaType(javaClass, ((ILMapValue) expression).getValueType());
+            var associations = ((ILMapValue) expression).getValue();
+
+            return "Maps.<%s, %s>builder()".formatted(keyType, valueType) + associations.stream()
+                    .map(t -> ".put(" + translateExpression(ctx, javaClass, t.get_1()) + ", " +
+                            translateExpression(ctx, javaClass, t.get_2()) + ")")
+                    .collect(Collectors.joining("")) + ".build()";
         } else if (expression instanceof FunctionCall) {
             FunctionCall functionCall = (FunctionCall) expression;
             String function;
@@ -238,8 +256,16 @@ public class IL2JavaTranslator {
                         arguments = "new " + javaType + "[] {}";
                         break;
                     default:
-                        throw new CompilerException("Unsupported type %s in ToString function");
+                        throw new CompilerException("Unsupported type %s in ToString function", type.getBaseType());
                 }
+            } else if (functionCall instanceof GetMapValue) {
+                var type = toJavaType(javaClass, ((GetMapValue) functionCall).getType());
+                function = "get";
+                object = ofNullable(translateExpression(ctx, javaClass,
+                        functionCall.getObject().orElseThrow(() -> new CompilerException("object must not be null"))));
+                arguments = translateExpression(ctx, javaClass, functionCall.getArguments().get(0));
+
+                return "((" + type + ")" + object.map(o -> o + ".").orElse("") + function + "(" + arguments + "))";
             } else {
                 function = functionCall.getFunction()
                         .orElseThrow(() -> new CompilerException("Undefined function of type %s",
@@ -262,7 +288,8 @@ public class IL2JavaTranslator {
         return translateExpression(ctx, javaClass, functionCall.getArguments().get(arg));
     }
 
-    private String translateBooleanExpression(CompilerContext ctx, JavaClass javaClass, BooleanExpression booleanExpression) {
+    private String translateBooleanExpression(CompilerContext ctx, JavaClass javaClass,
+            BooleanExpression booleanExpression) {
         if (booleanExpression instanceof BinaryBooleanExpression) {
             BinaryBooleanExpression binaryBooleanExpression = (BinaryBooleanExpression) booleanExpression;
             String operator;
@@ -303,12 +330,11 @@ public class IL2JavaTranslator {
                 javaClass.addImport(Arrays.class);
 
                 return "Arrays.equals(" + arguments + ")";
-            } else if (functionCall instanceof SetEquals) {
+            } else if (functionCall instanceof SetEquals || functionCall instanceof MapEquals) {
                 String object = translateArg(ctx, javaClass, functionCall, 0);
                 String argument = translateArg(ctx, javaClass, functionCall, 1);
 
                 return object + ".equals(" + argument + ")";
-
             } else {
                 String function = functionCall.getFunction()
                         .orElseThrow(() -> new CompilerException("Undefined function of type %s",
@@ -325,9 +351,9 @@ public class IL2JavaTranslator {
     }
 
     private String argumentsToString(CompilerContext ctx, JavaClass javaClass, BooleanFunctionCall functionCall) {
-        return functionCall.getArguments().stream()
+        return Optional.ofNullable(functionCall.getArguments()).map(arguments -> arguments.stream()
                 .map(expr -> translateExpression(ctx, javaClass, expr))
-                .collect(joining(", "));
+                .collect(joining(", "))).orElse("");
     }
 
     private String toJavaType(JavaClass javaClass, ILType type) {
@@ -346,6 +372,8 @@ public class IL2JavaTranslator {
                 return int[].class.getSimpleName();
             case LIST:
                 return typeWithImport(javaClass, List.class) + getTypeParameter(type);
+            case MAP:
+                return typeWithImport(javaClass, Map.class, Maps.class) + getTypeParameter(type);
             case SET:
                 return typeWithImport(javaClass, Set.class) + getTypeParameter(type);
             case STRING:
@@ -365,11 +393,15 @@ public class IL2JavaTranslator {
     }
 
     private String getTypeString(ILParameterizedType type) {
-        return CompilerUtils.getTypeParameterString(type.getTypeParameter());
+        return type.getTypeParameters().stream()
+                .map(p -> CompilerUtils.getTypeParameterString(p))
+                .collect(Collectors.joining(", "));
     }
 
-    private String typeWithImport(JavaClass javaClass, Class<?> clazz) {
+    private String typeWithImport(JavaClass javaClass, Class<?> clazz, Class<?>... additionalClasses) {
         javaClass.addImport(clazz);
+
+        Arrays.asList(additionalClasses).forEach(c -> javaClass.addImport(c));
 
         return clazz.getSimpleName();
     }

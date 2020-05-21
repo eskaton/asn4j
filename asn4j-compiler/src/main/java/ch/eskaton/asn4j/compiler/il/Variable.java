@@ -37,6 +37,10 @@ public class Variable implements Expression {
         this.name = name;
     }
 
+    public static Variable of(String name) {
+        return new Variable(name);
+    }
+
     public String getName() {
         return name;
     }

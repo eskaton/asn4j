@@ -13,6 +13,28 @@ TestSetOf8 ::= TestSetOf3 (WITH COMPONENT (SIZE (2) EXCEPT (WITH COMPONENT (1..2
 TestSequenceOf1 ::= SEQUENCE SIZE (1) OF INTEGER (0..4)
 TestSequenceOf2 ::= TestSequenceOf1 (WITH COMPONENT (1..2))
 
+TestSequence1 ::= SEQUENCE {
+    a INTEGER,
+    b BOOLEAN,
+    ...
+}
+TestSequence2 ::= TestSequence1 (WITH COMPONENTS {a (1..2), b (TRUE)})
+TestSequence3 ::= SEQUENCE {
+    c TestSequence2,
+    ...,
+    d BOOLEAN
+} (WITH COMPONENTS {c (WITH COMPONENTS {a (1), b (TRUE)}), d (FALSE)})
+TestSequence4 ::= SEQUENCE {
+    c SEQUENCE {
+        a INTEGER,
+        b BOOLEAN,
+        ...
+    },
+    ...,
+    d BOOLEAN
+} (WITH COMPONENTS {c (WITH COMPONENTS {a (1), b (TRUE)}), d (FALSE)})
+
+
 -- Test all types
 TestSetOf9 ::= SET OF BOOLEAN
 TestSetOf10 ::= TestSetOf9 (WITH COMPONENT (TRUE))

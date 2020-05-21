@@ -40,6 +40,10 @@ public class Parameter {
         this.name = name;
     }
 
+    public static Parameter of(ILType type, String name) {
+        return new Parameter(type, name);
+    }
+
     public ILType getType() {
         return type;
     }

@@ -89,7 +89,7 @@ public class DefaultsCompiler {
         try {
             compiler.compileDefault(ctx, clazz, field, typeName, type, value);
         } catch (CompilerException e) {
-            throw new CompilerException("Error in default for type " + formatTypeName(type) + ": " + e.getMessage(), e);
+            throw new CompilerException("Error in default for type %s: %s ", formatTypeName(type), e.getMessage(), e);
         }
     }
 
