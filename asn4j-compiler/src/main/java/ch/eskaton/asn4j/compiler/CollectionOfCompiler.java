@@ -43,7 +43,7 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
         javaClass.typeParameter(ctx.getTypeParameter(node, Optional.of(name)));
 
-        var contentType = compileContentType(ctx, node);
+        var contentType = compileContentType(ctx, node, name);
 
         CompiledType compiledType = new CompiledCollectionOfType(node, contentType);
         ConstraintDefinition constraintDef;
@@ -58,7 +58,7 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
         return compiledType;
     }
 
-    private CompiledType compileContentType(CompilerContext ctx, T node) {
+    private CompiledType compileContentType(CompilerContext ctx, T node, String name) {
         var type = node.getType();
 
         while (type instanceof CollectionOfType) {
@@ -66,7 +66,7 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
         }
 
         if (ctx.isSubtypeNeeded(type)) {
-            return ctx.defineType(type, "ContentType");
+            return ctx.defineType(type, name + "Content");
         }
 
         return ctx.getCompiledType(type);

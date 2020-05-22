@@ -35,11 +35,17 @@ import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf2;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf3;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf4;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf5;
+import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf5.TestSetOf5Content;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf6;
+import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf6.TestSetOf6Content;
 import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf7;
+import ch.eskaton.asn4j.test.modules.x680_28.TestSetOf7.TestSetOf7Content;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
+import static ch.eskaton.asn4j.test.modules.x680_28.TestSetOf5.TestSetOf5Content.A;
+import static ch.eskaton.asn4j.test.modules.x680_28.TestSetOf6.TestSetOf6Content.D;
+import static ch.eskaton.asn4j.test.modules.x680_28.TestSetOf7.TestSetOf7Content.G;
 
 public class TestX680_28 {
 
@@ -71,17 +77,17 @@ public class TestX680_28 {
 
     @Test
     public void testSetOf5() {
-        assertDecodable(TestSetOf5.class, value -> value.setValues(TestSetOf5.ContentType.A));
+        assertDecodable(TestSetOf5.class, value -> value.setValues(A));
     }
 
     @Test
     public void testSetOf6() {
-        assertDecodable(TestSetOf6.class, value -> value.setValues(new ASN1SetOf<>(TestSetOf6.ContentType.D)));
+        assertDecodable(TestSetOf6.class, value -> value.setValues(new ASN1SetOf<>(D)));
     }
 
     @Test
     public void testSetOf7() {
-        assertDecodable(TestSetOf7.class, value -> value.setValues(new ASN1SequenceOf<>(TestSetOf7.ContentType.G)));
+        assertDecodable(TestSetOf7.class, value -> value.setValues(new ASN1SequenceOf<>(G)));
     }
 
 }
