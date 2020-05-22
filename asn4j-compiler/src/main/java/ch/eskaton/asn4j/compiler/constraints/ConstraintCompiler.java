@@ -155,6 +155,17 @@ public class ConstraintCompiler {
         return maybeCompiler.get().compileConstraints(compiledType, singletonList(constraint), Optional.empty());
     }
 
+    public ConstraintDefinition compileConstraint(CompiledType compiledType, Constraint constraint) {
+        CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType);
+        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
+
+        if (!maybeCompiler.isPresent()) {
+            return null;
+        }
+
+        return maybeCompiler.get().compileConstraints(compiledBaseType, singletonList(constraint), Optional.empty());
+    }
+
     public Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
         CompiledType compiledType = ctx.getCompiledBaseType(type);
         Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);

@@ -56,4 +56,8 @@ TestSetOf24 ::= TestSetOf23 (WITH COMPONENT ('0101'B))
 TestSetOf25 ::= SET OF TestSequenceOf2
 TestSetOf26 ::= TestSetOf25 (WITH COMPONENT (WITH COMPONENT (1)))
 
+TestSequence5 ::= SEQUENCE {
+    a ENUMERATED {a, b, c}
+} (WITH COMPONENTS {a (a|b)})
+
 END
