@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.test.x680_51_8;
 
+import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
@@ -37,10 +38,16 @@ import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestEnumerated1;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence10;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence11;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence3;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence4;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence5;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence6;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence7;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence8;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence9;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf1;
@@ -344,6 +351,52 @@ public class TestX680_51_8 {
         testSequenceSuccess(TestSequence5.class, new TestSequence5(), s -> s.setA(B));
 
         testSequenceFailure(TestSequence5.class, new TestSequence5(), s -> s.setA(C));
+    }
+
+    @Test
+    public void testSequence6() {
+        testSequenceSuccess(TestSequence6.class, new TestSequence6(), s -> s.setA(new ASN1Null()));
+    }
+
+    @Test
+    public void testSequence7() {
+        testSequenceSuccess(TestSequence7.class, new TestSequence7(),
+                s -> s.setA(new ASN1ObjectIdentifier(0, 3, 6, 3)));
+
+        testSequenceFailure(TestSequence7.class, new TestSequence7(),
+                s -> s.setA(new ASN1ObjectIdentifier(0, 3, 6, 4)));
+    }
+
+    @Test
+    public void testSequence8() {
+        testSequenceSuccess(TestSequence8.class, new TestSequence8(), s -> s.setA(new ASN1RelativeOID(3, 6, 3)));
+
+        testSequenceFailure(TestSequence8.class, new TestSequence8(), s -> s.setA(new ASN1RelativeOID(3, 6, 4)));
+    }
+
+    @Test
+    public void testSequence9() {
+        testSequenceSuccess(TestSequence9.class, new TestSequence9(), s -> s.setA(new ASN1IRI("ISO", "a", "b", "e")));
+
+        testSequenceFailure(TestSequence9.class, new TestSequence9(), s -> s.setA(new ASN1IRI("ISO", "a", "b", "c")));
+    }
+
+    @Test
+    public void testSequence10() {
+        testSequenceSuccess(TestSequence10.class, new TestSequence10(),
+                s -> s.setA(new ASN1RelativeIRI("a", "b", "e")));
+
+        testSequenceFailure(TestSequence10.class, new TestSequence10(),
+                s -> s.setA(new ASN1RelativeIRI("a", "b", "c")));
+    }
+
+    @Test
+    public void testSequence11() {
+        testSequenceSuccess(TestSequence11.class, new TestSequence11(),
+                s -> s.setA(new ASN1BitString(new byte[] { 0x05 }, 4)));
+
+        testSequenceFailure(TestSequence11.class, new TestSequence11(),
+                s -> s.setA(new ASN1BitString(new byte[] { 0x05 }, 5)));
     }
 
 }

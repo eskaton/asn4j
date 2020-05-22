@@ -59,5 +59,23 @@ TestSetOf26 ::= TestSetOf25 (WITH COMPONENT (WITH COMPONENT (1)))
 TestSequence5 ::= SEQUENCE {
     a ENUMERATED {a, b, c}
 } (WITH COMPONENTS {a (a|b)})
+TestSequence6 ::= SEQUENCE {
+    a NULL
+} (WITH COMPONENTS {a (NULL)})
+TestSequence7 ::= SEQUENCE {
+    a OBJECT IDENTIFIER
+} (WITH COMPONENTS {a ({ 0 3 6 3 })})
+TestSequence8 ::= SEQUENCE {
+    a RELATIVE-OID
+} (WITH COMPONENTS {a ({ 3 6 3 })})
+TestSequence9 ::= SEQUENCE {
+    a OID-IRI
+} (WITH COMPONENTS {a ("/ISO/a/b/e")})
+TestSequence10 ::= SEQUENCE {
+    a RELATIVE-OID-IRI
+} (WITH COMPONENTS {a ("a/b/e")})
+TestSequence11 ::= SEQUENCE {
+    a BIT STRING
+} (WITH COMPONENTS {a ('0101'B)})
 
 END

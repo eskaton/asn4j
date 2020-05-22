@@ -107,6 +107,7 @@ import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.CUSTOM;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER_ARRAY;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.NULL;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING_ARRAY;
 import static ch.eskaton.commons.utils.StringUtils.initCap;
 import static java.util.Arrays.asList;
@@ -405,7 +406,20 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
             return Collections.singletonList(getCall.apply(GET_VALUE));
         } else if (runtimeType.equals(ASN1EnumeratedType.class.getSimpleName())) {
             return Collections.singletonList(getCall.apply(GET_VALUE));
-        } else if (runtimeType.equals(ASN1Sequence.class.getSimpleName())) {
+        } else if (runtimeType.equals(ASN1Null.class.getSimpleName())) {
+            return Collections.singletonList(getCall.apply(GET_VALUE));
+        } else if (runtimeType.equals(ASN1ObjectIdentifier.class.getSimpleName())) {
+            return Collections.singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getCall.apply(GET_VALUE)));
+        } else if (runtimeType.equals(ASN1RelativeOID.class.getSimpleName())) {
+            return Collections.singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getCall.apply(GET_VALUE)));
+        } else if (runtimeType.equals(ASN1IRI.class.getSimpleName())) {
+            return Collections.singletonList(new FunctionCall.ToArray(ILType.of(STRING), getCall.apply(GET_VALUE)));
+        } else if (runtimeType.equals(ASN1RelativeIRI.class.getSimpleName())) {
+            return Collections.singletonList(new FunctionCall.ToArray(ILType.of(STRING), getCall.apply(GET_VALUE)));
+        } else if (runtimeType.equals(ASN1BitString.class.getSimpleName())) {
+            return List.of(getCall.apply(GET_VALUE), getCall.apply("getUnusedBits"));
+        } else if (runtimeType.equals(ASN1Sequence.class.getSimpleName()) ||
+                runtimeType.equals(ASN1Set.class.getSimpleName())) {
             var associations = new HashSet<Tuple2<Expression, Expression>>();
 
             ((SequenceType) ctx.resolveTypeReference(component.getComponentType())).getAllComponents().stream()
