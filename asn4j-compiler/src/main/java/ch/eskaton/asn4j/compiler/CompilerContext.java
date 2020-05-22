@@ -1020,14 +1020,16 @@ public class CompilerContext {
 
     public Optional<String> getContentType(Type type, Optional<String> parentName) {
         if (parentName.isPresent() && isSubtypeNeeded(type)) {
-            return Optional.of(parentName.get() + "." + getTypeName(type, "ContentType"));
+            return Optional.of(parentName.get() + "." + getTypeName(type, parentName.get() + "Content"));
         }
 
         return Optional.empty();
     }
 
     public boolean isSubtypeNeeded(Type type) {
-        return (type instanceof EnumeratedType ||
+        return (type instanceof SequenceType ||
+                type instanceof SetType ||
+                type instanceof EnumeratedType ||
                 type instanceof IntegerType && ((IntegerType) type).getNamedNumbers() != null ||
                 type instanceof BitString && ((BitString) type).getNamedBits() != null);
     }

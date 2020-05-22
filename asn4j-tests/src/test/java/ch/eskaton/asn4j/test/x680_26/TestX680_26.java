@@ -27,15 +27,27 @@
 
 package ch.eskaton.asn4j.test.x680_26;
 
+import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf2;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf2.TestSequenceOf2Content;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf3;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf3.TestSequenceOf3Content;
 import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf4;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf4.TestSequenceOf4Content;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf5;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf5.TestSequenceOf5Content;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf5.TestSequenceOf5Content.A;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf5.TestSequenceOf5Content.A.AContent;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf5.TestSequenceOf5Content.B;
+import ch.eskaton.asn4j.test.modules.x680_26.TestSequenceOf5.TestSequenceOf5Content.B.BContent;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
+import static ch.eskaton.commons.utils.Utils.with;
+import static java.util.Arrays.asList;
 
 public class TestX680_26 {
 
@@ -47,22 +59,36 @@ public class TestX680_26 {
 
     @Test
     public void testSequenceOf2() {
-        assertDecodable(TestSequenceOf2.class, value -> value.setValues(new ASN1SetOf<>(TestSequenceOf2.ContentType.A)));
+        assertDecodable(TestSequenceOf2.class, value -> value.setValues(new ASN1SetOf<>(TestSequenceOf2Content.A)));
     }
 
     @Test
     public void testSequenceOf3() {
-        assertDecodable(TestSequenceOf3.class, value -> value.setValues(TestSequenceOf3.ContentType.ONE));
+        assertDecodable(TestSequenceOf3.class, value -> value.setValues(TestSequenceOf3Content.ONE));
     }
 
     @Test
     public void testSequenceOf4() {
         assertDecodable(TestSequenceOf4.class, value -> {
-            var bitString = new TestSequenceOf4.ContentType(new byte[] { 0x00 }, 0);
+            var bitString = new TestSequenceOf4Content(new byte[] { 0x00 }, 0);
 
-            bitString.setBit(TestSequenceOf4.ContentType.A);
+            bitString.setBit(TestSequenceOf4Content.A);
 
             value.setValues(bitString);
+        });
+    }
+
+    @Test
+    public void testSequenceOf5() {
+        assertDecodable(TestSequenceOf5.class, value -> {
+            value.setValues(with(new TestSequenceOf5Content(), (content) -> {
+                content.setA(with(new A(), (a) ->
+                        a.setValues(asList(with(new AContent(), (aContent) ->
+                                aContent.setA(ASN1Integer.valueOf(12)))))));
+                content.setB(with(new B(), (b) ->
+                        b.setValues(asList(with(new BContent(), (bContent) ->
+                                bContent.setB(ASN1Boolean.TRUE))))));
+            }));
         });
     }
 

@@ -9,4 +9,9 @@ TestSequenceOf3 ::= SEQUENCE OF INTEGER { one(1), two(2) }
 
 TestSequenceOf4 ::= SEQUENCE OF BIT STRING { a(1), b(2) }
 
+TestSequenceOf5 ::= SEQUENCE OF SEQUENCE {
+    a SEQUENCE OF SEQUENCE { a INTEGER },
+    b SEQUENCE OF SEQUENCE { b BOOLEAN }
+}
+
 END
