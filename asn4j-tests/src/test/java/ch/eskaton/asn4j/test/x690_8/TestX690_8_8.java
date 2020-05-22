@@ -38,14 +38,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX690_8_8 {
 
     @Test
-    public void testEncode() {
+    void testEncode() {
     	BEREncoder encoder = new BEREncoder();
 
     	assertArrayEquals(new byte[] { 0x05, 0x00 }, encoder.encode(new ASN1Null()));
     }
 
     @Test
-    public void testDecode() {
+    void testDecode() {
     	BERDecoder decoder = new BERDecoder();
 
     	assertEquals(new ASN1Null(), decoder.decode(ASN1Null.class, new byte[] { 0x05, 0x00 }));

@@ -41,7 +41,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class EnumeratedPresenceTypeConstraintOptimizingVisitorTest {
 
     @Test
-    public void testVisitBinOpNodeUnion() {
+    void testVisitBinOpNodeUnion() {
         Visitor visitor = new EnumeratedTypeConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(union(ConstraintTestUtils.enumValue(), ConstraintTestUtils.enumValue())), equalTo(ConstraintTestUtils.enumValue()));
@@ -52,7 +52,7 @@ public class EnumeratedPresenceTypeConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeIntersection() {
+    void testVisitBinOpNodeIntersection() {
         Visitor visitor = new EnumeratedTypeConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(ConstraintTestUtils.enumValue(), ConstraintTestUtils.enumValue())), equalTo(ConstraintTestUtils.enumValue()));
@@ -63,7 +63,7 @@ public class EnumeratedPresenceTypeConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeComplement() {
+    void testVisitBinOpNodeComplement() {
         Visitor visitor = new EnumeratedTypeConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(complement(ConstraintTestUtils.enumValue(), ConstraintTestUtils.enumValue())), equalTo(ConstraintTestUtils.enumValue()));
@@ -73,7 +73,7 @@ public class EnumeratedPresenceTypeConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeNot() {
+    void testVisitBinOpNodeNot() {
         Visitor visitor = new EnumeratedTypeConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(not(ConstraintTestUtils.enumValue(3, 4, 5)), ConstraintTestUtils.enumValue(1, 2, 3))), equalTo(ConstraintTestUtils.enumValue(1, 2)));

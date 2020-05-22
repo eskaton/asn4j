@@ -38,18 +38,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TagIdTest {
 
     @Test
-    public void testFromTag() {
+    void testFromTag() {
         assertEquals(new TagId(Clazz.APPLICATION, 21), TagId.fromTag(getTag(TestA.class)));
     }
 
     @Test
-    public void testFromTags() {
+    void testFromTags() {
         assertEquals(Arrays.asList(new TagId(Clazz.PRIVATE, 37), new TagId(Clazz.APPLICATION, 21)),
                 TagId.fromTags(Arrays.asList(getTag(TestB.class), getTag(TestA.class))));
     }
 
     @Test
-    public void testEqualsASN1Tag() {
+    void testEqualsASN1Tag() {
         assertTrue(new TagId(Clazz.APPLICATION, 21).equalsASN1Tag(getTag(TestA.class)));
     }
 

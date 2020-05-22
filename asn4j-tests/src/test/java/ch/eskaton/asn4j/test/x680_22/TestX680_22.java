@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class TestX680_22 {
 
     @Test
-    public void testEncoding() throws ASN1RuntimeException {
+    void testEncoding() throws ASN1RuntimeException {
         BEREncoder encoder = new BEREncoder();
 
         TestBitString1 a = new TestBitString1();
@@ -63,22 +63,22 @@ public class TestX680_22 {
     }
 
     @Test
-    public void test1() throws ASN1RuntimeException {
+    void test1() throws ASN1RuntimeException {
         testBitString(TestBitString1.TEST_A, 0);
     }
 
     @Test
-    public void test2() throws ASN1RuntimeException {
+    void test2() throws ASN1RuntimeException {
         testBitString(TestBitString1.TEST_B, 1);
     }
 
     @Test
-    public void test3() throws ASN1RuntimeException {
+    void test3() throws ASN1RuntimeException {
         testBitString(TestBitString1.TEST_C, 2);
     }
 
     @Test
-    public void test4() throws ASN1RuntimeException {
+    void test4() throws ASN1RuntimeException {
         TestHelper.assertDecodableVerifyAfter(TestBitString2.class,
                 value -> {
                     value.setValue(new byte[] { 0x00 });

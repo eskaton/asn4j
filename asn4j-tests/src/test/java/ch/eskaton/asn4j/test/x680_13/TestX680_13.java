@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX680_13 {
 
     @Test
-    public void testImportsAndExtReferencesCompiled() {
+    void testImportsAndExtReferencesCompiled() {
         new TestEnumeratedType1();
         new TestEnumeratedType2();
         new TestEnumeratedType3();

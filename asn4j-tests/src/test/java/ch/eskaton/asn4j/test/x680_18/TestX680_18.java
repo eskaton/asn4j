@@ -39,12 +39,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX680_18 {
 
     @Test
-    public void testBoolean() {
+    void testBoolean() {
         assertDecodable(TestBoolean.class, value -> value.setValue(true));
     }
 
     @Test
-    public void testBooleanDefault() {
+    void testBooleanDefault() {
         assertDecodableVerifyAfter(TestBooleans.class,
                 value -> {
                     assertEquals(ASN1Boolean.of(true), value.getTestBoolean1());

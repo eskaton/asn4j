@@ -42,7 +42,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class ObjectIdentifierConstraintOptimizingVisitorTest {
 
     @Test
-    public void testVisitBinOpNodeUnion() {
+    void testVisitBinOpNodeUnion() {
         Visitor visitor = new ObjectIdentifierConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(union(ConstraintTestUtils.oidValue(), ConstraintTestUtils.oidValue())), equalTo(ConstraintTestUtils.oidValue()));
@@ -57,7 +57,7 @@ public class ObjectIdentifierConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeIntersection() {
+    void testVisitBinOpNodeIntersection() {
         Visitor visitor = new ObjectIdentifierConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(ConstraintTestUtils.oidValue(), ConstraintTestUtils.oidValue())), equalTo(ConstraintTestUtils.oidValue()));
@@ -70,7 +70,7 @@ public class ObjectIdentifierConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeComplement() {
+    void testVisitBinOpNodeComplement() {
         Visitor visitor = new ObjectIdentifierConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(complement(ConstraintTestUtils.oidValue(), ConstraintTestUtils.oidValue())), equalTo(ConstraintTestUtils.oidValue()));
@@ -82,7 +82,7 @@ public class ObjectIdentifierConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeNot() {
+    void testVisitBinOpNodeNot() {
         Visitor visitor = new ObjectIdentifierConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(not(ConstraintTestUtils.oidValue(asList(3), asList(4), asList(5))),

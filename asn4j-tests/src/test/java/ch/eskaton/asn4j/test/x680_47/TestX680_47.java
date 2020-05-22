@@ -36,17 +36,17 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 public class TestX680_47 {
 
     @Test
-    public void testUTCTimeLocal() throws ASN1RuntimeException {
+    void testUTCTimeLocal() throws ASN1RuntimeException {
         assertDecodable(TestUTCTime.class, value -> value.setValue("1812311507"));
     }
 
     @Test
-    public void testUTCTimeZulu() throws ASN1RuntimeException {
+    void testUTCTimeZulu() throws ASN1RuntimeException {
         assertDecodable(TestUTCTime.class, value -> value.setValue("181231150703Z"));
     }
 
     @Test
-    public void testUTCTimeOffset() throws ASN1RuntimeException {
+    void testUTCTimeOffset() throws ASN1RuntimeException {
         assertDecodable(TestUTCTime.class, value -> value.setValue("181231150703-1230"));
     }
 

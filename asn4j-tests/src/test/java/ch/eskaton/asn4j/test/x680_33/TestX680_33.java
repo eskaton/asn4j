@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX680_33 {
 
     @Test
-    public void testRelativeObjectIdentifiersWithDefaults() {
+    void testRelativeObjectIdentifiersWithDefaults() {
         ASN1RelativeOID testRelativeObjectIdentifier1 = createRelativeOID(new ASN1RelativeOID(), 3);
         ASN1RelativeOID testRelativeObjectIdentifier2 = createRelativeOID(new ASN1RelativeOID(), 3, 6, 1);
 
@@ -52,7 +52,7 @@ public class TestX680_33 {
     }
 
     @Test
-    public void testRelativeObjectIdentifiersWithoutDefaults() {
+    void testRelativeObjectIdentifiersWithoutDefaults() {
         ASN1RelativeOID testRelativeObjectIdentifier1 = createRelativeOID(new ASN1RelativeOID(), 2, 3);
         ASN1RelativeOID testRelativeObjectIdentifier2 = createRelativeOID(new ASN1RelativeOID(), 0, 7, 1, 1);
 

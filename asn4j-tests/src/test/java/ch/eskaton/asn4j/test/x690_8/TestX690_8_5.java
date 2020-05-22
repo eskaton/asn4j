@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX690_8_5 {
 
     @Test
-    public void testEncode() {
+    void testEncode() {
         BEREncoder encoder = new BEREncoder();
 
         assertArrayEquals(new byte[] { 0x09, 0x01, 0x40 }, encoder.encode(ASN1Real.PLUS_INFINITY));
@@ -59,7 +59,7 @@ public class TestX690_8_5 {
     }
 
     @Test
-    public void testDecode() {
+    void testDecode() {
         BERDecoder decoder = new BERDecoder();
 
         assertEquals(ASN1Real.PLUS_INFINITY, decoder.decode(ASN1Real.class, new byte[] { 0x09, 0x01, 0x40 }));

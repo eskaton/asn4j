@@ -107,7 +107,7 @@ import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 public class TestX680_51_1 {
 
     @Test
-    public void testBitString1() {
+    void testBitString1() {
         testBitStringSuccess(TestBitString1.class, new TestBitString1(), 0x00, 5);
         testBitStringSuccess(TestBitString1.class, new TestBitString1(), 0x01, 5);
         testBitStringSuccess(TestBitString1.class, new TestBitString1(), 0x02, 5);
@@ -122,7 +122,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testBitString2() {
+    void testBitString2() {
         testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x00, 7);
         testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x01, 7);
         testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x00, 6);
@@ -137,7 +137,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testBitString3() {
+    void testBitString3() {
         testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x00, 7);
         testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x01, 7);
         testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x00, 6);
@@ -152,7 +152,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testBitString5() {
+    void testBitString5() {
         testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0x00, 5);
         testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0x01, 5);
 
@@ -160,7 +160,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testBitString6() {
+    void testBitString6() {
         testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x01, 0);
         testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x02, 4);
         testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x02, 6);
@@ -170,7 +170,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testBitString7() {
+    void testBitString7() {
         testBitStringSuccess(TestBitString7.class, new TestBitString7(), 0x00, 5);
         testBitStringSuccess(TestBitString7.class, new TestBitString7(), 0x02, 5);
         testBitStringSuccess(TestBitString7.class, new TestBitString7(), 0x01, 6);
@@ -179,14 +179,14 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testBoolean2() {
+    void testBoolean2() {
         testBooleanSuccess(TestBoolean2.class, new TestBoolean2(), false);
 
         testBooleanFailure(TestBoolean2.class, new TestBoolean2(), true);
     }
 
     @Test
-    public void testEnumeration2() {
+    void testEnumeration2() {
         testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.D);
         testEnumeratedSuccess(TestEnumeration2.class, new TestEnumeration2(), TestEnumeration1.E);
 
@@ -197,7 +197,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testEnumeration3() {
+    void testEnumeration3() {
         testEnumeratedSuccess(TestEnumeration3.class, new TestEnumeration3(), TestEnumeration1.A);
         testEnumeratedSuccess(TestEnumeration3.class, new TestEnumeration3(), TestEnumeration1.B);
         testEnumeratedSuccess(TestEnumeration3.class, new TestEnumeration3(), TestEnumeration1.E);
@@ -208,7 +208,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testEnumeration4() {
+    void testEnumeration4() {
         testEnumeratedSuccess(TestEnumeration4.class, new TestEnumeration4(), TestEnumeration1.D);
 
         testEnumeratedFailure(TestEnumeration4.class, new TestEnumeration4(), TestEnumeration1.A);
@@ -219,111 +219,111 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testInteger1() throws InstantiationException, IllegalAccessException {
+    void testInteger1() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger1.class, -1, 1);
         testIntegerFailure(TestInteger1.class, 0);
     }
 
     @Test
-    public void testInteger2() throws InstantiationException, IllegalAccessException {
+    void testInteger2() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger2.class, -2, 2);
         testIntegerFailure(TestInteger2.class, -1, 0, 1);
     }
 
     @Test
-    public void testInteger3() throws InstantiationException, IllegalAccessException {
+    void testInteger3() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger3.class, 0, 1, 2, 4, 5, 6, 9);
         testIntegerFailure(TestInteger3.class, -1, 3, 7, 8, 10);
     }
 
     @Test
-    public void testInteger4() throws InstantiationException, IllegalAccessException {
+    void testInteger4() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger4.class, 1, 2, 4, 5);
         testIntegerFailure(TestInteger4.class, 0, 3, 6);
     }
 
     @Test
-    public void testInteger5() throws InstantiationException, IllegalAccessException {
+    void testInteger5() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger5.class, 5, 6);
         testIntegerFailure(TestInteger5.class, 4, 7, 8, 9);
     }
 
     @Test
-    public void testInteger6() throws InstantiationException, IllegalAccessException {
+    void testInteger6() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger6.class, 4, 5);
         testIntegerFailure(TestInteger6.class, 0, 1, 2, 3, 6);
     }
 
     @Test
-    public void testInteger7() throws InstantiationException, IllegalAccessException {
+    void testInteger7() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger7.class, 5);
         testIntegerFailure(TestInteger7.class, 0, 1, 2, 3, 4, 6);
     }
 
     @Test
-    public void testInteger8() throws InstantiationException, IllegalAccessException {
+    void testInteger8() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger8.class, 6);
         testIntegerFailure(TestInteger8.class, 4, 5, 7, 8, 9);
     }
 
     @Test
-    public void testInteger9() throws InstantiationException, IllegalAccessException {
+    void testInteger9() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger9.class, 2, 4);
         testIntegerFailure(TestInteger9.class, 3);
     }
 
     @Test
-    public void testInteger10() throws InstantiationException, IllegalAccessException {
+    void testInteger10() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger10.class, 0, 2);
         testIntegerFailure(TestInteger10.class, 1);
     }
 
     @Test
-    public void testInteger11() throws InstantiationException, IllegalAccessException {
+    void testInteger11() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger11.class, 3, 5);
         testIntegerFailure(TestInteger11.class, 4);
     }
 
     @Test
-    public void testNull1() {
+    void testNull1() {
         testNullSuccess(TestNull1.class, () -> new TestNull1());
     }
 
     @Test
-    public void testNull2() {
+    void testNull2() {
         testNullFailure(TestNull2.class, () -> new TestNull2());
     }
 
     @Test
-    public void testObjectIdentifier2() {
+    void testObjectIdentifier2() {
         testObjectIdentifierSuccess(TestObjectIdentifier2.class, new TestObjectIdentifier2(), 0, 3, 6, 3);
 
         testObjectIdentifierFailure(TestObjectIdentifier2.class, new TestObjectIdentifier2(), 0, 3, 6, 4);
     }
 
     @Test
-    public void testRelativeOID2() {
+    void testRelativeOID2() {
         testRelativeOIDSuccess(TestRelativeOID2.class, new TestRelativeOID2(), 3, 6, 3);
 
         testRelativeOIDFailure(TestRelativeOID2.class, new TestRelativeOID2(), 3, 6, 4);
     }
 
     @Test
-    public void testOIDIRI2() {
+    void testOIDIRI2() {
         testIRISuccess(TestOidIri2.class, new TestOidIri2(), "ISO", "a", "b", "b");
 
         testIRIFailure(TestOidIri2.class, new TestOidIri2(), "ISO", "a", "b", "a");
     }
 
     @Test
-    public void testRelativeOIDIRI2() {
+    void testRelativeOIDIRI2() {
         testRelativeIRISuccess(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "b");
 
         testRelativeIRIFailure(TestRelativeOidIri2.class, new TestRelativeOidIri2(), "a", "b", "a");
     }
 
     @Test
-    public void testOctetString1() {
+    void testOctetString1() {
         testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), new byte[] { 0x01, 0x02, 0x02 });
         testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), new byte[] { 0x01, 0x02, 0x04 });
 
@@ -333,7 +333,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testOctetString2() {
+    void testOctetString2() {
         testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), new byte[] { 0x01, 0x02, 0x03 });
         testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), randomBytes(1));
         testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), randomBytes(2));
@@ -345,7 +345,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testOctetString3() {
+    void testOctetString3() {
         testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), new byte[] { 0x01, 0x02, 0x03 });
         testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), new byte[] { 0x01, 0x02, 0x03 });
         testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), new byte[] { 0x0A, 0x0B, 0x0C });
@@ -359,7 +359,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testOctetString5() {
+    void testOctetString5() {
         testOctetStringSuccess(TestOctetString5.class, new TestOctetString5(), new byte[] { 0x00 });
         testOctetStringSuccess(TestOctetString5.class, new TestOctetString5(), new byte[] { 0x0F });
 
@@ -367,7 +367,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testOctetString6() {
+    void testOctetString6() {
         testOctetStringSuccess(TestOctetString6.class, new TestOctetString6(), new byte[] {});
         testOctetStringSuccess(TestOctetString6.class, new TestOctetString6(), new byte[] { (byte) 0xEF });
         testOctetStringSuccess(TestOctetString6.class, new TestOctetString6(), new byte[] { (byte) 0xF1 });
@@ -376,7 +376,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testOctetString7() {
+    void testOctetString7() {
         testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), new byte[] {});
         testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), new byte[] { 0x0E });
         testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), new byte[] { 0x10 });
@@ -385,7 +385,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testSetOf1() {
+    void testSetOf1() {
         testSetOfSuccess(TestSetOf1.class, new TestSetOf1(), ASN1Integer.valueOf(0L));
         testSetOfSuccess(TestSetOf1.class, new TestSetOf1(), ASN1Integer.valueOf(2L));
         testSetOfSuccess(TestSetOf1.class, new TestSetOf1(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
@@ -394,7 +394,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testSetOf2() {
+    void testSetOf2() {
         testSetOfSuccess(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(1L));
         testSetOfSuccess(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
         testSetOfSuccess(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(0L), ASN1Integer.valueOf(3L));
@@ -404,7 +404,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testSetOf3() {
+    void testSetOf3() {
         testSetOfSuccess(TestSetOf3.class, new TestSetOf3(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
         testSetOfSuccess(TestSetOf3.class, new TestSetOf3(), ASN1Integer.valueOf(0L), ASN1Integer.valueOf(3L));
 
@@ -414,7 +414,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void TestSetOf4() {
+    void TestSetOf4() {
         testSetOfSuccess(TestSetOf4.class, new TestSetOf4(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(1L)),
                 new ASN1SetOf<>(ASN1Integer.valueOf(2L)));
@@ -437,7 +437,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testSetOf5() {
+    void testSetOf5() {
         testSetOfSuccess(TestSetOf5.class, new TestSetOf5(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
 
         testSetOfFailure(TestSetOf5.class, new TestSetOf5(), ASN1Integer.valueOf(1L));
@@ -445,7 +445,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testSetOf6() {
+    void testSetOf6() {
         testSetOfSuccess(TestSetOf6.class, new TestSetOf6(), new ASN1BitString(new byte[] { 0x02 }, 5),
                 new ASN1BitString(new byte[] { 0x03 }, 5));
 
@@ -455,7 +455,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testSetOf7() {
+    void testSetOf7() {
         testSetOfSuccess(TestSetOf7.class, new TestSetOf7(), ASN1Integer.valueOf(1L));
         testSetOfSuccess(TestSetOf7.class, new TestSetOf7(), ASN1Integer.valueOf(2L));
 
@@ -466,7 +466,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testSetOf8() {
+    void testSetOf8() {
         testSetOfSuccess(TestSetOf8.class, new TestSetOf8());
         testSetOfSuccess(TestSetOf8.class, new TestSetOf8(), ASN1Integer.valueOf(1L));
         testSetOfSuccess(TestSetOf8.class, new TestSetOf8(), ASN1Integer.valueOf(2L));
@@ -477,7 +477,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void testSetOf9() {
+    void testSetOf9() {
         testSetOfSuccess(TestSetOf9.class, new TestSetOf9());
         testSetOfSuccess(TestSetOf9.class, new TestSetOf9(), ASN1Integer.valueOf(2L));
         testSetOfSuccess(TestSetOf9.class, new TestSetOf9(), ASN1Integer.valueOf(3L));
@@ -488,7 +488,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void TestSetOf10() {
+    void TestSetOf10() {
         testSetOfSuccess(TestSetOf10.class, new TestSetOf10());
         testSetOfSuccess(TestSetOf10.class, new TestSetOf10(), new ASN1SetOf<>());
         testSetOfSuccess(TestSetOf10.class, new TestSetOf10(),
@@ -503,7 +503,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void TestSequenceOf1() {
+    void TestSequenceOf1() {
         testSequenceOfSuccess(TestSequenceOf1.class, new TestSequenceOf1(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(1L)),
                 new ASN1SetOf<>(ASN1Integer.valueOf(2L)));
@@ -526,7 +526,7 @@ public class TestX680_51_1 {
     }
 
     @Test
-    public void TestSequenceOf2() {
+    void TestSequenceOf2() {
         testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(1L)),
                 new ASN1SetOf<>(ASN1Integer.valueOf(2L)));

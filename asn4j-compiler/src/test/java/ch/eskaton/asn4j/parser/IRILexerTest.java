@@ -35,14 +35,14 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class IRILexerTest {
 
     @Test
-    public void testSolidus() throws ParserException {
+    void testSolidus() throws ParserException {
     	IRILexer lexer = new IRILexer("/");
 
     	assertEquals(IRIToken.Type.SOLIDUS, lexer.nextToken().getType());
     }
 
     @Test
-    public void testIntegerUnicodeLabel() throws ParserException {
+    void testIntegerUnicodeLabel() throws ParserException {
     	IRILexer lexer = new IRILexer("0");
 
     	IRIToken token = lexer.nextToken();
@@ -67,7 +67,7 @@ public class IRILexerTest {
     }
 
     @Test
-    public void testNonIntegerUnicodeLabel() throws ParserException {
+    void testNonIntegerUnicodeLabel() throws ParserException {
     	IRILexer lexer = new IRILexer("abc\ud841\udf0e");
 
     	IRIToken token = lexer.nextToken();

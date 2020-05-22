@@ -43,27 +43,27 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class TestX680_19 {
 
     @Test
-    public void test1() {
+    void test1() {
         assertDecodable(TestInteger.class, value -> value.setValue(BigInteger.valueOf(17)));
     }
 
     @Test
-    public void test2() {
+    void test2() {
         assertValueDecodable(TestNamedInteger.class, TestNamedInteger.VALUE3);
     }
 
     @Test
-    public void test3() {
+    void test3() {
         assertDecodable(TestNamedInteger.class, value -> value.setValue(BigInteger.valueOf(13)));
     }
 
     @Test
-    public void testEquality() {
+    void testEquality() {
         assertEquals(new TestNamedInteger3(), new TestNamedInteger3());
     }
 
     @Test
-    public void testInequality() {
+    void testInequality() {
         assertNotEquals(new TestNamedInteger3(), new TestNamedInteger5());
     }
 

@@ -46,27 +46,27 @@ import static org.mockito.Mockito.mock;
 public class JavaUtilsTest {
 
     @Test
-    public void testBitStringValue() {
+    void testBitStringValue() {
         assertEquals("new ASN1BitString(new byte[] { (byte) 0x01, (byte) 0x02, (byte) 0x03 }, 5)",
                 JavaUtils.getInitializerString(mock(CompilerContext.class), ASN1BitString.class.getSimpleName(),
                         new BitStringValue(new byte[] { 0x01, 0x02, 0x03 }, 5)));
     }
 
     @Test
-    public void testOctetStringValue() {
+    void testOctetStringValue() {
         assertEquals("new ASN1OctetString(new byte[] { (byte) 0x01, (byte) 0x02, (byte) 0x03 })",
                 JavaUtils.getInitializerString(mock(CompilerContext.class), ASN1OctetString.class.getSimpleName(),
                         new OctetStringValue(new byte[] { 0x01, 0x02, 0x03 })));
     }
 
     @Test
-    public void testIntegerValue() {
+    void testIntegerValue() {
         assertEquals("new ASN1Integer(4711L)", JavaUtils.getInitializerString(mock(CompilerContext.class),
                 ASN1Integer.class.getSimpleName(), new IntegerValue(4711)));
     }
 
     @Test
-    public void testUnsupportedValue() {
+    void testUnsupportedValue() {
         assertThrows(CompilerException.class, () -> getInitializerString(null, null, new EmptyValue(NO_POSITION)));
     }
 

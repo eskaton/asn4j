@@ -47,7 +47,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class SizeVisitorTest {
 
     @Test
-    public void testVisitBinOpNodeUnion() {
+    void testVisitBinOpNodeUnion() {
         Visitor visitor = new SizeVisitor();
 
         assertThat(visitor.visit(union(intValue(), intValue())), equalTo(optSize()));
@@ -61,7 +61,7 @@ public class SizeVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeIntersection() {
+    void testVisitBinOpNodeIntersection() {
         Visitor visitor = new SizeVisitor();
 
         assertThat(visitor.visit(intersection(intValue(), intValue())), equalTo(optSize()));
@@ -74,7 +74,7 @@ public class SizeVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeComplement() {
+    void testVisitBinOpNodeComplement() {
         Visitor visitor = new SizeVisitor();
 
         assertThat(visitor.visit(complement(intValue(), intValue())), equalTo(optSize()));
@@ -88,7 +88,7 @@ public class SizeVisitorTest {
     }
 
     @Test
-    public void testVisitOpNode() {
+    void testVisitOpNode() {
         Visitor visitor = new SizeVisitor();
 
         assertThat(visitor.visit(not(intValue(10, 15))),

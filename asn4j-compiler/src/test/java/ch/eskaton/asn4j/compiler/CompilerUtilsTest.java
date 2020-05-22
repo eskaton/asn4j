@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class CompilerUtilsTest {
 
     @Test
-    public void testGetTypeParameterString() {
+    void testGetTypeParameterString() {
         assertEquals("", CompilerUtils.getTypeParameterString(Collections.emptyList()));
         assertEquals("a", CompilerUtils.getTypeParameterString(Arrays.asList("a")));
         assertEquals("a<b>", CompilerUtils.getTypeParameterString(Arrays.asList("a", "b")));

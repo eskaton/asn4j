@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 public class TLVUtilsTest {
 
     @Test
-    public void testGetTagClasses() {
+    void testGetTagClasses() {
         assertArrayEquals(new byte[] { (byte) 0x01 }, TLVUtils
                 .getTag(UniversalPrimitiveTest.class.getAnnotation(ASN1Tag.class)));
 
@@ -63,7 +63,7 @@ public class TLVUtilsTest {
     }
 
     @Test
-    public void testGetTagNumber() {
+    void testGetTagNumber() {
         assertArrayEquals(new byte[] { (byte) 0xDE }, TLVUtils
                 .getTag(PrivatePrimitive30Test.class.getAnnotation(ASN1Tag.class)));
 

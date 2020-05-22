@@ -51,7 +51,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class BitStringConstraintOptimizingVisitorTest {
 
     @Test
-    public void testVisitBinOpNodeValueUnion() {
+    void testVisitBinOpNodeValueUnion() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(union(value(), value())), equalTo(value()));
@@ -64,7 +64,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeValueIntersection() {
+    void testVisitBinOpNodeValueIntersection() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(value(), value())), equalTo(value()));
@@ -76,7 +76,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeValueComplement() {
+    void testVisitBinOpNodeValueComplement() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(complement(value(), value())), equalTo(value()));
@@ -87,7 +87,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeValueNot() {
+    void testVisitBinOpNodeValueNot() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(value(bitStrings(0x01, 0x02)), not(value(bitString(0x01))))),
@@ -97,7 +97,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeSizeUnion() {
+    void testVisitBinOpNodeSizeUnion() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(union(ConstraintTestUtils.size(), ConstraintTestUtils.size())), equalTo(ConstraintTestUtils.size()));
@@ -112,7 +112,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeSizeIntersection() {
+    void testVisitBinOpNodeSizeIntersection() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(ConstraintTestUtils.size(), ConstraintTestUtils.size())), equalTo(ConstraintTestUtils.size()));
@@ -125,7 +125,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeSizeComplement() {
+    void testVisitBinOpNodeSizeComplement() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(complement(ConstraintTestUtils.size(), ConstraintTestUtils.size())), equalTo(ConstraintTestUtils.size()));
@@ -137,7 +137,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeSizeNot() {
+    void testVisitBinOpNodeSizeNot() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(ConstraintTestUtils.size(1, 10), not(ConstraintTestUtils.size(3, 7)))),
@@ -146,7 +146,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeValueSizeUnion() {
+    void testVisitBinOpNodeValueSizeUnion() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(union(value(), ConstraintTestUtils.size())), equalTo(value()));
@@ -158,7 +158,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeSizeValueUnion() {
+    void testVisitBinOpNodeSizeValueUnion() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(union(ConstraintTestUtils.size(), value())), equalTo(value()));
@@ -170,7 +170,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeValueSizeIntersection() {
+    void testVisitBinOpNodeValueSizeIntersection() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(value(), ConstraintTestUtils.size())), equalTo(value()));
@@ -182,7 +182,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeSizeValueIntersection() {
+    void testVisitBinOpNodeSizeValueIntersection() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(ConstraintTestUtils.size(), value())), equalTo(value()));
@@ -194,7 +194,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeValueSizeComplement() {
+    void testVisitBinOpNodeValueSizeComplement() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(complement(value(), ConstraintTestUtils.size())), equalTo(value()));
@@ -207,7 +207,7 @@ public class BitStringConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeSizeValueComplement() {
+    void testVisitBinOpNodeSizeValueComplement() {
         Visitor visitor = new BitStringConstraintOptimizingVisitor();
 
         BinOpNode complement = complement(ConstraintTestUtils.size(), value());

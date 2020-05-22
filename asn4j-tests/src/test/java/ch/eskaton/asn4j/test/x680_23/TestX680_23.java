@@ -39,12 +39,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX680_23 {
 
     @Test
-    public void test1() {
+    void test1() {
         assertDecodable(TestOctetString.class, value -> value.setValue("test".getBytes()));
     }
 
     @Test
-    public void testOctetStringDefault() {
+    void testOctetStringDefault() {
         assertDecodableVerifyAfter(TestOctetStrings.class, value -> {
             assertEquals(new ASN1OctetString(new byte[] { 0x01, (byte) 0xAF }), value.getTestOctetString1());
             assertEquals(new TestOctetString(new byte[] { 0x01, (byte) 0xAF }), value.getTestOctetString2());

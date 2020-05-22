@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX680_32 {
 
     @Test
-    public void testObjectIdentifiersWithDefaults() {
+    void testObjectIdentifiersWithDefaults() {
         TestObjectIdentifiers a = new TestObjectIdentifiers();
         ASN1ObjectIdentifier testObjectIdentifier1 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
         ASN1ObjectIdentifier testObjectIdentifier2 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
@@ -70,7 +70,7 @@ public class TestX680_32 {
     }
 
     @Test
-    public void testObjectIdentifiersWithoutDefaults() {
+    void testObjectIdentifiersWithoutDefaults() {
         TestObjectIdentifiers a = new TestObjectIdentifiers();
         ASN1ObjectIdentifier testObjectIdentifier1 = createOID(new ASN1ObjectIdentifier(), 2, 3);
         ASN1ObjectIdentifier testObjectIdentifier2 = createOID(new ASN1ObjectIdentifier(), 0, 7, 1, 1);
@@ -108,7 +108,7 @@ public class TestX680_32 {
     }
 
     @Test
-    public void testObjectIdentifiersRootArcs() {
+    void testObjectIdentifiersRootArcs() {
         TestObjectIdentifierRootArcs a = new TestObjectIdentifierRootArcs();
 
         ASN1ObjectIdentifier oidItuT = createOID(new ASN1ObjectIdentifier(), 0, 12);

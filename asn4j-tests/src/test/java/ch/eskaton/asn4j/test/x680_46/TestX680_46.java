@@ -39,17 +39,17 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 public class TestX680_46 {
 
     @Test
-    public void testGeneralizedTimeLocal() throws ASN1RuntimeException {
+    void testGeneralizedTimeLocal() throws ASN1RuntimeException {
         assertDecodable(TestGeneralizedTime.class, value -> value.setTime(LocalDateTime.now()));
     }
 
     @Test
-    public void testGeneralizedTimeOffset() throws ASN1RuntimeException {
+    void testGeneralizedTimeOffset() throws ASN1RuntimeException {
         assertDecodable(TestGeneralizedTime.class, value -> value.setTime(OffsetDateTime.now()));
     }
 
     @Test
-    public void testGeneralizedTimeFromString() throws ASN1RuntimeException {
+    void testGeneralizedTimeFromString() throws ASN1RuntimeException {
         assertDecodable(TestGeneralizedTime.class, value -> value.setValue("2016101923.1234567-0130"));
     }
 

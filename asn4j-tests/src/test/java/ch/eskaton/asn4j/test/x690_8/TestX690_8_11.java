@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class TestX690_8_11 {
 
     @Test
-    public void testEncodeTestSet1() {
+    void testEncodeTestSet1() {
         BEREncoder encoder = new BEREncoder();
 
         TestSet1 a = new TestSet1();
@@ -62,7 +62,7 @@ public class TestX690_8_11 {
     }
 
     @Test
-    public void testEncodeTestSet2() {
+    void testEncodeTestSet2() {
         BEREncoder encoder = new BEREncoder();
 
         TestSet2 a = new TestSet2();
@@ -80,7 +80,7 @@ public class TestX690_8_11 {
     }
 
     @Test
-    public void testDecodeTestSet2() {
+    void testDecodeTestSet2() {
         BERDecoder decoder = new BERDecoder();
 
         TestSet2 a = new TestSet2();
@@ -92,7 +92,7 @@ public class TestX690_8_11 {
     }
 
     @Test
-    public void testDecodeTestSet2MissingField() {
+    void testDecodeTestSet2MissingField() {
         BERDecoder decoder = new BERDecoder();
 
         try {

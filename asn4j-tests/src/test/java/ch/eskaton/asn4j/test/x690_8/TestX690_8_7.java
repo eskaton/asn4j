@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX690_8_7 {
 
     @Test
-    public void testEncode() {
+    void testEncode() {
         BEREncoder encoder = new BEREncoder();
 
         assertArrayEquals(new byte[] { 0x04, 0x00 },
@@ -48,7 +48,7 @@ public class TestX690_8_7 {
     }
 
     @Test
-    public void testDecode() {
+    void testDecode() {
         BERDecoder decoder = new BERDecoder();
 
         assertEquals(ASN1OctetString.valueOf(new byte[] {}), decoder.decode(

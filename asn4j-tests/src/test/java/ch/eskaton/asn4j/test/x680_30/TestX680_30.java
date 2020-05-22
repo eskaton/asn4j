@@ -39,7 +39,7 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 public class TestX680_30 {
 
     @Test
-    public void testTestSelectionSetType() throws ASN1RuntimeException {
+    void testTestSelectionSetType() throws ASN1RuntimeException {
         assertDecodable(TestSelectionSetType.class,
                 value -> {
                     SelectedType1 val = new SelectedType1();

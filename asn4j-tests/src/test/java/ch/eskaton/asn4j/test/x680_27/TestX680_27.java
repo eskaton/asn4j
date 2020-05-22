@@ -38,12 +38,12 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 public class TestX680_27 {
 
     @Test
-    public void testSet1() {
+    void testSet1() {
         assertDecodable(TestSet1.class, value -> value.setA(ASN1Integer.valueOf(4711)));
     }
 
     @Test
-    public void testSet2() {
+    void testSet2() {
         assertDecodable(TestSet2.class, value -> {
             value.setA(ASN1Integer.valueOf(4711));
             value.setB(ASN1OctetString.valueOf(new byte[] { 0x74, 0x65, 0x73, 0x74 }));
