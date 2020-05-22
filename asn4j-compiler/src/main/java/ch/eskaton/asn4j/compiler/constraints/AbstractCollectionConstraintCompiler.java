@@ -52,6 +52,7 @@ import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -112,7 +113,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
-import static java.util.function.Function.identity;
 
 public abstract class AbstractCollectionConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -143,39 +143,36 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         } else if (elements instanceof ContainedSubtype) {
             return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
         } else if (elements instanceof MultipleTypeConstraints) {
-            return calculateMultipleTypeConstraint(baseType, (MultipleTypeConstraints) elements);
+            return calculateMultipleTypeConstraint((CompiledCollectionType) baseType, (MultipleTypeConstraints) elements);
         } else {
             throw new CompilerException("Invalid constraint %s for %s type",
                     elements.getClass().getSimpleName(), typeName);
         }
     }
 
-    private Node calculateMultipleTypeConstraint(CompiledType baseType, MultipleTypeConstraints elements) {
-        var componentTypes = ((Collection) baseType.getType()).getAllComponents().stream()
-                .map(ComponentType::getNamedType)
-                .collect(Collectors.toMap(NamedType::getName, identity()));
+    private Node calculateMultipleTypeConstraint(CompiledCollectionType baseType, MultipleTypeConstraints elements) {
         var components = elements.getConstraints().stream()
-                .map(constraint -> calculateComponentConstraint(componentTypes, constraint))
+                .map(constraint -> calculateComponentConstraint(baseType.getComponents(), constraint))
                 .collect(Collectors.toSet());
 
         return new WithComponentsNode(components);
     }
 
-    private ComponentNode calculateComponentConstraint(Map<String, NamedType> componentTypes, NamedConstraint namedConstraint) {
+    private ComponentNode calculateComponentConstraint(Map<String, CompiledType> compiledComponents, NamedConstraint namedConstraint) {
         var name = namedConstraint.getName();
         var constraint = namedConstraint.getConstraint();
         var presence = Optional.ofNullable(constraint.getPresence()).map(PresenceConstraint::getType).orElse(null);
         var valueConstraint = constraint.getValue().getConstraint();
-        var componentType = componentTypes.get(name).getType();
-        var definition = ctx.compileConstraint(ctx.getCompiledType(componentType));
+        var compiledType = compiledComponents.get(name);
+        var definition = ctx.compileConstraint(compiledType);
 
         if (definition != null) {
-            definition = definition.serialApplication(ctx.compileConstraint(componentType, valueConstraint));
+            definition = definition.serialApplication(ctx.compileConstraint(compiledType, valueConstraint));
         } else {
-            definition = ctx.compileConstraint(componentType, valueConstraint);
+            definition = ctx.compileConstraint(compiledType, valueConstraint);
         }
 
-        return new ComponentNode(name, componentType, definition.getRoots(), presence);
+        return new ComponentNode(name, compiledType.getType(), definition.getRoots(), presence);
     }
 
     private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements) {
@@ -405,6 +402,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         if (runtimeType.equals(ASN1Integer.class.getSimpleName())) {
             return Collections.singletonList(getCall.apply(GET_VALUE));
         } else if (runtimeType.equals(ASN1Boolean.class.getSimpleName())) {
+            return Collections.singletonList(getCall.apply(GET_VALUE));
+        } else if (runtimeType.equals(ASN1EnumeratedType.class.getSimpleName())) {
             return Collections.singletonList(getCall.apply(GET_VALUE));
         } else if (runtimeType.equals(ASN1Sequence.class.getSimpleName())) {
             var associations = new HashSet<Tuple2<Expression, Expression>>();

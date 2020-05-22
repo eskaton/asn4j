@@ -795,6 +795,9 @@ public class CompilerContext {
         return constraintCompiler.compileConstraint(type, constraint);
     }
 
+    public ConstraintDefinition compileConstraint(CompiledType compiledType, Constraint constraint) {
+        return constraintCompiler.compileConstraint(compiledType, constraint);
+    }
 
     public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {
         constraintCompiler.addConstraint(compiledType, module, definition);

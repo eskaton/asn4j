@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_8.TestEnumerated1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence3;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence4;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence5;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf1;
@@ -66,6 +67,9 @@ import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
+import static ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence5.A.A;
+import static ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence5.A.B;
+import static ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence5.A.C;
 import static ch.eskaton.commons.utils.Utils.with;
 
 public class TestX680_51_8 {
@@ -332,6 +336,14 @@ public class TestX680_51_8 {
             }));
             s.setD(ASN1Boolean.TRUE);
         });
+    }
+
+    @Test
+    public void testSequence5() {
+        testSequenceSuccess(TestSequence5.class, new TestSequence5(), s -> s.setA(A));
+        testSequenceSuccess(TestSequence5.class, new TestSequence5(), s -> s.setA(B));
+
+        testSequenceFailure(TestSequence5.class, new TestSequence5(), s -> s.setA(C));
     }
 
 }
