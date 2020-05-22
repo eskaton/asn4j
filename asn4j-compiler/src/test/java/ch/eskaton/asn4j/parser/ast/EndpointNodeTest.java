@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class EndpointNodeTest {
 
     @Test
-    public void testCanonicalizeEndpoints() {
+    void testCanonicalizeEndpoints() {
         assertEquals(new IntegerValue(Long.MIN_VALUE),
                 canonicalizeLowerEndpoint(new EndpointNode(Value.MIN, true), Long.MIN_VALUE));
 

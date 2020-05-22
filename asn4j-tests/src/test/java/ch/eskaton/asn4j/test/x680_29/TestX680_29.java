@@ -36,7 +36,7 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 public class TestX680_29 {
 
     @Test
-    public void testChoice1() {
+    void testChoice1() {
         assertDecodable(TestChoice1.class,
                 value -> value.setB(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x65 })));
     }

@@ -53,32 +53,32 @@ public class TestX680_31 {
     }
 
     @Test
-    public void testTestPrefixedType1() throws ASN1RuntimeException {
+    void testTestPrefixedType1() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType1(), "test1");
     }
 
     @Test
-    public void testTestPrefixedType2() throws ASN1RuntimeException {
+    void testTestPrefixedType2() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType2(), "test2");
     }
 
     @Test
-    public void testTestPrefixedType3() throws ASN1RuntimeException {
+    void testTestPrefixedType3() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType3(), "test3");
     }
 
     @Test
-    public void testTestPrefixedType4() throws ASN1RuntimeException {
+    void testTestPrefixedType4() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType4(), "test4");
     }
 
     @Test
-    public void testTestPrefixedType5() throws ASN1RuntimeException {
+    void testTestPrefixedType5() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType5(), "test5");
     }
 
     @Test
-    public void testTestPrefixedType6() throws ASN1RuntimeException {
+    void testTestPrefixedType6() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType6(), "test6");
     }
 

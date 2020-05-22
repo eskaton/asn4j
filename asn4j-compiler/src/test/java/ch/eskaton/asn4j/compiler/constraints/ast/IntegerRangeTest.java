@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class IntegerRangeTest {
 
     @Test
-    public void testCompareCanonicalEndpoint() {
+    void testCompareCanonicalEndpoint() {
         assertEquals(-1, compareCanonicalEndpoint(-2, -1));
         assertEquals(-2, compareCanonicalEndpoint(-5, -1));
         assertEquals(0, compareCanonicalEndpoint(5, 5));
@@ -61,7 +61,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void testCompareCanonicalRange() {
+    void testCompareCanonicalRange() {
         assertTrue(-1 >= invokeCompareCanonicalRange(-2L, -1L, -1L, 0L));
         assertTrue(-1 >= invokeCompareCanonicalRange(-2L, -1L, -2L, 0L));
         assertEquals(0, invokeCompareCanonicalRange(-2L, -1L, -2L, -1L));
@@ -70,7 +70,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void testCanonicalizeRanges() {
+    void testCanonicalizeRanges() {
         assertEquals(new ArrayList<RangeNode>(), canonicalizeRanges(emptyList()));
 
         // 2 ranges
@@ -105,7 +105,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void testUnion() {
+    void testUnion() {
         assertEquals(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
                 union(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
                         asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE))));
@@ -120,7 +120,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void testIntersect() {
+    void testIntersect() {
         assertEquals(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
                 union(asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE)),
                         asList(createRange(Long.MIN_VALUE, Long.MAX_VALUE))));
@@ -148,7 +148,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void testInvert() {
+    void testInvert() {
         assertEquals(emptyList(), invert(emptyList()));
 
         assertEquals(asList(createRange(Long.MIN_VALUE, 4L), createRange(11L, Long.MAX_VALUE)),
@@ -167,7 +167,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void testComplement() {
+    void testComplement() {
         assertEquals(emptyList(), complement(emptyList(), emptyList()));
 
         assertEquals(emptyList(), complement(emptyList(), asList(createRange(0L, 10L))));
@@ -202,7 +202,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void testGetLowerBound() {
+    void testGetLowerBound() {
         assertEquals(Long.MIN_VALUE, getLowerBound(emptyList()));
 
         assertEquals(Long.MIN_VALUE, getLowerBound(asList(createRange(Long.MIN_VALUE, 10L))));
@@ -215,7 +215,7 @@ public class IntegerRangeTest {
     }
 
     @Test
-    public void testGetUpperBound() {
+    void testGetUpperBound() {
         assertEquals(Long.MAX_VALUE, getUpperBound(emptyList()));
 
         assertEquals(Long.MAX_VALUE, getUpperBound(asList(createRange(-10L, Long.MAX_VALUE))));

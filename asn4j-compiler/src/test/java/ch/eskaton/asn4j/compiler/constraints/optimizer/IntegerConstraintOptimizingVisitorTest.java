@@ -42,7 +42,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class IntegerConstraintOptimizingVisitorTest {
 
     @Test
-    public void testVisitBinOpNodeUnion() {
+    void testVisitBinOpNodeUnion() {
         Visitor visitor = new IntegerConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(union(ConstraintTestUtils.intValue(), ConstraintTestUtils.intValue())), equalTo(ConstraintTestUtils.intValue()));
@@ -56,7 +56,7 @@ public class IntegerConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeIntersection() {
+    void testVisitBinOpNodeIntersection() {
         Visitor visitor = new IntegerConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(ConstraintTestUtils.intValue(), ConstraintTestUtils.intValue())), equalTo(ConstraintTestUtils.intValue()));
@@ -69,7 +69,7 @@ public class IntegerConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeComplement() {
+    void testVisitBinOpNodeComplement() {
         Visitor visitor = new IntegerConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(complement(ConstraintTestUtils.intValue(), ConstraintTestUtils.intValue())), equalTo(ConstraintTestUtils.intValue()));
@@ -81,7 +81,7 @@ public class IntegerConstraintOptimizingVisitorTest {
     }
 
     @Test
-    public void testVisitBinOpNodeNot() {
+    void testVisitBinOpNodeNot() {
         Visitor visitor = new IntegerConstraintOptimizingVisitor();
 
         assertThat(visitor.visit(intersection(ConstraintTestUtils.intValue(1, 10), not(ConstraintTestUtils.intValue(3, 7)))),

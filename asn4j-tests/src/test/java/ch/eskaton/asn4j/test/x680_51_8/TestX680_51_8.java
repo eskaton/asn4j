@@ -82,7 +82,7 @@ import static ch.eskaton.commons.utils.Utils.with;
 public class TestX680_51_8 {
 
     @Test
-    public void testSetOf1() {
+    void testSetOf1() {
         testSetOfSuccess(TestSetOf1.class, new TestSetOf1(), ASN1Integer.valueOf(0));
         testSetOfSuccess(TestSetOf1.class, new TestSetOf1(), ASN1Integer.valueOf(4));
 
@@ -91,7 +91,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf2() {
+    void testSetOf2() {
         testSetOfSuccess(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(1));
         testSetOfSuccess(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(2));
 
@@ -100,7 +100,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf3() {
+    void testSetOf3() {
         testSetOfSuccess(TestSetOf3.class, new TestSetOf3(), new ASN1SetOf<>(ASN1Integer.valueOf(0)));
         testSetOfSuccess(TestSetOf3.class, new TestSetOf3(), new ASN1SetOf<>(ASN1Integer.valueOf(4)));
         testSetOfSuccess(TestSetOf3.class, new TestSetOf3(),
@@ -113,7 +113,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf4() {
+    void testSetOf4() {
         testSetOfSuccess(TestSetOf4.class, new TestSetOf4(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(0), ASN1Integer.valueOf(1)));
         testSetOfSuccess(TestSetOf4.class, new TestSetOf4(), new ASN1SetOf<>(ASN1Integer.valueOf(1),
@@ -128,7 +128,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf5() {
+    void testSetOf5() {
         testSetOfSuccess(TestSetOf5.class, new TestSetOf5(), new ASN1SetOf<>(ASN1Integer.valueOf(1)));
         testSetOfSuccess(TestSetOf5.class, new TestSetOf5(), new ASN1SetOf<>(ASN1Integer.valueOf(2)));
         testSetOfSuccess(TestSetOf5.class, new TestSetOf5(),
@@ -139,7 +139,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf6() {
+    void testSetOf6() {
         testSetOfSuccess(TestSetOf6.class, new TestSetOf6(), new ASN1SetOf<>(ASN1Integer.valueOf(1)));
         testSetOfSuccess(TestSetOf6.class, new TestSetOf6(), new ASN1SetOf<>(ASN1Integer.valueOf(2)));
         testSetOfSuccess(TestSetOf6.class, new TestSetOf6(),
@@ -152,7 +152,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf7() {
+    void testSetOf7() {
         testSetOfSuccess(TestSetOf7.class, new TestSetOf7(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(1), ASN1Integer.valueOf(2)));
 
@@ -165,7 +165,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf8() {
+    void testSetOf8() {
         testSetOfSuccess(TestSetOf8.class, new TestSetOf8(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(0), ASN1Integer.valueOf(3)));
 
@@ -178,7 +178,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf10() {
+    void testSetOf10() {
         testSetOfSuccess(TestSetOf10.class, new TestSetOf10());
         testSetOfSuccess(TestSetOf10.class, new TestSetOf10(), ASN1Boolean.TRUE);
 
@@ -186,7 +186,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf12() {
+    void testSetOf12() {
         testSetOfSuccess(TestSetOf12.class, new TestSetOf12());
         testSetOfSuccess(TestSetOf12.class, new TestSetOf12(), TestEnumerated1.A);
 
@@ -195,13 +195,13 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf14() {
+    void testSetOf14() {
         testSetOfSuccess(TestSetOf14.class, new TestSetOf14());
         testSetOfSuccess(TestSetOf14.class, new TestSetOf14(), new ASN1Null());
     }
 
     @Test
-    public void testSetOf16() {
+    void testSetOf16() {
         testSetOfSuccess(TestSetOf16.class, new TestSetOf16());
         testSetOfSuccess(TestSetOf16.class, new TestSetOf16(), ASN1ObjectIdentifier.from(0, 3, 6, 3));
 
@@ -209,7 +209,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf18() {
+    void testSetOf18() {
         testSetOfSuccess(TestSetOf18.class, new TestSetOf18());
         testSetOfSuccess(TestSetOf18.class, new TestSetOf18(), ASN1RelativeOID.from(3, 6, 3));
 
@@ -217,7 +217,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf20() {
+    void testSetOf20() {
         testSetOfSuccess(TestSetOf20.class, new TestSetOf20());
         testSetOfSuccess(TestSetOf20.class, new TestSetOf20(), ASN1IRI.from("ISO", "a", "b", "e"));
 
@@ -225,7 +225,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf22() {
+    void testSetOf22() {
         testSetOfSuccess(TestSetOf22.class, new TestSetOf22());
         testSetOfSuccess(TestSetOf22.class, new TestSetOf22(), ASN1RelativeIRI.from("a", "b", "e"));
 
@@ -233,7 +233,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSetOf24() {
+    void testSetOf24() {
         testSetOfSuccess(TestSetOf24.class, new TestSetOf24());
         testSetOfSuccess(TestSetOf24.class, new TestSetOf24(), ASN1OctetString.valueOf(new byte[] { 0x50 }));
 
@@ -241,7 +241,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSequenceOf1() {
+    void testSequenceOf1() {
         testSequenceOfSuccess(TestSequenceOf1.class, new TestSequenceOf1(), ASN1Integer.valueOf(0));
         testSequenceOfSuccess(TestSequenceOf1.class, new TestSequenceOf1(), ASN1Integer.valueOf(4));
 
@@ -250,7 +250,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSequenceOf2() {
+    void testSequenceOf2() {
         testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(1));
         testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(2));
 
@@ -259,7 +259,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSequence2() {
+    void testSequence2() {
         testSequenceSuccess(TestSequence2.class, new TestSequence2(), s -> {
             s.setA(ASN1Integer.valueOf(1));
             s.setB(ASN1Boolean.TRUE);
@@ -280,7 +280,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSequence3() {
+    void testSequence3() {
         testSequenceSuccess(TestSequence3.class, new TestSequence3(), s -> {
             s.setC(with(new TestSequence2(), s2 -> {
                 s2.setA(ASN1Integer.valueOf(1));
@@ -313,7 +313,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSequence4() {
+    void testSequence4() {
         testSequenceSuccess(TestSequence4.class, new TestSequence4(), s -> {
             s.setC(with(new TestSequence4.C(), s2 -> {
                 s2.setA(ASN1Integer.valueOf(1));
@@ -346,7 +346,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSequence5() {
+    void testSequence5() {
         testSequenceSuccess(TestSequence5.class, new TestSequence5(), s -> s.setA(A));
         testSequenceSuccess(TestSequence5.class, new TestSequence5(), s -> s.setA(B));
 
@@ -354,12 +354,12 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSequence6() {
+    void testSequence6() {
         testSequenceSuccess(TestSequence6.class, new TestSequence6(), s -> s.setA(new ASN1Null()));
     }
 
     @Test
-    public void testSequence7() {
+    void testSequence7() {
         testSequenceSuccess(TestSequence7.class, new TestSequence7(),
                 s -> s.setA(new ASN1ObjectIdentifier(0, 3, 6, 3)));
 
@@ -368,21 +368,21 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSequence8() {
+    void testSequence8() {
         testSequenceSuccess(TestSequence8.class, new TestSequence8(), s -> s.setA(new ASN1RelativeOID(3, 6, 3)));
 
         testSequenceFailure(TestSequence8.class, new TestSequence8(), s -> s.setA(new ASN1RelativeOID(3, 6, 4)));
     }
 
     @Test
-    public void testSequence9() {
+    void testSequence9() {
         testSequenceSuccess(TestSequence9.class, new TestSequence9(), s -> s.setA(new ASN1IRI("ISO", "a", "b", "e")));
 
         testSequenceFailure(TestSequence9.class, new TestSequence9(), s -> s.setA(new ASN1IRI("ISO", "a", "b", "c")));
     }
 
     @Test
-    public void testSequence10() {
+    void testSequence10() {
         testSequenceSuccess(TestSequence10.class, new TestSequence10(),
                 s -> s.setA(new ASN1RelativeIRI("a", "b", "e")));
 
@@ -391,7 +391,7 @@ public class TestX680_51_8 {
     }
 
     @Test
-    public void testSequence11() {
+    void testSequence11() {
         testSequenceSuccess(TestSequence11.class, new TestSequence11(),
                 s -> s.setA(new ASN1BitString(new byte[] { 0x05 }, 4)));
 

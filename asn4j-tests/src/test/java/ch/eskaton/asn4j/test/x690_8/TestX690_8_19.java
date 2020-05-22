@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX690_8_19 {
 
     @Test
-    public void testEncodeObjectIdentifier() {
+    void testEncodeObjectIdentifier() {
         BEREncoder encoder = new BEREncoder();
 
         ASN1ObjectIdentifier a = ASN1ObjectIdentifier.from(1, 3, 132, 0, 35);
@@ -47,7 +47,7 @@ public class TestX690_8_19 {
     }
 
     @Test
-    public void testDecodeTestChoice1() {
+    void testDecodeTestChoice1() {
         BERDecoder decoder = new BERDecoder();
 
         ASN1ObjectIdentifier a = ASN1ObjectIdentifier.from(1, 3, 132, 0, 35);

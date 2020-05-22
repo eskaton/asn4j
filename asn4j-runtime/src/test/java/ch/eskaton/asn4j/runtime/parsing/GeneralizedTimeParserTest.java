@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class GeneralizedTimeParserTest {
 
     @Test
-    public void testParseLocalDateTime() throws ASN1RuntimeException {
+    void testParseLocalDateTime() throws ASN1RuntimeException {
         verifyLocalDateTime(new GeneralizedTimeParser().parse("20191231"), 2019, 12, 31, 0, 0, 0, 0);
         verifyLocalDateTime(new GeneralizedTimeParser().parse("2019123105"), 2019, 12, 31, 5, 0, 0, 0);
         verifyLocalDateTime(new GeneralizedTimeParser().parse("2019123105.54321"), 2019, 12, 31, 5, 32, 35, 556000000);
@@ -48,7 +48,7 @@ public class GeneralizedTimeParserTest {
     }
 
     @Test
-    public void testParseOffsetDateTime() throws ASN1RuntimeException {
+    void testParseOffsetDateTime() throws ASN1RuntimeException {
         verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231Z"), 2019, 12, 31, 0, 0, 0, 0, null, true);
         verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231+0000"), 2019, 12, 31, 0, 0, 0, 0, "+0000", null);
         verifyOffsetDateTime(new GeneralizedTimeParser().parse("20191231+1230"), 2019, 12, 31, 0, 0, 0, 0, "+1230", null);
@@ -63,7 +63,7 @@ public class GeneralizedTimeParserTest {
     }
 
     @Test
-    public void testParseInvalidDateTime() {
+    void testParseInvalidDateTime() {
         assertInvalid("2019");
         assertInvalid("201905");
         assertInvalid("2019053");

@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX690_8_9 {
 
     @Test
-    public void testEncodeTestSequence1() {
+    void testEncodeTestSequence1() {
         BEREncoder encoder = new BEREncoder();
 
         TestSequence1 a = new TestSequence1();
@@ -56,7 +56,7 @@ public class TestX690_8_9 {
     }
 
     @Test
-    public void testDecodeTestSequence2() {
+    void testDecodeTestSequence2() {
         BERDecoder decoder = new BERDecoder();
 
         TestSequence2 a = new TestSequence2();

@@ -44,19 +44,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
     @Test
-    public void testEmptyTags() {
+    void testEmptyTags() {
         assertThrows(IllegalArgumentException.class,
                 () -> new BERDecoder.MultipleTagsMatcher(Collections.emptyList()));
     }
 
     @Test
-    public void testEmptyTagsList() {
+    void testEmptyTagsList() {
         assertThrows(IllegalArgumentException.class,
                 () -> new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1a.class), Collections.emptyList())));
     }
 
     @Test
-    public void testImplicit() {
+    void testImplicit() {
         List<ASN1Tag> tags1 = getTags(TestTag1a.class);
         List<ASN1Tag> tags2 = getTags(TestTag2a.class);
         BERDecoder.MultipleTagsMatcher matcher = new BERDecoder.MultipleTagsMatcher(asList(tags1, tags2));
@@ -81,7 +81,7 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    public void testImplicitFailure() {
+    void testImplicitFailure() {
         BERDecoder.MultipleTagsMatcher matcher = new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1a.class), getTags(TestTag2a.class)));
 
         assertTrue(matcher.hasNext());
@@ -94,7 +94,7 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    public void testExplicit() {
+    void testExplicit() {
         List<ASN1Tag> tags1 = getTags(TestTag1b.class);
         List<ASN1Tag> tags2 = getTags(TestTag2b.class);
         BERDecoder.MultipleTagsMatcher matcher = new BERDecoder.MultipleTagsMatcher(asList(tags1, tags2));
@@ -131,7 +131,7 @@ public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    public void testExplicitFailure() {
+    void testExplicitFailure() {
         BERDecoder.MultipleTagsMatcher matcher = new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1b.class), getTags(TestTag2b.class)));
 
         assertTrue(matcher.hasNext());

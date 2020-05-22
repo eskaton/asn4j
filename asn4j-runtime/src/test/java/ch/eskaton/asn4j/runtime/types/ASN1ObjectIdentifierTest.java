@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class ASN1ObjectIdentifierTest {
 
     @Test
-    public void testInvalidObjectIdentifiers() {
+    void testInvalidObjectIdentifiers() {
         testInvalidIdentifier(() -> ASN1ObjectIdentifier.from(0));
         testInvalidIdentifier(() -> ASN1ObjectIdentifier.from(3));
         testInvalidIdentifier(() -> ASN1ObjectIdentifier.from(-1));
@@ -21,7 +21,7 @@ public class ASN1ObjectIdentifierTest {
     }
 
     @Test
-    public void testValidObjectIdentifiers() {
+    void testValidObjectIdentifiers() {
         assertDoesNotThrow(() -> ASN1ObjectIdentifier.from(0, 1));
         assertDoesNotThrow(() -> ASN1ObjectIdentifier.from(1, 1));
         assertDoesNotThrow(() -> ASN1ObjectIdentifier.from(2, 1));

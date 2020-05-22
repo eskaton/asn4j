@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX680_35 {
 
     @Test
-    public void testRelativeIRIsWithDefaults() {
+    void testRelativeIRIsWithDefaults() {
         ASN1RelativeIRI testRelativeOidIri1 = createRelativeIRI(new ASN1RelativeIRI(), "Registration-Authority", "19785.CBEFF", "Organizations");
         ASN1RelativeIRI testRelativeOidIri2 = createRelativeIRI(new ASN1RelativeIRI(), "Registration-Authority", "Test");
         ASN1RelativeIRI testRelativeOidIri3 = createRelativeIRI(new ASN1RelativeIRI(), "19785.CBEFF");
@@ -54,7 +54,7 @@ public class TestX680_35 {
     }
 
     @Test
-    public void testRelativeIRIsWithoutDefaults() {
+    void testRelativeIRIsWithoutDefaults() {
         ASN1RelativeIRI testRelativeOidIri1 = createRelativeIRI(new ASN1RelativeIRI(), "Registration-Authority", "19785.CBEFF", "Organizations");
         ASN1RelativeIRI testRelativeOidIri2 = createRelativeIRI(new ASN1RelativeIRI(), "Registration-Authority", "Test");
         ASN1RelativeIRI testRelativeOidIri3 = createRelativeIRI(new ASN1RelativeIRI(), "19785.CBEFF");

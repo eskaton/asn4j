@@ -35,7 +35,7 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 public class TestX680_24 {
 
     @Test
-    public void test1() {
+    void test1() {
         assertDecodable(ASN1Null.class);
     }
 

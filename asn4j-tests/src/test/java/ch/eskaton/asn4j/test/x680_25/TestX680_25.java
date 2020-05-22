@@ -55,13 +55,13 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Single component")
-    public void testSequence0() {
+    void testSequence0() {
         assertDecodable(TestSequence0.class, value -> value.setA(ASN1Boolean.TRUE));
     }
 
     @Test
     @DisplayName("Multiple components")
-    public void testSequence1() {
+    void testSequence1() {
         assertDecodable(TestSequence1.class, value -> {
             value.setA(ASN1Integer.valueOf(4711));
             value.setB(ASN1Boolean.TRUE);
@@ -71,7 +71,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Optional component")
-    public void testSequence2() {
+    void testSequence2() {
         assertDecodable(TestSequence2.class, value -> {
             value.setA(ASN1Integer.valueOf(4711));
             value.setC(ASN1OctetString.valueOf(new byte[] { (byte) 0xff, (byte) 0x56 }));
@@ -80,7 +80,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Default values at end")
-    public void testSequence3() {
+    void testSequence3() {
         assertDecodableVerifyAfter(TestSequence3.class,
                 value -> {
                     value.setA(ASN1Integer.valueOf(4711));
@@ -91,7 +91,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Default values at beginning")
-    public void testSequence4() {
+    void testSequence4() {
         assertDecodableVerifyAfter(TestSequence4.class,
                 value -> {
                     value.setB(ASN1Boolean.TRUE);
@@ -102,7 +102,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Extension addition")
-    public void testSequence5() {
+    void testSequence5() {
         assertDecodableVerifyAfter(TestSequence5.class,
                 value -> {
                     value.setA(ASN1Integer.valueOf(4711));
@@ -118,7 +118,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Include components with COMPONENTS OF")
-    public void testSequence6() {
+    void testSequence6() {
         assertDecodableVerifyAfter(TestSequence6.class, value -> {
                     value.setA(ASN1Integer.valueOf(4711));
                     value.setB(ASN1Boolean.TRUE);
@@ -133,7 +133,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Include components with COMPONENTS OF with default value")
-    public void testSequence6defaults() {
+    void testSequence6defaults() {
         assertDecodableVerifyAfter(TestSequence6.class,
                 value -> {
                     value.setB(ASN1Boolean.FALSE);
@@ -148,7 +148,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Extension groups with version")
-    public void testSequence7() {
+    void testSequence7() {
         assertDecodableVerifyAfter(TestSequence7.class,
                 value -> {
                     value.setA(ASN1Integer.valueOf(23));
@@ -166,7 +166,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Nested sequence")
-    public void testSequence8() {
+    void testSequence8() {
         assertDecodableVerifyAfter(TestSequence8.class,
                 value -> value.setChildSequence(with(new TestSequence8.ChildSequence(),
                         childValue -> childValue.setA(ASN1Integer.valueOf(4711)))),
@@ -175,7 +175,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Enumerated component")
-    public void testSequence9() {
+    void testSequence9() {
         assertDecodableVerifyAfter(TestSequence9.class,
                 value -> value.setChildEnumerated(with(new TestSequence9.ChildEnumerated(),
                         childValue -> childValue.setValue(TestSequence9.ChildEnumerated.A))),
@@ -184,7 +184,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Extension group without version")
-    public void testSequence10() {
+    void testSequence10() {
         assertDecodableVerifyAfter(TestSequence10.class,
                 value -> {
                     value.setA(ASN1Integer.valueOf(23));
@@ -202,7 +202,7 @@ public class TestX680_25 {
 
     @Test
     @DisplayName("Nested sequence with extension addition")
-    public void testSequence11() {
+    void testSequence11() {
         assertDecodableVerifyAfter(TestSequence11.class,
                 value -> value.setChildSequence(with(new TestSequence11.ChildSequence(),
                         childValue -> {

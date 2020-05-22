@@ -52,23 +52,23 @@ import static java.util.Arrays.asList;
 public class TestX680_26 {
 
     @Test
-    public void testSequenceOf1() {
+    void testSequenceOf1() {
         assertDecodable(TestSequenceOf1.class,
                 value -> value.setValues(ASN1Integer.valueOf(4711), ASN1Integer.valueOf(23)));
     }
 
     @Test
-    public void testSequenceOf2() {
+    void testSequenceOf2() {
         assertDecodable(TestSequenceOf2.class, value -> value.setValues(new ASN1SetOf<>(TestSequenceOf2Content.A)));
     }
 
     @Test
-    public void testSequenceOf3() {
+    void testSequenceOf3() {
         assertDecodable(TestSequenceOf3.class, value -> value.setValues(TestSequenceOf3Content.ONE));
     }
 
     @Test
-    public void testSequenceOf4() {
+    void testSequenceOf4() {
         assertDecodable(TestSequenceOf4.class, value -> {
             var bitString = new TestSequenceOf4Content(new byte[] { 0x00 }, 0);
 
@@ -79,7 +79,7 @@ public class TestX680_26 {
     }
 
     @Test
-    public void testSequenceOf5() {
+    void testSequenceOf5() {
         assertDecodable(TestSequenceOf5.class, value -> {
             value.setValues(with(new TestSequenceOf5Content(), (content) -> {
                 content.setA(with(new A(), (a) ->

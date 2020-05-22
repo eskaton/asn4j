@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class AbstractBaseXStringValueTest {
 
     @Test
-    public void testToBitString() {
+    void testToBitString() {
         assertEquals(new BitStringValue(new byte[] {}, 0),
                 new AbstractBaseXStringValue(NO_POSITION, "", 2).toBitString());
 
@@ -50,7 +50,7 @@ public class AbstractBaseXStringValueTest {
     }
 
     @Test
-    public void testToOctetString() {
+    void testToOctetString() {
         assertEquals(new OctetStringValue(new byte[] {}),
                 new AbstractBaseXStringValue(NO_POSITION, "", 16).toOctetString());
 

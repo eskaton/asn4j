@@ -39,52 +39,52 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestX680_20 {
 
     @Test
-    public void test1() {
+    void test1() {
         testEnumeration(TestEnumeration.M, -3);
     }
 
     @Test
-    public void test2() {
+    void test2() {
         testEnumeration(TestEnumeration.A, 1);
     }
 
     @Test
-    public void test3() {
+    void test3() {
         testEnumeration(TestEnumeration.B, 2);
     }
 
     @Test
-    public void test4() {
+    void test4() {
         testEnumeration(TestEnumeration.C, 0);
     }
 
     @Test
-    public void test5() {
+    void test5() {
         testEnumeration(TestEnumeration.D, 3);
     }
 
     @Test
-    public void test6() {
+    void test6() {
         testEnumeration(TestEnumeration.E, 5);
     }
 
     @Test
-    public void test7() {
+    void test7() {
         testEnumeration(TestEnumeration.F, 6);
     }
 
     @Test
-    public void test8() {
+    void test8() {
         testEnumeration(TestEnumeration.G, 9);
     }
 
     @Test
-    public void test9() {
+    void test9() {
         testEnumeration(TestEnumeration.H, 10);
     }
 
     @Test
-    public void testEnumerationDefault() {
+    void testEnumerationDefault() {
         assertDecodableVerifyAfter(TestEnumerations.class, value -> {
             assertEquals(TestEnumeration.M, value.getTestEnumeration1());
             assertEquals(TestEnumeration.E, value.getTestEnumeration2());

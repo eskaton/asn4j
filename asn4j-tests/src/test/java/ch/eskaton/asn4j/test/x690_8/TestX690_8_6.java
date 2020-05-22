@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TestX690_8_6 {
 
     @Test
-    public void testEncode() {
+    void testEncode() {
         BEREncoder encoder = new BEREncoder();
 
         assertArrayEquals(new byte[] { 0x03, 0x01, 0x00 },
@@ -53,7 +53,7 @@ public class TestX690_8_6 {
     }
 
     @Test
-    public void testDecode() {
+    void testDecode() {
         BERDecoder decoder = new BERDecoder();
 
         assertEquals(ASN1BitString.of(new byte[] {}),
@@ -65,13 +65,13 @@ public class TestX690_8_6 {
     }
 
     @Test
-    public void testDecodeUnusedBitsFailure() {
+    void testDecodeUnusedBitsFailure() {
         assertThrows(DecodingException.class,
                 () -> new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x01, 0x01 }));
     }
 
     @Test
-    public void testDecodeLengthFailure() {
+    void testDecodeLengthFailure() {
         assertThrows(PrematureEndOfInputException.class,
                 () -> new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x02, 0x00 }));
     }

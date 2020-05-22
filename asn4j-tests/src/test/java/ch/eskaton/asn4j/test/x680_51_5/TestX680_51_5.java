@@ -72,13 +72,13 @@ import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 public class TestX680_51_5 {
 
     @Test
-    public void testBitString1() {
+    void testBitString1() {
         testBitStringSuccess(TestBitString1.class, new TestBitString1(), 0x0, 0);
         testBitStringSuccess(TestBitString1.class, new TestBitString1(), 0xFFFFFFFFFFFFFFFFL, 0);
     }
 
     @Test
-    public void testBitString2() {
+    void testBitString2() {
         testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0x0F, 4);
         testBitStringSuccess(TestBitString2.class, new TestBitString2(), 0xFFFFFFFFFFFFFFFFL, 0);
 
@@ -86,7 +86,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString3() {
+    void testBitString3() {
         testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x01, 7);
         testBitStringSuccess(TestBitString3.class, new TestBitString3(), 0x0F, 4);
 
@@ -94,7 +94,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString4() {
+    void testBitString4() {
         testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x02, 6);
         testBitStringSuccess(TestBitString4.class, new TestBitString4(), 0x3F, 2);
 
@@ -102,7 +102,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString5() {
+    void testBitString5() {
         testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0x02, 6);
         testBitStringSuccess(TestBitString5.class, new TestBitString5(), 0xFF, 0);
 
@@ -110,7 +110,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString6() {
+    void testBitString6() {
         testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0x0F, 4);
         testBitStringSuccess(TestBitString6.class, new TestBitString6(), 0xFF, 0);
 
@@ -119,7 +119,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString7() {
+    void testBitString7() {
         testBitStringSuccess(TestBitString7.class, new TestBitString7(), 0x0F, 4);
         testBitStringSuccess(TestBitString7.class, new TestBitString7(), 0x7F, 1);
         testBitStringSuccess(TestBitString7.class, new TestBitString7(), 0x01FFFFL, 7);
@@ -129,7 +129,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString8() {
+    void testBitString8() {
         testBitStringSuccess(TestBitString8.class, new TestBitString8(), 0x0F, 4);
         testBitStringSuccess(TestBitString8.class, new TestBitString8(), 0xFF, 0);
 
@@ -138,7 +138,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString9() {
+    void testBitString9() {
         testBitStringSuccess(TestBitString9.class, new TestBitString9(), 0x07, 5);
         testBitStringSuccess(TestBitString9.class, new TestBitString9(), 0x0F, 4);
         testBitStringSuccess(TestBitString9.class, new TestBitString9(), 0xFFF, 4);
@@ -146,7 +146,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString10() {
+    void testBitString10() {
         testBitStringSuccess(TestBitString10.class, new TestBitString10(), 0x00, 6);
         testBitStringSuccess(TestBitString10.class, new TestBitString10(), 0x01, 6);
         testBitStringSuccess(TestBitString10.class, new TestBitString10(), 0x02, 6);
@@ -157,7 +157,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString11() {
+    void testBitString11() {
         testBitStringFailure(TestBitString11.class, new TestBitString11(), 0x00, 7);
         testBitStringFailure(TestBitString11.class, new TestBitString11(), 0x01, 7);
 
@@ -167,7 +167,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testBitString12() {
+    void testBitString12() {
         testBitStringFailure(TestBitString12.class, new TestBitString12(), 0x00, 6);
         testBitStringFailure(TestBitString12.class, new TestBitString12(), 0x01, 6);
         testBitStringFailure(TestBitString12.class, new TestBitString12(), 0x02, 6);
@@ -179,13 +179,13 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString1() {
+    void testOctetString1() {
         testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), new byte[] {});
         testOctetStringSuccess(TestOctetString1.class, new TestOctetString1(), randomBytes(255));
     }
 
     @Test
-    public void testOctetString2() {
+    void testOctetString2() {
         testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), randomBytes(4));
         testOctetStringSuccess(TestOctetString2.class, new TestOctetString2(), randomBytes(255));
 
@@ -193,7 +193,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString3() {
+    void testOctetString3() {
         testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), new byte[] {});
         testOctetStringSuccess(TestOctetString3.class, new TestOctetString3(), randomBytes(4));
 
@@ -201,7 +201,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString4() {
+    void testOctetString4() {
         testOctetStringSuccess(TestOctetString4.class, new TestOctetString4(), randomBytes(2));
         testOctetStringSuccess(TestOctetString4.class, new TestOctetString4(), randomBytes(6));
 
@@ -210,7 +210,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString5() {
+    void testOctetString5() {
         testOctetStringSuccess(TestOctetString5.class, new TestOctetString5(), randomBytes(2));
         testOctetStringSuccess(TestOctetString5.class, new TestOctetString5(), randomBytes(255));
 
@@ -218,7 +218,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString6() {
+    void testOctetString6() {
         testOctetStringSuccess(TestOctetString6.class, new TestOctetString6(), randomBytes(4));
         testOctetStringSuccess(TestOctetString6.class, new TestOctetString6(), randomBytes(8));
 
@@ -227,7 +227,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString7() {
+    void testOctetString7() {
         testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), randomBytes(4));
         testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), randomBytes(7));
         testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), randomBytes(17));
@@ -238,7 +238,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString8() {
+    void testOctetString8() {
         testOctetStringSuccess(TestOctetString8.class, new TestOctetString8(), randomBytes(4));
         testOctetStringSuccess(TestOctetString8.class, new TestOctetString8(), randomBytes(8));
 
@@ -247,7 +247,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString9() {
+    void testOctetString9() {
         testOctetStringSuccess(TestOctetString9.class, new TestOctetString9(), randomBytes(3));
         testOctetStringSuccess(TestOctetString9.class, new TestOctetString9(), randomBytes(4));
         testOctetStringSuccess(TestOctetString9.class, new TestOctetString9(), randomBytes(16));
@@ -255,7 +255,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString10() {
+    void testOctetString10() {
         testOctetStringSuccess(TestOctetString10.class, new TestOctetString10(), randomBytes(2));
 
         testOctetStringFailure(TestOctetString10.class, new TestOctetString10(), randomBytes(1));
@@ -263,7 +263,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString11() {
+    void testOctetString11() {
         testOctetStringSuccess(TestOctetString11.class, new TestOctetString11(), new byte[] {});
         testOctetStringSuccess(TestOctetString11.class, new TestOctetString11(), randomBytes(2));
         testOctetStringSuccess(TestOctetString11.class, new TestOctetString11(), randomBytes(255));
@@ -272,7 +272,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testOctetString12() {
+    void testOctetString12() {
         testOctetStringSuccess(TestOctetString12.class, new TestOctetString12(), new byte[] {});
         testOctetStringSuccess(TestOctetString12.class, new TestOctetString12(), randomBytes(1));
         testOctetStringSuccess(TestOctetString12.class, new TestOctetString12(), randomBytes(255));
@@ -281,7 +281,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testSetOf1() {
+    void testSetOf1() {
         testSetOfSuccess(TestSetOf1.class, new TestSetOf1(), ASN1Integer.valueOf(1L));
         testSetOfSuccess(TestSetOf1.class, new TestSetOf1(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
 
@@ -291,7 +291,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testSetOf2() {
+    void testSetOf2() {
         testSetOfSuccess(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(1L));
         testSetOfSuccess(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
         testSetOfSuccess(TestSetOf2.class, new TestSetOf2(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L),
@@ -303,7 +303,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testSetOf3() {
+    void testSetOf3() {
         testSetOfSuccess(TestSetOf3.class, new TestSetOf3(), ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L));
 
         testSetOfFailure(TestSetOf3.class, new TestSetOf3(ASN1Integer.valueOf(1L)));
@@ -312,7 +312,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testSequenceOf1() {
+    void testSequenceOf1() {
         testSequenceOfSuccess(TestSequenceOf1.class, new TestSequenceOf1(), ASN1Integer.valueOf(1L));
         testSequenceOfSuccess(TestSequenceOf1.class, new TestSequenceOf1(), ASN1Integer.valueOf(1L),
                 ASN1Integer.valueOf(2L));
@@ -324,7 +324,7 @@ public class TestX680_51_5 {
     }
 
     @Test
-    public void testSequenceOf2() {
+    void testSequenceOf2() {
         testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(), ASN1Integer.valueOf(1L),
                 ASN1Integer.valueOf(2L));
 

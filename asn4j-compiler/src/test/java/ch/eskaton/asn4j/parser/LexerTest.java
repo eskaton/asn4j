@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class LexerTest {
 
     @Test
-    public void testTypeReference() throws IOException, ParserException {
+    void testTypeReference() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("T Type Test-Type Test--Type".getBytes()));
 
         assertEquals(Token.TokenType.TYPE_REFERENCE, lexer.nextToken(Context.NORMAL).getType());
@@ -65,14 +65,14 @@ public class LexerTest {
     }
 
     @Test
-    public void testInvalidTypeReference() throws IOException {
+    void testInvalidTypeReference() throws IOException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("Type-".getBytes()));
 
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.NORMAL));
     }
 
     @Test
-    public void testTypeIdentifier() throws IOException, ParserException {
+    void testTypeIdentifier() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("t type test-type test-TYPE test--type".getBytes()));
 
         assertEquals(Token.TokenType.IDENTIFIER, lexer.nextToken(Context.NORMAL).getType());
@@ -93,14 +93,14 @@ public class LexerTest {
     }
 
     @Test
-    public void testInvalidIdentifier() throws IOException {
+    void testInvalidIdentifier() throws IOException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("type-".getBytes()));
 
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.NORMAL));
     }
 
     @Test
-    public void testObjectClassReference() throws IOException, ParserException {
+    void testObjectClassReference() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("T OBJECT-CLASS".getBytes()));
 
         assertEquals(Token.TokenType.OBJECT_CLASS_REFERENCE, lexer.nextToken(Context.OBJECT_CLASS).getType());
@@ -112,14 +112,14 @@ public class LexerTest {
     }
 
     @Test
-    public void testInvalidObjectClassReference() throws IOException {
+    void testInvalidObjectClassReference() throws IOException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("Invalid".getBytes()));
 
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.OBJECT_CLASS).getType());
     }
 
     @Test
-    public void testTypeFieldReference() throws IOException, ParserException {
+    void testTypeFieldReference() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("&T &Type-Field".getBytes()));
 
         assertEquals(Token.TokenType.TYPE_FIELD_REFERENCE, lexer.nextToken(Context.TYPE_FIELD).getType());
@@ -131,7 +131,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testValueFieldReference() throws IOException, ParserException {
+    void testValueFieldReference() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("&value-field".getBytes()));
 
         assertEquals(Token.TokenType.VALUE_FIELD_REFERENCE, lexer.nextToken(Context.VALUE_FIELD).getType());
@@ -141,7 +141,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testWord() throws IOException, ParserException {
+    void testWord() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("A-WORD".getBytes()));
 
         assertEquals(Token.TokenType.WORD, lexer.nextToken(Context.SYNTAX).getType());
@@ -151,7 +151,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testNumber() throws IOException, ParserException {
+    void testNumber() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("0 1 42 4711".getBytes()));
         Token token;
 
@@ -172,7 +172,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testRealNumber() throws IOException, ParserException {
+    void testRealNumber() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream(
                 "01 2. 3.41 3e0 3e12 3e-12 42.e-0 42.e5 42.e-5 77.35E0 77.35e+6 77.35e-6".getBytes()));
         Token token;
@@ -219,14 +219,14 @@ public class LexerTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "5e", "5e01" })
-    public void testInvalidRealNumber(String input) throws IOException {
+    void testInvalidRealNumber(String input) throws IOException {
         Lexer lexer = new Lexer(new ByteArrayInputStream(input.getBytes()));
 
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.NORMAL));
     }
 
     @Test
-    public void testBString() throws IOException, ParserException {
+    void testBString() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("''B '0'B '1'B '0101'B '1 01 1'B".getBytes()));
         Token token;
 
@@ -250,7 +250,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testHString() throws IOException, ParserException {
+    void testHString() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("''H '0'H '0B0F'H 'F AD 5'H".getBytes()));
         Token token;
 
@@ -271,7 +271,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testCString() throws IOException, ParserException {
+    void testCString() throws IOException, ParserException {
         Lexer lexer = new Lexer(
                 new ByteArrayInputStream(
                         "\"\" \"\"\"\" \" \" \"a\"\"b\" \"abc def\" \"abc   \t\r\n   def\nghi\" \"\n\nabc\""
@@ -308,7 +308,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testSimpleString() throws IOException, ParserException {
+    void testSimpleString() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("\"a\" \"abc def\" \"abc\n\ndef\"".getBytes()));
         Token token;
 
@@ -327,7 +327,7 @@ public class LexerTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "\"\"", "\"\"\"\"", "\"ü\"" })
-    public void testInvalidSimpleString(String input) throws IOException, ParserException {
+    void testInvalidSimpleString(String input) throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream(input.getBytes()));
         Token token = lexer.nextToken(Context.NORMAL);
 
@@ -340,7 +340,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testTString() throws IOException, ParserException {
+    void testTString() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("\".\" \"0123456789+-:.,/CDHMRPSTWYZ\"".getBytes()));
         Token token;
 
@@ -356,7 +356,7 @@ public class LexerTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "\"\"", "\"A\"", "\"0 1\"" })
-    public void testInvalidTString(String input) throws IOException, ParserException {
+    void testInvalidTString(String input) throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream(input.getBytes()));
         Token token = lexer.nextToken(Context.NORMAL);
 
@@ -369,7 +369,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testTokens() throws IOException, ParserException {
+    void testTokens() throws IOException, ParserException {
         testToken("::=", Token.TokenType.ASSIGN);
         testToken("..", Token.TokenType.RANGE);
         testToken("...", Token.TokenType.ELLIPSIS);
@@ -399,7 +399,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testKeywords() throws IOException, ParserException {
+    void testKeywords() throws IOException, ParserException {
         testToken("ABSENT", Token.TokenType.ABSENT_KW);
         testToken("ABSTRACT-SYNTAX", Token.TokenType.ABSTRACT_SYNTAX_KW);
         testToken("ALL", Token.TokenType.ALL_KW);
@@ -494,7 +494,7 @@ public class LexerTest {
     }
 
     @Test
-    public void testEncodingReference() throws IOException, ParserException {
+    void testEncodingReference() throws IOException, ParserException {
         Lexer lexer = new Lexer(new ByteArrayInputStream("TAG XER PER".getBytes()));
         Token token;
 
@@ -513,7 +513,7 @@ public class LexerTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "ABC", "xer" })
-    public void testInvalidEncodingReference(String input) throws IOException {
+    void testInvalidEncodingReference(String input) throws IOException {
         Lexer lexer = new Lexer(new ByteArrayInputStream(input.getBytes()));
 
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.ENCODING));

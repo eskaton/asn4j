@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class RuntimeUtilsTest {
 
     @Test
-    public void testGetComponent() {
+    void testGetComponent() {
         Field field = RuntimeUtils.getComponent(new TestSetA(), "a");
 
         assertNotNull(field);

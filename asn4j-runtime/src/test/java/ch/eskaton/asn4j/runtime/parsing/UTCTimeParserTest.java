@@ -37,13 +37,13 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class UTCTimeParserTest {
 
     @Test
-    public void testParseLocalDateTime() throws ASN1RuntimeException {
+    void testParseLocalDateTime() throws ASN1RuntimeException {
         verifyDateTime(new UTCTimeParser().parse("1912310547"), 19, 12, 31, 5, 47, 0);
         verifyDateTime(new UTCTimeParser().parse("191231054731"), 19, 12, 31, 5, 47, 31);
     }
 
     @Test
-    public void testParseOffsetDateTime() throws ASN1RuntimeException {
+    void testParseOffsetDateTime() throws ASN1RuntimeException {
         verifyDateTime(new UTCTimeParser().parse("1912310547+0030"), 19, 12, 31, 05, 47, 0, "+0030", null);
         verifyDateTime(new UTCTimeParser().parse("1912310547Z"), 19, 12, 31, 05, 47, 0, null, true);
         verifyDateTime(new UTCTimeParser().parse("191231054731+0815"), 19, 12, 31, 05, 47, 31, "+0815", null);
@@ -53,7 +53,7 @@ public class UTCTimeParserTest {
     }
 
     @Test
-    public void testParseInvalidDateTime() {
+    void testParseInvalidDateTime() {
         assertInvalid("2019");
         assertInvalid("201905");
         assertInvalid("2019053");

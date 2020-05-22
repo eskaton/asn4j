@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ASN1BitStringTest {
 
     @Test
-    public void testSetValue() {
+    void testSetValue() {
     	ASN1BitString bs = new ASN1BitString();
 
     	bs.setValue(new byte[] { 0x01 });
@@ -62,21 +62,21 @@ public class ASN1BitStringTest {
     }
 
     @Test
-    public void testSetBit0() throws ASN1RuntimeException {
+    void testSetBit0() throws ASN1RuntimeException {
     	ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00 });
     	bs.setBit(0);
     	assertArrayEquals(new byte[] { (byte) 0x80 }, bs.getValue());
     }
 
     @Test
-    public void testSetBit7() throws ASN1RuntimeException {
+    void testSetBit7() throws ASN1RuntimeException {
     	ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00 });
     	bs.setBit(7);
     	assertArrayEquals(new byte[] { (byte) 0x01 }, bs.getValue());
     }
 
     @Test
-    public void testSetBit15() throws ASN1RuntimeException {
+    void testSetBit15() throws ASN1RuntimeException {
     	ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00, 0x00 });
     	bs.setBit(15);
     	assertArrayEquals(new byte[] { (byte) 0x00, (byte) 0x01 },
@@ -84,14 +84,14 @@ public class ASN1BitStringTest {
     }
 
     @Test
-    public void testTestBit15() throws ASN1RuntimeException {
+    void testTestBit15() throws ASN1RuntimeException {
     	ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00, 0x00 });
     	bs.setBit(15);
     	assertTrue(bs.testBit(15));
     }
 
     @Test
-    public void testClearBit() throws ASN1RuntimeException {
+    void testClearBit() throws ASN1RuntimeException {
     	ASN1BitString bs = ASN1BitString.of(new byte[] { 0x00, 0x00 });
     	bs.setBit(1);
 

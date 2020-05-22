@@ -461,12 +461,12 @@ public class ParserTest {
      */
 
     @Test
-    public void testModuleDefinitionParser() {
+    void testModuleDefinitionParser() {
         // TODO: implement
     }
 
     @Test
-    public void testModuleIdentifierParser() throws IOException,
+    void testModuleIdentifierParser() throws IOException,
             ParserException {
         ModuleIdentifierParser parser = new Parser(new ByteArrayInputStream(
                 "Module { test-a test-b (47) 21 }".getBytes())).new ModuleIdentifierParser();
@@ -479,7 +479,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinitiveIdentificationParser() throws IOException,
+    void testDefinitiveIdentificationParser() throws IOException,
             ParserException {
         DefinitiveIdentificationParser parser = new Parser(
                 new ByteArrayInputStream("{ test-a test-b (47) 21 }".getBytes())).new DefinitiveIdentificationParser();
@@ -502,7 +502,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinitiveOIDParser() throws IOException, ParserException {
+    void testDefinitiveOIDParser() throws IOException, ParserException {
         DefinitiveOIDParser parser = new Parser(new ByteArrayInputStream(
                 "{ test-a test-b (47) 21 }".getBytes())).new DefinitiveOIDParser();
 
@@ -512,7 +512,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinitiveObjIdComponentListParser() throws IOException,
+    void testDefinitiveObjIdComponentListParser() throws IOException,
             ParserException {
         DefinitiveObjIdComponentListParser parser = new Parser(
                 new ByteArrayInputStream("test-a test-b (47) 21".getBytes())).new DefinitiveObjIdComponentListParser();
@@ -525,7 +525,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinitiveObjIdComponentParser() throws IOException,
+    void testDefinitiveObjIdComponentParser() throws IOException,
             ParserException {
         DefinitiveObjIdComponentParser parser = new Parser(
                 new ByteArrayInputStream("test".getBytes())).new DefinitiveObjIdComponentParser();
@@ -548,7 +548,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinitiveNumberFormParser() throws IOException,
+    void testDefinitiveNumberFormParser() throws IOException,
             ParserException {
         DefinitiveNumberFormParser parser = new Parser(
                 new ByteArrayInputStream("23".getBytes())).new DefinitiveNumberFormParser();
@@ -561,7 +561,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinitiveNameAndNumberFormParser() throws IOException,
+    void testDefinitiveNameAndNumberFormParser() throws IOException,
             ParserException {
         DefinitiveNameAndNumberFormParser parser = new Parser(
                 new ByteArrayInputStream("test (23)".getBytes())).new DefinitiveNameAndNumberFormParser();
@@ -574,7 +574,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testEncodingReferenceDefault() throws IOException,
+    void testEncodingReferenceDefault() throws IOException,
             ParserException {
         EncodingReferenceDefaultParser parser = new Parser(
                 new ByteArrayInputStream("XER INSTRUCTIONS".getBytes())).new EncodingReferenceDefaultParser();
@@ -590,7 +590,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTagDefaultParser() throws IOException, ParserException {
+    void testTagDefaultParser() throws IOException, ParserException {
         TagDefaultParser parser = new Parser(new ByteArrayInputStream(
                 "EXPLICIT TAGS".getBytes())).new TagDefaultParser();
         assertEquals(TagMode.EXPLICIT, parser.parse());
@@ -605,7 +605,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionDefault() throws IOException, ParserException {
+    void testExtensionDefault() throws IOException, ParserException {
         ExtensionDefaultParser parser = new Parser(new ByteArrayInputStream(
                 "EXTENSIBILITY IMPLIED".getBytes())).new ExtensionDefaultParser();
         assertTrue(parser.parse());
@@ -615,7 +615,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testModuleBodyParser() throws IOException, ParserException {
+    void testModuleBodyParser() throws IOException, ParserException {
         ModuleBodyParser parser = new Parser(new ByteArrayInputStream(
                 "EXPORTS ALL;".getBytes())).new ModuleBodyParser();
 
@@ -667,7 +667,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExportsParser() throws IOException, ParserException {
+    void testExportsParser() throws IOException, ParserException {
         ExportsParser parser = new Parser(new ByteArrayInputStream(
                 "EXPORTS ALL;".getBytes())).new ExportsParser();
 
@@ -687,7 +687,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testImportsParser() throws IOException, ParserException {
+    void testImportsParser() throws IOException, ParserException {
         ImportsParser parser = new Parser(
                 new ByteArrayInputStream(
                         "IMPORTS OBJECT-CL FROM Module2 Type, value{} FROM Module1 { iso standard 12 module-1 (1) };"
@@ -707,7 +707,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSymbolsFromModuleListParser() throws IOException,
+    void testSymbolsFromModuleListParser() throws IOException,
             ParserException {
         SymbolsFromModuleListParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -729,7 +729,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSymbolsFromModuleParser() throws IOException,
+    void testSymbolsFromModuleParser() throws IOException,
             ParserException {
         SymbolsFromModuleParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -744,7 +744,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testGlobalModuleReferenceParser() throws IOException,
+    void testGlobalModuleReferenceParser() throws IOException,
             ParserException {
         GlobalModuleReferenceParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -769,7 +769,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testAssignedIdentifierParser() throws IOException, ParserException {
+    void testAssignedIdentifierParser() throws IOException, ParserException {
         AssignedIdentifierParser parser = new Parser(new ByteArrayInputStream(
                 "value-reference".getBytes())).new AssignedIdentifierParser();
 
@@ -788,7 +788,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSymbolListParser() throws IOException, ParserException {
+    void testSymbolListParser() throws IOException, ParserException {
         SymbolListParser parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference".getBytes())).new SymbolListParser();
 
@@ -807,7 +807,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSymbolParser() throws IOException, ParserException {
+    void testSymbolParser() throws IOException, ParserException {
         SymbolParser parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference".getBytes())).new SymbolParser();
 
@@ -826,7 +826,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testReferenceParser() throws IOException, ParserException {
+    void testReferenceParser() throws IOException, ParserException {
         ReferenceParser parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference".getBytes())).new ReferenceParser();
 
@@ -847,7 +847,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testAssignmentListParser() throws IOException, ParserException {
+    void testAssignmentListParser() throws IOException, ParserException {
         AssignmentListParser parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference ::= VisibleString value-reference VisibleString ::= \"string\""
                         .getBytes())).new AssignmentListParser();
@@ -860,7 +860,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testAssignmentParser() throws IOException, ParserException {
+    void testAssignmentParser() throws IOException, ParserException {
         AssignmentParser parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference ::= VisibleString".getBytes())).new AssignmentParser();
 
@@ -922,7 +922,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testDefinedValueParser() throws IOException, ParserException {
+    void testDefinedValueParser() throws IOException, ParserException {
         DefinedValueParser parser = new Parser(new ByteArrayInputStream(
                 "Module.value".getBytes())).new DefinedValueParser();
 
@@ -951,7 +951,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExternalTypeReferenceParser() throws IOException,
+    void testExternalTypeReferenceParser() throws IOException,
             ParserException {
         ExternalTypeReferenceParser parser = new Parser(
                 new ByteArrayInputStream("Module.Type".getBytes())).new ExternalTypeReferenceParser();
@@ -965,7 +965,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExternalValueReferenceParser() throws IOException,
+    void testExternalValueReferenceParser() throws IOException,
             ParserException {
         ExternalValueReferenceParser parser = new Parser(
                 new ByteArrayInputStream("Module.value".getBytes())).new ExternalValueReferenceParser();
@@ -986,7 +986,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testTypeAssignmentParser() throws IOException, ParserException {
+    void testTypeAssignmentParser() throws IOException, ParserException {
         TypeAssignmentParser parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference ::= [TAG: APPLICATION 23] INTEGER ((0..MAX))"
                         .getBytes())).new TypeAssignmentParser();
@@ -999,7 +999,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueAssignmentParser() throws IOException, ParserException {
+    void testValueAssignmentParser() throws IOException, ParserException {
         ValueAssignmentParser parser = new Parser(new ByteArrayInputStream(
                 "value-reference INTEGER ::= 4711".getBytes())).new ValueAssignmentParser();
 
@@ -1022,7 +1022,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueSetAssignmentParser() throws IOException, ParserException {
+    void testValueSetAssignmentParser() throws IOException, ParserException {
         ValueSetTypeAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
                         "Type-Reference INTEGER ::= { ALL EXCEPT (4..6) }"
@@ -1037,7 +1037,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueSetParser() throws IOException, ParserException {
+    void testValueSetParser() throws IOException, ParserException {
         ValueSetParser parser = new Parser(new ByteArrayInputStream(
                 "{ ALL EXCEPT (4..6) }".getBytes())).new ValueSetParser();
 
@@ -1053,7 +1053,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testBuiltinTypeParser() throws IOException, ParserException {
+    void testBuiltinTypeParser() throws IOException, ParserException {
         BuiltinTypeParser parser = new Parser(new ByteArrayInputStream(
                 "BIT STRING { fst-bit (1), snd-bit (2), trd-bit (val-ref) }"
                         .getBytes())).new BuiltinTypeParser();
@@ -1255,7 +1255,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testReferencedTypeParser() throws IOException, ParserException {
+    void testReferencedTypeParser() throws IOException, ParserException {
         ReferencedTypeParser parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference".getBytes())).new ReferencedTypeParser();
 
@@ -1291,7 +1291,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNamedTypeParser() throws IOException, ParserException {
+    void testNamedTypeParser() throws IOException, ParserException {
         NamedTypeParser parser = new Parser(new ByteArrayInputStream(
                 "ident INTEGER".getBytes())).new NamedTypeParser();
 
@@ -1303,7 +1303,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueParser() throws IOException, ParserException {
+    void testValueParser() throws IOException, ParserException {
         ValueParser parser = new Parser(new ByteArrayInputStream(
                 "'1101'B".getBytes())).new ValueParser();
 
@@ -1324,7 +1324,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testBuiltinOrReferencedValueParser() throws IOException, ParserException {
+    void testBuiltinOrReferencedValueParser() throws IOException, ParserException {
         BuiltinOrReferencedValueParser parser = new Parser(
                 new ByteArrayInputStream("'1101'B".getBytes())).new BuiltinOrReferencedValueParser();
 
@@ -1479,7 +1479,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNamedValueParser() throws IOException, ParserException {
+    void testNamedValueParser() throws IOException, ParserException {
         NamedValueParser parser = new Parser(new ByteArrayInputStream(
                 "name 12".getBytes())).new NamedValueParser();
 
@@ -1498,7 +1498,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testBooleanTypeParser() throws IOException, ParserException {
+    void testBooleanTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "BOOLEAN".getBytes())).new BuiltinTypeParserAux();
 
@@ -1509,7 +1509,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testBooleanValueParser() throws IOException, ParserException {
+    void testBooleanValueParser() throws IOException, ParserException {
         BooleanValueParser parser = new Parser(new ByteArrayInputStream(
                 "FALSE".getBytes())).new BooleanValueParser();
 
@@ -1535,7 +1535,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testIntegerTypeParser() throws IOException, ParserException {
+    void testIntegerTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "INTEGER".getBytes())).new BuiltinTypeParserAux();
 
@@ -1546,7 +1546,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNamedNumberListParser() throws IOException, ParserException {
+    void testNamedNumberListParser() throws IOException, ParserException {
         NamedNumberListParser parser = new Parser(new ByteArrayInputStream(
                 "a-number (-12), another-number (23)".getBytes())).new NamedNumberListParser();
 
@@ -1557,7 +1557,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNamedNumberParser() throws IOException, ParserException {
+    void testNamedNumberParser() throws IOException, ParserException {
         NamedNumberParser parser = new Parser(new ByteArrayInputStream(
                 "a-number (-12)".getBytes())).new NamedNumberParser();
 
@@ -1580,7 +1580,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSignedNumberParser() throws IOException, ParserException {
+    void testSignedNumberParser() throws IOException, ParserException {
         SignedNumberParser parser = new Parser(new ByteArrayInputStream(
                 "18446744073709551615".getBytes())).new SignedNumberParser();
 
@@ -1598,7 +1598,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testIntegerValueParser() throws IOException, ParserException {
+    void testIntegerValueParser() throws IOException, ParserException {
         IntegerValueParser parser = new Parser(new ByteArrayInputStream(
                 "-12".getBytes())).new IntegerValueParser();
 
@@ -1615,7 +1615,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testEnumeratedTypeParser() throws IOException, ParserException {
+    void testEnumeratedTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "ENUMERATED {root-enum, ..., additional-enum}".getBytes())).new BuiltinTypeParserAux();
 
@@ -1626,7 +1626,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testEnumerationsParser() throws IOException, ParserException {
+    void testEnumerationsParser() throws IOException, ParserException {
         EnumerationsParser parser = new Parser(new ByteArrayInputStream(
                 "root-enum, root-enum-b".getBytes())).new EnumerationsParser();
 
@@ -1680,7 +1680,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testEnumerationParser() throws IOException, ParserException {
+    void testEnumerationParser() throws IOException, ParserException {
         EnumerationParser parser = new Parser(new ByteArrayInputStream(
                 "enum-ident".getBytes())).new EnumerationParser();
 
@@ -1699,7 +1699,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testEnumerationItemParser() throws IOException, ParserException {
+    void testEnumerationItemParser() throws IOException, ParserException {
         EnumerationItemParser parser = new Parser(new ByteArrayInputStream(
                 "enum-ident".getBytes())).new EnumerationItemParser();
 
@@ -1732,7 +1732,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testRealTypeParser() throws IOException, ParserException {
+    void testRealTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "REAL".getBytes())).new BuiltinTypeParserAux();
 
@@ -1743,7 +1743,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testRealValueParser() throws IOException, ParserException {
+    void testRealValueParser() throws IOException, ParserException {
         RealValueParser parser = new Parser(new ByteArrayInputStream(
                 "3.14e2".getBytes())).new RealValueParser();
 
@@ -1774,7 +1774,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNumericRealValueParser() throws IOException,
+    void testNumericRealValueParser() throws IOException,
             ParserException {
         NumericRealValueParser parser = new Parser(new ByteArrayInputStream(
                 "-1.5".getBytes())).new NumericRealValueParser();
@@ -1818,7 +1818,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSpecialRealValueParser() throws IOException,
+    void testSpecialRealValueParser() throws IOException,
             ParserException {
         SpecialRealValueParser parser = new Parser(new ByteArrayInputStream(
                 "PLUS-INFINITY".getBytes())).new SpecialRealValueParser();
@@ -1851,7 +1851,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testBitStringTypeParser() throws IOException, ParserException {
+    void testBitStringTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "BIT STRING".getBytes())).new BuiltinTypeParserAux();
 
@@ -1871,7 +1871,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNamedBitListParser() throws IOException, ParserException {
+    void testNamedBitListParser() throws IOException, ParserException {
         NamedBitListParser parser = new Parser(new ByteArrayInputStream(
                 "a-bit (3), another-bit (5)".getBytes())).new NamedBitListParser();
 
@@ -1882,7 +1882,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNamedBitParser() throws IOException, ParserException {
+    void testNamedBitParser() throws IOException, ParserException {
         NamedBitParser parser = new Parser(new ByteArrayInputStream(
                 "a-bit (3)".getBytes())).new NamedBitParser();
 
@@ -1905,7 +1905,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testBitStringValueParser() throws IOException, ParserException {
+    void testBitStringValueParser() throws IOException, ParserException {
         BitOrOctetStringValueParser parser = new Parser(
                 new ByteArrayInputStream("'1101'B".getBytes())).new BitOrOctetStringValueParser();
 
@@ -1941,7 +1941,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testIdentifierListParser() throws IOException, ParserException {
+    void testIdentifierListParser() throws IOException, ParserException {
         IdentifierListParser parser = new Parser(new ByteArrayInputStream(
                 "abc, def".getBytes())).new IdentifierListParser();
 
@@ -1960,7 +1960,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testOctetStringTypeParser() throws IOException, ParserException {
+    void testOctetStringTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "OCTET STRING".getBytes())).new BuiltinTypeParserAux();
 
@@ -1971,7 +1971,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testOctetStringValueParser() throws IOException, ParserException {
+    void testOctetStringValueParser() throws IOException, ParserException {
         BitOrOctetStringValueParser parser = new Parser(
                 new ByteArrayInputStream("'11010000111'B".getBytes())).new BitOrOctetStringValueParser();
 
@@ -2005,7 +2005,7 @@ public class ParserTest {
      * ***********************************************************************
      */
     @Test
-    public void testNullTypeParser() throws IOException, ParserException {
+    void testNullTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "NULL".getBytes())).new BuiltinTypeParserAux();
 
@@ -2016,7 +2016,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNullValueParser() throws IOException, ParserException {
+    void testNullValueParser() throws IOException, ParserException {
         NullValueParser parser = new Parser(new ByteArrayInputStream(
                 "NULL".getBytes())).new NullValueParser();
 
@@ -2033,7 +2033,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testSequenceTypeParser() throws IOException, ParserException {
+    void testSequenceTypeParser() throws IOException, ParserException {
         // SEQUENCE "{" "}"
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "SEQUENCE {}".getBytes())).new BuiltinTypeParserAux();
@@ -2069,7 +2069,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionAndExceptionParser() throws IOException,
+    void testExtensionAndExceptionParser() throws IOException,
             ParserException {
         ExtensionAndExceptionParser parser = new Parser(
                 new ByteArrayInputStream("...".getBytes())).new ExtensionAndExceptionParser();
@@ -2085,7 +2085,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testOptionalExtensionMarkerParser() throws IOException,
+    void testOptionalExtensionMarkerParser() throws IOException,
             ParserException {
         OptionalExtensionMarkerParser parser = new Parser(
                 new ByteArrayInputStream(", ...".getBytes())).new OptionalExtensionMarkerParser();
@@ -2094,7 +2094,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testComponentTypeListsParser() throws IOException,
+    void testComponentTypeListsParser() throws IOException,
             ParserException {
         // RootComponentTypeList
         ComponentTypeListsParser parser = new Parser(new ByteArrayInputStream(
@@ -2200,7 +2200,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionEndMarkerParser() throws IOException,
+    void testExtensionEndMarkerParser() throws IOException,
             ParserException {
         ExtensionEndMarkerParser parser = new Parser(new ByteArrayInputStream(
                 ", ...".getBytes())).new ExtensionEndMarkerParser();
@@ -2211,7 +2211,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionAdditionsParser() throws IOException,
+    void testExtensionAdditionsParser() throws IOException,
             ParserException {
         ExtensionAdditionsParser parser = new Parser(new ByteArrayInputStream(
                 ", [[1: string VisibleString]]".getBytes())).new ExtensionAdditionsParser();
@@ -2225,7 +2225,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionAdditionListParser() throws IOException,
+    void testExtensionAdditionListParser() throws IOException,
             ParserException {
         ExtensionAdditionListParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -2246,7 +2246,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionAdditionParser() throws IOException,
+    void testExtensionAdditionParser() throws IOException,
             ParserException {
         ExtensionAdditionParser parser = new Parser(new ByteArrayInputStream(
                 "[[1: string VisibleString]]".getBytes())).new ExtensionAdditionParser();
@@ -2265,7 +2265,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionAdditionGroupParser() throws IOException,
+    void testExtensionAdditionGroupParser() throws IOException,
             ParserException {
         ExtensionAdditionGroupParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -2288,7 +2288,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testVersionNumberParser() throws IOException, ParserException {
+    void testVersionNumberParser() throws IOException, ParserException {
         VersionNumberParser parser = new Parser(new ByteArrayInputStream(
                 "123:".getBytes())).new VersionNumberParser();
 
@@ -2299,7 +2299,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testComponentTypeListParser() throws IOException,
+    void testComponentTypeListParser() throws IOException,
             ParserException {
         ComponentTypeListParser parser = new Parser(new ByteArrayInputStream(
                 "string VisibleString".getBytes())).new ComponentTypeListParser();
@@ -2329,7 +2329,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testComponentTypeParser() throws IOException, ParserException {
+    void testComponentTypeParser() throws IOException, ParserException {
         ComponentTypeParser parser = new Parser(new ByteArrayInputStream(
                 "string VisibleString".getBytes())).new ComponentTypeParser();
 
@@ -2392,7 +2392,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSequenceValueParser() throws IOException, ParserException {
+    void testSequenceValueParser() throws IOException, ParserException {
         CollectionValueParser parser = new Parser(new ByteArrayInputStream(
                 "{ string '0101'B, int 23 }".getBytes())).new CollectionValueParser();
 
@@ -2418,7 +2418,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testSequenceOfTypeParser() throws IOException, ParserException {
+    void testSequenceOfTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "SEQUENCE OF INTEGER".getBytes())).new BuiltinTypeParserAux();
 
@@ -2439,7 +2439,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSequenceOfValueParser() throws IOException, ParserException {
+    void testSequenceOfValueParser() throws IOException, ParserException {
         CollectionValueParser parser = new Parser(new ByteArrayInputStream(
                 "{ aInt 1, bInt 2 }".getBytes())).new CollectionValueParser();
 
@@ -2460,7 +2460,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueListParser() throws IOException, ParserException {
+    void testValueListParser() throws IOException, ParserException {
         ValueListParser parser = new Parser(new ByteArrayInputStream(
                 "12, '0101'B".getBytes())).new ValueListParser();
 
@@ -2473,7 +2473,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNamedValueListParser() throws IOException, ParserException {
+    void testNamedValueListParser() throws IOException, ParserException {
         NamedValueListParser parser = new Parser(new ByteArrayInputStream(
                 "aNumber 12, aString '0101'B".getBytes())).new NamedValueListParser();
 
@@ -2492,7 +2492,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testSetTypeParser() throws IOException, ParserException {
+    void testSetTypeParser() throws IOException, ParserException {
         // SET "{" "}"
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "SET {}".getBytes())).new BuiltinTypeParserAux();
@@ -2534,7 +2534,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testSetOfTypeParser() throws IOException, ParserException {
+    void testSetOfTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "SET OF INTEGER".getBytes())).new BuiltinTypeParserAux();
 
@@ -2561,7 +2561,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testChoiceTypeParser() throws IOException, ParserException {
+    void testChoiceTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "CHOICE {aNumber INTEGER, aString OCTET STRING }".getBytes())).new BuiltinTypeParserAux();
 
@@ -2573,7 +2573,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testAlternativeTypeListsParser() throws IOException,
+    void testAlternativeTypeListsParser() throws IOException,
             ParserException {
         AlternativeTypeListsParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -2629,7 +2629,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testRootAlternativeTypeListParser() throws IOException,
+    void testRootAlternativeTypeListParser() throws IOException,
             ParserException {
         RootAlternativeTypeListParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -2646,7 +2646,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionAdditionAlternativesParser() throws IOException,
+    void testExtensionAdditionAlternativesParser() throws IOException,
             ParserException {
         ExtensionAdditionAlternativesParser parser = new Parser(
                 new ByteArrayInputStream(", aString OCTET STRING".getBytes())).new ExtensionAdditionAlternativesParser();
@@ -2659,7 +2659,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionAdditionAlternativesListParser()
+    void testExtensionAdditionAlternativesListParser()
             throws IOException, ParserException {
         ExtensionAdditionAlternativesListParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -2678,7 +2678,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionAdditionAlternativeParser() throws IOException,
+    void testExtensionAdditionAlternativeParser() throws IOException,
             ParserException {
         ExtensionAdditionAlternativeParser parser = new Parser(
                 new ByteArrayInputStream("[[12: aNumber INTEGER]]".getBytes())).new ExtensionAdditionAlternativeParser();
@@ -2701,7 +2701,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExtensionAdditionAlternativesGroupParser()
+    void testExtensionAdditionAlternativesGroupParser()
             throws IOException, ParserException {
         ExtensionAdditionAlternativesGroupParser parser = new Parser(
                 new ByteArrayInputStream("[[12: aNumber INTEGER]]".getBytes())).new ExtensionAdditionAlternativesGroupParser();
@@ -2714,7 +2714,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testAlternativesTypeListParser() throws IOException,
+    void testAlternativesTypeListParser() throws IOException,
             ParserException {
         AlternativeTypeListParser parser = new Parser(new ByteArrayInputStream(
                 "aNumber INTEGER, aString OCTET STRING".getBytes())).new AlternativeTypeListParser();
@@ -2730,7 +2730,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testChoiceValueParser() throws IOException, ParserException {
+    void testChoiceValueParser() throws IOException, ParserException {
         ChoiceValueParser parser = new Parser(new ByteArrayInputStream(
                 "aNumber: 12".getBytes())).new ChoiceValueParser();
 
@@ -2748,7 +2748,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testSelectionTypeParser() throws IOException, ParserException {
+    void testSelectionTypeParser() throws IOException, ParserException {
         SelectionTypeParser parser = new Parser(new ByteArrayInputStream(
                 "identifier < Type".getBytes())).new SelectionTypeParser();
 
@@ -2766,7 +2766,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testPrefixedTypeParser() throws IOException, ParserException {
+    void testPrefixedTypeParser() throws IOException, ParserException {
         PrefixedTypeParser parser = new Parser(new ByteArrayInputStream(
                 "[TAG: APPLICATION 23] INTEGER".getBytes())).new PrefixedTypeParser();
 
@@ -2813,7 +2813,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTaggedTypeParser() throws IOException, ParserException {
+    void testTaggedTypeParser() throws IOException, ParserException {
         TaggedTypeParser parser = new Parser(new ByteArrayInputStream(
                 "[TAG: APPLICATION 1] INTEGER".getBytes())).new TaggedTypeParser();
 
@@ -2825,7 +2825,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTagParser() throws IOException, ParserException {
+    void testTagParser() throws IOException, ParserException {
         TagParser parser = new Parser(new ByteArrayInputStream(
                 "[TAG: UNIVERSAL 10]".getBytes())).new TagParser();
 
@@ -2838,7 +2838,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testEncodingReferenceParser() throws IOException,
+    void testEncodingReferenceParser() throws IOException,
             ParserException {
         EncodingReferenceParser parser = new Parser(new ByteArrayInputStream(
                 "TAG:".getBytes())).new EncodingReferenceParser();
@@ -2850,7 +2850,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testClassNumberParser() throws IOException, ParserException {
+    void testClassNumberParser() throws IOException, ParserException {
         ClassNumberParser parser = new Parser(new ByteArrayInputStream(
                 "4711".getBytes())).new ClassNumberParser();
 
@@ -2870,7 +2870,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testClassParser() throws IOException, ParserException {
+    void testClassParser() throws IOException, ParserException {
         ClassParser parser = new Parser(new ByteArrayInputStream(
                 "UNIVERSAL".getBytes())).new ClassParser();
 
@@ -2895,7 +2895,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testEncodingPrefixedTypeParser() throws IOException,
+    void testEncodingPrefixedTypeParser() throws IOException,
             ParserException {
         EncodingPrefixedTypeParser parser = new Parser(
                 new ByteArrayInputStream("[TAG: 21] VisibleString".getBytes())).new EncodingPrefixedTypeParser();
@@ -2908,7 +2908,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testEncodingPrefixParser() throws IOException, ParserException {
+    void testEncodingPrefixParser() throws IOException, ParserException {
         EncodingPrefixParser parser = new Parser(new ByteArrayInputStream(
                 "[TAG: \"encoding instruction\"]".getBytes())).new EncodingPrefixParser();
 
@@ -2935,7 +2935,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testObjectIdentifierTypeParser() throws IOException,
+    void testObjectIdentifierTypeParser() throws IOException,
             ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "OBJECT IDENTIFIER".getBytes())).new BuiltinTypeParserAux();
@@ -2947,7 +2947,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectIdentifierValueParser() throws IOException, ParserException {
+    void testObjectIdentifierValueParser() throws IOException, ParserException {
         ObjectIdentifierValueParser parser = new Parser(
                 new ByteArrayInputStream(
                         "{ oid-component1 Module.oid-component 4711 oid-comp (42)}"
@@ -2960,7 +2960,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectIdComponentListParser() throws IOException, ParserException {
+    void testObjectIdComponentListParser() throws IOException, ParserException {
         ObjIdComponentsListParser parser = new Parser(new ByteArrayInputStream(
                 "oid-component1 Module.oid-component 4711 oid-comp (42)"
                         .getBytes())).new ObjIdComponentsListParser();
@@ -2972,7 +2972,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectIdComponentsParser() throws IOException,
+    void testObjectIdComponentsParser() throws IOException,
             ParserException {
         ObjIdComponentsParser parser = new Parser(new ByteArrayInputStream(
                 "oid-component".getBytes())).new ObjIdComponentsParser();
@@ -3019,7 +3019,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNameFormParser() throws IOException, ParserException {
+    void testNameFormParser() throws IOException, ParserException {
         NameFormParser parser = new Parser(new ByteArrayInputStream(
                 "oid-component".getBytes())).new NameFormParser();
 
@@ -3031,7 +3031,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNumberFormParser() throws IOException, ParserException {
+    void testNumberFormParser() throws IOException, ParserException {
         NumberFormParser parser = new Parser(new ByteArrayInputStream(
                 "4711".getBytes())).new NumberFormParser();
 
@@ -3055,7 +3055,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNameAndNumberFormParser() throws IOException,
+    void testNameAndNumberFormParser() throws IOException,
             ParserException {
         NameAndNumberFormParser parser = new Parser(new ByteArrayInputStream(
                 "oid-component (Module.value)".getBytes())).new NameAndNumberFormParser();
@@ -3089,7 +3089,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testRelativeOIDTypeParser() throws IOException, ParserException {
+    void testRelativeOIDTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "RELATIVE-OID".getBytes())).new BuiltinTypeParserAux();
 
@@ -3100,7 +3100,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testRelativeOIDValueParser() throws IOException,
+    void testRelativeOIDValueParser() throws IOException,
             ParserException {
         RelativeOIDValueParser parser = new Parser(new ByteArrayInputStream(
                 "{ 4711 test (4712) }".getBytes())).new RelativeOIDValueParser();
@@ -3112,7 +3112,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testRelativeOIDComponentsListParser() throws IOException,
+    void testRelativeOIDComponentsListParser() throws IOException,
             ParserException {
         RelativeOIDComponentsListParser parser = new Parser(
                 new ByteArrayInputStream("4711 test (4712)".getBytes())).new RelativeOIDComponentsListParser();
@@ -3124,7 +3124,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testRelativeOIDComponentsParser() throws IOException,
+    void testRelativeOIDComponentsParser() throws IOException,
             ParserException {
         RelativeOIDComponentsParser parser = new Parser(
                 new ByteArrayInputStream("4711".getBytes())).new RelativeOIDComponentsParser();
@@ -3157,7 +3157,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testIRITypeParser() throws IOException, ParserException {
+    void testIRITypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "OID-IRI".getBytes())).new BuiltinTypeParserAux();
 
@@ -3168,7 +3168,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testIRIValueParser() throws IOException, ParserException {
+    void testIRIValueParser() throws IOException, ParserException {
         IRIValueParser parser = new Parser(new ByteArrayInputStream(
                 "\"/ISO/Registration-Authority/19785.CBEFF\"".getBytes())).new IRIValueParser();
 
@@ -3209,7 +3209,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testRelativeIRITypeParser() throws IOException, ParserException {
+    void testRelativeIRITypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "RELATIVE-OID-IRI".getBytes())).new BuiltinTypeParserAux();
 
@@ -3220,7 +3220,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testRelativeIRIValueParser() throws IOException,
+    void testRelativeIRIValueParser() throws IOException,
             ParserException {
         RelativeIRIValueParser parser = new Parser(
 
@@ -3264,7 +3264,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testEmbeddedPDVTypeParser() throws IOException, ParserException {
+    void testEmbeddedPDVTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "EMBEDDED PDV".getBytes())).new BuiltinTypeParserAux();
 
@@ -3275,7 +3275,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testEmbeddedPDVValueParser() throws IOException,
+    void testEmbeddedPDVValueParser() throws IOException,
             ParserException {
         // TODO: implement
     }
@@ -3287,7 +3287,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testExternalTypeParser() throws IOException, ParserException {
+    void testExternalTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "EXTERNAL".getBytes())).new BuiltinTypeParserAux();
 
@@ -3298,7 +3298,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExternalValueParser() {
+    void testExternalValueParser() {
         // TODO: Test sequence content
     }
 
@@ -3309,7 +3309,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testTimeTypeParser() throws IOException, ParserException {
+    void testTimeTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "TIME".getBytes())).new BuiltinTypeParserAux();
 
@@ -3320,7 +3320,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTimeValueParser() throws IOException, ParserException {
+    void testTimeValueParser() throws IOException, ParserException {
         RestrictedCharacterStringValueParser parser = new Parser(
                 new ByteArrayInputStream("\"P0Y29M0DT0H0.00M\"".getBytes())).new RestrictedCharacterStringValueParser();
 
@@ -3333,7 +3333,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDateTypeParser() throws IOException, ParserException {
+    void testDateTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "DATE".getBytes())).new BuiltinTypeParserAux();
 
@@ -3344,7 +3344,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTimeOfDayTypeParser() throws IOException, ParserException {
+    void testTimeOfDayTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "TIME-OF-DAY".getBytes())).new BuiltinTypeParserAux();
 
@@ -3355,7 +3355,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDateTimeTypeParser() throws IOException, ParserException {
+    void testDateTimeTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "DATE-TIME".getBytes())).new BuiltinTypeParserAux();
 
@@ -3366,7 +3366,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDurationTypeParser() throws IOException, ParserException {
+    void testDurationTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "DURATION".getBytes())).new BuiltinTypeParserAux();
 
@@ -3383,7 +3383,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testCharacterStringTypeParser() throws IOException,
+    void testCharacterStringTypeParser() throws IOException,
             ParserException {
         CharacterStringTypeParser parser = new Parser(new ByteArrayInputStream(
                 "BMPString".getBytes())).new CharacterStringTypeParser();
@@ -3403,7 +3403,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testCharacterStringValueParser() throws IOException,
+    void testCharacterStringValueParser() throws IOException,
             ParserException {
         CharacterStringValueParser parser = new Parser(
                 new ByteArrayInputStream("\"abc\"".getBytes())).new CharacterStringValueParser();
@@ -3423,7 +3423,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testRestrictedCharacterStringTypeParser() throws IOException,
+    void testRestrictedCharacterStringTypeParser() throws IOException,
             ParserException {
         RestrictedCharacterStringTypeParser parser = new Parser(
                 new ByteArrayInputStream("BMPString".getBytes())).new RestrictedCharacterStringTypeParser();
@@ -3527,7 +3527,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testRestrictedCharacterStringValueParser() throws IOException,
+    void testRestrictedCharacterStringValueParser() throws IOException,
             ParserException {
         RestrictedCharacterStringValueParser parser = new Parser(
                 new ByteArrayInputStream("\"abc\"".getBytes())).new RestrictedCharacterStringValueParser();
@@ -3565,7 +3565,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testCharacterStringListParser() throws IOException,
+    void testCharacterStringListParser() throws IOException,
             ParserException {
         CharacterStringListParser parser = new Parser(new ByteArrayInputStream(
                 "{\"abc\", {1, 2, 3, 4}, value-ref, {1, 2}}".getBytes())).new CharacterStringListParser();
@@ -3577,7 +3577,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testCharSymsParser() throws IOException, ParserException {
+    void testCharSymsParser() throws IOException, ParserException {
         CharSymsParser parser = new Parser(new ByteArrayInputStream(
                 "\"abc\", {1, 2, 3, 4}, value-ref, {1, 2}".getBytes())).new CharSymsParser();
 
@@ -3588,7 +3588,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testCharsDefnParser() throws IOException, ParserException {
+    void testCharsDefnParser() throws IOException, ParserException {
         CharsDefnParser parser = new Parser(new ByteArrayInputStream(
                 "\"abc\"".getBytes())).new CharsDefnParser();
 
@@ -3623,7 +3623,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testQuadrupleParser() throws IOException, ParserException {
+    void testQuadrupleParser() throws IOException, ParserException {
         CollectionValueParser parser = new Parser(new ByteArrayInputStream(
                 "{0, 0, 0, 0}".getBytes())).new CollectionValueParser();
 
@@ -3730,7 +3730,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTupleParser() throws IOException, ParserException {
+    void testTupleParser() throws IOException, ParserException {
         CollectionValueParser parser = new Parser(new ByteArrayInputStream(
                 "{7, 15}".getBytes())).new CollectionValueParser();
 
@@ -3786,7 +3786,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testUnrestrinctedCharacterStringTypeParser()
+    void testUnrestrinctedCharacterStringTypeParser()
             throws IOException, ParserException {
         UnrestrictedCharacterStringTypeParser parser = new Parser(
                 new ByteArrayInputStream("CHARACTER STRING".getBytes())).new UnrestrictedCharacterStringTypeParser();
@@ -3798,7 +3798,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testUnrestrinctedCharacterStringValueParser()
+    void testUnrestrinctedCharacterStringValueParser()
             throws IOException, ParserException {
         // TODO: implement
     }
@@ -3810,7 +3810,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testGeneralizedTimeParser() throws IOException, ParserException {
+    void testGeneralizedTimeParser() throws IOException, ParserException {
         UsefulTypeParser parser = new Parser(new ByteArrayInputStream(
                 "GeneralizedTime".getBytes())).new UsefulTypeParser();
 
@@ -3827,7 +3827,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testUTCTimeParser() throws IOException, ParserException {
+    void testUTCTimeParser() throws IOException, ParserException {
         UsefulTypeParser parser = new Parser(new ByteArrayInputStream(
                 "UTCTime".getBytes())).new UsefulTypeParser();
 
@@ -3844,7 +3844,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testObjectDescriptorParser() throws IOException,
+    void testObjectDescriptorParser() throws IOException,
             ParserException {
         UsefulTypeParser parser = new Parser(new ByteArrayInputStream(
                 "ObjectDescriptor".getBytes())).new UsefulTypeParser();
@@ -3862,7 +3862,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testConstrainedTypeParser() throws IOException, ParserException {
+    void testConstrainedTypeParser() throws IOException, ParserException {
         TypeParser parser = new Parser(new ByteArrayInputStream(
                 "VisibleString (ENCODED BY value)".getBytes())).new TypeParser();
 
@@ -3904,7 +3904,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTypeWithConstraintParser() throws IOException,
+    void testTypeWithConstraintParser() throws IOException,
             ParserException {
         TypeWithConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "SET SIZE (0 .. 2) OF VisibleString".getBytes())).new TypeWithConstraintParser();
@@ -3998,7 +3998,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testConstraintParser() throws IOException, ParserException {
+    void testConstraintParser() throws IOException, ParserException {
         ConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "((1..10) EXCEPT (4..6))".getBytes())).new ConstraintParser();
 
@@ -4017,7 +4017,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testConstraintSpecParser() throws IOException, ParserException {
+    void testConstraintSpecParser() throws IOException, ParserException {
         ConstraintSpecParser parser = new Parser(new ByteArrayInputStream(
                 "(1..10) EXCEPT (4..6)".getBytes())).new ConstraintSpecParser();
 
@@ -4036,7 +4036,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSubtypeConstraintParser() throws IOException,
+    void testSubtypeConstraintParser() throws IOException,
             ParserException {
         SubtypeConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "(1..10) EXCEPT (4..6)".getBytes())).new SubtypeConstraintParser();
@@ -4054,7 +4054,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testElementSetSpecsParser() throws IOException, ParserException {
+    void testElementSetSpecsParser() throws IOException, ParserException {
         SetSpecsParser parser = new Parser(new ByteArrayInputStream(
                 "(1..10) EXCEPT (4..6)".getBytes())).new SetSpecsParser();
 
@@ -4087,7 +4087,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testElementSetSpecParser() throws IOException, ParserException {
+    void testElementSetSpecParser() throws IOException, ParserException {
         ElementSetSpecParser parser = new Parser(new ByteArrayInputStream(
                 "ALL EXCEPT 1".getBytes())).new ElementSetSpecParser();
 
@@ -4141,7 +4141,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testUnionsParser() throws IOException, ParserException {
+    void testUnionsParser() throws IOException, ParserException {
         UnionsParser parser = new Parser(new ByteArrayInputStream(
                 "(1 .. 10) | (20..30)".getBytes())).new UnionsParser();
 
@@ -4153,7 +4153,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testIntersectionsParser() throws IOException, ParserException {
+    void testIntersectionsParser() throws IOException, ParserException {
         IntersectionsParser parser = new Parser(new ByteArrayInputStream(
                 "(1 .. 40) ^ (20..30)".getBytes())).new IntersectionsParser();
 
@@ -4174,7 +4174,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testIntersectionElementsParser() throws IOException,
+    void testIntersectionElementsParser() throws IOException,
             ParserException {
         IntersectionElementsParser parser = new Parser(
                 new ByteArrayInputStream("(1 .. 40)".getBytes())).new IntersectionElementsParser();
@@ -4194,7 +4194,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExclusionsParser() throws IOException, ParserException {
+    void testExclusionsParser() throws IOException, ParserException {
         ExclusionsParser parser = new Parser(new ByteArrayInputStream(
                 "EXCEPT 1".getBytes())).new ExclusionsParser();
 
@@ -4204,7 +4204,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testElementsParser() throws IOException, ParserException {
+    void testElementsParser() throws IOException, ParserException {
         ElementsParser parser = new Parser(new ByteArrayInputStream(
                 "12 .. 15".getBytes())).new ElementsParser();
 
@@ -4235,7 +4235,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testSubtypeElementsParser() throws IOException, ParserException {
+    void testSubtypeElementsParser() throws IOException, ParserException {
         // SingleValue
         SubtypeElementsParser parser = new Parser(new ByteArrayInputStream(
                 "4711".getBytes())).new SubtypeElementsParser();
@@ -4323,7 +4323,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSingleValueParser() throws IOException, ParserException {
+    void testSingleValueParser() throws IOException, ParserException {
         SingleValueParser parser = new Parser(new ByteArrayInputStream(
                 "4711".getBytes())).new SingleValueParser();
 
@@ -4343,7 +4343,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testContainedSubtypeParser() throws IOException,
+    void testContainedSubtypeParser() throws IOException,
             ParserException {
         ContainedSubtypeParser parser = new Parser(new ByteArrayInputStream(
                 "INCLUDES INTEGER".getBytes())).new ContainedSubtypeParser();
@@ -4364,7 +4364,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueRangeParser() throws IOException, ParserException {
+    void testValueRangeParser() throws IOException, ParserException {
         ValueRangeParser parser = new Parser(new ByteArrayInputStream(
                 "12 .. < MAX".getBytes())).new ValueRangeParser();
 
@@ -4419,7 +4419,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testLowerEndpointParser() throws IOException, ParserException {
+    void testLowerEndpointParser() throws IOException, ParserException {
         LowerEndpointParser parser = new Parser(new ByteArrayInputStream(
                 "MIN".getBytes())).new LowerEndpointParser();
 
@@ -4439,7 +4439,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testUpperEndpointParser() throws IOException, ParserException {
+    void testUpperEndpointParser() throws IOException, ParserException {
         UpperEndpointParser parser = new Parser(new ByteArrayInputStream(
                 "MAX".getBytes())).new UpperEndpointParser();
 
@@ -4459,7 +4459,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testLowerValueParser() throws IOException, ParserException {
+    void testLowerValueParser() throws IOException, ParserException {
         LowerEndValueParser parser = new Parser(new ByteArrayInputStream(
                 "MIN".getBytes())).new LowerEndValueParser();
 
@@ -4470,7 +4470,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testUpperValueParser() throws IOException, ParserException {
+    void testUpperValueParser() throws IOException, ParserException {
         UpperEndValueParser parser = new Parser(new ByteArrayInputStream(
                 "MAX".getBytes())).new UpperEndValueParser();
 
@@ -4481,7 +4481,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSizeConstraintParser() throws IOException, ParserException {
+    void testSizeConstraintParser() throws IOException, ParserException {
         SizeConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "SIZE (0..5)".getBytes())).new SizeConstraintParser();
 
@@ -4492,7 +4492,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTypeConstraintParser() throws IOException, ParserException {
+    void testTypeConstraintParser() throws IOException, ParserException {
         TypeConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "INTEGER".getBytes())).new TypeConstraintParser();
 
@@ -4503,7 +4503,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testPermittedAlphabetParser() throws IOException,
+    void testPermittedAlphabetParser() throws IOException,
             ParserException {
         PermittedAlphabetParser parser = new Parser(new ByteArrayInputStream(
                 "FROM (\"a\"..\"z\")".getBytes())).new PermittedAlphabetParser();
@@ -4515,7 +4515,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testInnerTypeConstraintsParser() throws IOException,
+    void testInnerTypeConstraintsParser() throws IOException,
             ParserException {
         InnerTypeConstraintsParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -4537,7 +4537,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testMultipleTypeConstraintsParser() throws IOException,
+    void testMultipleTypeConstraintsParser() throws IOException,
             ParserException {
         MultipleTypeConstraintsParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -4562,7 +4562,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testFullSpecificationParser() throws IOException,
+    void testFullSpecificationParser() throws IOException,
             ParserException {
         FullSpecificationParser parser = new Parser(new ByteArrayInputStream(
                 "{ identifier-1 (SIZE (1..10)) }".getBytes())).new FullSpecificationParser();
@@ -4576,7 +4576,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testPartialSpecificationParser() throws IOException,
+    void testPartialSpecificationParser() throws IOException,
             ParserException {
         PartialSpecificationParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -4591,7 +4591,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTypeConstraintsParser() throws IOException, ParserException {
+    void testTypeConstraintsParser() throws IOException, ParserException {
         TypeConstraintsParser parser = new Parser(new ByteArrayInputStream(
                 "identifier-1 (4711 | 4712) OPTIONAL, identifier-2 (SIZE (1..10)) DEFAULT 5"
                         .getBytes())).new TypeConstraintsParser();
@@ -4607,7 +4607,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testNamedConstraintParser() throws IOException, ParserException {
+    void testNamedConstraintParser() throws IOException, ParserException {
         NamedConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "identifier (4711 | 4712) OPTIONAL".getBytes())).new NamedConstraintParser();
 
@@ -4619,7 +4619,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testComponentConstraintParser() throws IOException,
+    void testComponentConstraintParser() throws IOException,
             ParserException {
         ComponentConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "(4711 | 4712) OPTIONAL".getBytes())).new ComponentConstraintParser();
@@ -4633,7 +4633,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueConstraintParser() throws IOException, ParserException {
+    void testValueConstraintParser() throws IOException, ParserException {
         ValueConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "(4711 | 4712)".getBytes())).new ValueConstraintParser();
 
@@ -4643,7 +4643,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testPresenceConstraintParser() throws IOException,
+    void testPresenceConstraintParser() throws IOException,
             ParserException {
         PresenceConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "PRESENT".getBytes())).new PresenceConstraintParser();
@@ -4669,7 +4669,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testPatternConstraintParser() throws IOException,
+    void testPatternConstraintParser() throws IOException,
             ParserException {
         // TODO: check pattern
         PatternConstraintParser parser = new Parser(new ByteArrayInputStream(
@@ -4682,7 +4682,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testPropertySettingsParser() throws IOException,
+    void testPropertySettingsParser() throws IOException,
             ParserException {
         PropertySettingsParser parser = new Parser(new ByteArrayInputStream(
                 "SETTINGS \"Midnight=Start\"".getBytes())).new PropertySettingsParser();
@@ -4702,7 +4702,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testPropertyAndSettingPairParser() throws IOException,
+    void testPropertyAndSettingPairParser() throws IOException,
             ParserException {
         PropertyAndSettingPairParser parser = new Parser(
                 new ByteArrayInputStream("Midnight=Start".getBytes())).new PropertyAndSettingPairParser();
@@ -4729,7 +4729,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDurationRangeParser() throws IOException, ParserException {
+    void testDurationRangeParser() throws IOException, ParserException {
         // TODO: implement
         DurationRangeParser parser = new Parser(new ByteArrayInputStream(
                 "\"PT2M0.000S\"..\"PT2M59.000S\"".getBytes())).new DurationRangeParser();
@@ -4740,12 +4740,12 @@ public class ParserTest {
     }
 
     @Test
-    public void testTimePointRangeParser() {
+    void testTimePointRangeParser() {
         // TODO: implement
     }
 
     @Test
-    public void testRecurrenceRangeParser() {
+    void testRecurrenceRangeParser() {
         // TODO: implement
     }
 
@@ -4756,7 +4756,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testExceptionSpecParser() throws IOException, ParserException {
+    void testExceptionSpecParser() throws IOException, ParserException {
         ExceptionSpecParser parser = new Parser(new ByteArrayInputStream(
                 "! 23".getBytes())).new ExceptionSpecParser();
 
@@ -4767,7 +4767,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExceptionIdentificationParser() throws IOException,
+    void testExceptionIdentificationParser() throws IOException,
             ParserException {
         ExceptionIdentificationParser parser = new Parser(
                 new ByteArrayInputStream("-4711".getBytes())).new ExceptionIdentificationParser();
@@ -4804,7 +4804,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testEncodingControlSectionsParser() throws IOException,
+    void testEncodingControlSectionsParser() throws IOException,
             ParserException {
         EncodingControlSectionsParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -4818,7 +4818,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testEncodingControlSectionParser() throws IOException,
+    void testEncodingControlSectionParser() throws IOException,
             ParserException {
         EncodingControlSectionParser parser = new Parser(
                 new ByteArrayInputStream("ENCODING-CONTROL PER".getBytes())).new EncodingControlSectionParser();
@@ -4847,7 +4847,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testDefinedObjectClassParser() throws IOException,
+    void testDefinedObjectClassParser() throws IOException,
             ParserException {
         DefinedObjectClassParser parser = new Parser(new ByteArrayInputStream(
                 "OBJECT-CLASS".getBytes())).new DefinedObjectClassParser();
@@ -4878,7 +4878,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinedObjectParser() throws IOException, ParserException {
+    void testDefinedObjectParser() throws IOException, ParserException {
         DefinedObjectParser parser = new Parser(new ByteArrayInputStream(
                 "object".getBytes())).new DefinedObjectParser();
 
@@ -4900,7 +4900,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinedObjectSetParser() throws IOException,
+    void testDefinedObjectSetParser() throws IOException,
             ParserException {
         DefinedObjectSetParser parser = new Parser(new ByteArrayInputStream(
                 "Object-Set".getBytes())).new DefinedObjectSetParser();
@@ -4923,7 +4923,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExternalObjectClassReferenceParser() throws IOException,
+    void testExternalObjectClassReferenceParser() throws IOException,
             ParserException {
         ExternalObjectClassReferenceParser parser = new Parser(
                 new ByteArrayInputStream("Module.OBJECT-CLASS".getBytes())).new ExternalObjectClassReferenceParser();
@@ -4936,7 +4936,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExternalObjectReferenceParser() throws IOException,
+    void testExternalObjectReferenceParser() throws IOException,
             ParserException {
         ExternalObjectReferenceParser parser = new Parser(
                 new ByteArrayInputStream("Module.object".getBytes())).new ExternalObjectReferenceParser();
@@ -4949,7 +4949,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testExternalObjectSetReferenceParser() throws IOException,
+    void testExternalObjectSetReferenceParser() throws IOException,
             ParserException {
         ExternalObjectSetReferenceParser parser = new Parser(
                 new ByteArrayInputStream("Module.ObjectSet".getBytes())).new ExternalObjectSetReferenceParser();
@@ -4962,7 +4962,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testUsefulObjectClassReferenceParser() throws IOException,
+    void testUsefulObjectClassReferenceParser() throws IOException,
             ParserException {
         UsefulObjectClassReferenceParser parser = new Parser(
                 new ByteArrayInputStream("TYPE-IDENTIFIER".getBytes())).new UsefulObjectClassReferenceParser();
@@ -4988,7 +4988,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testObjectClassAssignmentParser() throws IOException,
+    void testObjectClassAssignmentParser() throws IOException,
             ParserException {
         TypeAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -5004,7 +5004,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectClassParser() throws IOException, ParserException {
+    void testObjectClassParser() throws IOException, ParserException {
         ObjectClassParser parser = new Parser(new ByteArrayInputStream(
                 "CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
                         .getBytes())).new ObjectClassParser();
@@ -5034,7 +5034,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectClassDefnParser() throws IOException, ParserException {
+    void testObjectClassDefnParser() throws IOException, ParserException {
         ObjectClassDefnParser parser = new Parser(new ByteArrayInputStream(
                 "CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
                         .getBytes())).new ObjectClassDefnParser();
@@ -5047,7 +5047,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testWithSyntaxSpecParser() throws IOException, ParserException {
+    void testWithSyntaxSpecParser() throws IOException, ParserException {
         WithSyntaxSpecParser parser = new Parser(new ByteArrayInputStream(
                 "WITH SYNTAX { [ARGUMENT &ArgumentType] }".getBytes())).new WithSyntaxSpecParser();
 
@@ -5058,7 +5058,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testFieldSpecParser() throws IOException, ParserException {
+    void testFieldSpecParser() throws IOException, ParserException {
         // TypeFieldSpec
         FieldSpecParser parser = new Parser(new ByteArrayInputStream(
                 "&Type-Reference OPTIONAL".getBytes())).new FieldSpecParser();
@@ -5132,7 +5132,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTypeFieldSpecParser() throws IOException, ParserException {
+    void testTypeFieldSpecParser() throws IOException, ParserException {
         TypeFieldSpecParser parser = new Parser(new ByteArrayInputStream(
                 "&Type-Reference".getBytes())).new TypeFieldSpecParser();
 
@@ -5162,7 +5162,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTypeOptionalitySpecParser() throws IOException,
+    void testTypeOptionalitySpecParser() throws IOException,
             ParserException {
         TypeOptionalitySpecParser parser = new Parser(new ByteArrayInputStream(
                 "OPTIONAL".getBytes())).new TypeOptionalitySpecParser();
@@ -5183,7 +5183,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testFixedTypeValueFieldSpecParser() throws IOException,
+    void testFixedTypeValueFieldSpecParser() throws IOException,
             ParserException {
         FixedTypeValueOrObjectFieldSpecParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -5261,7 +5261,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueOptionalitySpecParser() throws IOException,
+    void testValueOptionalitySpecParser() throws IOException,
             ParserException {
         ValueOptionalitySpecParser parser = new Parser(
                 new ByteArrayInputStream("OPTIONAL".getBytes())).new ValueOptionalitySpecParser();
@@ -5281,7 +5281,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testVariableTypeValueFieldSpecParser() throws IOException,
+    void testVariableTypeValueFieldSpecParser() throws IOException,
             ParserException {
         VariableTypeValueFieldSpecParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -5317,7 +5317,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testFixedTypeValueSetFieldSpecParser() throws IOException,
+    void testFixedTypeValueSetFieldSpecParser() throws IOException,
             ParserException {
         SetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
                 "&ValueSet-Reference INTEGER OPTIONAL".getBytes())).new SetFieldSpecParser();
@@ -5343,7 +5343,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueSetOptionalitySpecParser() throws IOException,
+    void testValueSetOptionalitySpecParser() throws IOException,
             ParserException {
         ValueSetOptionalitySpecParser parser = new Parser(
                 new ByteArrayInputStream("OPTIONAL".getBytes())).new ValueSetOptionalitySpecParser();
@@ -5364,7 +5364,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testVariableTypeValueSetFieldSpecParser() throws IOException,
+    void testVariableTypeValueSetFieldSpecParser() throws IOException,
             ParserException {
         VariableTypeValueSetFieldSpecParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -5395,7 +5395,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectFieldSpecParser() throws IOException, ParserException {
+    void testObjectFieldSpecParser() throws IOException, ParserException {
         FieldSpecParser parser = new Parser(new ByteArrayInputStream(
                 "&object-field OBJECT-CLASS OPTIONAL".getBytes())).new FieldSpecParser();
 
@@ -5426,7 +5426,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectOptionalitySpecParser() throws IOException,
+    void testObjectOptionalitySpecParser() throws IOException,
             ParserException {
         OptionalitySpecParser parser = new Parser(new ByteArrayInputStream(
                 "OPTIONAL".getBytes())).new OptionalitySpecParser();
@@ -5448,7 +5448,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectSetFieldSpecParser() throws IOException,
+    void testObjectSetFieldSpecParser() throws IOException,
             ParserException {
         SetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
                 "&ObjectSet-Field OBJECT-CLASS OPTIONAL".getBytes())).new SetFieldSpecParser();
@@ -5478,7 +5478,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectSetOptionalitySpecParser() throws IOException,
+    void testObjectSetOptionalitySpecParser() throws IOException,
             ParserException {
         ObjectSetOptionalitySpecParser parser = new Parser(
                 new ByteArrayInputStream("OPTIONAL".getBytes())).new ObjectSetOptionalitySpecParser();
@@ -5498,7 +5498,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testPrimitiveFieldNameParser() throws IOException,
+    void testPrimitiveFieldNameParser() throws IOException,
             ParserException {
         PrimitiveFieldNameParser parser = new Parser(new ByteArrayInputStream(
                 "&Type-Reference".getBytes())).new PrimitiveFieldNameParser();
@@ -5541,7 +5541,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testFieldNameParser() throws IOException, ParserException {
+    void testFieldNameParser() throws IOException, ParserException {
         FieldNameParser parser = new Parser(new ByteArrayInputStream(
                 "&Type-Reference.&ObjectSet-Reference".getBytes())).new FieldNameParser();
 
@@ -5558,7 +5558,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testSyntaxListParser() throws IOException, ParserException {
+    void testSyntaxListParser() throws IOException, ParserException {
         SyntaxListParser parser = new Parser(new ByteArrayInputStream(
                 "{ [RETURN RESULT &resultReturned] [ARGUMENT &ArgumentType] }"
                         .getBytes())).new SyntaxListParser();
@@ -5575,7 +5575,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTokenOrGroupSpecParser() throws IOException,
+    void testTokenOrGroupSpecParser() throws IOException,
             ParserException {
         TokenOrGroupSpecParser parser = new Parser(new ByteArrayInputStream(
                 "A-WORD".getBytes())).new TokenOrGroupSpecParser();
@@ -5623,7 +5623,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testOptionalGroupParser() throws IOException, ParserException {
+    void testOptionalGroupParser() throws IOException, ParserException {
         OptionalGroupParser parser = new Parser(new ByteArrayInputStream(
                 "[ARGUMENT &ArgumentType]".getBytes())).new OptionalGroupParser();
 
@@ -5643,7 +5643,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testRequiredTokenParser() throws IOException, ParserException {
+    void testRequiredTokenParser() throws IOException, ParserException {
         RequiredTokenParser parser = new Parser(new ByteArrayInputStream(
                 "&ObjectSet-Reference".getBytes())).new RequiredTokenParser();
 
@@ -5664,7 +5664,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testLiteralParser() throws IOException, ParserException {
+    void testLiteralParser() throws IOException, ParserException {
         assertEquals(",", getLiteral(","));
         assertEquals("A-WORD", getLiteral("A-WORD"));
 
@@ -5719,7 +5719,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testObjectAssignmentParser() throws IOException,
+    void testObjectAssignmentParser() throws IOException,
             ParserException {
         ValueAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -5736,7 +5736,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectParser() throws IOException, ParserException {
+    void testObjectParser() throws IOException, ParserException {
         ObjectParser parser = new Parser(new ByteArrayInputStream(
                 "Module.object".getBytes())).new ObjectParser();
 
@@ -5773,7 +5773,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectDefnParser() throws IOException, ParserException {
+    void testObjectDefnParser() throws IOException, ParserException {
         ObjectDefnParser parser = new Parser(new ByteArrayInputStream(
                 "{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new ObjectDefnParser();
 
@@ -5792,7 +5792,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefaultSyntaxParser() throws IOException, ParserException {
+    void testDefaultSyntaxParser() throws IOException, ParserException {
         DefaultSyntaxParser parser = new Parser(new ByteArrayInputStream(
                 "{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new DefaultSyntaxParser();
 
@@ -5810,7 +5810,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testFieldSettingParser() throws IOException, ParserException {
+    void testFieldSettingParser() throws IOException, ParserException {
         FieldSettingParser parser = new Parser(new ByteArrayInputStream(
                 "&value-field 4711".getBytes())).new FieldSettingParser();
 
@@ -5822,7 +5822,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinedSyntaxParser() throws IOException, ParserException {
+    void testDefinedSyntaxParser() throws IOException, ParserException {
         DefinedSyntaxParser parser = new Parser(new ByteArrayInputStream(
                 "{ A-STRING VisibleString A-NUMBER INTEGER }".getBytes())).new DefinedSyntaxParser();
 
@@ -5838,7 +5838,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDefinedSyntaxTokenParser() throws IOException,
+    void testDefinedSyntaxTokenParser() throws IOException,
             ParserException {
         DefinedSyntaxTokenParser parser = new Parser(new ByteArrayInputStream(
                 "A-LITERAL".getBytes())).new DefinedSyntaxTokenParser();
@@ -5858,7 +5858,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSettingParser() throws IOException, ParserException {
+    void testSettingParser() throws IOException, ParserException {
         // Type
         SettingParser parser = new Parser(new ByteArrayInputStream(
                 "INTEGER".getBytes())).new SettingParser();
@@ -5913,7 +5913,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testObjectSetAssignmentParser() throws IOException,
+    void testObjectSetAssignmentParser() throws IOException,
             ParserException {
         ValueSetTypeAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -5930,7 +5930,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectSetParser() throws IOException, ParserException {
+    void testObjectSetParser() throws IOException, ParserException {
         ObjectSetParser parser = new Parser(new ByteArrayInputStream(
                 "{ (Object1 | Object2) }".getBytes())).new ObjectSetParser();
 
@@ -5940,7 +5940,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectSetSpecParser() throws IOException, ParserException {
+    void testObjectSetSpecParser() throws IOException, ParserException {
         SetSpecsParser parser = new Parser(new ByteArrayInputStream(
                 "(Object1 | Object2)".getBytes())).new SetSpecsParser();
 
@@ -5992,7 +5992,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectSetElementsParser() throws IOException,
+    void testObjectSetElementsParser() throws IOException,
             ParserException {
         ObjectSetElementsParser parser = new Parser(new ByteArrayInputStream(
                 "object-reference".getBytes())).new ObjectSetElementsParser();
@@ -6030,7 +6030,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testObjectClassFieldTypeParser() throws IOException,
+    void testObjectClassFieldTypeParser() throws IOException,
             ParserException {
         ObjectClassFieldTypeParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6045,7 +6045,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testObjectClassFieldValueParser() throws IOException, ParserException {
+    void testObjectClassFieldValueParser() throws IOException, ParserException {
         ObjectClassFieldValueParser parser = new Parser(
                 new ByteArrayInputStream("INTEGER: 4711".getBytes())).new ObjectClassFieldValueParser();
 
@@ -6065,7 +6065,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testOpenTypeFieldValParser() throws IOException,
+    void testOpenTypeFieldValParser() throws IOException,
             ParserException {
         OpenTypeFieldValParser parser = new Parser(new ByteArrayInputStream(
                 "INTEGER: 4711".getBytes())).new OpenTypeFieldValParser();
@@ -6087,7 +6087,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testFixedTypeFieldValParser() throws IOException,
+    void testFixedTypeFieldValParser() throws IOException,
             ParserException {
         FixedTypeFieldValParser parser = new Parser(new ByteArrayInputStream(
                 "object-reference {Object}.&value-reference".getBytes())).new FixedTypeFieldValParser();
@@ -6111,7 +6111,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testInformationFromObjectsParser() throws IOException,
+    void testInformationFromObjectsParser() throws IOException,
             ParserException {
         InformationFromObjectsParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6138,7 +6138,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testValueFromObjectParser() throws IOException, ParserException {
+    void testValueFromObjectParser() throws IOException, ParserException {
         ValueFromObjectParser parser = new Parser(new ByteArrayInputStream(
                 "object-reference {Object}.&value-reference1.&value-reference2"
                         .getBytes())).new ValueFromObjectParser();
@@ -6151,7 +6151,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTypeFromObjectsParser() throws IOException, ParserException {
+    void testTypeFromObjectsParser() throws IOException, ParserException {
         TypeFromObjectsParser parser = new Parser(new ByteArrayInputStream(
                 "object-reference {Object}.&Type-Reference1.&Type-Reference2"
                         .getBytes())).new TypeFromObjectsParser();
@@ -6164,7 +6164,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testReferencedObjectsParser() throws IOException,
+    void testReferencedObjectsParser() throws IOException,
             ParserException {
         ReferencedObjectsParser parser = new Parser(new ByteArrayInputStream(
                 "object-reference".getBytes())).new ReferencedObjectsParser();
@@ -6210,7 +6210,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testInstanceOfTypeParser() throws IOException, ParserException {
+    void testInstanceOfTypeParser() throws IOException, ParserException {
         BuiltinTypeParserAux parser = new Parser(new ByteArrayInputStream(
                 "INSTANCE OF OBJECT-CLASS".getBytes())).new BuiltinTypeParserAux();
 
@@ -6227,7 +6227,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testGeneralConstraintParser() throws IOException,
+    void testGeneralConstraintParser() throws IOException,
             ParserException {
         GeneralConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "CONSTRAINED BY {}".getBytes())).new GeneralConstraintParser();
@@ -6260,7 +6260,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testUserDefinedConstraintParser() throws IOException,
+    void testUserDefinedConstraintParser() throws IOException,
             ParserException {
         UserDefinedConstraintParser parser = new Parser(
                 new ByteArrayInputStream("CONSTRAINED BY {}".getBytes())).new UserDefinedConstraintParser();
@@ -6289,7 +6289,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testUserDefinedConstraintParameterParser() throws IOException,
+    void testUserDefinedConstraintParameterParser() throws IOException,
             ParserException {
         UserDefinedConstraintParameterParser parser = new Parser(
                 new ByteArrayInputStream("INTEGER: 4711".getBytes())).new UserDefinedConstraintParameterParser();
@@ -6326,7 +6326,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testTableConstraintParser() throws IOException, ParserException {
+    void testTableConstraintParser() throws IOException, ParserException {
         TableConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "{ErrorSet}".getBytes())).new TableConstraintParser();
 
@@ -6345,7 +6345,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSimpleTableConstraintParser() throws IOException,
+    void testSimpleTableConstraintParser() throws IOException,
             ParserException {
         SimpleTableConstraintParser parser = new Parser(
                 new ByteArrayInputStream("{ErrorSet} ".getBytes())).new SimpleTableConstraintParser();
@@ -6356,7 +6356,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testComponentRelationConstraintParser() throws IOException,
+    void testComponentRelationConstraintParser() throws IOException,
             ParserException {
         ComponentRelationConstraintParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6370,7 +6370,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testAtNotationParser() throws IOException, ParserException {
+    void testAtNotationParser() throws IOException, ParserException {
         AtNotationParser parser = new Parser(new ByteArrayInputStream(
                 "@identifier-1".getBytes())).new AtNotationParser();
 
@@ -6423,7 +6423,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testLevelParser() throws IOException, ParserException {
+    void testLevelParser() throws IOException, ParserException {
         assertEquals(0, (int) new Parser(
                 new ByteArrayInputStream("".getBytes())).new LevelParser()
                 .parse());
@@ -6438,7 +6438,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testComponentIdListParser() throws IOException, ParserException {
+    void testComponentIdListParser() throws IOException, ParserException {
         ComponentIdListParser parser = new Parser(new ByteArrayInputStream(
                 "identifier-1".getBytes())).new ComponentIdListParser();
 
@@ -6465,7 +6465,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testContentsConstraintParser() throws IOException,
+    void testContentsConstraintParser() throws IOException,
             ParserException {
         ContentsConstraintParser parser = new Parser(new ByteArrayInputStream(
                 "CONTAINING VisibleString".getBytes())).new ContentsConstraintParser();
@@ -6496,7 +6496,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testParameterizedAssignmentParser() throws IOException,
+    void testParameterizedAssignmentParser() throws IOException,
             ParserException {
         ParameterizedAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6554,7 +6554,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedTypeAssignmentParser() throws IOException,
+    void testParameterizedTypeAssignmentParser() throws IOException,
             ParserException {
         ParameterizedTypeAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6572,7 +6572,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedValueAssignmentParser() throws IOException,
+    void testParameterizedValueAssignmentParser() throws IOException,
             ParserException {
         ParameterizedValueAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6590,7 +6590,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedValueSetTypeAssignmentParser()
+    void testParameterizedValueSetTypeAssignmentParser()
             throws IOException, ParserException {
         ParameterizedValueSetTypeAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6606,7 +6606,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedObjectClassAssignmentParser()
+    void testParameterizedObjectClassAssignmentParser()
             throws IOException, ParserException {
         ParameterizedTypeAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6624,7 +6624,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedObjectAssignmentParser() throws IOException,
+    void testParameterizedObjectAssignmentParser() throws IOException,
             ParserException {
         ParameterizedValueAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6658,7 +6658,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedObjectSetAssignmentParser()
+    void testParameterizedObjectSetAssignmentParser()
             throws IOException, ParserException {
         ParameterizedObjectSetAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6674,7 +6674,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterListParser() throws IOException, ParserException {
+    void testParameterListParser() throws IOException, ParserException {
         ParameterListParser parser = new Parser(new ByteArrayInputStream(
                 "{VisibleString: aString, INTEGER: anInteger}".getBytes())).new ParameterListParser();
 
@@ -6701,7 +6701,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterParser() throws IOException, ParserException {
+    void testParameterParser() throws IOException, ParserException {
         ParameterParser parser = new Parser(new ByteArrayInputStream(
                 "VisibleString: aString".getBytes())).new ParameterParser();
 
@@ -6721,7 +6721,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParamGovernorParser() throws IOException, ParserException {
+    void testParamGovernorParser() throws IOException, ParserException {
         ParamGovernorParser parser = new Parser(new ByteArrayInputStream(
                 "INTEGER".getBytes())).new ParamGovernorParser();
 
@@ -6733,7 +6733,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testGovernorParser() throws IOException, ParserException {
+    void testGovernorParser() throws IOException, ParserException {
         GovernorParser parser = new Parser(new ByteArrayInputStream(
                 "INTEGER".getBytes())).new GovernorParser();
 
@@ -6752,7 +6752,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDummyGovernorParser() throws IOException, ParserException {
+    void testDummyGovernorParser() throws IOException, ParserException {
         DummyGovernorParser parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference".getBytes())).new DummyGovernorParser();
 
@@ -6763,7 +6763,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testDummyReferenceParser() throws IOException, ParserException {
+    void testDummyReferenceParser() throws IOException, ParserException {
         DummyReferenceParser parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference".getBytes())).new DummyReferenceParser();
 
@@ -6780,7 +6780,7 @@ public class ParserTest {
      */
 
     @Test
-    public void testParameterizedTypeParser() throws IOException,
+    void testParameterizedTypeParser() throws IOException,
             ParserException {
         ParameterizedTypeParser parser = new Parser(new ByteArrayInputStream(
                 "Module.Type {INTEGER}".getBytes())).new ParameterizedTypeParser();
@@ -6796,7 +6796,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSimpleDefinedTypeParser() throws IOException,
+    void testSimpleDefinedTypeParser() throws IOException,
             ParserException {
         SimpleDefinedTypeParser parser = new Parser(new ByteArrayInputStream(
                 "Module.TypeReference".getBytes())).new SimpleDefinedTypeParser();
@@ -6820,7 +6820,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedValueParser() throws IOException,
+    void testParameterizedValueParser() throws IOException,
             ParserException {
         ParameterizedValueParser parser = new Parser(new ByteArrayInputStream(
                 "Module.value {4711}".getBytes())).new ParameterizedValueParser();
@@ -6836,7 +6836,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testSimpleDefinedValueParser() throws IOException,
+    void testSimpleDefinedValueParser() throws IOException,
             ParserException {
         SimpleDefinedValueParser parser = new Parser(new ByteArrayInputStream(
                 "Module.value".getBytes())).new SimpleDefinedValueParser();
@@ -6859,7 +6859,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedValueSetTypeParser() throws IOException,
+    void testParameterizedValueSetTypeParser() throws IOException,
             ParserException {
         ParameterizedTypeParser parser = new Parser(new ByteArrayInputStream(
                 "ValueSet {VisibleString}".getBytes())).new ParameterizedTypeParser();
@@ -6872,7 +6872,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedObjectClassParser() throws IOException,
+    void testParameterizedObjectClassParser() throws IOException,
             ParserException {
         ParameterizedObjectClassParser parser = new Parser(
                 new ByteArrayInputStream(
@@ -6886,7 +6886,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedObjectSetParser() throws IOException,
+    void testParameterizedObjectSetParser() throws IOException,
             ParserException {
         ParameterizedObjectSetParser parser = new Parser(
                 new ByteArrayInputStream("ObjectSet {INTEGER}".getBytes())).new ParameterizedObjectSetParser();
@@ -6899,7 +6899,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testParameterizedObjectParser() throws IOException,
+    void testParameterizedObjectParser() throws IOException,
             ParserException {
         ParameterizedObjectParser parser = new Parser(new ByteArrayInputStream(
                 "object {INTEGER}".getBytes())).new ParameterizedObjectParser();
@@ -6912,7 +6912,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testActualParameterListParser() throws IOException,
+    void testActualParameterListParser() throws IOException,
             ParserException {
         ActualParameterListParser parser = new Parser(new ByteArrayInputStream(
                 "{CustomString {VisibleString}, INTEGER, object-reference}"
@@ -6925,7 +6925,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testActualParameterParser() throws IOException, ParserException {
+    void testActualParameterParser() throws IOException, ParserException {
         ActualParameterParser parser = new Parser(new ByteArrayInputStream(
                 "CustomString {VisibleString}".getBytes())).new ActualParameterParser();
 

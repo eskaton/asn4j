@@ -40,12 +40,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
 
     @Test
-    public void testEmptyTags() {
+    void testEmptyTags() {
         assertThrows(IllegalArgumentException.class, () -> new BERDecoder.SingleTagsMatcher(Collections.emptyList()));
     }
 
     @Test
-    public void testImplicit() {
+    void testImplicit() {
         BERDecoder.SingleTagsMatcher matcher = new BERDecoder.SingleTagsMatcher(getTags(TestTag1.class));
 
         assertTrue(matcher.hasNext());
@@ -57,7 +57,7 @@ public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    public void testImplicitFailure() {
+    void testImplicitFailure() {
         BERDecoder.SingleTagsMatcher matcher = new BERDecoder.SingleTagsMatcher(getTags(TestTag1.class));
 
         assertTrue(matcher.hasNext());
@@ -69,7 +69,7 @@ public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    public void testExplicit() {
+    void testExplicit() {
         BERDecoder.SingleTagsMatcher matcher = new BERDecoder.SingleTagsMatcher(getTags(TestTag2.class));
 
         assertTrue(matcher.hasNext());
@@ -86,7 +86,7 @@ public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    public void testExplicitFailure() {
+    void testExplicitFailure() {
         BERDecoder.SingleTagsMatcher matcher = new BERDecoder.SingleTagsMatcher(getTags(TestTag2.class));
 
         assertTrue(matcher.hasNext());

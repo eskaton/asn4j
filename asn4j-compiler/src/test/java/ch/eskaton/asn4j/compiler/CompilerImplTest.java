@@ -60,7 +60,7 @@ public class CompilerImplTest {
     @SuppressWarnings("unused")
     @ParameterizedTest(name = "[{index}] {3}")
     @MethodSource("provideInvalidTypesInConstraintsArguments")
-    public void testInvalidTypesInConstraints(String body, Class<? extends Exception> expected, String message, String description) {
+    void testInvalidTypesInConstraints(String body, Class<? extends Exception> expected, String message, String description) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()
                         .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())),

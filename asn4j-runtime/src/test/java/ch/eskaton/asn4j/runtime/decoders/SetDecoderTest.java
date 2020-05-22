@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class SetDecoderTest {
 
     @Test
-    public void testCheckMandatoryFieldsMissing() {
+    void testCheckMandatoryFieldsMissing() {
         SetDecoder decoder = new SetDecoder();
         TestSetA testSet = new TestSetA();
 

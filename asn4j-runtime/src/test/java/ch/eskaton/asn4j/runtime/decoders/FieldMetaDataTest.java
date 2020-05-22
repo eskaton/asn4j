@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FieldMetaDataTest {
 
     @Test
-    public void testFillMetaData() throws NoSuchFieldException, IllegalAccessException {
+    void testFillMetaData() throws NoSuchFieldException, IllegalAccessException {
         TestSetA testSet = new TestSetA();
 
         FieldMetaData fieldMetaData = new FieldMetaData(testSet, ASN1Component.class);
@@ -94,7 +94,7 @@ public class FieldMetaDataTest {
     }
 
     @Test
-    public void testGetMandatoryFieldsMissing() {
+    void testGetMandatoryFieldsMissing() {
         TestSetA testSet = new TestSetA();
 
         FieldMetaData fieldMetaData = new FieldMetaData(testSet, ASN1Component.class);
@@ -110,7 +110,7 @@ public class FieldMetaDataTest {
     }
 
     @Test
-    public void testGetMandatoryFieldsComplete() throws NoSuchFieldException, IllegalAccessException {
+    void testGetMandatoryFieldsComplete() throws NoSuchFieldException, IllegalAccessException {
         TestSetA testSet = new TestSetA();
 
         FieldMetaData fieldMetaData = new FieldMetaData(testSet, ASN1Component.class);

@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 public class TestX690_8_14 {
 
     @Test
-    public void testEncodeVisibleString() throws ASN1RuntimeException {
+    void testEncodeVisibleString() throws ASN1RuntimeException {
         BEREncoder encoder = new BEREncoder();
 
         Type2 type2 = new Type2();
@@ -81,7 +81,7 @@ public class TestX690_8_14 {
     }
 
     @Test
-    public void testEncodeSetOf() throws ASN1RuntimeException {
+    void testEncodeSetOf() throws ASN1RuntimeException {
         BEREncoder encoder = new BEREncoder();
 
         SetType1 type1 = new SetType1();

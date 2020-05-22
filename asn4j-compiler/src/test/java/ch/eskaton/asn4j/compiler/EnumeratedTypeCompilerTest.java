@@ -50,7 +50,7 @@ import static org.mockito.Mockito.mock;
 public class EnumeratedTypeCompilerTest {
 
     @Test
-    public void testAddRootItems() {
+    void testAddRootItems() {
         CompilerContext context = mock(CompilerContext.class);
         EnumeratedTypeCompiler compiler = new EnumeratedTypeCompiler();
         List<EnumerationItemNode> nodes = asList(createNode("a", 0), createNode("b"), createNode("c", 3));
@@ -71,7 +71,7 @@ public class EnumeratedTypeCompilerTest {
     }
 
     @Test
-    public void testAdditionalItems() {
+    void testAdditionalItems() {
         CompilerContext context = mock(CompilerContext.class);
         EnumeratedTypeCompiler compiler = new EnumeratedTypeCompiler();
         List<EnumerationItemNode> rootNodes = asList(createNode("a", 0), createNode("b"), createNode("c", 3));
@@ -101,7 +101,7 @@ public class EnumeratedTypeCompilerTest {
     }
 
     @Test
-    public void testGetNextNumber() {
+    void testGetNextNumber() {
         EnumeratedTypeCompiler compiler = new EnumeratedTypeCompiler();
 
         assertEquals(0, compiler.getNextNumber(emptyList(), 0));
