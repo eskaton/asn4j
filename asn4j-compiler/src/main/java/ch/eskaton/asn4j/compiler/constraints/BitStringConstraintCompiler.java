@@ -52,7 +52,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -122,7 +121,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
+    public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
         FunctionBuilder function = generateCheckConstraintValue(module,
@@ -145,7 +144,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<BitStringValue> values = ((BitStringValueNode) node).getValue();
@@ -163,7 +162,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                 return of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
 
             default:
-                return super.buildExpression(module, type, node);
+                return super.buildExpression(module, compiledType, node);
         }
     }
 

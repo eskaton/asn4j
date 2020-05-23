@@ -36,8 +36,8 @@ public class CompiledCollectionOfType extends CompiledType {
 
     private CompiledType contentType;
 
-    public CompiledCollectionOfType(Type type, CompiledType contentType) {
-        super(type);
+    public CompiledCollectionOfType(Type type, String name, CompiledType contentType) {
+        super(type, name);
 
         this.contentType = contentType;
     }

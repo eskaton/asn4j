@@ -40,8 +40,8 @@ public class CompiledEnumeratedType extends CompiledType {
 
     private EnumerationItems additions;
 
-    public CompiledEnumeratedType(Type type, EnumerationItems roots, EnumerationItems additions) {
-        super(type);
+    public CompiledEnumeratedType(Type type, String name, EnumerationItems roots, EnumerationItems additions) {
+        super(type, name);
 
         this.roots = roots;
         this.additions = additions;

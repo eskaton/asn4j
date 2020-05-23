@@ -62,7 +62,7 @@ public class SelectionTypeCompiler implements NamedCompiler<SelectionType, Compi
             }
         }
 
-        return new CompiledType(node);
+        return new CompiledType(node, name);
     }
 
 }

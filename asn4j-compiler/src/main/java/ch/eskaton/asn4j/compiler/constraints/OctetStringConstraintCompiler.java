@@ -116,7 +116,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
+    public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
         FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(BYTE_ARRAY), VALUE));
@@ -132,7 +132,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<OctetStringValue> values = ((OctetStringValueNode) node).getValue();
@@ -149,7 +149,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeExpressions));
             default:
-                return super.buildExpression(module, type, node);
+                return super.buildExpression(module, compiledType, node);
         }
     }
 

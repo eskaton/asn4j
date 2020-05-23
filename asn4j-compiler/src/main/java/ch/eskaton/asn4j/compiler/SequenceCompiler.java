@@ -58,7 +58,7 @@ public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledTyp
             }
         }
 
-        CompiledType compiledType = new CompiledCollectionType(node, components);
+        CompiledType compiledType = new CompiledCollectionType(node, name, components);
         ConstraintDefinition constraintDef;
 
         if (node.hasConstraint()) {

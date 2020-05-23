@@ -37,8 +37,8 @@ public class CompiledCollectionType extends CompiledType {
 
     private Map<String, CompiledType> components;
 
-    public CompiledCollectionType(Type type, Map<String, CompiledType> components) {
-        super(type);
+    public CompiledCollectionType(Type type, String name, Map<String, CompiledType> components) {
+        super(type, name);
 
         this.components = components;
     }

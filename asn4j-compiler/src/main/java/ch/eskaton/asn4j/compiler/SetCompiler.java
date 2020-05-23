@@ -61,7 +61,7 @@ public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
 
         ctx.finishClass();
 
-        return new CompiledType(node);
+        return new CompiledType(node, name);
     }
 
     private TagId getTagId(CompilerContext ctx, ComponentType component) {

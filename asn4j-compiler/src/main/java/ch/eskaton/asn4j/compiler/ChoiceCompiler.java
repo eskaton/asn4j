@@ -89,7 +89,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         ctx.finishClass();
 
-        return new CompiledType(node);
+        return new CompiledType(node, name);
     }
 
     private String compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,
