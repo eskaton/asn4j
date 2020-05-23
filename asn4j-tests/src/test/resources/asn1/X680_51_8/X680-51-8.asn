@@ -33,55 +33,64 @@ TestSequence4 ::= SEQUENCE {
     ...,
     d BOOLEAN
 } (WITH COMPONENTS {c (WITH COMPONENTS {a (1), b (TRUE)}), d (FALSE)})
+TestSequence5 ::= SEQUENCE {
+    c SEQUENCE {
+        a INTEGER,
+        b BOOLEAN,
+        ...
+    },
+    ...,
+    d BOOLEAN
+} (WITH COMPONENTS {c (WITH COMPONENTS {a (1)})})
 
 
 -- Test all types
-TestSetOf9 ::= SET OF BOOLEAN
-TestSetOf10 ::= TestSetOf9 (WITH COMPONENT (TRUE))
+TestSetOf109 ::= SET OF BOOLEAN
+TestSetOf110 ::= TestSetOf109 (WITH COMPONENT (TRUE))
 TestEnumerated1 ::= ENUMERATED {a, b, c}
-TestSetOf11 ::= SET OF TestEnumerated1
-TestSetOf12 ::= TestSetOf11 (WITH COMPONENT (a))
-TestSetOf13 ::= SET OF NULL
-TestSetOf14 ::= TestSetOf13 (WITH COMPONENT (NULL))
-TestSetOf15 ::= SET OF OBJECT IDENTIFIER
-TestSetOf16 ::= TestSetOf15 (WITH COMPONENT ({ 0 3 6 3 }))
-TestSetOf17 ::= SET OF RELATIVE-OID
-TestSetOf18 ::= TestSetOf17 (WITH COMPONENT ({ 3 6 3 }))
-TestSetOf19 ::= SET OF OID-IRI
-TestSetOf20 ::= TestSetOf19 (WITH COMPONENT ("/ISO/a/b/e"))
-TestSetOf21 ::= SET OF RELATIVE-OID-IRI
-TestSetOf22 ::= TestSetOf21 (WITH COMPONENT ("a/b/e"))
-TestSetOf23 ::= SET OF OCTET STRING
-TestSetOf24 ::= TestSetOf23 (WITH COMPONENT ('0101'B))
-TestSetOf25 ::= SET OF TestSequenceOf2
-TestSetOf26 ::= TestSetOf25 (WITH COMPONENT (WITH COMPONENT (1)))
+TestSetOf111 ::= SET OF TestEnumerated1
+TestSetOf112 ::= TestSetOf111 (WITH COMPONENT (a))
+TestSetOf113 ::= SET OF NULL
+TestSetOf114 ::= TestSetOf113 (WITH COMPONENT (NULL))
+TestSetOf115 ::= SET OF OBJECT IDENTIFIER
+TestSetOf116 ::= TestSetOf115 (WITH COMPONENT ({ 0 3 6 3 }))
+TestSetOf117 ::= SET OF RELATIVE-OID
+TestSetOf118 ::= TestSetOf117 (WITH COMPONENT ({ 3 6 3 }))
+TestSetOf119 ::= SET OF OID-IRI
+TestSetOf120 ::= TestSetOf119 (WITH COMPONENT ("/ISO/a/b/e"))
+TestSetOf121 ::= SET OF RELATIVE-OID-IRI
+TestSetOf122 ::= TestSetOf121 (WITH COMPONENT ("a/b/e"))
+TestSetOf123 ::= SET OF OCTET STRING
+TestSetOf124 ::= TestSetOf123 (WITH COMPONENT ('0101'B))
+TestSetOf125 ::= SET OF TestSequenceOf2
+TestSetOf126 ::= TestSetOf125 (WITH COMPONENT (WITH COMPONENT (1)))
 
-TestSequence5 ::= SEQUENCE {
+TestSequence105 ::= SEQUENCE {
     a ENUMERATED {a, b, c}
 } (WITH COMPONENTS {a (a|b)})
-TestSequence6 ::= SEQUENCE {
+TestSequence106 ::= SEQUENCE {
     a NULL
 } (WITH COMPONENTS {a (NULL)})
-TestSequence7 ::= SEQUENCE {
+TestSequence107 ::= SEQUENCE {
     a OBJECT IDENTIFIER
 } (WITH COMPONENTS {a ({ 0 3 6 3 })})
-TestSequence8 ::= SEQUENCE {
+TestSequence108 ::= SEQUENCE {
     a RELATIVE-OID
 } (WITH COMPONENTS {a ({ 3 6 3 })})
-TestSequence9 ::= SEQUENCE {
+TestSequence109 ::= SEQUENCE {
     a OID-IRI
 } (WITH COMPONENTS {a ("/ISO/a/b/e")})
-TestSequence10 ::= SEQUENCE {
+TestSequence110 ::= SEQUENCE {
     a RELATIVE-OID-IRI
 } (WITH COMPONENTS {a ("a/b/e")})
-TestSequence11 ::= SEQUENCE {
+TestSequence111 ::= SEQUENCE {
     a BIT STRING
 } (WITH COMPONENTS {a ('0101'B)})
-TestSequence12 ::= SEQUENCE {
+TestSequence112 ::= SEQUENCE {
     a TestSetOf1
 } (WITH COMPONENTS {a (WITH COMPONENT (1..3))})
-TestSequence13 ::= SEQUENCE {
-    COMPONENTS OF TestSequence12
+TestSequence113 ::= SEQUENCE {
+    COMPONENTS OF TestSequence112
 } (WITH COMPONENTS {a (WITH COMPONENT (1..2))})
 
 END
