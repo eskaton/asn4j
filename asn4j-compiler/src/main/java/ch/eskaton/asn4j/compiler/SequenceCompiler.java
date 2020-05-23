@@ -49,11 +49,11 @@ public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledTyp
                         .compile(ctx, component));
             } catch (CompilerException e) {
                 if (component.getNamedType() != null) {
-                    throw new CompilerException("Failed to compile component %s in %s %s",
-                            component.getNamedType().getName(), TypeName.SEQUENCE, name, e);
+                    throw new CompilerException("Failed to compile component %s in %s %s", e,
+                            component.getNamedType().getName(), TypeName.SEQUENCE, name);
                 } else {
-                    throw new CompilerException("Failed to compile a component in %s %s",
-                            TypeName.SEQUENCE, name, e);
+                    throw new CompilerException("Failed to compile a component in %s %s", e,
+                            TypeName.SEQUENCE, name);
                 }
             }
         }

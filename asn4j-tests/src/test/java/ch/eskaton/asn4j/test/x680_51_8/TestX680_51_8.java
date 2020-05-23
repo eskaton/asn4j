@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestEnumerated1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence10;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence11;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence12;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence3;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence4;
@@ -397,6 +398,21 @@ public class TestX680_51_8 {
 
         testSequenceFailure(TestSequence11.class, new TestSequence11(),
                 s -> s.setA(new ASN1BitString(new byte[] { 0x05 }, 5)));
+    }
+
+    @Test
+    void testSequence12() {
+        testSequenceSuccess(TestSequence12.class, new TestSequence12(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(1L)))));
+        testSequenceSuccess(TestSequence12.class, new TestSequence12(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(2L)))));
+        testSequenceSuccess(TestSequence12.class, new TestSequence12(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(3L)))));
+
+        testSequenceFailure(TestSequence12.class, new TestSequence12(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(0L)))));
+        testSequenceFailure(TestSequence12.class, new TestSequence12(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(4L)))));
     }
 
 }

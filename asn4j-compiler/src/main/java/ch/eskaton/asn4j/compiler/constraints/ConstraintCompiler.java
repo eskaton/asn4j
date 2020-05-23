@@ -174,7 +174,7 @@ public class ConstraintCompiler {
             throw new IllegalCompilerStateException("Compiler for type %s is missing", type);
         }
 
-        return maybeCompiler.get().buildExpression(module, null, node);
+        return maybeCompiler.get().buildExpression(module, type, node);
     }
 
 }
