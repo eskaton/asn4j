@@ -102,7 +102,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
     }
 
     @Override
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
+    public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
         FunctionBuilder builder = generateCheckConstraintValue(module,
@@ -120,7 +120,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         switch (node.getType()) {
             case VALUE:
                 List<BooleanExpression> arguments = (((N) node).getValue()).stream()
@@ -129,7 +129,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
 
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
             default:
-                return super.buildExpression(module, type, node);
+                return super.buildExpression(module, compiledType, node);
         }
     }
 

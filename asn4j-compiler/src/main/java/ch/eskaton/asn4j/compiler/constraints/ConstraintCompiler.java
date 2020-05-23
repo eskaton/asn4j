@@ -141,7 +141,7 @@ public class ConstraintCompiler {
             return;
         }
 
-        maybeCompiler.get().addConstraint(compiledType.getType(), module, definition);
+        maybeCompiler.get().addConstraint(compiledType, module, definition);
     }
 
     public ConstraintDefinition compileConstraint(Type type, Constraint constraint) {
@@ -166,15 +166,15 @@ public class ConstraintCompiler {
         return maybeCompiler.get().compileConstraints(compiledBaseType, singletonList(constraint), Optional.empty());
     }
 
-    public Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
-        CompiledType compiledType = ctx.getCompiledBaseType(type);
-        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
+    public Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
+        CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType.getType());
+        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
 
         if (!maybeCompiler.isPresent()) {
-            throw new IllegalCompilerStateException("Compiler for type %s is missing", type);
+            throw new IllegalCompilerStateException("Compiler for type %s is missing", compiledType.getType());
         }
 
-        return maybeCompiler.get().buildExpression(module, type, node);
+        return maybeCompiler.get().buildExpression(module, compiledType, node);
     }
 
 }

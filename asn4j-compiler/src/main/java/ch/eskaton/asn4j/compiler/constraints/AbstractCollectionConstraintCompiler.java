@@ -52,6 +52,7 @@ import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -204,21 +205,29 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     @Override
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
-        generateDoCheckConstraint(type, module);
+    public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {
+        var compiledBaseType = getCompiledCollectionType(compiledType);
 
-        SequenceType referencedType = (SequenceType) ctx.resolveTypeReference(type);
-        List<String> typeParameter = ctx.getTypeParameter(referencedType);
+        generateDoCheckConstraint(compiledBaseType, module);
+
+        List<String> typeParameter = ctx.getTypeParameter(compiledBaseType.getType());
 
         FunctionBuilder builder = generateCheckConstraintValue(module,
                 getMapParameter());
 
-        addConstraintCondition(referencedType, typeParameter, definition, builder, module);
+        addConstraintCondition(compiledType, typeParameter, definition, builder, module);
 
         builder.build();
     }
 
-    protected void generateDoCheckConstraint(Type type, Module module) {
+    private CompiledCollectionType getCompiledCollectionType(CompiledType compiledType) {
+        return Optional.ofNullable(ctx.getCompiledBaseType(compiledType))
+                .filter(CompiledCollectionType.class::isInstance)
+                .map(CompiledCollectionType.class::cast)
+                .orElseThrow(() -> new CompilerException("Failed to resolve the type of %s", compiledType));
+    }
+
+    protected void generateDoCheckConstraint(CompiledCollectionType compiledType, Module module) {
         // @formatter:off
         module.function()
                 .name("doCheckConstraint")
@@ -226,17 +235,16 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                 .visibility(ILVisibility.PUBLIC)
                 .returnType(ILType.of(BOOLEAN))
                 .statements()
-                    .returnExpression(generateCheckConstraintCall(type))
+                    .returnExpression(generateCheckConstraintCall(compiledType))
                     .build()
                 .build();
         // @formatter:on
     }
 
-    protected FunctionCall generateCheckConstraintCall(Type type) {
+    protected FunctionCall generateCheckConstraintCall(CompiledCollectionType compiledType) {
         Set<Tuple2<Expression, Expression>> associations = new HashSet<>();
 
-        ((SequenceType) ctx.resolveTypeReference(type)).getAllComponents().stream()
-                .map(c -> c.getNamedType().getName())
+        compiledType.getComponents().keySet().stream()
                 .map(n -> new Tuple2(ILValue.of(n), new FunctionCall(of("get" + initCap(n)))))
                 .forEach(associations::add);
 
@@ -245,18 +253,18 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                         ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
     }
 
-    protected void addConstraintCondition(Type type, List<String> typeParameter, ConstraintDefinition definition,
+    protected void addConstraintCondition(CompiledType compiledType, List<String> typeParameter, ConstraintDefinition definition,
             FunctionBuilder builder, Module module) {
         String functionName = "checkConstraintValue";
 
         if (definition.isExtensible()) {
             builder.statements().returnValue(Boolean.TRUE);
         } else if (builder.getModule().getFunctions().stream().noneMatch(f -> f.getName().equals(functionName))) {
-            addConstraintCondition(type, definition, builder);
+            addConstraintCondition(compiledType, definition, builder);
         } else {
             Node roots = definition.getRoots();
-            Optional<BooleanExpression> expression = buildExpression(module, type, roots);
-            Type elementType = ((CollectionOfType) type).getType();
+            Optional<BooleanExpression> expression = buildExpression(module, compiledType, roots);
+            Type elementType = ((CollectionOfType) compiledType.getType()).getType();
             BooleanExpression condition;
 
             if (elementType instanceof CollectionOfType) {
@@ -301,22 +309,22 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         if (node == null) {
             return Optional.empty();
         }
 
         return switch (node.getType()) {
-            case VALUE -> getValueExpression(type, (CollectionValueNode) node);
-            case WITH_COMPONENTS -> getWithComponentsExpression(module, type, (WithComponentsNode) node);
-            default -> super.buildExpression(module, type, node);
+            case VALUE -> getValueExpression(compiledType, (CollectionValueNode) node);
+            case WITH_COMPONENTS -> getWithComponentsExpression(module, compiledType, (WithComponentsNode) node);
+            default -> super.buildExpression(module, compiledType, node);
         };
     }
 
-    private Optional<BooleanExpression> getValueExpression(Type type, CollectionValueNode node) {
+    private Optional<BooleanExpression> getValueExpression(CompiledType compiledType, CollectionValueNode node) {
         Set<CollectionValue> values = node.getValue();
         List<BooleanExpression> valueArguments = values.stream()
-                .map(value -> buildExpression(type, value))
+                .map(value -> buildExpression(compiledType, value))
                 .collect(Collectors.toList());
 
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
@@ -339,8 +347,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         return super.getTypeName(elementType);
     }
 
-    private BooleanExpression buildExpression(Type type, CollectionValue collectionValue) {
-        var typeStream = ((SequenceType) type).getAllRootComponents().stream().map(componentType -> ctx.getTypeName(
+    private BooleanExpression buildExpression(CompiledType compiledType, CollectionValue collectionValue) {
+        var typeStream = ((SequenceType) compiledType.getType()).getAllRootComponents().stream().map(componentType -> ctx.getTypeName(
                 Optional.ofNullable(componentType.getType()).orElse(componentType.getNamedType().getType())));
         var valueStream = collectionValue.getValues().stream();
         var associations = new HashSet<Tuple2<Expression, Expression>>();
@@ -353,27 +361,23 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                 ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
     }
 
-    private Optional<BooleanExpression> getWithComponentsExpression(Module module, Type type, WithComponentsNode node) {
+    private Optional<BooleanExpression> getWithComponentsExpression(Module module, CompiledType compiledType,
+            WithComponentsNode node) {
         var componentComparator = Comparator.comparing(ComponentNode::getName);
-
-        var componentTypeNames = ((Collection) ctx.resolveTypeReference(type)).getAllComponents().stream()
-                .map(c -> Tuple2.of(c.getNamedType().getName(), ctx.getTypeName(c.getNamedType())))
-                .collect(Collectors.toMap(t -> t.get_1(), t -> t.get_2()));
+        var compiledCollectionType = getCompiledCollectionType(compiledType);
 
         var expressions = componentsStream(node, componentComparator)
                 .map(componentNode -> ctx
-                        .buildExpression(module, componentNode.getComponentType(), componentNode.getConstraint())
+                        .buildExpression(module, getComponent(compiledCollectionType, componentNode),
+                                componentNode.getConstraint())
                         .orElseThrow(() -> new IllegalCompilerStateException("Expected expression")));
 
-        var componentTypes = componentsStream(node, componentComparator).map(ComponentNode::getComponentType);
-
-        var properties = componentsStream(node, componentComparator);
-
         var expressionCalls = StreamsUtils.zip(
-                StreamsUtils.zip(componentTypes, expressions, Tuple2::new)
-                        .map(t -> buildExpressionFunction(module, t)), properties, Tuple2::new)
+                StreamsUtils.zip(componentsStream(node, componentComparator), expressions, Tuple2::new)
+                        .map(t -> buildExpressionFunction(module, getComponent(compiledCollectionType, t.get_1()), t.get_2())),
+                componentsStream(node, componentComparator), Tuple2::new)
                 .map(t -> new BooleanFunctionCall(Optional.of(t.get_1().get_1()),
-                        getParameters(t.get_2(), componentTypeNames.get(t.get_2().getName()), t.get_1().get_2())))
+                getParameters(t.get_2(), getComponent(compiledCollectionType, t.get_2()).getName(), t.get_1().get_2())))
                 .collect(Collectors.toList());
 
         String checkSym = module.generateSymbol("_checkConstraint");
@@ -390,6 +394,10 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         // @formatter:on
 
         return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), Variable.of(VALUES)));
+    }
+
+    private CompiledType getComponent(CompiledCollectionType compiledCollectionType, ComponentNode componentNode) {
+        return compiledCollectionType.getComponents().get(componentNode.getName());
     }
 
     private Stream<ComponentNode> componentsStream(WithComponentsNode node,
@@ -440,25 +448,26 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         throw new IllegalCompilerStateException("Unsupported type: " + runtimeType);
     }
 
-    private Tuple2<String, String> buildExpressionFunction(Module module, Tuple2<Type, BooleanExpression> typeAndExpression) {
+    private Tuple2<String, String> buildExpressionFunction(Module module, CompiledType compiledType,
+            BooleanExpression expression) {
         String expressionSym = module.generateSymbol("_expression");
 
         // @formatter:off
         module.function()
                 .returnType(ILType.of(BOOLEAN))
                 .name(expressionSym)
-                .parameters(getParameterDefinition(typeAndExpression.get_1()))
+                .parameters(getParameterDefinition(compiledType))
                 .statements()
-                    .returnExpression(typeAndExpression.get_2())
+                    .returnExpression(expression)
                     .build()
                 .build();
         // @formatter:on
 
-        return Tuple2.of(expressionSym, ctx.getRuntimeType(typeAndExpression.get_1()));
+        return Tuple2.of(expressionSym, ctx.getRuntimeType(compiledType.getType()));
     }
 
-    private List<Parameter> getParameterDefinition(Type type) {
-        String runtimeType = ctx.getRuntimeType(type);
+    private List<Parameter> getParameterDefinition(CompiledType compiledType) {
+        String runtimeType = ctx.getRuntimeType(compiledType.getType());
         List<Parameter> parameters;
 
         if (runtimeType.equals(ASN1Integer.class.getSimpleName())) {
@@ -485,7 +494,9 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
             parameters = singletonList(getMapParameter());
         } else if (runtimeType.equals(ASN1SequenceOf.class.getSimpleName()) ||
                 runtimeType.equals(ASN1SetOf.class.getSimpleName())) {
-            List<String> typeParameter = ctx.getParameterizedType(ctx.getBase(((CollectionOfType) type).getType()))
+            var contentType = ((CompiledCollectionOfType) ctx.getCompiledBaseType(compiledType))
+                    .getContentType().getType();
+            List<String> typeParameter = ctx.getParameterizedType(contentType)
                     .stream()
                     .collect(Collectors.toList());
 

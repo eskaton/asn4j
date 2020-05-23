@@ -37,19 +37,27 @@ public class CompiledType implements CompilationResult {
 
     private Type type;
 
+    private String name;
+
     private ConstraintDefinition constraintDefinition;
 
-    public CompiledType(Type type) {
+    public CompiledType(Type type, String name) {
         this.type = type;
+        this.name = name;
     }
 
-    public CompiledType(Type type, ConstraintDefinition constraintDefinition) {
-        this.type = type;
+    public CompiledType(Type type, String name, ConstraintDefinition constraintDefinition) {
+        this(type, name);
+
         this.constraintDefinition = constraintDefinition;
     }
 
     public Type getType() {
         return type;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public ConstraintDefinition getConstraintDefinition() {
@@ -73,12 +81,13 @@ public class CompiledType implements CompilationResult {
         CompiledType that = (CompiledType) obj;
 
         return Objects.equals(type, that.type) &&
+                Objects.equals(name, that.name) &&
                 Objects.equals(constraintDefinition, that.constraintDefinition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, constraintDefinition);
+        return Objects.hash(type, name, constraintDefinition);
     }
 
     @Override

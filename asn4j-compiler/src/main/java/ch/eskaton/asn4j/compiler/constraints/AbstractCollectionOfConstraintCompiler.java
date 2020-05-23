@@ -213,32 +213,32 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    public void addConstraint(Type type, Module module, ConstraintDefinition definition) {
+    public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
-        CollectionOfType referencedType = (CollectionOfType) ctx.resolveTypeReference(type);
+        CollectionOfType referencedType = (CollectionOfType) ctx.resolveTypeReference(compiledType.getType());
         List<String> typeParameter = ctx.getTypeParameter(referencedType);
 
         FunctionBuilder builder = generateCheckConstraintValue(module,
                 new Parameter(ILParameterizedType.of(collectionType, typeParameter), VALUE));
 
-        addConstraintCondition(referencedType, typeParameter, definition, builder, module);
+        addConstraintCondition(compiledType, typeParameter, definition, builder, module);
 
         builder.build();
     }
 
-    protected void addConstraintCondition(Type type, List<String> typeParameter, ConstraintDefinition definition,
+    protected void addConstraintCondition(CompiledType compiledType, List<String> typeParameter, ConstraintDefinition definition,
             FunctionBuilder builder, Module module) {
         String functionName = "checkConstraintValue";
 
         if (definition.isExtensible()) {
             builder.statements().returnValue(Boolean.TRUE);
         } else if (builder.getModule().getFunctions().stream().noneMatch(f -> f.getName().equals(functionName))) {
-            addConstraintCondition(type, definition, builder);
+            addConstraintCondition(compiledType, definition, builder);
         } else {
             Node roots = definition.getRoots();
-            Optional<BooleanExpression> expression = buildExpression(module, type, roots);
-            Type elementType = ((CollectionOfType) type).getType();
+            Optional<BooleanExpression> expression = buildExpression(module, compiledType, roots);
+            Type elementType = ((CollectionOfType) compiledType.getType()).getType();
             BooleanExpression condition;
 
             if (elementType instanceof CollectionOfType) {
@@ -303,27 +303,27 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    protected Optional<BooleanExpression> buildExpression(Module module, Type type, Node node) {
+    protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         if (node == null) {
             return Optional.empty();
         }
 
         switch (node.getType()) {
             case VALUE:
-                return getValueExpression(type, (CollectionOfValueNode) node);
+                return getValueExpression(compiledType, (CollectionOfValueNode) node);
             case SIZE:
                 return getSizeExpression((SizeNode) node);
             case WITH_COMPONENT:
                 return getWithComponentExpression(module, (WithComponentNode) node);
             default:
-                return super.buildExpression(module, type, node);
+                return super.buildExpression(module, compiledType, node);
         }
     }
 
-    private Optional<BooleanExpression> getValueExpression(Type type, CollectionOfValueNode node) {
+    private Optional<BooleanExpression> getValueExpression(CompiledType compiledType, CollectionOfValueNode node) {
         Set<CollectionOfValue> values = node.getValue();
         List<BooleanExpression> valueArguments = values.stream()
-                .map(value -> buildExpression(type, value))
+                .map(value -> buildExpression(compiledType, value))
                 .collect(Collectors.toList());
 
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
@@ -340,7 +340,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     private Optional<BooleanExpression> getWithComponentExpression(Module module, WithComponentNode node) {
         WithComponentNode componentNode = node;
         Optional<BooleanExpression> expression = ctx
-                .buildExpression(module, componentNode.getComponentType(), componentNode.getConstraint());
+                .buildExpression(module, ctx.getCompiledType(componentNode.getComponentType()),
+                        componentNode.getConstraint());
 
         String expressionSym = module.generateSymbol("_expression");
 
@@ -489,8 +490,9 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         return super.getTypeName(elementType);
     }
 
-    private BooleanExpression buildExpression(Type type, CollectionOfValue collectionOfValue) {
-        var values = collectionOfValue.getValues().stream().map(value -> new ILValue(getTypeName(type), value))
+    private BooleanExpression buildExpression(CompiledType compiledType, CollectionOfValue collectionOfValue) {
+        var values = collectionOfValue.getValues().stream()
+                .map(value -> new ILValue(getTypeName(compiledType.getType()), value))
                 .collect(Collectors.toList());
 
         return new BooleanFunctionCall.SetEquals(new Variable(VALUE), new ILListValue(values));

@@ -560,7 +560,7 @@ public class CompilerContext {
             return defineType(type, name, false);
         }
 
-        return getCompiledType(type);
+        return new CompiledType(type, getTypeName(type, name));
     }
 
     private CompiledType defineType(Type type, String name, boolean newType) {
@@ -568,7 +568,7 @@ public class CompilerContext {
             return compileType(type, getTypeName(type, name));
         }
 
-        return getCompiledType(type);
+        return new CompiledType(type, getTypeName(type, name));
     }
 
     private CompiledType compileType(Type type, String typeName) {
@@ -779,7 +779,8 @@ public class CompilerContext {
         }
     }
 
-    public Optional<BooleanExpression> buildExpression(Module module, Type type, ch.eskaton.asn4j.compiler.constraints.ast.Node node) {
+    public Optional<BooleanExpression> buildExpression(Module module, CompiledType type,
+            ch.eskaton.asn4j.compiler.constraints.ast.Node node) {
         return constraintCompiler.buildExpression(module, type, node);
     }
 
@@ -980,7 +981,7 @@ public class CompilerContext {
      * @return a compiled type
      */
     public CompiledType getCompiledType(Type type) {
-        return getCompiledType(type, false).orElse(new CompiledType(type));
+        return getCompiledType(type, false).orElse(new AnonymousCompiledType(type));
     }
 
     private HashMap<String, CompiledType> getTypesOfCurrentModule() {

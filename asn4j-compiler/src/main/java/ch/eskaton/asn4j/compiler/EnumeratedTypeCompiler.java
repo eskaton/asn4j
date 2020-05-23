@@ -60,10 +60,10 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
     public static final String VALUE_PARAMETER = "value";
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String typeName, EnumeratedType node) {
-        JavaClass javaClass = ctx.createClass(typeName, node, true);
-        EnumerationItems rootItems = getRootItems(ctx, typeName, node.getRootEnum());
-        EnumerationItems additionalItems = getAdditionalItems(ctx, typeName, rootItems, node.getAdditionalEnum());
+    public CompiledType compile(CompilerContext ctx, String name, EnumeratedType node) {
+        JavaClass javaClass = ctx.createClass(name, node, true);
+        EnumerationItems rootItems = getRootItems(ctx, name, node.getRootEnum());
+        EnumerationItems additionalItems = getAdditionalItems(ctx, name, rootItems, node.getAdditionalEnum());
         EnumerationItems allItems = rootItems.copy().addAll(additionalItems.getItems());
 
         if (node.hasExceptionSpec()) {
@@ -78,17 +78,17 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
             cases.put(value, fieldName);
 
-            javaClass.field().modifier(PUBLIC).asStatic().asFinal().type(typeName).name(fieldName)
-                    .initializer("new " + typeName + "(" + value + ")").build();
+            javaClass.field().modifier(PUBLIC).asStatic().asFinal().type(name).name(fieldName)
+                    .initializer("new " + name + "(" + value + ")").build();
         });
 
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, typeName));
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.PROTECTED, typeName,
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, name));
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.PROTECTED, name,
                 asList(new JavaParameter("int", VALUE_PARAMETER)), Optional.of("\t\tsuper.setValue(value);")));
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, typeName,
-                asList(new JavaParameter(typeName, VALUE_PARAMETER)), Optional.of("\t\tsuper.setValue(value.getValue());")));
+        javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, name,
+                asList(new JavaParameter(name, VALUE_PARAMETER)), Optional.of("\t\tsuper.setValue(value.getValue());")));
 
-        BodyBuilder builder = javaClass.method().asStatic().returnType(typeName).name("valueOf")
+        BodyBuilder builder = javaClass.method().asStatic().returnType(name).name("valueOf")
                 .parameter(INT, VALUE_PARAMETER).exception(ASN1RuntimeException.class).body();
 
         builder.append("switch(value) {");
@@ -106,11 +106,11 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
 
-        CompiledEnumeratedType compiledType = new CompiledEnumeratedType(node, rootItems, additionalItems);
+        CompiledEnumeratedType compiledType = new CompiledEnumeratedType(node, name, rootItems, additionalItems);
         ConstraintDefinition constraintDef;
 
         if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, typeName, compiledType);
+            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
             compiledType.setConstraintDefinition(constraintDef);
         }
 

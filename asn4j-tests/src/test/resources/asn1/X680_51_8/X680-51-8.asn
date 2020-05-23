@@ -80,5 +80,8 @@ TestSequence11 ::= SEQUENCE {
 TestSequence12 ::= SEQUENCE {
     a TestSetOf1
 } (WITH COMPONENTS {a (WITH COMPONENT (1..3))})
+TestSequence13 ::= SEQUENCE {
+    COMPONENTS OF TestSequence12
+} (WITH COMPONENTS {a (WITH COMPONENT (1..2))})
 
 END

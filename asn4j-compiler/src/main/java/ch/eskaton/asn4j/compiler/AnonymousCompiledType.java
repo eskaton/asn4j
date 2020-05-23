@@ -28,16 +28,17 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.Real;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
-public class RealCompiler extends BuiltinTypeCompiler<Real> {
+public class AnonymousCompiledType extends CompiledType {
+
+    public AnonymousCompiledType(Type type) {
+        super(type, null);
+    }
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, Real node) {
-        ctx.createClass(name, node, false);
-        ctx.finishClass();
-
-        return new CompiledType(node, name);
+    public String getName() {
+        throw new IllegalCompilerStateException("An anonymous compiled type doesn't have a name: %s", getType());
     }
 
 }
