@@ -48,7 +48,6 @@ import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID;
 import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID_IRI;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE_OF;
-import static ch.eskaton.asn4j.runtime.types.TypeName.SET;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -60,11 +59,23 @@ public class CompilerImplTest {
     @SuppressWarnings("unused")
     @ParameterizedTest(name = "[{index}] {3}")
     @MethodSource("provideInvalidTypesInConstraintsArguments")
-    void testInvalidTypesInConstraints(String body, Class<? extends Exception> expected, String message, String description) {
+    void testInvalidTypesInConstraints(String body, Class<? extends Exception> expected, String message,
+            String description) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()
-                        .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())),
-                expected);
+                .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())), expected);
+
+        exception.ifPresent(e -> assertThat(e.getMessage(), MatchesPattern.matchesPattern(".*" + message + ".*")));
+    }
+
+    @SuppressWarnings("unused")
+    @ParameterizedTest(name = "[{index}] {3}")
+    @MethodSource("provideInvalidMultipleTypeConstraints")
+    void testInvalidMultipleTypeConstraints(String body, Class<? extends Exception> expected, String message,
+            String description) {
+        var module = module("TEST-MODULE", body);
+        var exception = assertThrows(() -> new CompilerImpl()
+                .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())), expected);
 
         exception.ifPresent(e -> assertThat(e.getMessage(), MatchesPattern.matchesPattern(".*" + message + ".*")));
     }
@@ -76,67 +87,67 @@ public class CompilerImplTest {
                             Integer ::= INTEGER (1 | 2)
                             Boolean ::= BOOLEAN (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(BOOLEAN),
-                        getContainedSubtypeMessage(BOOLEAN)),
+                        getContainedSubtypeDescription(BOOLEAN)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             BitString ::= BIT STRING (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(BIT_STRING),
-                        getContainedSubtypeMessage(BIT_STRING)),
+                        getContainedSubtypeDescription(BIT_STRING)),
                Arguments.of("""
                             BitString ::= BIT STRING
                             Integer ::= INTEGER (INCLUDES BitString)
                         """, CompilerException.class, getContainedSubtypeError(INTEGER),
-                        getContainedSubtypeMessage(INTEGER)),
+                        getContainedSubtypeDescription(INTEGER)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             Enumeration ::= ENUMERATED { a, b } (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(ENUMERATED),
-                        getContainedSubtypeMessage(ENUMERATED)),
+                        getContainedSubtypeDescription(ENUMERATED)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             OctetString ::= OCTET STRING (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(OCTET_STRING),
-                        getContainedSubtypeMessage(OCTET_STRING)),
+                        getContainedSubtypeDescription(OCTET_STRING)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             Null ::= NULL (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(NULL),
-                        getContainedSubtypeMessage(NULL)),
+                        getContainedSubtypeDescription(NULL)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             RelativeOID ::= RELATIVE-OID (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(RELATIVE_OID),
-                        getContainedSubtypeMessage(RELATIVE_OID)),
+                        getContainedSubtypeDescription(RELATIVE_OID)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             Oid ::= OBJECT IDENTIFIER (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(OID),
-                        getContainedSubtypeMessage(OID)),
+                        getContainedSubtypeDescription(OID)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             RelativeOidIri ::= RELATIVE-OID-IRI (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(RELATIVE_OID_IRI),
-                        getContainedSubtypeMessage(RELATIVE_OID_IRI)),
+                        getContainedSubtypeDescription(RELATIVE_OID_IRI)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             OidIri ::= OID-IRI (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(OID_IRI),
-                        getContainedSubtypeMessage(OID_IRI)),
+                        getContainedSubtypeDescription(OID_IRI)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             Sequence ::= SEQUENCE { a INTEGER } (INCLUDES Integer)
                         """, CompilerException.class, getContainedSubtypeError(SEQUENCE),
-                        getContainedSubtypeMessage(SEQUENCE)),
+                        getContainedSubtypeDescription(SEQUENCE)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             SequenceOf ::= SEQUENCE (INCLUDES Integer) OF INTEGER
                         """, CompilerException.class, getContainedSubtypeError(SEQUENCE_OF),
-                        getContainedSubtypeMessage(SEQUENCE_OF)),
+                        getContainedSubtypeDescription(SEQUENCE_OF)),
                Arguments.of("""
                             Integer ::= INTEGER (1 | 2)
                             Set ::= SET (INCLUDES Integer) OF INTEGER
                         """, CompilerException.class, getContainedSubtypeError(SET_OF),
-                        getContainedSubtypeMessage(SET_OF)),
+                        getContainedSubtypeDescription(SET_OF)),
 
                Arguments.of("""
                             InvalidSizeType ::= BIT STRING
@@ -147,11 +158,31 @@ public class CompilerImplTest {
         // @formatter:on
     }
 
+    private static Stream<Arguments> provideInvalidMultipleTypeConstraints() {
+        // @formatter:off
+        return Stream.of(
+                Arguments.of("""
+                            Sequence ::= SEQUENCE {
+                                a INTEGER,
+                                b BOOLEAN
+                            } (WITH COMPONENTS {b (TRUE), a (1)})
+                        """, CompilerException.class, "Component 'a' not found in type 'Sequence'",
+                        "Test invalid order of components in SEQUENCE"),
+                Arguments.of("""
+                            Sequence ::= SEQUENCE {
+                                a INTEGER
+                            } (WITH COMPONENTS {a (1), b (TRUE)})
+                        """, CompilerException.class, "Component 'b' not found in type 'Sequence'",
+                        "Test inexistent components in SEQUENCE")
+        );
+        // @formatter:on
+    }
+
     private static String getContainedSubtypeError(TypeName type) {
         return "can't be used in INCLUDES constraint of type %s".formatted(type);
     }
 
-    private static String getContainedSubtypeMessage(TypeName type) {
+    private static String getContainedSubtypeDescription(TypeName type) {
         return "Contained subtype for %s must be derived of the same built-in type as the parent type"
                 .formatted(type);
     }
