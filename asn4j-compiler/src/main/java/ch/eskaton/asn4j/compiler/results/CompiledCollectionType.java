@@ -29,21 +29,24 @@ package ch.eskaton.asn4j.compiler.results;
 
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class CompiledCollectionType extends CompiledType {
 
-    private Map<String, CompiledType> components;
+    private List<Tuple2<String, CompiledType>> components;
 
-    public CompiledCollectionType(Type type, String name, Map<String, CompiledType> components) {
+    public CompiledCollectionType(Type type, String name, List<Tuple2<String, CompiledType>> components) {
         super(type, name);
 
         this.components = components;
     }
 
-    public Map<String, CompiledType> getComponents() {
+    public List<Tuple2<String, CompiledType>> getComponents() {
         return components;
     }
 
