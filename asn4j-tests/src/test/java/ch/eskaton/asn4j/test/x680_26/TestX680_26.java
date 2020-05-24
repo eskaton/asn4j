@@ -49,7 +49,7 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 import static ch.eskaton.commons.utils.Utils.with;
 import static java.util.Arrays.asList;
 
-public class TestX680_26 {
+class TestX680_26 {
 
     @Test
     void testSequenceOf1() {

@@ -69,6 +69,9 @@ import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
 
 public class TypeFormatter {
 
+    private TypeFormatter() {
+    }
+
     public static String formatType(CompilerContext ctx, Node type) {
         if (type instanceof SequenceType) {
             return SEQUENCE + "[" + ((SequenceType) type).getAllComponents().stream()

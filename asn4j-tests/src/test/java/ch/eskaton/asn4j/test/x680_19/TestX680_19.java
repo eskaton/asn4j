@@ -40,7 +40,7 @@ import static ch.eskaton.asn4j.test.TestHelper.assertValueDecodable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-public class TestX680_19 {
+class TestX680_19 {
 
     @Test
     void test1() {

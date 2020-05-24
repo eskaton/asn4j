@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 import static ch.eskaton.asn4j.test.TestUtils.assertSetEncodingEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestX690_8_12 {
+class TestX690_8_12 {
 
     @Test
     void testEncodeTestSetOf1() {

@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class TestX690_8_11 {
+class TestX690_8_11 {
 
     @Test
     void testEncodeTestSet1() {

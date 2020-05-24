@@ -32,9 +32,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class GeneralizedTimeParserTest {
+class GeneralizedTimeParserTest {
 
     @Test
     void testParseLocalDateTime() throws ASN1RuntimeException {
@@ -78,11 +78,7 @@ public class GeneralizedTimeParserTest {
     }
 
     private void assertInvalid(String dateTime) {
-        try {
-            new GeneralizedTimeParser().parse(dateTime);
-            fail("Exception expected");
-        } catch (ASN1RuntimeException e) {
-        }
+        assertThrows(ASN1RuntimeException.class, () -> new GeneralizedTimeParser().parse(dateTime));
     }
 
     private void verifyLocalDateTime(DateTime t, int year, int month, int day, int hour, int minute, int second, int nanos) {

@@ -39,7 +39,7 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class ObjectIdentifierConstraintOptimizingVisitorTest {
+class ObjectIdentifierConstraintOptimizingVisitorTest {
 
     @Test
     void testVisitBinOpNodeUnion() {

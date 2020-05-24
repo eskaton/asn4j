@@ -84,7 +84,7 @@ import static ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence105.A.B;
 import static ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence105.A.C;
 import static ch.eskaton.commons.utils.Utils.with;
 
-public class TestX680_51_8 {
+class TestX680_51_8 {
 
     @Test
     void testSetOf1() {

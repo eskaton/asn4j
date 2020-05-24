@@ -32,16 +32,19 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
+class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
 
     @Test
     void testEmptyTags() {
-        assertThrows(IllegalArgumentException.class, () -> new BERDecoder.SingleTagsMatcher(Collections.emptyList()));
+        List<ASN1Tag> emptyList = Collections.emptyList();
+
+        assertThrows(IllegalArgumentException.class, () -> new BERDecoder.SingleTagsMatcher(emptyList));
     }
 
     @Test

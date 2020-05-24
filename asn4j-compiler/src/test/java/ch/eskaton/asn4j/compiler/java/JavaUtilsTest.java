@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
-public class JavaUtilsTest {
+class JavaUtilsTest {
 
     @Test
     void testBitStringValue() {
@@ -67,7 +67,11 @@ public class JavaUtilsTest {
 
     @Test
     void testUnsupportedValue() {
-        assertThrows(CompilerException.class, () -> getInitializerString(null, null, new EmptyValue(NO_POSITION)));
+        assertThrows(CompilerException.class, () -> {
+            EmptyValue emptyValue = new EmptyValue(NO_POSITION);
+
+            getInitializerString(null, null, emptyValue);
+        });
     }
 
 }

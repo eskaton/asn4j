@@ -36,7 +36,7 @@ import java.util.function.Consumer;
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAround;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestX680_33 {
+class TestX680_33 {
 
     @Test
     void testRelativeObjectIdentifiersWithDefaults() {

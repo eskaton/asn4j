@@ -51,7 +51,7 @@ import static ch.eskaton.commons.utils.Utils.with;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @DisplayName("X.680 25 - SEQUENCE tests")
-public class TestX680_25 {
+class TestX680_25 {
 
     @Test
     @DisplayName("Single component")

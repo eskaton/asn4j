@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 
-public class TestX680_30 {
+class TestX680_30 {
 
     @Test
     void testTestSelectionSetType() throws ASN1RuntimeException {

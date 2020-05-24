@@ -34,7 +34,7 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CompilerUtilsTest {
+class CompilerUtilsTest {
 
     @Test
     void testGetTypeParameterString() {

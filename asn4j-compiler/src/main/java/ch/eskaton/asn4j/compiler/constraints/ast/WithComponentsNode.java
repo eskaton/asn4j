@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.constraints.ast;
 
 import java.util.Set;
 
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.WITH_COMPONENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.WITH_COMPONENTS;
 
 public class WithComponentsNode extends AbstractNode {

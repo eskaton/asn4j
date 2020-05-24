@@ -32,9 +32,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class UTCTimeParserTest {
+class UTCTimeParserTest {
 
     @Test
     void testParseLocalDateTime() throws ASN1RuntimeException {
@@ -68,11 +68,7 @@ public class UTCTimeParserTest {
     }
 
     private void assertInvalid(String dateTime) {
-        try {
-            new UTCTimeParser().parse(dateTime);
-            fail("Exception expected");
-        } catch (ASN1RuntimeException e) {
-        }
+        assertThrows(ASN1RuntimeException.class, () -> new UTCTimeParser().parse(dateTime));
     }
 
     private void verifyDateTime(DateTime t, int year, int month, int day, int hour, int minute, int second) {

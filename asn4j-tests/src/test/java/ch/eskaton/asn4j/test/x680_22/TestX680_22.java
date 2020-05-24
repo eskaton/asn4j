@@ -41,7 +41,7 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestX680_22 {
+class TestX680_22 {
 
     @Test
     void testEncoding() throws ASN1RuntimeException {

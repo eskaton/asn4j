@@ -35,7 +35,7 @@ import static ch.eskaton.asn4j.parser.ast.EndpointNode.canonicalizeLowerEndpoint
 import static ch.eskaton.asn4j.parser.ast.EndpointNode.canonicalizeUpperEndpoint;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class EndpointNodeTest {
+class EndpointNodeTest {
 
     @Test
     void testCanonicalizeEndpoints() {

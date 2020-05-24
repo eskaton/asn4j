@@ -36,7 +36,7 @@ import org.junit.jupiter.api.Test;
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestX680_20 {
+class TestX680_20 {
 
     @Test
     void test1() {

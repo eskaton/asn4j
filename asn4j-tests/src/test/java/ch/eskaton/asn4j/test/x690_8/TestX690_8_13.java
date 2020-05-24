@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestX690_8_13 {
+class TestX690_8_13 {
 
     @Test
     void testEncodeTestChoice1() {

@@ -47,7 +47,7 @@ import static ch.eskaton.asn4j.test.modules.x680_28.TestSetOf5.TestSetOf5Content
 import static ch.eskaton.asn4j.test.modules.x680_28.TestSetOf6.TestSetOf6Content.D;
 import static ch.eskaton.asn4j.test.modules.x680_28.TestSetOf7.TestSetOf7Content.G;
 
-public class TestX680_28 {
+class TestX680_28 {
 
     @Test
     void testSetOf1() {

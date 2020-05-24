@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 
-public class EnumeratedTypeCompilerTest {
+class EnumeratedTypeCompilerTest {
 
     @Test
     void testAddRootItems() {

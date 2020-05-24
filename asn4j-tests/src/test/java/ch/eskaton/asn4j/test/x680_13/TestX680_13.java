@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestX680_13 {
+class TestX680_13 {
 
     @Test
     void testImportsAndExtReferencesCompiled() {

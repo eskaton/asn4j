@@ -38,21 +38,23 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
+class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
 
     @Test
     void testEmptyTags() {
-        assertThrows(IllegalArgumentException.class,
-                () -> new BERDecoder.MultipleTagsMatcher(Collections.emptyList()));
+        List<List<ASN1Tag>> emp = Collections.emptyList();
+
+        assertThrows(IllegalArgumentException.class, () -> new BERDecoder.MultipleTagsMatcher(emp));
     }
 
     @Test
     void testEmptyTagsList() {
+        List<ASN1Tag> emptyList = Collections.emptyList();
         assertThrows(IllegalArgumentException.class,
-                () -> new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1a.class), Collections.emptyList())));
+                () -> new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1a.class), emptyList)));
     }
 
     @Test

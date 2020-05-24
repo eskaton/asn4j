@@ -46,7 +46,7 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class IntegerRangeTest {
+class IntegerRangeTest {
 
     @Test
     void testCompareCanonicalEndpoint() {

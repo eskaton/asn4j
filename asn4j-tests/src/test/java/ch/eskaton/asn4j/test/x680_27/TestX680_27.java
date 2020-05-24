@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 
-public class TestX680_27 {
+class TestX680_27 {
 
     @Test
     void testSet1() {

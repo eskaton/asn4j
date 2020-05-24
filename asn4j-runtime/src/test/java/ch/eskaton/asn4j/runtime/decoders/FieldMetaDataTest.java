@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FieldMetaDataTest {
+class FieldMetaDataTest {
 
     @Test
     void testFillMetaData() throws NoSuchFieldException, IllegalAccessException {

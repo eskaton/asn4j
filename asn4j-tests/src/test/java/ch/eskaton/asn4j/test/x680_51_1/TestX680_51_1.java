@@ -104,7 +104,7 @@ import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 
-public class TestX680_51_1 {
+class TestX680_51_1 {
 
     @Test
     void testBitString1() {

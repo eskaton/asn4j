@@ -52,7 +52,7 @@ import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class CompilerImplTest {
+class CompilerImplTest {
 
     public static final String MODULE_NAME = "TEST-MODULE";
 

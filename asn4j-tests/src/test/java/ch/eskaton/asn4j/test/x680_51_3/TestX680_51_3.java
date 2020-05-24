@@ -92,7 +92,7 @@ import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 import static ch.eskaton.commons.utils.Utils.with;
 
-public class TestX680_51_3 {
+class TestX680_51_3 {
 
     @Test
     void testBitString2() {

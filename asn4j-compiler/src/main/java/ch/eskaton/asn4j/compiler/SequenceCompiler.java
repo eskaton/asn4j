@@ -36,8 +36,6 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledType> {
 
