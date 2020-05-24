@@ -62,6 +62,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf118;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf120;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf122;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf124;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf126;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf128;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf3;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf4;
@@ -243,6 +245,39 @@ class TestX680_51_8 {
         testSetOfSuccess(TestSetOf124.class, new TestSetOf124(), ASN1OctetString.valueOf(new byte[] { 0x50 }));
 
         testSetOfFailure(TestSetOf124.class, new TestSetOf124(), ASN1OctetString.valueOf(new byte[] { 0x51 }));
+    }
+
+    @Test
+    void testSetOf126() {
+        testSetOfSuccess(TestSetOf126.class, new TestSetOf126(),
+                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(1))));
+
+        testSetOfFailure(TestSetOf126.class, new TestSetOf126(),
+                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(0))));
+        testSetOfFailure(TestSetOf126.class, new TestSetOf126(),
+                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(2))));
+        testSetOfFailure(TestSetOf126.class, new TestSetOf126(),
+                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(1), ASN1Integer.valueOf(1))));
+    }
+
+    @Test
+    void testSetOf128() {
+        testSetOfSuccess(TestSetOf128.class, new TestSetOf128(),
+                with(new TestSequence2(), s -> {
+                    s.setA(ASN1Integer.valueOf(1));
+                    s.setB(ASN1Boolean.TRUE);
+                }));
+
+        testSetOfFailure(TestSetOf128.class, new TestSetOf128(),
+                with(new TestSequence2(), s -> {
+                    s.setA(ASN1Integer.valueOf(2));
+                    s.setB(ASN1Boolean.TRUE);
+                }));
+        testSetOfFailure(TestSetOf128.class, new TestSetOf128(),
+                with(new TestSequence2(), s -> {
+                    s.setA(ASN1Integer.valueOf(1));
+                    s.setB(ASN1Boolean.FALSE);
+                }));
     }
 
     @Test

@@ -779,9 +779,9 @@ public class CompilerContext {
         }
     }
 
-    public Optional<BooleanExpression> buildExpression(Module module, CompiledType type,
+    public Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType,
             ch.eskaton.asn4j.compiler.constraints.ast.Node node) {
-        return constraintCompiler.buildExpression(module, type, node);
+        return constraintCompiler.buildExpression(module, compiledType, node);
     }
 
     public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, CompiledType compiledType) {

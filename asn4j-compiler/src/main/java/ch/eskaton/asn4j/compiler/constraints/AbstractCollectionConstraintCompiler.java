@@ -359,7 +359,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     private BooleanExpression buildExpression(CompiledType compiledType, CollectionValue collectionValue) {
-        var typeStream = ((SequenceType) compiledType.getType()).getAllRootComponents().stream().map(componentType -> ctx.getTypeName(
+        var compiledBaseType = ctx.getCompiledBaseType(compiledType);
+        var typeStream = ((SequenceType) compiledBaseType.getType()).getAllRootComponents().stream().map(componentType -> ctx.getTypeName(
                 Optional.ofNullable(componentType.getType()).orElse(componentType.getNamedType().getType())));
         var valueStream = collectionValue.getValues().stream();
         var associations = new HashSet<Tuple2<Expression, Expression>>();
@@ -374,12 +375,12 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
     private Optional<BooleanExpression> getWithComponentsExpression(Module module, CompiledType compiledType,
             WithComponentsNode node) {
-        var compiledCollectionTypes = (getCompiledCollectionType(compiledType)).getComponents()
+        var compiledComponentTypes = (getCompiledCollectionType(compiledType)).getComponents()
                 .stream()
                 .collect(Collectors.toMap(Tuple2::get_1, Tuple2::get_2));
 
         var expressionCalls = node.getComponents().stream().map(componentNode -> {
-            var compiledComponent = compiledCollectionTypes.get(componentNode.getName());
+            var compiledComponent = compiledComponentTypes.get(componentNode.getName());
             var expression = ctx.buildExpression(module, compiledComponent, componentNode.getConstraint())
                     .orElseThrow(() -> new IllegalCompilerStateException("Expected expression"));
             var expressionFunction = buildExpressionFunction(module, compiledComponent, expression);
