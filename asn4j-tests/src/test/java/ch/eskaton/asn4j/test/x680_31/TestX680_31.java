@@ -41,7 +41,7 @@ import java.util.function.Supplier;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertValueDecodable;
 
-public class TestX680_31 {
+class TestX680_31 {
 
     private <T extends ASN1VisibleString> void testPrefixedType(Supplier<T> prefixedType, String value)
             throws ASN1RuntimeException {

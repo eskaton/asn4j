@@ -394,14 +394,14 @@ public class IL2JavaTranslator {
 
     private String getTypeString(ILParameterizedType type) {
         return type.getTypeParameters().stream()
-                .map(p -> CompilerUtils.getTypeParameterString(p))
+                .map(CompilerUtils::getTypeParameterString)
                 .collect(Collectors.joining(", "));
     }
 
     private String typeWithImport(JavaClass javaClass, Class<?> clazz, Class<?>... additionalClasses) {
         javaClass.addImport(clazz);
 
-        Arrays.asList(additionalClasses).forEach(c -> javaClass.addImport(c));
+        Arrays.asList(additionalClasses).forEach(javaClass::addImport);
 
         return clazz.getSimpleName();
     }

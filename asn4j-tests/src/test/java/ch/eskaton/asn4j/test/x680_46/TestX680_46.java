@@ -36,7 +36,7 @@ import java.time.OffsetDateTime;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 
-public class TestX680_46 {
+class TestX680_46 {
 
     @Test
     void testGeneralizedTimeLocal() throws ASN1RuntimeException {

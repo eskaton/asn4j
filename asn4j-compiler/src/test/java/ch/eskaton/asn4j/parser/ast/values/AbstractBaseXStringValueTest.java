@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class AbstractBaseXStringValueTest {
+class AbstractBaseXStringValueTest {
 
     @Test
     void testToBitString() {

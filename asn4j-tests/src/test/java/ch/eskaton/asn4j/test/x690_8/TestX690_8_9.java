@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestX690_8_9 {
+class TestX690_8_9 {
 
     @Test
     void testEncodeTestSequence1() {

@@ -39,7 +39,7 @@ import org.junit.jupiter.api.Test;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
 
-public class TestX680_51_4 {
+class TestX680_51_4 {
 
     @Test
     void testInteger1() throws InstantiationException, IllegalAccessException {

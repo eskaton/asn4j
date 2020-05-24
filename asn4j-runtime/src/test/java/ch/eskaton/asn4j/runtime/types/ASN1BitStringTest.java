@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ASN1BitStringTest {
+class ASN1BitStringTest {
 
     @Test
     void testSetValue() {

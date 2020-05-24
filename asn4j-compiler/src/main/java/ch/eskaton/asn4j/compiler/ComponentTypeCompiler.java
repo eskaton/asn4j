@@ -44,13 +44,10 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
-import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 

@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class TestX690_8_6 {
+class TestX690_8_6 {
 
     @Test
     void testEncode() {
@@ -66,14 +66,18 @@ public class TestX690_8_6 {
 
     @Test
     void testDecodeUnusedBitsFailure() {
+        BERDecoder decoder = new BERDecoder();
+
         assertThrows(DecodingException.class,
-                () -> new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x01, 0x01 }));
+                () -> decoder.decode(ASN1BitString.class, new byte[] { 0x03, 0x01, 0x01 }));
     }
 
     @Test
     void testDecodeLengthFailure() {
+        BERDecoder decoder = new BERDecoder();
+
         assertThrows(PrematureEndOfInputException.class,
-                () -> new BERDecoder().decode(ASN1BitString.class, new byte[] { 0x03, 0x02, 0x00 }));
+                () -> decoder.decode(ASN1BitString.class, new byte[] { 0x03, 0x02, 0x00 }));
     }
 
 }

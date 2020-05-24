@@ -42,7 +42,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
-public class TestX690_8_14 {
+class TestX690_8_14 {
 
     @Test
     void testEncodeVisibleString() throws ASN1RuntimeException {

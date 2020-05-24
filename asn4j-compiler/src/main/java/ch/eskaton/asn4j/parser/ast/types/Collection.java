@@ -61,7 +61,8 @@ public abstract class Collection extends AbstractType {
         this.extensionRootComponents = compTypes.getExtensionRootComponents();
     }
 
-    public Collection(Position position, ExtensionAndExceptionNode extensionAndException, Boolean optionalExtensionMarker) {
+    public Collection(Position position, ExtensionAndExceptionNode extensionAndException,
+            Boolean optionalExtensionMarker) {
         super(position);
 
         this.extensionAndException = extensionAndException;
@@ -90,7 +91,7 @@ public abstract class Collection extends AbstractType {
         }
 
         if (extensionAdditions != null) {
-            extensionAdditions.stream().map(extension -> extension.getComponents()).forEach(components::addAll);
+            extensionAdditions.stream().map(ExtensionAdditionGroup::getComponents).forEach(components::addAll);
         }
 
         if (extensionRootComponents != null) {

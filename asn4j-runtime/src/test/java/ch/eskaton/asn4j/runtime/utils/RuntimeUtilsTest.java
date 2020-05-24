@@ -35,7 +35,7 @@ import java.lang.reflect.Field;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class RuntimeUtilsTest {
+class RuntimeUtilsTest {
 
     @Test
     void testGetComponent() {

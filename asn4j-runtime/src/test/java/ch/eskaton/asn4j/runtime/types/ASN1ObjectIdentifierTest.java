@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class ASN1ObjectIdentifierTest {
+class ASN1ObjectIdentifierTest {
 
     @Test
     void testInvalidObjectIdentifiers() {
