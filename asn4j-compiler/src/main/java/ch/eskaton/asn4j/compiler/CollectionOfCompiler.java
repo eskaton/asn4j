@@ -29,10 +29,13 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.results.AnonymousCompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
+import java.util.LinkedList;
 import java.util.Optional;
 
 public abstract class CollectionOfCompiler<T extends CollectionOfType> implements NamedCompiler<T, CompiledType> {
@@ -60,16 +63,22 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
     private CompiledType compileContentType(CompilerContext ctx, T node, String name) {
         var type = node.getType();
+        var types = new LinkedList<Type>();
 
         while (type instanceof CollectionOfType) {
+            types.push(type);
             type = ((CollectionOfType) type).getType();
         }
 
-        if (ctx.isSubtypeNeeded(type)) {
-            return ctx.defineType(type, name + "Content");
+        var compiledType = ctx.isSubtypeNeeded(type) ?
+                ctx.defineType(type, name + "Content") :
+                ctx.getCompiledType(type);
+
+        while (!types.isEmpty()) {
+            compiledType = new AnonymousCompiledCollectionOfType(types.pop(), compiledType);
         }
 
-        return ctx.getCompiledType(type);
+        return compiledType;
     }
 
 }

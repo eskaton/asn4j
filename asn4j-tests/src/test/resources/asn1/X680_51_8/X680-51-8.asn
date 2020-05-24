@@ -64,6 +64,8 @@ TestSetOf123 ::= SET OF OCTET STRING
 TestSetOf124 ::= TestSetOf123 (WITH COMPONENT ('0101'B))
 TestSetOf125 ::= SET OF TestSequenceOf2
 TestSetOf126 ::= TestSetOf125 (WITH COMPONENT (WITH COMPONENT (1)))
+TestSetOf127 ::= SET OF TestSequence2
+TestSetOf128 ::= TestSetOf127 (WITH COMPONENT ({ a 1, b TRUE }))
 
 TestSequence105 ::= SEQUENCE {
     a ENUMERATED {a, b, c}
