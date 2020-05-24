@@ -45,7 +45,9 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.commons.collections.Maps;
+import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,7 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
-    public Map<String, CompiledType> compile(CompilerContext ctx, ComponentType node) {
+    public List<Tuple2<String, CompiledType>> compile(CompilerContext ctx, ComponentType node) {
 
         TagMode mode = ctx.getModule().getTagMode();
 
@@ -72,7 +74,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         }
     }
 
-    private Map<String, CompiledType> compileComponentNamedType(CompilerContext ctx, ComponentType component, NamedType namedType) {
+    private List<Tuple2<String, CompiledType>> compileComponentNamedType(CompilerContext ctx, ComponentType component, NamedType namedType) {
         JavaClass javaClass = ctx.getCurrentClass();
         Type type = namedType.getType();
         TaggingMode taggingMode = type.getTaggingMode();
@@ -98,10 +100,10 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
         javaClass.addField(field);
 
-        return Maps.<String, CompiledType>builder().put(namedType.getName(), compiledType).build();
+        return List.of(Tuple2.of(namedType.getName(), compiledType));
     }
 
-    private Map<String, CompiledType> compileComponentType(CompilerContext ctx, TagMode mode, Type type) {
+    private List<Tuple2<String, CompiledType>> compileComponentType(CompilerContext ctx, TagMode mode, Type type) {
         TypeAssignmentNode assignment;
 
         if (type instanceof TypeReference) {
@@ -143,10 +145,10 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             throw new CompilerException("Components of type %s not supported", referencedType);
         }
 
-        var components = new HashMap<String, CompiledType>();
+        var components = new ArrayList<Tuple2<String, CompiledType>>();
 
         for (ComponentType referencedComponent : componentTypes) {
-            components.putAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
+            components.addAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
                     .compile(ctx, referencedComponent));
         }
 

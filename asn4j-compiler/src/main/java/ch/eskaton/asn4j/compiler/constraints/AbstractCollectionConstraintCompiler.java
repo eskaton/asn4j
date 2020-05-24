@@ -92,7 +92,6 @@ import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +100,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BIG_INTEGER;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
@@ -155,19 +153,31 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     private Node calculateMultipleTypeConstraint(CompiledCollectionType baseType, MultipleTypeConstraints elements) {
-        var components = elements.getConstraints().stream()
-                .map(constraint -> calculateComponentConstraint(baseType.getComponents(), constraint))
-                .collect(Collectors.toSet());
+        var components = baseType.getComponents();
+        var componentNodes = new HashSet<ComponentNode>();
+        var lastIndex = -1;
 
-        return new WithComponentsNode(components);
+        for (var constraint : elements.getConstraints()) {
+            var name = constraint.getName();
+            var index = StreamsUtils.indexOf(components, (c) -> Objects.equals(name, c.get_1()));
+
+            if (index != -1 && index > lastIndex) {
+                lastIndex = index;
+            } else {
+                throw new CompilerException("Component '%s' not found in type '%s'", name, baseType.getName());
+            }
+
+            componentNodes.add(calculateComponentConstraint(components.get(index).get_2(), constraint));
+        }
+
+        return new WithComponentsNode(componentNodes);
     }
 
-    private ComponentNode calculateComponentConstraint(Map<String, CompiledType> compiledComponents, NamedConstraint namedConstraint) {
+    private ComponentNode calculateComponentConstraint(CompiledType compiledType, NamedConstraint namedConstraint) {
         var name = namedConstraint.getName();
         var constraint = namedConstraint.getConstraint();
         var presence = Optional.ofNullable(constraint.getPresence()).map(PresenceConstraint::getType).orElse(null);
         var valueConstraint = constraint.getValue().getConstraint();
-        var compiledType = compiledComponents.get(name);
         var definition = ctx.compileConstraint(compiledType);
 
         if (definition != null) {
@@ -244,7 +254,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     protected FunctionCall generateCheckConstraintCall(CompiledCollectionType compiledType) {
         Set<Tuple2<Expression, Expression>> associations = new HashSet<>();
 
-        compiledType.getComponents().keySet().stream()
+        compiledType.getComponents().stream()
+                .map(t -> t.get_1())
                 .map(n -> new Tuple2(ILValue.of(n), new FunctionCall(of("get" + initCap(n)))))
                 .forEach(associations::add);
 
@@ -363,22 +374,19 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
     private Optional<BooleanExpression> getWithComponentsExpression(Module module, CompiledType compiledType,
             WithComponentsNode node) {
-        var componentComparator = Comparator.comparing(ComponentNode::getName);
-        var compiledCollectionType = getCompiledCollectionType(compiledType);
+        var compiledCollectionTypes = (getCompiledCollectionType(compiledType)).getComponents()
+                .stream()
+                .collect(Collectors.toMap(Tuple2::get_1, Tuple2::get_2));
 
-        var expressions = componentsStream(node, componentComparator)
-                .map(componentNode -> ctx
-                        .buildExpression(module, getComponent(compiledCollectionType, componentNode),
-                                componentNode.getConstraint())
-                        .orElseThrow(() -> new IllegalCompilerStateException("Expected expression")));
+        var expressionCalls = node.getComponents().stream().map(componentNode -> {
+            var compiledComponent = compiledCollectionTypes.get(componentNode.getName());
+            var expression = ctx.buildExpression(module, compiledComponent, componentNode.getConstraint())
+                    .orElseThrow(() -> new IllegalCompilerStateException("Expected expression"));
+            var expressionFunction = buildExpressionFunction(module, compiledComponent, expression);
 
-        var expressionCalls = StreamsUtils.zip(
-                StreamsUtils.zip(componentsStream(node, componentComparator), expressions, Tuple2::new)
-                        .map(t -> buildExpressionFunction(module, getComponent(compiledCollectionType, t.get_1()), t.get_2())),
-                componentsStream(node, componentComparator), Tuple2::new)
-                .map(t -> new BooleanFunctionCall(Optional.of(t.get_1().get_1()),
-                getParameters(t.get_2(), getComponent(compiledCollectionType, t.get_2()).getName(), t.get_1().get_2())))
-                .collect(Collectors.toList());
+            return new BooleanFunctionCall(Optional.of(expressionFunction.get_1()),
+                    getParameters(componentNode, compiledComponent.getName(), expressionFunction.get_2()));
+        }).collect(Collectors.toList());
 
         String checkSym = module.generateSymbol("_checkConstraint");
 
@@ -394,15 +402,6 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         // @formatter:on
 
         return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), Variable.of(VALUES)));
-    }
-
-    private CompiledType getComponent(CompiledCollectionType compiledCollectionType, ComponentNode componentNode) {
-        return compiledCollectionType.getComponents().get(componentNode.getName());
-    }
-
-    private Stream<ComponentNode> componentsStream(WithComponentsNode node,
-            Comparator<ComponentNode> componentComparator) {
-        return node.getComponents().stream().sorted(componentComparator);
     }
 
     private List<Expression> getParameters(ComponentNode component, String typeName, String runtimeType) {

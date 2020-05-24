@@ -33,19 +33,22 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, SequenceType node) {
         var javaClass = ctx.createClass(name, node, true);
-        var components = new HashMap<String, CompiledType>();
+        var components = new ArrayList<Tuple2<String, CompiledType>>();
 
         for (ComponentType component : node.getAllComponents()) {
             try {
-                components.putAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
+                components.addAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
                         .compile(ctx, component));
             } catch (CompilerException e) {
                 if (component.getNamedType() != null) {

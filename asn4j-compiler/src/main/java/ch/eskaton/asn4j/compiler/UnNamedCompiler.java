@@ -29,11 +29,12 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.Map;
+import java.util.List;
 
 public interface UnNamedCompiler<T extends Node> extends Compiler<T> {
 
-    Map<String, CompiledType> compile(CompilerContext ctx, T node);
+    List<Tuple2<String, CompiledType>> compile(CompilerContext ctx, T node);
 
 }
