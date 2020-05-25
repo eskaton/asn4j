@@ -130,21 +130,21 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     private final Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>> dispatcher =
             new Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>>()
                     .withComparator((t, u) -> t.equals(u.getSimpleName()))
-                    .withCase(ASN1Integer.class, (args) -> getValueParameter(BIG_INTEGER))
-                    .withCase(ASN1Boolean.class, (args) -> getValueParameter(BOOLEAN))
-                    .withCase(ASN1EnumeratedType.class, (args) -> getValueParameter(INTEGER))
-                    .withCase(ASN1Null.class, (args) -> getValueParameter(NULL))
-                    .withCase(ASN1ObjectIdentifier.class, (args) -> getValueParameter(INTEGER_ARRAY))
-                    .withCase(ASN1RelativeOID.class, (args) -> getValueParameter(INTEGER_ARRAY))
-                    .withCase(ASN1IRI.class, (args) -> getValueParameter(STRING_ARRAY))
-                    .withCase(ASN1RelativeIRI.class, (args) -> getValueParameter(STRING_ARRAY))
-                    .withCase(ASN1BitString.class, (args) -> asList(new Parameter(ILType.of(BYTE_ARRAY), VAR_VALUE),
+                    .withCase(ASN1Integer.class, args -> getValueParameter(BIG_INTEGER))
+                    .withCase(ASN1Boolean.class, args -> getValueParameter(BOOLEAN))
+                    .withCase(ASN1EnumeratedType.class, args -> getValueParameter(INTEGER))
+                    .withCase(ASN1Null.class, args -> getValueParameter(NULL))
+                    .withCase(ASN1ObjectIdentifier.class, args -> getValueParameter(INTEGER_ARRAY))
+                    .withCase(ASN1RelativeOID.class, args -> getValueParameter(INTEGER_ARRAY))
+                    .withCase(ASN1IRI.class, args -> getValueParameter(STRING_ARRAY))
+                    .withCase(ASN1RelativeIRI.class, args -> getValueParameter(STRING_ARRAY))
+                    .withCase(ASN1BitString.class, args -> asList(new Parameter(ILType.of(BYTE_ARRAY), VAR_VALUE),
                             new Parameter(ILType.of(INTEGER), VAR_UNUSED_BITS)))
-                    .withCase(ASN1OctetString.class, (args) -> getValueParameter(BYTE_ARRAY))
-                    .withCase(ASN1Sequence.class, (args) -> singletonList(getMapParameter()))
-                    .withCase(ASN1Set.class, (args) -> singletonList(getMapParameter()))
-                    .withCase(ASN1SequenceOf.class, (args) -> getCollectionOfParameter(args.get()))
-                    .withCase(ASN1SetOf.class, (args) -> getCollectionOfParameter(args.get()));
+                    .withCase(ASN1OctetString.class, args -> getValueParameter(BYTE_ARRAY))
+                    .withCase(ASN1Sequence.class, args -> singletonList(getMapParameter()))
+                    .withCase(ASN1Set.class, args -> singletonList(getMapParameter()))
+                    .withCase(ASN1SequenceOf.class, args -> getCollectionOfParameter(args.get()))
+                    .withCase(ASN1SetOf.class, args -> getCollectionOfParameter(args.get()));
 
     public AbstractCollectionOfConstraintCompiler(CompilerContext ctx, TypeName typeName, ILBuiltinType collectionType) {
         super(ctx);
