@@ -69,7 +69,6 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
@@ -89,9 +88,9 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
+import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.StreamsUtils;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +100,19 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_DO_CHECK_CONSTRAINT;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_EXPRESSION;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_UNUSED_BITS;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUES;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_OBJ;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_UNUSED_BITS;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUES;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.getMapParameter;
+import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.getValueParameter;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BIG_INTEGER;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BYTE_ARRAY;
@@ -118,17 +130,26 @@ import static java.util.Optional.of;
 
 public abstract class AbstractCollectionConstraintCompiler extends AbstractConstraintCompiler {
 
-    private static final String VALUE = "value";
-
-    private static final String VALUES = "values";
-
-    public static final String GET_VALUES = "getValues";
-
-    public static final String GET_VALUE = "getValue";
-
-    private static final String OBJ = "obj";
-
     private final TypeName typeName;
+
+    private final Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>> dispatcher =
+            new Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>>()
+                    .withComparator((t, u) -> t.equals(u.getSimpleName()))
+                    .withCase(ASN1Integer.class, (args) -> getValueParameter(BIG_INTEGER))
+                    .withCase(ASN1Boolean.class, (args) -> getValueParameter(BOOLEAN))
+                    .withCase(ASN1EnumeratedType.class, (args) -> getValueParameter(INTEGER))
+                    .withCase(ASN1Null.class, (args) -> getValueParameter(NULL))
+                    .withCase(ASN1ObjectIdentifier.class, (args) -> getValueParameter(INTEGER_ARRAY))
+                    .withCase(ASN1RelativeOID.class, (args) -> getValueParameter(INTEGER_ARRAY))
+                    .withCase(ASN1IRI.class, (args) -> getValueParameter(STRING_ARRAY))
+                    .withCase(ASN1RelativeIRI.class, (args) -> getValueParameter(STRING_ARRAY))
+                    .withCase(ASN1BitString.class, (args) -> asList(new Parameter(ILType.of(BYTE_ARRAY), VAR_VALUE),
+                            new Parameter(ILType.of(INTEGER), VAR_UNUSED_BITS)))
+                    .withCase(ASN1OctetString.class, (args) -> getValueParameter(BYTE_ARRAY))
+                    .withCase(ASN1Sequence.class, (args) -> singletonList(getMapParameter()))
+                    .withCase(ASN1Set.class, (args) -> singletonList(getMapParameter()))
+                    .withCase(ASN1SequenceOf.class, (args) -> getCollectionOfParameter(args.get()))
+                    .withCase(ASN1SetOf.class, (args) -> getCollectionOfParameter(args.get()));
 
     public AbstractCollectionConstraintCompiler(CompilerContext ctx, TypeName typeName) {
         super(ctx);
@@ -240,7 +261,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     protected void generateDoCheckConstraint(CompiledCollectionType compiledType, Module module) {
         // @formatter:off
         module.function()
-                .name("doCheckConstraint")
+                .name(FUNC_DO_CHECK_CONSTRAINT)
                 .overriden(true)
                 .visibility(ILVisibility.PUBLIC)
                 .returnType(ILType.of(BOOLEAN))
@@ -255,22 +276,20 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         Set<Tuple2<Expression, Expression>> associations = new HashSet<>();
 
         compiledType.getComponents().stream()
-                .map(t -> t.get_1())
+                .map(Tuple2::get_1)
                 .map(n -> new Tuple2(ILValue.of(n), new FunctionCall(of("get" + initCap(n)))))
                 .forEach(associations::add);
 
-        return new FunctionCall(of("checkConstraintValue"),
+        return new FunctionCall(of(FUNC_CHECK_CONSTRAINT_VALUE),
                 new ILMapValue(ILType.of(ILBuiltinType.STRING),
                         ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
     }
 
     protected void addConstraintCondition(CompiledType compiledType, List<String> typeParameter, ConstraintDefinition definition,
             FunctionBuilder builder, Module module) {
-        String functionName = "checkConstraintValue";
-
         if (definition.isExtensible()) {
             builder.statements().returnValue(Boolean.TRUE);
-        } else if (builder.getModule().getFunctions().stream().noneMatch(f -> f.getName().equals(functionName))) {
+        } else if (builder.getModule().getFunctions().stream().noneMatch(f -> f.getName().equals(FUNC_CHECK_CONSTRAINT_VALUE))) {
             addConstraintCondition(compiledType, definition, builder);
         } else {
             Node roots = definition.getRoots();
@@ -280,15 +299,15 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
             if (elementType instanceof CollectionOfType) {
                 condition = new NegationExpression(
-                        new FunctionCall(of(functionName), new FunctionCall(of(GET_VALUES), of(ILValue.of(OBJ)))));
+                        new FunctionCall(of(FUNC_CHECK_CONSTRAINT_VALUE), new FunctionCall(of(GET_VALUES), of(ILValue.of(VAR_OBJ)))));
             } else if (elementType instanceof BitString) {
                 condition = new NegationExpression(
-                        new FunctionCall(of(functionName),
-                                new FunctionCall(of(GET_VALUE), of(ILValue.of(OBJ))),
-                                new FunctionCall(of("getUnusedBits"), of(ILValue.of(OBJ)))));
+                        new FunctionCall(of(FUNC_CHECK_CONSTRAINT_VALUE),
+                                new FunctionCall(of(GET_VALUE), of(ILValue.of(VAR_OBJ))),
+                                new FunctionCall(of(GET_UNUSED_BITS), of(ILValue.of(VAR_OBJ)))));
             } else {
                 condition = new NegationExpression(
-                        new FunctionCall(of(functionName), new FunctionCall(of(GET_VALUE), of(ILValue.of(OBJ)))));
+                        new FunctionCall(of(FUNC_CHECK_CONSTRAINT_VALUE), new FunctionCall(of(GET_VALUE), of(ILValue.of(VAR_OBJ)))));
             }
 
             if (expression.isPresent()) {
@@ -296,7 +315,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
             } else {
                 // @formatter:off
                 builder.statements()
-                        .foreach(ILParameterizedType.of(CUSTOM, typeParameter), Variable.of(OBJ), Variable.of(VALUE))
+                        .foreach(ILParameterizedType.of(CUSTOM, typeParameter), Variable.of(VAR_OBJ), Variable.of(VAR_VALUE))
                             .statements()
                                 .conditions()
                                     .condition(condition)
@@ -341,35 +360,21 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
     }
 
-    @Override
-    protected String getTypeName(Type type) {
-        if (type instanceof TypeReference) {
-            type = (Type) ctx.resolveTypeReference(type);
-        }
-
-        Type elementType;
-
-        if (type instanceof CollectionOfType) {
-            elementType = ((CollectionOfType) type).getType();
-        } else {
-            elementType = type;
-        }
-
-        return super.getTypeName(elementType);
-    }
-
     private BooleanExpression buildExpression(CompiledType compiledType, CollectionValue collectionValue) {
         var compiledBaseType = ctx.getCompiledBaseType(compiledType);
-        var typeStream = ((SequenceType) compiledBaseType.getType()).getAllRootComponents().stream().map(componentType -> ctx.getTypeName(
-                Optional.ofNullable(componentType.getType()).orElse(componentType.getNamedType().getType())));
+        var typeStream = ((SequenceType) compiledBaseType.getType()).getAllRootComponents().stream()
+                .map(componentType -> ctx.getTypeName(
+                        Optional.ofNullable(componentType.getType())
+                                .orElse(componentType.getNamedType().getType())));
         var valueStream = collectionValue.getValues().stream();
         var associations = new HashSet<Tuple2<Expression, Expression>>();
 
         StreamsUtils.zip(typeStream, valueStream)
-                .map(t -> new Tuple2(ILValue.of(t.get_2().getName()), ILValue.of(t.get_1(), t.get_2().getValue())))
+                .map(t -> new Tuple2<Expression, Expression>(ILValue.of(t.get_2().getName()),
+                        ILValue.of(t.get_1(), t.get_2().getValue())))
                 .forEach(associations::add);
 
-        return new BooleanFunctionCall.MapEquals(Variable.of(VALUES), new ILMapValue(ILType.of(ILBuiltinType.STRING),
+        return new BooleanFunctionCall.MapEquals(Variable.of(VAR_VALUES), new ILMapValue(ILType.of(ILBuiltinType.STRING),
                 ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
     }
 
@@ -389,7 +394,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                     getParameters(componentNode, compiledComponent.getName(), expressionFunction.get_2()));
         }).collect(Collectors.toList());
 
-        String checkSym = module.generateSymbol("_checkConstraint");
+        String checkSym = module.generateSymbol(FUNC_CHECK_CONSTRAINT);
 
         // @formatter:off
         module.function()
@@ -402,36 +407,36 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                 .build();
         // @formatter:on
 
-        return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), Variable.of(VALUES)));
+        return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), Variable.of(VAR_VALUES)));
     }
 
     private List<Expression> getParameters(ComponentNode component, String typeName, String runtimeType) {
-        var accessor = new FunctionCall.GetMapValue(Variable.of(VALUES),
+        var accessor = new FunctionCall.GetMapValue(Variable.of(VAR_VALUES),
                 ILValue.of(component.getName()),
                 ILParameterizedType.of(CUSTOM, singletonList(typeName)));
         Function<String, FunctionCall> getCall = (String f) -> new FunctionCall(of(f), of(accessor));
 
         if (runtimeType.equals(ASN1Integer.class.getSimpleName())) {
-            return Collections.singletonList(getCall.apply(GET_VALUE));
+            return singletonList(getCall.apply(GET_VALUE));
         } else if (runtimeType.equals(ASN1Boolean.class.getSimpleName())) {
-            return Collections.singletonList(getCall.apply(GET_VALUE));
+            return singletonList(getCall.apply(GET_VALUE));
         } else if (runtimeType.equals(ASN1EnumeratedType.class.getSimpleName())) {
-            return Collections.singletonList(getCall.apply(GET_VALUE));
+            return singletonList(getCall.apply(GET_VALUE));
         } else if (runtimeType.equals(ASN1Null.class.getSimpleName())) {
-            return Collections.singletonList(getCall.apply(GET_VALUE));
+            return singletonList(getCall.apply(GET_VALUE));
         } else if (runtimeType.equals(ASN1ObjectIdentifier.class.getSimpleName())) {
-            return Collections.singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getCall.apply(GET_VALUE)));
+            return singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getCall.apply(GET_VALUE)));
         } else if (runtimeType.equals(ASN1RelativeOID.class.getSimpleName())) {
-            return Collections.singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getCall.apply(GET_VALUE)));
+            return singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getCall.apply(GET_VALUE)));
         } else if (runtimeType.equals(ASN1IRI.class.getSimpleName())) {
-            return Collections.singletonList(new FunctionCall.ToArray(ILType.of(STRING), getCall.apply(GET_VALUE)));
+            return singletonList(new FunctionCall.ToArray(ILType.of(STRING), getCall.apply(GET_VALUE)));
         } else if (runtimeType.equals(ASN1RelativeIRI.class.getSimpleName())) {
-            return Collections.singletonList(new FunctionCall.ToArray(ILType.of(STRING), getCall.apply(GET_VALUE)));
+            return singletonList(new FunctionCall.ToArray(ILType.of(STRING), getCall.apply(GET_VALUE)));
         } else if (runtimeType.equals(ASN1BitString.class.getSimpleName())) {
-            return List.of(getCall.apply(GET_VALUE), getCall.apply("getUnusedBits"));
+            return List.of(getCall.apply(GET_VALUE), getCall.apply(GET_UNUSED_BITS));
         } else if (runtimeType.equals(ASN1SequenceOf.class.getSimpleName()) ||
                 runtimeType.equals(ASN1SetOf.class.getSimpleName())) {
-            return Collections.singletonList(getCall.apply(GET_VALUES));
+            return singletonList(getCall.apply(GET_VALUES));
         } else if (runtimeType.equals(ASN1Sequence.class.getSimpleName()) ||
                 runtimeType.equals(ASN1Set.class.getSimpleName())) {
             var associations = new HashSet<Tuple2<Expression, Expression>>();
@@ -441,7 +446,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                     .map(n -> new Tuple2(ILValue.of(n), getCall.apply("get" + initCap(n))))
                     .forEach(associations::add);
 
-            return Collections.singletonList(new ILMapValue(ILType.of(ILBuiltinType.STRING),
+            return singletonList(new ILMapValue(ILType.of(ILBuiltinType.STRING),
                     ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
         }
 
@@ -450,7 +455,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
     private Tuple2<String, String> buildExpressionFunction(Module module, CompiledType compiledType,
             BooleanExpression expression) {
-        String expressionSym = module.generateSymbol("_expression");
+        String expressionSym = module.generateSymbol(FUNC_EXPRESSION);
 
         // @formatter:off
         module.function()
@@ -467,56 +472,19 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     private List<Parameter> getParameterDefinition(CompiledType compiledType) {
-        String runtimeType = ctx.getRuntimeType(compiledType.getType());
-        List<Parameter> parameters;
-
-        if (runtimeType.equals(ASN1Integer.class.getSimpleName())) {
-            parameters = getParameter(BIG_INTEGER);
-        } else if (runtimeType.equals(ASN1Boolean.class.getSimpleName())) {
-            parameters = getParameter(BOOLEAN);
-        } else if (runtimeType.equals(ASN1EnumeratedType.class.getSimpleName())) {
-            parameters = getParameter(INTEGER);
-        } else if (runtimeType.equals(ASN1Null.class.getSimpleName())) {
-            parameters = getParameter(NULL);
-        } else if (runtimeType.equals(ASN1ObjectIdentifier.class.getSimpleName()) ||
-                runtimeType.equals(ASN1RelativeOID.class.getSimpleName())) {
-            parameters = getParameter(INTEGER_ARRAY);
-        } else if (runtimeType.equals(ASN1IRI.class.getSimpleName()) ||
-                runtimeType.equals(ASN1RelativeIRI.class.getSimpleName())) {
-            parameters = getParameter(STRING_ARRAY);
-        } else if (runtimeType.equals(ASN1BitString.class.getSimpleName())) {
-            parameters = asList(Parameter.of(ILType.of(BYTE_ARRAY), VALUE),
-                    Parameter.of(ILType.of(INTEGER), "unusedBits"));
-        } else if (runtimeType.equals(ASN1OctetString.class.getSimpleName())) {
-            parameters = getParameter(BYTE_ARRAY);
-        } else if (runtimeType.equals(ASN1Sequence.class.getSimpleName()) ||
-                runtimeType.equals(ASN1Set.class.getSimpleName())) {
-            parameters = singletonList(getMapParameter());
-        } else if (runtimeType.equals(ASN1SequenceOf.class.getSimpleName()) ||
-                runtimeType.equals(ASN1SetOf.class.getSimpleName())) {
-            var contentType = ((CompiledCollectionOfType) ctx.getCompiledBaseType(compiledType))
-                    .getContentType().getType();
-            List<String> typeParameter = ctx.getParameterizedType(contentType)
-                    .stream()
-                    .collect(Collectors.toList());
-
-            parameters = singletonList(
-                    new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameter), VALUES));
-        } else {
-            throw new CompilerException("Unsupported runtimeType %s", runtimeType);
-        }
-
-        return parameters;
+        return dispatcher.execute(ctx.getRuntimeType(compiledType.getType()), compiledType);
     }
 
-    private Parameter getMapParameter() {
-        return Parameter.of(ILParameterizedType.of(ILBuiltinType.MAP,
-                singletonList(String.class.getSimpleName()),
-                singletonList(ASN1Type.class.getSimpleName())), VALUES);
+    private List<Parameter> getCollectionOfParameter(CompiledType compiledType) {
+        var compiledBaseType = (CompiledCollectionOfType) ctx.getCompiledBaseType(compiledType);
+        var contentType = compiledBaseType.getContentType().getType();
+
+        List<String> typeParameter = ctx.getParameterizedType((Type) ctx.resolveTypeReference(contentType))
+                .stream()
+                .collect(Collectors.toList());
+
+        return singletonList(new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameter), VAR_VALUES));
     }
 
-    private List<Parameter> getParameter(ILBuiltinType builtinType) {
-        return singletonList(Parameter.of(ILType.of(builtinType), VALUE));
-    }
 
 }

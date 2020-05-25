@@ -27,36 +27,31 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
-import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
-import ch.eskaton.asn4j.compiler.il.ILType;
-import ch.eskaton.asn4j.compiler.il.Parameter;
-import ch.eskaton.asn4j.runtime.types.ASN1Type;
+final class Constants {
 
-import java.util.List;
+    static final String VAR_OBJ = "obj";
 
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUES;
-import static java.util.Collections.singletonList;
+    static final String VAR_VALUE = "value";
 
-public class ConstraintUtils {
+    static final String VAR_VALUES = "values";
 
-    private ConstraintUtils() {
-    }
+    static final String VAR_UNUSED_BITS = "unusedBits";
 
-    public static <T> T throwUnimplementedNodeType(Node node) {
-        throw new IllegalStateException("Unimplemented node type: " + node.getType());
-    }
+    static final String GET_VALUE = "getValue";
 
-    public static Parameter getMapParameter() {
-        return Parameter.of(ILParameterizedType.of(ILBuiltinType.MAP,
-                singletonList(String.class.getSimpleName()),
-                singletonList(ASN1Type.class.getSimpleName())), VAR_VALUES);
-    }
+    static final String GET_VALUES = "getValues";
 
-    public static List<Parameter> getValueParameter(ILBuiltinType builtinType) {
-        return singletonList(Parameter.of(ILType.of(builtinType), VAR_VALUE));
+    static final String GET_UNUSED_BITS = "getUnusedBits";
+
+    static final String FUNC_EXPRESSION = "_expression";
+
+    static final String FUNC_CHECK_CONSTRAINT = "_checkConstraint";
+
+    static final String FUNC_CHECK_CONSTRAINT_VALUE = "checkConstraintValue";
+
+    static final String FUNC_DO_CHECK_CONSTRAINT = "doCheckConstraint";
+
+    private Constants() {
     }
 
 }

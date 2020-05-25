@@ -67,11 +67,9 @@ class JavaUtilsTest {
 
     @Test
     void testUnsupportedValue() {
-        assertThrows(CompilerException.class, () -> {
-            EmptyValue emptyValue = new EmptyValue(NO_POSITION);
+        EmptyValue emptyValue = new EmptyValue(NO_POSITION);
 
-            getInitializerString(null, null, emptyValue);
-        });
+        assertThrows(CompilerException.class, () -> getInitializerString(null, null, emptyValue));
     }
 
 }

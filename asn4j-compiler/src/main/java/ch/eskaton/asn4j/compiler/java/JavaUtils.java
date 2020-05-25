@@ -152,7 +152,7 @@ public class JavaUtils {
         return "new " + typeName + "(new byte[] { " + bytesStr + " })";
     }
 
-    public static String typeSwitch(CompilerContext ctx, String typeName, Value value, TriFunction<CompilerContext, String, Object,
+    private static String typeSwitch(CompilerContext ctx, String typeName, Value value, TriFunction<CompilerContext, String, Object,
             Optional<String>>... functions) {
         return Arrays.stream(functions)
                 .map(f -> f.apply(ctx, typeName, value))
