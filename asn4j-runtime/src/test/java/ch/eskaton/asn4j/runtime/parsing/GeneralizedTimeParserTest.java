@@ -78,7 +78,9 @@ class GeneralizedTimeParserTest {
     }
 
     private void assertInvalid(String dateTime) {
-        assertThrows(ASN1RuntimeException.class, () -> new GeneralizedTimeParser().parse(dateTime));
+        GeneralizedTimeParser parser = new GeneralizedTimeParser();
+
+        assertThrows(ASN1RuntimeException.class, () -> parser.parse(dateTime));
     }
 
     private void verifyLocalDateTime(DateTime t, int year, int month, int day, int hour, int minute, int second, int nanos) {

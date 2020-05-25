@@ -53,8 +53,9 @@ class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
     @Test
     void testEmptyTagsList() {
         List<ASN1Tag> emptyList = Collections.emptyList();
-        assertThrows(IllegalArgumentException.class,
-                () -> new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1a.class), emptyList)));
+        List<List<ASN1Tag>> tags = asList(getTags(TestTag1a.class), emptyList);
+
+        assertThrows(IllegalArgumentException.class, () -> new BERDecoder.MultipleTagsMatcher(tags));
     }
 
     @Test

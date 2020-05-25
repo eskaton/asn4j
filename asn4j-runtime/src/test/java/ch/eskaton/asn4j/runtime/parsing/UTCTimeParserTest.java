@@ -68,7 +68,9 @@ class UTCTimeParserTest {
     }
 
     private void assertInvalid(String dateTime) {
-        assertThrows(ASN1RuntimeException.class, () -> new UTCTimeParser().parse(dateTime));
+        UTCTimeParser parser = new UTCTimeParser();
+
+        assertThrows(ASN1RuntimeException.class, () -> parser.parse(dateTime));
     }
 
     private void verifyDateTime(DateTime t, int year, int month, int day, int hour, int minute, int second) {

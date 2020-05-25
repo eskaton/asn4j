@@ -67,6 +67,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.*;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
@@ -376,7 +378,7 @@ public abstract class AbstractConstraintCompiler {
     }
 
     protected FunctionCall generateCheckConstraintCall() {
-        return new FunctionCall(of("checkConstraintValue"), new FunctionCall(of("getValue")));
+        return new FunctionCall(of(FUNC_CHECK_CONSTRAINT_VALUE), new FunctionCall(of(GET_VALUE)));
     }
 
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
