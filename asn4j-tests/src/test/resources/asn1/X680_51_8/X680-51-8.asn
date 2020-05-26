@@ -62,10 +62,12 @@ TestSetOf121 ::= SET OF RELATIVE-OID-IRI
 TestSetOf122 ::= TestSetOf121 (WITH COMPONENT ("a/b/e"))
 TestSetOf123 ::= SET OF OCTET STRING
 TestSetOf124 ::= TestSetOf123 (WITH COMPONENT ('0101'B))
-TestSetOf125 ::= SET OF TestSequenceOf2
-TestSetOf126 ::= TestSetOf125 (WITH COMPONENT (WITH COMPONENT (1)))
-TestSetOf127 ::= SET OF TestSequence2
-TestSetOf128 ::= TestSetOf127 (WITH COMPONENT ({ a 1, b TRUE }))
+TestSetOf125 ::= SET OF BIT STRING
+TestSetOf126 ::= TestSetOf125 (WITH COMPONENT ('0101'B))
+TestSetOf127 ::= SET OF TestSequenceOf2
+TestSetOf128 ::= TestSetOf127 (WITH COMPONENT (WITH COMPONENT (1)))
+TestSetOf129 ::= SET OF TestSequence2
+TestSetOf130 ::= TestSetOf129 (WITH COMPONENT ({ a 1, b TRUE }))
 
 TestSequence105 ::= SEQUENCE {
     a ENUMERATED {a, b, c}
@@ -86,13 +88,16 @@ TestSequence110 ::= SEQUENCE {
     a RELATIVE-OID-IRI
 } (WITH COMPONENTS {a ("a/b/e")})
 TestSequence111 ::= SEQUENCE {
-    a BIT STRING
+    a OCTET STRING
 } (WITH COMPONENTS {a ('0101'B)})
 TestSequence112 ::= SEQUENCE {
+    a BIT STRING
+} (WITH COMPONENTS {a ('0101'B)})
+TestSequence113 ::= SEQUENCE {
     a TestSetOf1
 } (WITH COMPONENTS {a (WITH COMPONENT (1..3))})
-TestSequence113 ::= SEQUENCE {
-    COMPONENTS OF TestSequence112
+TestSequence114 ::= SEQUENCE {
+    COMPONENTS OF TestSequence113
 } (WITH COMPONENTS {a (WITH COMPONENT (1..2))})
 
 END
