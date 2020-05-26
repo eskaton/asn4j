@@ -45,14 +45,16 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
+import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.functional.TriFunction;
+import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static ch.eskaton.commons.utils.Utils.callWith;
 
 public class JavaUtils {
 
@@ -60,18 +62,31 @@ public class JavaUtils {
     }
 
     public static String getInitializerString(CompilerContext ctx, String typeName, Value value) {
-        return typeSwitch(ctx, typeName, value,
-                typeCase(BooleanValue.class, JavaUtils::getBooleanInitializerString),
-                typeCase(BitStringValue.class, JavaUtils::getBitStringInitializerString),
-                typeCase(EnumeratedValue.class, JavaUtils::getEnumeratedInitializerString),
-                typeCase(IntegerValue.class, JavaUtils::getIntegerInitializerString),
-                typeCase(IRIValue.class, JavaUtils::getIRIInitializerString),
-                typeCase(NullValue.class, JavaUtils::getNullInitializerString),
-                typeCase(ObjectIdentifierValue.class, JavaUtils::getObjectIdentifierInitializerString),
-                typeCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString),
-                typeCase(RelativeOIDValue.class, JavaUtils::getRelativeOIDInitializerString),
-                typeCase(RelativeIRIValue.class, JavaUtils::getRelativeIRIInitializerString)
-        );
+        var dispatcher = new Dispatcher<Value, Class<? extends Value>, Tuple3<CompilerContext, String, ? extends Value>, String>()
+                .withComparator((t, u) -> u.isInstance(t))
+                .withException(t -> new CompilerException("Failed to get initializer string for type %s", t));
+
+        addCase(dispatcher, BooleanValue.class, JavaUtils::getBooleanInitializerString);
+        addCase(dispatcher, BitStringValue.class, JavaUtils::getBitStringInitializerString);
+        addCase(dispatcher, EnumeratedValue.class, JavaUtils::getEnumeratedInitializerString);
+        addCase(dispatcher, IntegerValue.class, JavaUtils::getIntegerInitializerString);
+        addCase(dispatcher, IRIValue.class, JavaUtils::getIRIInitializerString);
+        addCase(dispatcher, NullValue.class, JavaUtils::getNullInitializerString);
+        addCase(dispatcher, ObjectIdentifierValue.class, JavaUtils::getObjectIdentifierInitializerString);
+        addCase(dispatcher, OctetStringValue.class, JavaUtils::getOctetStringInitializerString);
+        addCase(dispatcher, RelativeOIDValue.class, JavaUtils::getRelativeOIDInitializerString);
+        addCase(dispatcher, RelativeIRIValue.class, JavaUtils::getRelativeIRIInitializerString);
+
+        return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
+    }
+
+    private static <T extends Value> void addCase(
+            Dispatcher<Value, Class<? extends Value>, Tuple3<CompilerContext, String, ? extends Value>, String> dispatcher,
+            Class<T> valueClazz,
+            TriFunction<CompilerContext, String, T, String> initializer) {
+        dispatcher.withCase(valueClazz,
+                (maybeArgs) -> callWith(args -> initializer.apply(args.get_1(), args.get_2(),
+                        valueClazz.cast(args.get_3())), maybeArgs.get()));
     }
 
     private static String getBooleanInitializerString(CompilerContext ctx, String typeName, BooleanValue value) {
@@ -150,22 +165,6 @@ public class JavaUtils {
                 i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
 
         return "new " + typeName + "(new byte[] { " + bytesStr + " })";
-    }
-
-    private static String typeSwitch(CompilerContext ctx, String typeName, Value value, TriFunction<CompilerContext, String, Object,
-            Optional<String>>... functions) {
-        return Arrays.stream(functions)
-                .map(f -> f.apply(ctx, typeName, value))
-                .filter(Optional::isPresent)
-                .findFirst()
-                .orElseThrow(() -> new CompilerException("Failed to get initializer string for type %s",
-                        value.getClass())).get();
-    }
-
-    private static <T extends Value> TriFunction<CompilerContext, String, Object, Optional<String>> typeCase(
-            Class<T> cls, TriFunction<CompilerContext, String, T, String> fun) {
-        return (ctx, typeName, obj) -> cls.isInstance(obj) ?
-                Optional.of(fun.apply(ctx, typeName, cls.cast(obj))) : Optional.empty();
     }
 
 }

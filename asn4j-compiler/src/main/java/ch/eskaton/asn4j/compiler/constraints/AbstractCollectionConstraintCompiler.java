@@ -132,7 +132,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
     private final TypeName typeName;
 
-    private final Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>> dispatcher =
+    private final Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>> parameterDefinitionDispatcher =
             new Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>>()
                     .withComparator((t, u) -> t.equals(u.getSimpleName()))
                     .withCase(ASN1Integer.class, args -> getValueParameter(BIG_INTEGER))
@@ -148,8 +148,37 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                     .withCase(ASN1OctetString.class, args -> getValueParameter(BYTE_ARRAY))
                     .withCase(ASN1Sequence.class, args -> singletonList(getMapParameter()))
                     .withCase(ASN1Set.class, args -> singletonList(getMapParameter()))
-                    .withCase(ASN1SequenceOf.class, args -> getCollectionOfParameter(args.get()))
-                    .withCase(ASN1SetOf.class, args -> getCollectionOfParameter(args.get()));
+                    .withCase(ASN1SequenceOf.class, args -> getCollectionOfParameterDefinition(args.get()))
+                    .withCase(ASN1SetOf.class, args -> getCollectionOfParameterDefinition(args.get()));
+
+    private final Dispatcher<String, Class<? extends ASN1Type>, Tuple2<ComponentNode, String>, List<Expression>> parametersDispatcher =
+            new Dispatcher<String, Class<? extends ASN1Type>, Tuple2<ComponentNode, String>, List<Expression>>()
+                    .withComparator((t, u) -> t.equals(u.getSimpleName()))
+                    .withCase(ASN1Integer.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1Boolean.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1EnumeratedType.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1Null.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1ObjectIdentifier.class, args ->
+                            singletonList(new FunctionCall.ToArray(ILType.of(INTEGER),
+                                    getMapValueAccessor(args, GET_VALUE))))
+                    .withCase(ASN1RelativeOID.class, args ->
+                            singletonList(new FunctionCall.ToArray(ILType.of(INTEGER),
+                                    getMapValueAccessor(args, GET_VALUE))))
+                    .withCase(ASN1IRI.class, args ->
+                            singletonList(new FunctionCall.ToArray(ILType.of(STRING),
+                                    getMapValueAccessor(args, GET_VALUE))))
+                    .withCase(ASN1RelativeIRI.class, args ->
+                            singletonList(new FunctionCall.ToArray(ILType.of(STRING),
+                                    getMapValueAccessor(args, GET_VALUE))))
+                    .withCase(ASN1BitString.class, args -> List.of(getMapValueAccessor(args, GET_VALUE),
+                            getMapValueAccessor(args, GET_UNUSED_BITS)))
+                    .withCase(ASN1OctetString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1Sequence.class, args -> getCollectionParameters(args.get().get_1(),
+                            (acc) -> getMapValueAccessor(args, acc)))
+                    .withCase(ASN1Set.class, args -> getCollectionParameters(args.get().get_1(),
+                            (acc) -> getMapValueAccessor(args, acc)))
+                    .withCase(ASN1SequenceOf.class, args -> singletonList(getMapValueAccessor(args, GET_VALUES)))
+                    .withCase(ASN1SetOf.class, args -> singletonList(getMapValueAccessor(args, GET_VALUES)));
 
     public AbstractCollectionConstraintCompiler(CompilerContext ctx, TypeName typeName) {
         super(ctx);
@@ -410,47 +439,32 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), Variable.of(VAR_VALUES)));
     }
 
+
     private List<Expression> getParameters(ComponentNode component, String typeName, String runtimeType) {
-        var accessor = new FunctionCall.GetMapValue(Variable.of(VAR_VALUES),
-                ILValue.of(component.getName()),
-                ILParameterizedType.of(CUSTOM, singletonList(typeName)));
-        Function<String, FunctionCall> getCall = (String f) -> new FunctionCall(of(f), of(accessor));
+        return parametersDispatcher.execute(runtimeType, Tuple2.of(component, typeName));
+    }
 
-        if (runtimeType.equals(ASN1Integer.class.getSimpleName())) {
-            return singletonList(getCall.apply(GET_VALUE));
-        } else if (runtimeType.equals(ASN1Boolean.class.getSimpleName())) {
-            return singletonList(getCall.apply(GET_VALUE));
-        } else if (runtimeType.equals(ASN1EnumeratedType.class.getSimpleName())) {
-            return singletonList(getCall.apply(GET_VALUE));
-        } else if (runtimeType.equals(ASN1Null.class.getSimpleName())) {
-            return singletonList(getCall.apply(GET_VALUE));
-        } else if (runtimeType.equals(ASN1ObjectIdentifier.class.getSimpleName())) {
-            return singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getCall.apply(GET_VALUE)));
-        } else if (runtimeType.equals(ASN1RelativeOID.class.getSimpleName())) {
-            return singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getCall.apply(GET_VALUE)));
-        } else if (runtimeType.equals(ASN1IRI.class.getSimpleName())) {
-            return singletonList(new FunctionCall.ToArray(ILType.of(STRING), getCall.apply(GET_VALUE)));
-        } else if (runtimeType.equals(ASN1RelativeIRI.class.getSimpleName())) {
-            return singletonList(new FunctionCall.ToArray(ILType.of(STRING), getCall.apply(GET_VALUE)));
-        } else if (runtimeType.equals(ASN1BitString.class.getSimpleName())) {
-            return List.of(getCall.apply(GET_VALUE), getCall.apply(GET_UNUSED_BITS));
-        } else if (runtimeType.equals(ASN1SequenceOf.class.getSimpleName()) ||
-                runtimeType.equals(ASN1SetOf.class.getSimpleName())) {
-            return singletonList(getCall.apply(GET_VALUES));
-        } else if (runtimeType.equals(ASN1Sequence.class.getSimpleName()) ||
-                runtimeType.equals(ASN1Set.class.getSimpleName())) {
-            var associations = new HashSet<Tuple2<Expression, Expression>>();
+    private FunctionCall getMapValueAccessor(Optional<Tuple2<ComponentNode, String>> args, String accessor) {
+        return getMapValueAccessor(args.get().get_1(), args.get().get_2(), accessor);
+    }
 
-            ((SequenceType) ctx.resolveTypeReference(component.getComponentType())).getAllComponents().stream()
-                    .map(c -> c.getNamedType().getName())
-                    .map(n -> new Tuple2(ILValue.of(n), getCall.apply("get" + initCap(n))))
-                    .forEach(associations::add);
+    private FunctionCall getMapValueAccessor(ComponentNode component, String typeName, String accessor) {
+        return new FunctionCall(of(accessor),
+                of(new FunctionCall.GetMapValue(Variable.of(VAR_VALUES),
+                        ILValue.of(component.getName()),
+                        ILParameterizedType.of(CUSTOM, singletonList(typeName)))));
+    }
 
-            return singletonList(new ILMapValue(ILType.of(ILBuiltinType.STRING),
-                    ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
-        }
+    private List<Expression> getCollectionParameters(ComponentNode component, Function<String, FunctionCall> getCall) {
+        var associations = new HashSet<Tuple2<Expression, Expression>>();
 
-        throw new IllegalCompilerStateException("Unsupported type: " + runtimeType);
+        ((SequenceType) ctx.resolveTypeReference(component.getComponentType())).getAllComponents().stream()
+                .map(c -> c.getNamedType().getName())
+                .map(n -> new Tuple2(ILValue.of(n), getCall.apply("get" + initCap(n))))
+                .forEach(associations::add);
+
+        return singletonList(new ILMapValue(ILType.of(ILBuiltinType.STRING),
+                ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
     }
 
     private Tuple2<String, String> buildExpressionFunction(Module module, CompiledType compiledType,
@@ -472,10 +486,10 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     private List<Parameter> getParameterDefinition(CompiledType compiledType) {
-        return dispatcher.execute(ctx.getRuntimeType(compiledType.getType()), compiledType);
+        return parameterDefinitionDispatcher.execute(ctx.getRuntimeType(compiledType.getType()), compiledType);
     }
 
-    private List<Parameter> getCollectionOfParameter(CompiledType compiledType) {
+    private List<Parameter> getCollectionOfParameterDefinition(CompiledType compiledType) {
         var compiledBaseType = (CompiledCollectionOfType) ctx.getCompiledBaseType(compiledType);
         var contentType = compiledBaseType.getContentType().getType();
 

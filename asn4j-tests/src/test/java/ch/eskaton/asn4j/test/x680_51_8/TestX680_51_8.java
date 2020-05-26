@@ -47,6 +47,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence110;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence111;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence112;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence113;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence114;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence3;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence4;
@@ -64,6 +65,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf122;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf124;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf126;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf128;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf130;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf3;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf4;
@@ -249,31 +251,39 @@ class TestX680_51_8 {
 
     @Test
     void testSetOf126() {
-        testSetOfSuccess(TestSetOf126.class, new TestSetOf126(),
-                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(1))));
+        testSetOfSuccess(TestSetOf126.class, new TestSetOf126());
+        testSetOfSuccess(TestSetOf126.class, new TestSetOf126(), new ASN1BitString(new byte[] { 0x05 }, 4));
 
-        testSetOfFailure(TestSetOf126.class, new TestSetOf126(),
-                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(0))));
-        testSetOfFailure(TestSetOf126.class, new TestSetOf126(),
-                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(2))));
-        testSetOfFailure(TestSetOf126.class, new TestSetOf126(),
-                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(1), ASN1Integer.valueOf(1))));
+        testSetOfFailure(TestSetOf126.class, new TestSetOf126(), new ASN1BitString(new byte[] { 0x06 }, 4));
     }
 
     @Test
     void testSetOf128() {
         testSetOfSuccess(TestSetOf128.class, new TestSetOf128(),
+                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(1))));
+
+        testSetOfFailure(TestSetOf128.class, new TestSetOf128(),
+                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(0))));
+        testSetOfFailure(TestSetOf128.class, new TestSetOf128(),
+                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(2))));
+        testSetOfFailure(TestSetOf128.class, new TestSetOf128(),
+                with(new TestSequenceOf2(), s -> s.setValues(ASN1Integer.valueOf(1), ASN1Integer.valueOf(1))));
+    }
+
+    @Test
+    void testSetOf130() {
+        testSetOfSuccess(TestSetOf130.class, new TestSetOf130(),
                 with(new TestSequence2(), s -> {
                     s.setA(ASN1Integer.valueOf(1));
                     s.setB(ASN1Boolean.TRUE);
                 }));
 
-        testSetOfFailure(TestSetOf128.class, new TestSetOf128(),
+        testSetOfFailure(TestSetOf130.class, new TestSetOf130(),
                 with(new TestSequence2(), s -> {
                     s.setA(ASN1Integer.valueOf(2));
                     s.setB(ASN1Boolean.TRUE);
                 }));
-        testSetOfFailure(TestSetOf128.class, new TestSetOf128(),
+        testSetOfFailure(TestSetOf130.class, new TestSetOf130(),
                 with(new TestSequence2(), s -> {
                     s.setA(ASN1Integer.valueOf(1));
                     s.setB(ASN1Boolean.FALSE);
@@ -433,25 +443,19 @@ class TestX680_51_8 {
     @Test
     void testSequence111() {
         testSequenceSuccess(TestSequence111.class, new TestSequence111(),
-                s -> s.setA(new ASN1BitString(new byte[] { 0x05 }, 4)));
+                s -> s.setA(ASN1OctetString.valueOf(new byte[] { 0x50 })));
 
         testSequenceFailure(TestSequence111.class, new TestSequence111(),
-                s -> s.setA(new ASN1BitString(new byte[] { 0x05 }, 5)));
+                s -> s.setA(ASN1OctetString.valueOf(new byte[] { 0x51 })));
     }
 
     @Test
     void testSequence112() {
         testSequenceSuccess(TestSequence112.class, new TestSequence112(),
-                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(1L)))));
-        testSequenceSuccess(TestSequence112.class, new TestSequence112(),
-                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(2L)))));
-        testSequenceSuccess(TestSequence112.class, new TestSequence112(),
-                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(3L)))));
+                s -> s.setA(new ASN1BitString(new byte[] { 0x05 }, 4)));
 
         testSequenceFailure(TestSequence112.class, new TestSequence112(),
-                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(0L)))));
-        testSequenceFailure(TestSequence112.class, new TestSequence112(),
-                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(4L)))));
+                s -> s.setA(new ASN1BitString(new byte[] { 0x05 }, 5)));
     }
 
     @Test
@@ -460,10 +464,25 @@ class TestX680_51_8 {
                 s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(1L)))));
         testSequenceSuccess(TestSequence113.class, new TestSequence113(),
                 s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(2L)))));
+        testSequenceSuccess(TestSequence113.class, new TestSequence113(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(3L)))));
 
         testSequenceFailure(TestSequence113.class, new TestSequence113(),
                 s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(0L)))));
         testSequenceFailure(TestSequence113.class, new TestSequence113(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(4L)))));
+    }
+
+    @Test
+    void testSequence114() {
+        testSequenceSuccess(TestSequence114.class, new TestSequence114(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(1L)))));
+        testSequenceSuccess(TestSequence114.class, new TestSequence114(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(2L)))));
+
+        testSequenceFailure(TestSequence114.class, new TestSequence114(),
+                s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(0L)))));
+        testSequenceFailure(TestSequence114.class, new TestSequence114(),
                 s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(3L)))));
     }
 

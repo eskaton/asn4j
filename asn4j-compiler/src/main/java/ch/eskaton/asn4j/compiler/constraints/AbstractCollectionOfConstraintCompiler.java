@@ -127,24 +127,49 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
     private final ILBuiltinType collectionType;
 
-    private final Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>> dispatcher =
+    private final Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>> parameterDefinitionDispatcher =
             new Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>>()
                     .withComparator((t, u) -> t.equals(u.getSimpleName()))
-                    .withCase(ASN1Integer.class, args -> getValueParameter(BIG_INTEGER))
-                    .withCase(ASN1Boolean.class, args -> getValueParameter(BOOLEAN))
-                    .withCase(ASN1EnumeratedType.class, args -> getValueParameter(INTEGER))
-                    .withCase(ASN1Null.class, args -> getValueParameter(NULL))
-                    .withCase(ASN1ObjectIdentifier.class, args -> getValueParameter(INTEGER_ARRAY))
-                    .withCase(ASN1RelativeOID.class, args -> getValueParameter(INTEGER_ARRAY))
-                    .withCase(ASN1IRI.class, args -> getValueParameter(STRING_ARRAY))
-                    .withCase(ASN1RelativeIRI.class, args -> getValueParameter(STRING_ARRAY))
-                    .withCase(ASN1BitString.class, args -> asList(new Parameter(ILType.of(BYTE_ARRAY), VAR_VALUE),
+                    .withCase(ASN1Integer.class, () -> getValueParameter(BIG_INTEGER))
+                    .withCase(ASN1Boolean.class, () -> getValueParameter(BOOLEAN))
+                    .withCase(ASN1EnumeratedType.class, () -> getValueParameter(INTEGER))
+                    .withCase(ASN1Null.class, () -> getValueParameter(NULL))
+                    .withCase(ASN1ObjectIdentifier.class, () -> getValueParameter(INTEGER_ARRAY))
+                    .withCase(ASN1RelativeOID.class, () -> getValueParameter(INTEGER_ARRAY))
+                    .withCase(ASN1IRI.class, () -> getValueParameter(STRING_ARRAY))
+                    .withCase(ASN1RelativeIRI.class, () -> getValueParameter(STRING_ARRAY))
+                    .withCase(ASN1BitString.class, () -> asList(new Parameter(ILType.of(BYTE_ARRAY), VAR_VALUE),
                             new Parameter(ILType.of(INTEGER), VAR_UNUSED_BITS)))
-                    .withCase(ASN1OctetString.class, args -> getValueParameter(BYTE_ARRAY))
-                    .withCase(ASN1Sequence.class, args -> singletonList(getMapParameter()))
-                    .withCase(ASN1Set.class, args -> singletonList(getMapParameter()))
+                    .withCase(ASN1OctetString.class, () -> getValueParameter(BYTE_ARRAY))
+                    .withCase(ASN1Sequence.class, () -> singletonList(getMapParameter()))
+                    .withCase(ASN1Set.class, () -> singletonList(getMapParameter()))
                     .withCase(ASN1SequenceOf.class, args -> getCollectionOfParameter(args.get()))
                     .withCase(ASN1SetOf.class, args -> getCollectionOfParameter(args.get()));
+
+    Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Expression>> parametersDispatcher =
+            new Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Expression>>()
+                    .withComparator((t, u) -> t.equals(u.getSimpleName()))
+                    .withCase(ASN1Integer.class, () -> singletonList(getGetValueCall()))
+                    .withCase(ASN1Boolean.class, () -> singletonList(getGetValueCall()))
+                    .withCase(ASN1EnumeratedType.class, () -> singletonList(getGetValueCall()))
+                    .withCase(ASN1Null.class, () -> singletonList(getGetValueCall()))
+                    .withCase(ASN1ObjectIdentifier.class,
+                            () -> singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getGetValueCall())))
+                    .withCase(ASN1RelativeOID.class,
+                            () -> singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getGetValueCall())))
+                    .withCase(ASN1IRI.class,
+                            () -> singletonList(new FunctionCall.ToArray(ILType.of(ILBuiltinType.STRING),
+                                    getGetValueCall())))
+                    .withCase(ASN1RelativeIRI.class,
+                            () -> singletonList(new FunctionCall.ToArray(ILType.of(ILBuiltinType.STRING),
+                                    getGetValueCall())))
+                    .withCase(ASN1BitString.class,
+                            () -> List.of(getGetValueCall(), getAccessorCall(GET_UNUSED_BITS, VAR_VALUE)))
+                    .withCase(ASN1OctetString.class, () -> singletonList(getGetValueCall()))
+                    .withCase(ASN1Sequence.class, args -> getCollectionParameters((CompiledCollectionType) args.get()))
+                    .withCase(ASN1Set.class, args -> getCollectionParameters((CompiledCollectionType) args.get()))
+                    .withCase(ASN1SequenceOf.class, () -> singletonList(getGetValuesCall()))
+                    .withCase(ASN1SetOf.class, () -> singletonList(getGetValuesCall()));
 
     public AbstractCollectionOfConstraintCompiler(CompilerContext ctx, TypeName typeName, ILBuiltinType collectionType) {
         super(ctx);
@@ -424,34 +449,20 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     private List<Expression> getParameters(CompiledType compiledContentType) {
-        String runtimeType = ctx.getRuntimeType(compiledContentType.getType());
+        return parametersDispatcher.execute(ctx.getRuntimeType(compiledContentType.getType()), compiledContentType);
+    }
 
-        if (runtimeType.equals(ASN1BitString.class.getSimpleName())) {
-            return List.of(getGetValueCall(), getAccessorCall(GET_UNUSED_BITS, VAR_VALUE));
-        } else if (runtimeType.equals(ASN1ObjectIdentifier.class.getSimpleName()) ||
-                runtimeType.equals(ASN1RelativeOID.class.getSimpleName())) {
-            return singletonList(new FunctionCall.ToArray(ILType.of(INTEGER), getGetValueCall()));
-        } else if (runtimeType.equals(ASN1IRI.class.getSimpleName()) ||
-                runtimeType.equals(ASN1RelativeIRI.class.getSimpleName())) {
-            return singletonList(new FunctionCall.ToArray(ILType.of(ILBuiltinType.STRING), getGetValueCall()));
-        } else if (runtimeType.equals(ASN1SequenceOf.class.getSimpleName()) ||
-                runtimeType.equals(ASN1SetOf.class.getSimpleName())) {
-            return singletonList(getGetValuesCall());
-        } else if (runtimeType.equals(ASN1Sequence.class.getSimpleName()) ||
-                runtimeType.equals(ASN1Set.class.getSimpleName())) {
-            var associations = new HashSet<Tuple2<Expression, Expression>>();
+    private List<Expression> getCollectionParameters(CompiledCollectionType compiledContentType) {
+        var associations = new HashSet<Tuple2<Expression, Expression>>();
 
-            ((CompiledCollectionType) compiledContentType).getComponents().stream()
-                    .map(Tuple2::get_1)
-                    .map(n -> new Tuple2<Expression, Expression>(ILValue.of(n),
-                            new FunctionCall(of("get" + initCap(n)), of(Variable.of(VAR_VALUE)))))
-                    .forEach(associations::add);
+        compiledContentType.getComponents().stream()
+                .map(Tuple2::get_1)
+                .map(n -> new Tuple2<Expression, Expression>(ILValue.of(n),
+                        new FunctionCall(of("get" + initCap(n)), of(Variable.of(VAR_VALUE)))))
+                .forEach(associations::add);
 
-            return Collections.singletonList(new ILMapValue(ILType.of(ILBuiltinType.STRING),
-                    ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
-        } else {
-            return singletonList(getGetValueCall());
-        }
+        return Collections.singletonList(new ILMapValue(ILType.of(ILBuiltinType.STRING),
+                ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
     }
 
     private FunctionCall getGetValueCall() {
@@ -480,7 +491,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     private List<Parameter> getParameterDefinition(CompiledType compiledType, String type) {
-        return dispatcher.execute(ctx.getRuntimeType(type), compiledType);
+        return parameterDefinitionDispatcher.execute(ctx.getRuntimeType(type), compiledType);
     }
 
     private List<Parameter> getCollectionOfParameter(CompiledType compiledType) {
