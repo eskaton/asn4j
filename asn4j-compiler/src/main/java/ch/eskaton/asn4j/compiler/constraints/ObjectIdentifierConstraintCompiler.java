@@ -71,8 +71,8 @@ public class ObjectIdentifierConstraintCompiler extends AbstractOIDConstraintCom
     }
 
     @Override
-    protected TypeName getTypeName() {
-        return TypeName.OBJECT_IDENTIFIER;
+    protected String getTypeName() {
+        return TypeName.OBJECT_IDENTIFIER.toString();
     }
 
 }

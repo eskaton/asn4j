@@ -45,6 +45,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
@@ -58,6 +59,14 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
 
     public NullConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+
+        getDispatcher()
+                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
+                        this::compileConstraint, args))
+                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
+                        this::calculateSingleValueConstraint, args))
+                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
+                        this::calculateContainedSubtype, args));
     }
 
     @Override
@@ -65,20 +74,13 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
         return Optional.empty();
     }
 
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            return calculateSingleValueConstraints((SingleValueConstraint) elements);
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
-        } else {
-            throw new CompilerException("Invalid constraint %s for %s type",
-                    elements.getClass().getSimpleName(), TypeName.NULL);
-        }
+    @Override
+    protected String getTypeName() {
+        return TypeName.NULL.toString();
     }
 
-    private Node calculateSingleValueConstraints(SingleValueConstraint elements) {
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
+            Optional<Bounds> bounds) {
         Value value = elements.getValue();
 
         if (value instanceof NullValue) {

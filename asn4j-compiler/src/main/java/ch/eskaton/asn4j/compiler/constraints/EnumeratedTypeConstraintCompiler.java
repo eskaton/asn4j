@@ -47,12 +47,10 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.collections.Tuple2;
@@ -70,33 +68,32 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
 
     public EnumeratedTypeConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+
+        getDispatcher()
+                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
+                        this::compileConstraint, args))
+                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
+                        this::calculateSingleValueConstraint, args))
+                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
+                        this::calculateContainedSubtype, args))
+                .withCase(SizeConstraint.class, args -> dispatchToCalculate(SizeConstraint.class, this::calculateSize, args));
     }
 
     @Override
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            return calculateSingleValueConstraint((CompiledEnumeratedType) baseType, (SingleValueConstraint) elements);
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
-        } else if (elements instanceof SizeConstraint) {
-            return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
-        } else {
-            throw new CompilerException("Invalid constraint %s for %s type",
-                    elements.getClass().getSimpleName(), TypeName.ENUMERATED);
-        }
+    protected String getTypeName() {
+        return TypeName.ENUMERATED.toString();
     }
 
-    private Node calculateSingleValueConstraint(CompiledEnumeratedType baseType, SingleValueConstraint elements) {
-        Value value = elements.getValue();
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
+            Optional<Bounds> bounds) {
+        var compiledEnumeratedType = (CompiledEnumeratedType) baseType;
+        var value = elements.getValue();
 
         try {
             SimpleDefinedValue definedValue = CompilerUtils.resolveAmbiguousValue(value, SimpleDefinedValue.class);
             Integer enumValue;
 
             if (definedValue != null) {
-                CompiledEnumeratedType compiledEnumeratedType = baseType;
                 EnumerationItems allItems = compiledEnumeratedType.getRoots().copy()
                         .addAll(compiledEnumeratedType.getAdditions().getItems());
                 Optional<Tuple2<String, Integer>> enumItem = allItems.getItems().stream()

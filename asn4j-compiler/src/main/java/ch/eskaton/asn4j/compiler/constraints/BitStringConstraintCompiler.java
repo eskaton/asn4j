@@ -49,7 +49,6 @@ import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
@@ -79,6 +78,16 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
     public BitStringConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+
+        getDispatcher()
+                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
+                        this::compileConstraint, args))
+                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
+                        this::calculateSingleValueConstraint, args))
+                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
+                        this::calculateContainedSubtype, args))
+                .withCase(SizeConstraint.class, args -> dispatchToCalculate(SizeConstraint.class,
+                        this::calculateSize, args));
     }
 
     @Override
@@ -89,23 +98,12 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Node calculateElements(CompiledType baseType, Elements elements,
-            Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            return calculateSingleValueConstraints(baseType, (SingleValueConstraint) elements);
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
-        } else if (elements instanceof SizeConstraint) {
-            return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
-        } else {
-            throw new CompilerException("Invalid constraint %s for %s type",
-                    elements.getClass().getSimpleName(), TypeName.BIT_STRING);
-        }
+    protected String getTypeName() {
+        return TypeName.BIT_STRING.toString();
     }
 
-    private Node calculateSingleValueConstraints(CompiledType baseType, SingleValueConstraint elements) {
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
+            Optional<Bounds> bounds) {
         Value value = elements.getValue();
 
         try {
@@ -116,7 +114,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
             return new BitStringValueNode(singletonList(bitStringValue));
         } catch (Exception e) {
             throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                    value.getClass().getSimpleName(), TypeName.BIT_STRING);
+                    value.getClass().getSimpleName(), getTypeName());
         }
     }
 

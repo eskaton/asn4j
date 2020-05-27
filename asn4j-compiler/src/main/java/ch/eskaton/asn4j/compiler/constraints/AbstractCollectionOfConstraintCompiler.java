@@ -85,6 +85,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
+import ch.eskaton.commons.collections.Tuple3;
+import ch.eskaton.commons.functional.TriFunction;
 import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.Collections;
@@ -176,6 +178,24 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
         this.typeName = typeName;
         this.collectionType = collectionType;
+
+        getDispatcher()
+                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
+                        this::compileConstraint, args))
+                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
+                        this::calculateSingleValueConstraint, args))
+                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
+                        this::calculateContainedSubtype, args))
+                .withCase(SizeConstraint.class, args -> dispatchToCalculate(SizeConstraint.class,
+                        this::calculateSize, args))
+                .withCase(SingleTypeConstraint.class, args -> dispatchToCalculate(SingleTypeConstraint.class,
+                        this::calculateSingleTypeConstraint, args));
+    }
+
+
+    @Override
+    protected String getTypeName() {
+        return typeName.toString();
     }
 
     @Override
@@ -209,23 +229,12 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
     @Override
     protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            return calculateSingleValueConstraint(baseType, (SingleValueConstraint) elements);
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
-        } else if (elements instanceof SizeConstraint) {
-            return calculateSize(baseType, ((SizeConstraint) elements).getConstraint(), bounds);
-        } else if (elements instanceof SingleTypeConstraint) {
-            return calculateSingleTypeConstraint(baseType, (SingleTypeConstraint) elements);
-        } else {
-            throw new CompilerException("Invalid constraint %s for %s type",
-                    elements.getClass().getSimpleName(), typeName);
-        }
+        return getDispatcher().withComparator((t, c) -> c.isInstance(t))
+                .execute(elements, new Tuple3<>(baseType, elements, bounds));
     }
 
-    private Node calculateSingleTypeConstraint(CompiledType baseType, SingleTypeConstraint elements) {
+    private Node calculateSingleTypeConstraint(CompiledType baseType, SingleTypeConstraint elements,
+            Optional<Bounds> bounds) {
         Type componentType = ((CollectionOfType) baseType.getType()).getType();
 
         ConstraintDefinition definition = ctx.compileConstraint(ctx.getCompiledType(componentType));
@@ -240,7 +249,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         return new WithComponentNode(componentType, definition.getRoots());
     }
 
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements) {
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
+            Optional<Bounds> bounds) {
         Value value = elements.getValue();
 
         try {

@@ -43,7 +43,6 @@ import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -57,6 +56,19 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
 
     public BooleanConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+
+        getDispatcher()
+                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
+                        this::compileConstraint, args))
+                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
+                        this::calculateSingleValueConstraint, args))
+                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
+                        this::calculateContainedSubtype, args));
+    }
+
+    @Override
+    protected String getTypeName() {
+        return TypeName.BOOLEAN.toString();
     }
 
     @Override
@@ -64,20 +76,8 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
         return Optional.empty();
     }
 
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            return calculateSingleValueConstraint((SingleValueConstraint) elements);
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
-        } else {
-            throw new CompilerException("Invalid constraint %s for %s type",
-                    elements.getClass().getSimpleName(), TypeName.BOOLEAN);
-        }
-    }
-
-    private Node calculateSingleValueConstraint(SingleValueConstraint elements) {
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
+            Optional<Bounds> bounds) {
         Value value = elements.getValue();
 
         if (value instanceof BooleanValue) {
