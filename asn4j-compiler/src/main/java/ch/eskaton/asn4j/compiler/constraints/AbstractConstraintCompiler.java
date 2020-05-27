@@ -49,6 +49,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
+import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
@@ -56,18 +57,18 @@ import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.functional.TriFunction;
+import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.OptionalUtils;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
-import static ch.eskaton.asn4j.compiler.constraints.Constants.*;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
@@ -81,10 +82,35 @@ import static java.util.Optional.of;
 
 public abstract class AbstractConstraintCompiler {
 
+    private Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
+            ? extends Elements, Optional<Bounds>>, Node> dispatcher;
+
     protected CompilerContext ctx;
 
     public AbstractConstraintCompiler(CompilerContext ctx) {
         this.ctx = ctx;
+        this.dispatcher = new Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
+                ? extends Elements, Optional<Bounds>>, Node>()
+                .withException((e) -> new CompilerException("Invalid constraint %s for %s type",
+                        e.getClass().getSimpleName(), getTypeName()));
+    }
+
+    protected abstract String getTypeName();
+
+    public Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>,
+            Node> getDispatcher() {
+        return dispatcher;
+    }
+
+    protected  <T extends Elements> Node dispatchToCalculate(Class<T> clazz,
+            TriFunction<CompiledType, T, Optional<Bounds>, Node> function,
+            Optional<Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>> args) {
+        return function.apply(args.get().get_1(), clazz.cast(args.get().get_2()), args.get().get_3());
+    }
+
+    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
+        return getDispatcher().withComparator((t, c) -> c.isInstance(t))
+                .execute(elements, new Tuple3<>(baseType, elements, bounds));
     }
 
     public ConstraintDefinition compileConstraint(CompiledType baseType, SubtypeConstraint subtypeConstraint,
@@ -254,12 +280,11 @@ public abstract class AbstractConstraintCompiler {
         return new BinOpNode(COMPLEMENT, values1, values2);
     }
 
-    protected abstract Node calculateElements(CompiledType baseType, Elements elements,
-            Optional<Bounds> bounds);
-
-    protected Node calculateContainedSubtype(CompiledType compiledType, Type parent) {
+    protected Node calculateContainedSubtype(CompiledType compiledType, ContainedSubtype elements,
+            Optional<Bounds> bounds) {
         CompiledType compiledParentType;
-        Deque<Node> constraints = new ArrayDeque<>();
+        var parent = elements.getType();
+        var constraints = new ArrayDeque<Node>();
 
         do {
             compiledParentType = ctx.getCompiledType(parent);
@@ -303,7 +328,9 @@ public abstract class AbstractConstraintCompiler {
                 .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
     }
 
-    protected SizeNode calculateSize(CompiledType baseType, Constraint constraint, Optional<Bounds> bounds) {
+    protected SizeNode calculateSize(CompiledType baseType, SizeConstraint sizeConstraint, Optional<Bounds> bounds) {
+        var constraint = sizeConstraint.getConstraint();
+
         if (constraint instanceof SubtypeConstraint) {
             SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
 
@@ -411,7 +438,7 @@ public abstract class AbstractConstraintCompiler {
         return new NegationExpression(expr);
     }
 
-    private BiFunction<BooleanExpression, BooleanExpression, BooleanExpression> getBinOperation(BinaryOperator operator) {
+    private java.util.function.BinaryOperator<BooleanExpression> getBinOperation(BinaryOperator operator) {
         return (BooleanExpression a, BooleanExpression b) -> new BinaryBooleanExpression(operator, a, b);
     }
 

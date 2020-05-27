@@ -88,6 +88,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
+import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.StreamsUtils;
 
@@ -184,26 +185,28 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         super(ctx);
 
         this.typeName = typeName;
+
+        getDispatcher()
+                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
+                        this::compileConstraint, args))
+                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
+                        this::calculateSingleValueConstraint, args))
+                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
+                        this::calculateContainedSubtype, args))
+                .withCase(MultipleTypeConstraints.class, args -> dispatchToCalculate(MultipleTypeConstraints.class,
+                        this::calculateMultipleTypeConstraint, args));
     }
 
     @Override
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            return calculateSingleValueConstraint(baseType, (SingleValueConstraint) elements);
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
-        } else if (elements instanceof MultipleTypeConstraints) {
-            return calculateMultipleTypeConstraint((CompiledCollectionType) baseType, (MultipleTypeConstraints) elements);
-        } else {
-            throw new CompilerException("Invalid constraint %s for %s type",
-                    elements.getClass().getSimpleName(), typeName);
-        }
+    protected String getTypeName() {
+        return typeName.toString();
     }
 
-    private Node calculateMultipleTypeConstraint(CompiledCollectionType baseType, MultipleTypeConstraints elements) {
-        var components = baseType.getComponents();
+    private Node calculateMultipleTypeConstraint(CompiledType baseType, MultipleTypeConstraints elements,
+            Optional<Bounds> bounds) {
+        var compiledCollectionType = (CompiledCollectionType) baseType;
+
+        var components = compiledCollectionType.getComponents();
         var componentNodes = new HashSet<ComponentNode>();
         var lastIndex = -1;
 
@@ -214,7 +217,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
             if (index != -1 && index > lastIndex) {
                 lastIndex = index;
             } else {
-                throw new CompilerException("Component '%s' not found in type '%s'", name, baseType.getName());
+                throw new CompilerException("Component '%s' not found in type '%s'", name,
+                        compiledCollectionType.getName());
             }
 
             componentNodes.add(calculateComponentConstraint(components.get(index).get_2(), constraint));
@@ -239,7 +243,8 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         return new ComponentNode(name, compiledType.getType(), definition.getRoots(), presence);
     }
 
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements) {
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
+            Optional<Bounds> bounds) {
         Value value = elements.getValue();
 
         try {

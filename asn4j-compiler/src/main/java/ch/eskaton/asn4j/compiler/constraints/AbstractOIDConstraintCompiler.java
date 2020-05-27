@@ -67,27 +67,18 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
 
     public AbstractOIDConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+
+        getDispatcher()
+                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
+                        this::compileConstraint, args))
+                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
+                        this::calculateSingleValueConstraint, args))
+                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
+                        this::calculateContainedSubtype, args));
     }
 
-    @Override
-    Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
-        return Optional.empty();
-    }
-
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            return calculateSingleValueConstraints((SingleValueConstraint) elements);
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
-        } else {
-            throw new CompilerException("Invalid constraint %s for " + getTypeName() + " type",
-                    elements.getClass().getSimpleName());
-        }
-    }
-
-    private Node calculateSingleValueConstraints(SingleValueConstraint elements) {
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
+            Optional<Bounds> bounds) {
         AbstractOIDValueResolver resolver = getValueResolver();
         Value value = elements.getValue();
         AbstractOIDValue oidValue = (AbstractOIDValue) resolver.resolveValue(ctx, value, getValueClass());
@@ -142,7 +133,5 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
     protected abstract Class<? extends AbstractOIDValue> getValueClass();
 
     protected abstract AbstractOIDValueResolver getValueResolver();
-
-    protected abstract TypeName getTypeName();
 
 }

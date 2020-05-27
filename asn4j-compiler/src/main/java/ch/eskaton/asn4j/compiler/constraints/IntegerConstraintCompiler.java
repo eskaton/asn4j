@@ -48,7 +48,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -71,6 +70,15 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
 
     public IntegerConstraintCompiler(CompilerContext ctx) {
         super(ctx);
+
+        getDispatcher()
+                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
+                        this::compileConstraint, args))
+                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
+                        this::calculateSingleValueConstraint, args))
+                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
+                        this::calculateContainedSubtype, args))
+                .withCase(RangeNode.class, args -> dispatchToCalculate(RangeNode.class, this::calculateRangeNode, args));
     }
 
     @Override
@@ -81,23 +89,12 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected Node calculateElements(CompiledType baseType, Elements elements,
-            Optional<Bounds> bounds) {
-        if (elements instanceof ElementSet) {
-            return compileConstraint(baseType, (ElementSet) elements, bounds);
-        } else if (elements instanceof SingleValueConstraint) {
-            return calculateSingleValueConstraint(baseType, (SingleValueConstraint) elements);
-        } else if (elements instanceof ContainedSubtype) {
-            return calculateContainedSubtype(baseType, ((ContainedSubtype) elements).getType());
-        } else if (elements instanceof RangeNode) {
-            return calculateRangeNode((RangeNode) elements, bounds);
-        } else {
-            throw new CompilerException("Invalid constraint %s for %s type", elements.getClass().getSimpleName(),
-                    TypeName.INTEGER);
-        }
+    protected String getTypeName() {
+        return TypeName.INTEGER.toString();
     }
 
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements) {
+    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
+            Optional<Bounds> bounds) {
         Value value = elements.getValue();
 
         try {
@@ -111,7 +108,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
-    private Node calculateRangeNode(RangeNode elements, Optional<Bounds> bounds) {
+    private Node calculateRangeNode(CompiledType compiledType, RangeNode elements, Optional<Bounds> bounds) {
         long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
         long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
 
