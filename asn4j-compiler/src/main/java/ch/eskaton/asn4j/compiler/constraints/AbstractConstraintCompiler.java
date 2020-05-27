@@ -57,6 +57,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.functional.TriFunction;
 import ch.eskaton.commons.utils.Dispatcher;
@@ -92,20 +93,25 @@ public abstract class AbstractConstraintCompiler {
         this.dispatcher = new Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
                 ? extends Elements, Optional<Bounds>>, Node>()
                 .withException((e) -> new CompilerException("Invalid constraint %s for %s type",
-                        e.getClass().getSimpleName(), getTypeName()));
+                        e.getClass().getSimpleName(), getTypeName().getName()));
     }
 
-    protected abstract String getTypeName();
+    protected abstract TypeName getTypeName();
 
     public Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>,
             Node> getDispatcher() {
         return dispatcher;
     }
 
-    protected  <T extends Elements> Node dispatchToCalculate(Class<T> clazz,
+    protected <T extends Elements> Node dispatchToCalculate(Class<T> clazz,
             TriFunction<CompiledType, T, Optional<Bounds>, Node> function,
             Optional<Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>> args) {
         return function.apply(args.get().get_1(), clazz.cast(args.get().get_2()), args.get().get_3());
+    }
+
+    protected <T extends Elements> void addConstraintHandler(Class<T> clazz,
+            TriFunction<CompiledType, T, Optional<Bounds>, Node> function) {
+        getDispatcher().withCase(clazz, a -> dispatchToCalculate(clazz, function, a));
     }
 
     protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {

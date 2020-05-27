@@ -65,8 +65,8 @@ public class RelativeOIDConstraintCompiler extends AbstractOIDConstraintCompiler
     }
 
     @Override
-    protected String getTypeName() {
-        return TypeName.RELATIVE_OID.toString();
+    protected TypeName getTypeName() {
+        return TypeName.RELATIVE_OID;
     }
 
     @Override

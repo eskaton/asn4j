@@ -71,14 +71,10 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     public IntegerConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        getDispatcher()
-                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
-                        this::compileConstraint, args))
-                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
-                        this::calculateSingleValueConstraint, args))
-                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
-                        this::calculateContainedSubtype, args))
-                .withCase(RangeNode.class, args -> dispatchToCalculate(RangeNode.class, this::calculateRangeNode, args));
+        addConstraintHandler(ElementSet.class, this::compileConstraint);
+        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
+        addConstraintHandler(RangeNode.class, this::calculateRangeNode);
     }
 
     @Override
@@ -89,8 +85,8 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected String getTypeName() {
-        return TypeName.INTEGER.toString();
+    protected TypeName getTypeName() {
+        return TypeName.INTEGER;
     }
 
     private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,

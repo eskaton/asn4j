@@ -57,18 +57,14 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     public BooleanConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        getDispatcher()
-                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
-                        this::compileConstraint, args))
-                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
-                        this::calculateSingleValueConstraint, args))
-                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
-                        this::calculateContainedSubtype, args));
+        addConstraintHandler(ElementSet.class, this::compileConstraint);
+        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
     }
 
     @Override
-    protected String getTypeName() {
-        return TypeName.BOOLEAN.toString();
+    protected TypeName getTypeName() {
+        return TypeName.BOOLEAN;
     }
 
     @Override

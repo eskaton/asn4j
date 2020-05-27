@@ -74,19 +74,15 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     public OctetStringConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        getDispatcher()
-                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
-                        this::compileConstraint, args))
-                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
-                        this::calculateSingleValueConstraint, args))
-                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
-                        this::calculateContainedSubtype, args))
-                .withCase(SizeConstraint.class, args -> dispatchToCalculate(SizeConstraint.class, this::calculateSize, args));
+        addConstraintHandler(ElementSet.class, this::compileConstraint);
+        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
+        addConstraintHandler(SizeConstraint.class, this::calculateSize);
     }
 
     @Override
-    protected String getTypeName() {
-        return TypeName.OCTET_STRING.toString();
+    protected TypeName getTypeName() {
+        return TypeName.OCTET_STRING;
     }
 
     @Override

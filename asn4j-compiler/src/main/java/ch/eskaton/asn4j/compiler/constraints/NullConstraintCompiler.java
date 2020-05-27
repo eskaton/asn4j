@@ -43,9 +43,7 @@ import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
@@ -60,13 +58,9 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
     public NullConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        getDispatcher()
-                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
-                        this::compileConstraint, args))
-                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
-                        this::calculateSingleValueConstraint, args))
-                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
-                        this::calculateContainedSubtype, args));
+        addConstraintHandler(ElementSet.class, this::compileConstraint);
+        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
     }
 
     @Override
@@ -75,8 +69,8 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected String getTypeName() {
-        return TypeName.NULL.toString();
+    protected TypeName getTypeName() {
+        return TypeName.NULL;
     }
 
     private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,

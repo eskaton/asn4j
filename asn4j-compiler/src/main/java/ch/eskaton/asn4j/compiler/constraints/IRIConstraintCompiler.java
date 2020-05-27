@@ -71,8 +71,8 @@ public class IRIConstraintCompiler extends AbstractIRIConstraintCompiler<IRIValu
     }
 
     @Override
-    protected String getTypeName() {
-        return TypeName.OID_IRI.toString();
+    protected TypeName getTypeName() {
+        return TypeName.OID_IRI;
     }
 
 }
