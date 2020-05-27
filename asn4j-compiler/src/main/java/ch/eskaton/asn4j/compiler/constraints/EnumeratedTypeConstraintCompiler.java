@@ -69,19 +69,15 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     public EnumeratedTypeConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        getDispatcher()
-                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
-                        this::compileConstraint, args))
-                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
-                        this::calculateSingleValueConstraint, args))
-                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
-                        this::calculateContainedSubtype, args))
-                .withCase(SizeConstraint.class, args -> dispatchToCalculate(SizeConstraint.class, this::calculateSize, args));
+        addConstraintHandler(ElementSet.class, this::compileConstraint);
+        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
+        addConstraintHandler(SizeConstraint.class, this::calculateSize);
     }
 
     @Override
-    protected String getTypeName() {
-        return TypeName.ENUMERATED.toString();
+    protected TypeName getTypeName() {
+        return TypeName.ENUMERATED;
     }
 
     private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,

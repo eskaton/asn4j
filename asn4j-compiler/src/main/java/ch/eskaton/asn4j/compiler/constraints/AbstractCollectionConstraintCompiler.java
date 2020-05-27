@@ -57,7 +57,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
 import ch.eskaton.asn4j.parser.ast.constraints.NamedConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
@@ -88,7 +87,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
-import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.StreamsUtils;
 
@@ -186,20 +184,15 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
         this.typeName = typeName;
 
-        getDispatcher()
-                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
-                        this::compileConstraint, args))
-                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
-                        this::calculateSingleValueConstraint, args))
-                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
-                        this::calculateContainedSubtype, args))
-                .withCase(MultipleTypeConstraints.class, args -> dispatchToCalculate(MultipleTypeConstraints.class,
-                        this::calculateMultipleTypeConstraint, args));
+        addConstraintHandler(ElementSet.class, this::compileConstraint);
+        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
+        addConstraintHandler(MultipleTypeConstraints.class, this::calculateMultipleTypeConstraint);
     }
 
     @Override
-    protected String getTypeName() {
-        return typeName.toString();
+    protected TypeName getTypeName() {
+        return typeName;
     }
 
     private Node calculateMultipleTypeConstraint(CompiledType baseType, MultipleTypeConstraints elements,

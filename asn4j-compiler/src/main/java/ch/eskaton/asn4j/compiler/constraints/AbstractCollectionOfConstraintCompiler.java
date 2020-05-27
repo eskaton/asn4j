@@ -86,7 +86,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.collections.Tuple3;
-import ch.eskaton.commons.functional.TriFunction;
 import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.Collections;
@@ -179,23 +178,16 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         this.typeName = typeName;
         this.collectionType = collectionType;
 
-        getDispatcher()
-                .withCase(ElementSet.class, args -> dispatchToCalculate(ElementSet.class,
-                        this::compileConstraint, args))
-                .withCase(SingleValueConstraint.class, args -> dispatchToCalculate(SingleValueConstraint.class,
-                        this::calculateSingleValueConstraint, args))
-                .withCase(ContainedSubtype.class, args -> dispatchToCalculate(ContainedSubtype.class,
-                        this::calculateContainedSubtype, args))
-                .withCase(SizeConstraint.class, args -> dispatchToCalculate(SizeConstraint.class,
-                        this::calculateSize, args))
-                .withCase(SingleTypeConstraint.class, args -> dispatchToCalculate(SingleTypeConstraint.class,
-                        this::calculateSingleTypeConstraint, args));
+        addConstraintHandler(ElementSet.class, this::compileConstraint);
+        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
+        addConstraintHandler(SizeConstraint.class, this::calculateSize);
+        addConstraintHandler(SingleTypeConstraint.class, this::calculateSingleTypeConstraint);
     }
 
-
     @Override
-    protected String getTypeName() {
-        return typeName.toString();
+    protected TypeName getTypeName() {
+        return typeName;
     }
 
     @Override

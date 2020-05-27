@@ -71,8 +71,8 @@ public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler
     }
 
     @Override
-    protected String getTypeName() {
-        return TypeName.RELATIVE_OID_IRI.toString();
+    protected TypeName getTypeName() {
+        return TypeName.RELATIVE_OID_IRI;
     }
 
 }
