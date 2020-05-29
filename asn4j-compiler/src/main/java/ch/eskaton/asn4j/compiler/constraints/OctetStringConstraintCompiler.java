@@ -28,11 +28,11 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.OctetStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.OctetStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -51,7 +51,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
@@ -63,7 +62,6 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBou
 import static ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BYTE_ARRAY;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 
 public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -75,7 +73,9 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         super(ctx);
 
         addConstraintHandler(ElementSet.class, this::compileConstraint);
-        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(SingleValueConstraint.class,
+                new SingleValueCompiler(ctx, OctetStringValue.class, OctetStringValueNode.class, getTypeName(),
+                        List.class)::compile);
         addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
         addConstraintHandler(SizeConstraint.class, this::calculateSize);
     }
@@ -90,21 +90,6 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         return constraint.map(c ->
                 new StringSizeBounds(getLowerBound(BOUNDS_VISITOR.visit(c.getRoots()).orElse(emptyList())),
                         getUpperBound(BOUNDS_VISITOR.visit(c.getRoots()).orElse(emptyList()))));
-    }
-
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
-            Optional<Bounds> bounds) {
-        Value value = elements.getValue();
-
-        try {
-            OctetStringValue octetStringValue = ctx
-                    .resolveGenericValue(OctetStringValue.class, baseType.getType(), value);
-
-            return new OctetStringValueNode(singletonList(octetStringValue));
-        } catch (Exception e) {
-            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                    value.getClass().getSimpleName(), TypeName.OCTET_STRING);
-        }
     }
 
     @Override

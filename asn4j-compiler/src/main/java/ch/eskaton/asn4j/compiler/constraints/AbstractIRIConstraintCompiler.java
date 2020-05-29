@@ -28,7 +28,6 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractIRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -44,18 +43,10 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
-import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
-import ch.eskaton.asn4j.parser.ast.constraints.SingleTypeConstraint;
-import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
-import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +54,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING_ARRAY;
-import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 
 public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNode>
@@ -73,7 +63,6 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
         super(ctx);
 
         addConstraintHandler(ElementSet.class, this::compileConstraint);
-        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
         addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
         addConstraintHandler(SizeConstraint.class, this::calculateSize);
     }
@@ -81,20 +70,6 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     @Override
     Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
         return Optional.empty();
-    }
-
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
-            Optional<Bounds> bounds) {
-        AbstractIRIValueResolver resolver = getValueResolver();
-        Value value = elements.getValue();
-        AbstractIRIValue iriValue = (AbstractIRIValue) resolver.resolveValue(ctx, value, getValueClass());
-
-        if (iriValue != null) {
-            return createNode(singleton(resolver.resolveComponents(ctx, iriValue)));
-        } else {
-            throw new CompilerException("Invalid single-value constraint %s for %s type",
-                    value.getClass().getSimpleName(), getTypeName());
-        }
     }
 
     @Override
@@ -133,9 +108,5 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     }
 
     protected abstract N createNode(Set<List<String>> value);
-
-    protected abstract Class<? extends AbstractIRIValue> getValueClass();
-
-    protected abstract AbstractIRIValueResolver getValueResolver();
 
 }

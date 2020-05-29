@@ -28,10 +28,9 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.elements.EnumeratedTypeSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.EnumeratedTypeConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
@@ -50,9 +49,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.HashSet;
@@ -70,7 +67,8 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
         super(ctx);
 
         addConstraintHandler(ElementSet.class, this::compileConstraint);
-        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(SingleValueConstraint.class,
+                new EnumeratedTypeSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
         addConstraintHandler(SizeConstraint.class, this::calculateSize);
     }
@@ -78,37 +76,6 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     @Override
     protected TypeName getTypeName() {
         return TypeName.ENUMERATED;
-    }
-
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
-            Optional<Bounds> bounds) {
-        var compiledEnumeratedType = (CompiledEnumeratedType) baseType;
-        var value = elements.getValue();
-
-        try {
-            SimpleDefinedValue definedValue = CompilerUtils.resolveAmbiguousValue(value, SimpleDefinedValue.class);
-            Integer enumValue;
-
-            if (definedValue != null) {
-                EnumerationItems allItems = compiledEnumeratedType.getRoots().copy()
-                        .addAll(compiledEnumeratedType.getAdditions().getItems());
-                Optional<Tuple2<String, Integer>> enumItem = allItems.getItems().stream()
-                        .filter(t -> t.get_1().equals(definedValue.getValue())).findAny();
-
-                if (enumItem.isPresent()) {
-                    enumValue = enumItem.get().get_2();
-                } else {
-                    throw new CompilerException("Failed to resolve enum value: " + definedValue.getValue());
-                }
-            } else {
-                throw new CompilerException("Failed to resolve value: ", value.getClass().getSimpleName());
-            }
-
-            return new EnumeratedValueNode(Sets.<Integer>builder().add(enumValue).build());
-        } catch (Exception e) {
-            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                    value.getClass().getSimpleName(), TypeName.ENUMERATED);
-        }
     }
 
     @Override

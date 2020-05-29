@@ -28,7 +28,6 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractOIDValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -43,21 +42,15 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER_ARRAY;
-import static java.util.Collections.singleton;
 import static java.util.Optional.of;
 
 public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNode>
@@ -67,22 +60,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
         super(ctx);
 
         addConstraintHandler(ElementSet.class, this::compileConstraint);
-        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
         addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
-    }
-
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
-            Optional<Bounds> bounds) {
-        AbstractOIDValueResolver resolver = getValueResolver();
-        Value value = elements.getValue();
-        AbstractOIDValue oidValue = (AbstractOIDValue) resolver.resolveValue(ctx, value, getValueClass());
-
-        if (oidValue != null) {
-            return createNode(singleton(resolver.resolveComponents(ctx, oidValue)));
-        } else {
-            throw new CompilerException("Invalid single-value constraint %s for " + getTypeName() + " type",
-                    value.getClass().getSimpleName());
-        }
     }
 
     @Override
@@ -121,11 +99,5 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
         return new BooleanFunctionCall.ArrayEquals(new Variable("value"),
                 new ILValue(value.stream().mapToInt(Integer::intValue).toArray()));
     }
-
-    protected abstract N createNode(Set<List<Integer>> value);
-
-    protected abstract Class<? extends AbstractOIDValue> getValueClass();
-
-    protected abstract AbstractOIDValueResolver getValueResolver();
 
 }

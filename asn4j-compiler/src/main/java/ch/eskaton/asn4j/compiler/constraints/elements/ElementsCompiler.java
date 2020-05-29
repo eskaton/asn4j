@@ -25,44 +25,19 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.resolvers;
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.compiler.constraints.Bounds;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 
-import java.util.List;
+import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+public interface ElementsCompiler<C extends Elements> {
 
-public abstract class AbstractOIDOrIRIValueResolver<T extends Type, V extends Value>
-        extends DefaultValueResolver<T, V> {
-
-    public AbstractOIDOrIRIValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
-        super(ctx, typeClass, valueClass);
-    }
-
-    public V resolveValue(CompilerContext ctx, Value value, Class<V> valueClass) {
-        V idValue;
-
-        if (valueClass.isAssignableFrom(value.getClass())) {
-            idValue = (V) value;
-        } else if ((idValue = resolveAmbiguousValue(value, valueClass)) != null) {
-            // do nothing
-        } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
-            idValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
-        } else {
-            throw new CompilerException("Invalid %s value: %s", getTypeName(), value);
-        }
-
-        return idValue;
-    }
-
-    protected abstract TypeName getTypeName();
-
-    public abstract <U> List<U> resolveComponents(CompilerContext ctx, V value);
+    Node compile(CompiledType baseType, C elements, Optional<Bounds> bounds);
 
 }
+
+
