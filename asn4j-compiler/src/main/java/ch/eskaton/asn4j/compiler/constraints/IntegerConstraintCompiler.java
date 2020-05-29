@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.IntegerSingleValueCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.ValueRangeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerValueBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -50,7 +51,6 @@ import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.math.BigInteger;
@@ -62,7 +62,6 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBou
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BIG_INTEGER;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 
 public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
 
@@ -74,7 +73,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(SingleValueConstraint.class, new IntegerSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
-        addConstraintHandler(RangeNode.class, this::calculateRangeNode);
+        addConstraintHandler(RangeNode.class, new ValueRangeCompiler(ctx)::compile);
     }
 
     @Override
@@ -87,17 +86,6 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     @Override
     protected TypeName getTypeName() {
         return TypeName.INTEGER;
-    }
-
-    private Node calculateRangeNode(CompiledType compiledType, RangeNode elements, Optional<Bounds> bounds) {
-        long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
-        long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
-
-        IntegerValue lower = elements.getLower().getLowerEndPointValue(min);
-        IntegerValue upper = elements.getUpper().getUpperEndPointValue(max);
-
-        return new IntegerRangeValueNode(singletonList(new IntegerRange(lower.getValue().longValue(), upper
-                .getValue().longValue())));
     }
 
     @Override
