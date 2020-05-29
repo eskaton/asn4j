@@ -35,7 +35,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.CollectionContainedSubtypeCompiler;
-import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.MultipleTypeConstraintsCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -61,8 +61,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
-import ch.eskaton.asn4j.parser.ast.constraints.NamedConstraint;
-import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
@@ -91,7 +89,6 @@ import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -186,53 +183,12 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                 new SingleValueCompiler(ctx, CollectionValue.class, CollectionValueNode.class, getTypeName(),
                         Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new CollectionContainedSubtypeCompiler(ctx)::compile);
-        addConstraintHandler(MultipleTypeConstraints.class, this::calculateMultipleTypeConstraint);
+        addConstraintHandler(MultipleTypeConstraints.class, new MultipleTypeConstraintsCompiler(ctx)::compile);
     }
 
     @Override
     protected TypeName getTypeName() {
         return typeName;
-    }
-
-    private Node calculateMultipleTypeConstraint(CompiledType baseType, MultipleTypeConstraints elements,
-            Optional<Bounds> bounds) {
-        var compiledCollectionType = (CompiledCollectionType) baseType;
-
-        var components = compiledCollectionType.getComponents();
-        var componentNodes = new HashSet<ComponentNode>();
-        var lastIndex = -1;
-
-        for (var constraint : elements.getConstraints()) {
-            var name = constraint.getName();
-            var index = StreamsUtils.indexOf(components, (c) -> Objects.equals(name, c.get_1()));
-
-            if (index != -1 && index > lastIndex) {
-                lastIndex = index;
-            } else {
-                throw new CompilerException("Component '%s' not found in type '%s'", name,
-                        compiledCollectionType.getName());
-            }
-
-            componentNodes.add(calculateComponentConstraint(components.get(index).get_2(), constraint));
-        }
-
-        return new WithComponentsNode(componentNodes);
-    }
-
-    private ComponentNode calculateComponentConstraint(CompiledType compiledType, NamedConstraint namedConstraint) {
-        var name = namedConstraint.getName();
-        var constraint = namedConstraint.getConstraint();
-        var presence = Optional.ofNullable(constraint.getPresence()).map(PresenceConstraint::getType).orElse(null);
-        var valueConstraint = constraint.getValue().getConstraint();
-        var definition = ctx.compileConstraint(compiledType);
-
-        if (definition != null) {
-            definition = definition.serialApplication(ctx.compileConstraint(compiledType, valueConstraint));
-        } else {
-            definition = ctx.compileConstraint(compiledType, valueConstraint);
-        }
-
-        return new ComponentNode(name, compiledType.getType(), definition.getRoots(), presence);
     }
 
     @Override
@@ -470,6 +426,5 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
         return singletonList(new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameter), VAR_VALUES));
     }
-
 
 }
