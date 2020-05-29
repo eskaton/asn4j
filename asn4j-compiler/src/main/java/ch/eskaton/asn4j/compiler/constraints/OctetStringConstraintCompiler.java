@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.OctetStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.OctetStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -78,7 +79,8 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
                 new SingleValueCompiler(ctx, OctetStringValue.class, OctetStringValueNode.class, getTypeName(),
                         List.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
-        addConstraintHandler(SizeConstraint.class, this::calculateSize);
+        addConstraintHandler(SizeConstraint.class,
+                new SizeCompiler(ctx, new IntegerConstraintCompiler(ctx)::calculateElements)::compile);
     }
 
     @Override

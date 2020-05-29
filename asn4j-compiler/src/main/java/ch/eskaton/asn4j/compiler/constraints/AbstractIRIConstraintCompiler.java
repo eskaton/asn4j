@@ -47,7 +47,6 @@ import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 
 import java.util.List;
 import java.util.Optional;
@@ -65,7 +64,6 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
         addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
-        addConstraintHandler(SizeConstraint.class, this::calculateSize);
     }
 
     @Override
