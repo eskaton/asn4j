@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.elements.EnumeratedTypeContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.EnumeratedTypeSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.EnumeratedTypeConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -41,20 +42,14 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
-import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.compiler.results.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
-import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -69,35 +64,13 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
         addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(SingleValueConstraint.class,
                 new EnumeratedTypeSingleValueCompiler(ctx, getTypeName())::compile);
-        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
+        addConstraintHandler(ContainedSubtype.class, new EnumeratedTypeContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class, this::calculateSize);
     }
 
     @Override
     protected TypeName getTypeName() {
         return TypeName.ENUMERATED;
-    }
-
-    @Override
-    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        return super.isAssignable(compiledType, compiledParentType) && Objects
-                .equals(getItems(compiledType), getItems(compiledParentType));
-    }
-
-    private Object getItems(CompiledType compiledType) {
-        if (compiledType instanceof CompiledEnumeratedType) {
-            return getItemsAux(compiledType);
-        }
-
-        return getItemsAux(ctx.getCompiledBaseType(compiledType.getType()));
-    }
-
-    private Object getItemsAux(CompiledType compiledType) {
-        EnumerationItems roots = ((CompiledEnumeratedType) compiledType).getRoots();
-        EnumerationItems additions = ((CompiledEnumeratedType) compiledType).getAdditions();
-
-        return new Tuple2<>(((EnumeratedType) compiledType.getType()).isExtensible(),
-                new HashSet<>(roots.copy().addAll(additions.getItems()).getItems()));
     }
 
     @Override

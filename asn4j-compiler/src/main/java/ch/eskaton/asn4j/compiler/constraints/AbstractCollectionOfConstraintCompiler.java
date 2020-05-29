@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionOfConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -90,7 +91,6 @@ import ch.eskaton.commons.utils.Dispatcher;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -180,7 +180,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         addConstraintHandler(SingleValueConstraint.class,
                 new SingleValueCompiler(ctx, CollectionOfValue.class, CollectionOfValueNode.class, getTypeName(),
                         Set.class)::compile);
-        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
+        addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class, this::calculateSize);
         addConstraintHandler(SingleTypeConstraint.class, this::calculateSingleTypeConstraint);
     }
@@ -239,22 +239,6 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         }
 
         return new WithComponentNode(componentType, definition.getRoots());
-    }
-
-    @Override
-    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        return super.isAssignable(compiledType, compiledParentType) && Objects
-                .equals(getComponentClass(compiledType), getComponentClass(compiledParentType));
-    }
-
-    private Optional<Class<?>> getComponentClass(CompiledType compiledType) {
-        var type = compiledType.getType();
-
-        if (!(type instanceof CollectionOfType)) {
-            return Optional.empty();
-        }
-
-        return Optional.of(ctx.resolveTypeReference(((CollectionOfType) type).getType()).getClass());
     }
 
     @Override
