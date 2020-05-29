@@ -30,11 +30,9 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.elements.IRISingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IRIConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.IRIValue;
+import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
@@ -42,12 +40,10 @@ import java.util.Set;
 
 public class IRIConstraintCompiler extends AbstractIRIConstraintCompiler<IRIValueNode> {
 
-    private final IRIValueResolver valueResolver;
-
     public IRIConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        valueResolver = new IRIValueResolver(ctx);
+        addConstraintHandler(SingleValueConstraint.class, new IRISingleValueCompiler(ctx, getTypeName())::compile);
     }
 
     @Override
@@ -58,16 +54,6 @@ public class IRIConstraintCompiler extends AbstractIRIConstraintCompiler<IRIValu
     @Override
     protected IRIValueNode createNode(Set<List<String>> value) {
         return new IRIValueNode(value);
-    }
-
-    @Override
-    protected Class<? extends AbstractIRIValue> getValueClass() {
-        return IRIValue.class;
-    }
-
-    @Override
-    protected AbstractIRIValueResolver getValueResolver() {
-        return valueResolver;
     }
 
     @Override

@@ -30,38 +30,18 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.RelativeOIDSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeOIDConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
+import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import java.util.List;
-import java.util.Set;
-
 public class RelativeOIDConstraintCompiler extends AbstractOIDConstraintCompiler<RelativeOIDValueNode> {
-
-    private final RelativeOIDValueResolver valueResolver;
 
     public RelativeOIDConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        valueResolver = new RelativeOIDValueResolver(ctx);
-    }
-
-    @Override
-    protected RelativeOIDValueNode createNode(Set<List<Integer>> value) {
-        return new RelativeOIDValueNode(value);
-    }
-
-    @Override
-    protected Class<RelativeOIDValue> getValueClass() {
-        return RelativeOIDValue.class;
-    }
-
-    @Override
-    protected AbstractOIDValueResolver getValueResolver() {
-        return valueResolver;
+        addConstraintHandler(SingleValueConstraint.class,
+                new RelativeOIDSingleValueCompiler(ctx, getTypeName())::compile);
     }
 
     @Override

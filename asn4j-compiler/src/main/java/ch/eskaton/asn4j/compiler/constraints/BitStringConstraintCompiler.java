@@ -28,11 +28,11 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.BitStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -52,7 +52,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
@@ -65,7 +64,6 @@ import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BYTE_ARRAY;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 
 public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
@@ -80,7 +78,9 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         super(ctx);
 
         addConstraintHandler(ElementSet.class, this::compileConstraint);
-        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(SingleValueConstraint.class,
+                new SingleValueCompiler(ctx, BitStringValue.class, BitStringValueNode.class, getTypeName(),
+                        List.class)::compile);
         addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
         addConstraintHandler(SizeConstraint.class, this::calculateSize);
     }
@@ -95,22 +95,6 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     @Override
     protected TypeName getTypeName() {
         return TypeName.BIT_STRING;
-    }
-
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
-            Optional<Bounds> bounds) {
-        Value value = elements.getValue();
-
-        try {
-            // TODO: implement a more convenient resolver
-            BitStringValue bitStringValue = ctx
-                    .resolveGenericValue(BitStringValue.class, baseType.getType(), value);
-
-            return new BitStringValueNode(singletonList(bitStringValue));
-        } catch (Exception e) {
-            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                    value.getClass().getSimpleName(), getTypeName());
-        }
     }
 
     @Override

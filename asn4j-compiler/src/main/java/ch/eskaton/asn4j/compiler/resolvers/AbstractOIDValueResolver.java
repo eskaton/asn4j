@@ -73,6 +73,4 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
         return ctx.resolveValue(IntegerValue.class, component.getName()).getValue().intValue();
     }
 
-    public abstract List<Integer> resolveComponents(CompilerContext ctx, V value);
-
 }

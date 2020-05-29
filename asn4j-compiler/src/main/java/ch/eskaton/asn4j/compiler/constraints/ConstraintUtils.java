@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.constraints;
 
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
 import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
@@ -46,7 +47,7 @@ public class ConstraintUtils {
     }
 
     public static <T> T throwUnimplementedNodeType(Node node) {
-        throw new IllegalStateException("Unimplemented node type: " + node.getType());
+        throw new IllegalCompilerStateException("Unimplemented node type: %s", node.getType());
     }
 
     public static Parameter getMapParameter() {

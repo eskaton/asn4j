@@ -28,10 +28,10 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.elements.IntegerSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerValueBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -50,7 +50,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.math.BigInteger;
@@ -72,7 +71,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
         super(ctx);
 
         addConstraintHandler(ElementSet.class, this::compileConstraint);
-        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(SingleValueConstraint.class, new IntegerSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
         addConstraintHandler(RangeNode.class, this::calculateRangeNode);
     }
@@ -87,21 +86,6 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     @Override
     protected TypeName getTypeName() {
         return TypeName.INTEGER;
-    }
-
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
-            Optional<Bounds> bounds) {
-        Value value = elements.getValue();
-
-        try {
-            IntegerValue intValue = ctx.resolveGenericValue(IntegerValue.class, baseType.getType(), value);
-            long longValue = intValue.getValue().longValue();
-
-            return new IntegerRangeValueNode((singletonList(new IntegerRange(longValue, longValue))));
-        } catch (Exception e) {
-            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                    value.getClass().getSimpleName(), TypeName.INTEGER);
-        }
     }
 
     private Node calculateRangeNode(CompiledType compiledType, RangeNode elements, Optional<Bounds> bounds) {

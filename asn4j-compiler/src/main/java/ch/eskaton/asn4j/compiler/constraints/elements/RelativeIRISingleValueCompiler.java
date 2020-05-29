@@ -24,45 +24,30 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package ch.eskaton.asn4j.compiler.resolvers;
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
+import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
+import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import java.util.List;
+import java.util.Set;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+public class RelativeIRISingleValueCompiler extends AbstractIRISingleValueCompiler<RelativeIRIValue, RelativeIRIValueNode> {
 
-public abstract class AbstractOIDOrIRIValueResolver<T extends Type, V extends Value>
-        extends DefaultValueResolver<T, V> {
+    private final RelativeIRIValueResolver valueResolver;
 
-    public AbstractOIDOrIRIValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
-        super(ctx, typeClass, valueClass);
+    public RelativeIRISingleValueCompiler(CompilerContext ctx, TypeName typeName) {
+        super(ctx, RelativeIRIValue.class, RelativeIRIValueNode.class, typeName);
+
+        this.valueResolver = new RelativeIRIValueResolver(ctx);
     }
 
-    public V resolveValue(CompilerContext ctx, Value value, Class<V> valueClass) {
-        V idValue;
-
-        if (valueClass.isAssignableFrom(value.getClass())) {
-            idValue = (V) value;
-        } else if ((idValue = resolveAmbiguousValue(value, valueClass)) != null) {
-            // do nothing
-        } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
-            idValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
-        } else {
-            throw new CompilerException("Invalid %s value: %s", getTypeName(), value);
-        }
-
-        return idValue;
+    @Override
+    protected AbstractIRIValueResolver getValueResolver() {
+        return valueResolver;
     }
-
-    protected abstract TypeName getTypeName();
-
-    public abstract <U> List<U> resolveComponents(CompilerContext ctx, V value);
 
 }

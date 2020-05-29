@@ -103,7 +103,7 @@ public abstract class AbstractConstraintCompiler {
         return dispatcher;
     }
 
-    protected <T extends Elements> Node dispatchToCalculate(Class<T> clazz,
+    protected <T extends Elements> Node dispatchToCompiler(Class<T> clazz,
             TriFunction<CompiledType, T, Optional<Bounds>, Node> function,
             Optional<Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>> args) {
         return function.apply(args.get().get_1(), clazz.cast(args.get().get_2()), args.get().get_3());
@@ -111,7 +111,7 @@ public abstract class AbstractConstraintCompiler {
 
     protected <T extends Elements> void addConstraintHandler(Class<T> clazz,
             TriFunction<CompiledType, T, Optional<Bounds>, Node> function) {
-        getDispatcher().withCase(clazz, a -> dispatchToCalculate(clazz, function, a));
+        getDispatcher().withCase(clazz, a -> dispatchToCompiler(clazz, function, a));
     }
 
     protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {

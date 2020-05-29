@@ -24,45 +24,34 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package ch.eskaton.asn4j.compiler.resolvers;
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.compiler.constraints.ast.AbstractOIDValueNode;
+import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
+import java.util.Set;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+public abstract class AbstractOIDSingleValueCompiler<V extends AbstractOIDValue, N extends AbstractOIDValueNode>
+        extends SingleValueCompiler<V, N> {
 
-public abstract class AbstractOIDOrIRIValueResolver<T extends Type, V extends Value>
-        extends DefaultValueResolver<T, V> {
-
-    public AbstractOIDOrIRIValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
-        super(ctx, typeClass, valueClass);
+    public AbstractOIDSingleValueCompiler(CompilerContext ctx, Class<V> valueClazz, Class<N> valueNodeClazz,
+            TypeName typeName) {
+        super(ctx, valueClazz, valueNodeClazz, typeName, Set.class);
     }
 
-    public V resolveValue(CompilerContext ctx, Value value, Class<V> valueClass) {
-        V idValue;
+    @Override
+    protected List<Integer> resolveValue(CompiledType baseType, SingleValueConstraint elements) {
+        var value = getValueResolver().resolveValue(ctx, elements.getValue(), valueClazz);
 
-        if (valueClass.isAssignableFrom(value.getClass())) {
-            idValue = (V) value;
-        } else if ((idValue = resolveAmbiguousValue(value, valueClass)) != null) {
-            // do nothing
-        } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
-            idValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
-        } else {
-            throw new CompilerException("Invalid %s value: %s", getTypeName(), value);
-        }
-
-        return idValue;
+        return getValueResolver().resolveComponents(ctx, (AbstractOIDValue) value);
     }
 
-    protected abstract TypeName getTypeName();
-
-    public abstract <U> List<U> resolveComponents(CompilerContext ctx, V value);
+    protected abstract AbstractOIDValueResolver getValueResolver();
 
 }

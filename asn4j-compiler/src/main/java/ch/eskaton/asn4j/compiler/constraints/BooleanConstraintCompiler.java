@@ -28,9 +28,9 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.BooleanSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
@@ -44,8 +44,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.Optional;
@@ -58,7 +56,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
         super(ctx);
 
         addConstraintHandler(ElementSet.class, this::compileConstraint);
-        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(SingleValueConstraint.class, new BooleanSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
     }
 
@@ -70,18 +68,6 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     @Override
     Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
         return Optional.empty();
-    }
-
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
-            Optional<Bounds> bounds) {
-        Value value = elements.getValue();
-
-        if (value instanceof BooleanValue) {
-            return new ValueNode<>(((BooleanValue) value).getValue());
-        } else {
-            throw new CompilerException("Invalid single-value constraint %s for %s type",
-                    value.getClass().getSimpleName(), TypeName.BOOLEAN);
-        }
     }
 
     @Override

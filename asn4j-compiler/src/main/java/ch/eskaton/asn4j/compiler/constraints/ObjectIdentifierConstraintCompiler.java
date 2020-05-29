@@ -30,44 +30,24 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.ObjectIdentifierSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.ObjectIdentifierConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-
-import java.util.List;
-import java.util.Set;
 
 public class ObjectIdentifierConstraintCompiler extends AbstractOIDConstraintCompiler<ObjectIdentifierValueNode> {
 
-    private final ObjectIdentifierValueResolver valueResolver;
 
     public ObjectIdentifierConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        valueResolver = new ObjectIdentifierValueResolver(ctx);
+        addConstraintHandler(SingleValueConstraint.class,
+                new ObjectIdentifierSingleValueCompiler(ctx, getTypeName())::compile);
     }
 
     @Override
     protected Node optimize(Node node) {
         return new ObjectIdentifierConstraintOptimizingVisitor().visit(node);
-    }
-
-    @Override
-    protected ObjectIdentifierValueNode createNode(Set<List<Integer>> value) {
-        return new ObjectIdentifierValueNode(value);
-    }
-
-    @Override
-    protected Class<? extends AbstractOIDValue> getValueClass() {
-        return ObjectIdentifierValue.class;
-    }
-
-    @Override
-    protected AbstractOIDValueResolver getValueResolver() {
-        return valueResolver;
     }
 
     @Override

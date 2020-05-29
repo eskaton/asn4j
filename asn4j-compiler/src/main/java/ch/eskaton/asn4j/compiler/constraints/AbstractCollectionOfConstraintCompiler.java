@@ -28,13 +28,13 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionOfConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
@@ -67,7 +67,6 @@ import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
@@ -118,7 +117,6 @@ import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.NULL;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING_ARRAY;
 import static ch.eskaton.commons.utils.StringUtils.initCap;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.of;
 
@@ -179,7 +177,9 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         this.collectionType = collectionType;
 
         addConstraintHandler(ElementSet.class, this::compileConstraint);
-        addConstraintHandler(SingleValueConstraint.class, this::calculateSingleValueConstraint);
+        addConstraintHandler(SingleValueConstraint.class,
+                new SingleValueCompiler(ctx, CollectionOfValue.class, CollectionOfValueNode.class, getTypeName(),
+                        Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
         addConstraintHandler(SizeConstraint.class, this::calculateSize);
         addConstraintHandler(SingleTypeConstraint.class, this::calculateSingleTypeConstraint);
@@ -239,21 +239,6 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         }
 
         return new WithComponentNode(componentType, definition.getRoots());
-    }
-
-    private Node calculateSingleValueConstraint(CompiledType baseType, SingleValueConstraint elements,
-            Optional<Bounds> bounds) {
-        Value value = elements.getValue();
-
-        try {
-            CollectionOfValue collectionOfValue = ctx.resolveGenericValue(CollectionOfValue.class,
-                    baseType.getType(), value);
-
-            return new CollectionOfValueNode(singleton(collectionOfValue));
-        } catch (Exception e) {
-            throw new CompilerException("Invalid single-value constraint %s for %s type", e,
-                    value.getClass().getSimpleName(), typeName);
-        }
     }
 
     @Override
