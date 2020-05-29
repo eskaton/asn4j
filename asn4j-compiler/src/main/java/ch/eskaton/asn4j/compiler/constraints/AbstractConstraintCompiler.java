@@ -281,7 +281,7 @@ public abstract class AbstractConstraintCompiler {
     protected Node calculateExclude(Node values1, Node values2) {
         return new BinOpNode(COMPLEMENT, values1, values2);
     }
-    
+
     protected SizeNode calculateSize(CompiledType baseType, SizeConstraint sizeConstraint, Optional<Bounds> bounds) {
         var constraint = sizeConstraint.getConstraint();
 
