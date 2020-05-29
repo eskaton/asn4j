@@ -34,6 +34,8 @@ import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.CollectionContainedSubtypeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -63,10 +65,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.NamedConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
-import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
-import ch.eskaton.asn4j.parser.ast.types.ComponentType;
-import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
@@ -92,7 +91,6 @@ import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -187,7 +185,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         addConstraintHandler(SingleValueConstraint.class,
                 new SingleValueCompiler(ctx, CollectionValue.class, CollectionValueNode.class, getTypeName(),
                         Set.class)::compile);
-        addConstraintHandler(ContainedSubtype.class, this::calculateContainedSubtype);
+        addConstraintHandler(ContainedSubtype.class, new CollectionContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(MultipleTypeConstraints.class, this::calculateMultipleTypeConstraint);
     }
 
@@ -235,18 +233,6 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         }
 
         return new ComponentNode(name, compiledType.getType(), definition.getRoots(), presence);
-    }
-
-    @Override
-    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        return super.isAssignable(compiledType, compiledParentType) && Objects
-                .equals(getElementTypes(compiledType), getElementTypes(compiledParentType));
-    }
-
-    private Map<String, Class<? extends ch.eskaton.asn4j.parser.ast.Node>> getElementTypes(CompiledType compiledType) {
-        return ((Collection) compiledType.getType()).getAllRootComponents().stream()
-                .map(ComponentType::getNamedType)
-                .collect(Collectors.toMap(NamedType::getName, nt -> ctx.resolveTypeReference(nt.getType()).getClass()));
     }
 
     @Override

@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
@@ -49,7 +48,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
-import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
@@ -63,7 +61,6 @@ import ch.eskaton.commons.functional.TriFunction;
 import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.OptionalUtils;
 
-import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -77,7 +74,6 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
-import static ch.eskaton.asn4j.compiler.utils.TypeFormatter.formatType;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static java.util.Optional.of;
 
@@ -285,55 +281,7 @@ public abstract class AbstractConstraintCompiler {
     protected Node calculateExclude(Node values1, Node values2) {
         return new BinOpNode(COMPLEMENT, values1, values2);
     }
-
-    protected Node calculateContainedSubtype(CompiledType compiledType, ContainedSubtype elements,
-            Optional<Bounds> bounds) {
-        CompiledType compiledParentType;
-        var parent = elements.getType();
-        var constraints = new ArrayDeque<Node>();
-
-        do {
-            compiledParentType = ctx.getCompiledType(parent);
-
-            if (!isAssignable(compiledType, compiledParentType)) {
-                throw new CompilerException("Type %s can't be used in INCLUDES constraint of type %s",
-                        formatType(ctx, compiledParentType.getType()), formatType(ctx, compiledType.getType()));
-            }
-
-            if (compiledParentType.getConstraintDefinition() != null) {
-                constraints.push(compiledParentType.getConstraintDefinition().getRoots());
-            }
-
-            parent = compiledParentType.getType();
-        } while (parent instanceof TypeReference);
-
-        if (constraints.isEmpty()) {
-            return new AllValuesNode();
-        } else if (constraints.size() == 1) {
-            return constraints.pop();
-        } else {
-            Node node1 = constraints.pop();
-            Node node2 = constraints.pop();
-
-            do {
-                node1 = new BinOpNode(NodeType.INTERSECTION, node1, node2);
-
-                if (constraints.isEmpty()) {
-                    break;
-                }
-
-                node2 = constraints.pop();
-            } while (true);
-
-            return node1;
-        }
-    }
-
-    protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        return compiledType.getType().getClass()
-                .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
-    }
-
+    
     protected SizeNode calculateSize(CompiledType baseType, SizeConstraint sizeConstraint, Optional<Bounds> bounds) {
         var constraint = sizeConstraint.getConstraint();
 
