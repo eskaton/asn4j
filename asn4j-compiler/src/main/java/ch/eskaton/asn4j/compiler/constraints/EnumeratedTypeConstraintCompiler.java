@@ -46,7 +46,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
@@ -65,7 +64,6 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
         addConstraintHandler(SingleValueConstraint.class,
                 new EnumeratedTypeSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, new EnumeratedTypeContainedSubtypeCompiler(ctx)::compile);
-        addConstraintHandler(SizeConstraint.class, this::calculateSize);
     }
 
     @Override

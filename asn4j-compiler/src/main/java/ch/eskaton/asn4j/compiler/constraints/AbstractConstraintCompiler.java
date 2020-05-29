@@ -33,7 +33,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
@@ -46,13 +45,11 @@ import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
-import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
-import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -74,7 +71,6 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
-import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static java.util.Optional.of;
 
 public abstract class AbstractConstraintCompiler {
@@ -280,32 +276,6 @@ public abstract class AbstractConstraintCompiler {
 
     protected Node calculateExclude(Node values1, Node values2) {
         return new BinOpNode(COMPLEMENT, values1, values2);
-    }
-
-    protected SizeNode calculateSize(CompiledType baseType, SizeConstraint sizeConstraint, Optional<Bounds> bounds) {
-        var constraint = sizeConstraint.getConstraint();
-
-        if (constraint instanceof SubtypeConstraint) {
-            SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
-
-            Node node = new IntegerConstraintCompiler(ctx).calculateElements(
-                    ctx.getCompiledBaseType(new IntegerType(NO_POSITION)), setSpecs.getRootElements(),
-                    Optional.of(bounds.map(b -> new IntegerValueBounds(Math.max(0, ((SizeBounds) b).getMinSize()),
-                            ((SizeBounds) b).getMaxSize()))
-                            .orElse(new IntegerValueBounds(0L, Long.MAX_VALUE))));
-
-            Optional<SizeNode> maybeSizes = new SizeVisitor().visit(node);
-
-            if (!maybeSizes.isPresent() || maybeSizes.get().getSize().isEmpty()) {
-                throw new CompilerException(setSpecs.getPosition(),
-                        "Invalid SIZE constraint. It contains no restrictions.");
-            }
-
-            return maybeSizes.get();
-        } else {
-            throw new CompilerException("Constraints of type %s not yet supported",
-                    constraint.getClass().getSimpleName());
-        }
     }
 
     protected abstract void addConstraint(CompiledType type, Module module, ConstraintDefinition definition);

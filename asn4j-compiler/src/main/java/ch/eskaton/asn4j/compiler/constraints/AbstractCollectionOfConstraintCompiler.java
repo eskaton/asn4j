@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleTypeConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionOfConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
@@ -182,7 +183,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                 new SingleValueCompiler(ctx, CollectionOfValue.class, CollectionOfValueNode.class, getTypeName(),
                         Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
-        addConstraintHandler(SizeConstraint.class, this::calculateSize);
+        addConstraintHandler(SizeConstraint.class,
+                new SizeCompiler(ctx, new IntegerConstraintCompiler(ctx)::calculateElements)::compile);
         addConstraintHandler(SingleTypeConstraint.class, new SingleTypeConstraintCompiler(ctx)::compile);
     }
 
