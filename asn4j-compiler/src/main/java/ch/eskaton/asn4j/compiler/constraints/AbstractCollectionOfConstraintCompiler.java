@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.SingleTypeConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionOfConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -182,7 +183,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                         Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class, this::calculateSize);
-        addConstraintHandler(SingleTypeConstraint.class, this::calculateSingleTypeConstraint);
+        addConstraintHandler(SingleTypeConstraint.class, new SingleTypeConstraintCompiler(ctx)::compile);
     }
 
     @Override
@@ -223,22 +224,6 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
         return getDispatcher().withComparator((t, c) -> c.isInstance(t))
                 .execute(elements, new Tuple3<>(baseType, elements, bounds));
-    }
-
-    private Node calculateSingleTypeConstraint(CompiledType baseType, SingleTypeConstraint elements,
-            Optional<Bounds> bounds) {
-        Type componentType = ((CollectionOfType) baseType.getType()).getType();
-
-        ConstraintDefinition definition = ctx.compileConstraint(ctx.getCompiledType(componentType));
-
-        if (definition != null) {
-            definition = definition.serialApplication(
-                    ctx.compileConstraint(componentType, elements.getConstraint()));
-        } else {
-            definition = ctx.compileConstraint(componentType, elements.getConstraint());
-        }
-
-        return new WithComponentNode(componentType, definition.getRoots());
     }
 
     @Override
