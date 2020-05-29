@@ -355,29 +355,19 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
             WithComponentNode node) {
         var compiledBaseType = (CompiledCollectionOfType) ctx.getCompiledBaseType(compiledType);
         var compiledContentType = ctx.getCompiledBaseType(compiledBaseType.getContentType());
+        var maybeExpression = ctx.buildExpression(module, compiledContentType, node.getConstraint());
+        var expression = maybeExpression.orElseThrow(
+                () -> new IllegalCompilerStateException("Expected expression in %s"));
+        var expressionSym = module.generateSymbol(FUNC_EXPRESSION);
+        var parameterizedType = ctx.getParameterizedType(node.getComponentType());
+        var typeParameters = parameterizedType.stream().skip(1).collect(Collectors.toList());
+        var parameterDefinition = getParameterDefinition(compiledBaseType, parameterizedType.get(0), typeParameters);
 
-        Optional<BooleanExpression> expression = ctx
-                .buildExpression(module, compiledContentType, node.getConstraint());
+        ConstraintUtils.buildExpressionFunction(module, expression, expressionSym, parameterDefinition);
 
-        String expressionSym = module.generateSymbol(FUNC_EXPRESSION);
-
-        List<String> parameterizedType = ctx.getParameterizedType(node.getComponentType());
-        List<String> typeParameters = parameterizedType.stream().skip(1).collect(Collectors.toList());
-        List<Parameter> parameters = getParameterDefinition(compiledBaseType, parameterizedType.get(0), typeParameters);
-
-        // @formatter:off
-        module.function()
-                .returnType(ILType.of(BOOLEAN))
-                .name(expressionSym)
-                .parameters(parameters)
-                .statements()
-                    .returnExpression(expression.orElseThrow(() -> new IllegalCompilerStateException("Expected expression in %s")))
-                    .build()
-                .build();
-        // @formatter:on
+        var functionCall = new BooleanFunctionCall(Optional.of(expressionSym), getParameters(compiledContentType));
 
         String checkSym = module.generateSymbol(FUNC_CHECK_CONSTRAINT);
-        BooleanFunctionCall functionCall = new BooleanFunctionCall(Optional.of(expressionSym), getParameters(compiledContentType));
 
         // @formatter:off
         module.function()
@@ -433,7 +423,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         return new FunctionCall(Optional.of(function), Optional.of(new Variable(object)));
     }
 
-    private List<Parameter> getParameterDefinition(CompiledCollectionOfType compiledBaseType, String type, List<String> typeParameters) {
+    private List<Parameter> getParameterDefinition(CompiledCollectionOfType compiledBaseType, String type,
+            List<String> typeParameters) {
         List<Parameter> parameters;
 
         if (typeParameters.isEmpty()) {
