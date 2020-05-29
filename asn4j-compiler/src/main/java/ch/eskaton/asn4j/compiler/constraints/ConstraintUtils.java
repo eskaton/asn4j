@@ -29,9 +29,11 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
 import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
@@ -39,6 +41,7 @@ import java.util.List;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUES;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
 import static java.util.Collections.singletonList;
 
 public class ConstraintUtils {
@@ -58,6 +61,20 @@ public class ConstraintUtils {
 
     public static List<Parameter> getValueParameter(ILBuiltinType builtinType) {
         return singletonList(Parameter.of(ILType.of(builtinType), VAR_VALUE));
+    }
+
+    static void buildExpressionFunction(Module module, BooleanExpression expression, String functionName,
+            List<Parameter> parameterDefinition) {
+        // @formatter:off
+        module.function()
+                .returnType(ILType.of(BOOLEAN))
+                .name(functionName)
+                .parameters(parameterDefinition)
+                .statements()
+                    .returnExpression(expression)
+                    .build()
+                .build();
+        // @formatter:on
     }
 
 }

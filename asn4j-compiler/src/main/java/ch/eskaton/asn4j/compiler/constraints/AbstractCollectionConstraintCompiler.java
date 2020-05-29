@@ -350,22 +350,14 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                     getParameters(componentNode, compiledComponent.getName(), expressionFunction.get_2()));
         }).collect(Collectors.toList());
 
-        String checkSym = module.generateSymbol(FUNC_CHECK_CONSTRAINT);
+        var checkSym = module.generateSymbol(FUNC_CHECK_CONSTRAINT);
+        var parameterDefinition = getMapParameter();
+        var expression = new BinaryBooleanExpression(BinaryOperator.AND, expressionCalls);
 
-        // @formatter:off
-        module.function()
-                .returnType(ILType.of(BOOLEAN))
-                .name(checkSym)
-                .parameter(getMapParameter())
-                .statements()
-                    .returnExpression(new BinaryBooleanExpression(BinaryOperator.AND, expressionCalls))
-                    .build()
-                .build();
-        // @formatter:on
+        ConstraintUtils.buildExpressionFunction(module, expression, checkSym, singletonList(parameterDefinition));
 
         return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), Variable.of(VAR_VALUES)));
     }
-
 
     private List<Expression> getParameters(ComponentNode component, String typeName, String runtimeType) {
         return parametersDispatcher.execute(runtimeType, Tuple2.of(component, typeName));
@@ -396,18 +388,10 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
     private Tuple2<String, String> buildExpressionFunction(Module module, CompiledType compiledType,
             BooleanExpression expression) {
-        String expressionSym = module.generateSymbol(FUNC_EXPRESSION);
+        var expressionSym = module.generateSymbol(FUNC_EXPRESSION);
+        var parameterDefinition = getParameterDefinition(compiledType);
 
-        // @formatter:off
-        module.function()
-                .returnType(ILType.of(BOOLEAN))
-                .name(expressionSym)
-                .parameters(getParameterDefinition(compiledType))
-                .statements()
-                    .returnExpression(expression)
-                    .build()
-                .build();
-        // @formatter:on
+        ConstraintUtils.buildExpressionFunction(module, expression, expressionSym, parameterDefinition);
 
         return Tuple2.of(expressionSym, ctx.getRuntimeType(compiledType.getType()));
     }
