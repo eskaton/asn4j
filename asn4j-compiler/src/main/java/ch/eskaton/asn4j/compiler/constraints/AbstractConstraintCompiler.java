@@ -64,6 +64,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_DO_CHECK_CONSTRAINT;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
@@ -243,7 +244,7 @@ public abstract class AbstractConstraintCompiler {
 
     protected FunctionBuilder generateCheckConstraintValue(Module module, Parameter... parameters) {
         FunctionBuilder builder = module.function()
-                .name("checkConstraintValue")
+                .name(FUNC_CHECK_CONSTRAINT_VALUE)
                 .returnType(ILType.of(BOOLEAN));
 
         Arrays.stream(parameters).forEach(builder::parameter);
@@ -258,7 +259,7 @@ public abstract class AbstractConstraintCompiler {
     protected void generateDoCheckConstraint(Module module) {
         // @formatter:off
         module.function()
-                .name("doCheckConstraint")
+                .name(FUNC_DO_CHECK_CONSTRAINT)
                 .overriden(true)
                 .visibility(ILVisibility.PUBLIC)
                 .returnType(ILType.of(BOOLEAN))

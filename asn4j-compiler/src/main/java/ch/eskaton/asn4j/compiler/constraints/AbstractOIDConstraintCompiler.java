@@ -42,7 +42,6 @@ import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
-import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 
@@ -87,7 +86,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
         switch (node.getType()) {
             case VALUE:
                 List<BooleanExpression> arguments = (((N) node).getValue()).stream()
-                        .map(this::buildExpression2)
+                        .map(this::buildExpression)
                         .collect(Collectors.toList());
 
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
@@ -96,7 +95,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
         }
     }
 
-    protected BooleanExpression buildExpression2(List<Integer> value) {
+    protected BooleanExpression buildExpression(List<Integer> value) {
         return new BooleanFunctionCall.ArrayEquals(new Variable(VAR_VALUE),
                 new ILValue(value.stream().mapToInt(Integer::intValue).toArray()));
     }

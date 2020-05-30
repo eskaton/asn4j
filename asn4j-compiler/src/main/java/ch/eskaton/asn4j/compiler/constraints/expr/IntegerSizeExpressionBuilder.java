@@ -24,34 +24,24 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package ch.eskaton.asn4j.compiler.constraints.expr;
 
-package ch.eskaton.asn4j.compiler.constraints;
+import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.FunctionCall;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Variable;
 
-public final class Constants {
+import java.math.BigInteger;
 
-    public static final String VAR_OBJ = "obj";
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-    public static final String VAR_VALUE = "value";
+public class IntegerSizeExpressionBuilder extends AbstractSizeExpressionBuilder {
 
-    public static final String VAR_VALUES = "values";
+    protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
+        var expr = new FunctionCall.BigIntegerCompare(new Variable(VAR_VALUE), new ILValue(BigInteger.valueOf(value)));
 
-    public static final String VAR_UNUSED_BITS = "unusedBits";
-
-    public static final String GET_VALUE = "getValue";
-
-    public static final String GET_VALUES = "getValues";
-
-    public static final String GET_UNUSED_BITS = "getUnusedBits";
-
-    public static final String FUNC_EXPRESSION = "_expression";
-
-    public static final String FUNC_CHECK_CONSTRAINT = "_checkConstraint";
-
-    public static final String FUNC_CHECK_CONSTRAINT_VALUE = "checkConstraintValue";
-
-    public static final String FUNC_DO_CHECK_CONSTRAINT = "doCheckConstraint";
-
-    private Constants() {
+        return new BinaryBooleanExpression(operator, expr, new ILValue(0));
     }
 
 }

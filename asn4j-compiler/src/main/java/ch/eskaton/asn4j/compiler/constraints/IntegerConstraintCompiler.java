@@ -34,17 +34,15 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.IntegerSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.ValueRangeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.expr.IntegerSizeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerValueBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.FunctionCall.BigIntegerCompare;
 import ch.eskaton.asn4j.compiler.il.ILType;
-import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
-import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
@@ -52,7 +50,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -109,7 +106,9 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             case VALUE:
                 List<IntegerRange> range = ((IntegerRangeValueNode) node).getValue();
                 Optional<List<BooleanExpression>> maybeExpressions =
-                        Optional.of(range.stream().map(this::buildExpression).collect(Collectors.toList()));
+                        Optional.of(range.stream()
+                                .map(new IntegerSizeExpressionBuilder()::build)
+                                .collect(Collectors.toList()));
 
                 if (!maybeExpressions.get().isEmpty()) {
                     return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, maybeExpressions.get()));
@@ -121,30 +120,6 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
             default:
                 return super.buildExpression(module, compiledType, node);
         }
-    }
-
-    private BinaryBooleanExpression buildExpression(IntegerRange range) {
-        long lower = range.getLower();
-        long upper = range.getUpper();
-
-        if (lower == upper) {
-            return buildExpression(lower, BinaryOperator.EQ);
-        } else if (lower == Long.MIN_VALUE) {
-            return buildExpression(upper, BinaryOperator.LE);
-        } else if (upper == Long.MAX_VALUE) {
-            return buildExpression(lower, BinaryOperator.GE);
-        } else {
-            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
-            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
-
-            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
-        }
-    }
-
-    private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        return new BinaryBooleanExpression(operator,
-                new BigIntegerCompare(new Variable(VAR_VALUE), new ILValue(BigInteger.valueOf(value))),
-                new ILValue(0));
     }
 
 }
