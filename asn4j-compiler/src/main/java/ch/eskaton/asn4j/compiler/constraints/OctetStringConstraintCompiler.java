@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
 import static ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
@@ -67,8 +68,6 @@ import static java.util.Collections.emptyList;
 public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
 
     private static final SizeBoundsVisitor BOUNDS_VISITOR = new SizeBoundsVisitor();
-
-    private static final String VALUE = "value";
 
     public OctetStringConstraintCompiler(CompilerContext ctx) {
         super(ctx);
@@ -97,7 +96,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
-        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(BYTE_ARRAY), VALUE));
+        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(BYTE_ARRAY), VAR_VALUE));
 
         addConstraintCondition(type, definition, builder);
 
@@ -132,7 +131,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private BooleanExpression buildExpression2(OctetStringValue value) {
-        return new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VALUE));
+        return new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VAR_VALUE));
     }
 
     private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
@@ -154,7 +153,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        return new BinaryBooleanExpression(operator, new ArrayLength(new Variable(VALUE)), new ILValue(value));
+        return new BinaryBooleanExpression(operator, new ArrayLength(new Variable(VAR_VALUE)), new ILValue(value));
     }
 
 }

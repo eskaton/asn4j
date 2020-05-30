@@ -49,7 +49,6 @@ import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
@@ -58,6 +57,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BIG_INTEGER;
@@ -91,7 +91,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
-        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(BIG_INTEGER), "value"));
+        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(BIG_INTEGER), VAR_VALUE));
 
         addConstraintCondition(type, definition, builder);
 
@@ -143,7 +143,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
 
     private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
         return new BinaryBooleanExpression(operator,
-                new BigIntegerCompare(new Variable("value"), new ILValue(BigInteger.valueOf(value))),
+                new BigIntegerCompare(new Variable(VAR_VALUE), new ILValue(BigInteger.valueOf(value))),
                 new ILValue(0));
     }
 

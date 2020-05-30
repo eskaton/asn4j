@@ -45,12 +45,14 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER_ARRAY;
 import static java.util.Optional.of;
 
@@ -67,8 +69,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
     public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
-        FunctionBuilder builder = generateCheckConstraintValue(module,
-                new Parameter(ILType.of(INTEGER_ARRAY), "value"));
+        var builder = generateCheckConstraintValue(module, new Parameter(ILType.of(INTEGER_ARRAY), VAR_VALUE));
 
         addConstraintCondition(type, definition, builder);
 
@@ -77,8 +78,8 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
 
     @Override
     protected FunctionCall generateCheckConstraintCall() {
-        return new FunctionCall(of("checkConstraintValue"),
-                new FunctionCall.ToArray(ILType.of(ILBuiltinType.INTEGER), new FunctionCall(of("getValue"))));
+        return new FunctionCall(of(FUNC_CHECK_CONSTRAINT_VALUE),
+                new FunctionCall.ToArray(ILType.of(ILBuiltinType.INTEGER), new FunctionCall(of(GET_VALUE))));
     }
 
     @Override
@@ -96,7 +97,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
     }
 
     protected BooleanExpression buildExpression2(List<Integer> value) {
-        return new BooleanFunctionCall.ArrayEquals(new Variable("value"),
+        return new BooleanFunctionCall.ArrayEquals(new Variable(VAR_VALUE),
                 new ILValue(value.stream().mapToInt(Integer::intValue).toArray()));
     }
 

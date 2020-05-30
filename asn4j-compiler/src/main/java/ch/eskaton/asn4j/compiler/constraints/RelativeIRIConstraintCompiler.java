@@ -35,9 +35,6 @@ import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeIRIConstraintOpti
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import java.util.List;
-import java.util.Set;
-
 public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler<RelativeIRIValueNode> {
 
     public RelativeIRIConstraintCompiler(CompilerContext ctx) {
@@ -50,11 +47,6 @@ public class RelativeIRIConstraintCompiler extends AbstractIRIConstraintCompiler
     @Override
     protected Node optimize(Node node) {
         return new RelativeIRIConstraintOptimizingVisitor().visit(node);
-    }
-
-    @Override
-    protected RelativeIRIValueNode createNode(Set<List<String>> value) {
-        return new RelativeIRIValueNode(value);
     }
 
     @Override

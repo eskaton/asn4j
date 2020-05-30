@@ -43,12 +43,12 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.Optional;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
 
 public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
@@ -74,7 +74,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
-        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(BOOLEAN), "value"));
+        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(BOOLEAN), VAR_VALUE));
 
         addConstraintCondition(type, definition, builder);
 
@@ -85,7 +85,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         switch (node.getType()) {
             case VALUE:
-                return Optional.of(new BinaryBooleanExpression(BinaryOperator.EQ, new Variable("value"),
+                return Optional.of(new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE),
                         new ILValue(getTypeName(compiledType.getType()), ((ValueNode) node).getValue())));
             default:
                 return super.buildExpression(module, compiledType, node);
