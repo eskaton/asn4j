@@ -56,7 +56,6 @@ public class NullConstraintCompiler extends AbstractConstraintCompiler {
     public NullConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(SingleValueConstraint.class, new NullSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
     }

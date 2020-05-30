@@ -60,7 +60,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleTypeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
@@ -176,13 +175,12 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         this.typeName = typeName;
         this.collectionType = collectionType;
 
-        addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(SingleValueConstraint.class,
                 new SingleValueCompiler(ctx, CollectionOfValue.class, CollectionOfValueNode.class, getTypeName(),
                         Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class,
-                new SizeCompiler(ctx, new IntegerConstraintCompiler(ctx)::calculateElements)::compile);
+                new SizeCompiler(ctx, new IntegerConstraintCompiler(ctx).getDispatcher())::compile);
         addConstraintHandler(SingleTypeConstraint.class, new SingleTypeConstraintCompiler(ctx)::compile);
     }
 

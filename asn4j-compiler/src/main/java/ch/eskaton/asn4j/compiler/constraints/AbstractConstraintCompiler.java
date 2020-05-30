@@ -31,8 +31,8 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.ElementSetCompiler;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
@@ -44,7 +44,6 @@ import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
@@ -66,10 +65,6 @@ import java.util.Optional;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.COMPLEMENT;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.NEGATION;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
 import static java.util.Optional.of;
 
@@ -84,8 +79,11 @@ public abstract class AbstractConstraintCompiler {
         this.ctx = ctx;
         this.dispatcher = new Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
                 ? extends Elements, Optional<Bounds>>, Node>()
+                .withComparator((t, c) -> c.isInstance(t))
                 .withException((e) -> new CompilerException("Invalid constraint %s for %s type",
                         e.getClass().getSimpleName(), getTypeName().getName()));
+
+        addConstraintHandler(ElementSet.class, new ElementSetCompiler(dispatcher)::compile);
     }
 
     protected abstract TypeName getTypeName();
@@ -106,19 +104,16 @@ public abstract class AbstractConstraintCompiler {
         getDispatcher().withCase(clazz, a -> dispatchToCompiler(clazz, function, a));
     }
 
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        return getDispatcher().withComparator((t, c) -> c.isInstance(t))
-                .execute(elements, new Tuple3<>(baseType, elements, bounds));
-    }
-
     public ConstraintDefinition compileConstraint(CompiledType baseType, SubtypeConstraint subtypeConstraint,
             Optional<Bounds> bounds) {
-        ElementSetSpecsNode setSpecs = subtypeConstraint.getElementSetSpecs();
-        Node root = compileConstraint(baseType, setSpecs.getRootElements(), bounds);
+        var setSpecs = subtypeConstraint.getElementSetSpecs();
+        var rootElements = setSpecs.getRootElements();
+        Node root = dispatcher.execute(rootElements, Tuple3.of(baseType, rootElements, bounds));
         Node extension = null;
 
         if (setSpecs.hasExtensionElements()) {
-            extension = compileConstraint(baseType, setSpecs.getExtensionElements(), bounds);
+            var extensionElements = setSpecs.getExtensionElements();
+            extension = dispatcher.execute(extensionElements, Tuple3.of(baseType, extensionElements, bounds));
         }
 
         return new ConstraintDefinition(root, extension).extensible(setSpecs.hasExtensionMarker());
@@ -126,7 +121,10 @@ public abstract class AbstractConstraintCompiler {
 
     protected ConstraintDefinition compileConstraint(CompiledType baseType, SizeConstraint sizeConstraint,
             Optional<Bounds> bounds) {
-        return new ConstraintDefinition(calculateElements(baseType, sizeConstraint, bounds));
+        //return new ConstraintDefinition(calculateElements(baseType, sizeConstraint, bounds));
+        var node = dispatcher.execute(sizeConstraint, Tuple3.of(baseType, sizeConstraint, bounds));
+
+        return new ConstraintDefinition(node);
     }
 
     ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
@@ -216,66 +214,6 @@ public abstract class AbstractConstraintCompiler {
         }
 
         return constraintDef;
-    }
-
-    protected Node compileConstraint(CompiledType baseType, ElementSet set, Optional<Bounds> bounds) {
-        List<Elements> operands = set.getOperands();
-
-        switch (set.getOperation()) {
-            case ALL:
-                return calculateInversion(compileConstraint(baseType, (ElementSet) operands.get(0), bounds));
-
-            case EXCLUDE:
-                if (operands.size() == 1) {
-                    // ALL EXCEPT
-                    return calculateElements(baseType, operands.get(0), bounds);
-                } else {
-                    return calculateExclude(calculateElements(baseType, operands.get(0), bounds),
-                            calculateElements(baseType, operands.get(1), bounds));
-                }
-
-            case INTERSECTION:
-                return calculateIntersection(baseType, operands, bounds);
-
-            case UNION:
-                return calculateUnion(baseType, operands, bounds);
-
-            default:
-                throw new IllegalStateException("Unimplemented node type " + set.getOperation());
-        }
-    }
-
-    protected Node calculateIntersection(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds) {
-        return calculateBinOp(baseType, elements, bounds, INTERSECTION);
-    }
-
-    protected Node calculateUnion(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds) {
-        return calculateBinOp(baseType, elements, bounds, UNION);
-    }
-
-    protected Node calculateBinOp(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds,
-            NodeType type) {
-        Node node = null;
-
-        for (Elements element : elements) {
-            Node tmpNode = calculateElements(baseType, element, bounds);
-
-            if (node == null) {
-                node = tmpNode;
-            } else {
-                node = new BinOpNode(type, node, tmpNode);
-            }
-        }
-
-        return node;
-    }
-
-    protected Node calculateInversion(Node node) {
-        return new OpNode(NEGATION, node);
-    }
-
-    protected Node calculateExclude(Node values1, Node values2) {
-        return new BinOpNode(COMPLEMENT, values1, values2);
     }
 
     protected abstract void addConstraint(CompiledType type, Module module, ConstraintDefinition definition);

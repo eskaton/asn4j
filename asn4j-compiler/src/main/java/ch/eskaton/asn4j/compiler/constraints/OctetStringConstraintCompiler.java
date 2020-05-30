@@ -49,7 +49,6 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
@@ -74,13 +73,12 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     public OctetStringConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(SingleValueConstraint.class,
                 new SingleValueCompiler(ctx, OctetStringValue.class, OctetStringValueNode.class, getTypeName(),
                         List.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class,
-                new SizeCompiler(ctx, new IntegerConstraintCompiler(ctx)::calculateElements)::compile);
+                new SizeCompiler(ctx, new IntegerConstraintCompiler(ctx).getDispatcher())::compile);
     }
 
     @Override
