@@ -24,34 +24,32 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package ch.eskaton.asn4j.compiler.constraints.expr;
 
-package ch.eskaton.asn4j.compiler.constraints;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
+import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 
-public final class Constants {
+public abstract class AbstractSizeExpressionBuilder {
 
-    public static final String VAR_OBJ = "obj";
+    public BinaryBooleanExpression build(IntegerRange range) {
+        long lower = range.getLower();
+        long upper = range.getUpper();
 
-    public static final String VAR_VALUE = "value";
+        if (lower == upper) {
+            return buildExpression(lower, BinaryOperator.EQ);
+        } else if (lower == Long.MIN_VALUE) {
+            return buildExpression(upper, BinaryOperator.LE);
+        } else if (upper == Long.MAX_VALUE) {
+            return buildExpression(lower, BinaryOperator.GE);
+        } else {
+            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
+            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
 
-    public static final String VAR_VALUES = "values";
-
-    public static final String VAR_UNUSED_BITS = "unusedBits";
-
-    public static final String GET_VALUE = "getValue";
-
-    public static final String GET_VALUES = "getValues";
-
-    public static final String GET_UNUSED_BITS = "getUnusedBits";
-
-    public static final String FUNC_EXPRESSION = "_expression";
-
-    public static final String FUNC_CHECK_CONSTRAINT = "_checkConstraint";
-
-    public static final String FUNC_CHECK_CONSTRAINT_VALUE = "checkConstraintValue";
-
-    public static final String FUNC_DO_CHECK_CONSTRAINT = "doCheckConstraint";
-
-    private Constants() {
+            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
+        }
     }
+
+    protected abstract BinaryBooleanExpression buildExpression(long value, BinaryOperator operator);
 
 }

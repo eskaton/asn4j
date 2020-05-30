@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleTypeConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.expr.CollectionOfSizeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionOfConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
@@ -337,7 +338,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
     private Optional<BooleanExpression> getSizeExpression(SizeNode node) {
         List<IntegerRange> sizes = node.getSize();
-        List<BooleanExpression> sizeArguments = sizes.stream().map(this::buildSizeExpression)
+        List<BooleanExpression> sizeArguments = sizes.stream()
+                .map(new CollectionOfSizeExpressionBuilder()::build)
                 .collect(Collectors.toList());
 
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
@@ -468,29 +470,6 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                 .collect(Collectors.toList());
 
         return new BooleanFunctionCall.SetEquals(new Variable(VAR_VALUE), new ILListValue(values));
-    }
-
-    private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
-        long lower = range.getLower();
-        long upper = range.getUpper();
-
-        if (lower == upper) {
-            return buildSizeExpression(lower, BinaryOperator.EQ);
-        } else if (lower == Long.MIN_VALUE) {
-            return buildSizeExpression(upper, BinaryOperator.LE);
-        } else if (upper == Long.MAX_VALUE) {
-            return buildSizeExpression(lower, BinaryOperator.GE);
-        } else {
-            BinaryBooleanExpression expr1 = buildSizeExpression(lower, BinaryOperator.GE);
-            BinaryBooleanExpression expr2 = buildSizeExpression(upper, BinaryOperator.LE);
-
-            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
-        }
-    }
-
-    private BinaryBooleanExpression buildSizeExpression(long value, BinaryOperator operator) {
-        return new BinaryBooleanExpression(operator, new FunctionCall.GetSize(new Variable(VAR_VALUES)),
-                new ILValue(value));
     }
 
 }

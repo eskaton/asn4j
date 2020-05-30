@@ -35,13 +35,13 @@ import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.expr.BitStringStringSizeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.BitStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
-import ch.eskaton.asn4j.compiler.il.FunctionCall.BitStringSize;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
@@ -103,12 +103,12 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
-        FunctionBuilder function = generateCheckConstraintValue(module,
+        FunctionBuilder builder = generateCheckConstraintValue(module,
                 new Parameter(ILType.of(BYTE_ARRAY), VAR_VALUE), new Parameter(ILType.of(INTEGER), VAR_UNUSED_BITS));
 
-        addConstraintCondition(type, definition, function);
+        addConstraintCondition(type, definition, builder);
 
-        function.build();
+        builder.build();
     }
 
     @Override
@@ -127,7 +127,8 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         switch (node.getType()) {
             case VALUE:
                 List<BitStringValue> values = ((BitStringValueNode) node).getValue();
-                List<BooleanExpression> valueArguments = values.stream().map(this::buildExpression)
+                List<BooleanExpression> valueArguments = values.stream()
+                        .map(this::buildExpression)
                         .collect(Collectors.toList());
 
                 return of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
@@ -135,7 +136,8 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
                 return Optional.empty();
             case SIZE:
                 List<IntegerRange> sizes = ((SizeNode) node).getSize();
-                List<BooleanExpression> sizeArguments = sizes.stream().map(this::buildSizeExpression)
+                List<BooleanExpression> sizeArguments = sizes.stream()
+                        .map(new BitStringStringSizeExpressionBuilder()::build)
                         .collect(Collectors.toList());
 
                 return of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
@@ -146,36 +148,10 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     private BooleanExpression buildExpression(BitStringValue value) {
-        new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VAR_VALUE));
-        new BinaryBooleanExpression(BinaryOperator.EQ, new ILValue(value.getUnusedBits()), new Variable(VAR_UNUSED_BITS));
-
         return new BinaryBooleanExpression(BinaryOperator.AND,
                 new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VAR_VALUE)),
                 new BinaryBooleanExpression(BinaryOperator.EQ, new ILValue(value.getUnusedBits()),
                         new Variable(VAR_UNUSED_BITS)));
-    }
-
-    private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
-        long lower = range.getLower();
-        long upper = range.getUpper();
-
-        if (lower == upper) {
-            return buildExpression(lower, BinaryOperator.EQ);
-        } else if (lower == Long.MIN_VALUE) {
-            return buildExpression(upper, BinaryOperator.LE);
-        } else if (upper == Long.MAX_VALUE) {
-            return buildExpression(lower, BinaryOperator.GE);
-        } else {
-            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
-            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
-
-            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
-        }
-    }
-
-    private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        return new BinaryBooleanExpression(operator,
-                new BitStringSize(new Variable(VAR_VALUE), new Variable(VAR_UNUSED_BITS)), new ILValue(value));
     }
 
 }

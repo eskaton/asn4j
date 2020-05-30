@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.expr.OctetStringSizeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.OctetStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
@@ -61,7 +62,6 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
-import static ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BYTE_ARRAY;
 import static java.util.Collections.emptyList;
 
@@ -81,15 +81,15 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected TypeName getTypeName() {
-        return TypeName.OCTET_STRING;
-    }
-
-    @Override
     protected Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
         return constraint.map(c ->
                 new StringSizeBounds(getLowerBound(BOUNDS_VISITOR.visit(c.getRoots()).orElse(emptyList())),
                         getUpperBound(BOUNDS_VISITOR.visit(c.getRoots()).orElse(emptyList()))));
+    }
+
+    @Override
+    protected TypeName getTypeName() {
+        return TypeName.OCTET_STRING;
     }
 
     @Override
@@ -113,7 +113,8 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         switch (node.getType()) {
             case VALUE:
                 List<OctetStringValue> values = ((OctetStringValueNode) node).getValue();
-                List<BooleanExpression> valueExpressions = values.stream().map(this::buildExpression2)
+                List<BooleanExpression> valueExpressions = values.stream()
+                        .map(this::buildExpression)
                         .collect(Collectors.toList());
 
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueExpressions));
@@ -121,7 +122,8 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
                 return Optional.empty();
             case SIZE:
                 List<IntegerRange> sizes = ((SizeNode) node).getSize();
-                List<BooleanExpression> sizeExpressions = sizes.stream().map(this::buildSizeExpression)
+                List<BooleanExpression> sizeExpressions = sizes.stream()
+                        .map(new OctetStringSizeExpressionBuilder()::build)
                         .collect(Collectors.toList());
 
                 return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeExpressions));
@@ -130,30 +132,8 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         }
     }
 
-    private BooleanExpression buildExpression2(OctetStringValue value) {
+    private BooleanExpression buildExpression(OctetStringValue value) {
         return new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VAR_VALUE));
-    }
-
-    private BinaryBooleanExpression buildSizeExpression(IntegerRange range) {
-        long lower = range.getLower();
-        long upper = range.getUpper();
-
-        if (lower == upper) {
-            return buildExpression(lower, BinaryOperator.EQ);
-        } else if (lower == Long.MIN_VALUE) {
-            return buildExpression(upper, BinaryOperator.LE);
-        } else if (upper == Long.MAX_VALUE) {
-            return buildExpression(lower, BinaryOperator.GE);
-        } else {
-            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
-            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
-
-            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
-        }
-    }
-
-    private BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        return new BinaryBooleanExpression(operator, new ArrayLength(new Variable(VAR_VALUE)), new ILValue(value));
     }
 
 }
