@@ -53,6 +53,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER;
 
 public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler {
@@ -74,7 +75,7 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
-        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(INTEGER), "value"));
+        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(INTEGER), VAR_VALUE));
 
         addConstraintCondition(type, definition, builder);
 
@@ -101,7 +102,7 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     }
 
     private BinaryBooleanExpression buildExpression(Integer enumValue) {
-        return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable("value"), new ILValue(enumValue));
+        return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE), new ILValue(enumValue));
     }
 
 }

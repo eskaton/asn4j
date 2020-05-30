@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
@@ -95,8 +96,11 @@ public abstract class AbstractConstraintCompiler {
 
     protected <T extends Elements> Node dispatchToCompiler(Class<T> clazz,
             TriFunction<CompiledType, T, Optional<Bounds>, Node> function,
-            Optional<Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>> args) {
-        return function.apply(args.get().get_1(), clazz.cast(args.get().get_2()), args.get().get_3());
+            Optional<Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>> maybeArgs) {
+        var args = maybeArgs.orElseThrow(
+                () -> new IllegalCompilerStateException("Arguments in dispatchToCompiler may not be null"));
+
+        return function.apply(args.get_1(), clazz.cast(args.get_2()), args.get_3());
     }
 
     protected <T extends Elements> void addConstraintHandler(Class<T> clazz,
@@ -121,7 +125,6 @@ public abstract class AbstractConstraintCompiler {
 
     protected ConstraintDefinition compileConstraint(CompiledType baseType, SizeConstraint sizeConstraint,
             Optional<Bounds> bounds) {
-        //return new ConstraintDefinition(calculateElements(baseType, sizeConstraint, bounds));
         var node = dispatcher.execute(sizeConstraint, Tuple3.of(baseType, sizeConstraint, bounds));
 
         return new ConstraintDefinition(node);

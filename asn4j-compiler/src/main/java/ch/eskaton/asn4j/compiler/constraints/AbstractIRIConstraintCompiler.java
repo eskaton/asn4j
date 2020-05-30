@@ -43,16 +43,17 @@ import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
-import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING_ARRAY;
 import static java.util.Optional.of;
 
@@ -74,7 +75,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     public void addConstraint(CompiledType type, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
-        FunctionBuilder builder = generateCheckConstraintValue(module, new Parameter(ILType.of(STRING_ARRAY), "value"));
+        var builder = generateCheckConstraintValue(module, new Parameter(ILType.of(STRING_ARRAY), VAR_VALUE));
 
         addConstraintCondition(type, definition, builder);
 
@@ -83,8 +84,8 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
     @Override
     protected FunctionCall generateCheckConstraintCall() {
-        return new FunctionCall(of("checkConstraintValue"),
-                new ToArray(ILType.of(ILBuiltinType.STRING), new FunctionCall(of("getValue"))));
+        return new FunctionCall(of(FUNC_CHECK_CONSTRAINT_VALUE),
+                new ToArray(ILType.of(ILBuiltinType.STRING), new FunctionCall(of(GET_VALUE))));
     }
 
     @Override
@@ -102,9 +103,7 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     }
 
     protected BooleanExpression buildExpression(List<String> value) {
-        return new BooleanFunctionCall.ArrayEquals(new Variable("value"), new ILValue(value.toArray(new String[] {})));
+        return new BooleanFunctionCall.ArrayEquals(new Variable(VAR_VALUE), new ILValue(value.toArray(new String[] {})));
     }
-
-    protected abstract N createNode(Set<List<String>> value);
 
 }
