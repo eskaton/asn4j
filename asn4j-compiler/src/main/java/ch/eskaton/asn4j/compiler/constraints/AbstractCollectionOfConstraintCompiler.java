@@ -61,7 +61,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
-import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleTypeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
@@ -87,7 +86,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
-import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.Collections;
@@ -220,12 +218,6 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         }
 
         return constraintDefinition;
-    }
-
-    @Override
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        return getDispatcher().withComparator((t, c) -> c.isInstance(t))
-                .execute(elements, new Tuple3<>(baseType, elements, bounds));
     }
 
     @Override
