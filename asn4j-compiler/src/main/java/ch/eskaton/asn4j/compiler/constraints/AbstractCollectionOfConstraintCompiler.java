@@ -30,7 +30,6 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
@@ -319,7 +318,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
             case VALUE:
                 return getValueExpression(compiledType, (CollectionOfValueNode) node);
             case SIZE:
-                return getSizeExpression((SizeNode) node);
+                return new CollectionOfSizeExpressionBuilder().build(((SizeNode) node).getSize());
             case WITH_COMPONENT:
                 return getWithComponentExpression(module, compiledType, (WithComponentNode) node);
             default:
@@ -334,15 +333,6 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                 .collect(Collectors.toList());
 
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
-    }
-
-    private Optional<BooleanExpression> getSizeExpression(SizeNode node) {
-        List<IntegerRange> sizes = node.getSize();
-        List<BooleanExpression> sizeArguments = sizes.stream()
-                .map(new CollectionOfSizeExpressionBuilder()::build)
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
     }
 
     private Optional<BooleanExpression> getWithComponentExpression(Module module, CompiledType compiledType,

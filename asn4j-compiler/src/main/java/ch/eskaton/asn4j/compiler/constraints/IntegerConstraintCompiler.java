@@ -28,17 +28,14 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.IntegerSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.ValueRangeCompiler;
-import ch.eskaton.asn4j.compiler.constraints.expr.IntegerSizeExpressionBuilder;
+import ch.eskaton.asn4j.compiler.constraints.expr.IntegerRangeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerValueBoundsVisitor;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.Module;
@@ -50,9 +47,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
@@ -104,17 +99,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         switch (node.getType()) {
             case VALUE:
-                List<IntegerRange> range = ((IntegerRangeValueNode) node).getValue();
-                Optional<List<BooleanExpression>> maybeExpressions =
-                        Optional.of(range.stream()
-                                .map(new IntegerSizeExpressionBuilder()::build)
-                                .collect(Collectors.toList()));
-
-                if (!maybeExpressions.get().isEmpty()) {
-                    return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, maybeExpressions.get()));
-                }
-
-                return Optional.empty();
+                return new IntegerRangeExpressionBuilder().build(((IntegerRangeValueNode) node).getValue());
             case ALL_VALUES:
                 return Optional.empty();
             default:

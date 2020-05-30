@@ -26,30 +26,22 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.FunctionCall;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Variable;
 
-public abstract class AbstractSizeExpressionBuilder {
+import java.math.BigInteger;
 
-    public BinaryBooleanExpression build(IntegerRange range) {
-        long lower = range.getLower();
-        long upper = range.getUpper();
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-        if (lower == upper) {
-            return buildExpression(lower, BinaryOperator.EQ);
-        } else if (lower == Long.MIN_VALUE) {
-            return buildExpression(upper, BinaryOperator.LE);
-        } else if (upper == Long.MAX_VALUE) {
-            return buildExpression(lower, BinaryOperator.GE);
-        } else {
-            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
-            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
+public class IntegerRangeExpressionBuilder extends AbstractRangeExpressionBuilder {
 
-            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
-        }
+    protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
+        var expr = new FunctionCall.BigIntegerCompare(new Variable(VAR_VALUE), new ILValue(BigInteger.valueOf(value)));
+
+        return new BinaryBooleanExpression(operator, expr, new ILValue(0));
     }
-
-    protected abstract BinaryBooleanExpression buildExpression(long value, BinaryOperator operator);
 
 }

@@ -26,22 +26,45 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.FunctionCall;
-import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 
-import java.math.BigInteger;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
+import static java.util.Optional.of;
 
-public class IntegerSizeExpressionBuilder extends AbstractSizeExpressionBuilder {
+public abstract class AbstractRangeExpressionBuilder {
 
-    protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        var expr = new FunctionCall.BigIntegerCompare(new Variable(VAR_VALUE), new ILValue(BigInteger.valueOf(value)));
+    public Optional<BooleanExpression> build(List<IntegerRange> ranges) {
+        var expressions = ranges.stream()
+                .map(this::buildExpression)
+                .collect(Collectors.toList());
 
-        return new BinaryBooleanExpression(operator, expr, new ILValue(0));
+        return of(new BinaryBooleanExpression(BinaryOperator.OR, expressions));
     }
+
+    private BinaryBooleanExpression buildExpression(IntegerRange range) {
+        long lower = range.getLower();
+        long upper = range.getUpper();
+
+        if (lower == upper) {
+            return buildExpression(lower, BinaryOperator.EQ);
+        } else if (lower == Long.MIN_VALUE) {
+            return buildExpression(upper, BinaryOperator.LE);
+        } else if (upper == Long.MAX_VALUE) {
+            return buildExpression(lower, BinaryOperator.GE);
+        } else {
+            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
+            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
+
+            return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
+        }
+    }
+
+    protected abstract BinaryBooleanExpression buildExpression(long value, BinaryOperator operator);
 
 }

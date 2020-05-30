@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.BitStringValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
@@ -126,25 +125,23 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         switch (node.getType()) {
             case VALUE:
-                List<BitStringValue> values = ((BitStringValueNode) node).getValue();
-                List<BooleanExpression> valueArguments = values.stream()
-                        .map(this::buildExpression)
-                        .collect(Collectors.toList());
-
-                return of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
+                return getValueExpression((BitStringValueNode) node);
             case ALL_VALUES:
                 return Optional.empty();
             case SIZE:
-                List<IntegerRange> sizes = ((SizeNode) node).getSize();
-                List<BooleanExpression> sizeArguments = sizes.stream()
-                        .map(new BitStringStringSizeExpressionBuilder()::build)
-                        .collect(Collectors.toList());
-
-                return of(new BinaryBooleanExpression(BinaryOperator.OR, sizeArguments));
-
+                return new BitStringStringSizeExpressionBuilder().build(((SizeNode) node).getSize());
             default:
                 return super.buildExpression(module, compiledType, node);
         }
+    }
+
+    private Optional<BooleanExpression> getValueExpression(BitStringValueNode node) {
+        List<BitStringValue> values = node.getValue();
+        List<BooleanExpression> valueArguments = values.stream()
+                .map(this::buildExpression)
+                .collect(Collectors.toList());
+
+        return of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
     }
 
     private BooleanExpression buildExpression(BitStringValue value) {

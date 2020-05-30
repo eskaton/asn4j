@@ -28,7 +28,6 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.OctetStringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
@@ -112,24 +111,23 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         switch (node.getType()) {
             case VALUE:
-                List<OctetStringValue> values = ((OctetStringValueNode) node).getValue();
-                List<BooleanExpression> valueExpressions = values.stream()
-                        .map(this::buildExpression)
-                        .collect(Collectors.toList());
-
-                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueExpressions));
+                return getValueExpression((OctetStringValueNode) node);
             case ALL_VALUES:
                 return Optional.empty();
             case SIZE:
-                List<IntegerRange> sizes = ((SizeNode) node).getSize();
-                List<BooleanExpression> sizeExpressions = sizes.stream()
-                        .map(new OctetStringSizeExpressionBuilder()::build)
-                        .collect(Collectors.toList());
-
-                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, sizeExpressions));
+                return new OctetStringSizeExpressionBuilder().build(((SizeNode) node).getSize());
             default:
                 return super.buildExpression(module, compiledType, node);
         }
+    }
+
+    private Optional<BooleanExpression> getValueExpression(OctetStringValueNode node) {
+        List<OctetStringValue> values = node.getValue();
+        List<BooleanExpression> valueExpressions = values.stream()
+                .map(this::buildExpression)
+                .collect(Collectors.toList());
+
+        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueExpressions));
     }
 
     private BooleanExpression buildExpression(OctetStringValue value) {
