@@ -33,14 +33,13 @@ import ch.eskaton.asn4j.compiler.constraints.IntegerValueBounds;
 import ch.eskaton.asn4j.compiler.constraints.SizeBounds;
 import ch.eskaton.asn4j.compiler.constraints.SizeVisitor;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
-import ch.eskaton.commons.functional.TriFunction;
+import ch.eskaton.commons.collections.Tuple3;
+import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.Optional;
 
@@ -50,13 +49,14 @@ public class SizeCompiler implements ElementsCompiler<SizeConstraint> {
 
     protected final CompilerContext ctx;
 
-    protected final TriFunction<CompiledType, Elements, Optional<Bounds>, Node> calculateElements;
+    protected final Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
+            ? extends Elements, Optional<Bounds>>, Node> dispatcher;
 
 
-    public SizeCompiler(CompilerContext ctx,
-            TriFunction<CompiledType, Elements, Optional<Bounds>, Node> calculateElements) {
+    public SizeCompiler(CompilerContext ctx, Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
+            ? extends Elements, Optional<Bounds>>, Node> dispatcher) {
         this.ctx = ctx;
-        this.calculateElements = calculateElements;
+        this.dispatcher = dispatcher;
     }
 
     @Override
@@ -64,15 +64,18 @@ public class SizeCompiler implements ElementsCompiler<SizeConstraint> {
         var constraint = sizeConstraint.getConstraint();
 
         if (constraint instanceof SubtypeConstraint) {
-            SetSpecsNode setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
+            var setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
+            var compiledBaseType = ctx.getCompiledBaseType(new IntegerType(NO_POSITION));
+            var rootElements = setSpecs.getRootElements();
 
-            Node node = calculateElements.apply(
-                    ctx.getCompiledBaseType(new IntegerType(NO_POSITION)), setSpecs.getRootElements(),
-                    Optional.of(bounds.map(b -> new IntegerValueBounds(Math.max(0, ((SizeBounds) b).getMinSize()),
-                            ((SizeBounds) b).getMaxSize()))
-                            .orElse(new IntegerValueBounds(0L, Long.MAX_VALUE))));
+            var adjustedBounds = bounds.map(b -> new IntegerValueBounds(Math.max(0, ((SizeBounds) b).getMinSize()),
+                    ((SizeBounds) b).getMaxSize()))
+                    .orElse(new IntegerValueBounds(0L, Long.MAX_VALUE));
 
-            Optional<SizeNode> maybeSizes = new SizeVisitor().visit(node);
+            var node = dispatcher.execute(rootElements, Tuple3.of(compiledBaseType, rootElements,
+                    Optional.of(adjustedBounds)));
+
+            var maybeSizes = new SizeVisitor().visit(node);
 
             if (!maybeSizes.isPresent() || maybeSizes.get().getSize().isEmpty()) {
                 throw new CompilerException(setSpecs.getPosition(),

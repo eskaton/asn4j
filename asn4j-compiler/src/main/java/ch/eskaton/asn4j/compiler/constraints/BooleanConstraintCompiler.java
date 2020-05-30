@@ -56,7 +56,6 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     public BooleanConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(SingleValueConstraint.class, new BooleanSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
     }

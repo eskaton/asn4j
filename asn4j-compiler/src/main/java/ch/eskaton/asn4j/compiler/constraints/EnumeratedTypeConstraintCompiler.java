@@ -60,7 +60,6 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     public EnumeratedTypeConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(SingleValueConstraint.class,
                 new EnumeratedTypeSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, new EnumeratedTypeContainedSubtypeCompiler(ctx)::compile);

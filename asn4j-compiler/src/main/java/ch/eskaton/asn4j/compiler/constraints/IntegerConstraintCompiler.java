@@ -70,7 +70,6 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
     public IntegerConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(SingleValueConstraint.class, new IntegerSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(RangeNode.class, new ValueRangeCompiler(ctx)::compile);

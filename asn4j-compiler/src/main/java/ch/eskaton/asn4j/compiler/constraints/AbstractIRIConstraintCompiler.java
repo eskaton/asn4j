@@ -62,7 +62,6 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     public AbstractIRIConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
-        addConstraintHandler(ElementSet.class, this::compileConstraint);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
     }
 
