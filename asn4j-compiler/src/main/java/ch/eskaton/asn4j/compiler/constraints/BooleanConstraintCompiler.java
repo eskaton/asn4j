@@ -61,13 +61,13 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     }
 
     @Override
-    protected TypeName getTypeName() {
-        return TypeName.BOOLEAN;
+    Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
+        return Optional.empty();
     }
 
     @Override
-    Optional<Bounds> getBounds(Optional<ConstraintDefinition> constraint) {
-        return Optional.empty();
+    protected TypeName getTypeName() {
+        return TypeName.BOOLEAN;
     }
 
     @Override
@@ -83,13 +83,15 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
-        switch (node.getType()) {
-            case VALUE:
-                return Optional.of(new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE),
-                        new ILValue(getTypeName(compiledType.getType()), ((ValueNode) node).getValue())));
-            default:
-                return super.buildExpression(module, compiledType, node);
-        }
+        return switch (node.getType()) {
+            case VALUE -> getValueExpression(compiledType, (ValueNode) node);
+            default -> super.buildExpression(module, compiledType, node);
+        };
+    }
+
+    private Optional<BooleanExpression> getValueExpression(CompiledType compiledType, ValueNode node) {
+        return Optional.of(new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE),
+                new ILValue(getTypeName(compiledType.getType()), node.getValue())));
     }
 
 }

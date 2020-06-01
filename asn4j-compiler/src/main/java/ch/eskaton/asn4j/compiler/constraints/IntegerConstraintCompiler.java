@@ -97,14 +97,11 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
-        switch (node.getType()) {
-            case VALUE:
-                return new IntegerRangeExpressionBuilder().build(((IntegerRangeValueNode) node).getValue());
-            case ALL_VALUES:
-                return Optional.empty();
-            default:
-                return super.buildExpression(module, compiledType, node);
-        }
+        return switch (node.getType()) {
+            case VALUE -> new IntegerRangeExpressionBuilder().build(((IntegerRangeValueNode) node).getValue());
+            case ALL_VALUES -> Optional.empty();
+            default -> super.buildExpression(module, compiledType, node);
+        };
     }
 
 }

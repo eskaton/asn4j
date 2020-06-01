@@ -48,7 +48,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
@@ -90,16 +89,18 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
 
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
-        switch (node.getType()) {
-            case VALUE:
-                List<BooleanExpression> arguments = (((N) node).getValue()).stream()
-                        .map(this::buildExpression)
-                        .collect(Collectors.toList());
+        return switch (node.getType()) {
+            case VALUE -> getValueExpression((N) node);
+            default -> super.buildExpression(module, compiledType, node);
+        };
+    }
 
-                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
-            default:
-                return super.buildExpression(module, compiledType, node);
-        }
+    private Optional<BooleanExpression> getValueExpression(N node) {
+        List<BooleanExpression> arguments = (node.getValue()).stream()
+                .map(this::buildExpression)
+                .collect(Collectors.toList());
+
+        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
     }
 
     protected BooleanExpression buildExpression(List<String> value) {
