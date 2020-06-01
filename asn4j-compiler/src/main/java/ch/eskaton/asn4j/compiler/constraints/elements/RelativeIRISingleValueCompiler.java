@@ -33,8 +33,6 @@ import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import java.util.Set;
-
 public class RelativeIRISingleValueCompiler extends AbstractIRISingleValueCompiler<RelativeIRIValue, RelativeIRIValueNode> {
 
     private final RelativeIRIValueResolver valueResolver;

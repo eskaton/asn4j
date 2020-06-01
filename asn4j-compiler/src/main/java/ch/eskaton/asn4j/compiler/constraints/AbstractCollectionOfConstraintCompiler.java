@@ -314,16 +314,12 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
             return Optional.empty();
         }
 
-        switch (node.getType()) {
-            case VALUE:
-                return getValueExpression(compiledType, (CollectionOfValueNode) node);
-            case SIZE:
-                return new CollectionOfSizeExpressionBuilder().build(((SizeNode) node).getSize());
-            case WITH_COMPONENT:
-                return getWithComponentExpression(module, compiledType, (WithComponentNode) node);
-            default:
-                return super.buildExpression(module, compiledType, node);
-        }
+        return switch (node.getType()) {
+            case VALUE -> getValueExpression(compiledType, (CollectionOfValueNode) node);
+            case SIZE -> new CollectionOfSizeExpressionBuilder().build(((SizeNode) node).getSize());
+            case WITH_COMPONENT -> getWithComponentExpression(module, compiledType, (WithComponentNode) node);
+            default -> super.buildExpression(module, compiledType, node);
+        };
     }
 
     private Optional<BooleanExpression> getValueExpression(CompiledType compiledType, CollectionOfValueNode node) {

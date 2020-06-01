@@ -44,7 +44,6 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
@@ -89,16 +88,18 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
 
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
-        switch (node.getType()) {
-            case VALUE:
-                Set<Integer> values = ((EnumeratedValueNode) node).getValue();
-                List<BinaryBooleanExpression> arguments = values.stream().map(this::buildExpression)
-                        .collect(Collectors.toList());
+        return switch (node.getType()) {
+            case VALUE -> getValueExpression((EnumeratedValueNode) node);
+            default -> super.buildExpression(module, compiledType, node);
+        };
+    }
 
-                return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
-            default:
-                return super.buildExpression(module, compiledType, node);
-        }
+    private Optional<BooleanExpression> getValueExpression(EnumeratedValueNode node) {
+        Set<Integer> values = node.getValue();
+        List<BinaryBooleanExpression> arguments = values.stream().map(this::buildExpression)
+                .collect(Collectors.toList());
+
+        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
     }
 
     private BinaryBooleanExpression buildExpression(Integer enumValue) {

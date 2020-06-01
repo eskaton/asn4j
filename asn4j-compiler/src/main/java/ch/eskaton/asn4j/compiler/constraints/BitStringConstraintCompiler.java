@@ -123,16 +123,12 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
 
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
-        switch (node.getType()) {
-            case VALUE:
-                return getValueExpression((BitStringValueNode) node);
-            case ALL_VALUES:
-                return Optional.empty();
-            case SIZE:
-                return new BitStringStringSizeExpressionBuilder().build(((SizeNode) node).getSize());
-            default:
-                return super.buildExpression(module, compiledType, node);
-        }
+        return switch (node.getType()) {
+            case VALUE -> getValueExpression((BitStringValueNode) node);
+            case ALL_VALUES -> Optional.empty();
+            case SIZE -> new BitStringStringSizeExpressionBuilder().build(((SizeNode) node).getSize());
+            default -> super.buildExpression(module, compiledType, node);
+        };
     }
 
     private Optional<BooleanExpression> getValueExpression(BitStringValueNode node) {
