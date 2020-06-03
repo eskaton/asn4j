@@ -31,14 +31,15 @@ import ch.eskaton.asn4j.compiler.constraints.ast.AbstractOIDValueNode;
 import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.types.AbstractOID;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractOIDSingleValueCompiler<V extends AbstractOIDValue, N extends AbstractOIDValueNode>
-        extends SingleValueCompiler<V, N> {
+public abstract class AbstractOIDSingleValueCompiler<T extends AbstractOID, V extends AbstractOIDValue,
+        N extends AbstractOIDValueNode> extends SingleValueCompiler<V, N> {
 
     public AbstractOIDSingleValueCompiler(CompilerContext ctx, Class<V> valueClazz, Class<N> valueNodeClazz,
             TypeName typeName) {
@@ -49,9 +50,9 @@ public abstract class AbstractOIDSingleValueCompiler<V extends AbstractOIDValue,
     protected List<Integer> resolveValue(CompiledType baseType, SingleValueConstraint elements) {
         var value = getValueResolver().resolveValue(ctx, elements.getValue(), valueClazz);
 
-        return getValueResolver().resolveComponents(ctx, (AbstractOIDValue) value);
+        return getValueResolver().resolveComponents(ctx, value);
     }
 
-    protected abstract AbstractOIDValueResolver getValueResolver();
+    protected abstract AbstractOIDValueResolver<T, V> getValueResolver();
 
 }

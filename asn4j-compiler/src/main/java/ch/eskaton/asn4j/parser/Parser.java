@@ -252,6 +252,7 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static ch.eskaton.asn4j.parser.ParserUtils.getPosition;
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableMap;
 
 public class Parser {
 
@@ -2649,7 +2650,7 @@ public class Parser {
     protected class IdentifierListParser extends ListRuleParser<List<String>> {
 
         public List<String> parse() throws ParserException {
-            return parse(new CommaSeparatedRuleParser<>(new SingleTokenParser(TokenType.IDENTIFIER)),
+            return super.parse(new CommaSeparatedRuleParser<>(new SingleTokenParser(TokenType.IDENTIFIER)),
                     a -> a.p().stream().map(t -> ((Token) t).getText()).collect(Collectors.toList()));
         }
 
@@ -3097,7 +3098,7 @@ public class Parser {
             return super.parse(new ChoiceParser<>(
                     new SequenceParser(TokenType.L_BRACE, namedValueListParser, TokenType.R_BRACE),
                     new SequenceParser(TokenType.L_BRACE, valueListParser, TokenType.R_BRACE)), a ->
-                    ((List) a.l().n1()).stream().filter(e -> e instanceof NamedValue).findFirst().isPresent() ?
+                    ((List) a.l().n1()).stream().anyMatch(e -> e instanceof NamedValue) ?
                             new CollectionValue(a.P(), (List<NamedValue>) a.l().n1()) :
                             new CollectionOfValue(a.P(), (List<Value>) a.l().n1())
             );
@@ -3828,7 +3829,7 @@ public class Parser {
     protected class PropertyAndSettingPairParser extends ListRuleParser<PropertyAndSettingNode> {
 
         @SuppressWarnings("serial")
-        private final Map<String, Set<String>> PROPERTIES = Maps.<String, Set<String>>builder()
+        private final Map<String, Set<String>> properties = unmodifiableMap(Maps.<String, Set<String>>builder()
                 .put("Basic", new HashSet<>(asList("Date", "Time", "Date-Time", "Interval", "Rec-Interval")))
                 .put("Date", new HashSet<>(asList("C", "Y", "YM", "YMD", "YD", "YW", "YWD")))
                 .put("Year", new HashSet<>(asList("Basic", "Proleptic", "Negative")))
@@ -3838,7 +3839,7 @@ public class Parser {
                 .put("SE-point", new HashSet<>(asList("Date", "Time", "Date-Time")))
                 .put("Recurrence", new HashSet<>(asList("Unlimited")))
                 .put("Midnight", new HashSet<>(asList("Start", "End")))
-                .build();
+                .build());
 
         public PropertyAndSettingNode parse() throws ParserException {
             return super.parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.EQUALS, TokenType.TYPE_REFERENCE),
@@ -3848,7 +3849,7 @@ public class Parser {
                 String property = a.s0();
                 String setting = a.s2();
 
-                Set<String> settings = PROPERTIES.get(property);
+                Set<String> settings = properties.get(property);
 
                 if (settings == null) {
                     setException(String.format("Invalid property '%s'", property), propertyToken);

@@ -82,7 +82,7 @@ public abstract class AbstractConstraintCompiler {
         this.dispatcher = new Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
                 ? extends Elements, Optional<Bounds>>, Node>()
                 .withComparator((t, c) -> c.isInstance(t))
-                .withException((e) -> new CompilerException("Invalid constraint %s for %s type",
+                .withException(e -> new CompilerException("Invalid constraint %s for %s type",
                         e.getClass().getSimpleName(), getTypeName().getName()));
 
         addConstraintHandler(ElementSet.class, new ElementSetCompiler(dispatcher)::compile);
