@@ -31,24 +31,18 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractIRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.constraints.expr.IRIValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
 import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
 import ch.eskaton.asn4j.compiler.il.ILType;
-import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
-import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
@@ -90,21 +84,9 @@ public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNo
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         return switch (node.getType()) {
-            case VALUE -> getValueExpression((N) node);
+            case VALUE -> new IRIValueExpressionBuilder<N>(ctx).build(compiledType, (N) node);
             default -> super.buildExpression(module, compiledType, node);
         };
-    }
-
-    private Optional<BooleanExpression> getValueExpression(N node) {
-        List<BooleanExpression> arguments = (node.getValue()).stream()
-                .map(this::buildExpression)
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
-    }
-
-    protected BooleanExpression buildExpression(List<String> value) {
-        return new BooleanFunctionCall.ArrayEquals(new Variable(VAR_VALUE), new ILValue(value.toArray(new String[] {})));
     }
 
 }

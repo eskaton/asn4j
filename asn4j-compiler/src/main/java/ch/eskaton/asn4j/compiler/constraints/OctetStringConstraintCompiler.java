@@ -35,17 +35,13 @@ import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.OctetStringSizeExpressionBuilder;
+import ch.eskaton.asn4j.compiler.constraints.expr.OctetStringValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.OctetStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
 import ch.eskaton.asn4j.compiler.il.ILType;
-import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
-import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -56,7 +52,6 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
@@ -110,24 +105,11 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         return switch (node.getType()) {
-            case VALUE -> getValueExpression((OctetStringValueNode) node);
+            case VALUE -> new OctetStringValueExpressionBuilder(ctx).build(compiledType, (OctetStringValueNode) node);
             case ALL_VALUES -> Optional.empty();
             case SIZE -> new OctetStringSizeExpressionBuilder().build(((SizeNode) node).getSize());
             default -> super.buildExpression(module, compiledType, node);
         };
-    }
-
-    private Optional<BooleanExpression> getValueExpression(OctetStringValueNode node) {
-        List<OctetStringValue> values = node.getValue();
-        List<BooleanExpression> valueExpressions = values.stream()
-                .map(this::buildExpression)
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueExpressions));
-    }
-
-    private BooleanExpression buildExpression(OctetStringValue value) {
-        return new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VAR_VALUE));
     }
 
 }

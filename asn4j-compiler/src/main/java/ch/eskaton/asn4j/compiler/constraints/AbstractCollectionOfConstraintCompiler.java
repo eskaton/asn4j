@@ -38,15 +38,13 @@ import ch.eskaton.asn4j.compiler.constraints.elements.SingleTypeConstraintCompil
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.CollectionOfSizeExpressionBuilder;
+import ch.eskaton.asn4j.compiler.constraints.expr.CollectionOfValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionOfConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.Expression;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
-import ch.eskaton.asn4j.compiler.il.ILListValue;
 import ch.eskaton.asn4j.compiler.il.ILMapValue;
 import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
@@ -66,7 +64,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
@@ -315,20 +312,11 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         }
 
         return switch (node.getType()) {
-            case VALUE -> getValueExpression(compiledType, (CollectionOfValueNode) node);
+            case VALUE -> new CollectionOfValueExpressionBuilder(ctx).build(compiledType, (CollectionOfValueNode) node);
             case SIZE -> new CollectionOfSizeExpressionBuilder().build(((SizeNode) node).getSize());
             case WITH_COMPONENT -> getWithComponentExpression(module, compiledType, (WithComponentNode) node);
             default -> super.buildExpression(module, compiledType, node);
         };
-    }
-
-    private Optional<BooleanExpression> getValueExpression(CompiledType compiledType, CollectionOfValueNode node) {
-        Set<CollectionOfValue> values = node.getValue();
-        List<BooleanExpression> valueArguments = values.stream()
-                .map(value -> buildExpression(compiledType, value))
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
     }
 
     private Optional<BooleanExpression> getWithComponentExpression(Module module, CompiledType compiledType,
@@ -431,31 +419,6 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
                 .collect(Collectors.toList());
 
         return singletonList(new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameter), VAR_VALUES));
-    }
-
-    @Override
-    protected String getTypeName(Type type) {
-        if (type instanceof TypeReference) {
-            type = (Type) ctx.resolveTypeReference(type);
-        }
-
-        Type elementType;
-
-        if (type instanceof CollectionOfType) {
-            elementType = ((CollectionOfType) type).getType();
-        } else {
-            elementType = type;
-        }
-
-        return super.getTypeName(elementType);
-    }
-
-    private BooleanExpression buildExpression(CompiledType compiledType, CollectionOfValue collectionOfValue) {
-        var values = collectionOfValue.getValues().stream()
-                .map(value -> new ILValue(getTypeName(compiledType.getType()), value))
-                .collect(Collectors.toList());
-
-        return new BooleanFunctionCall.SetEquals(new Variable(VAR_VALUE), new ILListValue(values));
     }
 
 }
