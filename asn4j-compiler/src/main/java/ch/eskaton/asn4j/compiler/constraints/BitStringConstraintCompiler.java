@@ -35,17 +35,14 @@ import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.BitStringStringSizeExpressionBuilder;
+import ch.eskaton.asn4j.compiler.constraints.expr.BitStringValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.BitStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILType;
-import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
-import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
@@ -56,7 +53,6 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_UNUSED_BITS;
@@ -65,7 +61,6 @@ import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_UNUSED_BITS;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getLowerBound;
 import static ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange.getUpperBound;
-import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BYTE_ARRAY;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER;
 import static java.util.Collections.emptyList;
@@ -124,27 +119,11 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         return switch (node.getType()) {
-            case VALUE -> getValueExpression((BitStringValueNode) node);
+            case VALUE -> new BitStringValueExpressionBuilder(ctx).build(compiledType, (BitStringValueNode) node);
             case ALL_VALUES -> Optional.empty();
             case SIZE -> new BitStringStringSizeExpressionBuilder().build(((SizeNode) node).getSize());
             default -> super.buildExpression(module, compiledType, node);
         };
-    }
-
-    private Optional<BooleanExpression> getValueExpression(BitStringValueNode node) {
-        List<BitStringValue> values = node.getValue();
-        List<BooleanExpression> valueArguments = values.stream()
-                .map(this::buildExpression)
-                .collect(Collectors.toList());
-
-        return of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
-    }
-
-    private BooleanExpression buildExpression(BitStringValue value) {
-        return new BinaryBooleanExpression(BinaryOperator.AND,
-                new ArrayEquals(new ILValue(value.getByteValue()), new Variable(VAR_VALUE)),
-                new BinaryBooleanExpression(BinaryOperator.EQ, new ILValue(value.getUnusedBits()),
-                        new Variable(VAR_UNUSED_BITS)));
     }
 
 }

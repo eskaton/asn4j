@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.CollectionContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.MultipleTypeConstraintsCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
+import ch.eskaton.asn4j.compiler.constraints.expr.CollectionValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.CollectionConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
@@ -84,7 +85,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.Dispatcher;
-import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -299,37 +299,10 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         }
 
         return switch (node.getType()) {
-            case VALUE -> getValueExpression(compiledType, (CollectionValueNode) node);
+            case VALUE -> new CollectionValueExpressionBuilder(ctx).build(compiledType, (CollectionValueNode) node);
             case WITH_COMPONENTS -> getWithComponentsExpression(module, compiledType, (WithComponentsNode) node);
             default -> super.buildExpression(module, compiledType, node);
         };
-    }
-
-    private Optional<BooleanExpression> getValueExpression(CompiledType compiledType, CollectionValueNode node) {
-        Set<CollectionValue> values = node.getValue();
-        List<BooleanExpression> valueArguments = values.stream()
-                .map(value -> buildExpression(compiledType, value))
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
-    }
-
-    private BooleanExpression buildExpression(CompiledType compiledType, CollectionValue collectionValue) {
-        var compiledBaseType = ctx.getCompiledBaseType(compiledType);
-        var typeStream = ((SequenceType) compiledBaseType.getType()).getAllRootComponents().stream()
-                .map(componentType -> ctx.getTypeName(
-                        Optional.ofNullable(componentType.getType())
-                                .orElse(componentType.getNamedType().getType())));
-        var valueStream = collectionValue.getValues().stream();
-        var associations = new HashSet<Tuple2<Expression, Expression>>();
-
-        StreamsUtils.zip(typeStream, valueStream)
-                .map(t -> new Tuple2<Expression, Expression>(ILValue.of(t.get_2().getName()),
-                        ILValue.of(t.get_1(), t.get_2().getValue())))
-                .forEach(associations::add);
-
-        return new BooleanFunctionCall.MapEquals(Variable.of(VAR_VALUES), new ILMapValue(ILType.of(ILBuiltinType.STRING),
-                ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
     }
 
     private Optional<BooleanExpression> getWithComponentsExpression(Module module, CompiledType compiledType,

@@ -32,25 +32,19 @@ import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.elements.EnumeratedTypeContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.EnumeratedTypeSingleValueCompiler;
+import ch.eskaton.asn4j.compiler.constraints.expr.EnumeratedTypeValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.EnumeratedTypeConstraintOptimizingVisitor;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.ILType;
-import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
-import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.INTEGER;
@@ -89,21 +83,9 @@ public class EnumeratedTypeConstraintCompiler extends AbstractConstraintCompiler
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         return switch (node.getType()) {
-            case VALUE -> getValueExpression((EnumeratedValueNode) node);
+            case VALUE -> new EnumeratedTypeValueExpressionBuilder(ctx).build(compiledType, (EnumeratedValueNode) node);
             default -> super.buildExpression(module, compiledType, node);
         };
-    }
-
-    private Optional<BooleanExpression> getValueExpression(EnumeratedValueNode node) {
-        Set<Integer> values = node.getValue();
-        List<BinaryBooleanExpression> arguments = values.stream().map(this::buildExpression)
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, arguments));
-    }
-
-    private BinaryBooleanExpression buildExpression(Integer enumValue) {
-        return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE), new ILValue(enumValue));
     }
 
 }
