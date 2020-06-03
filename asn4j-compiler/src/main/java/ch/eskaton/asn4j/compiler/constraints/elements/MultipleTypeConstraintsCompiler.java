@@ -61,7 +61,7 @@ public class MultipleTypeConstraintsCompiler implements ElementsCompiler<Multipl
 
         for (var constraint : elements.getConstraints()) {
             var name = constraint.getName();
-            var index = StreamsUtils.indexOf(components, (c) -> Objects.equals(name, c.get_1()));
+            var index = StreamsUtils.indexOf(components, c -> Objects.equals(name, c.get_1()));
 
             if (index != -1 && index > lastIndex) {
                 lastIndex = index;

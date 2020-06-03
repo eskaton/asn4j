@@ -85,7 +85,7 @@ public class JavaUtils {
             Class<T> valueClazz,
             TriFunction<CompilerContext, String, T, String> initializer) {
         dispatcher.withCase(valueClazz,
-                (maybeArgs) -> callWith(args -> initializer.apply(args.get_1(), args.get_2(),
+                maybeArgs -> callWith(args -> initializer.apply(args.get_1(), args.get_2(),
                         valueClazz.cast(args.get_3())), maybeArgs.get()));
     }
 

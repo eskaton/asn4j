@@ -30,10 +30,11 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
 import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
+import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class IRISingleValueCompiler extends AbstractIRISingleValueCompiler<IRIValue, IRIValueNode> {
+public class IRISingleValueCompiler extends AbstractIRISingleValueCompiler<IRI, IRIValue, IRIValueNode> {
 
     private final IRIValueResolver valueResolver;
 
@@ -44,7 +45,7 @@ public class IRISingleValueCompiler extends AbstractIRISingleValueCompiler<IRIVa
     }
 
     @Override
-    protected AbstractIRIValueResolver getValueResolver() {
+    protected AbstractIRIValueResolver<IRI, IRIValue> getValueResolver() {
         return valueResolver;
     }
 
