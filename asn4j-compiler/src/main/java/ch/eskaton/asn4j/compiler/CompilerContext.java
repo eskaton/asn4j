@@ -50,6 +50,7 @@ import ch.eskaton.asn4j.compiler.resolvers.OctetStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
@@ -855,6 +856,13 @@ public class CompilerContext {
         } catch (ClassNotFoundException e) {
             throw new CompilerException("Unknown type: " + type);
         }
+    }
+
+    public CompiledCollectionType getCompiledCollectionType(CompiledType compiledType) {
+        return Optional.ofNullable(getCompiledBaseType(compiledType))
+                .filter(CompiledCollectionType.class::isInstance)
+                .map(CompiledCollectionType.class::cast)
+                .orElseThrow(() -> new CompilerException("Failed to resolve the type of %s", compiledType));
     }
 
     public <T> T withNewClass(Supplier<T> supplier) {
