@@ -277,7 +277,11 @@ public class IL2JavaTranslator {
                         .collect(joining(", "));
             }
 
-            return object.map(o -> o + ".").orElse("") + function + "(" + arguments + ")";
+            if (object.isPresent()) {
+                return "(" + object.get() + " != null ? " + object.get() + "." + function + "(" + arguments + ")" + ": null" + ")";
+            } else {
+                return function + "(" + arguments + ")";
+            }
         } else {
             throw new CompilerException("Unhandled expression type: %s",
                     expression.getClass().getSimpleName());
@@ -303,6 +307,9 @@ public class IL2JavaTranslator {
                     break;
                 case EQ:
                     operator = " == ";
+                    break;
+                case NE:
+                    operator = " != ";
                     break;
                 case GE:
                     operator = " >= ";

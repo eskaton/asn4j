@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
 import ch.eskaton.asn4j.parser.ast.constraints.NamedConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
+import ch.eskaton.asn4j.parser.ast.constraints.ValueConstraint;
 import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.HashSet;
@@ -80,17 +81,23 @@ public class MultipleTypeConstraintsCompiler implements ElementsCompiler<Multipl
         var name = namedConstraint.getName();
         var constraint = namedConstraint.getConstraint();
         var presence = Optional.ofNullable(constraint.getPresence()).map(PresenceConstraint::getType).orElse(null);
-        var valueConstraint = constraint.getValue().getConstraint();
+        var maybeValueConstraint = Optional.ofNullable(constraint.getValue()).map(ValueConstraint::getConstraint);
         var definition = ctx.compileConstraint(compiledType);
+        Node roots = null;
 
-        if (definition != null) {
-            definition = definition.serialApplication(ctx.compileConstraint(compiledType, valueConstraint));
-        } else {
-            definition = ctx.compileConstraint(compiledType, valueConstraint);
+        if (maybeValueConstraint.isPresent()) {
+            var valueConstraint = maybeValueConstraint.get();
+
+            if (definition != null) {
+                definition = definition.serialApplication(ctx.compileConstraint(compiledType, valueConstraint));
+            } else {
+                definition = ctx.compileConstraint(compiledType, valueConstraint);
+            }
+
+            roots = definition.getRoots();
         }
 
-        return new ComponentNode(name, compiledType.getType(), definition.getRoots(), presence);
+        return new ComponentNode(name, compiledType.getType(), roots, presence);
     }
-
 
 }

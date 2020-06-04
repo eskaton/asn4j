@@ -28,5 +28,5 @@
 package ch.eskaton.asn4j.compiler.il;
 
 public enum BinaryOperator {
-    AND, OR, EQ, LE, GE
+    AND, OR, EQ, NE, LE, GE
 }
