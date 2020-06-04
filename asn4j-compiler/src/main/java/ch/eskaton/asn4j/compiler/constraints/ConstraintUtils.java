@@ -31,13 +31,9 @@ import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
 import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
-import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
-import java.util.List;
-
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUES;
 import static java.util.Collections.singletonList;
 
