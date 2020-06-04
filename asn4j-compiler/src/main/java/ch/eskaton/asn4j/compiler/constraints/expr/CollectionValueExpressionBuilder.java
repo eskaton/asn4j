@@ -29,8 +29,6 @@ package ch.eskaton.asn4j.compiler.constraints.expr;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.Expression;
@@ -49,28 +47,20 @@ import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.HashSet;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUES;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.CUSTOM;
 import static java.util.Collections.singletonList;
 
-public class CollectionValueExpressionBuilder extends AbstractValueExpressionBuilder<CollectionValueNode> {
+public class CollectionValueExpressionBuilder
+        extends VectorValueExpressionBuilder<CollectionValue, CollectionValueNode> {
 
     public CollectionValueExpressionBuilder(CompilerContext ctx) {
         super(ctx);
     }
 
-    public Optional<BooleanExpression> build(CompiledType compiledType, CollectionValueNode node) {
-        var values = node.getValue();
-        var valueArguments = values.stream()
-                .map(value -> buildExpression(compiledType, value))
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
-    }
-
-    private BooleanExpression buildExpression(CompiledType compiledType, CollectionValue collectionValue) {
+    @Override
+    protected BooleanExpression buildExpression(CompiledType compiledType, CollectionValue collectionValue) {
         var compiledBaseType = ctx.getCompiledBaseType(compiledType);
         var typeStream = ((SequenceType) compiledBaseType.getType()).getAllRootComponents().stream()
                 .map(componentType -> ctx.getTypeName(

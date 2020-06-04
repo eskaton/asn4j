@@ -29,8 +29,6 @@ package ch.eskaton.asn4j.compiler.constraints.expr;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractIRIValueNode;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILValue;
@@ -38,28 +36,18 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-public class IRIValueExpressionBuilder<N extends AbstractIRIValueNode> extends AbstractValueExpressionBuilder<N> {
+public class IRIValueExpressionBuilder<N extends AbstractIRIValueNode>
+        extends VectorValueExpressionBuilder<List<String>, N> {
 
     public IRIValueExpressionBuilder(CompilerContext ctx) {
         super(ctx);
     }
 
-    public Optional<BooleanExpression> build(CompiledType compiledType, N node) {
-        var values = node.getValue();
-        var valueArguments = values.stream()
-                .map(this::buildExpression)
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
-    }
-
-    protected BooleanExpression buildExpression(List<String> value) {
+    @Override
+    protected BooleanExpression buildExpression(CompiledType compiledType, List<String> value) {
         return new BooleanFunctionCall.ArrayEquals(new Variable(VAR_VALUE), new ILValue(value.toArray(new String[] {})));
     }
 

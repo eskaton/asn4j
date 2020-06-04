@@ -38,30 +38,17 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_UNUSED_BITS;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
-import static java.util.Optional.of;
 
-public class BitStringValueExpressionBuilder extends AbstractValueExpressionBuilder<BitStringValueNode> {
+public class BitStringValueExpressionBuilder extends VectorValueExpressionBuilder<BitStringValue, BitStringValueNode> {
 
     public BitStringValueExpressionBuilder(CompilerContext ctx) {
         super(ctx);
     }
 
-    public Optional<BooleanExpression> build(CompiledType compiledType, BitStringValueNode node) {
-        var values = node.getValue();
-        var valueArguments = values.stream()
-                .map(this::buildExpression)
-                .collect(Collectors.toList());
-
-        return of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
-    }
-
-    private BooleanExpression buildExpression(BitStringValue value) {
+    @Override
+    protected BooleanExpression buildExpression(CompiledType compiledType, BitStringValue value) {
         return new BinaryBooleanExpression(BinaryOperator.AND,
                 new BooleanFunctionCall.ArrayEquals(new ILValue(value.getByteValue()), new Variable(VAR_VALUE)),
                 new BinaryBooleanExpression(BinaryOperator.EQ, new ILValue(value.getUnusedBits()),

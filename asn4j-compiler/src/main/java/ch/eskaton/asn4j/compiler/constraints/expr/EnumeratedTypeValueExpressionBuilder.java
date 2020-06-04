@@ -31,32 +31,20 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-public class EnumeratedTypeValueExpressionBuilder extends AbstractValueExpressionBuilder<EnumeratedValueNode> {
+public class EnumeratedTypeValueExpressionBuilder extends VectorValueExpressionBuilder<Integer, EnumeratedValueNode> {
 
     public EnumeratedTypeValueExpressionBuilder(CompilerContext ctx) {
         super(ctx);
     }
 
-    public Optional<BooleanExpression> build(CompiledType compiledType, EnumeratedValueNode node) {
-        var values = node.getValue();
-        var valueArguments = values.stream()
-                .map(this::buildExpression)
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
-    }
-
-    private BinaryBooleanExpression buildExpression(Integer enumValue) {
+    @Override
+    protected BinaryBooleanExpression buildExpression(CompiledType compiledType, Integer enumValue) {
         return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE), new ILValue(enumValue));
     }
 
