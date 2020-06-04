@@ -25,35 +25,45 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.ILBuiltinType;
-import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
+import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
-import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 import java.util.List;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUES;
+import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
 import static java.util.Collections.singletonList;
 
-public class ConstraintUtils {
+public class InnerTypeExpressionBuilder {
 
-    private ConstraintUtils() {
+    protected final CompilerContext ctx;
+
+    public InnerTypeExpressionBuilder(CompilerContext ctx) {
+        this.ctx = ctx;
     }
 
-    public static <T> T throwUnimplementedNodeType(Node node) {
-        throw new IllegalCompilerStateException("Unimplemented node type: %s", node.getType());
+    protected void buildExpressionFunction(Module module, BooleanExpression expression, String functionName,
+            List<Parameter> parameterDefinition) {
+        // @formatter:off
+        module.function()
+                .returnType(ILType.of(BOOLEAN))
+                .name(functionName)
+                .parameters(parameterDefinition)
+                .statements()
+                    .returnExpression(expression)
+                    .build()
+                .build();
+        // @formatter:on
     }
 
-    public static Parameter getMapParameter() {
-        return Parameter.of(ILParameterizedType.of(ILBuiltinType.MAP,
-                singletonList(String.class.getSimpleName()),
-                singletonList(ASN1Type.class.getSimpleName())), VAR_VALUES);
+    protected List<Parameter> getValueParameter(ILBuiltinType builtinType) {
+        return singletonList(Parameter.of(ILType.of(builtinType), VAR_VALUE));
     }
 
 }
