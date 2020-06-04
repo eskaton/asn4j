@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.BooleanSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
-import ch.eskaton.asn4j.compiler.constraints.expr.BooleanValueExpressionBuilder;
+import ch.eskaton.asn4j.compiler.constraints.expr.ScalarValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.Module;
@@ -81,7 +81,7 @@ public class BooleanConstraintCompiler extends AbstractConstraintCompiler {
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         return switch (node.getType()) {
-            case VALUE -> new BooleanValueExpressionBuilder(ctx).build(compiledType, (ValueNode) node);
+            case VALUE -> new ScalarValueExpressionBuilder(ctx).build(compiledType, (ValueNode) node);
             default -> super.buildExpression(module, compiledType, node);
         };
     }

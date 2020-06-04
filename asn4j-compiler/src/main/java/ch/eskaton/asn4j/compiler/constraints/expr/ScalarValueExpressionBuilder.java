@@ -40,12 +40,13 @@ import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-public class BooleanValueExpressionBuilder extends AbstractValueExpressionBuilder<ValueNode> {
+public class ScalarValueExpressionBuilder extends AbstractValueExpressionBuilder<ValueNode> {
 
-    public BooleanValueExpressionBuilder(CompilerContext ctx) {
+    public ScalarValueExpressionBuilder(CompilerContext ctx) {
         super(ctx);
     }
 
+    @Override
     public Optional<BooleanExpression> build(CompiledType compiledType, ValueNode node) {
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE),
                 new ILValue(getTypeName(compiledType.getType()), node.getValue())));

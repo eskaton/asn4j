@@ -29,8 +29,6 @@ package ch.eskaton.asn4j.compiler.constraints.expr;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILListValue;
@@ -42,29 +40,19 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-public class CollectionOfValueExpressionBuilder extends AbstractValueExpressionBuilder<CollectionOfValueNode> {
+public class CollectionOfValueExpressionBuilder
+        extends VectorValueExpressionBuilder<CollectionOfValue, CollectionOfValueNode> {
 
     public CollectionOfValueExpressionBuilder(CompilerContext ctx) {
         super(ctx);
     }
 
-    public Optional<BooleanExpression> build(CompiledType compiledType, CollectionOfValueNode node) {
-        Set<CollectionOfValue> values = node.getValue();
-        List<BooleanExpression> valueArguments = values.stream()
-                .map(value -> buildExpression(compiledType, value))
-                .collect(Collectors.toList());
-
-        return Optional.of(new BinaryBooleanExpression(BinaryOperator.OR, valueArguments));
-    }
-
-    private BooleanExpression buildExpression(CompiledType compiledType, CollectionOfValue collectionOfValue) {
+    @Override
+    protected BooleanExpression buildExpression(CompiledType compiledType, CollectionOfValue collectionOfValue) {
         var values = collectionOfValue.getValues().stream()
                 .map(value -> new ILValue(getTypeName(compiledType.getType()), value))
                 .collect(Collectors.toList());

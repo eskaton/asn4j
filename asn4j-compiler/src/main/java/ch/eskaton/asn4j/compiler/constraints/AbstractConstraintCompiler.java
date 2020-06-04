@@ -51,7 +51,6 @@ import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.functional.TriFunction;
@@ -229,16 +228,6 @@ public abstract class AbstractConstraintCompiler {
             buildExpression(builder.getModule(), compiledType, definition.getRoots()).ifPresentOrElse(
                     e -> builder.statements().returnExpression(e),
                     () -> builder.statements().returnValue(Boolean.TRUE));
-        }
-    }
-
-    protected String getTypeName(Type type) {
-        if (type == null) {
-            return "";
-        } else if (type instanceof TypeReference) {
-            return ((TypeReference) type).getType();
-        } else {
-            return ctx.getRuntimeType(type.getClass());
         }
     }
 
