@@ -42,7 +42,18 @@ TestSequence5 ::= SEQUENCE {
     ...,
     d BOOLEAN
 } (WITH COMPONENTS {c (WITH COMPONENTS {a (1)})})
-
+TestSequence6 ::= SEQUENCE {
+    a INTEGER OPTIONAL,
+    b BOOLEAN
+} (WITH COMPONENTS {a ABSENT})
+TestSequence7 ::= SEQUENCE {
+    a INTEGER OPTIONAL,
+    b BOOLEAN
+} (WITH COMPONENTS {a PRESENT})
+TestSequence8 ::= SEQUENCE {
+    a INTEGER OPTIONAL,
+    b BOOLEAN
+} (WITH COMPONENTS {a OPTIONAL})
 
 -- Test all types
 TestSetOf109 ::= SET OF BOOLEAN

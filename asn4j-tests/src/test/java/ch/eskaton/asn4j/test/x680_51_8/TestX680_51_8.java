@@ -52,6 +52,9 @@ import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence3;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence4;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence5;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence6;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence7;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence8;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf1;
@@ -391,6 +394,38 @@ class TestX680_51_8 {
 
         testSequenceFailure(TestSequence5.class, new TestSequence5(),
                 s -> init.accept(s, ASN1Integer.valueOf(2), ASN1Boolean.TRUE, ASN1Boolean.TRUE));
+    }
+
+    @Test
+    void testSequence6() {
+        testSequenceSuccess(TestSequence6.class, new TestSequence6(), s -> s.setB(ASN1Boolean.TRUE));
+        testSequenceSuccess(TestSequence6.class, new TestSequence6(), s -> s.setB(ASN1Boolean.FALSE));
+
+        testSequenceFailure(TestSequence6.class, new TestSequence6(), s -> {
+            s.setA(ASN1Integer.valueOf(1L));
+            s.setB(ASN1Boolean.FALSE);
+        });
+    }
+
+    @Test
+    void testSequence7() {
+        testSequenceSuccess(TestSequence7.class, new TestSequence7(), s -> {
+            s.setA(ASN1Integer.valueOf(1L));
+            s.setB(ASN1Boolean.FALSE);
+        });
+
+        testSequenceFailure(TestSequence7.class, new TestSequence7(), s -> s.setB(ASN1Boolean.TRUE));
+    }
+
+    @Test
+    void testSequence8() {
+        testSequenceSuccess(TestSequence8.class, new TestSequence8(), s -> {
+            s.setA(ASN1Integer.valueOf(1L));
+            s.setB(ASN1Boolean.FALSE);
+        });
+        testSequenceSuccess(TestSequence8.class, new TestSequence8(), s -> {
+            s.setB(ASN1Boolean.FALSE);
+        });
     }
 
     @Test

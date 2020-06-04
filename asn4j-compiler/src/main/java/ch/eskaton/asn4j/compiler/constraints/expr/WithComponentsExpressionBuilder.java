@@ -47,6 +47,7 @@ import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
@@ -69,6 +70,7 @@ import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -157,21 +159,52 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
 
         var expressionCalls = node.getComponents().stream().map(componentNode -> {
             var compiledComponent = compiledComponentTypes.get(componentNode.getName());
-            var expression = ctx.buildExpression(module, compiledComponent, componentNode.getConstraint())
-                    .orElseThrow(() -> new IllegalCompilerStateException("Expected expression"));
-            var expressionFunction = buildExpressionFunction(module, compiledComponent, expression);
+            var maybeValueExpression = Optional.ofNullable(componentNode.getConstraint())
+                    .map(constraint -> ctx.buildExpression(module, compiledComponent, constraint)
+                            .orElseThrow(() -> new IllegalCompilerStateException("Expected maybeValueExpression")));
+            var maybePresenceExpression = Optional.ofNullable(componentNode.getPresenceType())
+                    .map(presenceType -> buildPresenceExpression(componentNode.getName(), presenceType));
+            BooleanExpression expression = null;
 
-            return new BooleanFunctionCall(Optional.of(expressionFunction.get_1()),
-                    getParameters(componentNode, compiledComponent.getName(), expressionFunction.get_2()));
-        }).collect(Collectors.toList());
+            if (maybeValueExpression.isPresent() && maybePresenceExpression.isPresent()) {
+                expression = new BinaryBooleanExpression(BinaryOperator.AND, maybeValueExpression.get(), maybePresenceExpression.get());
+            } else if (maybeValueExpression.isPresent()) {
+                expression = maybeValueExpression.get();
+            } else if (maybePresenceExpression.isPresent()) {
+                expression = maybePresenceExpression.get();
+            }
+
+            if (expression != null) {
+                var expressionFunction = buildExpressionFunction(module, compiledComponent, expression);
+
+                return new BooleanFunctionCall(Optional.of(expressionFunction.get_1()),
+                        getParameters(componentNode, compiledComponent.getName(), expressionFunction.get_2()));
+            }
+
+            return null;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
 
         var checkSym = module.generateSymbol(FUNC_CHECK_CONSTRAINT);
         var parameterDefinition = getMapParameter();
-        var expression = new BinaryBooleanExpression(BinaryOperator.AND, expressionCalls);
 
-        buildExpressionFunction(module, expression, checkSym, singletonList(parameterDefinition));
+        if (!expressionCalls.isEmpty()) {
+            var expression = new BinaryBooleanExpression(BinaryOperator.AND, expressionCalls);
 
-        return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), Variable.of(VAR_VALUES)));
+            buildExpressionFunction(module, expression, checkSym, singletonList(parameterDefinition));
+
+            return Optional.of(new BooleanFunctionCall(Optional.of(checkSym), Variable.of(VAR_VALUES)));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private BooleanExpression buildPresenceExpression(String componentName,
+            PresenceConstraint.PresenceType presenceType) {
+        return switch (presenceType) {
+            case PRESENT -> new BinaryBooleanExpression(BinaryOperator.NE, new Variable(VAR_VALUE), new ILValue(null));
+            case ABSENT -> new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE), new ILValue(null));
+            case OPTIONAL -> null;
+        };
     }
 
     private List<Expression> getParameters(ComponentNode component, String typeName, String runtimeType) {
