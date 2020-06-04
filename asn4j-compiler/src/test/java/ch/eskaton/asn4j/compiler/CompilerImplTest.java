@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import org.hamcrest.text.MatchesPattern;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -156,6 +157,22 @@ class CompilerImplTest {
                         "Contained subtype in SIZE constraint must be of type INTEGER")
         );
         // @formatter:on
+    }
+
+    @Test
+    void testForbiddenAbsentPresenceConstraint() {
+        var body = """
+                Seq ::= SEQUENCE {
+                    a INTEGER
+                } (WITH COMPONENTS {a ABSENT})
+                """;
+        var module = module("TEST-MODULE", body);
+        var exception = assertThrows(() -> new CompilerImpl()
+                        .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())),
+                CompilerException.class);
+
+        exception.ifPresent(e -> assertThat(e.getMessage(), MatchesPattern
+                .matchesPattern(".*isn't optional and therefore can't have a presence constraint of ABSENT.*")));
     }
 
     private static Stream<Arguments> provideInvalidMultipleTypeConstraints() {
