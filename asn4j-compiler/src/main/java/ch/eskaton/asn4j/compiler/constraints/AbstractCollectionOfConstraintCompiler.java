@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
-import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.CollectionOfContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleTypeConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
@@ -80,7 +80,6 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
     private final ILBuiltinType collectionType;
 
-
     public AbstractCollectionOfConstraintCompiler(CompilerContext ctx, TypeName typeName, ILBuiltinType collectionType) {
         super(ctx);
 
@@ -90,7 +89,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         addConstraintHandler(SingleValueConstraint.class,
                 new SingleValueCompiler(ctx, CollectionOfValue.class, CollectionOfValueNode.class, getTypeName(),
                         Set.class)::compile);
-        addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
+        addConstraintHandler(ContainedSubtype.class, new CollectionOfContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class,
                 new SizeCompiler(ctx, new IntegerConstraintCompiler(ctx).getDispatcher())::compile);
         addConstraintHandler(SingleTypeConstraint.class, new SingleTypeConstraintCompiler(ctx)::compile);

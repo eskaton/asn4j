@@ -33,8 +33,10 @@ import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
+import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
@@ -76,6 +78,7 @@ public class JavaUtils {
         addCase(dispatcher, OctetStringValue.class, JavaUtils::getOctetStringInitializerString);
         addCase(dispatcher, RelativeOIDValue.class, JavaUtils::getRelativeOIDInitializerString);
         addCase(dispatcher, RelativeIRIValue.class, JavaUtils::getRelativeIRIInitializerString);
+        addCase(dispatcher, CollectionOfValue.class, JavaUtils::getCollectionOfInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
     }
@@ -165,6 +168,14 @@ public class JavaUtils {
                 i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
 
         return "new " + typeName + "(new byte[] { " + bytesStr + " })";
+    }
+
+    private static String getCollectionOfInitializerString(CompilerContext ctx, String typeName, CollectionOfValue value) {
+        var initString = value.getValues().stream()
+                .map(v -> getInitializerString(ctx, ctx.getTypeName(((AbstractValue) v).getType()), v))
+                .collect(Collectors.joining(", "));
+
+        return "new " + typeName + "(" + initString + ")";
     }
 
 }

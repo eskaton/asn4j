@@ -66,6 +66,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestOctetString7;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOID2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOidIri2;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequence1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf1;
@@ -79,6 +80,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf7;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf8;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf9;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
 
 import static ch.eskaton.asn4j.test.TestHelper.randomBytes;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
@@ -105,8 +108,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
+import static ch.eskaton.commons.utils.Utils.with;
 
 class TestX680_51_1 {
 
@@ -492,7 +497,7 @@ class TestX680_51_1 {
     }
 
     @Test
-    void TestSetOf10() {
+    void testSetOf10() {
         testSetOfSuccess(TestSetOf10.class, new TestSetOf10());
         testSetOfSuccess(TestSetOf10.class, new TestSetOf10(), new ASN1SetOf<>());
         testSetOfSuccess(TestSetOf10.class, new TestSetOf10(),
@@ -507,7 +512,7 @@ class TestX680_51_1 {
     }
 
     @Test
-    void TestSequenceOf1() {
+    void testSequenceOf1() {
         testSequenceOfSuccess(TestSequenceOf1.class, new TestSequenceOf1(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(1L)),
                 new ASN1SetOf<>(ASN1Integer.valueOf(2L)));
@@ -530,7 +535,7 @@ class TestX680_51_1 {
     }
 
     @Test
-    void TestSequenceOf2() {
+    void testSequenceOf2() {
         testSequenceOfSuccess(TestSequenceOf2.class, new TestSequenceOf2(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(1L)),
                 new ASN1SetOf<>(ASN1Integer.valueOf(2L)));
@@ -553,7 +558,16 @@ class TestX680_51_1 {
     }
 
     @Test
-    void TestChoice1() {
+    void testSequence1() {
+        testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new TestSequence1.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)));
+            s.setB(new TestSequence1.B(with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(4L))),
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(5L)))));
+        });
+    }
+
+    @Test
+    void testChoice1() {
         testChoiceSuccess(TestChoice1.class, new TestChoice1(), c -> c.setA(ASN1Integer.valueOf(3L)));
         testChoiceSuccess(TestChoice1.class, new TestChoice1(), c -> c.setB(ASN1Boolean.TRUE));
 

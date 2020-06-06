@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.java;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
@@ -93,7 +94,7 @@ public class IL2JavaTranslator {
             case PUBLIC:
                 return JavaVisibility.PUBLIC;
             default:
-                throw new CompilerException("Unimplemented case: " + visibility);
+                throw new IllegalCompilerStateException("Unimplemented case: " + visibility);
         }
     }
 
@@ -169,7 +170,7 @@ public class IL2JavaTranslator {
 
             return code.toString();
         } else {
-            throw new CompilerException("Unhandled statements type: %s",
+            throw new IllegalCompilerStateException("Unhandled statements type: %s",
                     statement.getClass().getSimpleName());
         }
     }
@@ -256,7 +257,8 @@ public class IL2JavaTranslator {
                         arguments = "new " + javaType + "[] {}";
                         break;
                     default:
-                        throw new CompilerException("Unsupported type %s in ToString function", type.getBaseType());
+                        throw new IllegalCompilerStateException("Unsupported type %s in ToString function",
+                                type.getBaseType());
                 }
             } else if (functionCall instanceof GetMapValue) {
                 var type = toJavaType(javaClass, ((GetMapValue) functionCall).getType());
@@ -283,7 +285,7 @@ public class IL2JavaTranslator {
                 return function + "(" + arguments + ")";
             }
         } else {
-            throw new CompilerException("Unhandled expression type: %s",
+            throw new IllegalCompilerStateException("Unhandled expression type: %s",
                     expression.getClass().getSimpleName());
         }
     }
@@ -318,7 +320,7 @@ public class IL2JavaTranslator {
                     operator = " <= ";
                     break;
                 default:
-                    throw new CompilerException("Unhandled operator type: %s",
+                    throw new IllegalCompilerStateException("Unhandled operator type: %s",
                             binaryBooleanExpression.getOperator());
             }
 
@@ -352,7 +354,7 @@ public class IL2JavaTranslator {
                 return object.map(obj -> obj + ".").orElse("") + function + "(" + arguments + ")";
             }
         } else {
-            throw new CompilerException("Unhandled boolean expression type: %s",
+            throw new IllegalCompilerStateException("Unhandled boolean expression type: %s",
                     booleanExpression.getClass().getSimpleName());
         }
     }
@@ -390,7 +392,7 @@ public class IL2JavaTranslator {
             case CUSTOM:
                 return getTypeString((ILParameterizedType) type);
             default:
-                throw new CompilerException("Unimplemented case: " + type);
+                throw new IllegalCompilerStateException("Unimplemented case: %s", type);
         }
     }
 
