@@ -38,15 +38,14 @@ import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.HashSet;
-import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUES;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.CUSTOM;
@@ -61,11 +60,8 @@ public class CollectionValueExpressionBuilder
 
     @Override
     protected BooleanExpression buildExpression(CompiledType compiledType, CollectionValue collectionValue) {
-        var compiledBaseType = ctx.getCompiledBaseType(compiledType);
-        var typeStream = ((SequenceType) compiledBaseType.getType()).getAllRootComponents().stream()
-                .map(componentType -> ctx.getTypeName(
-                        Optional.ofNullable(componentType.getType())
-                                .orElse(componentType.getNamedType().getType())));
+        var compiledBaseType = (CompiledCollectionType) ctx.getCompiledBaseType(compiledType);
+        var typeStream = compiledBaseType.getComponents().stream().map(c -> c.get_2().getName());
         var valueStream = collectionValue.getValues().stream();
         var associations = new HashSet<Tuple2<Expression, Expression>>();
 

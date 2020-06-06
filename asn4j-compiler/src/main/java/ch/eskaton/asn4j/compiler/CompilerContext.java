@@ -92,6 +92,7 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
@@ -583,7 +584,7 @@ public class CompilerContext {
     }
 
     public TypeAssignmentNode getTypeAssignment(String typeName, Optional<String> moduleName) {
-        Optional<ModuleNode> module = moduleName.map(n -> Optional.ofNullable(modules.get(moduleName)))
+        Optional<ModuleNode> module = moduleName.map(n -> Optional.ofNullable(modules.get(n)))
                 .orElseGet(() -> Optional.of(getModule()));
 
         return module.map(m -> m.getBody().getAssignments().stream()
@@ -629,7 +630,13 @@ public class CompilerContext {
     }
 
     public <T> T resolveGenericValue(Class<T> valueClass, Type type, Value value) {
-        return getValueResolver(valueClass).resolveGeneric(type, value);
+        var resolvedValue = getValueResolver(valueClass).resolveGeneric(type, value);
+
+        if (resolvedValue instanceof AbstractValue) {
+            ((AbstractValue) resolvedValue).setType(type);
+        }
+
+        return resolvedValue;
     }
 
     private <T> ValueResolver<T> getValueResolver(Class<T> valueClass) {
