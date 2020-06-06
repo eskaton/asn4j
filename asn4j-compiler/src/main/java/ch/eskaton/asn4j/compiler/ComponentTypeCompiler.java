@@ -48,6 +48,7 @@ import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
@@ -107,7 +108,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             TypeReference typeRef = (TypeReference) type;
             String refTypeName = typeRef.getType();
 
-            assignment = ctx.getTypeAssignment(refTypeName, null);
+            assignment = ctx.getTypeAssignment(refTypeName, Optional.empty());
 
             if (assignment == null) {
                 throw new CompilerException("Type %s referenced but not defined", refTypeName);
@@ -119,7 +120,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             String refTypeName = typeRef.getType();
             String refModuleName = typeRef.getModule();
 
-            assignment = ctx.getTypeAssignment(refTypeName, refModuleName);
+            assignment = ctx.getTypeAssignment(refTypeName, Optional.of(refModuleName));
 
             if (assignment == null) {
                 throw new CompilerException("Type %s from Module %s referenced but not defined or not exported",

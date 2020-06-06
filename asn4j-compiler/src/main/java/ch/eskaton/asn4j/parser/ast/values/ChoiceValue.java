@@ -45,11 +45,19 @@ public class ChoiceValue extends AbstractValue {
     }
 
     public String getId() {
-    	return id;
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Value getValue() {
-    	return value;
+        return value;
+    }
+
+    public void setValue(Value value) {
+        this.value = value;
     }
 
     @Override

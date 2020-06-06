@@ -25,37 +25,56 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.ExtensionAdditionAlternativesGroup;
-import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.commons.collections.Tuple2;
 
-public class ExtensionAdditionAlternativeNode extends AbstractNode {
+import java.util.List;
+import java.util.Objects;
 
-    private NamedType namedType;
+public class CompiledChoiceType extends CompiledType {
 
-    private ExtensionAdditionAlternativesGroup extensionAdditionAlternativesGroup;
+    private List<Tuple2<String, CompiledType>> components;
 
-    public ExtensionAdditionAlternativeNode(Position position, NamedType namedType) {
-        super(position);
+    public CompiledChoiceType(Type type, String name, List<Tuple2<String, CompiledType>> components) {
+        super(type, name);
 
-        this.namedType = namedType;
+        this.components = components;
     }
 
-    public ExtensionAdditionAlternativeNode(Position position,
-            ExtensionAdditionAlternativesGroup extensionAdditionAlternativesGroup) {
-        super(position);
-
-        this.extensionAdditionAlternativesGroup = extensionAdditionAlternativesGroup;
+    public List<Tuple2<String, CompiledType>> getComponents() {
+        return components;
     }
 
-    public NamedType getNamedType() {
-        return namedType;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(obj)) {
+            return false;
+        }
+
+        CompiledChoiceType that = (CompiledChoiceType) obj;
+
+        return Objects.equals(components, that.components);
     }
 
-    public ExtensionAdditionAlternativesGroup getExtensionAdditionAlternativesGroup() {
-        return extensionAdditionAlternativesGroup;
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), components);
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

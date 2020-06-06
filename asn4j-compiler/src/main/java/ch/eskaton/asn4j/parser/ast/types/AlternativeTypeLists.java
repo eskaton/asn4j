@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -36,45 +36,45 @@ import java.util.List;
 
 public class AlternativeTypeLists extends AbstractNode {
 
-    private List<NamedType> rootTypeList;
+    private List<NamedType> rootAlternatives;
 
     private ExtensionAndExceptionNode extensionAndException;
 
-    private List<ExtensionAdditionAlternativeNode> extAddAlts;
+    private List<ExtensionAdditionAlternativeNode> extensionAdditionAlternatives;
 
-    private boolean optExtMarker;
+    private boolean extensionMarker;
 
-    public AlternativeTypeLists(Position position, List<NamedType> rootTypeList) {
+    public AlternativeTypeLists(Position position, List<NamedType> rootAlternatives) {
         super(position);
 
-    	this.rootTypeList = rootTypeList;
+        this.rootAlternatives = rootAlternatives;
     }
 
-    public AlternativeTypeLists(Position position, List<NamedType> rootTypeList,
-    		ExtensionAndExceptionNode extensionAndException, List<ExtensionAdditionAlternativeNode> extAddAlts,
-    		boolean optExtMarker) {
+    public AlternativeTypeLists(Position position, List<NamedType> rootAlternatives,
+            ExtensionAndExceptionNode extensionAndException,
+            List<ExtensionAdditionAlternativeNode> extensionAdditionAlternatives, boolean extensionMarker) {
         super(position);
 
-    	this.rootTypeList = rootTypeList;
-    	this.extensionAndException = extensionAndException;
-    	this.extAddAlts = extAddAlts;
-    	this.optExtMarker = optExtMarker;
+        this.rootAlternatives = rootAlternatives;
+        this.extensionAndException = extensionAndException;
+        this.extensionAdditionAlternatives = extensionAdditionAlternatives;
+        this.extensionMarker = extensionMarker;
     }
 
-    public List<NamedType> getRootTypeList() {
-    	return rootTypeList;
+    public List<NamedType> getRootAlternatives() {
+        return rootAlternatives;
     }
 
     public ExtensionAndExceptionNode getExtensionAndException() {
-    	return extensionAndException;
+        return extensionAndException;
     }
 
-    public List<ExtensionAdditionAlternativeNode> getExtAddAlts() {
-    	return extAddAlts;
+    public List<ExtensionAdditionAlternativeNode> getExtensionAdditionAlternatives() {
+        return extensionAdditionAlternatives;
     }
 
-    public boolean hasOptExtMarker() {
-    	return optExtMarker;
+    public boolean hasExtensionMarker() {
+        return extensionMarker;
     }
 
 }

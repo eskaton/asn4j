@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.java.objs.JavaEnum;
 import ch.eskaton.asn4j.compiler.java.objs.JavaGetter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaTypedSetter;
+import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -41,6 +42,7 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,9 +72,14 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         builder.append("switch(" + CHOICE_FIELD + ") {");
 
-        for (NamedType type : node.getRootTypeList()) {
+        var components = new ArrayList<Tuple2<String, CompiledType>>();
+
+        for (NamedType type : node.getRootAlternatives()) {
             String typeConstant = CompilerUtils.formatConstant(type.getName());
-            String fieldName = compileChoiceNamedType(ctx, javaClass, type, typeConstant, clearFields);
+            Tuple2<String, CompiledType> component = compileChoiceNamedType(ctx, javaClass, type, typeConstant, clearFields);
+            String fieldName = component.get_1();
+
+            components.add(component);
             fieldNames.add(fieldName);
             typeEnum.addEnumConstant(typeConstant);
             builder.append("\tcase " + typeConstant + ":").append("\t\treturn " + fieldName + ";");
@@ -87,14 +94,23 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         addClearFieldsMethod(javaClass, fieldNames);
 
+        CompiledChoiceType compiledType = new CompiledChoiceType(node, name, components);
+
+        if (node.hasConstraint()) {
+            var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+
+            compiledType.setConstraintDefinition(constraintDef);
+        }
+
         ctx.finishClass();
 
         return new CompiledType(node, name);
     }
 
-    private String compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,
+    private Tuple2<String, CompiledType> compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,
             String typeConstant, String beforeCode) {
         String name = CompilerUtils.formatName(namedType.getName());
+        CompiledType compiledType = ctx.defineType(namedType);
         String typeName = ctx.getTypeName(namedType);
         Tag tag = namedType.getType().getTag();
         TaggingMode taggingMode = namedType.getType().getTaggingMode();
@@ -112,7 +128,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
                 beforeCode));
         javaClass.addMethod(new JavaGetter(typeName, name, field.hasDefault()));
 
-        return name;
+        return Tuple2.of(name, compiledType);
     }
 
     private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {

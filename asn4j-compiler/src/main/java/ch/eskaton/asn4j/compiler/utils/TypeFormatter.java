@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
+import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
@@ -47,6 +48,7 @@ import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
+import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 import java.util.List;
@@ -55,6 +57,7 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
+import static ch.eskaton.asn4j.runtime.types.TypeName.CHOICE;
 import static ch.eskaton.asn4j.runtime.types.TypeName.ENUMERATED;
 import static ch.eskaton.asn4j.runtime.types.TypeName.INTEGER;
 import static ch.eskaton.asn4j.runtime.types.TypeName.NULL;
@@ -65,6 +68,7 @@ import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID;
 import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID_IRI;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE_OF;
+import static ch.eskaton.asn4j.runtime.types.TypeName.SET;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
 
 public class TypeFormatter {
@@ -77,10 +81,18 @@ public class TypeFormatter {
             return SEQUENCE + "[" + ((SequenceType) type).getAllComponents().stream()
                     .map(t -> formatComponentType(ctx, t))
                     .collect(Collectors.joining(", ")) + "]";
+        } else if (type instanceof SetType) {
+            return SET + "[" + ((SequenceType) type).getAllComponents().stream()
+                    .map(t -> formatComponentType(ctx, t))
+                    .collect(Collectors.joining(", ")) + "]";
         } else if (type instanceof SequenceOfType) {
             return SEQUENCE_OF + "(" + formatType(ctx, ((SequenceOfType) type).getType()) + ")";
         } else if (type instanceof SetOfType) {
             return SET_OF + "(" + formatType(ctx, ((SetOfType) type).getType()) + ")";
+        } else if (type instanceof Choice) {
+            return CHOICE + "[" + ((Choice) type).getAllAlternatives().stream()
+                    .map(a -> formatNamedType(ctx, a))
+                    .collect(Collectors.joining(", ")) + "]";
         } else if (type instanceof BooleanType) {
             return BOOLEAN.getName();
         } else if (type instanceof IntegerType) {
@@ -139,12 +151,14 @@ public class TypeFormatter {
         if (component.getType() != null) {
             return "[" + formatType(ctx, component.getType()) + "]";
         } else if (component.getNamedType() != null) {
-            NamedType namedType = component.getNamedType();
-
-            return "[" + namedType.getName() + ": " + formatType(ctx, namedType.getType()) + "]";
+            return formatNamedType(ctx, component.getNamedType());
         }
 
         throw new IllegalCompilerStateException("Component type %s not handled", component);
+    }
+
+    private static String formatNamedType(CompilerContext ctx, NamedType namedType) {
+        return "[" + namedType.getName() + ": " + formatType(ctx, namedType.getType()) + "]";
     }
 
 }

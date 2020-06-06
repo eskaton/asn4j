@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
@@ -325,6 +326,20 @@ public class TestHelper {
         consumer.accept(sequenceValue);
 
         assertThrows(() -> assertValueDecodable(clazz, sequenceValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1Choice> void testChoiceSuccess(Class<? extends T> clazz, T choiceValue,
+            Consumer<T> consumer) {
+        consumer.accept(choiceValue);
+
+        assertValueDecodable(clazz, choiceValue);
+    }
+
+    public static <T extends ASN1Choice> void testChoiceFailure(Class<? extends T> clazz, T choiceValue,
+            Consumer<T> consumer) {
+        consumer.accept(choiceValue);
+
+        assertThrows(() -> assertValueDecodable(clazz, choiceValue), ConstraintViolatedException.class);
     }
 
     public static byte[] randomBytes(int length) {

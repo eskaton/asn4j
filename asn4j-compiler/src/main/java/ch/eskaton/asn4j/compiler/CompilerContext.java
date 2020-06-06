@@ -39,6 +39,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.ChoiceValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.CollectionOfValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.CollectionValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
@@ -198,6 +199,7 @@ public class CompilerContext {
             .put(RelativeIRIValue.class, new RelativeIRIValueResolver(CompilerContext.this))
             .put(CollectionValue.class, new CollectionValueResolver(CompilerContext.this))
             .put(CollectionOfValue.class, new CollectionOfValueResolver(CompilerContext.this))
+            .put(ChoiceValue.class, new ChoiceValueResolver(CompilerContext.this))
             .build();
 
     @SuppressWarnings("serial")
@@ -576,30 +578,19 @@ public class CompilerContext {
         return this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
     }
 
-    private TypeAssignmentNode getTypeAssignment(String type) {
-        return getTypeAssignment(type, null);
+    private TypeAssignmentNode getTypeAssignment(String typeName) {
+        return getTypeAssignment(typeName, Optional.empty());
     }
 
-    public TypeAssignmentNode getTypeAssignment(String typeName, String moduleName) {
-        ModuleNode module;
+    public TypeAssignmentNode getTypeAssignment(String typeName, Optional<String> moduleName) {
+        Optional<ModuleNode> module = moduleName.map(n -> Optional.ofNullable(modules.get(moduleName)))
+                .orElseGet(() -> Optional.of(getModule()));
 
-        if (moduleName != null) {
-            if (!modules.containsKey(moduleName)) {
-                return null;
-            }
-
-            module = modules.get(moduleName);
-        } else {
-            module = getModule();
-        }
-
-        for (AssignmentNode assignment : module.getBody().getAssignments()) {
-            if (assignment instanceof TypeAssignmentNode && typeName.equals(assignment.getReference())) {
-                return (TypeAssignmentNode) assignment;
-            }
-        }
-
-        return null;
+        return module.map(m -> m.getBody().getAssignments().stream()
+                .filter(TypeAssignmentNode.class::isInstance)
+                .map(TypeAssignmentNode.class::cast)
+                .filter(a -> typeName.equals(a.getReference()))
+                .findFirst()).get().orElse(null);
     }
 
     public Class<? extends Value> getValueType(Type type) {
@@ -821,7 +812,7 @@ public class CompilerContext {
                     Type collectionType = ((TypeAssignmentNode) assignment).getType();
 
                     if (collectionType instanceof Choice) {
-                        return ((Choice) collectionType).getRootTypeList().stream()
+                        return ((Choice) collectionType).getRootAlternatives().stream()
                                 .filter(t -> t.getName().equals(selectedId))
                                 .findFirst()
                                 .orElseThrow(() -> new CompilerException("Selected type not found")).getType();

@@ -43,7 +43,8 @@ public enum TypeName {
     SEQUENCE("SEQUENCE"),
     SEQUENCE_OF("SEQUENCE OF"),
     SET("SET"),
-    SET_OF("SET OF");
+    SET_OF("SET OF"),
+    CHOICE("CHOICE");
 
     private final String name;
 

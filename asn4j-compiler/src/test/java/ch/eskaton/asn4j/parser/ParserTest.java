@@ -1750,7 +1750,7 @@ class ParserTest {
         RealValue result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.NORMAL, result.getType());
+        assertEquals(RealValue.RealType.NORMAL, result.getRealType());
         assertEquals(BigDecimal.valueOf(314), result.getValue());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -1759,7 +1759,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.SPECIAL, result.getType());
+        assertEquals(RealValue.RealType.SPECIAL, result.getRealType());
         assertEquals(Long.valueOf(23), result.getMantissa());
         assertEquals(Long.valueOf(2), result.getBase());
         assertEquals(Long.valueOf(-11), result.getExponent());
@@ -1770,7 +1770,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.NEGATIVE_INF, result.getType());
+        assertEquals(RealValue.RealType.NEGATIVE_INF, result.getRealType());
     }
 
     @Test
@@ -1782,7 +1782,7 @@ class ParserTest {
         RealValue result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.NORMAL, result.getType());
+        assertEquals(RealValue.RealType.NORMAL, result.getRealType());
         assertEquals(new BigDecimal("-1.5"), result.getValue());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -1791,7 +1791,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.SPECIAL, result.getType());
+        assertEquals(RealValue.RealType.SPECIAL, result.getRealType());
         assertEquals(Long.valueOf(3), result.getMantissa());
         assertEquals(Long.valueOf(10), result.getBase());
         assertEquals(Long.valueOf(5), result.getExponent());
@@ -1826,7 +1826,7 @@ class ParserTest {
         RealValue result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.POSITIVE_INF, result.getType());
+        assertEquals(RealValue.RealType.POSITIVE_INF, result.getRealType());
 
         parser = new Parser(new ByteArrayInputStream(
                 "MINUS-INFINITY".getBytes())).new SpecialRealValueParser();
@@ -1834,14 +1834,14 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.NEGATIVE_INF, result.getType());
+        assertEquals(RealValue.RealType.NEGATIVE_INF, result.getRealType());
 
         parser = new Parser(new ByteArrayInputStream("NOT-A-NUMBER".getBytes())).new SpecialRealValueParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(RealValue.Type.NAN, result.getType());
+        assertEquals(RealValue.RealType.NAN, result.getRealType());
     }
 
     /**
@@ -2569,7 +2569,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof Choice);
-        assertEquals(2, ((Choice) result).getRootTypeList().size());
+        assertEquals(2, ((Choice) result).getRootAlternatives().size());
     }
 
     @Test
@@ -2582,11 +2582,11 @@ class ParserTest {
         AlternativeTypeLists result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(2, result.getRootTypeList().size());
-        assertEquals("aNumber", result.getRootTypeList().get(0).getName());
-        assertTrue(result.getRootTypeList().get(0).getType() instanceof IntegerType);
-        assertEquals("aString", result.getRootTypeList().get(1).getName());
-        assertTrue(result.getRootTypeList().get(1).getType() instanceof OctetString);
+        assertEquals(2, result.getRootAlternatives().size());
+        assertEquals("aNumber", result.getRootAlternatives().get(0).getName());
+        assertTrue(result.getRootAlternatives().get(0).getType() instanceof IntegerType);
+        assertEquals("aString", result.getRootAlternatives().get(1).getName());
+        assertTrue(result.getRootAlternatives().get(1).getType() instanceof OctetString);
 
         parser = new Parser(new ByteArrayInputStream(
                 "aNumber INTEGER, ...".getBytes())).new AlternativeTypeListsParser();
@@ -2594,7 +2594,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(1, result.getRootTypeList().size());
+        assertEquals(1, result.getRootAlternatives().size());
         assertNotNull(result.getExtensionAndException());
         assertNull(result.getExtensionAndException().getExceptionId());
 
@@ -2614,9 +2614,9 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertNotNull(result.getExtAddAlts());
-        assertEquals(1, result.getExtAddAlts().size());
-        assertFalse(result.hasOptExtMarker());
+        assertNotNull(result.getExtensionAdditionAlternatives());
+        assertEquals(1, result.getExtensionAdditionAlternatives().size());
+        assertFalse(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
                 "aNumber INTEGER, ... ! 23, aString OCTET STRING, ..."
@@ -2625,7 +2625,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result.hasOptExtMarker());
+        assertTrue(result.hasExtensionMarker());
     }
 
     @Test
@@ -2670,8 +2670,8 @@ class ParserTest {
 
         assertNotNull(result);
 
-        assertEquals(12, (int) result.get(0).getAltGroups().getVersion());
-        assertEquals("aNumber", result.get(0).getAltGroups().getAlternatives()
+        assertEquals(12, (int) result.get(0).getExtensionAdditionAlternativesGroup().getVersion());
+        assertEquals("aNumber", result.get(0).getExtensionAdditionAlternativesGroup().getAlternatives()
                 .get(0).getName());
 
         assertEquals("aString", result.get(1).getNamedType().getName());
@@ -2686,8 +2686,8 @@ class ParserTest {
         ExtensionAdditionAlternativeNode result = parser.parse();
 
         assertNotNull(result);
-        assertEquals(12, (int) result.getAltGroups().getVersion());
-        assertEquals("aNumber", result.getAltGroups().getAlternatives().get(0)
+        assertEquals(12, (int) result.getExtensionAdditionAlternativesGroup().getVersion());
+        assertEquals("aNumber", result.getExtensionAdditionAlternativesGroup().getAlternatives().get(0)
                 .getName());
 
         result = parser.parse();

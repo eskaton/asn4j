@@ -478,7 +478,9 @@ public class JavaClass implements JavaStructure {
         }
 
         private MethodBuilder body(List<String> body) {
-            this.body = body.stream().map(b -> "\t\t" + b + "\n").collect(toList());
+            if (body != null) {
+                this.body = body.stream().map(b -> "\t\t" + b + "\n").collect(toList());
+            }
 
             return this;
         }
