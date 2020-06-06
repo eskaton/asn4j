@@ -34,11 +34,11 @@ import java.util.Objects;
 
 public class RealValue extends AbstractValue {
 
-    public enum Type {
+    public enum RealType {
         POSITIVE_INF, NEGATIVE_INF, NAN, NORMAL, SPECIAL
     }
 
-    private Type type;
+    private RealType realType;
 
     private BigDecimal value;
 
@@ -48,23 +48,23 @@ public class RealValue extends AbstractValue {
 
     private Long exponent;
 
-    public RealValue(Position position, Type type) {
+    public RealValue(Position position, RealType realType) {
     	super(position);
 
-    	this.type = type;
+    	this.realType = realType;
     }
 
     public RealValue(Position position, BigDecimal value) {
         super(position);
 
-    	this.type = Type.NORMAL;
+    	this.realType = RealType.NORMAL;
     	this.value = value;
     }
 
     public RealValue(Position position, Long mantissa, Long base, Long exponent) {
         super(position);
 
-    	this.type = Type.SPECIAL;
+    	this.realType = RealType.SPECIAL;
     	this.mantissa = mantissa;
     	this.base = base;
     	this.exponent = exponent;
@@ -86,8 +86,8 @@ public class RealValue extends AbstractValue {
     	return exponent;
     }
 
-    public Type getType() {
-    	return type;
+    public RealType getRealType() {
+    	return realType;
     }
 
     @Override
@@ -102,7 +102,7 @@ public class RealValue extends AbstractValue {
 
         RealValue realValue = (RealValue) o;
 
-        return type == realValue.type &&
+        return realType == realValue.realType &&
                 Objects.equals(value, realValue.value) &&
                 Objects.equals(mantissa, realValue.mantissa) &&
                 Objects.equals(base, realValue.base) &&
@@ -111,7 +111,7 @@ public class RealValue extends AbstractValue {
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, value, mantissa, base, exponent);
+        return Objects.hash(realType, value, mantissa, base, exponent);
     }
 
 }

@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
@@ -36,8 +37,18 @@ public class AbstractValue implements Value {
 
     private Position position;
 
+    private Type type;
+
     public AbstractValue(Position position) {
         this.position = position;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     @Override
@@ -62,12 +73,12 @@ public class AbstractValue implements Value {
 
         AbstractValue that = (AbstractValue) o;
 
-        return Objects.equals(position, that.position);
+        return Objects.equals(type, that.type) && Objects.equals(position, that.position);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(position);
+        return Objects.hash(type, position);
     }
 
 }

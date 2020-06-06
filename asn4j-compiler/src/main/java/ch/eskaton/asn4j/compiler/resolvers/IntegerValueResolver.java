@@ -49,17 +49,13 @@ public class IntegerValueResolver extends AbstractValueResolver<IntegerValue> {
 
     @Override
     public IntegerValue resolveGeneric(Type type, Value value) {
-        CompiledType compiledType = ctx.getCompiledType(type);
-
         if (value instanceof IntegerValue) {
             return (IntegerValue) value;
         }
 
-        if (compiledType != null && compiledType.getType() instanceof IntegerType) {
-            if (value instanceof IntegerValue) {
-                return (IntegerValue) value;
-            }
+        CompiledType compiledType = ctx.getCompiledType(type);
 
+        if (compiledType != null && compiledType.getType() instanceof IntegerType) {
             Optional<ValueOrObjectAssignmentNode> assignmentNode =
                     ctx.tryResolveAllReferences((SimpleDefinedValue) value);
 
@@ -69,6 +65,7 @@ public class IntegerValueResolver extends AbstractValueResolver<IntegerValue> {
                 if (value instanceof IntegerValue) {
                     return (IntegerValue) value;
                 }
+
             }
 
             return resolveNamedNumber((SimpleDefinedValue) value, compiledType);
@@ -80,6 +77,10 @@ public class IntegerValueResolver extends AbstractValueResolver<IntegerValue> {
     private IntegerValue resolveNamedNumber(SimpleDefinedValue value, CompiledType compiledType) {
         String reference = value.getValue();
         NamedNumber namedNumber = ((IntegerType) compiledType.getType()).getNamedNumber(reference);
+
+        if (namedNumber == null) {
+            throw new CompilerException("Failed to resolve %s to an %s value", reference, TypeName.INTEGER);
+        }
 
         if (namedNumber.getValue() != null) {
             return new IntegerValue(namedNumber.getPosition(), namedNumber.getValue().getNumber());

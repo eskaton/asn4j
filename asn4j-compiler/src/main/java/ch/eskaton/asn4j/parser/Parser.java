@@ -195,6 +195,7 @@ import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
@@ -2988,11 +2989,11 @@ public class Parser {
                     TokenType.MINUS_INFINITY_KW, TokenType.NOT_A_NUMBER_KW), a -> {
                 switch (a.$()) {
                     case PLUS_INFINITY_KW:
-                        return new RealValue(a.P(), RealValue.Type.POSITIVE_INF);
+                        return new RealValue(a.P(), RealValue.RealType.POSITIVE_INF);
                     case MINUS_INFINITY_KW:
-                        return new RealValue(a.P(), RealValue.Type.NEGATIVE_INF);
+                        return new RealValue(a.P(), RealValue.RealType.NEGATIVE_INF);
                     case NOT_A_NUMBER_KW:
-                        return new RealValue(a.P(), RealValue.Type.NAN);
+                        return new RealValue(a.P(), RealValue.RealType.NAN);
                     default:
                         return null;
                 }
@@ -3298,7 +3299,13 @@ public class Parser {
                         if (type instanceof UsefulType) {
                             return new ValueAssignmentNode(a.P0(), a.s0(), (Type) type, a.n3());
                         } else {
-                            return new ValueOrObjectAssignmentNode<>(a.P0(), a.s0(), type, a.n3());
+                            Node value = a.n3();
+
+                            if (value instanceof AbstractValue) {
+                                ((AbstractValue) value).setType((TypeReference) type);
+                            }
+
+                            return new ValueOrObjectAssignmentNode<>(a.P0(), a.s0(), type, value);
                         }
                     } else {
                         return new ValueAssignmentNode(a.P0(), a.s0(), (Type) type, a.n3());

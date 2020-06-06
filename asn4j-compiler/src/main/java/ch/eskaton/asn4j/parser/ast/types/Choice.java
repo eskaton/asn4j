@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,48 +31,69 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Choice extends AbstractType {
 
-    private List<NamedType> rootTypeList;
+    private List<NamedType> rootAlternatives;
 
-    private boolean ext;
+    private boolean extensible;
 
-    private ExceptionIdentificationNode exId;
+    private ExceptionIdentificationNode exceptionId;
 
-    private List<ExtensionAdditionAlternativeNode> extAddAlts;
+    private List<ExtensionAdditionAlternativeNode> extensionAdditionAlternatives;
 
-    private boolean optExtMarker;
+    private boolean optionalExtensionMarker;
 
     public Choice(Position position, AlternativeTypeLists alternatives) {
         super(position);
 
-    	this.rootTypeList = alternatives.getRootTypeList();
-    	this.ext = alternatives.getExtensionAndException() != null;
-    	this.exId = this.ext ? alternatives.getExtensionAndException().getExceptionId() : null;
-    	this.extAddAlts = alternatives.getExtAddAlts();
-    	this.optExtMarker = alternatives.hasOptExtMarker();
+        this.rootAlternatives = alternatives.getRootAlternatives();
+        this.extensible = alternatives.getExtensionAndException() != null;
+        this.exceptionId = this.extensible ? alternatives.getExtensionAndException().getExceptionId() : null;
+        this.extensionAdditionAlternatives = alternatives.getExtensionAdditionAlternatives();
+        this.optionalExtensionMarker = alternatives.hasExtensionMarker();
     }
 
-    public List<NamedType> getRootTypeList() {
-    	return rootTypeList;
+    public List<NamedType> getRootAlternatives() {
+        return rootAlternatives;
     }
 
-    public boolean isExt() {
-    	return ext;
+    public List<NamedType> getAllAlternatives() {
+        var allAlternatives = new ArrayList(rootAlternatives);
+
+        if (extensionAdditionAlternatives != null) {
+            allAlternatives.add(
+                    extensionAdditionAlternatives.stream()
+                            .map(a -> getNamedTypes(a))
+                            .flatMap(List::stream)
+                            .collect(Collectors.toList()));
+        }
+
+        return allAlternatives;
     }
 
-    public ExceptionIdentificationNode getExId() {
-    	return exId;
+    private List<NamedType> getNamedTypes(ExtensionAdditionAlternativeNode a) {
+        return a.getNamedType() != null ? List.of(a.getNamedType()) :
+                a.getExtensionAdditionAlternativesGroup().getAlternatives();
     }
 
-    public List<ExtensionAdditionAlternativeNode> getExtAddAlts() {
-    	return extAddAlts;
+    public boolean isExtensible() {
+        return extensible;
     }
 
-    public boolean isOptExtMarker() {
-    	return optExtMarker;
+    public ExceptionIdentificationNode getExceptionId() {
+        return exceptionId;
+    }
+
+    public List<ExtensionAdditionAlternativeNode> getExtensionAdditionAlternatives() {
+        return extensionAdditionAlternatives;
+    }
+
+    public boolean isOptionalExtensionMarker() {
+        return optionalExtensionMarker;
     }
 
 }

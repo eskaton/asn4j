@@ -34,19 +34,14 @@ import java.util.Objects;
 
 public class OpenTypeFieldValue extends AbstractValue {
 
-    private Type type;
-
     private Value value;
 
     public OpenTypeFieldValue(Position position, Type type, Value value) {
         super(position);
 
-        this.type = type;
         this.value = value;
-    }
 
-    public Type getType() {
-        return type;
+        setType(type);
     }
 
     public Value getValue() {
@@ -65,13 +60,12 @@ public class OpenTypeFieldValue extends AbstractValue {
 
         OpenTypeFieldValue that = (OpenTypeFieldValue) o;
 
-        return Objects.equals(type, that.type) &&
-                Objects.equals(value, that.value);
+        return Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, value);
+        return Objects.hash(value);
     }
 
 }
