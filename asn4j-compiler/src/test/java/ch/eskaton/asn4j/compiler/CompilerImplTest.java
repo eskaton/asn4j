@@ -97,6 +97,18 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, "Duplicate tags in SET.*");
     }
 
+    @Test
+    void testDuplicateTagsInChoice() {
+        var body = """
+                Choice ::= CHOICE {
+                    a INTEGER,
+                    b INTEGER
+                }
+                """;
+
+        testModule(body, CompilerException.class, "Duplicate tags in CHOICE.*");
+    }
+
     private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()

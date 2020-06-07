@@ -39,12 +39,15 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,11 +76,23 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         builder.append("switch(" + CHOICE_FIELD + ") {");
 
         var components = new ArrayList<Tuple2<String, CompiledType>>();
+        var seenTags = new HashMap<TagId, NamedType>();
 
-        for (NamedType type : node.getRootAlternatives()) {
-            String typeConstant = CompilerUtils.formatConstant(type.getName());
-            Tuple2<String, CompiledType> component = compileChoiceNamedType(ctx, javaClass, type, typeConstant, clearFields);
-            String fieldName = component.get_1();
+        for (NamedType namedType : node.getRootAlternatives()) {
+            var tagId = getTagId(ctx, namedType);
+
+            var seenComponent = seenTags.get(tagId);
+
+            if (seenComponent != null) {
+                throw new CompilerException("Duplicate tags in %s %s: %s and %s", TypeName.CHOICE, name,
+                        seenComponent.getName(), namedType.getName());
+            }
+
+            seenTags.put(tagId, namedType);
+
+            var typeConstant = CompilerUtils.formatConstant(namedType.getName());
+            var component = compileChoiceNamedType(ctx, javaClass, namedType, typeConstant, clearFields);
+            var fieldName = component.get_1();
 
             components.add(component);
             fieldNames.add(fieldName);
@@ -134,6 +149,17 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
     private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
         javaClass.method().modifier(PRIVATE).name(CLEAR_FIELDS).body()
                 .append(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).finish().build();
+    }
+
+    private TagId getTagId(CompilerContext ctx, NamedType namedType) {
+        var type = namedType.getType();
+        var tag = ctx.resolveType(type).getTag();
+
+        if (tag != null) {
+            return CompilerUtils.toTagId(tag);
+        }
+
+        return ctx.getTagId(type);
     }
 
 }
