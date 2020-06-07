@@ -84,6 +84,13 @@ TestSequence1 ::= SEQUENCE {
    a SET OF INTEGER,
    b SET OF TestInteger1
 } ({a {1, 2}, b {4, 5}})
+TestSequence2 ::= SEQUENCE {
+   a SEQUENCE {
+       b INTEGER,
+       c BOOLEAN
+   },
+   d SET OF TestInteger1
+} ({a {b 1, c TRUE}, d {4, 5}})
 
 testChoice1 TestChoice1 ::= a: testInteger1
 

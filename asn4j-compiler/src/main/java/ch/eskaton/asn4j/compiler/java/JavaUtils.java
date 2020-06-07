@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
@@ -79,6 +80,7 @@ public class JavaUtils {
         addCase(dispatcher, RelativeOIDValue.class, JavaUtils::getRelativeOIDInitializerString);
         addCase(dispatcher, RelativeIRIValue.class, JavaUtils::getRelativeIRIInitializerString);
         addCase(dispatcher, CollectionOfValue.class, JavaUtils::getCollectionOfInitializerString);
+        addCase(dispatcher, CollectionValue.class, JavaUtils::getCollectionInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
     }
@@ -173,6 +175,14 @@ public class JavaUtils {
     private static String getCollectionOfInitializerString(CompilerContext ctx, String typeName, CollectionOfValue value) {
         var initString = value.getValues().stream()
                 .map(v -> getInitializerString(ctx, ctx.getTypeName(((AbstractValue) v).getType()), v))
+                .collect(Collectors.joining(", "));
+
+        return "new " + typeName + "(" + initString + ")";
+    }
+
+    private static String getCollectionInitializerString(CompilerContext ctx, String typeName, CollectionValue value) {
+        var initString = value.getValues().stream()
+                .map(v -> getInitializerString(ctx, ctx.getTypeName(v.getType()), v.getValue()))
                 .collect(Collectors.joining(", "));
 
         return "new " + typeName + "(" + initString + ")";

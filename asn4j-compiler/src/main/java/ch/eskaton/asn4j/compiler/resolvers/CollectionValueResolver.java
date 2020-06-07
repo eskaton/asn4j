@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
@@ -90,7 +91,11 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
                     .collect(Collectors.toMap(NamedType::getName, NamedType::getType));
 
             List<? extends NamedValue> values = collectionValue.getValues().stream()
-                    .map(v -> new NamedValue(v.getPosition(), v.getName(), getValue(typeName, elementTypes, v)))
+                    .map(v -> {
+                        AbstractValue resolvedValue = (AbstractValue) getValue(typeName, elementTypes, v);
+
+                        return new NamedValue(v.getPosition(), v.getName(), resolvedValue, resolvedValue.getType());
+                    })
                     .collect(Collectors.toList());
 
             collectionValue.getValues().clear();

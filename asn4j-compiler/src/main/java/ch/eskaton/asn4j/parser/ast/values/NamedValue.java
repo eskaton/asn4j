@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Objects;
 
@@ -39,6 +40,15 @@ public class NamedValue extends AbstractValue {
 
     public NamedValue(Position position, String name, Value value) {
         super(position);
+
+        this.name = name;
+        this.value = value;
+    }
+
+    public NamedValue(Position position, String name, Value value, Type type) {
+        super(position);
+
+        super.setType(type);
 
         this.name = name;
         this.value = value;
