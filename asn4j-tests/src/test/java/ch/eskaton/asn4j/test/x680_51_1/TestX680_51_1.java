@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.test.x680_51_1;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString2;
@@ -40,6 +41,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString7;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBoolean2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestChoice1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestChoice2;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestChoice3;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestEnumeration1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestEnumeration3;
@@ -622,6 +624,21 @@ class TestX680_51_1 {
 
         testChoiceFailure(TestChoice2.class, new TestChoice2(),
                 c -> c.setA(new TestChoice2.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L))));
+    }
+
+    @Test
+    void testChoice3() {
+        testChoiceSuccess(TestChoice3.class, new TestChoice3(),
+                c -> c.setA(new TestChoice3.A(ASN1Integer.valueOf(1L), ASN1Boolean.TRUE)));
+        testChoiceSuccess(TestChoice3.class, new TestChoice3(),
+                c -> c.setD(new ASN1OctetString(new byte[] { (byte) 0xbe, (byte) 0xef })));
+
+        testChoiceFailure(TestChoice3.class, new TestChoice3(),
+                c -> c.setA(new TestChoice3.A(ASN1Integer.valueOf(1L), ASN1Boolean.FALSE)));
+        testChoiceFailure(TestChoice3.class, new TestChoice3(),
+                c -> c.setA(new TestChoice3.A(ASN1Integer.valueOf(2L), ASN1Boolean.TRUE)));
+        testChoiceFailure(TestChoice3.class, new TestChoice3(),
+                c -> c.setD(new ASN1OctetString(new byte[] { (byte) 0xbe, (byte) 0xee })));
     }
 
 }
