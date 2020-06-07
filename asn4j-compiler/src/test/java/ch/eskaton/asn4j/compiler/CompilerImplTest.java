@@ -62,11 +62,7 @@ class CompilerImplTest {
     @MethodSource("provideInvalidTypesInConstraintsArguments")
     void testInvalidTypesInConstraints(String body, Class<? extends Exception> expected, String message,
             String description) {
-        var module = module("TEST-MODULE", body);
-        var exception = assertThrows(() -> new CompilerImpl()
-                .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())), expected);
-
-        exception.ifPresent(e -> assertThat(e.getMessage(), MatchesPattern.matchesPattern(".*" + message + ".*")));
+        testModule(body, expected, ".*" + message + ".*");
     }
 
     @SuppressWarnings("unused")
@@ -74,11 +70,40 @@ class CompilerImplTest {
     @MethodSource("provideInvalidMultipleTypeConstraints")
     void testInvalidMultipleTypeConstraints(String body, Class<? extends Exception> expected, String message,
             String description) {
+        testModule(body, expected, ".*" + message + ".*");
+    }
+
+    @Test
+    void testForbiddenAbsentPresenceConstraint() {
+        var body = """
+                Seq ::= SEQUENCE {
+                    a INTEGER
+                } (WITH COMPONENTS {a ABSENT})
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*isn't optional and therefore can't have a presence constraint of ABSENT.*");
+    }
+
+    @Test
+    void testDuplicateTagsInSet() {
+        var body = """
+                Set ::= SET {
+                    a INTEGER,
+                    b INTEGER
+                }
+                """;
+
+        testModule(body, CompilerException.class, "Duplicate tags in set.*");
+    }
+
+    private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()
-                .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())), expected);
+                        .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())),
+                expected);
 
-        exception.ifPresent(e -> assertThat(e.getMessage(), MatchesPattern.matchesPattern(".*" + message + ".*")));
+        exception.ifPresent(e -> assertThat(e.getMessage(), MatchesPattern.matchesPattern(message)));
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {
@@ -157,22 +182,6 @@ class CompilerImplTest {
                         "Contained subtype in SIZE constraint must be of type INTEGER")
         );
         // @formatter:on
-    }
-
-    @Test
-    void testForbiddenAbsentPresenceConstraint() {
-        var body = """
-                Seq ::= SEQUENCE {
-                    a INTEGER
-                } (WITH COMPONENTS {a ABSENT})
-                """;
-        var module = module("TEST-MODULE", body);
-        var exception = assertThrows(() -> new CompilerImpl()
-                        .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())),
-                CompilerException.class);
-
-        exception.ifPresent(e -> assertThat(e.getMessage(), MatchesPattern
-                .matchesPattern(".*isn't optional and therefore can't have a presence constraint of ABSENT.*")));
     }
 
     private static Stream<Arguments> provideInvalidMultipleTypeConstraints() {
