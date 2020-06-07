@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.Position;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class ModuleBodyNode extends AbstractNode {
 
     private List<ImportNode> imports = new ArrayList<>();
 
-    private Map<String, AssignmentNode> assignments;
+    private Map<String, AssignmentNode> assignments = new HashMap<>();
 
     public ModuleBodyNode(Position position, ExportsNode exports, List<ImportNode> imports,
             List<AssignmentNode> assignments) {
@@ -56,9 +57,14 @@ public class ModuleBodyNode extends AbstractNode {
         }
 
         if (assignments != null) {
-            this.assignments = new HashMap<>();
             for (AssignmentNode assignment : assignments) {
-                this.assignments.put(assignment.getReference(), assignment);
+                var typeName = assignment.getReference();
+
+                if (this.assignments.containsKey(assignment.getReference())) {
+                    throw new CompilerException("Type %s is already defined", typeName);
+                }
+
+                this.assignments.put(typeName, assignment);
             }
         }
     }
