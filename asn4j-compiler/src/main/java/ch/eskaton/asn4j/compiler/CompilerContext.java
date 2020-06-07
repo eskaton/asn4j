@@ -285,7 +285,8 @@ public class CompilerContext {
     }
 
     public void addType(String typeName, CompiledType compiledType) {
-        HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
+        var moduleTypes = getTypesOfCurrentModule();
+
         moduleTypes.put(typeName, compiledType);
     }
 
@@ -761,7 +762,7 @@ public class CompilerContext {
     public void ensureSymbolIsExported(ModuleNode module, String symbolName) {
         if (!isSymbolExported(module, symbolName)) {
             String format = "Module %s uses the symbol %s from module %s which the latter doesn't export";
-            throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(), symbolName,
+            throw new CompilerException(format, getCurrentModuleName(), symbolName,
                     module.getModuleId().getModuleName());
         }
     }
@@ -898,7 +899,7 @@ public class CompilerContext {
 
                     if (!isSymbolExported(module, typeName)) {
                         String format = "Module %s uses the type %s from module %s which the latter doesn't export";
-                        throw new CompilerException(format, currentModule.peek().getModuleId().getModuleName(),
+                        throw new CompilerException(format, getCurrentModuleName(),
                                 typeName, moduleName);
                     }
 
@@ -908,8 +909,7 @@ public class CompilerContext {
             }
 
             if (!compiledType.isPresent()) {
-                throw new CompilerException("Failed to resolve type %s in module %s ", typeName,
-                        currentModule.peek().getModuleId().getModuleName());
+                throw new CompilerException("Failed to resolve type %s in module %s ", typeName, getCurrentModuleName());
             }
 
             return compiledType;
@@ -991,7 +991,11 @@ public class CompilerContext {
     }
 
     private HashMap<String, CompiledType> getTypesOfCurrentModule() {
-        return definedTypes.computeIfAbsent(currentModule.peek().getModuleId().getModuleName(), key -> new HashMap<>());
+        return definedTypes.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
+    }
+
+    private String getCurrentModuleName() {
+        return currentModule.peek().getModuleId().getModuleName();
     }
 
     public String getRuntimeType(Class<?> type) {

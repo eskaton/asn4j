@@ -92,10 +92,6 @@ TestSetOfBitString1 ::= SET ({'0111'B}) OF BIT STRING
 
 TestSetOfBoolean1 ::= SET ({TRUE}) OF BOOLEAN
 
-TestEnumeration1 ::= ENUMERATED {
-        a, b, c, d
-}
-
 TestSetOfEnumeration1 ::= SET ({a}) OF TestEnumeration1
 TestSetOfEnumeration2 ::= SET ({a, c}) OF TestEnumeration1
 

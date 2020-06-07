@@ -109,6 +109,16 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, "Duplicate tags in CHOICE.*");
     }
 
+    @Test
+    void testRedefinitionOfType() {
+        var body = """
+                Integer ::= INTEGER
+                Integer ::= INTEGER
+                """;
+
+        testModule(body, CompilerException.class, "Type Integer is already defined");
+    }
+
     private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()
