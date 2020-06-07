@@ -28,17 +28,17 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.elements.SequenceMultipleTypeConstraintsCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.SetMultipleTypeConstraintsCompiler;
 import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 
-public class SequenceConstraintCompiler extends AbstractCollectionConstraintCompiler {
+public class SetConstraintCompiler extends AbstractCollectionConstraintCompiler {
 
-    public SequenceConstraintCompiler(CompilerContext ctx) {
-        super(ctx, TypeName.SEQUENCE);
+    public SetConstraintCompiler(CompilerContext ctx) {
+        super(ctx, TypeName.SET);
 
-        addConstraintHandler(MultipleTypeConstraints.class, new SequenceMultipleTypeConstraintsCompiler(ctx)::compile);
+        addConstraintHandler(MultipleTypeConstraints.class, new SetMultipleTypeConstraintsCompiler(ctx)::compile);
     }
 
 }

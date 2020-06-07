@@ -25,20 +25,14 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.elements.SequenceMultipleTypeConstraintsCompiler;
-import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
-import ch.eskaton.asn4j.runtime.types.TypeName;
 
+public class SetMultipleTypeConstraintsCompiler extends AbstractMultipleTypeConstraintsCompiler {
 
-public class SequenceConstraintCompiler extends AbstractCollectionConstraintCompiler {
-
-    public SequenceConstraintCompiler(CompilerContext ctx) {
-        super(ctx, TypeName.SEQUENCE);
-
-        addConstraintHandler(MultipleTypeConstraints.class, new SequenceMultipleTypeConstraintsCompiler(ctx)::compile);
+    public SetMultipleTypeConstraintsCompiler(CompilerContext ctx) {
+        super(ctx, () -> new ComponentVerifier());
     }
 
 }

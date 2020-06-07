@@ -32,7 +32,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.CollectionContainedSubtypeCompiler;
-import ch.eskaton.asn4j.compiler.constraints.elements.MultipleTypeConstraintsCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.CollectionValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.expr.WithComponentsExpressionBuilder;
@@ -53,7 +52,6 @@ import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
@@ -95,7 +93,6 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
                 new SingleValueCompiler(ctx, CollectionValue.class, CollectionValueNode.class, getTypeName(),
                         Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new CollectionContainedSubtypeCompiler(ctx)::compile);
-        addConstraintHandler(MultipleTypeConstraints.class, new MultipleTypeConstraintsCompiler(ctx)::compile);
     }
 
     @Override

@@ -43,6 +43,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
+import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
@@ -326,6 +327,20 @@ public class TestHelper {
         consumer.accept(sequenceValue);
 
         assertThrows(() -> assertValueDecodable(clazz, sequenceValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1Set> void testSetSuccess(Class<? extends T> clazz, T setValue,
+            Consumer<T> consumer) {
+        consumer.accept(setValue);
+
+        assertValueDecodable(clazz, setValue);
+    }
+
+    public static <T extends ASN1Set> void testSetFailure(Class<? extends T> clazz, T setValue,
+            Consumer<T> consumer) {
+        consumer.accept(setValue);
+
+        assertThrows(() -> assertValueDecodable(clazz, setValue), ConstraintViolatedException.class);
     }
 
     public static <T extends ASN1Choice> void testChoiceSuccess(Class<? extends T> clazz, T choiceValue,
