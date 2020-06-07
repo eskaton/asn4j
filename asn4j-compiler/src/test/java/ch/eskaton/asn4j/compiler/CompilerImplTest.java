@@ -94,7 +94,7 @@ class CompilerImplTest {
                 }
                 """;
 
-        testModule(body, CompilerException.class, "Duplicate tags in set.*");
+        testModule(body, CompilerException.class, "Duplicate tags in SET.*");
     }
 
     private void testModule(String body, Class<? extends Exception> expected, String message) {

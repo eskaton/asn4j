@@ -27,50 +27,14 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.ArrayList;
+public class SequenceCompiler extends AbstractCollectionCompiler<SequenceType> {
 
-public class SequenceCompiler extends CollectionCompiler<SequenceType> {
-
-    @Override
-    public CompiledType compile(CompilerContext ctx, String name, SequenceType node) {
-        var javaClass = ctx.createClass(name, node, true);
-        var components = new ArrayList<Tuple2<String, CompiledType>>();
-
-        for (ComponentType component : node.getAllComponents()) {
-            try {
-                components.addAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
-                        .compile(ctx, component));
-            } catch (CompilerException e) {
-                if (component.getNamedType() != null) {
-                    throw new CompilerException("Failed to compile component %s in %s %s", e,
-                            component.getNamedType().getName(), TypeName.SEQUENCE, name);
-                } else {
-                    throw new CompilerException("Failed to compile a component in %s %s", e,
-                            TypeName.SEQUENCE, name);
-                }
-            }
-        }
-
-        CompiledType compiledType = new CompiledCollectionType(node, name, components);
-        ConstraintDefinition constraintDef;
-
-        if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
-
-            compiledType.setConstraintDefinition(constraintDef);
-        }
-
-        ctx.finishClass();
-
-        return compiledType;
+    public SequenceCompiler() {
+        super(TypeName.SEQUENCE, (c, t) -> component -> {
+        });
     }
 
 }

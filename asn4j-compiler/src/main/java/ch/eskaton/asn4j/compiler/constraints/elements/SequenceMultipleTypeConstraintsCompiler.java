@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 public class SequenceMultipleTypeConstraintsCompiler extends AbstractMultipleTypeConstraintsCompiler {
 
     public SequenceMultipleTypeConstraintsCompiler(CompilerContext ctx) {
-        super(ctx, () -> new SequenceComponentVerifier());
+        super(ctx, SequenceComponentVerifier::new);
     }
 
     protected static class SequenceComponentVerifier extends ComponentVerifier {

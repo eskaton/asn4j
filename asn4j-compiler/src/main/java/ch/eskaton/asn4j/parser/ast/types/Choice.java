@@ -62,14 +62,17 @@ public class Choice extends AbstractType {
     }
 
     public List<NamedType> getAllAlternatives() {
-        var allAlternatives = new ArrayList(rootAlternatives);
+        var allAlternatives = new ArrayList<NamedType>();
+
+        allAlternatives.addAll(rootAlternatives);
 
         if (extensionAdditionAlternatives != null) {
-            allAlternatives.add(
-                    extensionAdditionAlternatives.stream()
-                            .map(a -> getNamedTypes(a))
-                            .flatMap(List::stream)
-                            .collect(Collectors.toList()));
+            List<NamedType> extensionAdditionAlternativesList = extensionAdditionAlternatives.stream()
+                    .map(this::getNamedTypes)
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
+
+            allAlternatives.addAll(extensionAdditionAlternativesList);
         }
 
         return allAlternatives;
