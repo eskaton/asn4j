@@ -39,14 +39,17 @@ public class JavaWriter {
     public static final JavaDefaultCtorBuilder JAVA_DEFAULT_CTOR_BUILDER = new JavaDefaultCtorBuilder();
 
     public void write(Map<String, JavaStructure> structs, String outputDir) {
+        createConstructors(structs);
+        writeClasses(structs, outputDir);
+    }
+
+    private void createConstructors(Map<String, JavaStructure> structs) {
         JAVA_DEFAULT_CTOR_BUILDER.build(structs);
 
         structs.values().stream().
                 filter(JavaClass.class::isInstance)
                 .forEach(struct -> ((JavaClass) struct).getInnerClasses()
-                        .forEach(innerClass -> JAVA_DEFAULT_CTOR_BUILDER.build(Map.of(innerClass.getName(), innerClass))));
-
-        writeClasses(structs, outputDir);
+                        .forEach(innerClass -> createConstructors(Map.of(innerClass.getName(), innerClass))));
     }
 
     private void writeClasses(Map<String, JavaStructure> structs, String outputDir) {
