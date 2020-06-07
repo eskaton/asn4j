@@ -38,8 +38,8 @@ import ch.eskaton.asn4j.compiler.il.ILParameterizedType;
 import ch.eskaton.asn4j.compiler.il.ILType;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.collections.Tuple2;
@@ -60,13 +60,13 @@ public class ChoiceValueExpressionBuilder
 
     @Override
     protected BooleanExpression buildExpression(CompiledType compiledType, ChoiceValue choiceValue) {
-        var compiledBaseType = ctx.getCompiledBaseType(compiledType);
+        var compiledBaseType = (CompiledChoiceType) ctx.getCompiledBaseType(compiledType);
         var associations = new HashSet<Tuple2<Expression, Expression>>();
 
-        ((Choice) compiledBaseType.getType()).getAllAlternatives().stream().forEach(a -> {
-            var value = a.getName().equals(choiceValue.getId()) ? choiceValue.getValue() : null;
+        compiledBaseType.getComponents().stream().forEach(c -> {
+            var value = c.get_1().equals(choiceValue.getId()) ? choiceValue.getValue() : null;
 
-            associations.add(Tuple2.of(ILValue.of(a.getName()), ILValue.of(ctx.getTypeName(a.getType()), value)));
+            associations.add(Tuple2.of(ILValue.of(c.get_1()), ILValue.of(c.get_2().getName(), value)));
         });
 
         return new BooleanFunctionCall.MapEquals(Variable.of(VAR_VALUES), new ILMapValue(ILType.of(ILBuiltinType.STRING),
