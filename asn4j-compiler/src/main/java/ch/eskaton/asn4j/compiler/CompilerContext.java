@@ -252,7 +252,7 @@ public class CompilerContext {
                     .put(IRI.class, IRIValue.class)
                     .put(RelativeIRI.class, RelativeIRIValue.class)
                     .put(OctetString.class, OctetStringValue.class)
-                    .put(SequenceType.class, CollectionOfValue.class)
+                    .put(SequenceType.class, CollectionValue.class)
                     .put(SequenceOfType.class, CollectionOfValue.class)
                     .put(SetType.class, CollectionValue.class)
                     .put(SetOfType.class, CollectionOfValue.class)

@@ -68,6 +68,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOID2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequence1;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf1;
@@ -107,6 +108,7 @@ import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRIFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
@@ -562,8 +564,45 @@ class TestX680_51_1 {
     void testSequence1() {
         testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> {
             s.setA(new TestSequence1.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)));
-            s.setB(new TestSequence1.B(with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(4L))),
+            s.setB(new TestSequence1.B(
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(4L))),
                     with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(5L)))));
+        });
+
+        testSequenceFailure(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new TestSequence1.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)));
+            s.setB(new TestSequence1.B(
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(3L))),
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(4L)))));
+        });
+    }
+
+    @Test
+    void testSequence2() {
+        testSequenceSuccess(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(new TestSequence2.A(ASN1Integer.valueOf(1L), ASN1Boolean.TRUE));
+            s.setD(new TestSequence2.D(
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(4L))),
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(5L)))));
+        });
+
+        testSequenceFailure(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(new TestSequence2.A(ASN1Integer.valueOf(1L), ASN1Boolean.FALSE));
+            s.setD(new TestSequence2.D(
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(4L))),
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(5L)))));
+        });
+        testSequenceFailure(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(new TestSequence2.A(ASN1Integer.valueOf(2L), ASN1Boolean.TRUE));
+            s.setD(new TestSequence2.D(
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(4L))),
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(5L)))));
+        });
+        testSequenceFailure(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(new TestSequence2.A(ASN1Integer.valueOf(1L), ASN1Boolean.TRUE));
+            s.setD(new TestSequence2.D(
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(3L))),
+                    with(new TestInteger1(), i -> i.setValue(BigInteger.valueOf(4L)))));
         });
     }
 

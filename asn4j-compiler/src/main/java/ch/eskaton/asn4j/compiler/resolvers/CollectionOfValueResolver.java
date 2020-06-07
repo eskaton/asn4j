@@ -104,14 +104,14 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
                 if (resolvedValue != null) {
                     value = resolvedValue;
                 } else {
-                    throw new CompilerException("Failed to resolve a value in a " + typeName + " to type %s: %s",
+                    throw new CompilerException("Failed to resolve a value in a %s to type %s: %s", typeName,
                             formatTypeName(elementType), formatValue(value));
                 }
             }
 
             return ctx.resolveGenericValue(valueClass, elementType, value);
         } catch (ClassCastException e) {
-            throw new CompilerException("Failed to resolve a value in a " + typeName + " to type %s: %s",
+            throw new CompilerException("Failed to resolve a value in a %s to type %s: %s", typeName,
                     formatTypeName(elementType), formatValue(value));
         }
     }
@@ -125,7 +125,7 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
     }
 
     protected CompilerException error(String typeName) {
-        return new CompilerException("Failed to resolve a " + typeName + " value");
+        return new CompilerException("Failed to resolve a %s value", typeName);
     }
 
 }
