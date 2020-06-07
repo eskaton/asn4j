@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 public class SetMultipleTypeConstraintsCompiler extends AbstractMultipleTypeConstraintsCompiler {
 
     public SetMultipleTypeConstraintsCompiler(CompilerContext ctx) {
-        super(ctx, () -> new ComponentVerifier());
+        super(ctx, ComponentVerifier::new);
     }
 
 }

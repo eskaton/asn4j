@@ -55,7 +55,6 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
     public List<Tuple2<String, CompiledType>> compile(CompilerContext ctx, ComponentType node) {
-
         TagMode mode = ctx.getModule().getTagMode();
 
         switch (node.getCompType()) {
@@ -68,7 +67,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             case TYPE:
                 return compileComponentType(ctx, mode, node.getType());
             default:
-                throw new CompilerException("Unsupported ComponentType: " + node.getCompType());
+                throw new IllegalCompilerStateException("Unsupported component type: %s", node.getCompType());
         }
     }
 
@@ -129,7 +128,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
             ctx.pushModule(refModuleName);
         } else {
-            throw new CompilerException("Unimplemented type " + type);
+            throw new CompilerException("Unimplemented type %s", type);
         }
 
         Type referencedType = assignment.getType();
