@@ -37,7 +37,7 @@ import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
 
-public class SequenceCompiler implements NamedCompiler<SequenceType, CompiledType> {
+public class SequenceCompiler extends CollectionCompiler<SequenceType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, SequenceType node) {

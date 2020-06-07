@@ -27,25 +27,30 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TagId;
+import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Function;
 
-public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
+public class SetCompiler extends CollectionCompiler<SetType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, SetType node) {
-        HashMap<TagId, ComponentType> seenTags = new HashMap<>();
+        var javaClass = ctx.createClass(name, node, true);
+        var components = new ArrayList<Tuple2<String, CompiledType>>();
+        var seenTags = new HashMap<TagId, ComponentType>();
 
-        ctx.createClass(name, node, true);
-
-        for (ComponentType component : node.getAllRootComponents()) {
+        for (ComponentType component : node.getAllComponents()) {
             TagId tagId = getTagId(ctx, component);
             ComponentType seenComponent = seenTags.get(tagId);
 
@@ -54,14 +59,34 @@ public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
                         getName(seenComponent), getName(component));
             }
 
-            seenTags.put(tagId, component);
+            try {
+                components.addAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
+                        .compile(ctx, component));
+            } catch (CompilerException e) {
+                if (component.getNamedType() != null) {
+                    throw new CompilerException("Failed to compile component %s in %s %s", e,
+                            component.getNamedType().getName(), TypeName.SEQUENCE, name);
+                } else {
+                    throw new CompilerException("Failed to compile a component in %s %s", e,
+                            TypeName.SEQUENCE, name);
+                }
+            }
 
-            ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class).compile(ctx, component);
+            seenTags.put(tagId, component);
+        }
+
+        CompiledType compiledType = new CompiledCollectionType(node, name, components);
+        ConstraintDefinition constraintDef;
+
+        if (node.hasConstraint()) {
+            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+
+            compiledType.setConstraintDefinition(constraintDef);
         }
 
         ctx.finishClass();
 
-        return new CompiledType(node, name);
+        return compiledType;
     }
 
     private TagId getTagId(CompilerContext ctx, ComponentType component) {
@@ -73,10 +98,6 @@ public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
         }
 
         return ctx.getTagId(type);
-    }
-
-    private String getName(ComponentType seenComponent) {
-        return getAttribute(seenComponent, c -> c.getNamedType().getName(), c -> "n/a");
     }
 
     private <T> T getAttribute(ComponentType component, Function<ComponentType, T> namedFunction,
@@ -93,6 +114,10 @@ public class SetCompiler implements NamedCompiler<SetType, CompiledType> {
             default:
                 throw new CompilerException("Unexpected component type: " + component.getCompType());
         }
+    }
+
+    private String getName(ComponentType seenComponent) {
+        return getAttribute(seenComponent, c -> c.getNamedType().getName(), c -> "n/a");
     }
 
 }
