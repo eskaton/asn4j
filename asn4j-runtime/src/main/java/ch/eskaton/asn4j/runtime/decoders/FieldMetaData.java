@@ -1,4 +1,4 @@
-package ch.eskaton.asn4j.runtime.decoders;/*
+/*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
  *
@@ -24,6 +24,8 @@ package ch.eskaton.asn4j.runtime.decoders;/*
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
+package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
