@@ -101,5 +101,12 @@ TestChoice1 ::= CHOICE {
 TestChoice2 ::= CHOICE {
    a SET OF INTEGER
 } (a: {1, 2, 3})
+TestChoice3 ::= CHOICE {
+   a SEQUENCE {
+       b INTEGER,
+       c BOOLEAN
+   },
+   d OCTET STRING
+} (a: {b 1, c TRUE} | d: 'BEEF'H)
 
 END
