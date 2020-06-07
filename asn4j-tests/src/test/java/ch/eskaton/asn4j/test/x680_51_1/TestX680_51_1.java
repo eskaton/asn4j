@@ -39,6 +39,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString6;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString7;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBoolean2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestChoice1;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestChoice2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestEnumeration1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestEnumeration3;
@@ -573,6 +574,15 @@ class TestX680_51_1 {
 
         testChoiceFailure(TestChoice1.class, new TestChoice1(), c -> c.setA(ASN1Integer.valueOf(2L)));
         testChoiceFailure(TestChoice1.class, new TestChoice1(), c -> c.setB(ASN1Boolean.FALSE));
+    }
+
+    @Test
+    void testChoice2() {
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(),
+                c -> c.setA(new TestChoice2.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L), ASN1Integer.valueOf(3L))));
+
+        testChoiceFailure(TestChoice2.class, new TestChoice2(),
+                c -> c.setA(new TestChoice2.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L))));
     }
 
 }
