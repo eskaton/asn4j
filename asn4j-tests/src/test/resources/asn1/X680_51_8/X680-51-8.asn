@@ -55,6 +55,11 @@ TestSequence8 ::= SEQUENCE {
     b BOOLEAN
 } (WITH COMPONENTS {a OPTIONAL})
 
+TestSet1 ::= SET {
+    a INTEGER,
+    b BOOLEAN
+} (WITH COMPONENTS {b(TRUE), a (1)})
+
 -- Test all types
 TestSetOf109 ::= SET OF BOOLEAN
 TestSetOf110 ::= TestSetOf109 (WITH COMPONENT (TRUE))

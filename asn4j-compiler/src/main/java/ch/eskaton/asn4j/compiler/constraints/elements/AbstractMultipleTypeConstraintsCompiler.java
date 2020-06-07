@@ -43,33 +43,33 @@ import ch.eskaton.commons.utils.StreamsUtils;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Supplier;
 
-public class MultipleTypeConstraintsCompiler implements ElementsCompiler<MultipleTypeConstraints> {
+public abstract class AbstractMultipleTypeConstraintsCompiler implements ElementsCompiler<MultipleTypeConstraints> {
 
     protected final CompilerContext ctx;
 
-    public MultipleTypeConstraintsCompiler(CompilerContext ctx) {
+    private final Supplier<? extends ComponentVerifier> verifierSupplier;
+
+    public AbstractMultipleTypeConstraintsCompiler(CompilerContext ctx,
+            Supplier<? extends ComponentVerifier> verifierSupplier) {
         this.ctx = ctx;
+        this.verifierSupplier = verifierSupplier;
     }
 
     @Override
     public Node compile(CompiledType baseType, MultipleTypeConstraints elements, Optional<Bounds> bounds) {
         var compiledCollectionType = (CompiledCollectionType) baseType;
-
         var components = compiledCollectionType.getComponents();
         var componentNodes = new HashSet<ComponentNode>();
-        var lastIndex = -1;
+        var verifier = verifierSupplier.get();
 
         for (var constraint : elements.getConstraints()) {
             var name = constraint.getName();
             var index = StreamsUtils.indexOf(components, c -> Objects.equals(name, c.get_1()));
 
-            if (index != -1 && index > lastIndex) {
-                lastIndex = index;
-            } else {
-                throw new CompilerException("Component '%s' not found in type '%s'", name,
-                        compiledCollectionType.getName());
-            }
+            verifier.verify(index, compiledCollectionType.getName(), name);
 
             componentNodes.add(compileComponentConstraint(components.get(index).get_2(), constraint));
         }
@@ -77,7 +77,7 @@ public class MultipleTypeConstraintsCompiler implements ElementsCompiler<Multipl
         return new WithComponentsNode(componentNodes);
     }
 
-    private ComponentNode compileComponentConstraint(CompiledType compiledType, NamedConstraint namedConstraint) {
+    protected ComponentNode compileComponentConstraint(CompiledType compiledType, NamedConstraint namedConstraint) {
         var name = namedConstraint.getName();
         var constraint = namedConstraint.getConstraint();
         var presence = Optional.ofNullable(constraint.getPresence()).map(PresenceConstraint::getType).orElse(null);
@@ -98,6 +98,28 @@ public class MultipleTypeConstraintsCompiler implements ElementsCompiler<Multipl
         }
 
         return new ComponentNode(name, compiledType.getType(), roots, presence);
+    }
+
+    protected static class ComponentVerifier {
+
+        private Set<String> definedComponents = new HashSet<>();
+
+        protected void verify(int index, String typeName, String componentName) {
+            if (index == -1) {
+                throwNotFound(typeName, componentName);
+            }
+
+            if (definedComponents.contains(componentName)) {
+                throw new CompilerException("Duplicate element '%s' found in type '%s'", componentName, typeName);
+            }
+
+            definedComponents.add(componentName);
+        }
+
+        protected void throwNotFound(String typeName, String componentName) {
+            throw new CompilerException("Component '%s' not found in type '%s'", componentName, typeName);
+        }
+
     }
 
 }

@@ -25,20 +25,31 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.constraints;
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.elements.SequenceMultipleTypeConstraintsCompiler;
-import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
-import ch.eskaton.asn4j.runtime.types.TypeName;
 
+public class SequenceMultipleTypeConstraintsCompiler extends AbstractMultipleTypeConstraintsCompiler {
 
-public class SequenceConstraintCompiler extends AbstractCollectionConstraintCompiler {
+    public SequenceMultipleTypeConstraintsCompiler(CompilerContext ctx) {
+        super(ctx, () -> new SequenceComponentVerifier());
+    }
 
-    public SequenceConstraintCompiler(CompilerContext ctx) {
-        super(ctx, TypeName.SEQUENCE);
+    protected static class SequenceComponentVerifier extends ComponentVerifier {
 
-        addConstraintHandler(MultipleTypeConstraints.class, new SequenceMultipleTypeConstraintsCompiler(ctx)::compile);
+        private int lastIndex = -1;
+
+        @Override
+        public void verify(int index, String typeName, String componentName) {
+            super.verify(index, typeName, componentName);
+
+            if (index <= lastIndex) {
+                throwNotFound(typeName, componentName);
+            }
+
+            lastIndex = index;
+        }
+
     }
 
 }

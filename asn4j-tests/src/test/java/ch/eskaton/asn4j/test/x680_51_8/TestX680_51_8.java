@@ -57,6 +57,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence7;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence8;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequenceOf2;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestSet1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf110;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSetOf112;
@@ -84,8 +85,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testSequenceFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSetFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSetSuccess;
 import static ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence105.A.A;
 import static ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence105.A.B;
 import static ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence105.A.C;
@@ -519,6 +522,23 @@ class TestX680_51_8 {
                 s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(0L)))));
         testSequenceFailure(TestSequence114.class, new TestSequence114(),
                 s -> s.setA(with(new TestSetOf1(), so -> so.setValues(ASN1Integer.valueOf(3L)))));
+    }
+
+    @Test
+    void testSet1() {
+        testSetSuccess(TestSet1.class, new TestSet1(), s -> {
+            s.setA(ASN1Integer.valueOf(1L));
+            s.setB(ASN1Boolean.TRUE);
+        });
+
+        testSetFailure(TestSet1.class, new TestSet1(), s -> {
+            s.setA(ASN1Integer.valueOf(2L));
+            s.setB(ASN1Boolean.TRUE);
+        });
+        testSetFailure(TestSet1.class, new TestSet1(), s -> {
+            s.setA(ASN1Integer.valueOf(1L));
+            s.setB(ASN1Boolean.FALSE);
+        });
     }
 
 }

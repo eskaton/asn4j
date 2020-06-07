@@ -199,7 +199,27 @@ class CompilerImplTest {
                                 a INTEGER
                             } (WITH COMPONENTS {a (1), b (TRUE)})
                         """, CompilerException.class, "Component 'b' not found in type 'Sequence'",
-                        "Test inexistent components in SEQUENCE")
+                        "Test inexistent components in SEQUENCE"),
+                Arguments.of("""
+                            Sequence ::= SEQUENCE {
+                                a INTEGER,
+                                b BOOLEAN
+                            } (WITH COMPONENTS {a (1), b (TRUE), a(2)})
+                        """, CompilerException.class, "Duplicate element 'a' found in type 'Sequence'",
+                        "Test duplicate components in SEQUENCE"),
+                Arguments.of("""
+                            Set ::= SET {
+                                a INTEGER
+                            } (WITH COMPONENTS {a (1), b (TRUE)})
+                        """, CompilerException.class, "Component 'b' not found in type 'Set'",
+                        "Test inexistent components in SET"),
+                Arguments.of("""
+                            Set ::= SET {
+                                a INTEGER,
+                                b BOOLEAN
+                            } (WITH COMPONENTS {a (1), b (TRUE), a(2)})
+                        """, CompilerException.class, "Duplicate element 'a' found in type 'Set'",
+                        "Test duplicate components in SET")
         );
         // @formatter:on
     }
