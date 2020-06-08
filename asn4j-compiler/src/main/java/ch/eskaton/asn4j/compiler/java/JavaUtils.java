@@ -34,11 +34,13 @@ import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
+import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.HexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
@@ -71,6 +73,8 @@ public class JavaUtils {
 
         addCase(dispatcher, BooleanValue.class, JavaUtils::getBooleanInitializerString);
         addCase(dispatcher, BitStringValue.class, JavaUtils::getBitStringInitializerString);
+        addCase(dispatcher, BinaryStringValue.class, JavaUtils::getBinaryStringInitializerString);
+        addCase(dispatcher, HexStringValue.class, JavaUtils::getHexStringInitializerString);
         addCase(dispatcher, EnumeratedValue.class, JavaUtils::getEnumeratedInitializerString);
         addCase(dispatcher, IntegerValue.class, JavaUtils::getIntegerInitializerString);
         addCase(dispatcher, IRIValue.class, JavaUtils::getIRIInitializerString);
@@ -104,6 +108,14 @@ public class JavaUtils {
                 i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
 
         return "new " + typeName + "(new byte[] { " + bytesStr + " }, " + value.getUnusedBits() + ")";
+    }
+
+    private static String getBinaryStringInitializerString(CompilerContext ctx, String typeName, BinaryStringValue value) {
+        return getBitStringInitializerString(ctx, typeName, value.toBitString());
+    }
+
+    private static String getHexStringInitializerString(CompilerContext ctx, String typeName, HexStringValue value) {
+        return getBitStringInitializerString(ctx, typeName, value.toBitString());
     }
 
     private static String getEnumeratedInitializerString(CompilerContext ctx, String typeName, EnumeratedValue value) {

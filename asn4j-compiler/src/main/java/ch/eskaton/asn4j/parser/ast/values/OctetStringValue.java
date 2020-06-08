@@ -29,51 +29,21 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
-import java.util.Arrays;
-
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
-public class OctetStringValue extends AbstractValue implements HasSize {
-
-    private byte[] byteValue;
+public class OctetStringValue extends ByteStringValue {
 
     public OctetStringValue(Position position, byte[] byteValue) {
-        super(position);
-
-        this.byteValue = byteValue;
+        super(position, byteValue);
     }
 
     public OctetStringValue(byte[] byteValue) {
         this(NO_POSITION, byteValue);
     }
 
-    public byte[] getByteValue() {
-        return byteValue;
-    }
-
     @Override
     public int getSize() {
         return byteValue.length;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        OctetStringValue that = (OctetStringValue) obj;
-
-        return Arrays.equals(byteValue, that.byteValue);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(byteValue);
     }
 
 }

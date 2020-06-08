@@ -27,34 +27,17 @@
 
 package ch.eskaton.asn4j.compiler.defaults;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaInitializer;
-import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class OctetStringDefaultCompiler implements DefaultCompiler {
+public class OctetStringDefaultCompiler extends ByteStringDefaultCompiler<OctetStringValue> {
 
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        byte[] bytes;
+    public OctetStringDefaultCompiler() {
+        super(OctetStringValue.class);
+    }
 
-        if (value instanceof EmptyValue) {
-            bytes = new byte[0];
-        } else {
-            OctetStringValue octetStringValue = ctx.resolveGenericValue(OctetStringValue.class, type, value);
-
-            bytes = octetStringValue.getByteValue();
-        }
-
-        String initializerString = BitStringUtils.getInitializerString(bytes);
-        String defaultField = addDefaultField(clazz, typeName, field);
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = " + "new " + typeName +
-                "(" + initializerString + ");"));
+    @Override
+    protected String getEmptyValueInitializer(String typeName) {
+        return "new " + typeName + "(new byte[] {})";
     }
 
 }
