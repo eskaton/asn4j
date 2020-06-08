@@ -63,7 +63,6 @@ import ch.eskaton.asn4j.compiler.il.Statement;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
-import ch.eskaton.asn4j.compiler.utils.BitStringUtils;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.commons.collections.Maps;
@@ -185,7 +184,12 @@ public class IL2JavaTranslator {
             Object value = ilValue.getValue();
 
             if (value instanceof byte[]) {
-                return BitStringUtils.getInitializerString((byte[]) value);
+                var byteValue = (byte[]) value;
+                var bytesStr = IntStream.range(0, byteValue.length).boxed()
+                        .map(i -> String.format("(byte) 0x%02x", byteValue[i]))
+                        .collect(Collectors.joining(", "));
+
+                return "new byte[] { " + bytesStr + " }";
             } else if (value instanceof int[]) {
                 return "new int[] {" + IntStream.range(0, ((int[]) value).length).boxed().map(
                         i -> String.format("%d", ((int[]) value)[i])).collect(Collectors.joining(", "))

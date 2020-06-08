@@ -25,21 +25,52 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.utils;
+package ch.eskaton.asn4j.parser.ast.values;
 
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import ch.eskaton.asn4j.parser.Position;
 
-public class BitStringUtils {
+import java.util.Arrays;
 
-    private BitStringUtils() {
+public abstract class ByteStringValue extends AbstractValue implements HasSize {
+
+    protected byte[] byteValue;
+
+    public ByteStringValue(Position position) {
+        super(position);
     }
 
-    public static String getInitializerString(byte[] bytes) {
-        String bytesStr = IntStream.range(0, bytes.length).boxed().map(
-                i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
+    public ByteStringValue(Position position, byte[] byteValue) {
+        super(position);
 
-        return "new byte[] { " + bytesStr + " }";
+        this.byteValue = byteValue;
+    }
+
+    public byte[] getByteValue() {
+        return byteValue;
+    }
+
+    public void setByteValue(byte[] byteValue) {
+        this.byteValue = byteValue;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ByteStringValue that = (ByteStringValue) o;
+
+        return Arrays.equals(byteValue, that.byteValue);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(byteValue);
     }
 
 }

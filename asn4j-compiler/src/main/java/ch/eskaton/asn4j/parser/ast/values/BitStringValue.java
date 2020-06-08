@@ -31,17 +31,14 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.HexDump;
 import ch.eskaton.commons.utils.StringUtils;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
-public class BitStringValue extends AbstractValue implements HasSize {
+public class BitStringValue extends ByteStringValue {
 
     private int unusedBits;
-
-    private byte[] byteValue;
 
     private List<String> namedValues;
 
@@ -52,16 +49,14 @@ public class BitStringValue extends AbstractValue implements HasSize {
     }
 
     public BitStringValue(Position position, byte[] byteValue, int unusedBits) {
-        super(position);
+        super(position, byteValue);
 
-        this.byteValue = byteValue;
         this.unusedBits = unusedBits;
     }
 
     public BitStringValue(byte[] byteValue, int unusedBits) {
-        super(NO_POSITION);
+        super(NO_POSITION, byteValue);
 
-        this.byteValue = byteValue;
         this.unusedBits = unusedBits;
     }
 
@@ -75,14 +70,6 @@ public class BitStringValue extends AbstractValue implements HasSize {
         super(position);
 
         this.value = value;
-    }
-
-    public byte[] getByteValue() {
-        return byteValue;
-    }
-
-    public void setByteValue(byte[] byteValue) {
-        this.byteValue = byteValue;
     }
 
     public Value getValue() {
@@ -115,19 +102,20 @@ public class BitStringValue extends AbstractValue implements HasSize {
             return false;
         }
 
+        if (!super.equals(o)) {
+            return false;
+        }
+
         BitStringValue that = (BitStringValue) o;
 
         return unusedBits == that.unusedBits &&
-                Arrays.equals(byteValue, that.byteValue) &&
                 Objects.equals(namedValues, that.namedValues) &&
                 Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(unusedBits, namedValues, value);
-        result = 31 * result + Arrays.hashCode(byteValue);
-        return result;
+        return Objects.hash(super.hashCode(), unusedBits, namedValues, value);
     }
 
     @Override
