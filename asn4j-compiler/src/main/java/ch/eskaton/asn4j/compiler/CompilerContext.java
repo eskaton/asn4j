@@ -718,6 +718,10 @@ public class CompilerContext {
     }
 
     public Optional<ValueOrObjectAssignmentNode> tryResolveReference(SimpleDefinedValue reference) {
+        if (reference instanceof ExternalValueReference) {
+            return Optional.ofNullable(resolveExternalReference(((ExternalValueReference) reference)));
+        }
+
         return tryResolveReference(reference.getValue());
     }
 

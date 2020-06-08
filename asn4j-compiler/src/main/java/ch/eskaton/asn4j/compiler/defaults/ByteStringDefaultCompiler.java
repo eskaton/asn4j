@@ -29,36 +29,24 @@ package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.java.JavaUtils;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.ByteStringValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public abstract class ByteStringDefaultCompiler<T extends ByteStringValue> implements DefaultCompiler {
-
-    private final Class<T> valueClass;
+public abstract class ByteStringDefaultCompiler<T extends ByteStringValue> extends DefaultCompilerImpl {
 
     public ByteStringDefaultCompiler(Class<T> valueClass) {
-        this.valueClass = valueClass;
+        super(valueClass);
     }
 
     @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        var initializerString = getInitializerString(ctx, typeName, type, value);
-        var defaultField = addDefaultField(clazz, typeName, field);
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = " + initializerString + ";"));
-    }
-
-    private String getInitializerString(CompilerContext ctx, String typeName, Type type, Value value) {
+    public String getInitializerString(CompilerContext ctx, String typeName, Type type, Value value) {
         if (value instanceof EmptyValue) {
             return getEmptyValueInitializer(typeName);
         }
 
-        var resolvedValue = ctx.resolveGenericValue(valueClass, type, value);
+        T resolvedValue = (T) ctx.resolveGenericValue(valueClass, type, value);
 
         return JavaUtils.getInitializerString(ctx, typeName, resolvedValue);
     }

@@ -33,10 +33,9 @@ import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class BooleanValueResolver extends AbstractValueResolver<BooleanValue> {
 
@@ -47,17 +46,15 @@ public class BooleanValueResolver extends AbstractValueResolver<BooleanValue> {
     @Override
     public BooleanValue resolveGeneric(Type type, Value value) {
         if (type instanceof BooleanType) {
-            if (value instanceof BooleanValue) {
+            if (value instanceof SimpleDefinedValue) {
+                return ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+            } else if (value instanceof BooleanValue) {
                 return (BooleanValue) value;
             }
 
             throw new CompilerException("%s value expected", TypeName.BOOLEAN);
         } else if (type instanceof TypeReference) {
-            BooleanValue booleanValue = resolveAmbiguousValue(value, BooleanValue.class);
-
-            if (booleanValue != null) {
-                return resolve(type, booleanValue);
-            }
+            return resolveGeneric((Type) ctx.resolveTypeReference(type), value);
         }
 
         throw new CompilerException("Failed to resolve a %s value", TypeName.BOOLEAN);

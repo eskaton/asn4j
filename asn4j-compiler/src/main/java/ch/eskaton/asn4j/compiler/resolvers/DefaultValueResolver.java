@@ -33,6 +33,8 @@ import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class DefaultValueResolver<T extends Type, V extends Value> extends AbstractValueResolver<V> {
@@ -72,9 +74,15 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
 
     @Override
     public V resolveGeneric(Type type, Value value) {
+        if (value instanceof SimpleDefinedValue) {
+            value = ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+        } else if (value instanceof AmbiguousValue) {
+            value = CompilerUtils.resolveAmbiguousValue(value, valueClass);
+        }
+
         if (!valueClass.isAssignableFrom(value.getClass())) {
             throw new IllegalStateException("Value class " + value.getClass().getSimpleName() + " is not an instance of "
-                    + valueClass.getSimpleName()+ ". resolveGeneric() must be overridden." );
+                    + valueClass.getSimpleName() + ". resolveGeneric() must be overridden.");
         }
 
         return ctx.resolveValue(valueClass, type, (V) value);

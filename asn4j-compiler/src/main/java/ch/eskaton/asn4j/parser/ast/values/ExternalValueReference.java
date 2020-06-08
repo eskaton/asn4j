@@ -69,7 +69,6 @@ public class ExternalValueReference extends SimpleDefinedValue {
 
     @Override
     public int hashCode() {
-
         return Objects.hash(module);
     }
 

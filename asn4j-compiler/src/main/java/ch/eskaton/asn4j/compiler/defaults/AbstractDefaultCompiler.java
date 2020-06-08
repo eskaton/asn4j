@@ -28,17 +28,25 @@
 package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class RelativeIRIDefaultCompiler extends AbstractIRIDefaultCompiler {
+public abstract class AbstractDefaultCompiler {
 
-    @Override
-    protected RelativeIRIValue resolveValue(CompilerContext ctx, Value value) {
-        RelativeIRIValueResolver resolver = new RelativeIRIValueResolver(ctx);
+    public abstract void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
+            Value value);
 
-        return resolver.resolveValue(ctx, value, RelativeIRIValue.class);
+    protected String addDefaultField(JavaClass clazz, String typeName, String field) {
+        String defaultField = CompilerUtils.getDefaultFieldName(field);
+
+        clazz.addField(new JavaDefinedField(typeName, defaultField), false, false);
+
+        return defaultField;
     }
+
+    protected abstract String getInitializerString(CompilerContext ctx, String typeName, Type type, Value value);
 
 }

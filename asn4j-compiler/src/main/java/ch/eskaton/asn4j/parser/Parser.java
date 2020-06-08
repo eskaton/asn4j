@@ -2632,7 +2632,7 @@ public class Parser {
                                 return new EmptyValue(a.P());
                             }
                         } else {
-                            String value = a.s().substring(0, a.s().length());
+                            String value = a.s();
 
                             if (a.$() == TokenType.B_STRING) {
                                 return new BinaryStringValue(a.P(), value);
