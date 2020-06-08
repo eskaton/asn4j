@@ -29,12 +29,13 @@ package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
 import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.MutableInteger;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -95,7 +96,7 @@ public class JavaDefaultCtorBuilder {
                     .forEach(ctor -> generateParentConstructor(javaClass, ctor));
 
         } catch (ClassNotFoundException e) {
-            throw new CompilerException("Failed to resolve builtin type: " + javaClass.getParent());
+            throw new CompilerException("Failed to resolve builtin type: %s", javaClass.getParent());
         }
     }
 
@@ -263,7 +264,7 @@ public class JavaDefaultCtorBuilder {
     }
 
     private boolean constructorDefined(List<JavaConstructor> childCtors, JavaConstructor childCtor) {
-        return childCtors.stream().noneMatch(ctor ->
+        return childCtors.stream().anyMatch(ctor ->
                 ctor.getClazz().equals(childCtor.getClazz())
                         && ctor.getParameters().equals(childCtor.getParameters())
                         && ctor.getVisibility().equals(childCtor.getVisibility()));
@@ -274,7 +275,7 @@ public class JavaDefaultCtorBuilder {
 
         for (JavaStructure struct : structs.values()) {
             if (!(struct instanceof JavaClass)) {
-                throw new ASN1RuntimeException("Support for " + struct + " not implemented.");
+                throw new IllegalCompilerStateException("Support for %s not implemented.", struct);
             }
 
             JavaClass javaClass = (JavaClass) struct;
@@ -294,7 +295,7 @@ public class JavaDefaultCtorBuilder {
 
                     clazzHierarchy.push(javaClass);
                 } else {
-                    throw new ASN1RuntimeException("Support for " + struct + " not implemented.");
+                    throw new IllegalCompilerStateException("Support for %s not implemented.", struct);
                 }
             }
 
@@ -348,6 +349,10 @@ public class JavaDefaultCtorBuilder {
             return subclasses;
         }
 
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
     }
 
 }
