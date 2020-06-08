@@ -43,6 +43,7 @@ import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.HexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NamedValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
@@ -193,11 +194,18 @@ public class JavaUtils {
     }
 
     private static String getCollectionInitializerString(CompilerContext ctx, String typeName, CollectionValue value) {
-        var initString = value.getValues().stream()
-                .map(v -> getInitializerString(ctx, ctx.getTypeName(v.getType()), v.getValue()))
-                .collect(Collectors.joining(", "));
+        var maybeCompiledType = ctx.findRecursive(value.getType());
+        var values = value.getValues().stream().collect(Collectors.toMap(NamedValue::getName, NamedValue::getValue));
 
-        return "new " + typeName + "(" + initString + ")";
+        return maybeCompiledType.map(compiledType -> {
+            var initString = compiledType.getComponents().stream()
+                    .map(c -> values.containsKey(c.get_1()) ?
+                            getInitializerString(ctx, ctx.getTypeName(c.get_2().getType()), values.get(c.get_1())) :
+                            "null")
+                    .collect(Collectors.joining(", "));
+
+            return "new " + typeName + "(" + initString + ")";
+        }).orElseThrow(() -> new CompilerException("Failed to resolve type %s", typeName));
     }
 
 }

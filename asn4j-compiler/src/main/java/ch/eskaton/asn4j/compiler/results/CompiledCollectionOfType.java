@@ -36,14 +36,16 @@ public class CompiledCollectionOfType extends CompiledType {
 
     private CompiledType contentType;
 
-    public CompiledCollectionOfType(Type type, String name, CompiledType contentType) {
+    public CompiledCollectionOfType(Type type, String name) {
         super(type, name);
-
-        this.contentType = contentType;
     }
 
     public CompiledType getContentType() {
         return contentType;
+    }
+
+    public void setContentType(CompiledType contentType) {
+        this.contentType = contentType;
     }
 
     @Override

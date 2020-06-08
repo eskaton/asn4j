@@ -37,7 +37,7 @@ public class RealCompiler extends BuiltinTypeCompiler<Real> {
         ctx.createClass(name, node, false);
         ctx.finishClass();
 
-        return new CompiledType(node, name);
+        return ctx.createCompiledType(node, name);
     }
 
 }

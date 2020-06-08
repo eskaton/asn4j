@@ -49,6 +49,7 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static ch.eskaton.commons.utils.Utils.with;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DisplayName("X.680 25 - SEQUENCE tests")
 class TestX680_25 {
@@ -86,7 +87,14 @@ class TestX680_25 {
                     value.setA(ASN1Integer.valueOf(4711));
                     value.setB(ASN1Boolean.TRUE);
                 },
-                value -> assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), value.getC()));
+                value -> {
+                    assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), value.getC());
+                    assertEquals(ASN1Integer.valueOf(1L), value.getI().getA());
+                    assertEquals(ASN1Boolean.FALSE, value.getI().getB());
+                    assertEquals(ASN1Integer.valueOf(1L), value.getJ().getA());
+                    assertNull(value.getJ().getB());
+                    assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), value.getJ().getC());
+                });
     }
 
     @Test

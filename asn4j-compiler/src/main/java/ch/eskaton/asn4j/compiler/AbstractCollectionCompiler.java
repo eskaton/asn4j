@@ -35,9 +35,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -55,17 +53,17 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
 
     public CompiledType compile(CompilerContext ctx, String name, T node) {
         var javaClass = ctx.createClass(name, node, true);
-        var components = new ArrayList<Tuple2<String, CompiledType>>();
         var componentVerifier = componentVerifierSupplier.apply(ctx, name);
         var ctor = new JavaConstructor(JavaVisibility.PUBLIC, name);
         var ctorBody = new StringBuilder();
+        var compiledType = ctx.createCompiledType(CompiledCollectionType.class, node, name);
 
         for (ComponentType component : node.getAllComponents()) {
             componentVerifier.verify(component);
 
             try {
                 var compiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
-                var compiledComponent = compiler.compile(ctx, component);
+                var compiledComponent = compiler.compile(ctx, compiledType, component);
 
                 compiledComponent.forEach(c -> {
                     var argType = c.get_2().getName();
@@ -75,7 +73,6 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
                     ctorBody.append("\t\tthis." + argName + " = " + argName + ";\n");
                 });
 
-                components.addAll(compiledComponent);
             } catch (CompilerException e) {
                 if (component.getNamedType() != null) {
                     throw new CompilerException("Failed to compile component %s in %s %s", e,
@@ -88,8 +85,6 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
 
         ctor.setBody(Optional.of(ctorBody.toString()));
         javaClass.addMethod(ctor);
-
-        var compiledType = new CompiledCollectionType(node, name, components);
 
         if (node.hasConstraint()) {
             var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);

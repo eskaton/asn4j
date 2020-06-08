@@ -109,7 +109,9 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         addClearFieldsMethod(javaClass, fieldNames);
 
-        CompiledChoiceType compiledType = new CompiledChoiceType(node, name, components);
+        CompiledChoiceType compiledType = ctx.createCompiledType(CompiledChoiceType.class, node, name);
+
+        compiledType.getComponents().addAll(components);
 
         if (node.hasConstraint()) {
             var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
@@ -119,7 +121,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         ctx.finishClass();
 
-        return new CompiledType(node, name);
+        return ctx.createCompiledType(node, name);
     }
 
     private Tuple2<String, CompiledType> compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,

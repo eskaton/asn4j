@@ -40,19 +40,24 @@ public class CompiledEnumeratedType extends CompiledType {
 
     private EnumerationItems additions;
 
-    public CompiledEnumeratedType(Type type, String name, EnumerationItems roots, EnumerationItems additions) {
+    public CompiledEnumeratedType(Type type, String name) {
         super(type, name);
-
-        this.roots = roots;
-        this.additions = additions;
     }
 
     public EnumerationItems getRoots() {
         return roots;
     }
 
+    public void setRoots(EnumerationItems roots) {
+        this.roots = roots;
+    }
+
     public EnumerationItems getAdditions() {
         return additions;
+    }
+
+    public void setAdditions(EnumerationItems additions) {
+        this.additions = additions;
     }
 
     public Optional<Tuple2<String, Integer>> getElementById(String id) {

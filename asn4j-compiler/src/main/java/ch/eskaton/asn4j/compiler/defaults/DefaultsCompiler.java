@@ -39,9 +39,12 @@ import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
+import ch.eskaton.asn4j.parser.ast.types.SequenceType;
+import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
@@ -69,6 +72,8 @@ public class DefaultsCompiler {
                     .put(RelativeOID.class, new DefaultCompilerImpl(RelativeOIDValue.class))
                     .put(IRI.class, new DefaultCompilerImpl(IRIValue.class))
                     .put(RelativeIRI.class, new DefaultCompilerImpl(RelativeIRIValue.class))
+                    .put(SetType.class, new DefaultCompilerImpl(CollectionValue.class))
+                    .put(SequenceType.class, new DefaultCompilerImpl(CollectionValue.class))
                     .build();
 
     private CompilerContext ctx;
@@ -96,7 +101,7 @@ public class DefaultsCompiler {
         try {
             compiler.compileDefault(ctx, clazz, field, typeName, type, value);
         } catch (CompilerException e) {
-            throw new CompilerException("Error in default for type %s: %s ", formatTypeName(type), e.getMessage(), e);
+            throw new CompilerException("Error in default for type %s: %s ", e, formatTypeName(type), e.getMessage());
         }
     }
 
