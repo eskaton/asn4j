@@ -28,46 +28,34 @@
 package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompiler {
 
-public class IntegerDefaultCompiler implements DefaultCompiler {
+    protected Class<V> valueClass;
+
+    public DefaultCompilerImpl(Class<V> valueClass) {
+        this.valueClass = valueClass;
+    }
 
     @Override
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
             Value value) {
-        long intValue;
+        var initializerString = getInitializerString(ctx, typeName, type, value);
+        var defaultField = addDefaultField(clazz, typeName, field);
 
-        if (resolveAmbiguousValue(value, SimpleDefinedValue.class) != null) {
-            intValue = ctx.resolveValue(IntegerValue.class,
-                    resolveAmbiguousValue(value, SimpleDefinedValue.class)).getValue().longValue();
-        } else if (value instanceof IntegerValue) {
-            intValue = ((IntegerValue) value).getValue().longValue();
+        clazz.addInitializer(new JavaInitializer(String.format("\t\t%s = %s;", defaultField, initializerString)));
+    }
 
-            try {
-                ASN1Integer.valueOf(intValue);
-            } catch (ConstraintViolatedException e) {
-                throw new CompilerException("Default value doesn't satisfy constraints", e);
-            }
-        } else {
-            throw new CompilerException("Invalid default value");
-        }
+    @Override
+    public String getInitializerString(CompilerContext ctx, String typeName, Type type, Value value) {
+        var resolvedValue = ctx.resolveGenericValue(valueClass, type, value);
 
-        String defaultField = addDefaultField(clazz, typeName, field);
-
-        clazz.addInitializer(new JavaInitializer("\t\t" + defaultField + " = "
-                + typeName + ".valueOf(" + intValue + ");"));
-
-        clazz.addImport(ConstraintViolatedException.class);
+        return JavaUtils.getInitializerString(ctx, typeName, resolvedValue);
     }
 
 }

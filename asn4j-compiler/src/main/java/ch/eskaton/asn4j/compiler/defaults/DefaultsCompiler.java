@@ -41,6 +41,13 @@ import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.IRIValue;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Maps;
 
@@ -51,17 +58,17 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.getTypeName;
 
 public class DefaultsCompiler {
 
-    private Map<Class<? extends Type>, DefaultCompiler> compilers =
-            Maps.<Class<? extends Type>, DefaultCompiler>builder()
-                    .put(BooleanType.class, new BooleanDefaultCompiler())
-                    .put(IntegerType.class, new IntegerDefaultCompiler())
-                    .put(EnumeratedType.class, new EnumeratedDefaultCompiler())
+    private Map<Class<? extends Type>, AbstractDefaultCompiler> compilers =
+            Maps.<Class<? extends Type>, AbstractDefaultCompiler>builder()
+                    .put(BooleanType.class, new DefaultCompilerImpl(BooleanValue.class))
+                    .put(IntegerType.class, new DefaultCompilerImpl(IntegerValue.class))
+                    .put(EnumeratedType.class, new DefaultCompilerImpl(EnumeratedValue.class))
                     .put(BitString.class, new BitStringDefaultCompiler())
                     .put(OctetString.class, new OctetStringDefaultCompiler())
-                    .put(ObjectIdentifier.class, new ObjectIdentifierDefaultCompiler())
-                    .put(RelativeOID.class, new RelativeOIDDefaultCompiler())
-                    .put(IRI.class, new IRIDefaultCompiler())
-                    .put(RelativeIRI.class, new RelativeIRIDefaultCompiler())
+                    .put(ObjectIdentifier.class, new DefaultCompilerImpl(ObjectIdentifierValue.class))
+                    .put(RelativeOID.class, new DefaultCompilerImpl(RelativeOIDValue.class))
+                    .put(IRI.class, new DefaultCompilerImpl(IRIValue.class))
+                    .put(RelativeIRI.class, new DefaultCompilerImpl(RelativeIRIValue.class))
                     .build();
 
     private CompilerContext ctx;
@@ -84,7 +91,7 @@ public class DefaultsCompiler {
             throw new CompilerException("Defaults for type %s not yet supported", getTypeName(base));
         }
 
-        DefaultCompiler compiler = compilers.get(base.getClass());
+        AbstractDefaultCompiler compiler = compilers.get(base.getClass());
 
         try {
             compiler.compileDefault(ctx, clazz, field, typeName, type, value);
