@@ -33,7 +33,9 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 public class AnonymousCompiledCollectionOfType extends CompiledCollectionOfType {
 
     public AnonymousCompiledCollectionOfType(Type type, CompiledType contentType) {
-        super(type, null, contentType);
+        super(type, null);
+
+        setContentType(contentType);
     }
 
     @Override

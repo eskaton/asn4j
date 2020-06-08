@@ -31,17 +31,16 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class CompiledChoiceType extends CompiledType {
 
-    private List<Tuple2<String, CompiledType>> components;
+    private List<Tuple2<String, CompiledType>> components = new ArrayList<>();
 
-    public CompiledChoiceType(Type type, String name, List<Tuple2<String, CompiledType>> components) {
+    public CompiledChoiceType(Type type, String name) {
         super(type, name);
-
-        this.components = components;
     }
 
     public List<Tuple2<String, CompiledType>> getComponents() {

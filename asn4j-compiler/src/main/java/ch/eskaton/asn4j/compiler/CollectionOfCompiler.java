@@ -48,7 +48,10 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
         var contentType = compileContentType(ctx, node, name);
 
-        CompiledType compiledType = new CompiledCollectionOfType(node, name, contentType);
+        CompiledCollectionOfType compiledType = ctx.createCompiledType(CompiledCollectionOfType.class, node, name);
+
+        compiledType.setContentType(contentType);
+
         ConstraintDefinition constraintDef;
 
         if (node.hasAnyConstraint()) {

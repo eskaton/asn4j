@@ -41,7 +41,7 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
     public CompiledType compile(CompilerContext ctx, String name, T node) {
         JavaClass javaClass = ctx.createClass(name, node, isConstructed(ctx, name));
 
-        CompiledType compiledType = new CompiledType(node, name);
+        CompiledType compiledType = ctx.createCompiledType(node, name);
         ConstraintDefinition constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
 
         compiledType.setConstraintDefinition(constraintDef);

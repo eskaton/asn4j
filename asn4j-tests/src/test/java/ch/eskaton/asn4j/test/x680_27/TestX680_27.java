@@ -27,13 +27,17 @@
 
 package ch.eskaton.asn4j.test.x680_27;
 
+import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.test.modules.x680_27.TestSet1;
 import ch.eskaton.asn4j.test.modules.x680_27.TestSet2;
+import ch.eskaton.asn4j.test.modules.x680_27.TestSet3;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class TestX680_27 {
 
@@ -49,6 +53,15 @@ class TestX680_27 {
             value.setB(ASN1OctetString.valueOf(new byte[] { 0x74, 0x65, 0x73, 0x74 }));
             value.setC(ASN1Integer.valueOf(23));
         });
+    }
+
+    @Test
+    void testSet3() {
+        assertEquals(ASN1Integer.valueOf(1L), new TestSet3().getA().getB());
+        assertEquals(ASN1Boolean.TRUE, new TestSet3().getA().getC());
+        assertEquals(ASN1Integer.valueOf(1L), new TestSet3().getB().getA());
+        assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), new TestSet3().getB().getB());
+        assertNull(new TestSet3().getB().getC());
     }
 
 }

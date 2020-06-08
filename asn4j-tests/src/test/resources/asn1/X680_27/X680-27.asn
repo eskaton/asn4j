@@ -12,4 +12,12 @@ TestSet2 ::= SET {
 	c INTEGER OPTIONAL
 }
 
+TestSet3 ::= SET {
+    a [0] SET {
+        b INTEGER,
+        c BOOLEAN
+    } DEFAULT { b 1, c TRUE },
+    b [1] TestSet2 DEFAULT { a 1, b 'ABC'H }
+}
+
 END

@@ -41,15 +41,9 @@ public class CompiledType implements CompilationResult {
 
     private ConstraintDefinition constraintDefinition;
 
-    public CompiledType(Type type, String name) {
+    CompiledType(Type type, String name) {
         this.type = type;
         this.name = name;
-    }
-
-    public CompiledType(Type type, String name, ConstraintDefinition constraintDefinition) {
-        this(type, name);
-
-        this.constraintDefinition = constraintDefinition;
     }
 
     public Type getType() {

@@ -33,9 +33,13 @@ public class IllegalCompilerStateException extends CompilerException {
     public IllegalCompilerStateException(String message) {
         super(message);
     }
-    
+
     public IllegalCompilerStateException(String format, Object... args) {
-        super(String.format(format, args));
+        super(format, args);
+    }
+
+    public IllegalCompilerStateException(String format, Throwable e, Object... args) {
+        super(format, e, args);
     }
 
 }

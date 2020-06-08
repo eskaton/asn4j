@@ -101,7 +101,7 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
                 Optional.of("\t\tsuper.setValue(BigInteger.valueOf(value));"),
                 singletonList(ConstraintViolatedException.class.getName())));
 
-        CompiledType compiledType = new CompiledType(node, name);
+        CompiledType compiledType = ctx.createCompiledType(node, name);
         ConstraintDefinition constraintDef;
 
         if (node.hasConstraint()) {

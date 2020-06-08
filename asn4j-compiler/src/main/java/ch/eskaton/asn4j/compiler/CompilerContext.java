@@ -51,6 +51,7 @@ import ch.eskaton.asn4j.compiler.resolvers.OctetStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
+import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -142,11 +143,14 @@ import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -284,7 +288,7 @@ public class CompilerContext {
         this.outputDir = outputDir;
     }
 
-    public void addType(String typeName, CompiledType compiledType) {
+    private void addType(String typeName, CompiledType compiledType) {
         var moduleTypes = getTypesOfCurrentModule();
 
         moduleTypes.put(typeName, compiledType);
@@ -565,7 +569,7 @@ public class CompilerContext {
             return defineType(type, name, false);
         }
 
-        return new CompiledType(type, getTypeName(type, name));
+        return createCompiledType(type, getTypeName(type, name), true);
     }
 
     private CompiledType defineType(Type type, String name, boolean newType) {
@@ -573,7 +577,7 @@ public class CompilerContext {
             return compileType(type, getTypeName(type, name));
         }
 
-        return new CompiledType(type, getTypeName(type, name));
+        return createCompiledType(type, getTypeName(type, name));
     }
 
     private CompiledType compileType(Type type, String typeName) {
@@ -861,6 +865,10 @@ public class CompilerContext {
         }
     }
 
+    public CompiledType getCompiledType(String typeName) {
+        return getTypesOfCurrentModule().get(typeName);
+    }
+
     public CompiledCollectionType getCompiledCollectionType(CompiledType compiledType) {
         return Optional.ofNullable(getCompiledBaseType(compiledType))
                 .filter(CompiledCollectionType.class::isInstance)
@@ -1067,6 +1075,82 @@ public class CompilerContext {
         } while (true);
 
         return typeNames;
+    }
+
+    public CompiledType createCompiledType(Type type, String name) {
+        return createCompiledType(CompiledType.class, type, name);
+    }
+
+    public CompiledType createCompiledType(Type type, String name, boolean isSubType) {
+        return createCompiledType(CompiledType.class, type, name, isSubType);
+    }
+
+    public <T extends CompiledType> T createCompiledType(Class<T> compiledTypeClass, Type type, String name) {
+        return createCompiledType(compiledTypeClass, type, name, false);
+    }
+
+    public <T extends CompiledType> T createCompiledType(Class<T> compiledTypeClass, Type type, String name,
+            boolean isSubType) {
+        Constructor<T> ctor;
+
+        try {
+            ctor = compiledTypeClass.getDeclaredConstructor(Type.class, String.class);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalCompilerStateException("Constructor not found in %s", e, compiledTypeClass);
+        }
+
+        ctor.setAccessible(true);
+
+        T compiledType;
+
+        try {
+            compiledType = ctor.newInstance(type, name);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalCompilerStateException("Constructor %s threw an exception", e, compiledTypeClass);
+        }
+
+        if (!isSubType) {
+            addType(name, compiledType);
+        }
+
+        return compiledType;
+    }
+
+    public Optional<CompiledCollectionType> findRecursive(Type type) {
+        if (type instanceof TypeReference) {
+            // type references are not nested, but may not yet be compiled, so we force the compilation here
+            var compiledType = getCompiledType(type);
+
+            if (compiledType != null && compiledType instanceof CompiledCollectionType) {
+                return Optional.of((CompiledCollectionType) compiledType);
+            }
+
+            return Optional.empty();
+        }
+
+        return getTypesOfCurrentModule().entrySet().stream()
+                .filter(e -> e.getValue() instanceof CompiledCollectionType)
+                .map(Map.Entry::getValue)
+                .map(CompiledCollectionType.class::cast)
+                .map(c -> findRecursive(type, c))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
+    }
+
+    private Optional<CompiledCollectionType> findRecursive(Type type, CompiledCollectionType compiledType) {
+        if (Objects.equals(type, compiledType.getType())) {
+            return Optional.of(compiledType);
+        }
+
+        return compiledType.getComponents().stream()
+                .map(t -> t.get_2())
+                .filter(CompiledCollectionType.class::isInstance)
+                .map(CompiledCollectionType.class::cast)
+                .map(c -> findRecursive(type, c))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .findFirst();
     }
 
 }

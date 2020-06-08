@@ -35,6 +35,8 @@ two TestNamedInteger2 ::= two
 
 testBitString2 TestBitString2 ::= { test-a, test-b }
 
+testSequence2 TestSequence2 ::= { a 1, c 'ABC'H }
+
 TestSequence3 ::= SEQUENCE {
 	a INTEGER,
 	b BOOLEAN,
@@ -43,7 +45,12 @@ TestSequence3 ::= SEQUENCE {
 	e BIT STRING DEFAULT '0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'H,
 	f BIT STRING DEFAULT testBitString2,
 	g TestBitString2 DEFAULT { test-a, test-c },
-	h TestBitString2 DEFAULT { }
+	h TestBitString2 DEFAULT { },
+	i SEQUENCE {
+	    a INTEGER,
+	    b BOOLEAN
+	} DEFAULT { a 1, b FALSE },
+	j TestSequence2 DEFAULT testSequence2
 }
 
 intValue INTEGER ::= 4711
