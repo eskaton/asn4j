@@ -34,8 +34,9 @@ import ch.eskaton.commons.collections.Tuple2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-public class CompiledChoiceType extends CompiledType {
+public class CompiledChoiceType extends CompiledType implements HasChildComponents {
 
     private List<Tuple2<String, CompiledType>> components = new ArrayList<>();
 
@@ -45,6 +46,11 @@ public class CompiledChoiceType extends CompiledType {
 
     public List<Tuple2<String, CompiledType>> getComponents() {
         return components;
+    }
+
+    @Override
+    public List<? extends CompiledType> getChildComponents() {
+        return components.stream().map(t -> t.get_2()).collect(Collectors.toList());
     }
 
     @Override

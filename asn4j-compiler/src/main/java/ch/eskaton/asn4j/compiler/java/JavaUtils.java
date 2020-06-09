@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
@@ -194,7 +195,9 @@ public class JavaUtils {
     }
 
     private static String getCollectionInitializerString(CompilerContext ctx, String typeName, CollectionValue value) {
-        var maybeCompiledType = ctx.findRecursive(value.getType());
+        var maybeCompiledType = ctx.findCompiledTypeRecursive(value.getType())
+                .filter(CompiledCollectionType.class::isInstance)
+                .map(CompiledCollectionType.class::cast);
         var values = value.getValues().stream().collect(Collectors.toMap(NamedValue::getName, NamedValue::getValue));
 
         return maybeCompiledType.map(compiledType -> {
