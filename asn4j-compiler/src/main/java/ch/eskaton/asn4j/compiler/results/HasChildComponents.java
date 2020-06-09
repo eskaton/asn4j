@@ -27,63 +27,10 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.runtime.utils.ToString;
-import ch.eskaton.commons.collections.Tuple2;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
-public class CompiledCollectionType extends CompiledType implements HasChildComponents {
+public interface HasChildComponents {
 
-    private List<Tuple2<String, CompiledType>> components = new ArrayList<>();
-
-    public CompiledCollectionType(Type type, String name) {
-        super(type, name);
-    }
-
-    public List<Tuple2<String, CompiledType>> getComponents() {
-        return components;
-    }
-
-    public void setComponents(List<Tuple2<String, CompiledType>> components) {
-        this.components = components;
-    }
-
-    @Override
-    public List<? extends CompiledType> getChildComponents() {
-        return components.stream().map(t -> t.get_2()).collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(obj)) {
-            return false;
-        }
-
-        CompiledCollectionType that = (CompiledCollectionType) obj;
-
-        return Objects.equals(components, that.components);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), components);
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
-    }
+    List<? extends CompiledType> getChildComponents();
 
 }

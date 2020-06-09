@@ -54,6 +54,7 @@ import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.HasChildComponents;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
@@ -154,6 +155,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
@@ -1109,45 +1111,49 @@ public class CompilerContext {
             throw new IllegalCompilerStateException("Constructor %s threw an exception", e, compiledTypeClass);
         }
 
-        if (!isSubType) {
+        if (!isSubType && isTopLevelType()) {
             addType(name, compiledType);
         }
 
         return compiledType;
     }
 
-    public Optional<CompiledCollectionType> findRecursive(Type type) {
+    private boolean isTopLevelType() {
+        return currentClass.size() == 1;
+    }
+
+    public <T extends CompiledType & HasChildComponents> Optional<T> findCompiledTypeRecursive(Type type) {
         if (type instanceof TypeReference) {
             // type references are not nested, but may not yet be compiled, so we force the compilation here
             var compiledType = getCompiledType(type);
 
-            if (compiledType != null && compiledType instanceof CompiledCollectionType) {
-                return Optional.of((CompiledCollectionType) compiledType);
+            if (compiledType != null && compiledType instanceof HasChildComponents) {
+                return Optional.of((T) compiledType);
             }
 
             return Optional.empty();
         }
 
-        return getTypesOfCurrentModule().entrySet().stream()
-                .filter(e -> e.getValue() instanceof CompiledCollectionType)
-                .map(Map.Entry::getValue)
-                .map(CompiledCollectionType.class::cast)
-                .map(c -> findRecursive(type, c))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .findFirst();
+        var componentStream = getTypesOfCurrentModule().entrySet().stream().map(Map.Entry::getValue);
+
+        return findCompiledTypeRecursiveAux(type, componentStream);
     }
 
-    private Optional<CompiledCollectionType> findRecursive(Type type, CompiledCollectionType compiledType) {
+    private <T extends CompiledType & HasChildComponents> Optional<T> findCompiledTypeRecursive(Type type,
+            T compiledType) {
         if (Objects.equals(type, compiledType.getType())) {
             return Optional.of(compiledType);
         }
 
-        return compiledType.getComponents().stream()
-                .map(t -> t.get_2())
-                .filter(CompiledCollectionType.class::isInstance)
-                .map(CompiledCollectionType.class::cast)
-                .map(c -> findRecursive(type, c))
+        var componentStream = compiledType.getChildComponents().stream();
+
+        return findCompiledTypeRecursiveAux(type, componentStream);
+    }
+
+    private <T extends CompiledType & HasChildComponents> Optional<T> findCompiledTypeRecursiveAux(Type type,
+            Stream<? extends CompiledType> componentStream) {
+        return componentStream.filter(HasChildComponents.class::isInstance)
+                .map(c -> findCompiledTypeRecursive(type, (T) c))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();

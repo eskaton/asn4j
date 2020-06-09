@@ -30,9 +30,11 @@ package ch.eskaton.asn4j.compiler.results;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
-public class CompiledCollectionOfType extends CompiledType {
+public class CompiledCollectionOfType extends CompiledType implements HasChildComponents {
 
     private CompiledType contentType;
 
@@ -46,6 +48,11 @@ public class CompiledCollectionOfType extends CompiledType {
 
     public void setContentType(CompiledType contentType) {
         this.contentType = contentType;
+    }
+
+    @Override
+    public List<? extends CompiledType> getChildComponents() {
+        return contentType != null ? List.of(contentType) : Collections.emptyList();
     }
 
     @Override
