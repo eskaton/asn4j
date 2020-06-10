@@ -51,6 +51,7 @@ import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE_OF;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
+import static ch.eskaton.asn4j.test.TestUtils.module;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 class CompilerImplTest {
@@ -253,15 +254,6 @@ class CompilerImplTest {
     private static String getContainedSubtypeDescription(TypeName type) {
         return "Contained subtype for %s must be derived of the same built-in type as the parent type"
                 .formatted(type);
-    }
-
-    public String module(String name, String body) {
-        return """
-                %s DEFINITIONS ::=
-                BEGIN
-                    %s
-                END
-                """.formatted(name, body);
     }
 
 }

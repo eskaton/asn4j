@@ -110,4 +110,74 @@ TestSequence11 ::= SEQUENCE {
    }
 }
 
+-- Test defaults for all types
+
+TestBoolean ::= BOOLEAN
+
+testBooleanValue1 BOOLEAN ::= TRUE
+
+testBooleanValue2 BOOLEAN ::= FALSE
+
+testBooleanValue3 TestBoolean ::= TRUE
+
+TestSequenceDefaults1 ::= SEQUENCE {
+    testBoolean1 BOOLEAN DEFAULT testBooleanValue1,
+    testBoolean2 BOOLEAN DEFAULT testBooleanValue2,
+    testBoolean3 TestBoolean DEFAULT testBooleanValue3,
+    testBoolean4 BOOLEAN DEFAULT FALSE
+}
+
+TestEnumeration ::= ENUMERATED {
+	a, b
+}
+
+testEnumerationValue1 TestEnumeration ::= a
+
+testEnumerationValue2 TestEnumeration ::= testEnumerationValue1
+
+TestSequenceDefaults2 ::= SEQUENCE {
+    testEnumeration1 TestEnumeration DEFAULT b,
+    testEnumeration2 TestEnumeration DEFAULT testEnumerationValue1,
+    testEnumeration3 TestEnumeration DEFAULT testEnumerationValue2
+}
+
+TestOctetString ::= OCTET STRING
+
+testOctetStringValue1 TestOctetString ::= '01AF'H
+
+testOctetStringValue2 TestOctetString ::= testOctetStringValue1
+
+TestSequenceDefaults3 ::= SEQUENCE {
+    testOctetString1 OCTET STRING DEFAULT testOctetStringValue1,
+    testOctetString2 TestOctetString DEFAULT testOctetStringValue1,
+    testOctetString3 TestOctetString DEFAULT testOctetStringValue2,
+    testOctetString4 TestOctetString DEFAULT '0101'B
+}
+
+testObjectIdentifierValue1 OBJECT IDENTIFIER ::= { 1 3 6 1 }
+
+TestSequenceDefaults4 ::= SEQUENCE {
+    testObjectIdentifier1 OBJECT IDENTIFIER DEFAULT testObjectIdentifierValue1
+}
+
+testRelativeOIDValue1 RELATIVE-OID ::= { 3 6 1 }
+
+TestSequenceDefaults5 ::= SEQUENCE {
+    testRelativeOID1 RELATIVE-OID DEFAULT testRelativeOIDValue1
+}
+
+testOidIriValue1 OID-IRI ::= "/ISO/Registration-Authority/19785.CBEFF/Organizations"
+
+TestSequenceDefaults6 ::= SEQUENCE {
+    testOidIri1 OID-IRI DEFAULT testOidIriValue1,
+    testOidIri2 OID-IRI DEFAULT "/ISO/Registration-Authority/Test"
+}
+
+testRelativeOidIriValue1 RELATIVE-OID-IRI ::= "Registration-Authority/19785.CBEFF/Organizations"
+
+TestSequenceDefaults7 ::= SEQUENCE {
+    testRelativeOidIri1 RELATIVE-OID-IRI DEFAULT testRelativeOidIriValue1,
+    testRelativeOidIri2 RELATIVE-OID-IRI DEFAULT "Registration-Authority/Test"
+}
+
 END

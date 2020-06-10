@@ -27,52 +27,19 @@
 
 package ch.eskaton.asn4j.test.x680_33;
 
-import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
-import ch.eskaton.asn4j.test.modules.x680_33.TestRelativeObjectIdentifiers;
+import ch.eskaton.asn4j.test.modules.x680_33.TestRelativeOID1;
 import org.junit.jupiter.api.Test;
 
-import java.util.function.Consumer;
-
-import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAround;
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
+import static ch.eskaton.asn4j.test.TestHelper.createOID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestX680_33 {
 
     @Test
-    void testRelativeObjectIdentifiersWithDefaults() {
-        ASN1RelativeOID testRelativeObjectIdentifier1 = createRelativeOID(new ASN1RelativeOID(), 3);
-        ASN1RelativeOID testRelativeObjectIdentifier2 = createRelativeOID(new ASN1RelativeOID(), 3, 6, 1);
-
-        Consumer<TestRelativeObjectIdentifiers> verifier = value -> {
-            assertEquals(testRelativeObjectIdentifier1, value.getTestRelativeObjectIdentifier1());
-            assertEquals(testRelativeObjectIdentifier2, value.getTestRelativeObjectIdentifier2());
-        };
-
-        assertDecodableVerifyAround(TestRelativeObjectIdentifiers.class, verifier, verifier);
-    }
-
-    @Test
-    void testRelativeObjectIdentifiersWithoutDefaults() {
-        ASN1RelativeOID testRelativeObjectIdentifier1 = createRelativeOID(new ASN1RelativeOID(), 2, 3);
-        ASN1RelativeOID testRelativeObjectIdentifier2 = createRelativeOID(new ASN1RelativeOID(), 0, 7, 1, 1);
-
-        Consumer<TestRelativeObjectIdentifiers> verifier = value -> {
-            assertEquals(testRelativeObjectIdentifier1, value.getTestRelativeObjectIdentifier1());
-            assertEquals(testRelativeObjectIdentifier2, value.getTestRelativeObjectIdentifier2());
-        };
-
-        assertDecodableVerifyAround(TestRelativeObjectIdentifiers.class,
-                value -> {
-                    value.setTestRelativeObjectIdentifier1(testRelativeObjectIdentifier1);
-                    value.setTestRelativeObjectIdentifier2(testRelativeObjectIdentifier2);
-                },
-                verifier, verifier);
-    }
-
-    public <T extends ASN1RelativeOID> T createRelativeOID(ASN1RelativeOID oid, int... components) {
-        oid.setValue(components);
-
-        return (T) oid;
+    void testRelativeOID1() {
+        assertDecodableVerifyAfter(TestRelativeOID1.class, value -> value.setValue(3, 6, 1),
+                value -> assertEquals(createOID(new TestRelativeOID1(), 3, 6, 1), value));
     }
 
 }

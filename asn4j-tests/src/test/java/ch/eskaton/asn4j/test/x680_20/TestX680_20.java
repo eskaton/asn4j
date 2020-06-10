@@ -30,10 +30,8 @@ package ch.eskaton.asn4j.test.x680_20;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.test.modules.x680_20.TestEnumeration;
-import ch.eskaton.asn4j.test.modules.x680_20.TestEnumerations;
 import org.junit.jupiter.api.Test;
 
-import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestX680_20 {
@@ -81,16 +79,6 @@ class TestX680_20 {
     @Test
     void test9() {
         testEnumeration(TestEnumeration.H, 10);
-    }
-
-    @Test
-    void testEnumerationDefault() {
-        assertDecodableVerifyAfter(TestEnumerations.class, value -> {
-            assertEquals(TestEnumeration.M, value.getTestEnumeration1());
-            assertEquals(TestEnumeration.E, value.getTestEnumeration2());
-            assertEquals(TestEnumeration.E, value.getTestEnumeration3());
-
-        });
     }
 
     private void testEnumeration(TestEnumeration a, int enumValue) {

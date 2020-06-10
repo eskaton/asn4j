@@ -30,10 +30,12 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
+import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
@@ -58,14 +60,18 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
         type = ctx.resolveTypeReference(type);
 
         if (typeClass.isAssignableFrom(type.getClass())) {
-            value = CompilerUtils.resolveAmbiguousValue(value, valueClass);
+            if (DefinedValue.class.isAssignableFrom(value.getClass())) {
+                return resolve(ctx.resolveDefinedValue((DefinedValue) value));
+            }
 
-            if (!(valueClass.isAssignableFrom(value.getClass()))) {
+            var resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
+
+            if (resolvedValue == null) {
                 throw new CompilerException("Expected a value of type %s but found %s", valueClass.getSimpleName(),
                         value.getClass().getSimpleName());
             }
 
-            return (V) value;
+            return resolvedValue;
         }
 
         throw new CompilerException("Failed to resolve a value of type %s. Found type %s", typeClass.getSimpleName(),
@@ -74,15 +80,17 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
 
     @Override
     public V resolveGeneric(Type type, Value value) {
+        var resolvedValue = value;
+
         if (value instanceof SimpleDefinedValue) {
-            value = ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+            resolvedValue = value = ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
         } else if (value instanceof AmbiguousValue) {
-            value = CompilerUtils.resolveAmbiguousValue(value, valueClass);
+            resolvedValue = value = CompilerUtils.resolveAmbiguousValue(value, valueClass);
         }
 
-        if (!valueClass.isAssignableFrom(value.getClass())) {
-            throw new IllegalStateException("Value class " + value.getClass().getSimpleName() + " is not an instance of "
-                    + valueClass.getSimpleName() + ". resolveGeneric() must be overridden.");
+        if (resolvedValue == null || !valueClass.isAssignableFrom(resolvedValue.getClass())) {
+            throw new IllegalCompilerStateException("Value class %s is not an instance of %s. resolveGeneric() must be overridden.",
+                    value.getClass().getSimpleName(), valueClass.getSimpleName());
         }
 
         return ctx.resolveValue(valueClass, type, (V) value);

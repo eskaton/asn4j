@@ -27,31 +27,16 @@
 
 package ch.eskaton.asn4j.test.x680_18;
 
-import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.test.modules.x680_18.TestBoolean;
-import ch.eskaton.asn4j.test.modules.x680_18.TestBooleans;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
-import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestX680_18 {
 
     @Test
     void testBoolean() {
         assertDecodable(TestBoolean.class, value -> value.setValue(true));
-    }
-
-    @Test
-    void testBooleanDefault() {
-        assertDecodableVerifyAfter(TestBooleans.class,
-                value -> {
-                    assertEquals(ASN1Boolean.of(true), value.getTestBoolean1());
-                    assertEquals(ASN1Boolean.of(false), value.getTestBoolean2());
-                    assertEquals(new TestBoolean(true), value.getTestBoolean3());
-                    assertEquals(ASN1Boolean.of(false), value.getTestBoolean4());
-                });
     }
 
 }

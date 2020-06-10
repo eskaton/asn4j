@@ -25,18 +25,30 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.test.x680_23;
+package ch.eskaton.asn4j.compiler.resolver;
 
-import ch.eskaton.asn4j.test.modules.x680_23.TestOctetString;
-import org.junit.jupiter.api.Test;
+import ch.eskaton.asn4j.compiler.CompilerImpl;
+import ch.eskaton.asn4j.parser.ParserException;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
-class TestX680_23 {
+import static ch.eskaton.asn4j.test.TestUtils.module;
 
-    @Test
-    void test1() {
-        assertDecodable(TestOctetString.class, value -> value.setValue("test".getBytes()));
+public class ResolverTestUtils {
+
+    public static final String MODULE_NAME = "TEST-MODULE";
+
+    public static <V extends Value> V resolveValue(String body, Class<V> valueClass, String reference)
+            throws IOException, ParserException {
+        var module = module(MODULE_NAME, body);
+        var compiler = new CompilerImpl();
+        var ctx = compiler.getCompilerContext();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        return ctx.resolveValue(valueClass, MODULE_NAME, reference);
     }
 
 }

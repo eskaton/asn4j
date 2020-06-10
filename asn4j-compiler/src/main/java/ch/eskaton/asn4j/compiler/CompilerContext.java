@@ -636,6 +636,22 @@ public class CompilerContext {
         return getValueResolver(valueClass).resolve(ref);
     }
 
+    public <T> T resolveValue(Class<T> valueClass, String moduleName, String reference) {
+        var module = getModule(moduleName);
+
+        if (module != null) {
+            currentModule.push(module);
+
+            try {
+                return getValueResolver(valueClass).resolve(reference);
+            } finally {
+                currentModule.pop();
+            }
+        }
+
+        return null;
+    }
+
     public <T> T resolveGenericValue(Class<T> valueClass, Type type, Value value) {
         var resolvedValue = getValueResolver(valueClass).resolveGeneric(type, value);
 
