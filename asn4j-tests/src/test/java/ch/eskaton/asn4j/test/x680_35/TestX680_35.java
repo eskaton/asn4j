@@ -27,57 +27,19 @@
 
 package ch.eskaton.asn4j.test.x680_35;
 
-import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
-import ch.eskaton.asn4j.test.modules.x680_35.TestRelativeOidIris;
+import ch.eskaton.asn4j.test.modules.x680_35.TestRelativeOIDIRI1;
 import org.junit.jupiter.api.Test;
 
-import java.util.function.Consumer;
-
-import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAround;
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
+import static ch.eskaton.asn4j.test.TestHelper.createIRI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestX680_35 {
 
     @Test
-    void testRelativeIRIsWithDefaults() {
-        ASN1RelativeIRI testRelativeOidIri1 = createRelativeIRI(new ASN1RelativeIRI(), "Registration-Authority", "19785.CBEFF", "Organizations");
-        ASN1RelativeIRI testRelativeOidIri2 = createRelativeIRI(new ASN1RelativeIRI(), "Registration-Authority", "Test");
-        ASN1RelativeIRI testRelativeOidIri3 = createRelativeIRI(new ASN1RelativeIRI(), "19785.CBEFF");
-
-        Consumer<TestRelativeOidIris> verifier = value -> {
-            assertEquals(testRelativeOidIri1, value.getTestRelativeOidIri1());
-            assertEquals(testRelativeOidIri2, value.getTestRelativeOidIri2());
-            assertEquals(testRelativeOidIri3, value.getTestRelativeOidIri3());
-        };
-
-        assertDecodableVerifyAround(TestRelativeOidIris.class, verifier, verifier);
-    }
-
-    @Test
-    void testRelativeIRIsWithoutDefaults() {
-        ASN1RelativeIRI testRelativeOidIri1 = createRelativeIRI(new ASN1RelativeIRI(), "Registration-Authority", "19785.CBEFF", "Organizations");
-        ASN1RelativeIRI testRelativeOidIri2 = createRelativeIRI(new ASN1RelativeIRI(), "Registration-Authority", "Test");
-        ASN1RelativeIRI testRelativeOidIri3 = createRelativeIRI(new ASN1RelativeIRI(), "19785.CBEFF");
-
-        Consumer<TestRelativeOidIris> verifier = value -> {
-            assertEquals(testRelativeOidIri1, value.getTestRelativeOidIri1());
-            assertEquals(testRelativeOidIri2, value.getTestRelativeOidIri2());
-            assertEquals(testRelativeOidIri3, value.getTestRelativeOidIri3());
-        };
-
-        assertDecodableVerifyAround(TestRelativeOidIris.class, value -> {
-                    value.setTestRelativeOidIri1(testRelativeOidIri1);
-                    value.setTestRelativeOidIri2(testRelativeOidIri2);
-                    value.setTestRelativeOidIri3(testRelativeOidIri3);
-                }, verifier, verifier
-
-        );
-    }
-
-    public <T extends ASN1RelativeIRI> T createRelativeIRI(ASN1RelativeIRI iri, String... components) {
-        iri.setValue(components);
-
-        return (T) iri;
+    void testRelativeOIDIRI1() {
+        assertDecodableVerifyAfter(TestRelativeOIDIRI1.class, value -> value.setValue("Registration-Authority", "Test"),
+                value -> assertEquals(createIRI(new TestRelativeOIDIRI1(), "Registration-Authority", "Test"), value));
     }
 
 }
