@@ -82,7 +82,7 @@ public class CompilerImpl {
         compilerContext = new CompilerContext(this, pkg, outputDir);
     }
 
-    CompilerImpl() {
+    public CompilerImpl() {
         compilerContext = new CompilerContext(this, "", "");
     }
 
@@ -104,7 +104,7 @@ public class CompilerImpl {
         compileModule(moduleName);
     }
 
-    void loadAndCompileModule(String moduleName, InputStream moduleInputStream) throws IOException, ParserException {
+    public void loadAndCompileModule(String moduleName, InputStream moduleInputStream) throws IOException, ParserException {
         parseModule(moduleName, moduleInputStream);
         compileModule(moduleName);
     }
@@ -249,6 +249,10 @@ public class CompilerImpl {
         }
 
         return Optional.empty();
+    }
+
+    public CompilerContext getCompilerContext() {
+        return compilerContext;
     }
 
 }

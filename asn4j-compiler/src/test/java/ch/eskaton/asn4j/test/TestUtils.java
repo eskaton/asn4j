@@ -100,4 +100,13 @@ public class TestUtils {
         assertEquals(expected, values);
     }
 
+    public static String module(String name, String body) {
+        return """
+                %s DEFINITIONS ::=
+                BEGIN
+                    %s
+                END
+                """.formatted(name, body);
+    }
+
 }

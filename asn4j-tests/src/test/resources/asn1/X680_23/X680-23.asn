@@ -3,15 +3,4 @@ BEGIN
 
 TestOctetString ::= OCTET STRING
 
-testOctetStringValue1 TestOctetString ::= '01AF'H
-
-testOctetStringValue2 TestOctetString ::= testOctetStringValue1
-
-TestOctetStrings ::= SEQUENCE {
-    testOctetString1 OCTET STRING DEFAULT testOctetStringValue1,
-    testOctetString2 TestOctetString DEFAULT testOctetStringValue1,
-    testOctetString3 TestOctetString DEFAULT testOctetStringValue2,
-    testOctetString4 TestOctetString DEFAULT '0101'B
-}
-
 END

@@ -1,19 +1,6 @@
 X680-33 DEFINITIONS ::=
 BEGIN
 
-identified-organization INTEGER ::= 3
-
-dod INTEGER ::= 6
-
-internet INTEGER ::= 1
-
-testRelativeObjectIdentifier1 RELATIVE-OID ::= { identified-organization }
-
-testRelativeObjectIdentifier2 RELATIVE-OID ::= { testRelativeObjectIdentifier1 dod(6) internet(1) }
-
-TestRelativeObjectIdentifiers ::= SEQUENCE {
-    testRelativeObjectIdentifier1 RELATIVE-OID DEFAULT testRelativeObjectIdentifier1,
-    testRelativeObjectIdentifier2 RELATIVE-OID DEFAULT testRelativeObjectIdentifier2
-}
+TestRelativeOID1 ::= RELATIVE-OID
 
 END

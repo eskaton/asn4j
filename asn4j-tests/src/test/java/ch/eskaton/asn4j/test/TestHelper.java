@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.test;
 
+import ch.eskaton.asn4j.parser.ast.types.AbstractIRI;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -46,6 +47,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.AbstractASN1IRI;
+import ch.eskaton.asn4j.runtime.types.AbstractASN1OID;
 
 import java.math.BigInteger;
 import java.util.function.Consumer;
@@ -365,6 +368,18 @@ public class TestHelper {
         }
 
         return value;
+    }
+
+    public static <T extends AbstractASN1OID> T createOID(T oid, int... components) {
+        oid.setValue(components);
+
+        return oid;
+    }
+
+    public static <T extends AbstractASN1IRI> T createIRI(T iri, String... components) {
+        iri.setValue(components);
+
+        return iri;
     }
 
 }

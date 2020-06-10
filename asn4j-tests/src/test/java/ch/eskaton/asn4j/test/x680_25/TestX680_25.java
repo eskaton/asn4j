@@ -28,8 +28,15 @@
 package ch.eskaton.asn4j.test.x680_25;
 
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
+import ch.eskaton.asn4j.test.modules.x680_25.TestBoolean;
+import ch.eskaton.asn4j.test.modules.x680_25.TestEnumeration;
+import ch.eskaton.asn4j.test.modules.x680_25.TestOctetString;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence0;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence10;
@@ -42,11 +49,20 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequence6;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence7;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence8;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence9;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults2;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults5;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults6;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults7;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
+import static ch.eskaton.asn4j.test.TestHelper.createIRI;
+import static ch.eskaton.asn4j.test.TestHelper.createOID;
 import static ch.eskaton.commons.utils.Utils.with;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -221,6 +237,77 @@ class TestX680_25 {
                     assertEquals(ASN1Integer.valueOf(4711), value.getChildSequence().getA());
                     assertEquals(ASN1Boolean.TRUE, value.getChildSequence().getB());
                 });
+    }
+
+    @Test
+    @DisplayName("Test defaults for BOOLEAN")
+    void testSequenceDefaults1() {
+        assertDecodableVerifyAfter(TestSequenceDefaults1.class,
+                value -> {
+                    assertEquals(ASN1Boolean.of(true), value.getTestBoolean1());
+                    assertEquals(ASN1Boolean.of(false), value.getTestBoolean2());
+                    assertEquals(new TestBoolean(true), value.getTestBoolean3());
+                    assertEquals(ASN1Boolean.of(false), value.getTestBoolean4());
+                });
+    }
+
+    @Test
+    @DisplayName("Test defaults for ENUMERATED")
+    void testSequenceDefaults2() {
+        assertDecodableVerifyAfter(TestSequenceDefaults2.class, value -> {
+            assertEquals(TestEnumeration.B, value.getTestEnumeration1());
+            assertEquals(TestEnumeration.A, value.getTestEnumeration2());
+            assertEquals(TestEnumeration.A, value.getTestEnumeration3());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for OCTET STRING")
+    void testSequenceDefaults3() {
+        assertDecodableVerifyAfter(TestSequenceDefaults3.class, value -> {
+            assertEquals(new ASN1OctetString(new byte[] { 0x01, (byte) 0xAF }), value.getTestOctetString1());
+            assertEquals(new TestOctetString(new byte[] { 0x01, (byte) 0xAF }), value.getTestOctetString2());
+            assertEquals(new TestOctetString(new byte[] { 0x01, (byte) 0xAF }), value.getTestOctetString3());
+            assertEquals(new TestOctetString(new byte[] { 0x50 }), value.getTestOctetString4());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for OBJECT IDENTIFIER")
+    void testSequenceDefaults4() {
+        assertDecodableVerifyAfter(TestSequenceDefaults4.class, value -> {
+            assertEquals(createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1), value.getTestObjectIdentifier1());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for RELATIVE-OID")
+    void testSequenceDefaults5() {
+        assertDecodableVerifyAfter(TestSequenceDefaults5.class, value -> {
+            assertEquals(createOID(new ASN1RelativeOID(), 3, 6, 1), value.getTestRelativeOID1());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for OID-IRI")
+    void testSequenceDefaults6() {
+        assertDecodableVerifyAfter(TestSequenceDefaults6.class, value -> {
+            assertEquals(createIRI(new ASN1IRI(), "ISO", "Registration-Authority", "19785.CBEFF", "Organizations"),
+                    value.getTestOidIri1());
+            assertEquals(createIRI(new ASN1IRI(), "ISO", "Registration-Authority", "Test"), value.getTestOidIri2());
+
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for RELATIVE-OID-IRI")
+    void testSequenceDefaults7() {
+        assertDecodableVerifyAfter(TestSequenceDefaults7.class, value -> {
+            assertEquals(createIRI(new ASN1RelativeIRI(), "Registration-Authority", "19785.CBEFF", "Organizations"),
+                    value.getTestRelativeOidIri1());
+            assertEquals(createIRI(new ASN1RelativeIRI(), "Registration-Authority", "Test"),
+                    value.getTestRelativeOidIri2());
+        });
     }
 
 }

@@ -27,106 +27,19 @@
 
 package ch.eskaton.asn4j.test.x680_32;
 
-import ch.eskaton.asn4j.runtime.BERDecoder;
-import ch.eskaton.asn4j.runtime.BEREncoder;
-import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
-import ch.eskaton.asn4j.test.modules.x680_32.TestObjectIdentifierRootArcs;
-import ch.eskaton.asn4j.test.modules.x680_32.TestObjectIdentifiers;
+import ch.eskaton.asn4j.test.modules.x680_32.TestObjectIdentifier1;
 import org.junit.jupiter.api.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
+import static ch.eskaton.asn4j.test.TestHelper.createOID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestX680_32 {
 
     @Test
-    void testObjectIdentifiersWithDefaults() {
-        TestObjectIdentifiers a = new TestObjectIdentifiers();
-        ASN1ObjectIdentifier testObjectIdentifier1 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
-        ASN1ObjectIdentifier testObjectIdentifier2 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
-        ASN1ObjectIdentifier testObjectIdentifier3 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
-        ASN1ObjectIdentifier testObjectIdentifier4 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1, 23);
-        ASN1ObjectIdentifier testObjectIdentifier5 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 1);
-        ASN1ObjectIdentifier testObjectIdentifier6 = createOID(new ASN1ObjectIdentifier(), 1, 3, 6, 2);
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestObjectIdentifiers b = decoder.decode(TestObjectIdentifiers.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(testObjectIdentifier1, a.getTestObjectIdentifier1());
-        assertEquals(testObjectIdentifier2, a.getTestObjectIdentifier2());
-        assertEquals(testObjectIdentifier3, a.getTestObjectIdentifier3());
-        assertEquals(testObjectIdentifier4, a.getTestObjectIdentifier4());
-        assertEquals(testObjectIdentifier5, a.getTestObjectIdentifier5());
-        assertEquals(testObjectIdentifier6, a.getTestObjectIdentifier6());
-
-        assertEquals(testObjectIdentifier1, b.getTestObjectIdentifier1());
-        assertEquals(testObjectIdentifier2, b.getTestObjectIdentifier2());
-        assertEquals(testObjectIdentifier3, b.getTestObjectIdentifier3());
-        assertEquals(testObjectIdentifier4, b.getTestObjectIdentifier4());
-        assertEquals(testObjectIdentifier5, b.getTestObjectIdentifier5());
-        assertEquals(testObjectIdentifier6, b.getTestObjectIdentifier6());
-    }
-
-    @Test
-    void testObjectIdentifiersWithoutDefaults() {
-        TestObjectIdentifiers a = new TestObjectIdentifiers();
-        ASN1ObjectIdentifier testObjectIdentifier1 = createOID(new ASN1ObjectIdentifier(), 2, 3);
-        ASN1ObjectIdentifier testObjectIdentifier2 = createOID(new ASN1ObjectIdentifier(), 0, 7, 1, 1);
-        ASN1ObjectIdentifier testObjectIdentifier3 = createOID(new ASN1ObjectIdentifier(), 1, 9, 6, 7);
-        ASN1ObjectIdentifier testObjectIdentifier4 = createOID(new ASN1ObjectIdentifier(), 1, 9, 6, 7, 17);
-        ASN1ObjectIdentifier testObjectIdentifier5 = createOID(new ASN1ObjectIdentifier(), 1, 9, 6, 7, 13);
-        ASN1ObjectIdentifier testObjectIdentifier6 = createOID(new ASN1ObjectIdentifier(), 1, 9, 6, 7, 11);
-
-        a.setTestObjectIdentifier1(testObjectIdentifier1);
-        a.setTestObjectIdentifier2(testObjectIdentifier2);
-        a.setTestObjectIdentifier3(testObjectIdentifier3);
-        a.setTestObjectIdentifier4(testObjectIdentifier4);
-        a.setTestObjectIdentifier5(testObjectIdentifier5);
-        a.setTestObjectIdentifier6(testObjectIdentifier6);
-
-        BEREncoder encoder = new BEREncoder();
-        BERDecoder decoder = new BERDecoder();
-
-        TestObjectIdentifiers b = decoder.decode(TestObjectIdentifiers.class, encoder.encode(a));
-
-        assertEquals(a, b);
-        assertEquals(testObjectIdentifier1, a.getTestObjectIdentifier1());
-        assertEquals(testObjectIdentifier2, a.getTestObjectIdentifier2());
-        assertEquals(testObjectIdentifier3, a.getTestObjectIdentifier3());
-        assertEquals(testObjectIdentifier4, a.getTestObjectIdentifier4());
-        assertEquals(testObjectIdentifier5, a.getTestObjectIdentifier5());
-        assertEquals(testObjectIdentifier6, a.getTestObjectIdentifier6());
-
-        assertEquals(testObjectIdentifier1, b.getTestObjectIdentifier1());
-        assertEquals(testObjectIdentifier2, b.getTestObjectIdentifier2());
-        assertEquals(testObjectIdentifier3, b.getTestObjectIdentifier3());
-        assertEquals(testObjectIdentifier4, b.getTestObjectIdentifier4());
-        assertEquals(testObjectIdentifier5, b.getTestObjectIdentifier5());
-        assertEquals(testObjectIdentifier6, b.getTestObjectIdentifier6());
-    }
-
-    @Test
-    void testObjectIdentifiersRootArcs() {
-        TestObjectIdentifierRootArcs a = new TestObjectIdentifierRootArcs();
-
-        ASN1ObjectIdentifier oidItuT = createOID(new ASN1ObjectIdentifier(), 0, 12);
-        ASN1ObjectIdentifier oidCcitt = createOID(new ASN1ObjectIdentifier(), 0, 12);
-        ASN1ObjectIdentifier oidIso = createOID(new ASN1ObjectIdentifier(), 1, 12);
-        ASN1ObjectIdentifier oidJointIsoItuT = createOID(new ASN1ObjectIdentifier(), 2, 12);
-        ASN1ObjectIdentifier oidIsoCcitt = createOID(new ASN1ObjectIdentifier(), 2, 12);
-
-        assertEquals(oidItuT, a.getTestOidItuT());
-        assertEquals(oidCcitt, a.getTestOidCcitt());
-        assertEquals(oidIso, a.getTestOidIso());
-        assertEquals(oidJointIsoItuT, a.getTestOidJointIsoItuT());
-        assertEquals(oidIsoCcitt, a.getTestOidJointIsoCcitt());
-    }
-
-    public <T extends ASN1ObjectIdentifier> T createOID(ASN1ObjectIdentifier oid, int... components) {
-        oid.setValue(components);
-        return (T) oid;
+    void testObjectIdentifier1() {
+        assertDecodableVerifyAfter(TestObjectIdentifier1.class, value -> value.setValue(1, 3, 6, 1),
+                value -> assertEquals(createOID(new TestObjectIdentifier1(), 1, 3, 6, 1), value));
     }
 
 }
