@@ -28,14 +28,12 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
-import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 public class ObjectIdentifierSingleValueCompiler
-        extends AbstractOIDSingleValueCompiler<ObjectIdentifier, ObjectIdentifierValue, ObjectIdentifierValueNode> {
+        extends AbstractOIDSingleValueCompiler<ObjectIdentifierValue, ObjectIdentifierValueNode> {
 
     private final ObjectIdentifierValueResolver valueResolver;
 
@@ -43,11 +41,6 @@ public class ObjectIdentifierSingleValueCompiler
         super(ctx, ObjectIdentifierValue.class, ObjectIdentifierValueNode.class, typeName);
 
         this.valueResolver = new ObjectIdentifierValueResolver(ctx);
-    }
-
-    @Override
-    protected AbstractOIDValueResolver<ObjectIdentifier, ObjectIdentifierValue> getValueResolver() {
-        return valueResolver;
     }
 
 }

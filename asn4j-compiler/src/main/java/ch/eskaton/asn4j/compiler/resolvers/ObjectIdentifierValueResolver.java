@@ -28,13 +28,13 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<ObjectIdentifier, ObjectIdentifierValue> {
@@ -49,35 +49,28 @@ public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<Obje
     }
 
     @Override
-    public List<Integer> resolveComponents(CompilerContext ctx, ObjectIdentifierValue value) {
-        List<Integer> ids = new ArrayList<>();
-        int componentNum = 1;
+    protected List<OIDComponentNode> resolveComponents(CompilerContext ctx, ObjectIdentifierValue value) {
+        var components = super.resolveComponents(ctx, value);
 
-        for (OIDComponentNode component : value.getComponents()) {
-            try {
-                try {
-                    ids.add(getComponentId(ctx, component));
-                } catch (CompilerException e) {
-                    if (componentNum == 1) {
-                        Integer id = resolveRootArc(component.getName());
+        ObjectIdentifierVerifier.verifyComponents(CompilerUtils.getComponentIds(components));
 
-                        if (id != null) {
-                            ids.add(id);
-                        } else {
-                            resolveOIDReference(ctx, ids, component, ObjectIdentifierValue.class);
-                        }
-                    } else {
-                        throw e;
-                    }
-                }
-            } catch (CompilerException e) {
-                throw new CompilerException("Failed to resolve component of %s value", e, getTypeName());
+        return components;
+    }
+
+    @Override
+    protected List<OIDComponentNode> resolveComponent(CompilerContext ctx, OIDComponentNode component,
+            int componentPos) {
+        if (componentPos == 1) {
+            Integer id = resolveRootArc(component.getName());
+
+            if (id != null) {
+                return List.of(new OIDComponentNode(component.getPosition(), id, component.getName()));
+            } else {
+                return resolveOIDReference(ctx, component, ObjectIdentifierValue.class);
             }
-
-            componentNum++;
         }
 
-        return ids;
+        return null;
     }
 
     protected Integer resolveRootArc(String name) {

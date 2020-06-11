@@ -28,25 +28,13 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class IRISingleValueCompiler extends AbstractIRISingleValueCompiler<IRI, IRIValue, IRIValueNode> {
-
-    private final IRIValueResolver valueResolver;
+public class IRISingleValueCompiler extends AbstractIRISingleValueCompiler<IRIValue, IRIValueNode> {
 
     public IRISingleValueCompiler(CompilerContext ctx, TypeName typeName) {
         super(ctx, IRIValue.class, IRIValueNode.class, typeName);
-
-        this.valueResolver = new IRIValueResolver(ctx);
-    }
-
-    @Override
-    protected AbstractIRIValueResolver<IRI, IRIValue> getValueResolver() {
-        return valueResolver;
     }
 
 }

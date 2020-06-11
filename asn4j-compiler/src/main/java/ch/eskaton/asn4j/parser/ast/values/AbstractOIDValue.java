@@ -24,6 +24,10 @@ public class AbstractOIDValue extends AbstractValue {
         return components;
     }
 
+    public void setComponents(List<OIDComponentNode> components) {
+        this.components = components;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

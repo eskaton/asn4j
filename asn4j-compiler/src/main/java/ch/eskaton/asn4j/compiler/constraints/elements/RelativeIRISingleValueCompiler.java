@@ -28,26 +28,14 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class RelativeIRISingleValueCompiler extends AbstractIRISingleValueCompiler<RelativeIRI, RelativeIRIValue,
+public class RelativeIRISingleValueCompiler extends AbstractIRISingleValueCompiler<RelativeIRIValue,
         RelativeIRIValueNode> {
-
-    private final RelativeIRIValueResolver valueResolver;
 
     public RelativeIRISingleValueCompiler(CompilerContext ctx, TypeName typeName) {
         super(ctx, RelativeIRIValue.class, RelativeIRIValueNode.class, typeName);
-
-        this.valueResolver = new RelativeIRIValueResolver(ctx);
-    }
-
-    @Override
-    protected AbstractIRIValueResolver<RelativeIRI, RelativeIRIValue> getValueResolver() {
-        return valueResolver;
     }
 
 }

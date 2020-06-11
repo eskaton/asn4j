@@ -30,12 +30,17 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.AbstractOID;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends AbstractOIDValue>
         extends AbstractOIDOrIRIValueResolver<T, V> {
@@ -44,7 +49,51 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
         super(ctx, typeClass, valueClass);
     }
 
-    public void resolveOIDReference(CompilerContext ctx, List<Integer> ids, OIDComponentNode component,
+    @Override
+    protected V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
+        return resolveComponents(super.resolve(valueAssignment), ctx);
+    }
+
+    @Override
+    public V resolve(Optional<Type> type, V value) {
+        return resolveComponents(value, ctx);
+    }
+
+    public V resolveValue(CompilerContext ctx, Value value, Class<V> valueClass) {
+        return resolveComponents(super.resolveValue(ctx, value, valueClass), ctx);
+    }
+
+    protected List<OIDComponentNode> resolveComponents(CompilerContext ctx, V value) {
+        var components = new ArrayList<OIDComponentNode>();
+        var componentPos = 1;
+
+        for (OIDComponentNode component : value.getComponents()) {
+            try {
+                try {
+                    components.add(resolveComponentId(ctx, component));
+                } catch (CompilerException e) {
+                    List<OIDComponentNode> resolvedComponents = resolveComponent(ctx, component, componentPos);
+
+                    if (resolvedComponents != null) {
+                        components.addAll(resolvedComponents);
+                    } else {
+                        throw e;
+                    }
+                }
+            } catch (CompilerException e) {
+                throw new CompilerException("Failed to resolve component of %s value", e, getTypeName());
+            }
+
+            componentPos++;
+        }
+
+        return components;
+    }
+
+    protected abstract List<OIDComponentNode> resolveComponent(CompilerContext ctx, OIDComponentNode component,
+            int componentPos);
+
+    protected List<OIDComponentNode> resolveOIDReference(CompilerContext ctx, OIDComponentNode component,
             Class<V> valueClass) {
         V referencedOidValue;
 
@@ -54,23 +103,35 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
             referencedOidValue = ctx.resolveValue(valueClass, component.getDefinedValue());
         }
 
-        ids.addAll(resolveComponents(ctx, referencedOidValue));
+        return resolveComponents(ctx, referencedOidValue);
     }
 
-    protected Integer getComponentId(CompilerContext ctx, OIDComponentNode component) {
+    protected OIDComponentNode resolveComponentId(CompilerContext ctx, OIDComponentNode component) {
         Integer id = component.getId();
 
         if (id != null) {
-            return id;
+            return component;
         }
 
         DefinedValue definedValue = component.getDefinedValue();
 
+        int componentId;
+
         if (definedValue != null) {
-            return ctx.resolveValue(IntegerValue.class, definedValue).getValue().intValue();
+            componentId = ctx.resolveValue(IntegerValue.class, definedValue).getValue().intValue();
+        } else {
+            componentId = ctx.resolveValue(IntegerValue.class, component.getName()).getValue().intValue();
         }
 
-        return ctx.resolveValue(IntegerValue.class, component.getName()).getValue().intValue();
+        return new OIDComponentNode(component.getPosition(), componentId, component.getName());
+    }
+
+    private V resolveComponents(V resolvedValue, CompilerContext ctx) {
+        var components = resolveComponents(ctx, resolvedValue);
+
+        resolvedValue.setComponents(components);
+
+        return resolvedValue;
     }
 
 }

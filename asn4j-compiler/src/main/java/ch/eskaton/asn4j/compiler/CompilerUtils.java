@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -226,6 +227,10 @@ public class CompilerUtils {
         } else {
             return value.toString();
         }
+    }
+
+    public static List<Integer> getComponentIds(List<OIDComponentNode> components) {
+        return components.stream().map(OIDComponentNode::getId).collect(Collectors.toList());
     }
 
 }

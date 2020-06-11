@@ -81,8 +81,9 @@ public class RelativeOIDValueResolverTest {
 
         assertNotNull(value);
         assertThat(value.getComponents().size(), equalTo(3));
-
-        // TODO: resolve and test defined values
+        assertThat(value.getComponents().get(0).getId(), equalTo(3));
+        assertThat(value.getComponents().get(1).getId(), equalTo(6));
+        assertThat(value.getComponents().get(2).getId(), equalTo(1));
     }
 
     @Test
@@ -97,8 +98,9 @@ public class RelativeOIDValueResolverTest {
 
         assertNotNull(value);
         assertThat(value.getComponents().size(), equalTo(3));
-
-        // TODO: resolve and test defined values
+        assertThat(value.getComponents().get(0).getId(), equalTo(3));
+        assertThat(value.getComponents().get(1).getId(), equalTo(6));
+        assertThat(value.getComponents().get(2).getId(), equalTo(1));
     }
 
     @Test
@@ -111,7 +113,11 @@ public class RelativeOIDValueResolverTest {
 
         assertNotNull(value);
 
-        // TODO: resolve and test defined values
+        assertThat(value.getComponents().size(), equalTo(4));
+        assertThat(value.getComponents().get(0).getId(), equalTo(3));
+        assertThat(value.getComponents().get(1).getId(), equalTo(6));
+        assertThat(value.getComponents().get(2).getId(), equalTo(1));
+        assertThat(value.getComponents().get(3).getId(), equalTo(5));
     }
 
     @Test

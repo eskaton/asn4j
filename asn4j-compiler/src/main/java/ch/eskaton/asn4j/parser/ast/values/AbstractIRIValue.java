@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.Position;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class AbstractIRIValue extends AbstractValue {
 
@@ -45,6 +46,10 @@ public class AbstractIRIValue extends AbstractValue {
 
     public List<IRIToken> getArcIdentifiers() {
         return arcIdentifiers;
+    }
+
+    public List<String> getArcIdentifierTexts() {
+        return getArcIdentifiers().stream().map(IRIToken::getText).collect(Collectors.toList());
     }
 
     @Override

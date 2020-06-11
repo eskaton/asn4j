@@ -29,10 +29,6 @@ package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
@@ -51,16 +47,17 @@ import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
 import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.functional.TriFunction;
 import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static ch.eskaton.asn4j.compiler.CompilerUtils.getComponentIds;
 import static ch.eskaton.commons.utils.Utils.callWith;
 
 public class JavaUtils {
@@ -129,19 +126,15 @@ public class JavaUtils {
     }
 
     private static String getIRIInitializerString(CompilerContext ctx, String typeName, IRIValue value) {
-        IRIValueResolver resolver = new IRIValueResolver(ctx);
+        var iriValue = ctx.resolveValue(IRIValue.class, Optional.empty(), value);
 
-        List<String> components = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, IRIValue.class));
-
-        return getIRIInitializerString(typeName, components);
+        return getIRIInitializerString(typeName, iriValue.getArcIdentifierTexts());
     }
 
     private static String getRelativeIRIInitializerString(CompilerContext ctx, String typeName, RelativeIRIValue value) {
-        RelativeIRIValueResolver resolver = new RelativeIRIValueResolver(ctx);
+        var iriValue = ctx.resolveValue(RelativeIRIValue.class, Optional.empty(), value);
 
-        List<String> components = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, RelativeIRIValue.class));
-
-        return getIRIInitializerString(typeName, components);
+        return getIRIInitializerString(typeName, iriValue.getArcIdentifierTexts());
     }
 
     private static String getIRIInitializerString(String typeName, List<String> components) {
@@ -155,21 +148,11 @@ public class JavaUtils {
     }
 
     private static String getObjectIdentifierInitializerString(CompilerContext ctx, String typeName, ObjectIdentifierValue value) {
-        ObjectIdentifierValueResolver resolver = new ObjectIdentifierValueResolver(ctx);
-
-        List<Integer> ids = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, ObjectIdentifierValue.class));
-
-        ObjectIdentifierVerifier.verifyComponents(ids);
-
-        return getOIDInitializerString(typeName, ids);
+        return getOIDInitializerString(typeName, getComponentIds(value.getComponents()));
     }
 
     private static String getRelativeOIDInitializerString(CompilerContext ctx, String typeName, RelativeOIDValue value) {
-        RelativeOIDValueResolver resolver = new RelativeOIDValueResolver(ctx);
-
-        List<Integer> ids = resolver.resolveComponents(ctx, resolver.resolveValue(ctx, value, RelativeOIDValue.class));
-
-        return getOIDInitializerString(typeName, ids);
+        return getOIDInitializerString(typeName, getComponentIds(value.getComponents()));
     }
 
     private static String getOIDInitializerString(String typeName, List<Integer> ids) {

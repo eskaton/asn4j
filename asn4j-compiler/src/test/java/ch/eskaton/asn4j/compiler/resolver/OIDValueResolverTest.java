@@ -89,8 +89,14 @@ public class OIDValueResolverTest {
 
         assertNotNull(value);
         assertThat(value.getComponents().size(), equalTo(4));
-
-        // TODO: resolve and test defined values
+        assertThat(value.getComponents().get(0).getId(), equalTo(1));
+        assertThat(value.getComponents().get(0).getName(), equalTo("iso"));
+        assertThat(value.getComponents().get(1).getId(), equalTo(3));
+        assertThat(value.getComponents().get(1).getName(), equalTo("identified-organization"));
+        assertThat(value.getComponents().get(2).getId(), equalTo(6));
+        assertThat(value.getComponents().get(2).getName(), equalTo("dod"));
+        assertThat(value.getComponents().get(3).getId(), equalTo(1));
+        assertThat(value.getComponents().get(3).getName(), equalTo("internet"));
     }
 
     @Test
@@ -106,8 +112,10 @@ public class OIDValueResolverTest {
 
         assertNotNull(value);
         assertThat(value.getComponents().size(), equalTo(4));
-
-        // TODO: resolve and test defined values
+        assertThat(value.getComponents().get(0).getId(), equalTo(1));
+        assertThat(value.getComponents().get(1).getId(), equalTo(3));
+        assertThat(value.getComponents().get(2).getId(), equalTo(6));
+        assertThat(value.getComponents().get(3).getId(), equalTo(1));
     }
 
     @Test
@@ -119,8 +127,12 @@ public class OIDValueResolverTest {
         var value = resolveValue(body, ObjectIdentifierValue.class, "testObjectIdentifier2");
 
         assertNotNull(value);
-
-        // TODO: resolve and test defined values
+        assertThat(value.getComponents().size(), equalTo(5));
+        assertThat(value.getComponents().get(0).getId(), equalTo(1));
+        assertThat(value.getComponents().get(1).getId(), equalTo(3));
+        assertThat(value.getComponents().get(2).getId(), equalTo(6));
+        assertThat(value.getComponents().get(3).getId(), equalTo(1));
+        assertThat(value.getComponents().get(4).getId(), equalTo(5));
     }
 
     @Test
@@ -146,8 +158,9 @@ public class OIDValueResolverTest {
         var value = resolveValue(body, ObjectIdentifierValue.class, "testObjectIdentifier");
 
         assertNotNull(value);
-
-        // TODO: resolve and components
+        assertThat(value.getComponents().size(), equalTo(2));
+        assertThat(value.getComponents().get(0).getId(), equalTo(id));
+        assertThat(value.getComponents().get(1).getId(), equalTo(12));
     }
 
     private static Stream<Arguments> provideRootArcs() {
