@@ -28,17 +28,15 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractIRIValueNode;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractIRIValueResolver;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.types.AbstractIRI;
 import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractIRISingleValueCompiler<T extends AbstractIRI, V extends AbstractIRIValue,
+public abstract class AbstractIRISingleValueCompiler<V extends AbstractIRIValue,
         N extends AbstractIRIValueNode> extends SingleValueCompiler<V, N> {
 
     public AbstractIRISingleValueCompiler(CompilerContext ctx, Class<V> valueClazz, Class<N> valueNodeClazz,
@@ -48,11 +46,7 @@ public abstract class AbstractIRISingleValueCompiler<T extends AbstractIRI, V ex
 
     @Override
     protected List<String> resolveValue(CompiledType baseType, SingleValueConstraint elements) {
-        var value = getValueResolver().resolveValue(ctx, elements.getValue(), valueClazz);
-
-        return getValueResolver().resolveComponents(ctx, value);
+        return super.<V>resolveValue(baseType, elements).getArcIdentifierTexts();
     }
-
-    protected abstract AbstractIRIValueResolver<T, V> getValueResolver();
 
 }

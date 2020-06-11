@@ -28,13 +28,11 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class RelativeOIDValueResolver extends AbstractOIDValueResolver<RelativeOID, RelativeOIDValue> {
@@ -49,22 +47,9 @@ public class RelativeOIDValueResolver extends AbstractOIDValueResolver<RelativeO
     }
 
     @Override
-    public List<Integer> resolveComponents(CompilerContext ctx, RelativeOIDValue value) {
-        List<Integer> ids = new ArrayList<>();
-
-        for (OIDComponentNode component : value.getComponents()) {
-            try {
-                try {
-                    ids.add(getComponentId(ctx, component));
-                } catch (CompilerException e) {
-                    resolveOIDReference(ctx, ids, component, RelativeOIDValue.class);
-                }
-            } catch (CompilerException e) {
-                throw new CompilerException("Failed to resolve component of %s value", e, getTypeName());
-            }
-        }
-
-        return ids;
+    protected List<OIDComponentNode> resolveComponent(CompilerContext ctx, OIDComponentNode component,
+            int componentPos) {
+        return resolveOIDReference(ctx, component, RelativeOIDValue.class);
     }
 
 }

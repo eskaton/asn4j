@@ -39,6 +39,8 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
+import java.util.Optional;
+
 public class DefaultValueResolver<T extends Type, V extends Value> extends AbstractValueResolver<V> {
 
     private Class<T> typeClass;
@@ -93,7 +95,7 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
                     value.getClass().getSimpleName(), valueClass.getSimpleName());
         }
 
-        return ctx.resolveValue(valueClass, type, (V) value);
+        return resolve(Optional.of(type), (V) resolvedValue);
     }
 
 }

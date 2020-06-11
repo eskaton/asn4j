@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -45,6 +46,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.getTypeName;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
@@ -56,8 +58,9 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
     }
 
     @Override
-    public BitStringValue resolve(Type type, BitStringValue value) {
-        Type base = ctx.getBase(type);
+    public BitStringValue resolve(Optional<Type> maybeType, BitStringValue value) {
+        var type = maybeType.orElseThrow(() -> new IllegalCompilerStateException("Type may not be empty"));
+        var base = ctx.getBase(type);
 
         if (base instanceof BitString) {
             BitString bitString = (BitString) base;
@@ -79,7 +82,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
             value = resolveAmbiguousValue(value, BitStringValue.class);
 
             if (value instanceof BitStringValue) {
-                return resolve(type, (BitStringValue) value);
+                return resolve(Optional.of(type), (BitStringValue) value);
             }
         }
 

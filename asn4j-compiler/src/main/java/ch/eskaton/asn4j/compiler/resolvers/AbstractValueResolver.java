@@ -35,6 +35,8 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
+import java.util.Optional;
+
 public abstract class AbstractValueResolver<V extends Value> implements ValueResolver<V> {
 
     protected CompilerContext ctx;
@@ -62,7 +64,7 @@ public abstract class AbstractValueResolver<V extends Value> implements ValueRes
     }
 
     @Override
-    public V resolve(Type type, V value) {
+    public V resolve(Optional<Type> type, V value) {
         return value;
     }
 

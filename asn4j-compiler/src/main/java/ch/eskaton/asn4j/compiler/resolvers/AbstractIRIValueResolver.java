@@ -28,22 +28,14 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.parser.IRIToken;
 import ch.eskaton.asn4j.parser.ast.types.AbstractIRI;
 import ch.eskaton.asn4j.parser.ast.values.AbstractIRIValue;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class AbstractIRIValueResolver<T extends AbstractIRI, V extends AbstractIRIValue>
         extends AbstractOIDOrIRIValueResolver<T, V> {
 
     public AbstractIRIValueResolver(CompilerContext ctx, Class<T> typeClass, Class<V> valueClass) {
         super(ctx, typeClass, valueClass);
-    }
-
-    public List<String> resolveComponents(CompilerContext ctx, AbstractIRIValue iriValue) {
-        return iriValue.getArcIdentifiers().stream().map(IRIToken::getText).collect(Collectors.toList());
     }
 
 }

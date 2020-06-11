@@ -28,14 +28,12 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
-import ch.eskaton.asn4j.compiler.resolvers.AbstractOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
-import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 public class RelativeOIDSingleValueCompiler
-        extends AbstractOIDSingleValueCompiler<RelativeOID, RelativeOIDValue, RelativeOIDValueNode> {
+        extends AbstractOIDSingleValueCompiler<RelativeOIDValue, RelativeOIDValueNode> {
 
     private final RelativeOIDValueResolver valueResolver;
 
@@ -43,11 +41,6 @@ public class RelativeOIDSingleValueCompiler
         super(ctx, RelativeOIDValue.class, RelativeOIDValueNode.class, typeName);
 
         this.valueResolver = new RelativeOIDValueResolver(ctx);
-    }
-
-    @Override
-    protected AbstractOIDValueResolver<RelativeOID, RelativeOIDValue> getValueResolver() {
-        return valueResolver;
     }
 
 }
