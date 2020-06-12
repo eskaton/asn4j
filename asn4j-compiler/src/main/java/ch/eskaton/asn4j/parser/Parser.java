@@ -1393,9 +1393,13 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public OIDComponentNode parse() throws ParserException {
-            return super.parse(new ChoiceParser<>(new SingleTokenParser(TokenType.NUMBER), definedValueParser),
-                    a -> a.p() instanceof Token ? new OIDComponentNode(a.P(), Integer.parseInt(a.s())) :
-                    new OIDComponentNode(a.P(), (DefinedValue) a.n()));
+            try {
+                return super.parse(new ChoiceParser<>(new SingleTokenParser(TokenType.NUMBER), definedValueParser),
+                        a -> a.p() instanceof Token ? new OIDComponentNode(a.P(), Integer.parseInt(a.s())) :
+                                new OIDComponentNode(a.P(), (DefinedValue) a.n()));
+            } catch (NumberFormatException e) {
+                return null;
+            }
         }
 
     }
@@ -2922,42 +2926,13 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public RealValue parse() throws ParserException {
             return super.parse(new ChoiceParser<>(new SingleTokenParser(TokenType.REAL_NUMBER),
-                    new SequenceParser(TokenType.MINUS, TokenType.REAL_NUMBER), collectionValueParser), a -> {
+                    new SequenceParser(TokenType.MINUS, TokenType.REAL_NUMBER)), a -> {
                 Object rule = a.p();
 
                 if (rule instanceof Token) {
                     return new RealValue(a.P(), new BigDecimal(a.s()));
-                } else if (rule instanceof CollectionValue) {
-                    List<NamedValue> values = ((CollectionValue) rule).getValues();
-                    BigInteger mantissa = getValue(values, 0, "mantissa");
-                    BigInteger base = getValue(values, 1, "base");
-                    BigInteger exponent = getValue(values, 2, "exponent");
-
-                    if (mantissa == null || base == null || exponent == null) {
-                        throw new ParserException(
-                                "Invalid sequence. It must contain values for 'mantissa', 'base' and 'exponent'");
-                    }
-
-                    byte[] baseBytes = base.toByteArray();
-
-                    if (baseBytes.length != 1 || baseBytes[0] != 2 && baseBytes[0] != 10) {
-                        throw new ParserException("Invalid base: " + base);
-                    }
-
-                    if (mantissa.bitLength() > 63) {
-                        throw new ParserException("Mantissa to long: " + mantissa);
-                    }
-
-                    if (exponent.bitLength() > 63) {
-                        throw new ParserException("Exponent to long: " + exponent);
-                    }
-
-
-                    return new RealValue(values.get(0).getPosition(), mantissa.longValue(), base.longValue(),
-                            exponent.longValue());
                 } else if (rule instanceof List) {
-                    return new RealValue(((Token) ((List<Object>) rule).get(1)).getPosition(),
-                            new BigDecimal("-" + ((Token) ((List<Object>) rule).get(1)).getText()));
+                    return new RealValue(a.l().P1(), new BigDecimal("-" + a.l().s1()));
                 }
 
                 return null;
@@ -2968,7 +2943,7 @@ public class Parser {
             if (values.size() > i) {
                 NamedValue value = values.get(i);
 
-                if (name.equals(value.getName())  && value.getValue() instanceof IntegerValue) {
+                if (name.equals(value.getName()) && value.getValue() instanceof IntegerValue) {
                     return ((IntegerValue) value.getValue()).getValue();
                 }
             }

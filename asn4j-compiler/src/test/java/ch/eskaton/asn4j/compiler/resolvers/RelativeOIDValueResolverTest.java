@@ -25,7 +25,7 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.resolver;
+package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static ch.eskaton.asn4j.compiler.resolver.ResolverTestUtils.resolveValue;
+import static ch.eskaton.asn4j.compiler.resolvers.ResolverTestUtils.resolveValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

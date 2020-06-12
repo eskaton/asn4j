@@ -48,6 +48,7 @@ import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.NullValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.OctetStringValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.RealValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
@@ -196,6 +197,7 @@ public class CompilerContext {
     private Map<Class<?>, ValueResolver<?>> valueResolvers = Maps.<Class<?>, ValueResolver<?>>builder()
             .put(BooleanValue.class, new BooleanValueResolver(CompilerContext.this))
             .put(IntegerValue.class, new IntegerValueResolver(CompilerContext.this))
+            .put(RealValue.class, new RealValueResolver(CompilerContext.this))
             .put(EnumeratedValue.class, new EnumeratedValueResolver(CompilerContext.this))
             .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
             .put(OctetStringValue.class, new OctetStringValueResolver(CompilerContext.this))

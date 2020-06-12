@@ -25,48 +25,50 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.resolver;
+package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.parser.ParserException;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static ch.eskaton.asn4j.compiler.resolver.ResolverTestUtils.resolveValue;
+import static ch.eskaton.asn4j.compiler.resolvers.ResolverTestUtils.resolveValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class RelativeIRIValueResolverTest {
+public class IRIValueResolverTest {
 
     @Test
     void testResolveValue() throws IOException, ParserException {
         var body = """
-                testRelativeOidIri1 RELATIVE-OID-IRI ::= "Registration-Authority/19785.CBEFF/Organizations"
+                testOidIri1 OID-IRI ::= "/ISO/Registration-Authority/19785.CBEFF/Organizations"
                 """;
-        RelativeIRIValue value = resolveValue(body, RelativeIRIValue.class, "testRelativeOidIri1");
+        var value = resolveValue(body, IRIValue.class, "testOidIri1");
 
         assertNotNull(value);
-        assertThat(value.getArcIdentifiers().size(), equalTo(3));
-        assertThat(value.getArcIdentifiers().get(0).getText(), equalTo("Registration-Authority"));
-        assertThat(value.getArcIdentifiers().get(1).getText(), equalTo("19785.CBEFF"));
-        assertThat(value.getArcIdentifiers().get(2).getText(), equalTo("Organizations"));
+        assertThat(value.getArcIdentifiers().size(), equalTo(4));
+        assertThat(value.getArcIdentifiers().get(0).getText(), equalTo("ISO"));
+        assertThat(value.getArcIdentifiers().get(1).getText(), equalTo("Registration-Authority"));
+        assertThat(value.getArcIdentifiers().get(2).getText(), equalTo("19785.CBEFF"));
+        assertThat(value.getArcIdentifiers().get(3).getText(), equalTo("Organizations"));
     }
 
     @Test
     void testResolveReference() throws IOException, ParserException {
         var body = """
-                testRelativeOidIri1 RELATIVE-OID-IRI ::= "Registration-Authority/19785.CBEFF/Organizations"
-                testRelativeOidIri2 RELATIVE-OID-IRI ::= testRelativeOidIri1
+                testOidIri1 OID-IRI ::= "/ISO/Registration-Authority/19785.CBEFF/Organizations"
+                testOidIri2 OID-IRI ::= testOidIri1
                 """;
-        RelativeIRIValue value = resolveValue(body, RelativeIRIValue.class, "testRelativeOidIri2");
+        var value = resolveValue(body, IRIValue.class, "testOidIri2");
 
         assertNotNull(value);
-        assertThat(value.getArcIdentifiers().size(), equalTo(3));
-        assertThat(value.getArcIdentifiers().get(0).getText(), equalTo("Registration-Authority"));
-        assertThat(value.getArcIdentifiers().get(1).getText(), equalTo("19785.CBEFF"));
-        assertThat(value.getArcIdentifiers().get(2).getText(), equalTo("Organizations"));
+        assertThat(value.getArcIdentifiers().size(), equalTo(4));
+        assertThat(value.getArcIdentifiers().get(0).getText(), equalTo("ISO"));
+        assertThat(value.getArcIdentifiers().get(1).getText(), equalTo("Registration-Authority"));
+        assertThat(value.getArcIdentifiers().get(2).getText(), equalTo("19785.CBEFF"));
+        assertThat(value.getArcIdentifiers().get(3).getText(), equalTo("Organizations"));
     }
 
 }
