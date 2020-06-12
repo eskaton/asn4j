@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 9, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
@@ -61,13 +62,21 @@ public class ASN1Real implements ASN1Type, HasConstraint {
         this.type = type;
     }
 
+    public ASN1Real(BigDecimal value) {
+        setValue(value);
+    }
+
+    public ASN1Real(long mantissa, long base, int exponent) {
+        setValue(BigDecimal.valueOf(mantissa).multiply(BigDecimal.valueOf(base).pow(exponent, new MathContext(9))));
+    }
+
     public BigDecimal getValue() {
         return value;
     }
 
     public void setValue(BigDecimal value) {
         this.type = Type.NORMAL;
-        this.value = value;
+        this.value = value.stripTrailingZeros();
     }
 
     public Type getType() {
@@ -81,7 +90,7 @@ public class ASN1Real implements ASN1Type, HasConstraint {
 
     public static ASN1Real valueOf(double d) {
         ASN1Real value = new ASN1Real();
-        value.setValue(BigDecimal.valueOf(d).stripTrailingZeros());
+        value.setValue(BigDecimal.valueOf(d));
         return value;
     }
 
