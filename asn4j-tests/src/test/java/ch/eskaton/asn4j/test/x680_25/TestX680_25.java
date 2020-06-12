@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.test.x680_25;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
@@ -37,6 +38,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.test.modules.x680_25.TestBoolean;
 import ch.eskaton.asn4j.test.modules.x680_25.TestEnumeration;
+import ch.eskaton.asn4j.test.modules.x680_25.TestNull1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestOctetString;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence0;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence1;
@@ -51,6 +53,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequence7;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence8;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence9;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults10;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
@@ -335,6 +338,15 @@ class TestX680_25 {
             assertEquals(ASN1Real.MINUS_INFINITY, value.getTestReal5());
             assertEquals(ASN1Real.PLUS_INFINITY, value.getTestReal6());
             assertEquals(ASN1Real.NOT_A_NUMBER, value.getTestReal7());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for NULL")
+    void testSequenceDefaults10() {
+        assertDecodableVerifyAfter(TestSequenceDefaults10.class, value -> {
+            assertEquals(new ASN1Null(), value.getTestNull1());
+            assertEquals(new TestNull1(), value.getTestNull2());
         });
     }
 
