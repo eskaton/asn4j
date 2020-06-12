@@ -203,7 +203,7 @@ public class JavaDefaultCtorBuilder {
             return getArrayTypeName(isVarArgs, level, typeName);
         }
 
-        return type.getTypeName();
+        return type.getTypeName().replace("$", ".");
     }
 
     private String getArrayTypeName(boolean isVarArgs, int level, String typeName) {

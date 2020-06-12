@@ -27,40 +27,22 @@
 
 package ch.eskaton.asn4j.compiler.defaults;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaInitializer;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.RealValue;
 
-public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompiler {
+import java.math.BigDecimal;
 
-    protected Class<V> valueClass;
+public class RealDefaultCompiler extends DefaultCompilerImpl<RealValue> {
 
-    public DefaultCompilerImpl(Class<V> valueClass) {
-        this.valueClass = valueClass;
+    public RealDefaultCompiler() {
+        super(RealValue.class);
     }
 
     @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
-        var initializerString = getInitializerString(ctx, typeName, type, value);
-        var defaultField = addDefaultField(clazz, typeName, field);
-
-        clazz.addInitializer(new JavaInitializer(String.format("\t\t%s = %s;", defaultField, initializerString)));
-
-        addImports(clazz);
-    }
-
-    @Override
-    public String getInitializerString(CompilerContext ctx, String typeName, Type type, Value value) {
-        var resolvedValue = ctx.resolveGenericValue(valueClass, type, value);
-
-        return JavaUtils.getInitializerString(ctx, typeName, resolvedValue);
-    }
-
     protected void addImports(JavaClass clazz) {
+        super.addImports(clazz);
+
+        clazz.addImport(BigDecimal.class);
     }
 
 }

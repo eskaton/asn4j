@@ -58,7 +58,7 @@ public class ASN1Real implements ASN1Type, HasConstraint {
     public ASN1Real() {
     }
 
-    private ASN1Real(Type type) {
+    public ASN1Real(Type type) {
         this.type = type;
     }
 
