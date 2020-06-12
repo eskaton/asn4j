@@ -37,32 +37,32 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class AbstractCollectionCompiler<T extends Collection> implements NamedCompiler<T, CompiledType> {
 
     private final TypeName typeName;
 
-    private final BiFunction<CompilerContext, String, ? extends ComponentVerifier> componentVerifierSupplier;
+    private final List<? extends Function<CompilerContext, ComponentVerifier>> componentVerifierSuppliers;
 
     public AbstractCollectionCompiler(TypeName typeName,
-            BiFunction<CompilerContext, String, ? extends ComponentVerifier> componentVerifierSupplier) {
+            Function<CompilerContext, ComponentVerifier> componentVerifierSupplier) {
         this.typeName = typeName;
-        this.componentVerifierSupplier = componentVerifierSupplier;
+        this.componentVerifierSuppliers = List.of(componentVerifierSupplier, (c) -> new NameUniquenessVerifier());
     }
 
     public CompiledType compile(CompilerContext ctx, String name, T node) {
         var javaClass = ctx.createClass(name, node, true);
-        var componentVerifier = componentVerifierSupplier.apply(ctx, name);
+        var componentVerifiers = componentVerifierSuppliers.stream().map(s -> s.apply(ctx)).collect(Collectors.toList());
         var ctor = new JavaConstructor(JavaVisibility.PUBLIC, name);
         var ctorBody = new StringBuilder();
         var compiledType = ctx.createCompiledType(CompiledCollectionType.class, node, name);
-        var componentNames = new HashSet<String>();
 
         for (ComponentType component : node.getAllComponents()) {
-            componentVerifier.verify(component);
-
             try {
                 var compiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
                 var compiledComponent = compiler.compile(ctx, compiledType, component);
@@ -71,12 +71,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
                     var argType = c.get_2().getName();
                     var argName = CompilerUtils.formatName(c.get_1());
 
-                    if (componentNames.contains(c.get_1())) {
-                        throw new CompilerException("Failed to compile %s %s. Duplicate component %s",
-                                typeName, name, c.get_1());
-                    }
-
-                    componentNames.add(argName);
+                    componentVerifiers.stream().forEach(v -> v.verify(c.get_1(), c.get_2()));
 
                     ctor.getParameters().add(new JavaParameter(argType, argName));
                     ctorBody.append("\t\tthis." + argName + " = " + argName + ";\n");
@@ -109,7 +104,21 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
     @FunctionalInterface
     protected interface ComponentVerifier {
 
-        void verify(ComponentType component);
+        void verify(String name, CompiledType component);
+
+    }
+
+    private static class NameUniquenessVerifier implements ComponentVerifier {
+
+        private final Set<String> seenNames = new HashSet<>();
+
+        public void verify(String name, CompiledType component) {
+            if (seenNames.contains(name)) {
+                throw new CompilerException("Duplicate component name");
+            }
+
+            seenNames.add(name);
+        }
 
     }
 
