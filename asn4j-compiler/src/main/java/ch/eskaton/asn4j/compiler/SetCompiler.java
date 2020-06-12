@@ -27,47 +27,43 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.types.ComponentType;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.HashMap;
 
 public class SetCompiler extends AbstractCollectionCompiler<SetType> {
 
     public SetCompiler() {
-        super(TypeName.SET, (c, t) -> new TagUniquenessVerifier(c, t));
+        super(TypeName.SET, (c) -> new TagUniquenessVerifier(c));
     }
 
     private static class TagUniquenessVerifier implements ComponentVerifier {
 
         private final CompilerContext ctx;
 
-        private final HashMap<TagId, ComponentType> seenTags = new HashMap<>();
+        private final HashMap<TagId, Tuple2<String, CompiledType>> seenTags = new HashMap<>();
 
-        private final String typeName;
-
-        public TagUniquenessVerifier(CompilerContext ctx, String typeName) {
+        public TagUniquenessVerifier(CompilerContext ctx) {
             this.ctx = ctx;
-            this.typeName = typeName;
         }
 
-        public void verify(ComponentType component) {
+        public void verify(String name, CompiledType component) {
             var tagId = getTagId(ctx, component);
             var seenComponent = seenTags.get(tagId);
 
             if (seenComponent != null) {
-                throw new CompilerException("Duplicate tags in %s %s: %s and %s", TypeName.SET, typeName,
-                        getName(seenComponent), getName(component));
+                throw new CompilerException("Duplicate tags: %s and %s", seenComponent.get_1(), name);
             }
 
-            seenTags.put(tagId, component);
+            seenTags.put(tagId, Tuple2.of(name, component));
         }
 
-        private TagId getTagId(CompilerContext ctx, ComponentType component) {
-            var type = getType(component);
+        private TagId getTagId(CompilerContext ctx, CompiledType component) {
+            var type = component.getType();
             var tag = ctx.resolveType(type).getTag();
 
             if (tag != null) {
@@ -75,25 +71,6 @@ public class SetCompiler extends AbstractCollectionCompiler<SetType> {
             }
 
             return ctx.getTagId(type);
-        }
-
-        private Type getType(ComponentType component) {
-            switch (component.getCompType()) {
-                case NAMED_TYPE:
-                    // fall through
-                case NAMED_TYPE_DEF:
-                    // fall through
-                case NAMED_TYPE_OPT:
-                    return component.getNamedType().getType();
-                case TYPE:
-                    return component.getType();
-                default:
-                    throw new IllegalCompilerStateException("Unexpected component type: %s", component.getCompType());
-            }
-        }
-
-        private String getName(ComponentType seenComponent) {
-            return getType(seenComponent).toString();
         }
 
     }

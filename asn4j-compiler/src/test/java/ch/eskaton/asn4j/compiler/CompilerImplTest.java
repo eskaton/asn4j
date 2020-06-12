@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.utils.Utils;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -86,16 +87,10 @@ class CompilerImplTest {
                 ".*isn't optional and therefore can't have a presence constraint of ABSENT.*");
     }
 
-    @Test
-    void testDuplicateTagsInSet() {
-        var body = """
-                Set ::= SET {
-                    a INTEGER,
-                    b INTEGER
-                }
-                """;
-
-        testModule(body, CompilerException.class, "Duplicate tags in SET.*");
+    @ParameterizedTest(name = "[{index}] {1}")
+    @MethodSource("provideSetsWithDuplicateTags")
+    void testDuplicateTagsInSet(String body, String description) {
+        testModule(body, CompilerException.class, "Duplicate tags:.*");
     }
 
     @Test
@@ -126,7 +121,7 @@ class CompilerImplTest {
                         .loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes())),
                 expected);
 
-        exception.ifPresent(e -> assertThat(e.getMessage(), MatchesPattern.matchesPattern(message)));
+        exception.ifPresent(e -> assertThat(Utils.rootCause(e).getMessage(), MatchesPattern.matchesPattern(message)));
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {
@@ -243,6 +238,39 @@ class CompilerImplTest {
                             } (WITH COMPONENTS {a (1), b (TRUE), a(2)})
                         """, CompilerException.class, "Duplicate element 'a' found in type 'Set'",
                         "Test duplicate components in SET")
+        );
+        // @formatter:on
+    }
+
+    private static Stream<Arguments> provideSetsWithDuplicateTags() {
+        // @formatter:off
+        return Stream.of(
+                Arguments.of("""
+                            Set ::= SET {
+                                a INTEGER,
+                                b INTEGER
+                            }
+                        """,
+                        "Test duplicate tags with equal types in SET"),
+                Arguments.of("""
+                            Set1 ::= SET {
+                                a INTEGER,
+                                b NULL
+                            }
+                            Set2 ::= SET {
+                                COMPONENTS OF Set1,
+                                c INTEGER
+                            }
+                        """,
+                        "Test duplicate tags with referenced components in SET"),
+                Arguments.of("""
+                            Integer ::= INTEGER
+                            Set ::= SET {
+                                a Integer,
+                                b INTEGER
+                            }
+                        """,
+                        "Test duplicate tags with user defined type in SET")
         );
         // @formatter:on
     }
