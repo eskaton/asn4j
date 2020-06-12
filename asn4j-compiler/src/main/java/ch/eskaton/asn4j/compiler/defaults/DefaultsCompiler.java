@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
+import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
@@ -49,12 +50,14 @@ import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Maps;
 
+import javax.lang.model.type.NullType;
 import java.util.Map;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
@@ -64,6 +67,7 @@ public class DefaultsCompiler {
 
     private Map<Class<? extends Type>, AbstractDefaultCompiler> compilers =
             Maps.<Class<? extends Type>, AbstractDefaultCompiler>builder()
+                    .put(Null.class, new DefaultCompilerImpl(NullValue.class))
                     .put(BooleanType.class, new DefaultCompilerImpl(BooleanValue.class))
                     .put(IntegerType.class, new DefaultCompilerImpl(IntegerValue.class))
                     .put(Real.class, new RealDefaultCompiler())

@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.test.modules.x680_25.TestBoolean;
@@ -56,8 +57,12 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults5;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults6;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults7;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults8;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults9;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
@@ -307,6 +312,29 @@ class TestX680_25 {
                     value.getTestRelativeOidIri1());
             assertEquals(createIRI(new ASN1RelativeIRI(), "Registration-Authority", "Test"),
                     value.getTestRelativeOidIri2());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for INTEGER")
+    void testSequenceDefaults8() {
+        assertDecodableVerifyAfter(TestSequenceDefaults8.class, value -> {
+            assertEquals(ASN1Integer.valueOf(4711), value.getTestInteger1());
+            assertEquals(ASN1Integer.valueOf(23), value.getTestInteger2());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for REAL")
+    void testSequenceDefaults9() {
+        assertDecodableVerifyAfter(TestSequenceDefaults9.class, value -> {
+            assertEquals(new ASN1Real(new BigDecimal("12.78")), value.getTestReal1());
+            assertEquals(new ASN1Real(5, 2, 3), value.getTestReal2());
+            assertEquals(new ASN1Real(7, 2, 3), value.getTestReal3());
+            assertEquals(new ASN1Real(new BigDecimal("12.78e-5")), value.getTestReal4());
+            assertEquals(ASN1Real.MINUS_INFINITY, value.getTestReal5());
+            assertEquals(ASN1Real.PLUS_INFINITY, value.getTestReal6());
+            assertEquals(ASN1Real.NOT_A_NUMBER, value.getTestReal7());
         });
     }
 
