@@ -496,6 +496,8 @@ public class CompilerContext {
             typeName = getTypeName(type, name, isSubtypeNeeded(type));
         } else if (type instanceof IntegerType) {
             typeName = getTypeName(type, name, isSubtypeNeeded(type));
+        } else if (type instanceof Real) {
+            typeName = getTypeName(type, name, false);
         } else if (type instanceof BitString) {
             typeName = getTypeName(type, name, isSubtypeNeeded(type));
         } else if (type instanceof SequenceType

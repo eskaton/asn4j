@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
+import ch.eskaton.asn4j.parser.ast.types.Real;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
@@ -65,6 +66,7 @@ public class DefaultsCompiler {
             Maps.<Class<? extends Type>, AbstractDefaultCompiler>builder()
                     .put(BooleanType.class, new DefaultCompilerImpl(BooleanValue.class))
                     .put(IntegerType.class, new DefaultCompilerImpl(IntegerValue.class))
+                    .put(Real.class, new RealDefaultCompiler())
                     .put(EnumeratedType.class, new DefaultCompilerImpl(EnumeratedValue.class))
                     .put(BitString.class, new BitStringDefaultCompiler())
                     .put(OctetString.class, new OctetStringDefaultCompiler())

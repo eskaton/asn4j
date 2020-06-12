@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class IRIValueResolverTest {
 
     @Test
-    void testResolveValue() throws IOException, ParserException {
+    void testResolveNumericValue() throws IOException, ParserException {
         var body = """
                 testOidIri1 OID-IRI ::= "/ISO/Registration-Authority/19785.CBEFF/Organizations"
                 """;

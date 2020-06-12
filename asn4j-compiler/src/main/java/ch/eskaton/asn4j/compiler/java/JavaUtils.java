@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
@@ -44,6 +45,7 @@ import ch.eskaton.asn4j.parser.ast.values.NamedValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
+import ch.eskaton.asn4j.parser.ast.values.RealValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -76,6 +78,7 @@ public class JavaUtils {
         addCase(dispatcher, HexStringValue.class, JavaUtils::getHexStringInitializerString);
         addCase(dispatcher, EnumeratedValue.class, JavaUtils::getEnumeratedInitializerString);
         addCase(dispatcher, IntegerValue.class, JavaUtils::getIntegerInitializerString);
+        addCase(dispatcher, RealValue.class, JavaUtils::getRealInitializerString);
         addCase(dispatcher, IRIValue.class, JavaUtils::getIRIInitializerString);
         addCase(dispatcher, NullValue.class, JavaUtils::getNullInitializerString);
         addCase(dispatcher, ObjectIdentifierValue.class, JavaUtils::getObjectIdentifierInitializerString);
@@ -123,6 +126,18 @@ public class JavaUtils {
 
     private static String getIntegerInitializerString(CompilerContext ctx, String typeName, IntegerValue value) {
         return "new " + typeName + "(" + value.getValue().longValue() + "L)";
+    }
+
+    private static String getRealInitializerString(CompilerContext ctx, String typeName, RealValue value) {
+        return switch (value.getRealType()) {
+            case NORMAL -> String.format("new %s(new BigDecimal(\"%s\"))", typeName, value.getValue().toString());
+            case SPECIAL -> String.format("new %s(%d, %d, %d)", typeName, value.getMantissa(), value.getBase(),
+                    value.getExponent());
+            case NEGATIVE_INF -> String.format("new %s(ASN1Real.Type.MINUS_INFINITY)", typeName);
+            case POSITIVE_INF -> String.format("new %s(ASN1Real.Type.PLUS_INFINITY)", typeName);
+            case NAN -> String.format("new %s(ASN1Real.Type.NOT_A_NUMBER)", typeName);
+            default -> throw new IllegalCompilerStateException("Real type %s not handled", value.getRealType());
+        };
     }
 
     private static String getIRIInitializerString(CompilerContext ctx, String typeName, IRIValue value) {
