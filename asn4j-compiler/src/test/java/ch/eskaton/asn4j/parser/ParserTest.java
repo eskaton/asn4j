@@ -1415,13 +1415,6 @@ class ParserTest {
         assertTrue(result instanceof RealValue);
 
         parser = new Parser(new ByteArrayInputStream(
-                "{mantissa 23, base 2, exponent -11}".getBytes())).new BuiltinOrReferencedValueParser();
-
-        result = parser.parse();
-
-        testAmbiguousValue(result, RealValue.class);
-
-        parser = new Parser(new ByteArrayInputStream(
                 "MINUS-INFINITY".getBytes())).new BuiltinOrReferencedValueParser();
 
         result = parser.parse();
@@ -1754,17 +1747,6 @@ class ParserTest {
         assertEquals(BigDecimal.valueOf(314), result.getValue());
 
         parser = new Parser(new ByteArrayInputStream(
-                "{mantissa 23, base 2, exponent -11}".getBytes())).new RealValueParser();
-
-        result = parser.parse();
-
-        assertNotNull(result);
-        assertEquals(RealValue.RealType.SPECIAL, result.getRealType());
-        assertEquals(Long.valueOf(23), result.getMantissa());
-        assertEquals(Long.valueOf(2), result.getBase());
-        assertEquals(Long.valueOf(-11), result.getExponent());
-
-        parser = new Parser(new ByteArrayInputStream(
                 "MINUS-INFINITY".getBytes())).new RealValueParser();
 
         result = parser.parse();
@@ -1784,37 +1766,6 @@ class ParserTest {
         assertNotNull(result);
         assertEquals(RealValue.RealType.NORMAL, result.getRealType());
         assertEquals(new BigDecimal("-1.5"), result.getValue());
-
-        parser = new Parser(new ByteArrayInputStream(
-                "{mantissa 3, base 10, exponent 5}".getBytes())).new NumericRealValueParser();
-
-        result = parser.parse();
-
-        assertNotNull(result);
-        assertEquals(RealValue.RealType.SPECIAL, result.getRealType());
-        assertEquals(Long.valueOf(3), result.getMantissa());
-        assertEquals(Long.valueOf(10), result.getBase());
-        assertEquals(Long.valueOf(5), result.getExponent());
-
-        try {
-            // invalid base
-            parser = new Parser(new ByteArrayInputStream(
-                    "{mantissa 3, base 3, exponent 5}".getBytes())).new NumericRealValueParser();
-            parser.parse();
-            fail("ASN1ParserException expected");
-        } catch (ParserException e) {
-
-        }
-
-        try {
-            // missing exponent
-            parser = new Parser(new ByteArrayInputStream(
-                    "{mantissa 3, base 3}".getBytes())).new NumericRealValueParser();
-            parser.parse();
-            fail("ASN1ParserException expected");
-        } catch (ParserException e) {
-
-        }
     }
 
     @Test

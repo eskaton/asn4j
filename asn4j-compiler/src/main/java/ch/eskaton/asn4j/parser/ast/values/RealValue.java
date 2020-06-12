@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -44,50 +44,50 @@ public class RealValue extends AbstractValue {
 
     private Long mantissa;
 
-    private Long base;
+    private Integer base;
 
-    private Long exponent;
+    private Integer exponent;
 
     public RealValue(Position position, RealType realType) {
-    	super(position);
+        super(position);
 
-    	this.realType = realType;
+        this.realType = realType;
     }
 
     public RealValue(Position position, BigDecimal value) {
         super(position);
 
-    	this.realType = RealType.NORMAL;
-    	this.value = value;
+        this.realType = RealType.NORMAL;
+        this.value = value;
     }
 
-    public RealValue(Position position, Long mantissa, Long base, Long exponent) {
+    public RealValue(Position position, Long mantissa, Integer base, Integer exponent) {
         super(position);
 
-    	this.realType = RealType.SPECIAL;
-    	this.mantissa = mantissa;
-    	this.base = base;
-    	this.exponent = exponent;
+        this.realType = RealType.SPECIAL;
+        this.mantissa = mantissa;
+        this.base = base;
+        this.exponent = exponent;
     }
 
     public BigDecimal getValue() {
-    	return value;
+        return value;
     }
 
     public Long getMantissa() {
-    	return mantissa;
+        return mantissa;
     }
 
-    public Long getBase() {
-    	return base;
+    public Integer getBase() {
+        return base;
     }
 
-    public Long getExponent() {
-    	return exponent;
+    public Integer getExponent() {
+        return exponent;
     }
 
     public RealType getRealType() {
-    	return realType;
+        return realType;
     }
 
     @Override

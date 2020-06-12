@@ -49,7 +49,7 @@ public class NullValueResolver extends AbstractValueResolver<NullValue> {
             return (NullValue) value;
         }
 
-        throw new CompilerException("Failed to resolve an %s value", TypeName.NULL);
+        throw new CompilerException("Failed to resolve a %s value", TypeName.NULL);
     }
 
 }
