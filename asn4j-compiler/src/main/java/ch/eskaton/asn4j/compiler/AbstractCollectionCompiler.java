@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -57,6 +58,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         var ctor = new JavaConstructor(JavaVisibility.PUBLIC, name);
         var ctorBody = new StringBuilder();
         var compiledType = ctx.createCompiledType(CompiledCollectionType.class, node, name);
+        var componentNames = new HashSet<String>();
 
         for (ComponentType component : node.getAllComponents()) {
             componentVerifier.verify(component);
@@ -67,7 +69,14 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
 
                 compiledComponent.forEach(c -> {
                     var argType = c.get_2().getName();
-                    var argName = c.get_1();
+                    var argName = CompilerUtils.formatName(c.get_1());
+
+                    if (componentNames.contains(c.get_1())) {
+                        throw new CompilerException("Failed to compile %s %s. Duplicate component %s",
+                                typeName, name, c.get_1());
+                    }
+
+                    componentNames.add(argName);
 
                     ctor.getParameters().add(new JavaParameter(argType, argName));
                     ctorBody.append("\t\tthis." + argName + " = " + argName + ";\n");

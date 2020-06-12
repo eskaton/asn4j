@@ -180,4 +180,36 @@ TestSequenceDefaults7 ::= SEQUENCE {
     testRelativeOidIri2 RELATIVE-OID-IRI DEFAULT "Registration-Authority/Test"
 }
 
+testIntegerValue1 INTEGER ::= 4711
+
+TestSequenceDefaults8 ::= SEQUENCE {
+    testInteger1 INTEGER DEFAULT testIntegerValue1,
+    testInteger2 INTEGER DEFAULT 23
+}
+
+testMantissa1 INTEGER ::= 7
+testRealValue1 REAL ::= 12.78
+testRealValue2 REAL ::= { mantissa 5, base 2, exponent 3}
+testRealValue3 REAL ::= { mantissa testMantissa1, base 2, exponent 3}
+
+TestReal1 ::= REAL
+
+TestSequenceDefaults9 ::= SEQUENCE {
+    testReal1 REAL DEFAULT testRealValue1,
+    testReal2 REAL DEFAULT testRealValue2,
+    testReal3 REAL DEFAULT testRealValue3,
+    testReal4 REAL DEFAULT 12.78e-5,
+    testReal5 REAL DEFAULT MINUS-INFINITY,
+    testReal6 REAL DEFAULT PLUS-INFINITY,
+    testReal7 REAL DEFAULT NOT-A-NUMBER,
+    testReal8 TestReal1 DEFAULT NOT-A-NUMBER
+}
+
+TestNull1 ::= NULL
+
+TestSequenceDefaults10 ::= SEQUENCE {
+    test-Null1 NULL DEFAULT NULL,
+    test-Null2 TestNull1 DEFAULT NULL
+}
+
 END
