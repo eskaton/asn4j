@@ -30,9 +30,8 @@ package ch.eskaton.asn4j.runtime.encoders;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
-import java.util.LinkedList;
+import java.util.List;
 
-
-public class SequenceOfEncoder<T extends ASN1Type> extends CollectionOfEncoder<ASN1SequenceOf<T>, LinkedList<T>, T> {
+public class SequenceOfEncoder<T extends ASN1Type> extends CollectionOfEncoder<ASN1SequenceOf<T>, List<T>, T> {
 
 }

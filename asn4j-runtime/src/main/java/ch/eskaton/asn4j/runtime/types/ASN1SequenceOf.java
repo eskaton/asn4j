@@ -32,10 +32,11 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 16, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
-public class ASN1SequenceOf<T extends ASN1Type> extends ASN1CollectionOf<LinkedList<T>, T> {
+public class ASN1SequenceOf<T extends ASN1Type> extends ASN1CollectionOf<List<T>, T> {
 
     public ASN1SequenceOf() {
         super(new LinkedList<>());
@@ -43,6 +44,10 @@ public class ASN1SequenceOf<T extends ASN1Type> extends ASN1CollectionOf<LinkedL
 
     public ASN1SequenceOf(T... values) {
         super(CollectionUtils.asLinkedList(values));
+    }
+
+    public ASN1SequenceOf(List<T> values) {
+        super(List.copyOf(values));
     }
 
     @Override

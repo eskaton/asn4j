@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
@@ -77,6 +78,10 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
             collectionOfValue = CompilerUtils.resolveAmbiguousValue(value, CollectionOfValue.class);
         } else if (value instanceof CollectionOfValue) {
             collectionOfValue = (CollectionOfValue) value;
+        }
+
+        if (type instanceof TypeReference) {
+            type = (Type) ctx.resolveTypeReference(type);
         }
 
         if (collectionOfValue != null) {

@@ -35,8 +35,6 @@ two TestNamedInteger2 ::= two
 
 testBitString2 TestBitString2 ::= { test-a, test-b }
 
-testSequence2 TestSequence2 ::= { a 1, c 'ABC'H }
-
 TestSequence3 ::= SEQUENCE {
 	a INTEGER,
 	b BOOLEAN,
@@ -45,12 +43,7 @@ TestSequence3 ::= SEQUENCE {
 	e BIT STRING DEFAULT '0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF'H,
 	f BIT STRING DEFAULT testBitString2,
 	g TestBitString2 DEFAULT { test-a, test-c },
-	h TestBitString2 DEFAULT { },
-	i SEQUENCE {
-	    a INTEGER,
-	    b BOOLEAN
-	} DEFAULT { a 1, b FALSE },
-	j TestSequence2 DEFAULT testSequence2
+	h TestBitString2 DEFAULT { }
 }
 
 intValue INTEGER ::= 4711
@@ -210,6 +203,49 @@ TestNull1 ::= NULL
 TestSequenceDefaults10 ::= SEQUENCE {
     test-Null1 NULL DEFAULT NULL,
     test-Null2 TestNull1 DEFAULT NULL
+}
+
+testSequenceValue1 TestSequence2 ::= { a 1, c 'ABC'H }
+
+TestSequenceDefaults11 ::= SEQUENCE {
+	a SEQUENCE {
+	    a INTEGER,
+	    b BOOLEAN
+	} DEFAULT { a 1, b FALSE },
+	b TestSequence2 DEFAULT testSequenceValue1
+}
+
+TestSet1 ::= SET {
+    a BOOLEAN,
+    b INTEGER
+}
+
+testSetValue1 TestSet1 ::= { b 1, a FALSE}
+
+TestSequenceDefaults12 ::= SEQUENCE {
+	a SET {
+	    a INTEGER,
+	    b BOOLEAN
+	} DEFAULT { b TRUE, a 2 },
+	b TestSet1 DEFAULT testSetValue1
+}
+
+TestSequenceOf1 ::= SEQUENCE OF INTEGER
+
+testSequenceOfValue1 TestSequenceOf1 ::= { 1, 3, 5 }
+
+TestSequenceDefaults13 ::= SEQUENCE {
+	a SEQUENCE OF BOOLEAN DEFAULT { TRUE, FALSE },
+	b TestSequenceOf1 DEFAULT testSequenceOfValue1
+}
+
+TestSetOf1 ::= SET OF INTEGER
+
+testSetOfValue1 TestSetOf1 ::= { 2, 4, 6 }
+
+TestSequenceDefaults14 ::= SEQUENCE {
+	a SET OF BOOLEAN DEFAULT { FALSE, FALSE },
+	b TestSetOf1 DEFAULT testSetOfValue1
 }
 
 END
