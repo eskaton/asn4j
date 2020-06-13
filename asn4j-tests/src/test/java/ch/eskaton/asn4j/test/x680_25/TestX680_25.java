@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.test.modules.x680_25.TestBoolean;
+import ch.eskaton.asn4j.test.modules.x680_25.TestChoice1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestEnumeration;
 import ch.eskaton.asn4j.test.modules.x680_25.TestNull1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestOctetString;
@@ -58,6 +59,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults11;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults12;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults13;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults14;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults15;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
@@ -389,6 +391,15 @@ class TestX680_25 {
         assertDecodableVerifyAfter(TestSequenceDefaults14.class, value -> {
             assertEquals(new TestSequenceDefaults14.A(toBooleans(false, false)), value.getA());
             assertEquals(new TestSetOf1(toInts(2, 4, 6)), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for CHOICE*")
+    void testSequenceDefaults15() {
+        assertDecodableVerifyAfter(TestSequenceDefaults15.class, value -> {
+            assertEquals(with(new TestSequenceDefaults15.A(), v -> v.setA(ASN1Integer.valueOf(25))), value.getA());
+            assertEquals(with(new TestChoice1(), v -> v.setA(ASN1Boolean.TRUE)), value.getB());
         });
     }
 

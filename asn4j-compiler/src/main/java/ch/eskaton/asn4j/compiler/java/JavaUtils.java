@@ -29,12 +29,15 @@ package ch.eskaton.asn4j.compiler.java;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
@@ -87,6 +90,7 @@ public class JavaUtils {
         addCase(dispatcher, RelativeIRIValue.class, JavaUtils::getRelativeIRIInitializerString);
         addCase(dispatcher, CollectionOfValue.class, JavaUtils::getCollectionOfInitializerString);
         addCase(dispatcher, CollectionValue.class, JavaUtils::getCollectionInitializerString);
+        addCase(dispatcher, ChoiceValue.class, JavaUtils::getChoiceInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
     }
@@ -206,6 +210,25 @@ public class JavaUtils {
                     .collect(Collectors.joining(", "));
 
             return "new " + typeName + "(" + initString + ")";
+        }).orElseThrow(() -> new CompilerException("Failed to resolve type %s", typeName));
+    }
+
+    private static String getChoiceInitializerString(CompilerContext ctx, String typeName, ChoiceValue value) {
+        var maybeCompiledType = ctx.findCompiledTypeRecursive(value.getType())
+                .filter(CompiledChoiceType.class::isInstance)
+                .map(CompiledChoiceType.class::cast);
+
+        return maybeCompiledType.map(compiledType -> {
+            var componentType = compiledType.getComponents().stream()
+                    .filter(c -> c.get_1().equals(value.getId()))
+                    .map(c -> c.get_2().getType())
+                    .findFirst();
+            var name = StringUtils.initCap(CompilerUtils.formatName(value.getId()));
+
+            return componentType.map(t -> String.format("with(new %s(), v -> v.set%s(%s))", typeName, name,
+                    getInitializerString(ctx, ctx.getTypeName(t), value.getValue())))
+                    .orElseThrow(() -> new CompilerException("Invalid component '%s' in type %s",
+                            value.getId(), typeName));
         }).orElseThrow(() -> new CompilerException("Failed to resolve type %s", typeName));
     }
 

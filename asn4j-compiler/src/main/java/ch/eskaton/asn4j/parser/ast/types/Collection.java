@@ -101,7 +101,6 @@ public abstract class Collection extends AbstractType {
         return components;
     }
 
-
     public List<ComponentType> getRootComponents() {
         return rootComponents;
     }

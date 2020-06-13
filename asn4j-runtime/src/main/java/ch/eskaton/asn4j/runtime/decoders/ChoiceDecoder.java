@@ -42,13 +42,17 @@ import java.lang.reflect.Method;
 
 public class ChoiceDecoder {
 
-    public void decode(Decoder decoder, DecoderStates states, ASN1Choice obj) {
+    public <T extends ASN1Choice> T decode(Decoder decoder, DecoderStates states, T obj, boolean optional) {
         FieldMetaData metaData = new FieldMetaData(obj, ASN1Alternative.class);
         DecodingResult<? extends ASN1Type> result;
 
         result = decoder.decode(states, metaData.getTagsToTypes());
 
         if (result == null) {
+            if (optional) {
+                return null;
+            }
+
             throw new DecodingException("Empty choice");
         }
 
@@ -70,6 +74,8 @@ public class ChoiceDecoder {
         } catch (NoSuchMethodException e) {
             throw new DecodingException("Setter '" + setterName + "' missing on type " + typeName);
         }
+
+        return obj;
     }
 
 }

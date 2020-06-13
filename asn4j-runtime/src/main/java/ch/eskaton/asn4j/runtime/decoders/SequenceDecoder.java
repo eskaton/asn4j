@@ -54,7 +54,7 @@ public class SequenceDecoder implements CollectionDecoder<ASN1Sequence> {
             if (annotation != null) {
                 @SuppressWarnings("unchecked")
                 DecodingResult<? extends ASN1Type> result = decoder
-                        .decode((Class<? extends ASN1Type>) compField.getType(), states,
+                        .decode(compField.getType(), states,
                                 compField.getAnnotation(ASN1Tag.class),
                                 annotation.optional() || annotation.hasDefault());
 
