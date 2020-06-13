@@ -54,6 +54,10 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequence8;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence9;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults10;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults11;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults12;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults13;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults14;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
@@ -62,6 +66,8 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults6;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults7;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults8;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults9;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceOf1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSetOf1;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -71,9 +77,10 @@ import static ch.eskaton.asn4j.test.TestHelper.assertDecodable;
 import static ch.eskaton.asn4j.test.TestHelper.assertDecodableVerifyAfter;
 import static ch.eskaton.asn4j.test.TestHelper.createIRI;
 import static ch.eskaton.asn4j.test.TestHelper.createOID;
+import static ch.eskaton.asn4j.test.TestHelper.toBooleans;
+import static ch.eskaton.asn4j.test.TestHelper.toInts;
 import static ch.eskaton.commons.utils.Utils.with;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DisplayName("X.680 25 - SEQUENCE tests")
 class TestX680_25 {
@@ -113,11 +120,6 @@ class TestX680_25 {
                 },
                 value -> {
                     assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), value.getC());
-                    assertEquals(ASN1Integer.valueOf(1L), value.getI().getA());
-                    assertEquals(ASN1Boolean.FALSE, value.getI().getB());
-                    assertEquals(ASN1Integer.valueOf(1L), value.getJ().getA());
-                    assertNull(value.getJ().getB());
-                    assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), value.getJ().getC());
                 });
     }
 
@@ -347,6 +349,46 @@ class TestX680_25 {
         assertDecodableVerifyAfter(TestSequenceDefaults10.class, value -> {
             assertEquals(new ASN1Null(), value.getTestNull1());
             assertEquals(new TestNull1(), value.getTestNull2());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for SEQUENCE")
+    void testSequenceDefaults11() {
+        assertDecodableVerifyAfter(TestSequenceDefaults11.class, value -> {
+            assertEquals(ASN1Integer.valueOf(1), value.getA().getA());
+            assertEquals(ASN1Boolean.FALSE, value.getA().getB());
+            assertEquals(ASN1Integer.valueOf(1), value.getB().getA());
+            assertEquals(ASN1OctetString.valueOf(new byte[] { (byte) 0xab, (byte) 0xc0 }), value.getB().getC());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for SET")
+    void testSequenceDefaults12() {
+        assertDecodableVerifyAfter(TestSequenceDefaults12.class, value -> {
+            assertEquals(ASN1Integer.valueOf(2), value.getA().getA());
+            assertEquals(ASN1Boolean.TRUE, value.getA().getB());
+            assertEquals(ASN1Boolean.FALSE, value.getB().getA());
+            assertEquals(ASN1Integer.valueOf(1), value.getB().getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for SEQUENCE OF")
+    void testSequenceDefaults13() {
+        assertDecodableVerifyAfter(TestSequenceDefaults13.class, value -> {
+            assertEquals(new TestSequenceDefaults13.A(toBooleans(true, false)), value.getA());
+            assertEquals(new TestSequenceOf1(toInts(1, 3, 5)), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for SET OF")
+    void testSequenceDefaults14() {
+        assertDecodableVerifyAfter(TestSequenceDefaults14.class, value -> {
+            assertEquals(new TestSequenceDefaults14.A(toBooleans(false, false)), value.getA());
+            assertEquals(new TestSetOf1(toInts(2, 4, 6)), value.getB());
         });
     }
 

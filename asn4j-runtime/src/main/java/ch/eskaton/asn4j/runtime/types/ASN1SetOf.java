@@ -46,6 +46,10 @@ public class ASN1SetOf<T extends ASN1Type> extends ASN1CollectionOf<List<T>, T> 
         super(CollectionUtils.asLinkedList(values));
     }
 
+    public ASN1SetOf(List<T> values) {
+        super(List.copyOf(values));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(values);

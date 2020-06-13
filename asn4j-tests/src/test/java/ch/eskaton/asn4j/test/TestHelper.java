@@ -27,7 +27,6 @@
 
 package ch.eskaton.asn4j.test;
 
-import ch.eskaton.asn4j.parser.ast.types.AbstractIRI;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -51,8 +50,10 @@ import ch.eskaton.asn4j.runtime.types.AbstractASN1IRI;
 import ch.eskaton.asn4j.runtime.types.AbstractASN1OID;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -380,6 +381,14 @@ public class TestHelper {
         iri.setValue(components);
 
         return iri;
+    }
+
+    public static java.util.List<ASN1Integer> toInts(Integer... ints) {
+        return Arrays.stream(ints).map(i -> ASN1Integer.valueOf(i)).collect(Collectors.toList());
+    }
+
+    public static java.util.List<ASN1Boolean> toBooleans(Boolean... booleans) {
+        return Arrays.stream(booleans).map(b -> ASN1Boolean.of(b)).collect(Collectors.toList());
     }
 
 }

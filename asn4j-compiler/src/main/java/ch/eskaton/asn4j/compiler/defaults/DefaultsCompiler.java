@@ -41,11 +41,14 @@ import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
+import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
@@ -57,7 +60,6 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Maps;
 
-import javax.lang.model.type.NullType;
 import java.util.Map;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
@@ -79,7 +81,9 @@ public class DefaultsCompiler {
                     .put(IRI.class, new DefaultCompilerImpl(IRIValue.class))
                     .put(RelativeIRI.class, new DefaultCompilerImpl(RelativeIRIValue.class))
                     .put(SetType.class, new DefaultCompilerImpl(CollectionValue.class))
+                    .put(SetOfType.class, new DefaultCompilerImpl(CollectionOfValue.class))
                     .put(SequenceType.class, new DefaultCompilerImpl(CollectionValue.class))
+                    .put(SequenceOfType.class, new DefaultCompilerImpl(CollectionOfValue.class))
                     .build();
 
     private CompilerContext ctx;
