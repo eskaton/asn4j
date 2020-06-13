@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
+import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
@@ -48,6 +49,7 @@ import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
@@ -84,6 +86,7 @@ public class DefaultsCompiler {
                     .put(SetOfType.class, new DefaultCompilerImpl(CollectionOfValue.class))
                     .put(SequenceType.class, new DefaultCompilerImpl(CollectionValue.class))
                     .put(SequenceOfType.class, new DefaultCompilerImpl(CollectionOfValue.class))
+                    .put(Choice.class, new DefaultCompilerImpl(ChoiceValue.class))
                     .build();
 
     private CompilerContext ctx;

@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.ModuleNode.TagMode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
@@ -91,6 +92,11 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             compAnnotation.addParameter("optional", "true");
         } else if (hasDefault) {
             compAnnotation.addParameter("hasDefault", "true");
+
+            if (type instanceof Choice) {
+                javaClass.addStaticImport(ch.eskaton.commons.utils.Utils.class, "with");
+            }
+
             ctx.compileDefault(javaClass, field.getName(), typeName, type, component.getValue());
         }
 

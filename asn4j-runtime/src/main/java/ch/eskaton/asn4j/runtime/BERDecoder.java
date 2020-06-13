@@ -159,7 +159,7 @@ public class BERDecoder implements Decoder {
         Class clazz = toClass(type);
 
         if (ReflectionUtils.extendsClazz(clazz, ASN1Choice.class)) {
-            return decodeChoice(clazz, states);
+            return decodeChoice(clazz, states, optional);
         }
 
         tags = RuntimeUtils.getTags(clazz, tag);
@@ -183,7 +183,7 @@ public class BERDecoder implements Decoder {
         }
     }
 
-    private <T extends ASN1Type> DecodingResult<T> decodeChoice(Class<T> type, DecoderStates states) {
+    private <T extends ASN1Choice> DecodingResult<T> decodeChoice(Class<T> type, DecoderStates states, boolean optional) {
         T obj;
 
         try {
@@ -192,7 +192,7 @@ public class BERDecoder implements Decoder {
             throw new DecodingException(e);
         }
 
-        choiceDecoder.decode(this, states, (ASN1Choice) obj);
+        obj = choiceDecoder.decode(this, states, obj, optional);
 
         return new DecodingResult<>(Collections.emptyList(), obj);
     }

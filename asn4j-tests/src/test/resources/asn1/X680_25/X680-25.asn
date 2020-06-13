@@ -248,4 +248,17 @@ TestSequenceDefaults14 ::= SEQUENCE {
 	b TestSetOf1 DEFAULT testSetOfValue1
 }
 
+TestChoice1 ::= CHOICE {
+    a BOOLEAN,
+    b INTEGER
+}
+
+TestSequenceDefaults15 ::= SEQUENCE {
+    a CHOICE {
+        a INTEGER,
+        b BOOLEAN
+    } DEFAULT a: 25,
+    b TestChoice1 DEFAULT a: TRUE
+}
+
 END

@@ -121,7 +121,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         ctx.finishClass();
 
-        return ctx.createCompiledType(node, name);
+        return compiledType;
     }
 
     private Tuple2<String, CompiledType> compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,

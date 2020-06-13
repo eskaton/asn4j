@@ -61,7 +61,7 @@ public class CompilerUtils {
         return StringUtils.initCap(formatName(name));
     }
 
-    static String formatName(String name) {
+    public static String formatName(String name) {
         StringBuilder sb = new StringBuilder();
         boolean cap = false;
 
