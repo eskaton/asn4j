@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.runtime.decoders.ChoiceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.EnumeratedTypeDecoder;
 import ch.eskaton.asn4j.runtime.decoders.IRIDecoder;
 import ch.eskaton.asn4j.runtime.decoders.IntegerDecoder;
+import ch.eskaton.asn4j.runtime.decoders.NumericStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ObjectIdentifierDecoder;
 import ch.eskaton.asn4j.runtime.decoders.OctetStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.RealDecoder;
@@ -56,6 +57,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1NamedInteger;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
@@ -109,6 +111,7 @@ public class BERDecoder implements Decoder {
                     .put(ASN1RelativeIRI.class, new RelativeIRIDecoder())
                     .put(ASN1OctetString.class, new OctetStringDecoder())
                     .put(ASN1VisibleString.class, new VisibleStringDecoder())
+                    .put(ASN1NumericString.class, new NumericStringDecoder())
                     .build();
 
     private ChoiceDecoder choiceDecoder = new ChoiceDecoder();
@@ -244,6 +247,8 @@ public class BERDecoder implements Decoder {
                 getDecoder(ASN1OctetString.class).decode(states, state, (ASN1OctetString) obj);
             } else if (obj instanceof ASN1VisibleString) {
                 getDecoder(ASN1VisibleString.class).decode(states, state, (ASN1VisibleString) obj);
+            } else if (obj instanceof ASN1NumericString) {
+                getDecoder(ASN1NumericString.class).decode(states, state, (ASN1NumericString) obj);
             } else if (obj instanceof ASN1ObjectIdentifier) {
                 getDecoder(ASN1ObjectIdentifier.class).decode(states, state, (ASN1ObjectIdentifier) obj);
             } else if (obj instanceof ASN1RelativeOID) {
