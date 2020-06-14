@@ -268,4 +268,11 @@ TestSequenceDefaults16 ::= SEQUENCE {
     b TestVisibleString1 DEFAULT "test2"
 }
 
+TestGeneralizedTime1 ::= GeneralizedTime
+
+TestSequenceDefaults17 ::= SEQUENCE {
+    a GeneralizedTime DEFAULT "19851106210627.3Z",
+    b TestGeneralizedTime1 DEFAULT "19851106210627.3-0500"
+}
+
 END

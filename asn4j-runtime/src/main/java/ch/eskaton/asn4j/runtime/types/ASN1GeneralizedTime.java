@@ -56,28 +56,19 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
 
     private Temporal dateTime;
 
-    public static ASN1GeneralizedTime from(LocalDateTime dateTime) {
-        ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
-
-        instance.setTime(dateTime);
-
-        return instance;
+    public ASN1GeneralizedTime() {
     }
 
-    public static ASN1GeneralizedTime from(OffsetDateTime dateTime) {
-        ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
-
-        instance.setTime(dateTime);
-
-        return instance;
+    public ASN1GeneralizedTime(String value) {
+        setValue(value);
     }
 
-    public static ASN1GeneralizedTime from(String dateTimeString) {
-        ASN1GeneralizedTime instance = new ASN1GeneralizedTime();
+    public ASN1GeneralizedTime(LocalDateTime dateTime) {
+        this.setTime(dateTime);
+    }
 
-        instance.setValue(dateTimeString);
-
-        return instance;
+    public ASN1GeneralizedTime(OffsetDateTime dateTime) {
+        this.setTime(dateTime);
     }
 
     @Override

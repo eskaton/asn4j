@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.test.x680_25;
 
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
@@ -40,6 +41,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.test.modules.x680_25.TestBoolean;
 import ch.eskaton.asn4j.test.modules.x680_25.TestChoice1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestEnumeration;
+import ch.eskaton.asn4j.test.modules.x680_25.TestGeneralizedTime1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestNull1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestOctetString;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence0;
@@ -62,6 +64,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults13;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults14;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults15;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults16;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults17;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
@@ -412,6 +415,15 @@ class TestX680_25 {
         assertDecodableVerifyAfter(TestSequenceDefaults16.class, value -> {
             assertEquals(new ASN1VisibleString("test1"), value.getA());
             assertEquals(new TestVisibleString1("test2"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for GeneralizedTime")
+    void testSequenceDefaults17() {
+        assertDecodableVerifyAfter(TestSequenceDefaults17.class, value -> {
+            assertEquals(new ASN1GeneralizedTime("19851106210627.3Z"), value.getA());
+            assertEquals(new TestGeneralizedTime1("19851106210627.3-0500"), value.getB());
         });
     }
 
