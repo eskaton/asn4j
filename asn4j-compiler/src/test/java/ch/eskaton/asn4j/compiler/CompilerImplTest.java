@@ -115,6 +115,17 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, "Type Integer is already defined");
     }
 
+    @Test
+    void testInvalidVisibleString() {
+        var body = """
+                Sequence ::= SEQUENCE {
+                    a VisibleString DEFAULT "é"
+                }
+                """;
+
+        testModule(body, CompilerException.class, "VisibleString contains invalid characters.*");
+    }
+
     private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()

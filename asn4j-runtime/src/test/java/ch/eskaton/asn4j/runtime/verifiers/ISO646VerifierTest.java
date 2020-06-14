@@ -25,32 +25,28 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.runtime.verifiers;
 
-import ch.eskaton.asn4j.runtime.Clazz;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
+import org.junit.jupiter.api.Test;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 26, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
-public class ASN1VisibleString extends AbstractASN1String {
+import java.util.Optional;
 
-    public ASN1VisibleString() {
-        super();
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+public class ISO646VerifierTest {
+
+    public static final String ALLOWED_CHARACTERS = " !\"#$&'()+,./0123456789:;<=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+
+    @Test
+    void testValidCharacters() {
+        assertThat(Optional.empty(), equalTo(ISO646Verifier.verify(ALLOWED_CHARACTERS)));
     }
 
-    public ASN1VisibleString(String value) {
-        super(value);
-
-        ISO646Verifier.verify(value);
-    }
-
-    public void setValue(String value) {
-        ISO646Verifier.verify(value).ifPresent(v -> {
-            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
-        });
-
-        super.setValue(value);
+    @Test
+    void testInvalidCharacters() {
+        assertThat(Optional.of("\u0015"), equalTo(ISO646Verifier.verify("ab\u0015cd")));
+        assertThat(Optional.of("\u007F"), equalTo(ISO646Verifier.verify("ab\u007Fcd")));
     }
 
 }

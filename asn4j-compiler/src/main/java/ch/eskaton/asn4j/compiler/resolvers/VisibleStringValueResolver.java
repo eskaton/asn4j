@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
 
 public class VisibleStringValueResolver extends AbstractValueResolver<VisibleStringValue> {
 
@@ -57,8 +58,13 @@ public class VisibleStringValueResolver extends AbstractValueResolver<VisibleStr
         }
 
         var stringValue = (StringValue) value;
+        var cString = stringValue.getCString();
 
-        return new VisibleStringValue(stringValue.getPosition(), stringValue.getCString());
+        ISO646Verifier.verify(cString).ifPresent(v -> {
+            throw new CompilerException("%s contains invalid characters: %s", TypeName.VISIBLE_STRING, v);
+        });
+
+        return new VisibleStringValue(stringValue.getPosition(), cString);
     }
 
 }
