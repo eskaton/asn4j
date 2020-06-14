@@ -238,12 +238,17 @@ public class JavaUtils {
 
     private static String getVisibleStringInitializerString(CompilerContext ctx, String typeName,
             VisibleStringValue value) {
-        return String.format("new %s(\"%s\")", typeName, value.getValue());
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 
     private static String getNumericStringInitializerString(CompilerContext ctx, String typeName,
             NumericStringValue value) {
-        return String.format("new %s(\"%s\")", typeName, value.getValue());
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getGenericStringInitializerString(CompilerContext ctx, String typeName,
+            String value) {
+        return String.format("new %s(\"%s\")", typeName, value);
     }
 
 }

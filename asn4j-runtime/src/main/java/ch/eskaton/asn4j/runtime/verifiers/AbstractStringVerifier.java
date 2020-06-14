@@ -25,38 +25,21 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.runtime.verifiers;
 
-import ch.eskaton.asn4j.runtime.Clazz;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 26, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
-public class ASN1VisibleString extends AbstractASN1String {
+public abstract class AbstractStringVerifier {
 
-    private static final ISO646Verifier VERIFIER = new ISO646Verifier();
-
-    public ASN1VisibleString() {
-        super();
+    public Optional<String> verify(String value) {
+        return Optional.ofNullable(value.chars()
+                .filter(c -> !isValidCharacter(c))
+                .mapToObj(i -> new String(Character.toChars(i)))
+                .collect(Collectors.joining()))
+                .filter(v -> !v.isEmpty());
     }
 
-    public ASN1VisibleString(String value) {
-        super(value);
-
-        verifyString(value);
-    }
-
-    public void setValue(String value) {
-        verifyString(value);
-
-        super.setValue(value);
-    }
-
-    private void verifyString(String value) {
-        VERIFIER.verify(value).ifPresent(v -> {
-            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
-        });
-    }
+    protected abstract boolean isValidCharacter(int c);
 
 }
