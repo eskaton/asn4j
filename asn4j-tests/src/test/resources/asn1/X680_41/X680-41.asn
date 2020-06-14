@@ -1,0 +1,8 @@
+X680-41 DEFINITIONS ::=
+BEGIN
+
+TestVisibleString1 ::= VisibleString
+
+TestNumericString1 ::= NumericString
+
+END
