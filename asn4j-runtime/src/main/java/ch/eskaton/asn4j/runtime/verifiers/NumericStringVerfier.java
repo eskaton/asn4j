@@ -25,43 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.runtime.verifiers;
 
-public enum TypeName {
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE");
+public class NumericStringVerfier {
 
-    private final String name;
-
-    TypeName(String name) {
-        this.name = name;
+    public static Optional<String> verify(String value) {
+        return Optional.ofNullable(value.chars()
+                .filter(c -> !isValidCharacter(c))
+                .mapToObj(i -> new String(Character.toChars(i)))
+                .collect(Collectors.joining()))
+                .filter(v -> !v.isEmpty());
     }
 
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    private static boolean isValidCharacter(int c) {
+        return c == 32 || c >= 48 && c <= 57;
     }
 
 }

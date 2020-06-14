@@ -46,6 +46,7 @@ import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
+import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RealValue;
@@ -93,6 +94,7 @@ public class JavaUtils {
         addCase(dispatcher, CollectionValue.class, JavaUtils::getCollectionInitializerString);
         addCase(dispatcher, ChoiceValue.class, JavaUtils::getChoiceInitializerString);
         addCase(dispatcher, VisibleStringValue.class, JavaUtils::getVisibleStringInitializerString);
+        addCase(dispatcher, NumericStringValue.class, JavaUtils::getNumericStringInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
     }
@@ -236,6 +238,11 @@ public class JavaUtils {
 
     private static String getVisibleStringInitializerString(CompilerContext ctx, String typeName,
             VisibleStringValue value) {
+        return String.format("new %s(\"%s\")", typeName, value.getValue());
+    }
+
+    private static String getNumericStringInitializerString(CompilerContext ctx, String typeName,
+            NumericStringValue value) {
         return String.format("new %s(\"%s\")", typeName, value.getValue());
     }
 

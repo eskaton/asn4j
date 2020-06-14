@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
@@ -44,6 +45,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestChoice1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestEnumeration;
 import ch.eskaton.asn4j.test.modules.x680_25.TestGeneralizedTime1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestNull1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestNumericString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestOctetString;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence0;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence1;
@@ -67,6 +69,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults15;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults16;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults17;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults18;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults19;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
@@ -436,6 +439,15 @@ class TestX680_25 {
         assertDecodableVerifyAfter(TestSequenceDefaults18.class, value -> {
             assertEquals(new ASN1UTCTime("8201021200Z"), value.getA());
             assertEquals(new TestUTCTime1("8201020700-0500"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for NumericString")
+    void testSequenceDefaults19() {
+        assertDecodableVerifyAfter(TestSequenceDefaults19.class, value -> {
+            assertEquals(new ASN1NumericString("1234"), value.getA());
+            assertEquals(new TestNumericString1("5678"), value.getB());
         });
     }
 

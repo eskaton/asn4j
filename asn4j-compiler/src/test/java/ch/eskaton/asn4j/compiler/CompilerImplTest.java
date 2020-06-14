@@ -126,6 +126,17 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, "VisibleString contains invalid characters.*");
     }
 
+    @Test
+    void testInvalidNumericString() {
+        var body = """
+                Sequence ::= SEQUENCE {
+                    a NumericString DEFAULT "a"
+                }
+                """;
+
+        testModule(body, CompilerException.class, "NumericString contains invalid characters.*");
+    }
+
     private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()

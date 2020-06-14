@@ -25,43 +25,27 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.runtime.verifiers;
 
-public enum TypeName {
+import org.junit.jupiter.api.Test;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE");
+import java.util.Optional;
 
-    private final String name;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
-    TypeName(String name) {
-        this.name = name;
+public class NumericStringVerifierTest {
+
+    public static final String ALLOWED_CHARACTERS = " 0123456789";
+
+    @Test
+    void testValidCharacters() {
+        assertThat(Optional.empty(), equalTo(NumericStringVerfier.verify(ALLOWED_CHARACTERS)));
     }
 
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    @Test
+    void testInvalidCharacters() {
+        assertThat(Optional.of("ab"), equalTo(NumericStringVerfier.verify("01ab23")));
     }
 
 }

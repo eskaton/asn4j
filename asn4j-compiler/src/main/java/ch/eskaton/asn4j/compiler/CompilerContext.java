@@ -46,6 +46,7 @@ import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.NullValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.NumericStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.OctetStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RealValueResolver;
@@ -81,6 +82,7 @@ import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
@@ -108,6 +110,7 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
+import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RealValue;
@@ -130,6 +133,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
@@ -187,6 +191,7 @@ public class CompilerContext {
             .put(ExternalTypeReference.class, new ExternalTypeReferenceCompiler())
             .put(TypeAssignmentNode.class, new TypeAssignmentCompiler())
             .put(VisibleString.class, new VisibleStringCompiler())
+            .put(NumericString.class, new NumericStringCompiler())
             .put(SelectionType.class, new SelectionTypeCompiler())
             .put(ObjectIdentifier.class, new ObjectIdentifierCompiler())
             .put(RelativeOID.class, new RelativeOIDCompiler())
@@ -212,6 +217,7 @@ public class CompilerContext {
             .put(CollectionOfValue.class, new CollectionOfValueResolver(CompilerContext.this))
             .put(ChoiceValue.class, new ChoiceValueResolver(CompilerContext.this))
             .put(VisibleStringValue.class, new VisibleStringValueResolver(CompilerContext.this))
+            .put(NumericStringValue.class, new NumericStringValueResolver(CompilerContext.this))
             .build();
 
     @SuppressWarnings("serial")
@@ -223,6 +229,7 @@ public class CompilerContext {
             .add(OctetString.class.getSimpleName())
             .add(Real.class.getSimpleName())
             .add(VisibleString.class.getSimpleName())
+            .add(NumericString.class.getSimpleName())
             .build();
 
     @SuppressWarnings("serial")
@@ -498,6 +505,8 @@ public class CompilerContext {
             typeName = ASN1Boolean.class.getSimpleName();
         } else if (type instanceof VisibleString) {
             typeName = ASN1VisibleString.class.getSimpleName();
+        } else if (type instanceof NumericString) {
+            typeName = ASN1NumericString.class.getSimpleName();
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof EnumeratedType) {

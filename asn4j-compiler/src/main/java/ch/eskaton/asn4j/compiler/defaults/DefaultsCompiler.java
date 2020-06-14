@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
@@ -57,6 +58,7 @@ import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
+import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
@@ -92,6 +94,7 @@ public class DefaultsCompiler {
                     .put(SequenceOfType.class, new DefaultCompilerImpl(CollectionOfValue.class))
                     .put(Choice.class, new DefaultCompilerImpl(ChoiceValue.class))
                     .put(VisibleString.class, new DefaultCompilerImpl(VisibleStringValue.class))
+                    .put(NumericString.class, new DefaultCompilerImpl(NumericStringValue.class))
                     .build();
 
     private CompilerContext ctx;
