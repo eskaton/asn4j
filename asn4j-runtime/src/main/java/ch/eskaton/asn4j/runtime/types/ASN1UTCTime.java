@@ -38,21 +38,20 @@ import java.util.Objects;
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 23, mode = ASN1Tag.Mode.IMPLICIT, constructed = false)
 public class ASN1UTCTime extends ASN1VisibleString {
 
-    private static UTCTimeParser utcTimeParser = new UTCTimeParser();
+    private static final UTCTimeParser UTC_TIME_PARSER = new UTCTimeParser();
 
     private DateTime dateTime;
 
-    public static ASN1UTCTime from(String dateTimeString) {
-        ASN1UTCTime instance = new ASN1UTCTime();
+    public ASN1UTCTime() {
+    }
 
-        instance.setValue(dateTimeString);
-
-        return instance;
+    public ASN1UTCTime(String value) {
+        setValue(value);
     }
 
     @Override
     public void setValue(String value) {
-        this.dateTime = utcTimeParser.parse(value);
+        this.dateTime = UTC_TIME_PARSER.parse(value);
     }
 
     @Override
