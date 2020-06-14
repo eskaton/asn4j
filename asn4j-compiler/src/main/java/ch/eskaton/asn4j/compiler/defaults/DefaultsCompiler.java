@@ -48,6 +48,7 @@ import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
@@ -59,7 +60,10 @@ import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
+import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
+import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.collections.Maps;
 
 import java.util.Map;
@@ -87,6 +91,7 @@ public class DefaultsCompiler {
                     .put(SequenceType.class, new DefaultCompilerImpl(CollectionValue.class))
                     .put(SequenceOfType.class, new DefaultCompilerImpl(CollectionOfValue.class))
                     .put(Choice.class, new DefaultCompilerImpl(ChoiceValue.class))
+                    .put(VisibleString.class, new DefaultCompilerImpl(VisibleStringValue.class))
                     .build();
 
     private CompilerContext ctx;

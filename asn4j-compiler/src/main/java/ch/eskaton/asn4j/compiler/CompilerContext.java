@@ -52,6 +52,7 @@ import ch.eskaton.asn4j.compiler.resolvers.RealValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.VisibleStringValueResolver;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -117,6 +118,7 @@ import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.TimeValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
@@ -209,6 +211,7 @@ public class CompilerContext {
             .put(CollectionValue.class, new CollectionValueResolver(CompilerContext.this))
             .put(CollectionOfValue.class, new CollectionOfValueResolver(CompilerContext.this))
             .put(ChoiceValue.class, new ChoiceValueResolver(CompilerContext.this))
+            .put(VisibleStringValue.class, new VisibleStringValueResolver(CompilerContext.this))
             .build();
 
     @SuppressWarnings("serial")
@@ -478,7 +481,12 @@ public class CompilerContext {
 
         if (type instanceof TypeReference) {
             if (type instanceof UsefulType) {
-                typeName = ((UsefulType) type).getType();
+                typeName = switch (((UsefulType) type).getType()) {
+                    case "GeneralizedTime" -> ASN1GeneralizedTime.class.getSimpleName();
+                    case "UTCTime" -> ASN1UTCTime.class.getSimpleName();
+                    default -> throw new IllegalCompilerStateException("Unsupported UsefulType: %s",
+                            ((UsefulType) type).getType());
+                };
             } else {
                 typeName = CompilerUtils.formatTypeName(((TypeReference) type).getType());
             }

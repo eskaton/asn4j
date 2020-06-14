@@ -37,6 +37,7 @@ public enum TypeName {
     NULL("NULL"),
     OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
     OCTET_STRING("OCTET STRING"),
+    VISIBLE_STRING("VisibleString"),
     OID("OID"),
     RELATIVE_OID("RELATIVE OID"),
     OID_IRI("OID-IRI"),

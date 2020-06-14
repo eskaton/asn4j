@@ -3196,11 +3196,11 @@ public class Parser {
                     TokenType.OBJECT_DESCRIPTOR_KW), a -> {
                 switch (a.$()) {
                     case UTC_TIME_KW:
-                        return new UTCTime(a.P(), ASN1UTCTime.class.getSimpleName());
+                        return new UTCTime(a.P(), UTCTime.class.getSimpleName());
                     case GENERALIZED_TIME_KW:
-                        return new GeneralizedTime(a.P(), ASN1GeneralizedTime.class.getSimpleName());
+                        return new GeneralizedTime(a.P(), GeneralizedTime.class.getSimpleName());
                     case OBJECT_DESCRIPTOR_KW:
-                        return new ObjectDescriptor(a.P(), ASN1ObjectDescriptor.class.getSimpleName());
+                        return new ObjectDescriptor(a.P(), ObjectDescriptor.class.getSimpleName());
                     default:
                         return null;
                 }

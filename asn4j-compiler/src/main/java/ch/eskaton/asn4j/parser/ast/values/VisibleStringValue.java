@@ -25,54 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.parser.ast.values;
 
-import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.asn4j.parser.Position;
 
-import java.util.Objects;
-
-public class AbstractASN1String implements ASN1Type {
+public class VisibleStringValue extends AbstractValue {
 
     private String value;
 
-    public AbstractASN1String() {
-    }
+    public VisibleStringValue(Position position, String value) {
+        super(position);
 
-    public AbstractASN1String(String value) {
         this.value = value;
     }
 
     public String getValue() {
         return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        AbstractASN1String other = (AbstractASN1String) obj;
-
-        return Objects.equals(value, other.value);
     }
 
 }

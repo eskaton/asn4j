@@ -261,4 +261,11 @@ TestSequenceDefaults15 ::= SEQUENCE {
     b TestChoice1 DEFAULT a: TRUE
 }
 
+TestVisibleString1 ::= VisibleString
+
+TestSequenceDefaults16 ::= SEQUENCE {
+    a VisibleString DEFAULT "test1",
+    b TestVisibleString1 DEFAULT "test2"
+}
+
 END

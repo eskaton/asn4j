@@ -25,54 +25,40 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+import ch.eskaton.asn4j.parser.ast.values.StringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import java.util.Objects;
+public class VisibleStringValueResolver extends AbstractValueResolver<VisibleStringValue> {
 
-public class AbstractASN1String implements ASN1Type {
-
-    private String value;
-
-    public AbstractASN1String() {
-    }
-
-    public AbstractASN1String(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    public VisibleStringValueResolver(CompilerContext ctx) {
+        super(ctx);
     }
 
     @Override
-    public String toString() {
-        return ToString.get(this);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
+    public VisibleStringValue resolveGeneric(Type type, Value value) {
+        if (value instanceof SimpleDefinedValue) {
+            value = ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+        } else if (value instanceof AmbiguousValue) {
+            value = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
+        } else if (value instanceof StringValue) {
+            // value is already a string
+        } else {
+            throw new CompilerException("Failed to resolve a %s value", TypeName.VISIBLE_STRING);
         }
 
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
+        var stringValue = (StringValue) value;
 
-        AbstractASN1String other = (AbstractASN1String) obj;
-
-        return Objects.equals(value, other.value);
+        return new VisibleStringValue(stringValue.getPosition(), stringValue.getCString());
     }
 
 }
