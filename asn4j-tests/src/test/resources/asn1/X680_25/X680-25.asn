@@ -275,4 +275,11 @@ TestSequenceDefaults17 ::= SEQUENCE {
     b TestGeneralizedTime1 DEFAULT "19851106210627.3-0500"
 }
 
+TestUTCTime1 ::= UTCTime
+
+TestSequenceDefaults18 ::= SEQUENCE {
+    a UTCTime DEFAULT "8201021200Z",
+    b TestUTCTime1 DEFAULT "8201020700-0500"
+}
+
 END

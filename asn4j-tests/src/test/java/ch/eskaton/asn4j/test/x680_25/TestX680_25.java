@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
+import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.test.modules.x680_25.TestBoolean;
 import ch.eskaton.asn4j.test.modules.x680_25.TestChoice1;
@@ -65,6 +66,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults14;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults15;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults16;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults17;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults18;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
@@ -75,6 +77,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults8;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults9;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSetOf1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestUTCTime1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestVisibleString1;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -424,6 +427,15 @@ class TestX680_25 {
         assertDecodableVerifyAfter(TestSequenceDefaults17.class, value -> {
             assertEquals(new ASN1GeneralizedTime("19851106210627.3Z"), value.getA());
             assertEquals(new TestGeneralizedTime1("19851106210627.3-0500"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for UTCTime")
+    void testSequenceDefaults18() {
+        assertDecodableVerifyAfter(TestSequenceDefaults18.class, value -> {
+            assertEquals(new ASN1UTCTime("8201021200Z"), value.getA());
+            assertEquals(new TestUTCTime1("8201020700-0500"), value.getB());
         });
     }
 

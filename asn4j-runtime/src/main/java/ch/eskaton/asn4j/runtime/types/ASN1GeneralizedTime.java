@@ -52,7 +52,7 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
 
     private static final DateTimeFormatter OFFSET_FORMATTER = DateTimeFormatter.ofPattern("X");
 
-    private static GeneralizedTimeParser generalizedTimeParser = new GeneralizedTimeParser();
+    private static final GeneralizedTimeParser GENERALIZED_TIME_PARSER = new GeneralizedTimeParser();
 
     private Temporal dateTime;
 
@@ -73,8 +73,9 @@ public class ASN1GeneralizedTime extends ASN1VisibleString {
 
     @Override
     public void setValue(String value) {
-        DateTime dateTime = generalizedTimeParser.parse(value);
-        LocalDateTime localDateTime = LocalDateTime.of(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay(), dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond(), dateTime.getNanos());
+        DateTime dateTime = GENERALIZED_TIME_PARSER.parse(value);
+        LocalDateTime localDateTime = LocalDateTime.of(dateTime.getYear(), dateTime.getMonth(), dateTime.getDay(),
+                dateTime.getHour(), dateTime.getMinute(), dateTime.getSecond(), dateTime.getNanos());
 
         if (dateTime.hasOffset()) {
             if (dateTime.isZulu()) {
