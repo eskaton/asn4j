@@ -25,43 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.parser.ast.values;
 
-public enum TypeName {
+import ch.eskaton.asn4j.parser.Position;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE");
+public class NumericStringValue extends AbstractValue {
 
-    private final String name;
+    private String value;
 
-    TypeName(String name) {
-        this.name = name;
+    public NumericStringValue(Position position, String value) {
+        super(position);
+
+        this.value = value;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    public String getValue() {
+        return value;
     }
 
 }

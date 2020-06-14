@@ -282,4 +282,11 @@ TestSequenceDefaults18 ::= SEQUENCE {
     b TestUTCTime1 DEFAULT "8201020700-0500"
 }
 
+TestNumericString1 ::= NumericString
+
+TestSequenceDefaults19 ::= SEQUENCE {
+    a NumericString DEFAULT "1234",
+    b TestNumericString1 DEFAULT "5678"
+}
+
 END

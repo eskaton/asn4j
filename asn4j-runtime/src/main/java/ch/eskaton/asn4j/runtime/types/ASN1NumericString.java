@@ -27,41 +27,30 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-public enum TypeName {
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE");
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 18, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+public class ASN1NumericString extends AbstractASN1String {
 
-    private final String name;
-
-    TypeName(String name) {
-        this.name = name;
+    public ASN1NumericString() {
+        super();
     }
 
-    public String getName() {
-        return name;
+    public ASN1NumericString(String value) {
+        super(value);
+
+        ISO646Verifier.verify(value);
     }
 
-    @Override
-    public String toString() {
-        return name;
+    public void setValue(String value) {
+        ISO646Verifier.verify(value).ifPresent(v -> {
+            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
+        });
+
+        super.setValue(value);
     }
 
 }
