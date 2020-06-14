@@ -86,19 +86,19 @@ class TestX690_8_14 {
 
         SetType1 type1 = new SetType1();
 
-        type1.setValues(ASN1VisibleString.fromString("test"));
+        type1.setValues(new ASN1VisibleString("test"));
 
         assertArrayEquals(new byte[] { 0x31, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type1));
 
         SetType2 type2 = new SetType2();
 
-        type2.setValues(ASN1VisibleString.fromString("test"));
+        type2.setValues(new ASN1VisibleString("test"));
 
         assertArrayEquals(new byte[] { 0x61, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type2));
 
         SetType3 type3 = new SetType3();
 
-        type3.setValues(ASN1VisibleString.fromString("test"));
+        type3.setValues(new ASN1VisibleString("test"));
 
         assertArrayEquals(new byte[] { (byte) 0xa0, 0x08, 0x61, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 },
                 encoder.encode(type3));

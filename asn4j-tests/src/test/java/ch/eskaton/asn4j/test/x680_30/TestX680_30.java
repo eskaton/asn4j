@@ -46,7 +46,7 @@ class TestX680_30 {
                     val.setValue(true);
 
                     value.setA(ASN1Integer.valueOf(4711));
-                    value.setB(ASN1VisibleString.fromString("test"));
+                    value.setB(new ASN1VisibleString("test"));
                     value.setC(val);
                 });
     }

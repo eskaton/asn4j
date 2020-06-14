@@ -33,10 +33,12 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 26, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1VisibleString extends AbstractASN1String {
 
-    public static ASN1VisibleString fromString(String s) {
-        ASN1VisibleString vs = new ASN1VisibleString();
-        vs.setValue(s);
-        return vs;
+    public ASN1VisibleString() {
+        super();
+    }
+
+    public ASN1VisibleString(String value) {
+        super(value);
     }
 
 }

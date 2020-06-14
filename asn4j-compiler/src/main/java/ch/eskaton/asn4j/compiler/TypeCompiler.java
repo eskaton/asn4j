@@ -77,10 +77,10 @@ public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
             return ctx.<RelativeIRI, RelativeIRICompiler>getCompiler(RelativeIRI.class).compile(ctx, name, (RelativeIRI) node);
         } else if (node instanceof TypeReference) {
             if (node instanceof UsefulType) {
-                if (((UsefulType) node).getType().equals(ASN1GeneralizedTime.class.getSimpleName())) {
+                if (((UsefulType) node).getType().equals(GeneralizedTime.class.getSimpleName())) {
                     return ctx.<GeneralizedTime, GeneralizedTimeCompiler>getCompiler(GeneralizedTime.class)
                             .compile(ctx, name, (UsefulType) node);
-                } else if (((UsefulType) node).getType().equals(ASN1UTCTime.class.getSimpleName())) {
+                } else if (((UsefulType) node).getType().equals(UTCTime.class.getSimpleName())) {
                     return ctx.<UTCTime, UTCTimeCompiler>getCompiler(UTCTime.class).compile(ctx, name, (UsefulType) node);
                 } else {
                     throw new CompilerException("Unsupported UsefulType: " + ((UsefulType) node).getType());

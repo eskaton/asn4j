@@ -52,6 +52,7 @@ import ch.eskaton.asn4j.parser.ast.values.RealValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.functional.TriFunction;
 import ch.eskaton.commons.utils.Dispatcher;
@@ -91,6 +92,7 @@ public class JavaUtils {
         addCase(dispatcher, CollectionOfValue.class, JavaUtils::getCollectionOfInitializerString);
         addCase(dispatcher, CollectionValue.class, JavaUtils::getCollectionInitializerString);
         addCase(dispatcher, ChoiceValue.class, JavaUtils::getChoiceInitializerString);
+        addCase(dispatcher, VisibleStringValue.class, JavaUtils::getVisibleStringInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
     }
@@ -230,6 +232,11 @@ public class JavaUtils {
                     .orElseThrow(() -> new CompilerException("Invalid component '%s' in type %s",
                             value.getId(), typeName));
         }).orElseThrow(() -> new CompilerException("Failed to resolve type %s", typeName));
+    }
+
+    private static String getVisibleStringInitializerString(CompilerContext ctx, String typeName,
+            VisibleStringValue value) {
+        return String.format("new %s(\"%s\")", typeName, value.getValue());
     }
 
 }
