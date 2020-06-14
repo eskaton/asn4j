@@ -41,6 +41,8 @@ import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
 
 public class VisibleStringValueResolver extends AbstractValueResolver<VisibleStringValue> {
 
+    public static final ISO646Verifier VERIFIER = new ISO646Verifier();
+
     public VisibleStringValueResolver(CompilerContext ctx) {
         super(ctx);
     }
@@ -60,7 +62,7 @@ public class VisibleStringValueResolver extends AbstractValueResolver<VisibleStr
         var stringValue = (StringValue) value;
         var cString = stringValue.getCString();
 
-        ISO646Verifier.verify(cString).ifPresent(v -> {
+        VERIFIER.verify(cString).ifPresent(v -> {
             throw new CompilerException("%s contains invalid characters: %s", TypeName.VISIBLE_STRING, v);
         });
 

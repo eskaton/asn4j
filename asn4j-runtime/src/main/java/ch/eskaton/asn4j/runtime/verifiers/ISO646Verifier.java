@@ -27,17 +27,11 @@
 
 package ch.eskaton.asn4j.runtime.verifiers;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
+public class ISO646Verifier extends AbstractStringVerifier {
 
-public class ISO646Verifier {
-
-    public static Optional<String> verify(String value) {
-        return Optional.ofNullable(value.chars()
-                .filter(c -> !(c >= 32 && c <= 126))
-                .mapToObj(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+    @Override
+    protected boolean isValidCharacter(int c) {
+        return c >= 32 && c <= 126;
     }
 
 }

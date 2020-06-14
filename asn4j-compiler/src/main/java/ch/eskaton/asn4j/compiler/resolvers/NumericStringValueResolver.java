@@ -41,6 +41,8 @@ import ch.eskaton.asn4j.runtime.verifiers.NumericStringVerfier;
 
 public class NumericStringValueResolver extends AbstractValueResolver<NumericStringValue> {
 
+    public static final NumericStringVerfier VERFIER = new NumericStringVerfier();
+
     public NumericStringValueResolver(CompilerContext ctx) {
         super(ctx);
     }
@@ -60,7 +62,7 @@ public class NumericStringValueResolver extends AbstractValueResolver<NumericStr
         var stringValue = (StringValue) value;
         var cString = stringValue.getCString();
 
-        NumericStringVerfier.verify(cString).ifPresent(v -> {
+        VERFIER.verify(cString).ifPresent(v -> {
             throw new CompilerException("%s contains invalid characters: %s", TypeName.NUMERIC_STRING, v);
         });
 

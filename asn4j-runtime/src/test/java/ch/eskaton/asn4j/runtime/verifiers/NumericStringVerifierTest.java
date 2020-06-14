@@ -38,14 +38,16 @@ public class NumericStringVerifierTest {
 
     public static final String ALLOWED_CHARACTERS = " 0123456789";
 
+    public static final NumericStringVerfier verifier = new NumericStringVerfier();
+
     @Test
     void testValidCharacters() {
-        assertThat(Optional.empty(), equalTo(NumericStringVerfier.verify(ALLOWED_CHARACTERS)));
+        assertThat(Optional.empty(), equalTo(verifier.verify(ALLOWED_CHARACTERS)));
     }
 
     @Test
     void testInvalidCharacters() {
-        assertThat(Optional.of("ab"), equalTo(NumericStringVerfier.verify("01ab23")));
+        assertThat(Optional.of("ab"), equalTo(verifier.verify("01ab23")));
     }
 
 }

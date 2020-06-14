@@ -38,15 +38,17 @@ public class ISO646VerifierTest {
 
     public static final String ALLOWED_CHARACTERS = " !\"#$&'()+,./0123456789:;<=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
+    public static final ISO646Verifier verifier = new ISO646Verifier();
+
     @Test
     void testValidCharacters() {
-        assertThat(Optional.empty(), equalTo(ISO646Verifier.verify(ALLOWED_CHARACTERS)));
+        assertThat(Optional.empty(), equalTo(verifier.verify(ALLOWED_CHARACTERS)));
     }
 
     @Test
     void testInvalidCharacters() {
-        assertThat(Optional.of("\u0015"), equalTo(ISO646Verifier.verify("ab\u0015cd")));
-        assertThat(Optional.of("\u007F"), equalTo(ISO646Verifier.verify("ab\u007Fcd")));
+        assertThat(Optional.of("\u0015"), equalTo(verifier.verify("ab\u0015cd")));
+        assertThat(Optional.of("\u007F"), equalTo(verifier.verify("ab\u007Fcd")));
     }
 
 }
