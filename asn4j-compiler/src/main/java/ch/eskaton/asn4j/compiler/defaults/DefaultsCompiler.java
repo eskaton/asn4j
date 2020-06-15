@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
@@ -49,12 +50,14 @@ import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
@@ -62,10 +65,9 @@ import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.StringValue;
+import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
-import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.collections.Maps;
 
 import java.util.Map;
@@ -94,6 +96,8 @@ public class DefaultsCompiler {
                     .put(SequenceOfType.class, new DefaultCompilerImpl(CollectionOfValue.class))
                     .put(Choice.class, new DefaultCompilerImpl(ChoiceValue.class))
                     .put(VisibleString.class, new DefaultCompilerImpl(VisibleStringValue.class))
+                    .put(UTCTime.class, new DefaultCompilerImpl(UTCTimeValue.class))
+                    .put(GeneralizedTime.class, new DefaultCompilerImpl(GeneralizedTimeValue.class))
                     .put(NumericString.class, new DefaultCompilerImpl(NumericStringValue.class))
                     .build();
 

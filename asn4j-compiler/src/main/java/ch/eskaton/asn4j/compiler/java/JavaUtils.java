@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.HexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
@@ -52,6 +53,7 @@ import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RealValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
+import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.commons.collections.Tuple3;
@@ -94,6 +96,8 @@ public class JavaUtils {
         addCase(dispatcher, CollectionValue.class, JavaUtils::getCollectionInitializerString);
         addCase(dispatcher, ChoiceValue.class, JavaUtils::getChoiceInitializerString);
         addCase(dispatcher, VisibleStringValue.class, JavaUtils::getVisibleStringInitializerString);
+        addCase(dispatcher, UTCTimeValue.class, JavaUtils::getUTCTimeInitializerString);
+        addCase(dispatcher, GeneralizedTimeValue.class, JavaUtils::getGeneralizedTimeInitializerString);
         addCase(dispatcher, NumericStringValue.class, JavaUtils::getNumericStringInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
@@ -243,6 +247,16 @@ public class JavaUtils {
 
     private static String getNumericStringInitializerString(CompilerContext ctx, String typeName,
             NumericStringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getUTCTimeInitializerString(CompilerContext ctx, String typeName,
+            UTCTimeValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getGeneralizedTimeInitializerString(CompilerContext ctx, String typeName,
+            GeneralizedTimeValue value) {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 

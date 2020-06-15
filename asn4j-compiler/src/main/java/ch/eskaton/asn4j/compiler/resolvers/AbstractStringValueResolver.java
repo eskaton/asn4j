@@ -43,21 +43,26 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class AbstractStringValueResolver<T extends HasStringValue & Value> extends AbstractValueResolver<T> {
 
     private final TypeName typeName;
 
-    private final Map<Class<? extends Type>, StringVerifier> typesAndVerifiers;
+    private final Class<? extends Type> typeClass;
 
-    public AbstractStringValueResolver(CompilerContext ctx, TypeName typeName,
-            Map<Class<? extends Type>, StringVerifier> typesAndVerifiers) {
+    private final StringVerifier verifier;
+
+    public AbstractStringValueResolver(CompilerContext ctx, TypeName typeName, Class<? extends Type> typeClass, StringVerifier verifier) {
         super(ctx);
 
         this.typeName = typeName;
-        this.typesAndVerifiers = typesAndVerifiers;
+        this.typeClass = typeClass;
+        this.verifier = verifier;
+    }
+
+    protected TypeName getTypeName() {
+        return typeName;
     }
 
     @Override
@@ -67,23 +72,22 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
         if (value instanceof SimpleDefinedValue) {
             return resolve((SimpleDefinedValue) value);
         } else if (value instanceof AmbiguousValue) {
-            Value resolvedValue = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
+            var stringValue = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
 
-            if (resolvedValue == null) {
-                resolvedValue = CompilerUtils.resolveAmbiguousValue(value, CharacterStringList.class);
+            if (stringValue == null) {
+                var characterStringListValue = resolveCharacterStringList(resolvedType, value);
 
-                if (resolvedValue != null) {
-                    return createValue(value.getPosition(), ((CharacterStringList) resolvedValue).getValues()
-                            .stream()
-                            .map(v -> resolveCharSyms(resolvedType, v))
-                            .collect(Collectors.joining()));
+                if (characterStringListValue != null) {
+                    return characterStringListValue;
                 }
             }
 
-            value = resolvedValue;
+            value = stringValue;
         } else if (value instanceof StringValue) {
             // value is already a string
-        } else {
+        }
+
+        if (value == null) {
             throw new CompilerException("Failed to resolve a %s value", typeName);
         }
 
@@ -93,10 +97,23 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
         return createValue(stringValue.getPosition(), cString);
     }
 
+    protected T resolveCharacterStringList(Type resolvedType, Value value) {
+        var resolvedValue = CompilerUtils.resolveAmbiguousValue(value, CharacterStringList.class);
+
+        if (resolvedValue != null) {
+            return createValue(value.getPosition(), resolvedValue.getValues()
+                    .stream()
+                    .map(v -> resolveCharSyms(resolvedType, v))
+                    .collect(Collectors.joining()));
+        }
+
+        return null;
+    }
+
     private Type verifyType(Type type) {
         var resolvedType = resolveTypeReference(type);
 
-        if (typesAndVerifiers.keySet().stream().noneMatch(clazz -> clazz.isAssignableFrom(resolvedType.getClass()))) {
+        if (!typeClass.isAssignableFrom(resolvedType.getClass())) {
             throw new CompilerException("Failed to resolve a value. Expected %s but found %s.",
                     typeName, type.getClass().getSimpleName());
         }
@@ -125,7 +142,7 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
     private String getString(Type type, StringValue stringValue) {
         var cString = stringValue.getCString();
 
-        typesAndVerifiers.get(type.getClass()).verify(cString).ifPresent(v -> {
+        verifier.verify(cString).ifPresent(v -> {
             throw new CompilerException("%s contains invalid characters: %s", typeName, v);
         });
 

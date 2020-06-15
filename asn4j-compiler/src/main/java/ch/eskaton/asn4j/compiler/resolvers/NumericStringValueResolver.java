@@ -34,12 +34,10 @@ import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.NumericStringVerifier;
 
-import static java.util.Collections.singletonMap;
-
 public class NumericStringValueResolver extends AbstractStringValueResolver<NumericStringValue> {
 
     public NumericStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.NUMERIC_STRING, singletonMap(NumericString.class, new NumericStringVerifier()));
+        super(ctx, TypeName.NUMERIC_STRING, NumericString.class, new NumericStringVerifier());
     }
 
     @Override

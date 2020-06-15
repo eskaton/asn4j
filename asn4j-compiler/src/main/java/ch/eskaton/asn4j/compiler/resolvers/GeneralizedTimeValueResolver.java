@@ -25,45 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-public enum TypeName {
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
+import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.GeneralizedTimeVerifier;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    UTC_TIME("UTCTime"),
-    GENERALIZED_TIME("GeneralizedTime"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE");
+public class GeneralizedTimeValueResolver extends AbstractTimeValueResolver<GeneralizedTimeValue> {
 
-    private final String name;
-
-    TypeName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    public GeneralizedTimeValueResolver(CompilerContext ctx) {
+        super(ctx, TypeName.GENERALIZED_TIME, GeneralizedTime.class, new GeneralizedTimeVerifier());
     }
 
     @Override
-    public String toString() {
-        return name;
+    protected GeneralizedTimeValue createValue(Position position, String value) {
+        return new GeneralizedTimeValue(position, value);
     }
 
 }
