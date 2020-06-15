@@ -36,8 +36,9 @@ public class GeneralizedTimeParser extends AbstractDateTimeParser {
 
     public static final BigDecimal SIXTY = BigDecimal.valueOf(60);
 
-    public DateTime parse(String s) {
-        Context ctx = new Context(s);
+    @Override
+    public DateTime parse(String value) {
+        Context ctx = new Context(value);
 
         while (true) {
             try {
@@ -93,7 +94,7 @@ public class GeneralizedTimeParser extends AbstractDateTimeParser {
                         break;
                     case ACCEPT:
                         if (ctx.available()) {
-                            throw new ASN1RuntimeException("Failed to parse: " + s);
+                            throw new ASN1RuntimeException("Failed to parse: %s", value);
                         }
 
                         DateTime dateTime = new DateTime(ctx.year, ctx.month, ctx.day, ctx.hour, ctx.minute, ctx.second)
@@ -109,9 +110,9 @@ public class GeneralizedTimeParser extends AbstractDateTimeParser {
 
                         return dateTime;
                     case ERROR:
-                        throw new ASN1RuntimeException("Failed to parse: " + s);
+                        throw new ASN1RuntimeException("Failed to parse: %s", value);
                     default:
-                        throw new ASN1RuntimeException("Unimplemented state: " + ctx.getState());
+                        throw new ASN1RuntimeException("Unimplemented state: %s", ctx.getState());
                 }
             } catch (IOException e) {
                 throw new ASN1RuntimeException(e);
@@ -120,8 +121,8 @@ public class GeneralizedTimeParser extends AbstractDateTimeParser {
     }
 
     protected Integer parseSecond(Context ctx) throws IOException {
-        return parseComponent(ctx, State.SECOND_FRACTION, 2, second ->
-                new LessEqualVerifiyer("second", 59).verify(second));
+        return parseComponent(ctx, State.SECOND_FRACTION, 2, (c, second) ->
+                new LessEqualVerifiyer("second", 59).verify(c, second));
     }
 
     private void processFraction(Context ctx, State state, String fractionStr) {
@@ -168,59 +169,6 @@ public class GeneralizedTimeParser extends AbstractDateTimeParser {
         ctx.unread();
 
         return null;
-    }
-
-    private String parseTimeZone(Context ctx) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        int chr = ctx.read();
-
-        ctx.setState(State.ACCEPT);
-
-        if (chr == 'Z') {
-            sb.append((char) chr);
-
-            return sb.toString();
-        }
-
-        if (chr != '+' && chr != '-') {
-            ctx.unread();
-
-            return null;
-        }
-
-        sb.append((char) chr);
-
-        ctx.mark();
-
-        String hour = parseDigits(ctx, 2);
-
-        if (hour == null) {
-            ctx.reset();
-
-            return null;
-        }
-
-        sb.append(hour);
-
-        ctx.mark();
-
-        String minute = parseDigits(ctx, 2);
-
-        if (minute == null) {
-            ctx.reset();
-
-            return sb.toString();
-        }
-
-        int intMinute = Integer.parseInt(minute);
-
-        if (Integer.parseInt(hour) * 100 + intMinute > 1800 || intMinute > 59) {
-            throw new ASN1RuntimeException("Invalid offset");
-        }
-
-        sb.append(minute);
-
-        return sb.toString();
     }
 
 }

@@ -33,8 +33,9 @@ import java.io.IOException;
 
 public class UTCTimeParser extends AbstractDateTimeParser {
 
-    public DateTime parse(String s) {
-        Context ctx = new Context(s);
+    @Override
+    public DateTime parse(String value) {
+        Context ctx = new Context(value);
 
         while (true) {
             try {
@@ -67,7 +68,7 @@ public class UTCTimeParser extends AbstractDateTimeParser {
                         break;
                     case ACCEPT:
                         if (ctx.available()) {
-                            throw new ASN1RuntimeException("Failed to parse: " + s);
+                            throw new ASN1RuntimeException("Failed to parse: %s", value);
                         }
 
                         DateTime dateTime = new DateTime(ctx.year, ctx.month, ctx.day, ctx.hour, ctx.minute, ctx.second);
@@ -82,9 +83,9 @@ public class UTCTimeParser extends AbstractDateTimeParser {
 
                         return dateTime;
                     case ERROR:
-                        throw new ASN1RuntimeException("Failed to parse: " + s);
+                        throw new ASN1RuntimeException("Failed to parse: %s", value);
                     default:
-                        throw new ASN1RuntimeException("Unimplemented state: " + ctx.getState());
+                        throw new ASN1RuntimeException("Unimplemented state: %s", ctx.getState());
                 }
             } catch (IOException e) {
                 throw new ASN1RuntimeException(e);
@@ -97,55 +98,8 @@ public class UTCTimeParser extends AbstractDateTimeParser {
     }
 
     protected Integer parseSecond(Context ctx) throws IOException {
-        return parseComponent(ctx, State.TIME_ZONE, 2, second ->
-                new LessEqualVerifiyer("second", 59).verify(second));
-    }
-
-    private String parseTimeZone(Context ctx) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        int chr = ctx.read();
-
-        ctx.setState(State.ACCEPT);
-
-        if (chr == 'Z') {
-            sb.append((char) chr);
-
-            return sb.toString();
-        }
-
-        if (chr != '+' && chr != '-') {
-            ctx.unread();
-
-            return null;
-        }
-
-        sb.append((char) chr);
-
-        ctx.mark();
-
-        String hour = parseDigits(ctx, 2);
-
-        if (hour == null) {
-            ctx.reset();
-
-            return null;
-        }
-
-        sb.append(hour);
-
-        ctx.mark();
-
-        String minute = parseDigits(ctx, 2);
-
-        if (minute == null) {
-            ctx.reset();
-
-            return sb.toString();
-        }
-
-        sb.append(minute);
-
-        return sb.toString();
+        return parseComponent(ctx, State.TIME_ZONE, 2, (c, second) ->
+                new LessEqualVerifiyer("second", 59).verify(c, second));
     }
 
 }
