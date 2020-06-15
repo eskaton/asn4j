@@ -27,11 +27,26 @@
 
 package ch.eskaton.asn4j.runtime.verifiers;
 
-public class ISO646Verifier implements StringVerifier {
+import ch.eskaton.asn4j.runtime.parsing.AbstractDateTimeParser;
 
-    @Override
-    public boolean isValidCharacter(int c) {
-        return c >= 32 && c <= 126;
+import java.util.Optional;
+
+public abstract class AbstractTimeStringVerifier implements StringVerifier {
+
+    private final AbstractDateTimeParser parser;
+
+    public AbstractTimeStringVerifier(AbstractDateTimeParser parser) {
+        this.parser = parser;
+    }
+
+    public Optional<String> verify(String value) {
+        var errors = StringVerifier.super.verify(value);
+
+        if (errors.isEmpty()) {
+            parser.parse(value);
+        }
+
+        return errors;
     }
 
 }
