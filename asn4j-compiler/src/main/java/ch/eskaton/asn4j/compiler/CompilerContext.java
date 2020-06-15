@@ -43,6 +43,7 @@ import ch.eskaton.asn4j.compiler.resolvers.ChoiceValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.CollectionOfValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.CollectionValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.GeneralizedTimeValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.NullValueResolver;
@@ -52,6 +53,7 @@ import ch.eskaton.asn4j.compiler.resolvers.OctetStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RealValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.UTCTimeValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.VisibleStringValueResolver;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
@@ -107,6 +109,7 @@ import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
+import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
@@ -120,6 +123,7 @@ import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.TimeValue;
+import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.TagId;
@@ -217,6 +221,8 @@ public class CompilerContext {
             .put(CollectionOfValue.class, new CollectionOfValueResolver(CompilerContext.this))
             .put(ChoiceValue.class, new ChoiceValueResolver(CompilerContext.this))
             .put(VisibleStringValue.class, new VisibleStringValueResolver(CompilerContext.this))
+            .put(UTCTimeValue.class, new UTCTimeValueResolver(CompilerContext.this))
+            .put(GeneralizedTimeValue.class, new GeneralizedTimeValueResolver(CompilerContext.this))
             .put(NumericStringValue.class, new NumericStringValueResolver(CompilerContext.this))
             .build();
 
@@ -451,9 +457,8 @@ public class CompilerContext {
             String typeName = type.getType();
 
             // Check for implicitly defined types
-            if (GeneralizedTime.class.getSimpleName().equals(typeName) ||
-                    UTCTime.class.getSimpleName().equals(typeName)) {
-                return new VisibleString(NO_POSITION);
+            if (type instanceof UsefulType) {
+                return type;
             }
 
             TypeAssignmentNode assignment = getTypeAssignment(typeName);
@@ -932,7 +937,7 @@ public class CompilerContext {
     }
 
     public Optional<CompiledType> getCompiledType(Type type, boolean isSubType) {
-        if (type instanceof TypeReference) {
+        if (isResolvableReference(type)) {
             String typeName = ((TypeReference) type).getType();
             HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
             Optional<CompiledType> compiledType = Optional.ofNullable(moduleTypes.get(typeName));
@@ -1028,9 +1033,13 @@ public class CompilerContext {
             compiledType = getCompiledType(type);
 
             type = compiledType.getType();
-        } while (type instanceof TypeReference);
+        } while (isResolvableReference(type));
 
         return compiledType;
+    }
+
+    private boolean isResolvableReference(Type type) {
+        return type instanceof TypeReference && !(type instanceof UsefulType);
     }
 
     /**

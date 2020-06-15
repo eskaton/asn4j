@@ -29,26 +29,15 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.asn4j.runtime.verifiers.GeneralizedTimeVerifier;
 import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
-import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
-import ch.eskaton.asn4j.runtime.verifiers.UTCTimeVerifier;
-import ch.eskaton.commons.collections.Maps;
 
 public class VisibleStringValueResolver extends AbstractStringValueResolver<VisibleStringValue> {
 
     public VisibleStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.VISIBLE_STRING, Maps.<Class<? extends Type>, StringVerifier>builder()
-                .put(VisibleString.class, new ISO646Verifier())
-                .put(UTCTime.class, new UTCTimeVerifier())
-                .put(GeneralizedTime.class, new GeneralizedTimeVerifier())
-                .build());
+        super(ctx, TypeName.VISIBLE_STRING, VisibleString.class, new ISO646Verifier());
     }
 
     @Override

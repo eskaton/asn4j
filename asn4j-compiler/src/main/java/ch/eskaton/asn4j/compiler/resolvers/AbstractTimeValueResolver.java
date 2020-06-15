@@ -25,45 +25,33 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-public enum TypeName {
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    UTC_TIME("UTCTime"),
-    GENERALIZED_TIME("GeneralizedTime"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE");
+public abstract class AbstractTimeValueResolver<T extends HasStringValue & Value>
+        extends AbstractStringValueResolver<T> {
 
-    private final String name;
-
-    TypeName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    public AbstractTimeValueResolver(CompilerContext ctx, TypeName typeName, Class<? extends Type> typeClass,
+            StringVerifier verifier) {
+        super(ctx, typeName, typeClass, verifier);
     }
 
     @Override
-    public String toString() {
-        return name;
+    protected T resolveCharacterStringList(Type resolvedType, Value value) {
+        var resolvedValue = super.resolveCharacterStringList(resolvedType, value);
+
+        if (resolvedValue != null) {
+            throw new CompilerException("Unsupported value for %s type: %s", getTypeName(), value);
+        }
+
+        return null;
     }
 
 }
