@@ -27,19 +27,11 @@
 
 package ch.eskaton.asn4j.runtime.verifiers;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
+public class NumericStringVerifier implements StringVerifier {
 
-public abstract class AbstractStringVerifier {
-
-    public Optional<String> verify(String value) {
-        return Optional.ofNullable(value.chars()
-                .filter(c -> !isValidCharacter(c))
-                .mapToObj(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+    @Override
+    public boolean isValidCharacter(int c) {
+        return c == 32 || c >= 48 && c <= 57;
     }
-
-    protected abstract boolean isValidCharacter(int c);
 
 }

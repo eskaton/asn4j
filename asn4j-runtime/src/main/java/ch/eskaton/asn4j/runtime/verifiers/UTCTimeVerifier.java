@@ -27,11 +27,17 @@
 
 package ch.eskaton.asn4j.runtime.verifiers;
 
-public class ISO646Verifier implements StringVerifier {
+import ch.eskaton.asn4j.runtime.parsing.UTCTimeParser;
+
+public class UTCTimeVerifier extends AbstractTimeStringVerifier {
+
+    public UTCTimeVerifier() {
+        super(new UTCTimeParser());
+    }
 
     @Override
     public boolean isValidCharacter(int c) {
-        return c >= 32 && c <= 126;
+        return c >= 48 && c <= 57 || c == '-' || c == '+' || c == 'Z';
     }
 
 }
