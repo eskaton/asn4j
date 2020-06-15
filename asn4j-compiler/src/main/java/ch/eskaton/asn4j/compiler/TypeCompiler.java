@@ -45,8 +45,6 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
-import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
-import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 
 public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
 

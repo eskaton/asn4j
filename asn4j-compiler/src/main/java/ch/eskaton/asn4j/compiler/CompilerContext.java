@@ -1177,7 +1177,7 @@ public class CompilerContext {
             // type references are not nested, but may not yet be compiled, so we force the compilation here
             var compiledType = getCompiledType(type);
 
-            if (compiledType != null && compiledType instanceof HasChildComponents) {
+            if (compiledType instanceof HasChildComponents) {
                 return Optional.of((T) compiledType);
             }
 

@@ -52,7 +52,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
     public AbstractCollectionCompiler(TypeName typeName,
             Function<CompilerContext, ComponentVerifier> componentVerifierSupplier) {
         this.typeName = typeName;
-        this.componentVerifierSuppliers = List.of(componentVerifierSupplier, (c) -> new NameUniquenessVerifier());
+        this.componentVerifierSuppliers = List.of(componentVerifierSupplier, c -> new NameUniquenessVerifier());
     }
 
     public CompiledType compile(CompilerContext ctx, String name, T node) {
