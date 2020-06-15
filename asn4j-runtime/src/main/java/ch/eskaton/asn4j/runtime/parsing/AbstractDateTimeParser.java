@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 
 import java.io.IOException;
 
-public class AbstractDateTimeParser {
+public abstract class AbstractDateTimeParser {
 
     public static final Integer ZERO = Integer.valueOf(0);
 
@@ -40,36 +40,39 @@ public class AbstractDateTimeParser {
         SECOND_FRACTION, TIME_ZONE, ACCEPT, ERROR
     }
 
+    public abstract DateTime parse(String value);
+
     protected Integer parseYear(Context ctx) throws IOException {
         return parseComponent(ctx, State.YEAR, 4, null);
     }
 
     protected Integer parseMonth(Context ctx) throws IOException {
-        return parseComponent(ctx, State.MONTH, 2, month ->
-                new LessEqualVerifiyer("month", 12).verify(month));
+        return parseComponent(ctx, State.MONTH, 2, (c, month) ->
+                new LessEqualVerifiyer("month", 12).verify(c, month));
     }
 
     protected Integer parseDay(Context ctx) throws IOException {
-        return parseComponent(ctx, State.DAY, 2, day ->
-                new LessEqualVerifiyer("day", 31).verify(day));
+        return parseComponent(ctx, State.DAY, 2, (c, day) ->
+                new LessEqualVerifiyer("day", 31).verify(c, day));
     }
 
     protected Integer parseHour(Context ctx) throws IOException {
-        return parseComponent(ctx, State.HOUR, 2, hour ->
-                new LessEqualVerifiyer("hour", 23).verify(hour));
+        return parseComponent(ctx, State.HOUR, 2, (c, hour) ->
+                new LessEqualVerifiyer("hour", 23).verify(c, hour));
     }
 
     protected Integer parseMinute(Context ctx) throws IOException {
-        return parseComponent(ctx, State.MINUTE, 2, minute ->
-                new LessEqualVerifiyer("minute", 59).verify(minute));
+        return parseComponent(ctx, State.MINUTE, 2, (c, minute) ->
+                new LessEqualVerifiyer("minute", 59).verify(c, minute));
     }
 
-    protected Integer parseComponent(Context ctx, State targetState, int length, Verifier<Integer> verifier) throws IOException {
+    protected Integer parseComponent(Context ctx, State targetState, int length, Verifier<Integer> verifier)
+            throws IOException {
         String component = parseDigits(ctx, length);
 
         if (component != null) {
             if (verifier != null) {
-                verifier.verify(Integer.valueOf(component));
+                verifier.verify(ctx, Integer.valueOf(component));
             }
 
             ctx.setState(targetState);
@@ -113,7 +116,63 @@ public class AbstractDateTimeParser {
         return -1;
     }
 
+    protected String parseTimeZone(Context ctx) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int chr = ctx.read();
+
+        ctx.setState(State.ACCEPT);
+
+        if (chr == 'Z') {
+            sb.append((char) chr);
+
+            return sb.toString();
+        }
+
+        if (chr != '+' && chr != '-') {
+            ctx.unread();
+
+            return null;
+        }
+
+        sb.append((char) chr);
+
+        ctx.mark();
+
+        String hour = parseDigits(ctx, 2);
+
+        if (hour == null) {
+            ctx.reset();
+
+            return null;
+        }
+
+        sb.append(hour);
+
+        ctx.mark();
+
+        String minute = parseDigits(ctx, 2);
+
+        if (minute == null) {
+            ctx.reset();
+
+            return sb.toString();
+        }
+
+        sb.append(minute);
+
+        int intMinute = Integer.parseInt(minute);
+
+        if (Integer.parseInt(hour) * 100 + intMinute > 1800 || intMinute > 59) {
+            throw new ASN1RuntimeException("Invalid offset: %s", sb.toString());
+        }
+
+
+        return sb.toString();
+    }
+
     protected static class Context {
+
+        private String value;
 
         private LexerInputStream is;
 
@@ -135,8 +194,13 @@ public class AbstractDateTimeParser {
 
         String timeZone;
 
-        public Context(String s) {
-            is = new LexerInputStream(s.toCharArray());
+        public Context(String value) {
+            this.value = value;
+            this.is = new LexerInputStream(value.toCharArray());
+        }
+
+        public String getValue() {
+            return value;
         }
 
         public State getState() {
@@ -171,7 +235,7 @@ public class AbstractDateTimeParser {
 
     protected interface Verifier<T> {
 
-        void verify(T value);
+        void verify(Context ctx, T value);
 
     }
 
@@ -187,9 +251,9 @@ public class AbstractDateTimeParser {
         }
 
         @Override
-        public void verify(Integer value) {
+        public void verify(Context ctx, Integer value) {
             if (value > threshold) {
-                throw new ASN1RuntimeException("Invalid " + valueName + ": " + value);
+                throw new ASN1RuntimeException("Invalid %s '%s' in value '%s'", valueName, value, ctx.getValue());
             }
         }
     }
