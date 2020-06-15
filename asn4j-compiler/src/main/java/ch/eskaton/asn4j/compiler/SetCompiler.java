@@ -38,7 +38,7 @@ import java.util.HashMap;
 public class SetCompiler extends AbstractCollectionCompiler<SetType> {
 
     public SetCompiler() {
-        super(TypeName.SET, (c) -> new TagUniquenessVerifier(c));
+        super(TypeName.SET, TagUniquenessVerifier::new);
     }
 
     private static class TagUniquenessVerifier implements ComponentVerifier {

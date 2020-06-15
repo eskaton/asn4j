@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 public class SequenceCompiler extends AbstractCollectionCompiler<SequenceType> {
 
     public SequenceCompiler() {
-        super(TypeName.SEQUENCE, (c) -> (name, component) -> {
+        super(TypeName.SEQUENCE, c -> (name, component) -> {
         });
     }
 

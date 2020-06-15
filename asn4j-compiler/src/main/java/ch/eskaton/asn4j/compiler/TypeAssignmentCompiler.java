@@ -39,9 +39,8 @@ public class TypeAssignmentCompiler implements Compiler<TypeAssignmentNode> {
         System.out.println("Compiling type " + typeName);
 
         TypeCompiler compiler = ctx.getCompiler(Type.class);
-        CompiledType compiledType = compiler.compile(ctx, typeName, node.getType());
 
-        return compiledType;
+        return compiler.compile(ctx, typeName, node.getType());
     }
 
 }
