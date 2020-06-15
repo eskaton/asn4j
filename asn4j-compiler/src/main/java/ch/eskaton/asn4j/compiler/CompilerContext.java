@@ -695,6 +695,10 @@ public class CompilerContext {
 
     public Node resolveTypeReference(Node type) {
         while (type instanceof TypeReference) {
+            if (type instanceof GeneralizedTime || type instanceof UTCTime) {
+                return type;
+            }
+
             TypeAssignmentNode assignment = getTypeAssignment(((TypeReference) type).getType());
 
             if (assignment != null) {

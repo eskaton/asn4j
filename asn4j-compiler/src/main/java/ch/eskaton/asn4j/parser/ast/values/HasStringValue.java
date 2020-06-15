@@ -27,21 +27,8 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-import ch.eskaton.asn4j.parser.Position;
+public interface HasStringValue {
 
-public class VisibleStringValue extends AbstractValue implements HasStringValue {
-
-    private String value;
-
-    public VisibleStringValue(Position position, String value) {
-        super(position);
-
-        this.value = value;
-    }
-
-    @Override
-    public String getValue() {
-        return value;
-    }
+    String getValue();
 
 }

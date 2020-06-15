@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class NumericStringValue extends AbstractValue {
+public class NumericStringValue extends AbstractValue implements HasStringValue {
 
     private String value;
 
@@ -39,6 +39,7 @@ public class NumericStringValue extends AbstractValue {
         this.value = value;
     }
 
+    @Override
     public String getValue() {
         return value;
     }

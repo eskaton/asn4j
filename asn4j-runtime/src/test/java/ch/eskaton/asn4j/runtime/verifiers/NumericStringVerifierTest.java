@@ -38,7 +38,7 @@ public class NumericStringVerifierTest {
 
     public static final String ALLOWED_CHARACTERS = " 0123456789";
 
-    public static final NumericStringVerfier verifier = new NumericStringVerfier();
+    public static final NumericStringVerifier verifier = new NumericStringVerifier();
 
     @Test
     void testValidCharacters() {

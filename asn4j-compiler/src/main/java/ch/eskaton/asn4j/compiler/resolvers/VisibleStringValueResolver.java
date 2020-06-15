@@ -28,45 +28,32 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.StringValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.types.UTCTime;
+import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.GeneralizedTimeVerifier;
 import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
+import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
+import ch.eskaton.asn4j.runtime.verifiers.UTCTimeVerifier;
+import ch.eskaton.commons.collections.Maps;
 
-public class VisibleStringValueResolver extends AbstractValueResolver<VisibleStringValue> {
-
-    public static final ISO646Verifier VERIFIER = new ISO646Verifier();
+public class VisibleStringValueResolver extends AbstractStringValueResolver<VisibleStringValue> {
 
     public VisibleStringValueResolver(CompilerContext ctx) {
-        super(ctx);
+        super(ctx, TypeName.VISIBLE_STRING, Maps.<Class<? extends Type>, StringVerifier>builder()
+                .put(VisibleString.class, new ISO646Verifier())
+                .put(UTCTime.class, new UTCTimeVerifier())
+                .put(GeneralizedTime.class, new GeneralizedTimeVerifier())
+                .build());
     }
 
     @Override
-    public VisibleStringValue resolveGeneric(Type type, Value value) {
-        if (value instanceof SimpleDefinedValue) {
-            value = ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
-        } else if (value instanceof AmbiguousValue) {
-            value = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
-        } else if (value instanceof StringValue) {
-            // value is already a string
-        } else {
-            throw new CompilerException("Failed to resolve a %s value", TypeName.VISIBLE_STRING);
-        }
-
-        var stringValue = (StringValue) value;
-        var cString = stringValue.getCString();
-
-        VERIFIER.verify(cString).ifPresent(v -> {
-            throw new CompilerException("%s contains invalid characters: %s", TypeName.VISIBLE_STRING, v);
-        });
-
-        return new VisibleStringValue(stringValue.getPosition(), cString);
+    protected VisibleStringValue createValue(Position position, String value) {
+        return new VisibleStringValue(position, value);
     }
 
 }

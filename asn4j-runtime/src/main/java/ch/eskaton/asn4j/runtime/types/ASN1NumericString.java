@@ -30,13 +30,12 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
-import ch.eskaton.asn4j.runtime.verifiers.NumericStringVerfier;
+import ch.eskaton.asn4j.runtime.verifiers.NumericStringVerifier;
 
 @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 18, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
 public class ASN1NumericString extends AbstractASN1String {
 
-    private static final NumericStringVerfier VERIFIER = new NumericStringVerfier();
+    private static final NumericStringVerifier VERIFIER = new NumericStringVerifier();
 
     public ASN1NumericString() {
         super();

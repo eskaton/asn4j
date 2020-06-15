@@ -28,45 +28,23 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.CompilerUtils;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.StringValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.asn4j.runtime.verifiers.NumericStringVerfier;
+import ch.eskaton.asn4j.runtime.verifiers.NumericStringVerifier;
 
-public class NumericStringValueResolver extends AbstractValueResolver<NumericStringValue> {
+import static java.util.Collections.singletonMap;
 
-    public static final NumericStringVerfier VERFIER = new NumericStringVerfier();
+public class NumericStringValueResolver extends AbstractStringValueResolver<NumericStringValue> {
 
     public NumericStringValueResolver(CompilerContext ctx) {
-        super(ctx);
+        super(ctx, TypeName.NUMERIC_STRING, singletonMap(NumericString.class, new NumericStringVerifier()));
     }
 
     @Override
-    public NumericStringValue resolveGeneric(Type type, Value value) {
-        if (value instanceof SimpleDefinedValue) {
-            value = ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
-        } else if (value instanceof AmbiguousValue) {
-            value = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
-        } else if (value instanceof StringValue) {
-            // value is already a string
-        } else {
-            throw new CompilerException("Failed to resolve a %s value", TypeName.NUMERIC_STRING);
-        }
-
-        var stringValue = (StringValue) value;
-        var cString = stringValue.getCString();
-
-        VERFIER.verify(cString).ifPresent(v -> {
-            throw new CompilerException("%s contains invalid characters: %s", TypeName.NUMERIC_STRING, v);
-        });
-
-        return new NumericStringValue(stringValue.getPosition(), cString);
+    protected NumericStringValue createValue(Position position, String value) {
+        return new NumericStringValue(position, value);
     }
 
 }
