@@ -25,48 +25,34 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.runtime.verifiers;
 
-public enum TypeName {
+import org.junit.jupiter.api.Test;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    PRINTABLE_STRING("PrintableString"),
-    IA5_STRING("IA5String"),
-    GRAPHIC_STRING("GraphicString"),
-    UTC_TIME("UTCTime"),
-    GENERALIZED_TIME("GeneralizedTime"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE");
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-    private final String name;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
-    TypeName(String name) {
-        this.name = name;
+public class GraphicStringVerifierTest {
+
+    public static final IA5StringVerifier verifier = new IA5StringVerifier();
+
+    @Test
+    void testValidCharacters() {
+        var allowedCharacters = IntStream.range(32, 127).boxed()
+                .map(i -> (char) i.intValue())
+                .map(String::valueOf)
+                .collect(Collectors.joining());
+
+        assertThat(Optional.empty(), equalTo(verifier.verify(allowedCharacters)));
     }
 
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
+    @Test
+    void testInvalidCharacters() {
+        assertThat(Optional.of("öüäé"), equalTo(verifier.verify("aböüäé;\n12")));
     }
 
 }

@@ -303,4 +303,11 @@ TestSequenceDefaults21 ::= SEQUENCE {
     b TestIA5String1 DEFAULT "5678"
 }
 
+TestGraphicString1 ::= GraphicString
+
+TestSequenceDefaults22 ::= SEQUENCE {
+    a GraphicString DEFAULT "abCD",
+    b TestGraphicString1 DEFAULT "5678"
+}
+
 END

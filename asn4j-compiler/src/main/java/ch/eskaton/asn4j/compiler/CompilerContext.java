@@ -44,6 +44,7 @@ import ch.eskaton.asn4j.compiler.resolvers.CollectionOfValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.CollectionValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.GeneralizedTimeValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.GraphicStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IA5StringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
@@ -82,6 +83,7 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
+import ch.eskaton.asn4j.parser.ast.types.GraphicString;
 import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
@@ -114,6 +116,7 @@ import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
+import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
@@ -140,6 +143,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
+import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
 import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
@@ -206,6 +210,7 @@ public class CompilerContext {
             .put(NumericString.class, new NumericStringCompiler())
             .put(PrintableString.class, new PrintableStringCompiler())
             .put(IA5String.class, new IA5StringCompiler())
+            .put(GraphicString.class, new GraphicStringCompiler())
             .put(SelectionType.class, new SelectionTypeCompiler())
             .put(ObjectIdentifier.class, new ObjectIdentifierCompiler())
             .put(RelativeOID.class, new RelativeOIDCompiler())
@@ -236,6 +241,7 @@ public class CompilerContext {
             .put(NumericStringValue.class, new NumericStringValueResolver(CompilerContext.this))
             .put(PrintableStringValue.class, new PrintableStringValueResolver(CompilerContext.this))
             .put(IA5StringValue.class, new IA5StringValueResolver(CompilerContext.this))
+            .put(GraphicStringValue.class, new GraphicStringValueResolver(CompilerContext.this))
             .build();
 
     @SuppressWarnings("serial")
@@ -250,6 +256,7 @@ public class CompilerContext {
             .add(NumericString.class.getSimpleName())
             .add(PrintableString.class.getSimpleName())
             .add(IA5String.class.getSimpleName())
+            .add(GraphicString.class.getSimpleName())
             .build();
 
     @SuppressWarnings("serial")
@@ -530,6 +537,8 @@ public class CompilerContext {
             typeName = ASN1PrintableString.class.getSimpleName();
         } else if (type instanceof IA5String) {
             typeName = ASN1IA5String.class.getSimpleName();
+        } else if (type instanceof GraphicString) {
+            typeName = ASN1GraphicString.class.getSimpleName();
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof EnumeratedType) {
