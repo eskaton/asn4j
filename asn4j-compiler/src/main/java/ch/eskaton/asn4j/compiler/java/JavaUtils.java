@@ -42,6 +42,7 @@ import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
+import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
 import ch.eskaton.asn4j.parser.ast.values.HexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
@@ -103,6 +104,7 @@ public class JavaUtils {
         addCase(dispatcher, NumericStringValue.class, JavaUtils::getNumericStringInitializerString);
         addCase(dispatcher, PrintableStringValue.class, JavaUtils::getPrintableStringInitializerString);
         addCase(dispatcher, IA5StringValue.class, JavaUtils::getIA5StringInitializerString);
+        addCase(dispatcher, GraphicStringValue.class, JavaUtils::getGraphicStringInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
     }
@@ -261,6 +263,11 @@ public class JavaUtils {
 
     private static String getIA5StringInitializerString(CompilerContext ctx, String typeName,
             IA5StringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getGraphicStringInitializerString(CompilerContext ctx, String typeName,
+            GraphicStringValue value) {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 

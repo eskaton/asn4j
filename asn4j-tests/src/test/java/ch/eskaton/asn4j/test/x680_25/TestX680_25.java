@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.test.x680_25;
 
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
+import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
 import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
@@ -46,6 +47,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestBoolean;
 import ch.eskaton.asn4j.test.modules.x680_25.TestChoice1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestEnumeration;
 import ch.eskaton.asn4j.test.modules.x680_25.TestGeneralizedTime1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestGraphicString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestIA5String1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestNull1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestNumericString1;
@@ -77,6 +79,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults19;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults20;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults21;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults22;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults5;
@@ -472,6 +475,15 @@ class TestX680_25 {
         assertDecodableVerifyAfter(TestSequenceDefaults21.class, value -> {
             assertEquals(new ASN1IA5String("abCD\"\'\\\n"), value.getA());
             assertEquals(new TestIA5String1("5678"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for GraphicString")
+    void testSequenceDefaults22() {
+        assertDecodableVerifyAfter(TestSequenceDefaults22.class, value -> {
+            assertEquals(new ASN1GraphicString("abCD"), value.getA());
+            assertEquals(new TestGraphicString1("5678"), value.getB());
         });
     }
 

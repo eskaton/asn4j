@@ -27,46 +27,36 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-public enum TypeName {
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.verifiers.GraphicStringVerifier;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    PRINTABLE_STRING("PrintableString"),
-    IA5_STRING("IA5String"),
-    GRAPHIC_STRING("GraphicString"),
-    UTC_TIME("UTCTime"),
-    GENERALIZED_TIME("GeneralizedTime"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE");
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 25, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+public class ASN1GraphicString extends AbstractASN1String {
 
-    private final String name;
+    private static final GraphicStringVerifier VERIFIER = new GraphicStringVerifier();
 
-    TypeName(String name) {
-        this.name = name;
+    public ASN1GraphicString() {
+        super();
     }
 
-    public String getName() {
-        return name;
+    public ASN1GraphicString(String value) {
+        super(value);
+
+        verifyString(value);
     }
 
-    @Override
-    public String toString() {
-        return name;
+    public void setValue(String value) {
+        verifyString(value);
+
+        super.setValue(value);
+    }
+
+    private void verifyString(String value) {
+        VERIFIER.verify(value).ifPresent(v -> {
+            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
+        });
     }
 
 }

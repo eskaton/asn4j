@@ -25,48 +25,25 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-public enum TypeName {
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.GraphicString;
+import ch.eskaton.asn4j.parser.ast.types.IA5String;
+import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.GraphicStringVerifier;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    PRINTABLE_STRING("PrintableString"),
-    IA5_STRING("IA5String"),
-    GRAPHIC_STRING("GraphicString"),
-    UTC_TIME("UTCTime"),
-    GENERALIZED_TIME("GeneralizedTime"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE");
+public class GraphicStringValueResolver extends AbstractStringValueResolver<GraphicStringValue> {
 
-    private final String name;
-
-    TypeName(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
+    public GraphicStringValueResolver(CompilerContext ctx) {
+        super(ctx, TypeName.GRAPHIC_STRING, GraphicString.class, new GraphicStringVerifier());
     }
 
     @Override
-    public String toString() {
-        return name;
+    protected GraphicStringValue createValue(Position position, String value) {
+        return new GraphicStringValue(position, value);
     }
 
 }

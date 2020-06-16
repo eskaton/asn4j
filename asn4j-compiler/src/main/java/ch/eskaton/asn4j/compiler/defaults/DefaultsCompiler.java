@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
+import ch.eskaton.asn4j.parser.ast.types.GraphicString;
 import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
@@ -60,6 +61,7 @@ import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
+import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
@@ -105,6 +107,7 @@ public class DefaultsCompiler {
                     .put(NumericString.class, new DefaultCompilerImpl(NumericStringValue.class))
                     .put(PrintableString.class, new DefaultCompilerImpl(PrintableStringValue.class))
                     .put(IA5String.class, new DefaultCompilerImpl(IA5StringValue.class))
+                    .put(GraphicString.class, new DefaultCompilerImpl(GraphicStringValue.class))
                     .build();
 
     private CompilerContext ctx;
