@@ -37,7 +37,7 @@ public class UTCTimeVerifier extends AbstractTimeStringVerifier {
 
     @Override
     public boolean isValidCharacter(int c) {
-        return c >= 48 && c <= 57 || c == '-' || c == '+' || c == 'Z';
+        return c >= '0' && c <= '9' || c == '-' || c == '+' || c == 'Z';
     }
 
 }

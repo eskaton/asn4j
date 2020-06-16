@@ -27,11 +27,27 @@
 
 package ch.eskaton.asn4j.runtime.verifiers;
 
-public class NumericStringVerifier implements StringVerifier {
+import org.junit.jupiter.api.Test;
 
-    @Override
-    public boolean isValidCharacter(int c) {
-        return c == ' ' || c >= '0' && c <= '9';
+import java.util.Optional;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+public class PrintableStringVerifierTest {
+
+    public static final String ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 \'()+,-./:=?";
+
+    public static final PrintableStringVerifier verifier = new PrintableStringVerifier();
+
+    @Test
+    void testValidCharacters() {
+        assertThat(Optional.empty(), equalTo(verifier.verify(ALLOWED_CHARACTERS)));
+    }
+
+    @Test
+    void testInvalidCharacters() {
+        assertThat(Optional.of("öüäé;"), equalTo(verifier.verify("aböüäé;12")));
     }
 
 }

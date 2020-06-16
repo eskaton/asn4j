@@ -27,11 +27,32 @@
 
 package ch.eskaton.asn4j.runtime.verifiers;
 
-public class NumericStringVerifier implements StringVerifier {
+import org.junit.jupiter.api.Test;
 
-    @Override
-    public boolean isValidCharacter(int c) {
-        return c == ' ' || c >= '0' && c <= '9';
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
+public class IA5StringVerifierTest {
+
+    public static final IA5StringVerifier verifier = new IA5StringVerifier();
+
+    @Test
+    void testValidCharacters() {
+        var allowedCharacters = IntStream.range(0, 128).boxed()
+                .map(i -> (char) i.intValue())
+                .map(String::valueOf)
+                .collect(Collectors.joining());
+
+        assertThat(Optional.empty(), equalTo(verifier.verify(allowedCharacters)));
+    }
+
+    @Test
+    void testInvalidCharacters() {
+        assertThat(Optional.of("öüäé"), equalTo(verifier.verify("aböüäé;\n12")));
     }
 
 }

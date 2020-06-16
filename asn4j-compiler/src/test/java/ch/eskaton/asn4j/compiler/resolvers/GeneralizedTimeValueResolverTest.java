@@ -38,6 +38,7 @@ import java.io.IOException;
 import static ch.eskaton.asn4j.compiler.resolvers.ResolverTestUtils.resolveValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -127,6 +128,28 @@ public class GeneralizedTimeValueResolverTest {
                 """;
 
         assertThrows(CompilerException.class, () -> resolveValue(body, GeneralizedTimeValue.class, "testGeneralizedTime1"));
+    }
+
+    @Test
+    void testResolveInvalidTupleValue() {
+        var body = """
+                testGeneralizedTime1 GeneralizedTime ::= {1, 1}
+                """;
+        var exception = assertThrows(CompilerException.class,
+                () -> resolveValue(body, GeneralizedTimeValue.class, "testGeneralizedTime1"));
+
+        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type GeneralizedTime.*"));
+    }
+
+    @Test
+    void testResolveInvalidQuadrupleValue() {
+        var body = """
+                testGeneralizedTime1 GeneralizedTime ::= {1, 1, 1, 1}
+                """;
+        var exception = assertThrows(CompilerException.class,
+                () -> resolveValue(body, GeneralizedTimeValue.class, "testGeneralizedTime1"));
+
+        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type GeneralizedTime.*"));
     }
 
 }

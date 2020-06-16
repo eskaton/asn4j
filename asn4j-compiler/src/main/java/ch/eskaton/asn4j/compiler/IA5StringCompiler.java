@@ -25,13 +25,10 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.compiler;
 
-public class NumericStringVerifier implements StringVerifier {
+import ch.eskaton.asn4j.parser.ast.types.IA5String;
 
-    @Override
-    public boolean isValidCharacter(int c) {
-        return c == ' ' || c >= '0' && c <= '9';
-    }
+public class IA5StringCompiler extends BuiltinTypeCompiler<IA5String> {
 
 }

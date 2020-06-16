@@ -25,13 +25,30 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-public class NumericStringVerifier implements StringVerifier {
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.TupleNode;
+import ch.eskaton.asn4j.parser.ast.types.IA5String;
+import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.IA5StringVerifier;
+
+public class IA5StringValueResolver extends AbstractStringValueResolver<IA5StringValue> {
+
+    public IA5StringValueResolver(CompilerContext ctx) {
+        super(ctx, TypeName.IA5_STRING, IA5String.class, new IA5StringVerifier());
+    }
 
     @Override
-    public boolean isValidCharacter(int c) {
-        return c == ' ' || c >= '0' && c <= '9';
+    protected IA5StringValue createValue(Position position, String value) {
+        return new IA5StringValue(position, value);
+    }
+
+    @Override
+    protected IA5StringValue resolveTupleValue(TupleNode tuple) {
+        return createValue(tuple.getPosition(), Character.toString(tuple.getRow() + tuple.getColumn() * 16));
     }
 
 }

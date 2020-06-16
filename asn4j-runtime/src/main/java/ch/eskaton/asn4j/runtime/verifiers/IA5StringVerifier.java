@@ -27,11 +27,11 @@
 
 package ch.eskaton.asn4j.runtime.verifiers;
 
-public class NumericStringVerifier implements StringVerifier {
+public class IA5StringVerifier implements StringVerifier {
 
     @Override
     public boolean isValidCharacter(int c) {
-        return c == ' ' || c >= '0' && c <= '9';
+        return c >= 0 && c <= 127;
     }
 
 }
