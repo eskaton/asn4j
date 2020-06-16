@@ -29,7 +29,8 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ParserException;
-import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
+import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
+import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -41,83 +42,83 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class VisibleStringValueResolverTest {
+public class PrintableStringValueResolverTest {
 
     @Test
     void testResolveCStringValue() throws IOException, ParserException {
         var body = """
-                testVisibleString1 VisibleString ::= "test"
+                testPrintableString1 PrintableString ::= "abc"
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString1");
+        var value = resolveValue(body, PrintableStringValue.class, "testPrintableString1");
 
         assertNotNull(value);
-        assertThat(value.getValue(), equalTo("test"));
+        assertThat(value.getValue(), equalTo("abc"));
     }
 
     @Test
     void testResolveInvalidCStringValue() {
         var body = """
-                testVisibleString1 VisibleString ::= "öäü"
+                testPrintableString1 PrintableString ::= "äöü"
                 """;
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, PrintableStringValue.class, "testPrintableString1"));
     }
 
     @Test
     void testResolveReference() throws IOException, ParserException {
         var body = """
-                testVisibleString1 VisibleString ::= "test"
-                testVisibleString2 VisibleString ::= testVisibleString1
+                testPrintableString1 PrintableString ::= "abc"
+                testPrintableString2 PrintableString ::= testPrintableString1
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString2");
+        var value = resolveValue(body, PrintableStringValue.class, "testPrintableString2");
 
         assertNotNull(value);
-        assertThat(value.getValue(), equalTo("test"));
+        assertThat(value.getValue(), equalTo("abc"));
     }
 
     @Test
     void testResolveCStringValueWithTypeReference() throws IOException, ParserException {
         var body = """
-                TestVisibleString1 ::= VisibleString
-                TestVisibleString2 ::= TestVisibleString1
-                testVisibleString1 TestVisibleString2 ::= "test"
+                TestPrintableString1 ::= PrintableString
+                TestPrintableString2 ::= TestPrintableString1
+                testPrintableString1 TestPrintableString2 ::= "abc"
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString1");
+        var value = resolveValue(body, PrintableStringValue.class, "testPrintableString1");
 
         assertNotNull(value);
-        assertThat(value.getValue(), equalTo("test"));
+        assertThat(value.getValue(), equalTo("abc"));
     }
 
     @Test
     void testResolveReferenceWithTypeReference() throws IOException, ParserException {
         var body = """
-                TestVisibleString1 ::= VisibleString
-                TestVisibleString2 ::= TestVisibleString1
-                testVisibleString1 TestVisibleString2 ::= "test"
-                testVisibleString2 VisibleString ::= testVisibleString1
+                TestPrintableString1 ::= PrintableString
+                TestPrintableString2 ::= TestPrintableString1
+                testPrintableString1 TestPrintableString2 ::= "abc"
+                testPrintableString2 PrintableString ::= testPrintableString1
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString2");
+        var value = resolveValue(body, PrintableStringValue.class, "testPrintableString2");
 
         assertNotNull(value);
-        assertThat(value.getValue(), equalTo("test"));
+        assertThat(value.getValue(), equalTo("abc"));
     }
 
     @Test
     void testResolveReferenceWithInvalidTypeReference() {
         var body = """
-                TestVisibleString1 ::= NumericString
-                testVisibleString1 TestVisibleString1 ::= "test"
-                testVisibleString2 VisibleString ::= testVisibleString1
+                TestPrintableString1 ::= VisibleString
+                testPrintableString1 TestPrintableString1 ::= "abc"
+                testPrintableString2 PrintableString ::= testPrintableString1
                 """;
 
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString2"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, PrintableStringValue.class, "testPrintableString2"));
     }
 
     @Test
     void testResolveCharacterStringList() throws IOException, ParserException {
         var body = """
-                testVisibleString1 VisibleString ::= {"abc", "def"}
+                testPrintableString1 PrintableString ::= {"abc", "def"}
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString1");
+        var value = resolveValue(body, PrintableStringValue.class, "testPrintableString1");
 
         assertNotNull(value);
         assertThat(value.getValue(), equalTo("abcdef"));
@@ -126,62 +127,62 @@ public class VisibleStringValueResolverTest {
     @Test
     void testResolveInvalidCharacterStringList() {
         var body = """
-                testVisibleString1 VisibleString ::= {"abc", "öäü"}
+                testPrintableString1 PrintableString ::= {"abc", "äöü"}
                 """;
 
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, PrintableStringValue.class, "testPrintableString1"));
     }
 
     @Test
     void testResolveCharacterStringListWithReference() throws IOException, ParserException {
         var body = """
-                testVisibleString1 VisibleString ::= "abc"
-                testVisibleString2 VisibleString ::= {testVisibleString1, "def"}
-                testVisibleString3 VisibleString ::= {testVisibleString2, "ghi"}
+                testPrintableString1 PrintableString ::= "123"
+                testPrintableString2 PrintableString ::= {testPrintableString1, "456"}
+                testPrintableString3 PrintableString ::= {testPrintableString2, "789"}
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString3");
+        var value = resolveValue(body, PrintableStringValue.class, "testPrintableString3");
 
         assertNotNull(value);
-        assertThat(value.getValue(), equalTo("abcdefghi"));
+        assertThat(value.getValue(), equalTo("123456789"));
     }
 
     @Test
     void testResolveCharacterStringListWithMissingReference() {
         var body = """
-                testVisibleString2 VisibleString ::= {testVisibleString1, "def"}
+                testPrintableString2 PrintableString ::= {testPrintableString1, "123"}
                 """;
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString2"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, PrintableStringValue.class, "testPrintableString2"));
     }
 
     @Test
     void testResolveCharacterStringListWithInvalidReference() {
         var body = """
-                testNumericString1 NumericString ::= "123"
-                testVisibleString2 VisibleString ::= {testNumericString1, "def"}
+                testPrintableString1 VisibleString ::= "123"
+                testPrintableString2 PrintableString ::= {testPrintableString1, "456"}
                 """;
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString2"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, PrintableStringValue.class, "testPrintableString2"));
     }
 
     @Test
     void testResolveInvalidTupleValue() {
         var body = """
-                testVisibleString1 VisibleString ::= {1, 1}
+                testPrintableString1 PrintableString ::= {1, 1}
                 """;
         var exception = assertThrows(CompilerException.class,
-                () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
+                () -> resolveValue(body, PrintableStringValue.class, "testPrintableString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type VisibleString.*"));
+        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type PrintableString.*"));
     }
 
     @Test
     void testResolveInvalidQuadrupleValue() {
         var body = """
-                testVisibleString1 VisibleString ::= {1, 1, 1, 1}
+                testPrintableString1 PrintableString ::= {1, 1, 1, 1}
                 """;
         var exception = assertThrows(CompilerException.class,
-                () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
+                () -> resolveValue(body, PrintableStringValue.class, "testPrintableString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type VisibleString.*"));
+        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type PrintableString.*"));
     }
 
 }

@@ -43,6 +43,7 @@ import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.HexStringValue;
+import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedValue;
@@ -50,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
+import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RealValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
@@ -99,6 +101,8 @@ public class JavaUtils {
         addCase(dispatcher, UTCTimeValue.class, JavaUtils::getUTCTimeInitializerString);
         addCase(dispatcher, GeneralizedTimeValue.class, JavaUtils::getGeneralizedTimeInitializerString);
         addCase(dispatcher, NumericStringValue.class, JavaUtils::getNumericStringInitializerString);
+        addCase(dispatcher, PrintableStringValue.class, JavaUtils::getPrintableStringInitializerString);
+        addCase(dispatcher, IA5StringValue.class, JavaUtils::getIA5StringInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
     }
@@ -250,6 +254,16 @@ public class JavaUtils {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 
+    private static String getPrintableStringInitializerString(CompilerContext ctx, String typeName,
+            PrintableStringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getIA5StringInitializerString(CompilerContext ctx, String typeName,
+            IA5StringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
     private static String getUTCTimeInitializerString(CompilerContext ctx, String typeName,
             UTCTimeValue value) {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
@@ -262,7 +276,33 @@ public class JavaUtils {
 
     private static String getGenericStringInitializerString(CompilerContext ctx, String typeName,
             String value) {
-        return String.format("new %s(\"%s\")", typeName, value);
+        var escaped = value.chars().boxed().map(JavaUtils::escapeCharacter).collect(Collectors.joining());
+
+        return String.format("new %s(\"%s\")", typeName, escaped);
+    }
+
+    private static String escapeCharacter(Integer chr) {
+        if (Character.isISOControl(chr)) {
+            return escapeControl(chr);
+        }
+
+        return switch (chr.intValue()) {
+            case '\'' -> "\\\'";
+            case '\"' -> "\\\"";
+            case '\\' -> "\\\\";
+            default -> String.valueOf(Character.valueOf((char) chr.intValue()));
+        };
+    }
+
+    private static String escapeControl(Integer chr) {
+        return switch (chr.intValue()) {
+            case '\t' -> "\\t";
+            case '\b' -> "\\b";
+            case '\n' -> "\\n";
+            case '\r' -> "\\r";
+            case '\f' -> "\\f";
+            default -> String.format("\0%02d", Integer.toOctalString(chr));
+        };
     }
 
 }

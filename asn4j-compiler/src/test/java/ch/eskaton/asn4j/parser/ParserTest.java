@@ -1445,7 +1445,7 @@ class ParserTest {
 
         result = parser.parse();
 
-        testAmbiguousValue(result, CollectionOfValue.class);
+        assertTrue(result instanceof CollectionOfValue);
 
         parser = new Parser(new ByteArrayInputStream(
                 "\"P0Y29M0DT0H0.00M\"".getBytes())).new BuiltinOrReferencedValueParser();

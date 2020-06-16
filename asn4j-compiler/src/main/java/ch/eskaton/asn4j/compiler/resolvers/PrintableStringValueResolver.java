@@ -25,13 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-public class NumericStringVerifier implements StringVerifier {
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.PrintableString;
+import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.PrintableStringVerifier;
+
+public class PrintableStringValueResolver extends AbstractStringValueResolver<PrintableStringValue> {
+
+    public PrintableStringValueResolver(CompilerContext ctx) {
+        super(ctx, TypeName.PRINTABLE_STRING, PrintableString.class, new PrintableStringVerifier());
+    }
 
     @Override
-    public boolean isValidCharacter(int c) {
-        return c == ' ' || c >= '0' && c <= '9';
+    protected PrintableStringValue createValue(Position position, String value) {
+        return new PrintableStringValue(position, value);
     }
 
 }

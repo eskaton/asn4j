@@ -25,13 +25,38 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.runtime.types;
 
-public class NumericStringVerifier implements StringVerifier {
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.verifiers.IA5StringVerifier;
 
-    @Override
-    public boolean isValidCharacter(int c) {
-        return c == ' ' || c >= '0' && c <= '9';
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 22, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+public class ASN1IA5String extends AbstractASN1String {
+
+    private static final IA5StringVerifier VERIFIER = new IA5StringVerifier();
+
+    public ASN1IA5String() {
+        super();
+    }
+
+    public ASN1IA5String(String value) {
+        super(value);
+
+        verifyString(value);
+    }
+
+    public void setValue(String value) {
+        verifyString(value);
+
+        super.setValue(value);
+    }
+
+    private void verifyString(String value) {
+        VERIFIER.verify(value).ifPresent(v -> {
+            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
+        });
     }
 
 }

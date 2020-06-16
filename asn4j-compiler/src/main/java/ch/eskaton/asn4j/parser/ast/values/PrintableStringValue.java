@@ -25,13 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.parser.ast.values;
 
-public class NumericStringVerifier implements StringVerifier {
+import ch.eskaton.asn4j.parser.Position;
+
+public class PrintableStringValue extends AbstractValue implements HasStringValue {
+
+    private String value;
+
+    public PrintableStringValue(Position position, String value) {
+        super(position);
+
+        this.value = value;
+    }
 
     @Override
-    public boolean isValidCharacter(int c) {
-        return c == ' ' || c >= '0' && c <= '9';
+    public String getValue() {
+        return value;
     }
 
 }

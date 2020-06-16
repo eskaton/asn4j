@@ -226,9 +226,6 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.ValueFromObject;
 import ch.eskaton.asn4j.runtime.TaggingMode;
-import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
-import ch.eskaton.asn4j.runtime.types.ASN1ObjectDescriptor;
-import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -2708,14 +2705,6 @@ public class Parser {
 
                     return string;
                 } else {
-                    if (p() instanceof CollectionOfValue) {
-                        if (((CollectionOfValue) p()).isTuple() || ((CollectionOfValue) p()).isQuadruple()) {
-                            return (Value) p();
-                        }
-
-                        return null;
-                    }
-
                     return (Value) p();
                 }
             }
@@ -2771,14 +2760,6 @@ public class Parser {
 
                     return string;
                 } else if (p() instanceof Value) {
-                    if (p() instanceof CollectionOfValue) {
-                        if (((CollectionOfValue) p()).isTuple() || ((CollectionOfValue) p()).isQuadruple()) {
-                            return (Value) p();
-                        }
-
-                        return null;
-                    }
-
                     return (Value) p();
                 }
             }

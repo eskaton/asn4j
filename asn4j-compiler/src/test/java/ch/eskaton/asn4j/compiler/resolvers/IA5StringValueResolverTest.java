@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ParserException;
-import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
+import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -41,14 +41,14 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class VisibleStringValueResolverTest {
+public class IA5StringValueResolverTest {
 
     @Test
     void testResolveCStringValue() throws IOException, ParserException {
         var body = """
-                testVisibleString1 VisibleString ::= "test"
+                testIA5String1 IA5String ::= "test"
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString1");
+        var value = resolveValue(body, IA5StringValue.class, "testIA5String1");
 
         assertNotNull(value);
         assertThat(value.getValue(), equalTo("test"));
@@ -57,31 +57,64 @@ public class VisibleStringValueResolverTest {
     @Test
     void testResolveInvalidCStringValue() {
         var body = """
-                testVisibleString1 VisibleString ::= "öäü"
+                testIA5String1 IA5String ::= "öäü"
                 """;
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, IA5StringValue.class, "testIA5String1"));
     }
 
     @Test
     void testResolveReference() throws IOException, ParserException {
         var body = """
-                testVisibleString1 VisibleString ::= "test"
-                testVisibleString2 VisibleString ::= testVisibleString1
+                testIA5String1 IA5String ::= "test"
+                testIA5String2 IA5String ::= testIA5String1
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString2");
+        var value = resolveValue(body, IA5StringValue.class, "testIA5String2");
 
         assertNotNull(value);
         assertThat(value.getValue(), equalTo("test"));
     }
 
     @Test
+    void testResolveTupleValue() throws IOException, ParserException {
+        var body = """
+                testIA5String1 IA5String ::= {0, 10}
+                """;
+        var value = resolveValue(body, IA5StringValue.class, "testIA5String1");
+
+        assertNotNull(value);
+        assertThat(value.getValue(), equalTo("\n"));
+    }
+
+    @Test
+    void testResolveInvalidTupleValue() {
+        var body = """
+                testIA5String1 IA5String ::= {10, 10}
+                """;
+        var exception = assertThrows(CompilerException.class,
+                () -> resolveValue(body, IA5StringValue.class, "testIA5String1"));
+
+        assertThat(exception.getMessage(), matchesPattern("Invalid tuple.*"));
+    }
+
+    @Test
+    void testResolveInvalidQuadrupleValue() {
+        var body = """
+                testIA5String1 IA5String ::= {1, 1, 1, 1}
+                """;
+        var exception = assertThrows(CompilerException.class,
+                () -> resolveValue(body, IA5StringValue.class, "testIA5String1"));
+
+        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type IA5String.*"));
+    }
+
+    @Test
     void testResolveCStringValueWithTypeReference() throws IOException, ParserException {
         var body = """
-                TestVisibleString1 ::= VisibleString
-                TestVisibleString2 ::= TestVisibleString1
-                testVisibleString1 TestVisibleString2 ::= "test"
+                TestIA5String1 ::= IA5String
+                TestIA5String2 ::= TestIA5String1
+                testIA5String1 TestIA5String2 ::= "test"
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString1");
+        var value = resolveValue(body, IA5StringValue.class, "testIA5String1");
 
         assertNotNull(value);
         assertThat(value.getValue(), equalTo("test"));
@@ -90,12 +123,12 @@ public class VisibleStringValueResolverTest {
     @Test
     void testResolveReferenceWithTypeReference() throws IOException, ParserException {
         var body = """
-                TestVisibleString1 ::= VisibleString
-                TestVisibleString2 ::= TestVisibleString1
-                testVisibleString1 TestVisibleString2 ::= "test"
-                testVisibleString2 VisibleString ::= testVisibleString1
+                TestIA5String1 ::= IA5String
+                TestIA5String2 ::= TestIA5String1
+                testIA5String1 TestIA5String2 ::= "test"
+                testIA5String2 IA5String ::= testIA5String1
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString2");
+        var value = resolveValue(body, IA5StringValue.class, "testIA5String2");
 
         assertNotNull(value);
         assertThat(value.getValue(), equalTo("test"));
@@ -104,20 +137,20 @@ public class VisibleStringValueResolverTest {
     @Test
     void testResolveReferenceWithInvalidTypeReference() {
         var body = """
-                TestVisibleString1 ::= NumericString
-                testVisibleString1 TestVisibleString1 ::= "test"
-                testVisibleString2 VisibleString ::= testVisibleString1
+                TestIA5String1 ::= NumericString
+                testIA5String1 TestIA5String1 ::= "test"
+                testIA5String2 IA5String ::= testIA5String1
                 """;
 
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString2"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, IA5StringValue.class, "testIA5String2"));
     }
 
     @Test
     void testResolveCharacterStringList() throws IOException, ParserException {
         var body = """
-                testVisibleString1 VisibleString ::= {"abc", "def"}
+                testIA5String1 IA5String ::= {"abc", "def"}
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString1");
+        var value = resolveValue(body, IA5StringValue.class, "testIA5String1");
 
         assertNotNull(value);
         assertThat(value.getValue(), equalTo("abcdef"));
@@ -126,20 +159,20 @@ public class VisibleStringValueResolverTest {
     @Test
     void testResolveInvalidCharacterStringList() {
         var body = """
-                testVisibleString1 VisibleString ::= {"abc", "öäü"}
+                testIA5String1 IA5String ::= {"abc", "öäü"}
                 """;
 
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, IA5StringValue.class, "testIA5String1"));
     }
 
     @Test
     void testResolveCharacterStringListWithReference() throws IOException, ParserException {
         var body = """
-                testVisibleString1 VisibleString ::= "abc"
-                testVisibleString2 VisibleString ::= {testVisibleString1, "def"}
-                testVisibleString3 VisibleString ::= {testVisibleString2, "ghi"}
+                testIA5String1 IA5String ::= "abc"
+                testIA5String2 IA5String ::= {testIA5String1, "def"}
+                testIA5String3 IA5String ::= {testIA5String2, "ghi"}
                 """;
-        var value = resolveValue(body, VisibleStringValue.class, "testVisibleString3");
+        var value = resolveValue(body, IA5StringValue.class, "testIA5String3");
 
         assertNotNull(value);
         assertThat(value.getValue(), equalTo("abcdefghi"));
@@ -148,40 +181,30 @@ public class VisibleStringValueResolverTest {
     @Test
     void testResolveCharacterStringListWithMissingReference() {
         var body = """
-                testVisibleString2 VisibleString ::= {testVisibleString1, "def"}
+                testIA5String2 IA5String ::= {testIA5String1, "def"}
                 """;
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString2"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, IA5StringValue.class, "testIA5String2"));
     }
 
     @Test
     void testResolveCharacterStringListWithInvalidReference() {
         var body = """
                 testNumericString1 NumericString ::= "123"
-                testVisibleString2 VisibleString ::= {testNumericString1, "def"}
+                testIA5String2 IA5String ::= {testNumericString1, "def"}
                 """;
-        assertThrows(CompilerException.class, () -> resolveValue(body, VisibleStringValue.class, "testVisibleString2"));
+        assertThrows(CompilerException.class, () -> resolveValue(body, IA5StringValue.class, "testIA5String2"));
     }
 
     @Test
-    void testResolveInvalidTupleValue() {
+    void testResolveCharacterStringListWithTuples() throws IOException, ParserException {
         var body = """
-                testVisibleString1 VisibleString ::= {1, 1}
+                testIA5String1 IA5String ::= {4, 1}
+                testIA5String2 IA5String ::= {testIA5String1, {0, 10}}
                 """;
-        var exception = assertThrows(CompilerException.class,
-                () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
+        var value = resolveValue(body, IA5StringValue.class, "testIA5String2");
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type VisibleString.*"));
-    }
-
-    @Test
-    void testResolveInvalidQuadrupleValue() {
-        var body = """
-                testVisibleString1 VisibleString ::= {1, 1, 1, 1}
-                """;
-        var exception = assertThrows(CompilerException.class,
-                () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
-
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type VisibleString.*"));
+        assertNotNull(value);
+        assertThat(value.getValue(), equalTo("A\n"));
     }
 
 }

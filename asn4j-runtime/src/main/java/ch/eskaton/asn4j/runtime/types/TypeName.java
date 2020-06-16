@@ -39,6 +39,8 @@ public enum TypeName {
     OCTET_STRING("OCTET STRING"),
     VISIBLE_STRING("VisibleString"),
     NUMERIC_STRING("NumericString"),
+    PRINTABLE_STRING("PrintableString"),
+    IA5_STRING("IA5String"),
     UTC_TIME("UTCTime"),
     GENERALIZED_TIME("GeneralizedTime"),
     OID("OID"),

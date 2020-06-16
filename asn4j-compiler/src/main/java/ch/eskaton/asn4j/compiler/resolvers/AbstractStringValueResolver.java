@@ -32,10 +32,13 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
+import ch.eskaton.asn4j.parser.ast.TupleNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.CharacterStringList;
+import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
@@ -83,6 +86,14 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
             }
 
             value = stringValue;
+        } else if (value instanceof CollectionOfValue) {
+            if (((CollectionOfValue) value).getValues().size() == 2) {
+                return resolveTupleValue(((CollectionOfValue) value).toTuple());
+            } else if (((CollectionOfValue) value).getValues().size() == 4) {
+                return resolveQuadrupleValue(((CollectionOfValue) value).toQuadruple());
+            }
+
+            throw new CompilerException("Invalid value for type %s: %s", typeName, value);
         } else if (value instanceof StringValue) {
             // value is already a string
         }
@@ -95,6 +106,14 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
         var cString = getString(resolvedType, stringValue);
 
         return createValue(stringValue.getPosition(), cString);
+    }
+
+    protected T resolveTupleValue(TupleNode tuple) {
+        throw new CompilerException("Tuple values not allowed for type %s: %s", typeName, tuple);
+    }
+
+    protected T resolveQuadrupleValue(QuadrupleNode quadruple) {
+        throw new CompilerException("Quadruple values not allowed for type %s: %s", typeName, quadruple);
     }
 
     protected T resolveCharacterStringList(Type resolvedType, Value value) {
@@ -134,6 +153,8 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
             return getString(type, (StringValue) value);
         } else if (value instanceof SimpleDefinedValue) {
             return resolve((SimpleDefinedValue) value).getValue();
+        } else if (value instanceof CollectionOfValue) {
+            return resolveGeneric(type, value).getValue();
         } else {
             throw new IllegalCompilerStateException("Unsupported value for %s: %s", typeName, value);
         }

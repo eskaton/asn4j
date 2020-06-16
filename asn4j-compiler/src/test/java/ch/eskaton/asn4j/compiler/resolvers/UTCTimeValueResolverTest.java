@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ParserException;
+import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
 import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import static ch.eskaton.asn4j.compiler.resolvers.ResolverTestUtils.resolveValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -127,6 +129,28 @@ public class UTCTimeValueResolverTest {
                 """;
 
         assertThrows(CompilerException.class, () -> resolveValue(body, UTCTimeValue.class, "testUTCTime1"));
+    }
+
+    @Test
+    void testResolveInvalidTupleValue() {
+        var body = """
+                testUTCTime1 UTCTime ::= {1, 1}
+                """;
+        var exception = assertThrows(CompilerException.class,
+                () -> resolveValue(body, UTCTimeValue.class, "testUTCTime1"));
+
+        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type UTCTime.*"));
+    }
+
+    @Test
+    void testResolveInvalidQuadrupleValue() {
+        var body = """
+                testUTCTime1 UTCTime ::= {1, 1, 1, 1}
+                """;
+        var exception = assertThrows(CompilerException.class,
+                () -> resolveValue(body, UTCTimeValue.class, "testUTCTime1"));
+
+        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type UTCTime.*"));
     }
 
 }

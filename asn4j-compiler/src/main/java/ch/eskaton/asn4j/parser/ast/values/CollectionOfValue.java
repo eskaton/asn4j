@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
@@ -81,7 +82,7 @@ public class CollectionOfValue extends AbstractValue implements HasSize {
         List<Value> values = getValues();
 
         if (!isTuple()) {
-            return null;
+            throw new CompilerException("Invalid tuple: %s", values);
         }
 
         return new TupleNode(getPosition(), getShort(values, 0), getShort(values, 1));
@@ -101,7 +102,7 @@ public class CollectionOfValue extends AbstractValue implements HasSize {
         List<Value> values = getValues();
 
         if (!isQuadruple()) {
-            return null;
+            throw new CompilerException("Invalid quadruple: %s", values);
         }
 
         return new QuadrupleNode(getPosition(), getShort(values, 0), getShort(values, 1),

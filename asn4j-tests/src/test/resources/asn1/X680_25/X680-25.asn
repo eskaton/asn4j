@@ -289,4 +289,18 @@ TestSequenceDefaults19 ::= SEQUENCE {
     b TestNumericString1 DEFAULT "5678"
 }
 
+TestPrintableString1 ::= PrintableString
+
+TestSequenceDefaults20 ::= SEQUENCE {
+    a PrintableString DEFAULT "abCD",
+    b TestPrintableString1 DEFAULT "5678"
+}
+
+TestIA5String1 ::= IA5String
+
+TestSequenceDefaults21 ::= SEQUENCE {
+    a IA5String DEFAULT {"abCD", {2, 2}, {2, 7}, {5, 12}, {0, 10}},
+    b TestIA5String1 DEFAULT "5678"
+}
+
 END

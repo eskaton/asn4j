@@ -29,8 +29,8 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ParserException;
+import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
-import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -38,6 +38,7 @@ import java.io.IOException;
 import static ch.eskaton.asn4j.compiler.resolvers.ResolverTestUtils.resolveValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -160,6 +161,28 @@ public class NumericStringValueResolverTest {
                 testNumericString2 NumericString ::= {testNumericString1, "456"}
                 """;
         assertThrows(CompilerException.class, () -> resolveValue(body, NumericStringValue.class, "testNumericString2"));
+    }
+
+    @Test
+    void testResolveInvalidTupleValue() {
+        var body = """
+                testNumericString1 NumericString ::= {1, 1}
+                """;
+        var exception = assertThrows(CompilerException.class,
+                () -> resolveValue(body, NumericStringValue.class, "testNumericString1"));
+
+        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type NumericString.*"));
+    }
+
+    @Test
+    void testResolveInvalidQuadrupleValue() {
+        var body = """
+                testNumericString1 NumericString ::= {1, 1, 1, 1}
+                """;
+        var exception = assertThrows(CompilerException.class,
+                () -> resolveValue(body, NumericStringValue.class, "testNumericString1"));
+
+        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type NumericString.*"));
     }
 
 }
