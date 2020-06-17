@@ -27,12 +27,15 @@
 
 package ch.eskaton.asn4j.test.x680_41;
 
+import ch.eskaton.asn4j.test.modules.x680_41.TestBMPString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestGeneralString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestGraphicString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestIA5String1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestNumericString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestPrintableString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestTeletexString1;
+import ch.eskaton.asn4j.test.modules.x680_41.TestUTF8String1;
+import ch.eskaton.asn4j.test.modules.x680_41.TestUniversalString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestVisibleString1;
 import org.junit.jupiter.api.Test;
@@ -88,6 +91,24 @@ class TestX680_41 {
     void testGeneralString1() {
         assertDecodableVerifyAfter(TestGeneralString1.class, value -> value.setValue("ab12"),
                 value -> assertEquals(new TestGeneralString1("ab12"), value));
+    }
+
+    @Test
+    void testUniversalString1() {
+        assertDecodableVerifyAfter(TestUniversalString1.class, value -> value.setValue("ab12\uD83D\uDE02"),
+                value -> assertEquals(new TestUniversalString1("ab12\uD83D\uDE02"), value));
+    }
+
+    @Test
+    void testUTF8String1() {
+        assertDecodableVerifyAfter(TestUTF8String1.class, value -> value.setValue("ab12\uD83D\uDE02"),
+                value -> assertEquals(new TestUTF8String1("ab12\uD83D\uDE02"), value));
+    }
+
+    @Test
+    void testBMPString1() {
+        assertDecodableVerifyAfter(TestBMPString1.class, value -> value.setValue("ab12ü€"),
+                value -> assertEquals(new TestBMPString1("ab12ü€"), value));
     }
 
 }

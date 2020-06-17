@@ -25,23 +25,34 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 
-public interface StringVerifier {
+public abstract class UnicodeStringValueResolver<T extends HasStringValue & Value>
+        extends AbstractStringValueResolver<T> {
 
-    default Optional<String> verify(String value) {
-        return Optional.ofNullable(IntStream.range(0, value.length()).boxed()
-                .map(i -> value.codePointAt(i))
-                .filter(c -> !isValidCharacter(c))
-                .map(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+    public UnicodeStringValueResolver(CompilerContext ctx, TypeName typeName, Class<? extends Type> typeClass,
+            StringVerifier verifier) {
+        super(ctx, typeName, typeClass, verifier);
     }
 
-    boolean isValidCharacter(int c);
+    @Override
+    protected String resolveQuadrupleValue(QuadrupleNode quadruple) {
+        return new String(Character.toChars(getCodePoint(quadruple)));
+    }
+
+    private int getCodePoint(QuadrupleNode quadruple) {
+        return (((quadruple.getGroup() << 24) |
+                quadruple.getPlane() << 16) |
+                quadruple.getRow() << 8) |
+                quadruple.getCell();
+    }
 
 }

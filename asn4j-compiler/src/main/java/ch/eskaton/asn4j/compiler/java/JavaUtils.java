@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
+import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
@@ -59,6 +60,8 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
+import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
+import ch.eskaton.asn4j.parser.ast.values.UniversalStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
@@ -111,6 +114,9 @@ public class JavaUtils {
         addCase(dispatcher, GeneralStringValue.class, JavaUtils::getGeneralStringInitializerString);
         addCase(dispatcher, TeletexStringValue.class, JavaUtils::getTeletexStringInitializerString);
         addCase(dispatcher, VideotexStringValue.class, JavaUtils::getVideotexStringInitializerString);
+        addCase(dispatcher, UniversalStringValue.class, JavaUtils::getUniversalStringInitializerString);
+        addCase(dispatcher, UTF8StringValue.class, JavaUtils::getUTF8StringInitializerString);
+        addCase(dispatcher, BMPStringValue.class, JavaUtils::getBMPStringInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
     }
@@ -289,6 +295,21 @@ public class JavaUtils {
 
     private static String getVideotexStringInitializerString(CompilerContext ctx, String typeName,
             VideotexStringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getUniversalStringInitializerString(CompilerContext ctx, String typeName,
+            UniversalStringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getUTF8StringInitializerString(CompilerContext ctx, String typeName,
+            UTF8StringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getBMPStringInitializerString(CompilerContext ctx, String typeName,
+            BMPStringValue value) {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 

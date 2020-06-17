@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.defaults;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
@@ -57,8 +58,11 @@ import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
+import ch.eskaton.asn4j.parser.ast.types.UTF8String;
+import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
@@ -78,6 +82,8 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
+import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
+import ch.eskaton.asn4j.parser.ast.values.UniversalStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
@@ -119,6 +125,9 @@ public class DefaultsCompiler {
                     .put(TeletexString.class, new DefaultCompilerImpl(TeletexStringValue.class))
                     .put(T61String.class, new DefaultCompilerImpl(TeletexStringValue.class))
                     .put(VideotexString.class, new DefaultCompilerImpl(VideotexStringValue.class))
+                    .put(UniversalString.class, new DefaultCompilerImpl(UniversalStringValue.class))
+                    .put(UTF8String.class, new DefaultCompilerImpl(UTF8StringValue.class))
+                    .put(BMPString.class, new DefaultCompilerImpl(BMPStringValue.class))
                     .build();
 
     private CompilerContext ctx;

@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
+import ch.eskaton.asn4j.compiler.resolvers.BMPStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ChoiceValueResolver;
@@ -59,6 +60,8 @@ import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.TeletexStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.UTCTimeValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.UTF8StringValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.UniversalStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.VideotexStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.VisibleStringValueResolver;
@@ -77,6 +80,7 @@ import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
+import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
@@ -110,10 +114,13 @@ import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
+import ch.eskaton.asn4j.parser.ast.types.UTF8String;
+import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
+import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
@@ -142,12 +149,15 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.TimeValue;
 import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
+import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
+import ch.eskaton.asn4j.parser.ast.values.UniversalStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
@@ -172,6 +182,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
+import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
+import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.collections.Maps;
@@ -228,6 +240,9 @@ public class CompilerContext {
             .put(TeletexString.class, new TeletexStringCompiler())
             .put(T61String.class, new TeletexStringCompiler())
             .put(VideotexString.class, new VideotexStringCompiler())
+            .put(UniversalString.class, new UniversalStringCompiler())
+            .put(UTF8String.class, new UTF8StringCompiler())
+            .put(BMPString.class, new BMPStringCompiler())
             .put(SelectionType.class, new SelectionTypeCompiler())
             .put(ObjectIdentifier.class, new ObjectIdentifierCompiler())
             .put(RelativeOID.class, new RelativeOIDCompiler())
@@ -262,6 +277,9 @@ public class CompilerContext {
             .put(GeneralStringValue.class, new GeneralStringValueResolver(CompilerContext.this))
             .put(TeletexStringValue.class, new TeletexStringValueResolver(CompilerContext.this))
             .put(VideotexStringValue.class, new VideotexStringValueResolver(CompilerContext.this))
+            .put(UniversalStringValue.class, new UniversalStringValueResolver(CompilerContext.this))
+            .put(UTF8StringValue.class, new UTF8StringValueResolver(CompilerContext.this))
+            .put(BMPStringValue.class, new BMPStringValueResolver(CompilerContext.this))
             .build();
 
     @SuppressWarnings("serial")
@@ -281,6 +299,9 @@ public class CompilerContext {
             .add(TeletexString.class.getSimpleName())
             .add(T61String.class.getSimpleName())
             .add(VideotexString.class.getSimpleName())
+            .add(UniversalString.class.getSimpleName())
+            .add(UTF8String.class.getSimpleName())
+            .add(BMPString.class.getSimpleName())
             .build();
 
     @SuppressWarnings("serial")
@@ -571,6 +592,12 @@ public class CompilerContext {
             typeName = ASN1TeletexString.class.getSimpleName();
         } else if (type instanceof VideotexString) {
             typeName = ASN1VideotexString.class.getSimpleName();
+        } else if (type instanceof UniversalString) {
+            typeName = ASN1UniversalString.class.getSimpleName();
+        } else if (type instanceof UTF8String) {
+            typeName = ASN1UTF8String.class.getSimpleName();
+        } else if (type instanceof BMPString) {
+            typeName = ASN1BMPString.class.getSimpleName();
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof EnumeratedType) {

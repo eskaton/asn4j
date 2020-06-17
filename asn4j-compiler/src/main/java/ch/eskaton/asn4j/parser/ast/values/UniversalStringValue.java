@@ -25,23 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.parser.ast.values;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import ch.eskaton.asn4j.parser.Position;
 
-public interface StringVerifier {
+public class UniversalStringValue extends AbstractValue implements HasStringValue {
 
-    default Optional<String> verify(String value) {
-        return Optional.ofNullable(IntStream.range(0, value.length()).boxed()
-                .map(i -> value.codePointAt(i))
-                .filter(c -> !isValidCharacter(c))
-                .map(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+    private String value;
+
+    public UniversalStringValue(Position position, String value) {
+        super(position);
+
+        this.value = value;
     }
 
-    boolean isValidCharacter(int c);
+    @Override
+    public String getValue() {
+        return value;
+    }
 
 }

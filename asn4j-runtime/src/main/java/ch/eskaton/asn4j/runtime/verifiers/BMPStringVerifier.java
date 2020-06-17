@@ -27,21 +27,11 @@
 
 package ch.eskaton.asn4j.runtime.verifiers;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+public class BMPStringVerifier implements StringVerifier {
 
-public interface StringVerifier {
-
-    default Optional<String> verify(String value) {
-        return Optional.ofNullable(IntStream.range(0, value.length()).boxed()
-                .map(i -> value.codePointAt(i))
-                .filter(c -> !isValidCharacter(c))
-                .map(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+    @Override
+    public boolean isValidCharacter(int c) {
+        return c >= 0 && c < 1 << 16;
     }
-
-    boolean isValidCharacter(int c);
 
 }

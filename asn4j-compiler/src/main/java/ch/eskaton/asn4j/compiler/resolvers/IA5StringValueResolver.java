@@ -47,8 +47,8 @@ public class IA5StringValueResolver extends AbstractStringValueResolver<IA5Strin
     }
 
     @Override
-    protected IA5StringValue resolveTupleValue(TupleNode tuple) {
-        return createValue(tuple.getPosition(), Character.toString(tuple.getRow() + tuple.getColumn() * 16));
+    protected String resolveTupleValue(TupleNode tuple) {
+        return Character.toString((tuple.getColumn() << 4) | tuple.getRow());
     }
 
 }

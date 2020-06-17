@@ -88,9 +88,11 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
             value = stringValue;
         } else if (value instanceof CollectionOfValue) {
             if (((CollectionOfValue) value).getValues().size() == 2) {
-                return resolveTupleValue(((CollectionOfValue) value).toTuple());
+                return createValue(value.getPosition(),
+                        verifyString(resolveTupleValue(((CollectionOfValue) value).toTuple())));
             } else if (((CollectionOfValue) value).getValues().size() == 4) {
-                return resolveQuadrupleValue(((CollectionOfValue) value).toQuadruple());
+                return createValue(value.getPosition(),
+                        verifyString(resolveQuadrupleValue(((CollectionOfValue) value).toQuadruple())));
             }
 
             throw new CompilerException("Invalid value for type %s: %s", typeName, value);
@@ -108,11 +110,11 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
         return createValue(stringValue.getPosition(), cString);
     }
 
-    protected T resolveTupleValue(TupleNode tuple) {
+    protected String resolveTupleValue(TupleNode tuple) {
         throw new CompilerException("Tuple values not allowed for type %s: %s", typeName, tuple);
     }
 
-    protected T resolveQuadrupleValue(QuadrupleNode quadruple) {
+    protected String resolveQuadrupleValue(QuadrupleNode quadruple) {
         throw new CompilerException("Quadruple values not allowed for type %s: %s", typeName, quadruple);
     }
 
@@ -161,13 +163,15 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
     }
 
     private String getString(Type type, StringValue stringValue) {
-        var cString = stringValue.getCString();
+        return verifyString(stringValue.getCString());
+    }
 
-        verifier.verify(cString).ifPresent(v -> {
+    private String verifyString(String str) {
+        verifier.verify(str).ifPresent(v -> {
             throw new CompilerException("%s contains invalid characters: %s", typeName, v);
         });
 
-        return cString;
+        return str;
     }
 
     protected abstract T createValue(Position position, String value);
