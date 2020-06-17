@@ -39,6 +39,7 @@ public abstract class AbstractTimeStringVerifier implements StringVerifier {
         this.parser = parser;
     }
 
+    @Override
     public Optional<String> verify(String value) {
         var errors = StringVerifier.super.verify(value);
 

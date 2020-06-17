@@ -36,7 +36,7 @@ import java.util.stream.IntStream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class GeneralStringVerifierTest {
+class GeneralStringVerifierTest {
 
     public static final GeneralStringVerifier verifier = new GeneralStringVerifier();
 

@@ -36,7 +36,7 @@ import java.util.stream.IntStream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class GraphicStringVerifierTest {
+class GraphicStringVerifierTest {
 
     public static final GraphicStringVerifier verifier = new GraphicStringVerifier();
 

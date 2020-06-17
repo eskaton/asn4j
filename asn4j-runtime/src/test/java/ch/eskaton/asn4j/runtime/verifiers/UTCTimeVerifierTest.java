@@ -34,7 +34,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class UTCTimeVerifierTest {
+class UTCTimeVerifierTest {
 
     public static final UTCTimeVerifier verifier = new UTCTimeVerifier();
 
