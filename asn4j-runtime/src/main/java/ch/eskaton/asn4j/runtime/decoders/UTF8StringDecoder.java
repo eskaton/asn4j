@@ -25,23 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.runtime.decoders;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import ch.eskaton.asn4j.runtime.DecoderState;
+import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
-public interface StringVerifier {
+public class UTF8StringDecoder implements TypeDecoder<ASN1UTF8String> {
 
-    default Optional<String> verify(String value) {
-        return Optional.ofNullable(IntStream.range(0, value.length()).boxed()
-                .map(i -> value.codePointAt(i))
-                .filter(c -> !isValidCharacter(c))
-                .map(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+    @Override
+    public void decode(DecoderStates states, DecoderState state, ASN1UTF8String obj) {
+        try {
+            obj.setValue(new String(RuntimeUtils.getValue(states, state)));
+        } catch (ASN1RuntimeException e) {
+            throw new DecodingException(e);
+        }
     }
-
-    boolean isValidCharacter(int c);
 
 }

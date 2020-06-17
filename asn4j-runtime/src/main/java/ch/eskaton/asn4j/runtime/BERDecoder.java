@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.decoders.BMPStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.BitStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.BooleanDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ChoiceDecoder;
@@ -50,11 +51,14 @@ import ch.eskaton.asn4j.runtime.decoders.SetDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SetOfDecoder;
 import ch.eskaton.asn4j.runtime.decoders.TeletexStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.TypeDecoder;
+import ch.eskaton.asn4j.runtime.decoders.UTF8StringDecoder;
+import ch.eskaton.asn4j.runtime.decoders.UniversalStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.VideotexStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.VisibleStringDecoder;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.exceptions.PrematureEndOfInputException;
 import ch.eskaton.asn4j.runtime.exceptions.UnexpectedTagException;
+import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
@@ -79,6 +83,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
+import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.runtime.types.HasConstraint;
@@ -130,6 +136,9 @@ public class BERDecoder implements Decoder {
                     .put(ASN1IA5String.class, new IA5StringDecoder())
                     .put(ASN1TeletexString.class, new TeletexStringDecoder())
                     .put(ASN1VideotexString.class, new VideotexStringDecoder())
+                    .put(ASN1UniversalString.class, new UniversalStringDecoder())
+                    .put(ASN1UTF8String.class, new UTF8StringDecoder())
+                    .put(ASN1BMPString.class, new BMPStringDecoder())
                     .build();
 
     private ChoiceDecoder choiceDecoder = new ChoiceDecoder();
@@ -279,6 +288,12 @@ public class BERDecoder implements Decoder {
                 getDecoder(ASN1TeletexString.class).decode(states, state, (ASN1TeletexString) obj);
             } else if (obj instanceof ASN1VideotexString) {
                 getDecoder(ASN1VideotexString.class).decode(states, state, (ASN1VideotexString) obj);
+            } else if (obj instanceof ASN1UniversalString) {
+                getDecoder(ASN1UniversalString.class).decode(states, state, (ASN1UniversalString) obj);
+            } else if (obj instanceof ASN1UTF8String) {
+                getDecoder(ASN1UTF8String.class).decode(states, state, (ASN1UTF8String) obj);
+            } else if (obj instanceof ASN1BMPString) {
+                getDecoder(ASN1BMPString.class).decode(states, state, (ASN1BMPString) obj);
             } else if (obj instanceof ASN1ObjectIdentifier) {
                 getDecoder(ASN1ObjectIdentifier.class).decode(states, state, (ASN1ObjectIdentifier) obj);
             } else if (obj instanceof ASN1RelativeOID) {

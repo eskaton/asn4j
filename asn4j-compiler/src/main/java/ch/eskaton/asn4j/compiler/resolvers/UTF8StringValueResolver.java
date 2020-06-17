@@ -25,23 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.UTF8String;
+import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.NonRestrictingStringVerifier;
 
-public interface StringVerifier {
+public class UTF8StringValueResolver extends UnicodeStringValueResolver<UTF8StringValue> {
 
-    default Optional<String> verify(String value) {
-        return Optional.ofNullable(IntStream.range(0, value.length()).boxed()
-                .map(i -> value.codePointAt(i))
-                .filter(c -> !isValidCharacter(c))
-                .map(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+    public UTF8StringValueResolver(CompilerContext ctx) {
+        super(ctx, TypeName.UTF8_STRING, UTF8String.class, new NonRestrictingStringVerifier());
     }
 
-    boolean isValidCharacter(int c);
+    @Override
+    protected UTF8StringValue createValue(Position position, String value) {
+        return new UTF8StringValue(position, value);
+    }
 
 }

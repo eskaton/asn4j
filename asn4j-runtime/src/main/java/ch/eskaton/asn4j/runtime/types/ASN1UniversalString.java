@@ -25,23 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.runtime.types;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-public interface StringVerifier {
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 28, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+public class ASN1UniversalString extends AbstractASN1String {
 
-    default Optional<String> verify(String value) {
-        return Optional.ofNullable(IntStream.range(0, value.length()).boxed()
-                .map(i -> value.codePointAt(i))
-                .filter(c -> !isValidCharacter(c))
-                .map(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+    public ASN1UniversalString() {
+        super();
     }
 
-    boolean isValidCharacter(int c);
+    public ASN1UniversalString(String value) {
+        super(value);
+    }
+
+    public void setValue(String value) {
+        super.setValue(value);
+    }
 
 }

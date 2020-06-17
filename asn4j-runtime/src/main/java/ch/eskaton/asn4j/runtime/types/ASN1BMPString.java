@@ -25,23 +25,38 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.runtime.types;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.verifiers.BMPStringVerifier;
 
-public interface StringVerifier {
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 30, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+public class ASN1BMPString extends AbstractASN1String {
 
-    default Optional<String> verify(String value) {
-        return Optional.ofNullable(IntStream.range(0, value.length()).boxed()
-                .map(i -> value.codePointAt(i))
-                .filter(c -> !isValidCharacter(c))
-                .map(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+    private static final BMPStringVerifier VERIFIER = new BMPStringVerifier();
+
+    public ASN1BMPString() {
+        super();
     }
 
-    boolean isValidCharacter(int c);
+    public ASN1BMPString(String value) {
+        super(value);
+
+        verifyString(value);
+    }
+
+    public void setValue(String value) {
+        verifyString(value);
+
+        super.setValue(value);
+    }
+
+    private void verifyString(String value) {
+        VERIFIER.verify(value).ifPresent(v -> {
+            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
+        });
+    }
 
 }

@@ -19,4 +19,10 @@ TestGraphicString1 ::= GraphicString
 
 TestGeneralString1 ::= GeneralString
 
+TestUniversalString1 ::= UniversalString
+
+TestUTF8String1 ::= UTF8String
+
+TestBMPString1 ::= BMPString
+
 END

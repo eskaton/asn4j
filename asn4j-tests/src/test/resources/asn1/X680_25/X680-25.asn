@@ -338,4 +338,25 @@ TestSequenceDefaults26 ::= SEQUENCE {
     b TestGeneralString1 DEFAULT "5678"
 }
 
+TestUniversalString1 ::= UniversalString
+
+TestSequenceDefaults27 ::= SEQUENCE {
+    a UniversalString DEFAULT {"abCD", {0, 1, 246, 2}},
+    b TestUniversalString1 DEFAULT "5678"
+}
+
+TestUTF8String1 ::= UTF8String
+
+TestSequenceDefaults28 ::= SEQUENCE {
+    a UTF8String DEFAULT {"abCD", {0, 1, 246, 2}},
+    b TestUTF8String1 DEFAULT "5678"
+}
+
+TestBMPString1 ::= BMPString
+
+TestSequenceDefaults29 ::= SEQUENCE {
+    a BMPString DEFAULT {"abCDü"},
+    b TestBMPString1 DEFAULT "5678"
+}
+
 END

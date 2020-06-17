@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.encoders.BMPStringEncoder;
 import ch.eskaton.asn4j.runtime.encoders.BitStringEncoder;
 import ch.eskaton.asn4j.runtime.encoders.BooleanEncoder;
 import ch.eskaton.asn4j.runtime.encoders.ChoiceEncoder;
@@ -45,7 +46,9 @@ import ch.eskaton.asn4j.runtime.encoders.SequenceOfEncoder;
 import ch.eskaton.asn4j.runtime.encoders.SetEncoder;
 import ch.eskaton.asn4j.runtime.encoders.SetOfEncoder;
 import ch.eskaton.asn4j.runtime.encoders.TypeEncoder;
+import ch.eskaton.asn4j.runtime.encoders.UniversalStringEncoder;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
+import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
@@ -69,6 +72,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
+import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.runtime.types.HasConstraint;
@@ -101,6 +106,8 @@ public class BEREncoder implements Encoder {
                     .put(ASN1IRI.class, new IRIEncoder())
                     .put(ASN1RelativeIRI.class, new RelativeIRIEncoder())
                     .put(ASN1OctetString.class, new OctetStringEncoder())
+                    .put(ASN1UniversalString.class, new UniversalStringEncoder())
+                    .put(ASN1BMPString.class, new BMPStringEncoder())
                     .put(ASN1Sequence.class, new SequenceEncoder())
                     .put(ASN1SequenceOf.class, new SequenceOfEncoder())
                     .put(ASN1Set.class, new SetEncoder())
@@ -170,6 +177,12 @@ public class BEREncoder implements Encoder {
             buf = ((ASN1TeletexString) obj).getValue().getBytes();
         } else if (obj instanceof ASN1VideotexString) {
             buf = ((ASN1VideotexString) obj).getValue().getBytes();
+        } else if (obj instanceof ASN1UniversalString) {
+            buf = this.getEncoder(ASN1UniversalString.class).encode(this, (ASN1UniversalString) obj);
+        } else if (obj instanceof ASN1UTF8String) {
+            buf = ((ASN1UTF8String) obj).getValue().getBytes();
+        } else if (obj instanceof ASN1BMPString) {
+            buf = this.getEncoder(ASN1BMPString.class).encode(this, (ASN1BMPString) obj);
         } else if (obj instanceof ASN1Null) {
             buf = this.<ASN1Null, NullEncoder>getEncoder(ASN1Null.class).encode(this, (ASN1Null) obj);
         } else if (obj instanceof ASN1ObjectIdentifier) {

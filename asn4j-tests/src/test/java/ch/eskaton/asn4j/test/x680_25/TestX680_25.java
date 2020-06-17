@@ -27,7 +27,9 @@
 
 package ch.eskaton.asn4j.test.x680_25;
 
+import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
 import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
@@ -43,11 +45,15 @@ import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
+import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
+import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
+import ch.eskaton.asn4j.test.modules.x680_25.TestBMPString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestBoolean;
 import ch.eskaton.asn4j.test.modules.x680_25.TestChoice1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestEnumeration;
+import ch.eskaton.asn4j.test.modules.x680_25.TestGeneralString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestGeneralizedTime1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestGraphicString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestIA5String1;
@@ -85,6 +91,10 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults22;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults23;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults24;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults25;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults26;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults27;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults28;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults29;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults5;
@@ -97,6 +107,8 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestT61String1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestTeletexString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestUTCTime1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestUTF8String1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestUniversalString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestVisibleString1;
 import org.junit.jupiter.api.DisplayName;
@@ -519,6 +531,42 @@ class TestX680_25 {
         assertDecodableVerifyAfter(TestSequenceDefaults25.class, value -> {
             assertEquals(new ASN1VideotexString("abCD"), value.getA());
             assertEquals(new TestVideotexString1("5678"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for GeneralString")
+    void testSequenceDefaults26() {
+        assertDecodableVerifyAfter(TestSequenceDefaults26.class, value -> {
+            assertEquals(new ASN1GeneralString("abCD"), value.getA());
+            assertEquals(new TestGeneralString1("5678"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for UniversalString")
+    void testSequenceDefaults27() {
+        assertDecodableVerifyAfter(TestSequenceDefaults27.class, value -> {
+            assertEquals(new ASN1UniversalString("abCD\uD83D\uDE02"), value.getA());
+            assertEquals(new TestUniversalString1("5678"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for UTF8String")
+    void testSequenceDefaults28() {
+        assertDecodableVerifyAfter(TestSequenceDefaults28.class, value -> {
+            assertEquals(new ASN1UTF8String("abCD\uD83D\uDE02"), value.getA());
+            assertEquals(new TestUTF8String1("5678"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for BMPString")
+    void testSequenceDefaults29() {
+        assertDecodableVerifyAfter(TestSequenceDefaults29.class, value -> {
+            assertEquals(new ASN1BMPString("abCDü"), value.getA());
+            assertEquals(new TestBMPString1("5678"), value.getB());
         });
     }
 

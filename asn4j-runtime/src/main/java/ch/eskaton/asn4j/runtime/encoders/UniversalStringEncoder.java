@@ -25,23 +25,18 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.runtime.encoders;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 
-public interface StringVerifier {
+import java.nio.charset.Charset;
 
-    default Optional<String> verify(String value) {
-        return Optional.ofNullable(IntStream.range(0, value.length()).boxed()
-                .map(i -> value.codePointAt(i))
-                .filter(c -> !isValidCharacter(c))
-                .map(i -> new String(Character.toChars(i)))
-                .collect(Collectors.joining()))
-                .filter(v -> !v.isEmpty());
+public class UniversalStringEncoder implements TypeEncoder<ASN1UniversalString> {
+
+    @Override
+    public byte[] encode(Encoder encoder, ASN1UniversalString obj) {
+        return obj.getValue().getBytes(Charset.forName("UTF32"));
     }
-
-    boolean isValidCharacter(int c);
 
 }
