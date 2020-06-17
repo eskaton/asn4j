@@ -34,7 +34,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class ISO646VerifierTest {
+class ISO646VerifierTest {
 
     public static final String ALLOWED_CHARACTERS = " !\"#$&'()+,./0123456789:;<=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 

@@ -47,6 +47,7 @@ public class ASN1PrintableString extends AbstractASN1String {
         verifyString(value);
     }
 
+    @Override
     public void setValue(String value) {
         verifyString(value);
 

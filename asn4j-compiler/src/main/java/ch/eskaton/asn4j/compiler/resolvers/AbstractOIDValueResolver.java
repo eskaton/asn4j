@@ -59,6 +59,7 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
         return resolveComponents(value, ctx);
     }
 
+    @Override
     public V resolveValue(CompilerContext ctx, Value value, Class<V> valueClass) {
         return resolveComponents(super.resolveValue(ctx, value, valueClass), ctx);
     }

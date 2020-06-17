@@ -34,7 +34,7 @@ import java.util.Optional;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class NumericStringVerifierTest {
+class NumericStringVerifierTest {
 
     public static final String ALLOWED_CHARACTERS = " 0123456789";
 

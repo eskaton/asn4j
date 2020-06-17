@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
-import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 

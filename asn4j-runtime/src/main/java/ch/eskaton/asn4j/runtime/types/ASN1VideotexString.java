@@ -41,8 +41,4 @@ public class ASN1VideotexString extends AbstractASN1String {
         super(value);
     }
 
-    public void setValue(String value) {
-        super.setValue(value);
-    }
-
 }
