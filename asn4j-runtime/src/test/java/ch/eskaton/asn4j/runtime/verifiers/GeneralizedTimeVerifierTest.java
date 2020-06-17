@@ -40,14 +40,14 @@ public class GeneralizedTimeVerifierTest {
 
     @Test
     void testValidCharacters() {
-        assertThat(Optional.empty(), equalTo(verifier.verify("19851206134207.3Z")));
-        assertThat(Optional.empty(), equalTo(verifier.verify("19851206134207.3+0500")));
-        assertThat(Optional.empty(), equalTo(verifier.verify("19851206134207.3-0500")));
+        assertThat(verifier.verify("19851206134207.3Z"), equalTo(Optional.empty()));
+        assertThat(verifier.verify("19851206134207.3+0500"), equalTo(Optional.empty()));
+        assertThat(verifier.verify("19851206134207.3-0500"), equalTo(Optional.empty()));
     }
 
     @Test
     void testInvalidCharacters() {
-        assertThat(Optional.of(",aA"), equalTo(verifier.verify("01,aA23")));
+        assertThat(verifier.verify("01,aA23"), equalTo(Optional.of(",aA")));
     }
 
 }

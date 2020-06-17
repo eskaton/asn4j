@@ -331,4 +331,11 @@ TestSequenceDefaults25 ::= SEQUENCE {
     b TestVideotexString1 DEFAULT "5678"
 }
 
+TestGeneralString1 ::= GeneralString
+
+TestSequenceDefaults26 ::= SEQUENCE {
+    a GeneralString DEFAULT "abCD",
+    b TestGeneralString1 DEFAULT "5678"
+}
+
 END

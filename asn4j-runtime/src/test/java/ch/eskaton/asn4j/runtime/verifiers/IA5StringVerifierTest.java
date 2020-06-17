@@ -47,12 +47,12 @@ public class IA5StringVerifierTest {
                 .map(String::valueOf)
                 .collect(Collectors.joining());
 
-        assertThat(Optional.empty(), equalTo(verifier.verify(allowedCharacters)));
+        assertThat(verifier.verify(allowedCharacters), equalTo(Optional.empty()));
     }
 
     @Test
     void testInvalidCharacters() {
-        assertThat(Optional.of("öüäé"), equalTo(verifier.verify("aböüäé;\n12")));
+        assertThat(verifier.verify("aböüäé;\n12"), equalTo(Optional.of("öüäé")));
     }
 
 }

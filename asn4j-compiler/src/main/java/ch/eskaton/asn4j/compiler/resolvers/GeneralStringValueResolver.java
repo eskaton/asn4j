@@ -25,29 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.compiler.resolvers;
 
-import org.junit.jupiter.api.Test;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.GeneralString;
+import ch.eskaton.asn4j.parser.ast.values.GeneralStringValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.runtime.verifiers.GeneralStringVerifier;
 
-import java.util.Optional;
+public class GeneralStringValueResolver extends AbstractStringValueResolver<GeneralStringValue> {
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-public class UTCTimeVerifierTest {
-
-    public static final UTCTimeVerifier verifier = new UTCTimeVerifier();
-
-    @Test
-    void testValidCharacters() {
-        assertThat(verifier.verify("5612301417-0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417+0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417Z"), equalTo(Optional.empty()));
+    public GeneralStringValueResolver(CompilerContext ctx) {
+        super(ctx, TypeName.GENERAL_STRING, GeneralString.class, new GeneralStringVerifier());
     }
 
-    @Test
-    void testInvalidCharacters() {
-        assertThat(verifier.verify("01.,aA23"), equalTo(Optional.of(".,aA")));
+    @Override
+    protected GeneralStringValue createValue(Position position, String value) {
+        return new GeneralStringValue(position, value);
     }
 
 }

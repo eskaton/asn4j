@@ -15,4 +15,8 @@ TestVideotexString1 ::= VideotexString
 
 TestIA5String1 ::= IA5String
 
+TestGraphicString1 ::= GraphicString
+
+TestGeneralString1 ::= GeneralString
+
 END

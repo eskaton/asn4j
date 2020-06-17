@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.GeneralStringValue;
 import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
 import ch.eskaton.asn4j.parser.ast.values.HexStringValue;
@@ -107,6 +108,7 @@ public class JavaUtils {
         addCase(dispatcher, PrintableStringValue.class, JavaUtils::getPrintableStringInitializerString);
         addCase(dispatcher, IA5StringValue.class, JavaUtils::getIA5StringInitializerString);
         addCase(dispatcher, GraphicStringValue.class, JavaUtils::getGraphicStringInitializerString);
+        addCase(dispatcher, GeneralStringValue.class, JavaUtils::getGeneralStringInitializerString);
         addCase(dispatcher, TeletexStringValue.class, JavaUtils::getTeletexStringInitializerString);
         addCase(dispatcher, VideotexStringValue.class, JavaUtils::getVideotexStringInitializerString);
 
@@ -272,6 +274,11 @@ public class JavaUtils {
 
     private static String getGraphicStringInitializerString(CompilerContext ctx, String typeName,
             GraphicStringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getGeneralStringInitializerString(CompilerContext ctx, String typeName,
+            GeneralStringValue value) {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 

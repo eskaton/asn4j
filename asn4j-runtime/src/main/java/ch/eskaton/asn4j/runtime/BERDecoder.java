@@ -32,6 +32,8 @@ import ch.eskaton.asn4j.runtime.decoders.BitStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.BooleanDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ChoiceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.EnumeratedTypeDecoder;
+import ch.eskaton.asn4j.runtime.decoders.GeneralStringDecoder;
+import ch.eskaton.asn4j.runtime.decoders.GraphicStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.IA5StringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.IRIDecoder;
 import ch.eskaton.asn4j.runtime.decoders.IntegerDecoder;
@@ -57,6 +59,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
+import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
 import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
@@ -121,6 +125,8 @@ public class BERDecoder implements Decoder {
                     .put(ASN1VisibleString.class, new VisibleStringDecoder())
                     .put(ASN1NumericString.class, new NumericStringDecoder())
                     .put(ASN1PrintableString.class, new PrintableStringDecoder())
+                    .put(ASN1GraphicString.class, new GraphicStringDecoder())
+                    .put(ASN1GeneralString.class, new GeneralStringDecoder())
                     .put(ASN1IA5String.class, new IA5StringDecoder())
                     .put(ASN1TeletexString.class, new TeletexStringDecoder())
                     .put(ASN1VideotexString.class, new VideotexStringDecoder())
@@ -261,6 +267,10 @@ public class BERDecoder implements Decoder {
                 getDecoder(ASN1VisibleString.class).decode(states, state, (ASN1VisibleString) obj);
             } else if (obj instanceof ASN1NumericString) {
                 getDecoder(ASN1NumericString.class).decode(states, state, (ASN1NumericString) obj);
+            } else if (obj instanceof ASN1GraphicString) {
+                getDecoder(ASN1GraphicString.class).decode(states, state, (ASN1GraphicString) obj);
+            } else if (obj instanceof ASN1GeneralString) {
+                getDecoder(ASN1GeneralString.class).decode(states, state, (ASN1GeneralString) obj);
             } else if (obj instanceof ASN1PrintableString) {
                 getDecoder(ASN1PrintableString.class).decode(states, state, (ASN1PrintableString) obj);
             } else if (obj instanceof ASN1IA5String) {

@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.test.x680_41;
 
+import ch.eskaton.asn4j.test.modules.x680_41.TestGeneralString1;
+import ch.eskaton.asn4j.test.modules.x680_41.TestGraphicString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestIA5String1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestNumericString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestPrintableString1;
@@ -74,6 +76,18 @@ class TestX680_41 {
     void testIA5String1() {
         assertDecodableVerifyAfter(TestIA5String1.class, value -> value.setValue("ab12"),
                 value -> assertEquals(new TestIA5String1("ab12"), value));
+    }
+
+    @Test
+    void testGraphicString1() {
+        assertDecodableVerifyAfter(TestGraphicString1.class, value -> value.setValue("ab12"),
+                value -> assertEquals(new TestGraphicString1("ab12"), value));
+    }
+
+    @Test
+    void testGeneralString1() {
+        assertDecodableVerifyAfter(TestGeneralString1.class, value -> value.setValue("ab12"),
+                value -> assertEquals(new TestGeneralString1("ab12"), value));
     }
 
 }

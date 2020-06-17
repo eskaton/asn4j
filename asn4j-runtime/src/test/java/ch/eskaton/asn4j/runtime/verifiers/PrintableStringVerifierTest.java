@@ -42,12 +42,12 @@ public class PrintableStringVerifierTest {
 
     @Test
     void testValidCharacters() {
-        assertThat(Optional.empty(), equalTo(verifier.verify(ALLOWED_CHARACTERS)));
+        assertThat(verifier.verify(ALLOWED_CHARACTERS), equalTo(Optional.empty()));
     }
 
     @Test
     void testInvalidCharacters() {
-        assertThat(Optional.of("öüäé;"), equalTo(verifier.verify("aböüäé;12")));
+        assertThat(verifier.verify("aböüäé;12"), equalTo(Optional.of("öüäé;")));
     }
 
 }

@@ -42,12 +42,12 @@ public class NumericStringVerifierTest {
 
     @Test
     void testValidCharacters() {
-        assertThat(Optional.empty(), equalTo(verifier.verify(ALLOWED_CHARACTERS)));
+        assertThat(verifier.verify(ALLOWED_CHARACTERS), equalTo(Optional.empty()));
     }
 
     @Test
     void testInvalidCharacters() {
-        assertThat(Optional.of("ab"), equalTo(verifier.verify("01ab23")));
+        assertThat(verifier.verify("01ab23"), equalTo(Optional.of("ab")));
     }
 
 }
