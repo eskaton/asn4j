@@ -42,6 +42,8 @@ public enum TypeName {
     PRINTABLE_STRING("PrintableString"),
     IA5_STRING("IA5String"),
     GRAPHIC_STRING("GraphicString"),
+    TELETEX_STRING("TeletexString"),
+    VIDEOTEX_STRING("VideotexString"),
     UTC_TIME("UTCTime"),
     GENERALIZED_TIME("GeneralizedTime"),
     OID("OID"),

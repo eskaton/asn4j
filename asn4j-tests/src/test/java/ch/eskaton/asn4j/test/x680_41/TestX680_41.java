@@ -27,7 +27,11 @@
 
 package ch.eskaton.asn4j.test.x680_41;
 
+import ch.eskaton.asn4j.test.modules.x680_41.TestIA5String1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestNumericString1;
+import ch.eskaton.asn4j.test.modules.x680_41.TestPrintableString1;
+import ch.eskaton.asn4j.test.modules.x680_41.TestTeletexString1;
+import ch.eskaton.asn4j.test.modules.x680_41.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_41.TestVisibleString1;
 import org.junit.jupiter.api.Test;
 
@@ -48,5 +52,28 @@ class TestX680_41 {
                 value -> assertEquals(new TestNumericString1("1234"), value));
     }
 
-}
+    @Test
+    void testPrintableString1() {
+        assertDecodableVerifyAfter(TestPrintableString1.class, value -> value.setValue("ab12"),
+                value -> assertEquals(new TestPrintableString1("ab12"), value));
+    }
 
+    @Test
+    void testTeletexString1() {
+        assertDecodableVerifyAfter(TestTeletexString1.class, value -> value.setValue("ab12ö"),
+                value -> assertEquals(new TestTeletexString1("ab12ö"), value));
+    }
+
+    @Test
+    void testVideotexString1() {
+        assertDecodableVerifyAfter(TestVideotexString1.class, value -> value.setValue("ab12ö"),
+                value -> assertEquals(new TestVideotexString1("ab12ö"), value));
+    }
+
+    @Test
+    void testIA5String1() {
+        assertDecodableVerifyAfter(TestIA5String1.class, value -> value.setValue("ab12"),
+                value -> assertEquals(new TestIA5String1("ab12"), value));
+    }
+
+}

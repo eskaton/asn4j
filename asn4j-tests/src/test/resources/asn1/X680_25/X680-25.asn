@@ -310,4 +310,25 @@ TestSequenceDefaults22 ::= SEQUENCE {
     b TestGraphicString1 DEFAULT "5678"
 }
 
+TestTeletexString1 ::= TeletexString
+
+TestSequenceDefaults23 ::= SEQUENCE {
+    a TeletexString DEFAULT "abCD",
+    b TestTeletexString1 DEFAULT "5678"
+}
+
+TestT61String1 ::= T61String
+
+TestSequenceDefaults24 ::= SEQUENCE {
+    a T61String DEFAULT "abCD",
+    b TestT61String1 DEFAULT "5678"
+}
+
+TestVideotexString1 ::= VideotexString
+
+TestSequenceDefaults25 ::= SEQUENCE {
+    a VideotexString DEFAULT "abCD",
+    b TestVideotexString1 DEFAULT "5678"
+}
+
 END

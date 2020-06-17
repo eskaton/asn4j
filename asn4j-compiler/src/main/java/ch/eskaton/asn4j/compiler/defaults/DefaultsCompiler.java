@@ -51,9 +51,12 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.T61String;
+import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
+import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
@@ -71,8 +74,10 @@ import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
+import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.commons.collections.Maps;
 
@@ -108,6 +113,9 @@ public class DefaultsCompiler {
                     .put(PrintableString.class, new DefaultCompilerImpl(PrintableStringValue.class))
                     .put(IA5String.class, new DefaultCompilerImpl(IA5StringValue.class))
                     .put(GraphicString.class, new DefaultCompilerImpl(GraphicStringValue.class))
+                    .put(TeletexString.class, new DefaultCompilerImpl(TeletexStringValue.class))
+                    .put(T61String.class, new DefaultCompilerImpl(TeletexStringValue.class))
+                    .put(VideotexString.class, new DefaultCompilerImpl(VideotexStringValue.class))
                     .build();
 
     private CompilerContext ctx;
