@@ -56,8 +56,10 @@ import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RealValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
+import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.commons.collections.Tuple3;
 import ch.eskaton.commons.functional.TriFunction;
@@ -105,6 +107,8 @@ public class JavaUtils {
         addCase(dispatcher, PrintableStringValue.class, JavaUtils::getPrintableStringInitializerString);
         addCase(dispatcher, IA5StringValue.class, JavaUtils::getIA5StringInitializerString);
         addCase(dispatcher, GraphicStringValue.class, JavaUtils::getGraphicStringInitializerString);
+        addCase(dispatcher, TeletexStringValue.class, JavaUtils::getTeletexStringInitializerString);
+        addCase(dispatcher, VideotexStringValue.class, JavaUtils::getVideotexStringInitializerString);
 
         return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
     }
@@ -268,6 +272,16 @@ public class JavaUtils {
 
     private static String getGraphicStringInitializerString(CompilerContext ctx, String typeName,
             GraphicStringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getTeletexStringInitializerString(CompilerContext ctx, String typeName,
+            TeletexStringValue value) {
+        return getGenericStringInitializerString(ctx, typeName, value.getValue());
+    }
+
+    private static String getVideotexStringInitializerString(CompilerContext ctx, String typeName,
+            VideotexStringValue value) {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 

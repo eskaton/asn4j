@@ -32,11 +32,13 @@ import ch.eskaton.asn4j.runtime.decoders.BitStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.BooleanDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ChoiceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.EnumeratedTypeDecoder;
+import ch.eskaton.asn4j.runtime.decoders.IA5StringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.IRIDecoder;
 import ch.eskaton.asn4j.runtime.decoders.IntegerDecoder;
 import ch.eskaton.asn4j.runtime.decoders.NumericStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ObjectIdentifierDecoder;
 import ch.eskaton.asn4j.runtime.decoders.OctetStringDecoder;
+import ch.eskaton.asn4j.runtime.decoders.PrintableStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.RealDecoder;
 import ch.eskaton.asn4j.runtime.decoders.RelativeIRIDecoder;
 import ch.eskaton.asn4j.runtime.decoders.RelativeOIDDecoder;
@@ -44,7 +46,9 @@ import ch.eskaton.asn4j.runtime.decoders.SequenceDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SequenceOfDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SetDecoder;
 import ch.eskaton.asn4j.runtime.decoders.SetOfDecoder;
+import ch.eskaton.asn4j.runtime.decoders.TeletexStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.TypeDecoder;
+import ch.eskaton.asn4j.runtime.decoders.VideotexStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.VisibleStringDecoder;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.exceptions.PrematureEndOfInputException;
@@ -53,6 +57,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1NamedInteger;
@@ -60,6 +65,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
@@ -67,7 +73,9 @@ import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.runtime.types.HasConstraint;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
@@ -112,6 +120,10 @@ public class BERDecoder implements Decoder {
                     .put(ASN1OctetString.class, new OctetStringDecoder())
                     .put(ASN1VisibleString.class, new VisibleStringDecoder())
                     .put(ASN1NumericString.class, new NumericStringDecoder())
+                    .put(ASN1PrintableString.class, new PrintableStringDecoder())
+                    .put(ASN1IA5String.class, new IA5StringDecoder())
+                    .put(ASN1TeletexString.class, new TeletexStringDecoder())
+                    .put(ASN1VideotexString.class, new VideotexStringDecoder())
                     .build();
 
     private ChoiceDecoder choiceDecoder = new ChoiceDecoder();
@@ -249,6 +261,14 @@ public class BERDecoder implements Decoder {
                 getDecoder(ASN1VisibleString.class).decode(states, state, (ASN1VisibleString) obj);
             } else if (obj instanceof ASN1NumericString) {
                 getDecoder(ASN1NumericString.class).decode(states, state, (ASN1NumericString) obj);
+            } else if (obj instanceof ASN1PrintableString) {
+                getDecoder(ASN1PrintableString.class).decode(states, state, (ASN1PrintableString) obj);
+            } else if (obj instanceof ASN1IA5String) {
+                getDecoder(ASN1IA5String.class).decode(states, state, (ASN1IA5String) obj);
+            } else if (obj instanceof ASN1TeletexString) {
+                getDecoder(ASN1TeletexString.class).decode(states, state, (ASN1TeletexString) obj);
+            } else if (obj instanceof ASN1VideotexString) {
+                getDecoder(ASN1VideotexString.class).decode(states, state, (ASN1VideotexString) obj);
             } else if (obj instanceof ASN1ObjectIdentifier) {
                 getDecoder(ASN1ObjectIdentifier.class).decode(states, state, (ASN1ObjectIdentifier) obj);
             } else if (obj instanceof ASN1RelativeOID) {

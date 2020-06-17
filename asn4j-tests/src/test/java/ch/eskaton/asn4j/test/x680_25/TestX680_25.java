@@ -41,7 +41,9 @@ import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
+import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
+import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.test.modules.x680_25.TestBoolean;
 import ch.eskaton.asn4j.test.modules.x680_25.TestChoice1;
@@ -80,6 +82,9 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults20;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults21;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults22;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults23;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults24;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults25;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults4;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults5;
@@ -89,7 +94,10 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults8;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceDefaults9;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSetOf1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestT61String1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestTeletexString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestUTCTime1;
+import ch.eskaton.asn4j.test.modules.x680_25.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestVisibleString1;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -484,6 +492,33 @@ class TestX680_25 {
         assertDecodableVerifyAfter(TestSequenceDefaults22.class, value -> {
             assertEquals(new ASN1GraphicString("abCD"), value.getA());
             assertEquals(new TestGraphicString1("5678"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for TeletexString")
+    void testSequenceDefaults23() {
+        assertDecodableVerifyAfter(TestSequenceDefaults23.class, value -> {
+            assertEquals(new ASN1TeletexString("abCD"), value.getA());
+            assertEquals(new TestTeletexString1("5678"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for T61String")
+    void testSequenceDefaults24() {
+        assertDecodableVerifyAfter(TestSequenceDefaults24.class, value -> {
+            assertEquals(new ASN1TeletexString("abCD"), value.getA());
+            assertEquals(new TestT61String1("5678"), value.getB());
+        });
+    }
+
+    @Test
+    @DisplayName("Test defaults for VideotexString")
+    void testSequenceDefaults25() {
+        assertDecodableVerifyAfter(TestSequenceDefaults25.class, value -> {
+            assertEquals(new ASN1VideotexString("abCD"), value.getA());
+            assertEquals(new TestVideotexString1("5678"), value.getB());
         });
     }
 

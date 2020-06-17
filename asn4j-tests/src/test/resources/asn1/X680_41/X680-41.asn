@@ -5,4 +5,14 @@ TestVisibleString1 ::= VisibleString
 
 TestNumericString1 ::= NumericString
 
+TestPrintableString1 ::= PrintableString
+
+TestTeletexString1 ::= TeletexString
+
+TestT61String1 ::= T61String
+
+TestVideotexString1 ::= VideotexString
+
+TestIA5String1 ::= IA5String
+
 END

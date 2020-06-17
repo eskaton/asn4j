@@ -56,8 +56,10 @@ import ch.eskaton.asn4j.compiler.resolvers.PrintableStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RealValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.TeletexStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.UTCTimeValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
+import ch.eskaton.asn4j.compiler.resolvers.VideotexStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.VisibleStringValueResolver;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
@@ -101,10 +103,13 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.T61String;
+import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
+import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
@@ -131,9 +136,11 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
+import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.TimeValue;
 import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
@@ -159,7 +166,9 @@ import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
+import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.collections.Sets;
@@ -211,6 +220,9 @@ public class CompilerContext {
             .put(PrintableString.class, new PrintableStringCompiler())
             .put(IA5String.class, new IA5StringCompiler())
             .put(GraphicString.class, new GraphicStringCompiler())
+            .put(TeletexString.class, new TeletexStringCompiler())
+            .put(T61String.class, new TeletexStringCompiler())
+            .put(VideotexString.class, new VideotexStringCompiler())
             .put(SelectionType.class, new SelectionTypeCompiler())
             .put(ObjectIdentifier.class, new ObjectIdentifierCompiler())
             .put(RelativeOID.class, new RelativeOIDCompiler())
@@ -242,6 +254,8 @@ public class CompilerContext {
             .put(PrintableStringValue.class, new PrintableStringValueResolver(CompilerContext.this))
             .put(IA5StringValue.class, new IA5StringValueResolver(CompilerContext.this))
             .put(GraphicStringValue.class, new GraphicStringValueResolver(CompilerContext.this))
+            .put(TeletexStringValue.class, new TeletexStringValueResolver(CompilerContext.this))
+            .put(VideotexStringValue.class, new VideotexStringValueResolver(CompilerContext.this))
             .build();
 
     @SuppressWarnings("serial")
@@ -257,6 +271,9 @@ public class CompilerContext {
             .add(PrintableString.class.getSimpleName())
             .add(IA5String.class.getSimpleName())
             .add(GraphicString.class.getSimpleName())
+            .add(TeletexString.class.getSimpleName())
+            .add(T61String.class.getSimpleName())
+            .add(VideotexString.class.getSimpleName())
             .build();
 
     @SuppressWarnings("serial")
@@ -539,6 +556,12 @@ public class CompilerContext {
             typeName = ASN1IA5String.class.getSimpleName();
         } else if (type instanceof GraphicString) {
             typeName = ASN1GraphicString.class.getSimpleName();
+        } else if (type instanceof TeletexString) {
+            typeName = ASN1TeletexString.class.getSimpleName();
+        } else if (type instanceof T61String) {
+            typeName = ASN1TeletexString.class.getSimpleName();
+        } else if (type instanceof VideotexString) {
+            typeName = ASN1VideotexString.class.getSimpleName();
         } else if (type instanceof OctetString) {
             typeName = ASN1OctetString.class.getSimpleName();
         } else if (type instanceof EnumeratedType) {
