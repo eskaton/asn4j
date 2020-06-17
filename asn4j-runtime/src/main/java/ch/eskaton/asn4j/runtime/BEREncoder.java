@@ -50,6 +50,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
+import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
 import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
@@ -160,6 +162,10 @@ public class BEREncoder implements Encoder {
             buf = ((ASN1PrintableString) obj).getValue().getBytes();
         } else if (obj instanceof ASN1IA5String) {
             buf = ((ASN1IA5String) obj).getValue().getBytes();
+        } else if (obj instanceof ASN1GraphicString) {
+            buf = ((ASN1GraphicString) obj).getValue().getBytes();
+        } else if (obj instanceof ASN1GeneralString) {
+            buf = ((ASN1GeneralString) obj).getValue().getBytes();
         } else if (obj instanceof ASN1TeletexString) {
             buf = ((ASN1TeletexString) obj).getValue().getBytes();
         } else if (obj instanceof ASN1VideotexString) {

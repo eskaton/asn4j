@@ -25,29 +25,38 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.runtime.types;
 
-import org.junit.jupiter.api.Test;
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.verifiers.GeneralStringVerifier;
 
-import java.util.Optional;
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 27, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+public class ASN1GeneralString extends AbstractASN1String {
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+    private static final GeneralStringVerifier VERIFIER = new GeneralStringVerifier();
 
-public class UTCTimeVerifierTest {
-
-    public static final UTCTimeVerifier verifier = new UTCTimeVerifier();
-
-    @Test
-    void testValidCharacters() {
-        assertThat(verifier.verify("5612301417-0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417+0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417Z"), equalTo(Optional.empty()));
+    public ASN1GeneralString() {
+        super();
     }
 
-    @Test
-    void testInvalidCharacters() {
-        assertThat(verifier.verify("01.,aA23"), equalTo(Optional.of(".,aA")));
+    public ASN1GeneralString(String value) {
+        super(value);
+
+        verifyString(value);
+    }
+
+    public void setValue(String value) {
+        verifyString(value);
+
+        super.setValue(value);
+    }
+
+    private void verifyString(String value) {
+        VERIFIER.verify(value).ifPresent(v -> {
+            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
+        });
     }
 
 }

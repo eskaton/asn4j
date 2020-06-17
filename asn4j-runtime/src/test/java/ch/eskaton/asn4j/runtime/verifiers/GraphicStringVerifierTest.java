@@ -38,7 +38,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class GraphicStringVerifierTest {
 
-    public static final IA5StringVerifier verifier = new IA5StringVerifier();
+    public static final GraphicStringVerifier verifier = new GraphicStringVerifier();
 
     @Test
     void testValidCharacters() {
@@ -47,12 +47,12 @@ public class GraphicStringVerifierTest {
                 .map(String::valueOf)
                 .collect(Collectors.joining());
 
-        assertThat(Optional.empty(), equalTo(verifier.verify(allowedCharacters)));
+        assertThat(verifier.verify(allowedCharacters), equalTo(Optional.empty()));
     }
 
     @Test
     void testInvalidCharacters() {
-        assertThat(Optional.of("öüäé"), equalTo(verifier.verify("aböüäé;\n12")));
+        assertThat(verifier.verify("aböüäé;\n12"), equalTo(Optional.of("öüäé\n")));
     }
 
 }

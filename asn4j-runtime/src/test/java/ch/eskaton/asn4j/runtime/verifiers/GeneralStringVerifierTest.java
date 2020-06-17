@@ -30,24 +30,29 @@ package ch.eskaton.asn4j.runtime.verifiers;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class UTCTimeVerifierTest {
+public class GeneralStringVerifierTest {
 
-    public static final UTCTimeVerifier verifier = new UTCTimeVerifier();
+    public static final GeneralStringVerifier verifier = new GeneralStringVerifier();
 
     @Test
     void testValidCharacters() {
-        assertThat(verifier.verify("5612301417-0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417+0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417Z"), equalTo(Optional.empty()));
+        var allowedCharacters = IntStream.range(0, 128).boxed()
+                .map(i -> (char) i.intValue())
+                .map(String::valueOf)
+                .collect(Collectors.joining());
+
+        assertThat(verifier.verify(allowedCharacters), equalTo(Optional.empty()));
     }
 
     @Test
     void testInvalidCharacters() {
-        assertThat(verifier.verify("01.,aA23"), equalTo(Optional.of(".,aA")));
+        assertThat(verifier.verify("öüäé"), equalTo(Optional.of("öüäé")));
     }
 
 }

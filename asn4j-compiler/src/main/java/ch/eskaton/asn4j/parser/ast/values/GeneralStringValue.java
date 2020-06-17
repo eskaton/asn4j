@@ -25,29 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.parser.ast.values;
 
-import org.junit.jupiter.api.Test;
+import ch.eskaton.asn4j.parser.Position;
 
-import java.util.Optional;
+public class GeneralStringValue extends AbstractValue implements HasStringValue {
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+    private String value;
 
-public class UTCTimeVerifierTest {
+    public GeneralStringValue(Position position, String value) {
+        super(position);
 
-    public static final UTCTimeVerifier verifier = new UTCTimeVerifier();
-
-    @Test
-    void testValidCharacters() {
-        assertThat(verifier.verify("5612301417-0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417+0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417Z"), equalTo(Optional.empty()));
+        this.value = value;
     }
 
-    @Test
-    void testInvalidCharacters() {
-        assertThat(verifier.verify("01.,aA23"), equalTo(Optional.of(".,aA")));
+    @Override
+    public String getValue() {
+        return value;
     }
 
 }

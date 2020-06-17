@@ -27,27 +27,11 @@
 
 package ch.eskaton.asn4j.runtime.verifiers;
 
-import org.junit.jupiter.api.Test;
+public class GeneralStringVerifier implements StringVerifier {
 
-import java.util.Optional;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-public class UTCTimeVerifierTest {
-
-    public static final UTCTimeVerifier verifier = new UTCTimeVerifier();
-
-    @Test
-    void testValidCharacters() {
-        assertThat(verifier.verify("5612301417-0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417+0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417Z"), equalTo(Optional.empty()));
-    }
-
-    @Test
-    void testInvalidCharacters() {
-        assertThat(verifier.verify("01.,aA23"), equalTo(Optional.of(".,aA")));
+    @Override
+    public boolean isValidCharacter(int c) {
+        return c >= 0 && c <= 127;
     }
 
 }

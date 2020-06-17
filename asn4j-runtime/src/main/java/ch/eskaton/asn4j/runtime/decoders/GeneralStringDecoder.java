@@ -25,29 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.verifiers;
+package ch.eskaton.asn4j.runtime.decoders;
 
-import org.junit.jupiter.api.Test;
+import ch.eskaton.asn4j.runtime.DecoderState;
+import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
-import java.util.Optional;
+public class GeneralStringDecoder implements TypeDecoder<ASN1GeneralString> {
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
-public class UTCTimeVerifierTest {
-
-    public static final UTCTimeVerifier verifier = new UTCTimeVerifier();
-
-    @Test
-    void testValidCharacters() {
-        assertThat(verifier.verify("5612301417-0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417+0809"), equalTo(Optional.empty()));
-        assertThat(verifier.verify("5612301417Z"), equalTo(Optional.empty()));
-    }
-
-    @Test
-    void testInvalidCharacters() {
-        assertThat(verifier.verify("01.,aA23"), equalTo(Optional.of(".,aA")));
+    @Override
+    public void decode(DecoderStates states, DecoderState state, ASN1GeneralString obj) {
+        try {
+            obj.setValue(new String(RuntimeUtils.getValue(states, state)));
+        } catch (ASN1RuntimeException e) {
+            throw new DecodingException(e);
+        }
     }
 
 }

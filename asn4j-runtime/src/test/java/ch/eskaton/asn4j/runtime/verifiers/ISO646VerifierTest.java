@@ -42,13 +42,13 @@ public class ISO646VerifierTest {
 
     @Test
     void testValidCharacters() {
-        assertThat(Optional.empty(), equalTo(verifier.verify(ALLOWED_CHARACTERS)));
+        assertThat(verifier.verify(ALLOWED_CHARACTERS), equalTo(Optional.empty()));
     }
 
     @Test
     void testInvalidCharacters() {
-        assertThat(Optional.of("\u0015"), equalTo(verifier.verify("ab\u0015cd")));
-        assertThat(Optional.of("\u007F"), equalTo(verifier.verify("ab\u007Fcd")));
+        assertThat(verifier.verify("ab\u0015cd"), equalTo(Optional.of("\u0015")));
+        assertThat(verifier.verify("ab\u007Fcd"), equalTo(Optional.of("\u007F")));
     }
 
 }

@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.GeneralString;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.GraphicString;
 import ch.eskaton.asn4j.parser.ast.types.IA5String;
@@ -63,6 +64,7 @@ import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.GeneralStringValue;
 import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
 import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
@@ -113,6 +115,7 @@ public class DefaultsCompiler {
                     .put(PrintableString.class, new DefaultCompilerImpl(PrintableStringValue.class))
                     .put(IA5String.class, new DefaultCompilerImpl(IA5StringValue.class))
                     .put(GraphicString.class, new DefaultCompilerImpl(GraphicStringValue.class))
+                    .put(GeneralString.class, new DefaultCompilerImpl(GeneralStringValue.class))
                     .put(TeletexString.class, new DefaultCompilerImpl(TeletexStringValue.class))
                     .put(T61String.class, new DefaultCompilerImpl(TeletexStringValue.class))
                     .put(VideotexString.class, new DefaultCompilerImpl(VideotexStringValue.class))
