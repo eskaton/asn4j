@@ -144,7 +144,7 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
 
     private Type resolveTypeReference(Type type) {
         if (type instanceof TypeReference) {
-            type = (Type) ctx.resolveTypeReference(type);
+            type = ctx.resolveTypeReference(type);
         }
 
         return type;

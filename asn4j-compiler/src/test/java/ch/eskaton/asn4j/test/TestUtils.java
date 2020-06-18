@@ -52,7 +52,9 @@ public class TestUtils {
             action.execute();
             fail(exception.getSimpleName() + " expected");
         } catch (Exception e) {
-            assertTrue(exception.isAssignableFrom(rootCause(e).getClass()));
+            assertTrue(exception.isAssignableFrom(rootCause(e).getClass()),
+                    () -> String.format("Expected an exception of type %s but was %s",
+                            exception.getSimpleName(), rootCause(e).getClass().getSimpleName()));
 
             return Optional.of(e);
         }

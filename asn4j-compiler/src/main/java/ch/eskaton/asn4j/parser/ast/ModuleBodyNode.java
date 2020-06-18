@@ -85,7 +85,7 @@ public class ModuleBodyNode extends AbstractNode {
         }
     }
 
-    public AssignmentNode getAssignments(String name) {
+    public AssignmentNode getAssignment(String name) {
         if (assignments != null && assignments.containsKey(name)) {
             return assignments.get(name);
         }

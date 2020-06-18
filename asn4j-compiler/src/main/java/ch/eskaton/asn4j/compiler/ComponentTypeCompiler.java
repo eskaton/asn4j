@@ -113,15 +113,15 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
     private List<Tuple2<String, CompiledType>> compileComponentType(CompilerContext ctx,
             CompiledCollectionType compiledType, TagMode mode, Type type) {
-        TypeAssignmentNode assignment;
+        Optional<TypeAssignmentNode> assignment;
 
         if (type instanceof TypeReference) {
             TypeReference typeRef = (TypeReference) type;
             String refTypeName = typeRef.getType();
 
-            assignment = ctx.getTypeAssignment(refTypeName, Optional.empty());
+            assignment = ctx.getTypeAssignment(refTypeName);
 
-            if (assignment == null) {
+            if (assignment.isEmpty()) {
                 throw new CompilerException("Type %s referenced but not defined", refTypeName);
             }
 
@@ -131,9 +131,9 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             String refTypeName = typeRef.getType();
             String refModuleName = typeRef.getModule();
 
-            assignment = ctx.getTypeAssignment(refTypeName, Optional.of(refModuleName));
+            assignment = ctx.getTypeAssignment(refModuleName, refTypeName);
 
-            if (assignment == null) {
+            if (assignment.isEmpty()) {
                 throw new CompilerException("Type %s from Module %s referenced but not defined or not exported",
                         refTypeName, refModuleName);
             }
@@ -143,7 +143,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             throw new CompilerException("Unimplemented type %s", type);
         }
 
-        Type referencedType = assignment.getType();
+        Type referencedType = assignment.get().getType();
         List<ComponentType> componentTypes;
 
         if (referencedType instanceof SetType) {

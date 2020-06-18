@@ -59,7 +59,11 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
         Node type = valueAssignment.getType();
         Node value = valueAssignment.getValue();
 
-        type = ctx.resolveTypeReference(type);
+        if (!(type instanceof Type)) {
+            throw new CompilerException("Invalid type %s", type.getClass().getSimpleName());
+        }
+
+        type = ctx.resolveTypeReference((Type) type);
 
         if (typeClass.isAssignableFrom(type.getClass())) {
             if (DefinedValue.class.isAssignableFrom(value.getClass())) {

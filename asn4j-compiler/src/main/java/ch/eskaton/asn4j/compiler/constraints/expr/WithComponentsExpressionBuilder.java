@@ -248,11 +248,11 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
 
         buildExpressionFunction(module, expression, expressionSym, parameterDefinition);
 
-        return Tuple2.of(expressionSym, ctx.getRuntimeType(compiledType.getType()));
+        return Tuple2.of(expressionSym, ctx.getRuntimeTypeName(compiledType.getType()));
     }
 
     private List<Parameter> getParameterDefinition(CompiledType compiledType) {
-        return parameterDefinitionDispatcher.execute(ctx.getRuntimeType(compiledType.getType()), compiledType);
+        return parameterDefinitionDispatcher.execute(ctx.getRuntimeTypeName(compiledType.getType()), compiledType);
     }
 
     private List<Parameter> getCollectionOfParameterDefinition(CompiledType compiledType) {

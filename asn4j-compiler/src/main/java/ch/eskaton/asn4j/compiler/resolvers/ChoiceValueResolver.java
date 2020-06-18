@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -73,19 +74,23 @@ public class ChoiceValueResolver extends AbstractValueResolver<ChoiceValue> {
                 choiceType = (Choice) type;
             } else {
                 String typeName;
-                Optional<String> moduleName;
+                Optional<TypeAssignmentNode> typeAssignment;
 
                 if (resolvedType instanceof TypeReference) {
                     typeName = ((TypeReference) resolvedType).getType();
-                    moduleName = Optional.empty();
+                    typeAssignment = ctx.getTypeAssignment(typeName);
                 } else if (resolvedType instanceof ExternalTypeReference) {
                     typeName = ((ExternalTypeReference) resolvedType).getType();
-                    moduleName = Optional.of(((ExternalTypeReference) resolvedType).getModule());
+                    typeAssignment = ctx.getTypeAssignment(((ExternalTypeReference) resolvedType).getModule());
                 } else {
                     throw new IllegalCompilerStateException("Unsupported type: %s", formatType(ctx, resolvedType));
                 }
 
-                choiceType = (Choice) ctx.getTypeAssignment(typeName, moduleName).getType();
+                if (typeAssignment.isEmpty()) {
+                    throw new CompilerException("Failed to resolve type: %s", typeName);
+                }
+
+                choiceType = (Choice) typeAssignment.get().getType();
             }
 
             var maybeNamedType = choiceType.getAllAlternatives().stream()

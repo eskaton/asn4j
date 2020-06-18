@@ -187,11 +187,11 @@ public class WithComponentExpressionBuilder extends InnerTypeExpressionBuilder {
     }
 
     private List<Expression> getParameters(CompiledType compiledContentType) {
-        return parametersDispatcher.execute(ctx.getRuntimeType(compiledContentType.getType()), compiledContentType);
+        return parametersDispatcher.execute(ctx.getRuntimeTypeName(compiledContentType.getType()), compiledContentType);
     }
 
     private List<Parameter> getParameterDefinition(CompiledType compiledType, String type) {
-        return parameterDefinitionDispatcher.execute(ctx.getRuntimeType(type), compiledType);
+        return parameterDefinitionDispatcher.execute(ctx.getRuntimeTypeName(type), compiledType);
     }
 
     private List<Parameter> getParameterDefinition(CompiledCollectionOfType compiledBaseType, String type,
