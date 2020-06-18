@@ -114,7 +114,7 @@ public class TypeFormatter {
         } else if (type instanceof RelativeIRI) {
             return RELATIVE_OID_IRI.getName();
         } else if (type instanceof TypeReference) {
-            return formatType(ctx, ctx.resolveTypeReference(type));
+            return formatType(ctx, ctx.resolveTypeReference((TypeReference) type));
         }
 
         throw new IllegalCompilerStateException("Formatter for type %s not defined", type.getClass());

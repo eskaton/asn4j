@@ -37,34 +37,7 @@ import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
-import ch.eskaton.asn4j.compiler.resolvers.BMPStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.ChoiceValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.CollectionOfValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.CollectionValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.EnumeratedValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.GeneralStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.GeneralizedTimeValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.GraphicStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.IA5StringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.IRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.IntegerValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.NullValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.NumericStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.ObjectIdentifierValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.OctetStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.PrintableStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RealValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeIRIValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.RelativeOIDValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.TeletexStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.UTCTimeValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.UTF8StringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.UniversalStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.VideotexStringValueResolver;
-import ch.eskaton.asn4j.compiler.resolvers.VisibleStringValueResolver;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -78,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BMPString;
@@ -86,7 +60,6 @@ import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
-import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.GeneralString;
@@ -120,74 +93,29 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
-import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
-import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
-import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
-import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
-import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
-import ch.eskaton.asn4j.parser.ast.values.GeneralStringValue;
-import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
-import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
-import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
-import ch.eskaton.asn4j.parser.ast.values.IRIValue;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.parser.ast.values.NullValue;
-import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
-import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
-import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
-import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
-import ch.eskaton.asn4j.parser.ast.values.RealValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
-import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
-import ch.eskaton.asn4j.parser.ast.values.TimeValue;
-import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
-import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
-import ch.eskaton.asn4j.parser.ast.values.UniversalStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
-import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
-import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
-import ch.eskaton.asn4j.runtime.types.ASN1Choice;
-import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
 import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
 import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
-import ch.eskaton.asn4j.runtime.types.ASN1IRI;
-import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
-import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
-import ch.eskaton.asn4j.runtime.types.ASN1Real;
-import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
-import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
-import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
-import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
-import ch.eskaton.asn4j.runtime.types.ASN1Set;
-import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
 import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
-import ch.eskaton.commons.collections.Maps;
-import ch.eskaton.commons.collections.Sets;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -201,7 +129,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -213,142 +140,7 @@ public class CompilerContext {
 
     private HashMap<String, HashMap<String, CompiledType>> definedTypes = new HashMap<>();
 
-    private Map<Class<?>, Compiler<?>> compilers = Maps.<Class<?>, Compiler<?>>builder()
-            .put(BitString.class, new BitStringCompiler())
-            .put(BooleanType.class, new BooleanCompiler())
-            .put(Choice.class, new ChoiceCompiler())
-            .put(ComponentType.class, new ComponentTypeCompiler())
-            .put(EnumeratedType.class, new EnumeratedTypeCompiler())
-            .put(IntegerType.class, new IntegerCompiler())
-            .put(Null.class, new NullCompiler())
-            .put(OctetString.class, new OctetStringCompiler())
-            .put(Real.class, new RealCompiler())
-            .put(SequenceType.class, new SequenceCompiler())
-            .put(SequenceOfType.class, new SequenceOfCompiler())
-            .put(SetType.class, new SetCompiler())
-            .put(SetOfType.class, new SetOfCompiler())
-            .put(Type.class, new TypeCompiler())
-            .put(TypeReference.class, new TypeReferenceCompiler())
-            .put(ExternalTypeReference.class, new ExternalTypeReferenceCompiler())
-            .put(TypeAssignmentNode.class, new TypeAssignmentCompiler())
-            .put(VisibleString.class, new VisibleStringCompiler())
-            .put(NumericString.class, new NumericStringCompiler())
-            .put(PrintableString.class, new PrintableStringCompiler())
-            .put(IA5String.class, new IA5StringCompiler())
-            .put(GraphicString.class, new GraphicStringCompiler())
-            .put(GeneralString.class, new GeneralStringCompiler())
-            .put(TeletexString.class, new TeletexStringCompiler())
-            .put(T61String.class, new TeletexStringCompiler())
-            .put(VideotexString.class, new VideotexStringCompiler())
-            .put(UniversalString.class, new UniversalStringCompiler())
-            .put(UTF8String.class, new UTF8StringCompiler())
-            .put(BMPString.class, new BMPStringCompiler())
-            .put(SelectionType.class, new SelectionTypeCompiler())
-            .put(ObjectIdentifier.class, new ObjectIdentifierCompiler())
-            .put(RelativeOID.class, new RelativeOIDCompiler())
-            .put(IRI.class, new IRICompiler())
-            .put(RelativeIRI.class, new RelativeIRICompiler())
-            .put(GeneralizedTime.class, new GeneralizedTimeCompiler())
-            .put(UTCTime.class, new UTCTimeCompiler())
-            .build();
-
-    private Map<Class<?>, ValueResolver<?>> valueResolvers = Maps.<Class<?>, ValueResolver<?>>builder()
-            .put(BooleanValue.class, new BooleanValueResolver(CompilerContext.this))
-            .put(IntegerValue.class, new IntegerValueResolver(CompilerContext.this))
-            .put(RealValue.class, new RealValueResolver(CompilerContext.this))
-            .put(EnumeratedValue.class, new EnumeratedValueResolver(CompilerContext.this))
-            .put(BitStringValue.class, new BitStringValueResolver(CompilerContext.this))
-            .put(OctetStringValue.class, new OctetStringValueResolver(CompilerContext.this))
-            .put(NullValue.class, new NullValueResolver(CompilerContext.this))
-            .put(ObjectIdentifierValue.class, new ObjectIdentifierValueResolver(CompilerContext.this))
-            .put(RelativeOIDValue.class, new RelativeOIDValueResolver(CompilerContext.this))
-            .put(IRIValue.class, new IRIValueResolver(CompilerContext.this))
-            .put(RelativeIRIValue.class, new RelativeIRIValueResolver(CompilerContext.this))
-            .put(CollectionValue.class, new CollectionValueResolver(CompilerContext.this))
-            .put(CollectionOfValue.class, new CollectionOfValueResolver(CompilerContext.this))
-            .put(ChoiceValue.class, new ChoiceValueResolver(CompilerContext.this))
-            .put(VisibleStringValue.class, new VisibleStringValueResolver(CompilerContext.this))
-            .put(UTCTimeValue.class, new UTCTimeValueResolver(CompilerContext.this))
-            .put(GeneralizedTimeValue.class, new GeneralizedTimeValueResolver(CompilerContext.this))
-            .put(NumericStringValue.class, new NumericStringValueResolver(CompilerContext.this))
-            .put(PrintableStringValue.class, new PrintableStringValueResolver(CompilerContext.this))
-            .put(IA5StringValue.class, new IA5StringValueResolver(CompilerContext.this))
-            .put(GraphicStringValue.class, new GraphicStringValueResolver(CompilerContext.this))
-            .put(GeneralStringValue.class, new GeneralStringValueResolver(CompilerContext.this))
-            .put(TeletexStringValue.class, new TeletexStringValueResolver(CompilerContext.this))
-            .put(VideotexStringValue.class, new VideotexStringValueResolver(CompilerContext.this))
-            .put(UniversalStringValue.class, new UniversalStringValueResolver(CompilerContext.this))
-            .put(UTF8StringValue.class, new UTF8StringValueResolver(CompilerContext.this))
-            .put(BMPStringValue.class, new BMPStringValueResolver(CompilerContext.this))
-            .build();
-
-    @SuppressWarnings("serial")
-    private Set<String> builtinTypes = Sets.<String>builder()
-            .add(BooleanType.class.getSimpleName())
-            .add(BitString.class.getSimpleName())
-            .add(IntegerType.class.getSimpleName())
-            .add(Null.class.getSimpleName())
-            .add(OctetString.class.getSimpleName())
-            .add(Real.class.getSimpleName())
-            .add(VisibleString.class.getSimpleName())
-            .add(NumericString.class.getSimpleName())
-            .add(PrintableString.class.getSimpleName())
-            .add(IA5String.class.getSimpleName())
-            .add(GraphicString.class.getSimpleName())
-            .add(GeneralString.class.getSimpleName())
-            .add(TeletexString.class.getSimpleName())
-            .add(T61String.class.getSimpleName())
-            .add(VideotexString.class.getSimpleName())
-            .add(UniversalString.class.getSimpleName())
-            .add(UTF8String.class.getSimpleName())
-            .add(BMPString.class.getSimpleName())
-            .build();
-
-    @SuppressWarnings("serial")
-    private Map<String, String> runtimeTypes = Maps.<String, String>builder()
-            .put(BooleanType.class.getSimpleName(), ASN1Boolean.class.getSimpleName())
-            .put(BitString.class.getSimpleName(), ASN1BitString.class.getSimpleName())
-            .put(Choice.class.getSimpleName(), ASN1Choice.class.getSimpleName())
-            .put(EnumeratedType.class.getSimpleName(), ASN1EnumeratedType.class.getSimpleName())
-            .put(GeneralizedTime.class.getSimpleName(), ASN1GeneralizedTime.class.getSimpleName())
-            .put(UTCTime.class.getSimpleName(), ASN1UTCTime.class.getSimpleName())
-            .put(IntegerType.class.getSimpleName(), ASN1Integer.class.getSimpleName())
-            .put(Null.class.getSimpleName(), ASN1Null.class.getSimpleName())
-            .put(ObjectIdentifier.class.getSimpleName(), ASN1ObjectIdentifier.class.getSimpleName())
-            .put(RelativeOID.class.getSimpleName(), ASN1RelativeOID.class.getSimpleName())
-            .put(IRI.class.getSimpleName(), ASN1IRI.class.getSimpleName())
-            .put(RelativeIRI.class.getSimpleName(), ASN1RelativeIRI.class.getSimpleName())
-            .put(OctetString.class.getSimpleName(), ASN1OctetString.class.getSimpleName())
-            .put(SequenceType.class.getSimpleName(), ASN1Sequence.class.getSimpleName())
-            .put(SequenceOfType.class.getSimpleName(), ASN1SequenceOf.class.getSimpleName())
-            .put(SetType.class.getSimpleName(), ASN1Set.class.getSimpleName())
-            .put(SetOfType.class.getSimpleName(), ASN1SetOf.class.getSimpleName())
-            .put(Real.class.getSimpleName(), ASN1Real.class.getSimpleName())
-            .put(VisibleString.class.getSimpleName(), ASN1VisibleString.class.getSimpleName())
-            .build();
-
-    private Map<Class<? extends Type>, Class<? extends Value>> types2values =
-            Maps.<Class<? extends Type>, Class<? extends Value>>builder()
-                    .put(BooleanType.class, BooleanValue.class)
-                    .put(BitString.class, BitStringValue.class)
-                    .put(Choice.class, ChoiceValue.class)
-                    .put(EnumeratedType.class, EnumeratedValue.class)
-                    .put(GeneralizedTime.class, TimeValue.class)
-                    .put(UTCTime.class, TimeValue.class)
-                    .put(IntegerType.class, IntegerValue.class)
-                    .put(Null.class, NullValue.class)
-                    .put(ObjectIdentifier.class, ObjectIdentifierValue.class)
-                    .put(RelativeOID.class, RelativeOIDValue.class)
-                    .put(IRI.class, IRIValue.class)
-                    .put(RelativeIRI.class, RelativeIRIValue.class)
-                    .put(OctetString.class, OctetStringValue.class)
-                    .put(SequenceType.class, CollectionValue.class)
-                    .put(SequenceOfType.class, CollectionOfValue.class)
-                    .put(SetType.class, CollectionValue.class)
-                    .put(SetOfType.class, CollectionOfValue.class)
-                    .put(Real.class, RealValue.class)
-                    .put(VisibleString.class, StringValue.class)
-                    .build();
+    private TypeConfiguration config = new TypeConfiguration(this);
 
     private ConstraintCompiler constraintCompiler = new ConstraintCompiler(this);
 
@@ -382,13 +174,7 @@ public class CompilerContext {
 
     @SuppressWarnings("unchecked")
     public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> clazz) {
-        Compiler<?> compiler = compilers.get(clazz);
-
-        if (compiler == null) {
-            throw new CompilerException("No compiler for node-type " + clazz.getSimpleName());
-        }
-
-        return (C) compiler;
+        return config.getCompiler(clazz);
     }
 
     public ModuleNode getModule() {
@@ -485,21 +271,32 @@ public class CompilerContext {
     }
 
     public Type getBase(String typeName) {
+        return getType(currentModule.peek(), typeName);
+    }
+
+    private Type getType(ModuleNode module, String typeName) {
         // TODO: what to do if the type isn't known in the current module
         while (true) {
             // Check for implicitly defined types
-            if (GeneralizedTime.class.getSimpleName().equals(typeName) ||
-                    UTCTime.class.getSimpleName().equals(typeName)) {
-                return new VisibleString(NO_POSITION);
+            if (GeneralizedTime.class.getSimpleName().equals(typeName)) {
+                return new GeneralizedTime(NO_POSITION, typeName);
+            } else if (UTCTime.class.getSimpleName().equals(typeName)) {
+                return new UTCTime(NO_POSITION, typeName);
             }
 
-            TypeAssignmentNode assignment = getTypeAssignment(typeName);
+            Optional<TypeAssignmentNode> assignment = getTypeAssignment(module, typeName);
 
-            if (assignment == null) {
-                throw new CompilerException("Failed to resolve a type: " + typeName);
+            if (assignment.isEmpty()) {
+                var moduleName = findImport(typeName);
+
+                if (moduleName.isPresent()) {
+                    return getType(getModule(moduleName.get()), typeName);
+                }
+
+                throw new CompilerException("Failed to resolve a type: %s", typeName);
             }
 
-            Type base = assignment.getType();
+            Type base = assignment.get().getType();
 
             if (base instanceof TypeReference) {
                 typeName = ((TypeReference) base).getType();
@@ -507,6 +304,15 @@ public class CompilerContext {
                 return base;
             }
         }
+    }
+
+    private Optional<String> findImport(String typeName) {
+        return currentModule.peek().getBody().getImports().stream()
+                .filter(importNode -> importNode.getSymbols().stream()
+                        .filter(sym -> sym.getName().equals(typeName))
+                        .findFirst().isPresent()
+                ).map(importNode -> importNode.getReference().getName())
+                .findAny();
     }
 
     public Type getBase(Type type) {
@@ -518,29 +324,7 @@ public class CompilerContext {
     }
 
     public Type getBase(TypeReference type) {
-        // TODO: what to do if the type isn't known in the current module
-        while (true) {
-            String typeName = type.getType();
-
-            // Check for implicitly defined types
-            if (type instanceof UsefulType) {
-                return type;
-            }
-
-            TypeAssignmentNode assignment = getTypeAssignment(typeName);
-
-            if (assignment == null) {
-                throw new CompilerException(type.getPosition(), "Failed to resolve a type: " + typeName);
-            }
-
-            Type base = assignment.getType();
-
-            if (base instanceof TypeReference) {
-                type = (TypeReference) base;
-            } else {
-                return base;
-            }
-        }
+        return getBase(type.getType());
     }
 
     public String getTypeName(Type type) {
@@ -642,7 +426,7 @@ public class CompilerContext {
         if (newType && name != null) {
             typeName = CompilerUtils.formatTypeName(name);
         } else {
-            typeName = getRuntimeType(type.getClass());
+            typeName = getRuntimeTypeName(type.getClass());
 
             if (typeName == null) {
                 throw new CompilerException("No runtime class available for type " + type);
@@ -698,23 +482,30 @@ public class CompilerContext {
         return this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
     }
 
-    private TypeAssignmentNode getTypeAssignment(String typeName) {
-        return getTypeAssignment(typeName, Optional.empty());
+    public Optional<TypeAssignmentNode> getTypeAssignment(String typeName) {
+        return getTypeAssignment(currentModule.peek(), typeName);
     }
 
-    public TypeAssignmentNode getTypeAssignment(String typeName, Optional<String> moduleName) {
-        Optional<ModuleNode> module = moduleName.map(n -> Optional.ofNullable(modules.get(n)))
-                .orElseGet(() -> Optional.of(getModule()));
+    public Optional<TypeAssignmentNode> getTypeAssignment(String moduleName, String typeName) {
+        var module = Optional.ofNullable(modules.get(moduleName));
 
-        return module.map(m -> m.getBody().getAssignments().stream()
+        if (module.isPresent()) {
+            return getTypeAssignment(module.get(), typeName);
+        }
+
+        return Optional.empty();
+    }
+
+    private Optional<TypeAssignmentNode> getTypeAssignment(ModuleNode module, String typeName) {
+        return module.getBody().getAssignments().stream()
                 .filter(TypeAssignmentNode.class::isInstance)
                 .map(TypeAssignmentNode.class::cast)
                 .filter(a -> typeName.equals(a.getReference()))
-                .findFirst()).get().orElse(null);
+                .findFirst();
     }
 
     public Class<? extends Value> getValueType(Type type) {
-        Class<?> typeClass;
+        Class<? extends Type> typeClass;
 
         if (type instanceof TypeReference) {
             typeClass = resolveTypeReference(type).getClass();
@@ -722,33 +513,26 @@ public class CompilerContext {
             typeClass = type.getClass();
         }
 
-        Class<? extends Value> valueClass = types2values.get(typeClass);
-
-        if (valueClass == null) {
-            throw new ASN1RuntimeException(String.format("Value class for type %s not defined",
-                    typeClass.getSimpleName()));
-        }
-
-        return valueClass;
+        return config.getValueClass(typeClass);
     }
 
-    public boolean isBuiltin(String name) {
-        return builtinTypes.contains(name);
+    public boolean isConstructed(Type type) {
+        return config.isConstructed(type.getClass());
     }
 
-    public <T> T resolveValue(Class<T> valueClass, Optional<Type> type, T value) {
+    public <V extends Value> V resolveValue(Class<V> valueClass, Optional<Type> type, V value) {
         return getValueResolver(valueClass).resolve(type, value);
     }
 
-    public <T> T resolveValue(Class<T> valueClass, DefinedValue ref) {
+    public <V extends Value> V resolveValue(Class<V> valueClass, DefinedValue ref) {
         return getValueResolver(valueClass).resolve(ref);
     }
 
-    public <T> T resolveValue(Class<T> valueClass, String ref) {
+    public <V extends Value> V resolveValue(Class<V> valueClass, String ref) {
         return getValueResolver(valueClass).resolve(ref);
     }
 
-    public <T> T resolveValue(Class<T> valueClass, String moduleName, String reference) {
+    public <V extends Value> V resolveValue(Class<V> valueClass, String moduleName, String reference) {
         var module = getModule(moduleName);
 
         if (module != null) {
@@ -764,7 +548,7 @@ public class CompilerContext {
         return null;
     }
 
-    public <T> T resolveGenericValue(Class<T> valueClass, Type type, Value value) {
+    public <V extends Value> V resolveGenericValue(Class<V> valueClass, Type type, Value value) {
         var resolvedValue = getValueResolver(valueClass).resolveGeneric(type, value);
 
         if (resolvedValue instanceof AbstractValue) {
@@ -774,32 +558,40 @@ public class CompilerContext {
         return resolvedValue;
     }
 
-    private <T> ValueResolver<T> getValueResolver(Class<T> valueClass) {
-        ValueResolver<T> valueResolver = (ValueResolver<T>) valueResolvers.get(valueClass);
-
-        if (valueResolver == null) {
-            throw new CompilerException("No value resolver defined for type " + valueClass.getSimpleName());
-        }
-
-        return valueResolver;
+    private <V extends Value> ValueResolver<V> getValueResolver(Class<V> valueClass) {
+        return config.getValueResolver(valueClass);
     }
 
-    public Node resolveTypeReference(Node type) {
-        while (type instanceof TypeReference) {
-            if (type instanceof GeneralizedTime || type instanceof UTCTime) {
-                return type;
+    public Type resolveTypeReference(String reference) {
+        // TODO: what to do if the type isn't known in the current module
+        return Optional.ofNullable(((TypeAssignmentNode) getModule().getBody().getAssignment(reference)))
+                .map(TypeOrObjectClassAssignmentNode::getType)
+                .orElseThrow(() -> new CompilerException("Failed to resolve reference to %s", reference));
+    }
+
+    public Type resolveTypeReference(Type typeReference) {
+        while (typeReference instanceof TypeReference) {
+            if (typeReference instanceof GeneralizedTime || typeReference instanceof UTCTime) {
+                return typeReference;
             }
 
-            TypeAssignmentNode assignment = getTypeAssignment(((TypeReference) type).getType());
+            Optional<TypeAssignmentNode> assignment = getTypeAssignment(((TypeReference) typeReference).getType());
 
-            if (assignment != null) {
-                type = assignment.getType();
+            if (assignment.isPresent()) {
+                var node = assignment.get().getType();
+
+                if (!(node instanceof Type)) {
+                    throw new CompilerException("Invalid type: %s", node.getClass().getSimpleName());
+                }
+
+                typeReference = node;
             } else {
-                throw new CompilerException("Failed to resolve reference to " + ((TypeReference) type).getType());
+                throw new CompilerException("Failed to resolve reference to %s",
+                        ((TypeReference) typeReference).getType());
             }
         }
 
-        return type;
+        return typeReference;
     }
 
     public ValueOrObjectAssignmentNode resolveDefinedValue(DefinedValue ref) {
@@ -823,7 +615,7 @@ public class CompilerContext {
 
         ensureSymbolIsExported(module, symbolName);
 
-        AssignmentNode assignment = modules.get(moduleName).getBody().getAssignments(symbolName);
+        AssignmentNode assignment = modules.get(moduleName).getBody().getAssignment(symbolName);
 
         if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
             throw new CompilerException("Failed to resolve reference " + reference);
@@ -864,7 +656,7 @@ public class CompilerContext {
     }
 
     public Optional<ValueOrObjectAssignmentNode> tryResolveReference(String symbolName) {
-        AssignmentNode assignment = getModule().getBody().getAssignments(symbolName);
+        AssignmentNode assignment = getModule().getBody().getAssignment(symbolName);
 
         if (assignment == null) {
             Optional<ImportNode> imp = getImport(symbolName);
@@ -876,7 +668,7 @@ public class CompilerContext {
 
                 ensureSymbolIsExported(module, symbolName);
 
-                assignment = modules.get(moduleName).getBody().getAssignments(symbolName);
+                assignment = modules.get(moduleName).getBody().getAssignment(symbolName);
             }
         }
 
@@ -956,7 +748,7 @@ public class CompilerContext {
             Type selectedType = ((SelectionType) type).getType();
 
             if (selectedType instanceof TypeReference) {
-                Object assignment = getModule().getBody().getAssignments(((TypeReference) selectedType).getType());
+                Object assignment = getModule().getBody().getAssignment(((TypeReference) selectedType).getType());
 
                 if (assignment instanceof TypeAssignmentNode) {
                     Type collectionType = ((TypeAssignmentNode) assignment).getType();
@@ -1148,22 +940,22 @@ public class CompilerContext {
         return currentModule.peek().getModuleId().getModuleName();
     }
 
-    public String getRuntimeType(Class<?> type) {
-        return runtimeTypes.get(type.getSimpleName());
+    public String getRuntimeTypeName(Class<? extends Type> type) {
+        return config.getRuntimeTypeClass(type).getSimpleName();
     }
 
-    public String getRuntimeType(String typeName) {
+    public String getRuntimeTypeName(String typeName) {
         try {
             Type type = getBase(typeName);
 
-            return getRuntimeType(type.getClass());
+            return getRuntimeTypeName(type.getClass());
         } catch (CompilerException e) {
             return typeName;
         }
     }
 
-    public String getRuntimeType(Type type) {
-        return getRuntimeType(resolveTypeReference(type).getClass());
+    public String getRuntimeTypeName(Type type) {
+        return getRuntimeTypeName(resolveTypeReference(type).getClass());
     }
 
     public List<String> getTypeParameter(Type type) {

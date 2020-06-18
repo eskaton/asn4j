@@ -46,7 +46,7 @@ public class SelectionTypeCompiler implements NamedCompiler<SelectionType, Compi
         Type selectedType = node.getType();
 
         if (selectedType instanceof TypeReference) {
-            assignment = ctx.getModule().getBody().getAssignments(((TypeReference) selectedType).getType());
+            assignment = ctx.getModule().getBody().getAssignment(((TypeReference) selectedType).getType());
 
             if (assignment instanceof TypeAssignmentNode) {
                 Type collectionType = ((TypeAssignmentNode) assignment).getType();

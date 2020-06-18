@@ -50,7 +50,7 @@ public abstract class AbstractValueExpressionBuilder<V extends ValueNode> {
         } else if (type instanceof TypeReference) {
             return ((TypeReference) type).getType();
         } else {
-            return ctx.getRuntimeType(type.getClass());
+            return ctx.getRuntimeTypeName(type.getClass());
         }
     }
 

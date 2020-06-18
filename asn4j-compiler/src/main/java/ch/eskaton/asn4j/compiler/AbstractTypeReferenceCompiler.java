@@ -30,7 +30,6 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
@@ -56,17 +55,15 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         return compiledType;
     }
 
-    protected boolean isConstructed(CompilerContext ctx, String type) {
-        // TODO: what to do if the type isn't known in the current module
-        TypeAssignmentNode assignment = (TypeAssignmentNode) ctx.getModule().getBody().getAssignments(type);
-        Type base = assignment.getType();
+    protected boolean isConstructed(CompilerContext ctx, String typeName) {
+        Type base = ctx.resolveTypeReference(typeName);
         ASN1Tag.Mode mode = CompilerUtils.getTaggingMode(ctx.getModule(), base);
 
         if (ASN1Tag.Mode.EXPLICIT.equals(mode)) {
             return true;
         }
 
-        return !ctx.isBuiltin(ctx.getBase(base).getClass().getSimpleName());
+        return ctx.isConstructed(ctx.getBase(base));
     }
 
 }
