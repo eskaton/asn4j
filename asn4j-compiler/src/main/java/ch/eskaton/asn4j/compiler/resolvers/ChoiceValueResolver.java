@@ -30,7 +30,6 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -39,8 +38,6 @@ import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-
-import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.utils.TypeFormatter.formatType;
 
@@ -58,14 +55,14 @@ public class ChoiceValueResolver extends AbstractValueResolver<ChoiceValue> {
 
         if (value instanceof ChoiceValue) {
             final var choiceValue = (ChoiceValue) value;
-            var resolvedType = ctx.resolveType(type);
+            var resolvedType = ctx.resolveBaseType(type);
 
             Type valueType = ((ChoiceValue) value).getType();
 
             if (valueType != null) {
                 // if the type is null, the value is defined in the context of the currently compiled CHOICE,
                 // otherwise it must match the type of the latter
-                checkTypes(resolvedType, ctx.resolveType(valueType));
+                checkTypes(resolvedType, ctx.resolveBaseType(valueType));
             }
 
             Choice choiceType;

@@ -79,7 +79,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         JavaClass javaClass = ctx.getCurrentClass();
         Type type = namedType.getType();
         TaggingMode taggingMode = type.getTaggingMode();
-        Tag tag = ctx.resolveType(type).getTag();
+        Tag tag = ctx.resolveBaseType(type).getTag();
         JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
         boolean hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
         CompiledType compiledComponent = ctx.defineType(namedType);
@@ -132,6 +132,8 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             String refModuleName = typeRef.getModule();
 
             assignment = ctx.getTypeAssignment(refModuleName, refTypeName);
+
+            ctx.resolveBaseType(refModuleName, refTypeName);
 
             if (assignment.isEmpty()) {
                 throw new CompilerException("Type %s from Module %s referenced but not defined or not exported",
