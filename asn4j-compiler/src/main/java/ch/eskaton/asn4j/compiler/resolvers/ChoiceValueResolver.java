@@ -55,14 +55,14 @@ public class ChoiceValueResolver extends AbstractValueResolver<ChoiceValue> {
 
         if (value instanceof ChoiceValue) {
             final var choiceValue = (ChoiceValue) value;
-            var resolvedType = ctx.resolveBaseType(type);
+            var resolvedType = ctx.resolveSelectedType(type);
 
             Type valueType = ((ChoiceValue) value).getType();
 
             if (valueType != null) {
                 // if the type is null, the value is defined in the context of the currently compiled CHOICE,
                 // otherwise it must match the type of the latter
-                checkTypes(resolvedType, ctx.resolveBaseType(valueType));
+                checkTypes(resolvedType, ctx.resolveSelectedType(valueType));
             }
 
             Choice choiceType;

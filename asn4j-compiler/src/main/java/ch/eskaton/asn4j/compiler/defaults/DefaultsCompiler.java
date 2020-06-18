@@ -141,7 +141,7 @@ public class DefaultsCompiler {
         Type base;
 
         if (type instanceof TypeReference) {
-            base = ctx.getBase((TypeReference) type);
+            base = ctx.resolveBaseType((TypeReference) type);
         } else {
             base = type;
         }

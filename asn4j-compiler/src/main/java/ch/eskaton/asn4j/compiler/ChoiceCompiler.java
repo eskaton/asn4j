@@ -155,7 +155,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
     private TagId getTagId(CompilerContext ctx, NamedType namedType) {
         var type = namedType.getType();
-        var tag = ctx.resolveBaseType(type).getTag();
+        var tag = ctx.resolveSelectedType(type).getTag();
 
         if (tag != null) {
             return CompilerUtils.toTagId(tag);

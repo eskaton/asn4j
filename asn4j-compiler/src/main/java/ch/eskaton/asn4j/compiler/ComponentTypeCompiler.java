@@ -79,7 +79,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         JavaClass javaClass = ctx.getCurrentClass();
         Type type = namedType.getType();
         TaggingMode taggingMode = type.getTaggingMode();
-        Tag tag = ctx.resolveBaseType(type).getTag();
+        Tag tag = ctx.resolveSelectedType(type).getTag();
         JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
         boolean hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
         CompiledType compiledComponent = ctx.defineType(namedType);
