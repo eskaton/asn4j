@@ -89,7 +89,7 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
         var resolvedValue = value;
 
         if (value instanceof SimpleDefinedValue) {
-            resolvedValue = value = ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+            resolvedValue = value = ctx.tryResolveAllValueReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
         } else if (value instanceof AmbiguousValue) {
             resolvedValue = value = CompilerUtils.resolveAmbiguousValue(value, valueClass);
         }

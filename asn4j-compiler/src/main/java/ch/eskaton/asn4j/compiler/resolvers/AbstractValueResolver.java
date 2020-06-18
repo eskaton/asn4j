@@ -52,7 +52,7 @@ public abstract class AbstractValueResolver<V extends Value> implements ValueRes
 
     public V resolve(SimpleDefinedValue value) {
         try {
-            return ctx.tryResolveAllReferences(value).map(this::resolve).orElseThrow(this::error);
+            return ctx.tryResolveAllValueReferences(value).map(this::resolve).orElseThrow(this::error);
         } catch (Throwable throwable) {
             throw (RuntimeException) throwable;
         }
@@ -60,7 +60,7 @@ public abstract class AbstractValueResolver<V extends Value> implements ValueRes
 
     @Override
     public V resolve(String ref) {
-        return resolve(ctx.resolveReference(ref));
+        return resolve(ctx.resolveValueReference(ref));
     }
 
     @Override

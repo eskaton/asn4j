@@ -133,6 +133,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
+import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
@@ -271,10 +272,14 @@ public class CompilerContext {
     }
 
     public Type getBase(String typeName) {
-        return getType(currentModule.peek(), typeName);
+        return resolveType(currentModule.peek(), typeName);
     }
 
-    private Type getType(ModuleNode module, String typeName) {
+    public Type resolveType(String moduleName, String typeName) {
+        return resolveType(getModule(moduleName), typeName);
+    }
+
+    private Type resolveType(ModuleNode module, String typeName) {
         // TODO: what to do if the type isn't known in the current module
         while (true) {
             // Check for implicitly defined types
@@ -290,7 +295,7 @@ public class CompilerContext {
                 var moduleName = findImport(typeName);
 
                 if (moduleName.isPresent()) {
-                    return getType(getModule(moduleName.get()), typeName);
+                    return resolveType(getModule(moduleName.get()), typeName);
                 }
 
                 throw new CompilerException("Failed to resolve a type: %s", typeName);
@@ -569,6 +574,28 @@ public class CompilerContext {
                 .orElseThrow(() -> new CompilerException("Failed to resolve reference to %s", reference));
     }
 
+    public <T extends Type> T resolveTypeReference(Class<T> typeClass, String reference) {
+        Type type = resolveTypeReference(reference);
+
+        if (!type.getClass().equals(typeClass)) {
+            throw new CompilerException("Failed to resolve reference %s to type %s. Found type: %s",
+                    reference, typeClass.getSimpleName(), formatTypeName(type));
+        }
+
+        return (T) type;
+    }
+
+    public <T extends Type> T resolveTypeReference(Class<T> typeClass, String moduleName, String reference) {
+        Type type = resolveType(moduleName, reference);
+
+        if (!type.getClass().equals(typeClass)) {
+            throw new CompilerException("Failed to resolve reference %s to type %s. Found type: %s",
+                    reference, typeClass.getSimpleName(), formatTypeName(type));
+        }
+
+        return (T) type;
+    }
+
     public Type resolveTypeReference(Type typeReference) {
         while (typeReference instanceof TypeReference) {
             if (typeReference instanceof GeneralizedTime || typeReference instanceof UTCTime) {
@@ -598,7 +625,7 @@ public class CompilerContext {
         if (ref instanceof ExternalValueReference) {
             return resolveExternalReference(((ExternalValueReference) ref));
         } else {
-            return resolveReference(((SimpleDefinedValue) ref));
+            return resolveValueReference(((SimpleDefinedValue) ref));
         }
     }
 
@@ -624,8 +651,8 @@ public class CompilerContext {
         return (ValueOrObjectAssignmentNode<?, ?>) assignment;
     }
 
-    public Optional<ValueOrObjectAssignmentNode> tryResolveAllReferences(SimpleDefinedValue reference) {
-        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveReference(reference);
+    public Optional<ValueOrObjectAssignmentNode> tryResolveAllValueReferences(SimpleDefinedValue reference) {
+        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveValueReference(reference);
         Optional<ValueOrObjectAssignmentNode> tmpAssignment = assignment;
 
         while (tmpAssignment.isPresent()) {
@@ -637,7 +664,7 @@ public class CompilerContext {
                 break;
             }
 
-            tmpAssignment = tryResolveReference(reference);
+            tmpAssignment = tryResolveValueReference(reference);
 
             if (tmpAssignment.equals(assignment)) {
                 break;
@@ -647,15 +674,15 @@ public class CompilerContext {
         return assignment;
     }
 
-    public Optional<ValueOrObjectAssignmentNode> tryResolveReference(SimpleDefinedValue reference) {
+    public Optional<ValueOrObjectAssignmentNode> tryResolveValueReference(SimpleDefinedValue reference) {
         if (reference instanceof ExternalValueReference) {
             return Optional.ofNullable(resolveExternalReference(((ExternalValueReference) reference)));
         }
 
-        return tryResolveReference(reference.getValue());
+        return tryResolveValueReference(reference.getValue());
     }
 
-    public Optional<ValueOrObjectAssignmentNode> tryResolveReference(String symbolName) {
+    public Optional<ValueOrObjectAssignmentNode> tryResolveValueReference(String symbolName) {
         AssignmentNode assignment = getModule().getBody().getAssignment(symbolName);
 
         if (assignment == null) {
@@ -679,12 +706,12 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    public ValueOrObjectAssignmentNode resolveReference(SimpleDefinedValue reference) {
-        return resolveReference(reference.getValue());
+    public ValueOrObjectAssignmentNode resolveValueReference(SimpleDefinedValue reference) {
+        return resolveValueReference(reference.getValue());
     }
 
-    public ValueOrObjectAssignmentNode resolveReference(String symbolName) {
-        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveReference(symbolName);
+    public ValueOrObjectAssignmentNode resolveValueReference(String symbolName) {
+        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveValueReference(symbolName);
 
         if (!assignment.isPresent()) {
             throw new CompilerException("Failed to resolve reference " + symbolName);
@@ -789,10 +816,6 @@ public class CompilerContext {
         } catch (ClassNotFoundException e) {
             throw new CompilerException("Unknown type: " + type);
         }
-    }
-
-    public CompiledType getCompiledType(String typeName) {
-        return getTypesOfCurrentModule().get(typeName);
     }
 
     public CompiledCollectionType getCompiledCollectionType(CompiledType compiledType) {
@@ -1039,6 +1062,11 @@ public class CompilerContext {
             throw new IllegalCompilerStateException("Constructor %s threw an exception", e, compiledTypeClass);
         }
 
+//        if (isSubType && currentClass.size() == 1) {
+//            System.out.println(String.format("Created compiled type %s (%s): isSubType=%s stackSize=%s", compiledType.getName(), type, isSubType, currentClass.size()));
+//        }
+
+        // TODO: Optimize condition
         if (!isSubType && isTopLevelType()) {
             addType(name, compiledType);
         }

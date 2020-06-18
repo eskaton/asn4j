@@ -54,7 +54,7 @@ public class RealValueResolver extends AbstractValueResolver<RealValue> {
     @Override
     public RealValue resolveGeneric(Type type, Value value) {
         if (value instanceof SimpleDefinedValue) {
-            return ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+            return ctx.tryResolveAllValueReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
         } else if (value instanceof RealValue) {
             return (RealValue) value;
         } else if (value instanceof CollectionValue) {

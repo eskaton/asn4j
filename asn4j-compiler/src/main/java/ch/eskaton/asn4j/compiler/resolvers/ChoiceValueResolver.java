@@ -73,24 +73,18 @@ public class ChoiceValueResolver extends AbstractValueResolver<ChoiceValue> {
             if (type instanceof Choice) {
                 choiceType = (Choice) type;
             } else {
-                String typeName;
-                Optional<TypeAssignmentNode> typeAssignment;
-
                 if (resolvedType instanceof TypeReference) {
-                    typeName = ((TypeReference) resolvedType).getType();
-                    typeAssignment = ctx.getTypeAssignment(typeName);
+                    var typeName = ((TypeReference) resolvedType).getType();
+
+                    choiceType = ctx.resolveTypeReference(Choice.class, typeName);
                 } else if (resolvedType instanceof ExternalTypeReference) {
-                    typeName = ((ExternalTypeReference) resolvedType).getType();
-                    typeAssignment = ctx.getTypeAssignment(((ExternalTypeReference) resolvedType).getModule());
+                    var typeName = ((ExternalTypeReference) resolvedType).getType();
+                    var moduleName = ((ExternalTypeReference) resolvedType).getModule();
+
+                    choiceType = ctx.resolveTypeReference(Choice.class, moduleName, typeName);
                 } else {
                     throw new IllegalCompilerStateException("Unsupported type: %s", formatType(ctx, resolvedType));
                 }
-
-                if (typeAssignment.isEmpty()) {
-                    throw new CompilerException("Failed to resolve type: %s", typeName);
-                }
-
-                choiceType = (Choice) typeAssignment.get().getType();
             }
 
             var maybeNamedType = choiceType.getAllAlternatives().stream()
