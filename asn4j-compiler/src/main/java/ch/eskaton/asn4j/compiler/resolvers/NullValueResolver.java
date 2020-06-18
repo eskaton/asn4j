@@ -44,7 +44,7 @@ public class NullValueResolver extends AbstractValueResolver<NullValue> {
     @Override
     public NullValue resolveGeneric(Type type, Value value) {
         if (value instanceof SimpleDefinedValue) {
-            return ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+            return ctx.tryResolveAllValueReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
         } else if (value instanceof NullValue) {
             return (NullValue) value;
         }

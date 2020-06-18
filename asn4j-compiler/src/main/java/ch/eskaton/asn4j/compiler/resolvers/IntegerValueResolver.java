@@ -57,7 +57,7 @@ public class IntegerValueResolver extends AbstractValueResolver<IntegerValue> {
 
         if (compiledType != null && compiledType.getType() instanceof IntegerType) {
             Optional<ValueOrObjectAssignmentNode> assignmentNode =
-                    ctx.tryResolveAllReferences((SimpleDefinedValue) value);
+                    ctx.tryResolveAllValueReferences((SimpleDefinedValue) value);
 
             if (assignmentNode.isPresent()) {
                 value = (Value) assignmentNode.get().getValue();

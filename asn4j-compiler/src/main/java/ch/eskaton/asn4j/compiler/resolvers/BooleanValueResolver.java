@@ -47,7 +47,7 @@ public class BooleanValueResolver extends AbstractValueResolver<BooleanValue> {
     public BooleanValue resolveGeneric(Type type, Value value) {
         if (type instanceof BooleanType) {
             if (value instanceof SimpleDefinedValue) {
-                return ctx.tryResolveAllReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+                return ctx.tryResolveAllValueReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
             } else if (value instanceof BooleanValue) {
                 return (BooleanValue) value;
             }

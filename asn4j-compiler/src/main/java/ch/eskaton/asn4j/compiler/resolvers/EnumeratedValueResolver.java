@@ -56,7 +56,7 @@ public class EnumeratedValueResolver extends AbstractValueResolver<EnumeratedVal
 
             if (compiledType != null) {
                 Optional<ValueOrObjectAssignmentNode> assignmentNode =
-                        ctx.tryResolveAllReferences((SimpleDefinedValue) value);
+                        ctx.tryResolveAllValueReferences((SimpleDefinedValue) value);
 
                 if (assignmentNode.isPresent()) {
                     value = resolveAmbiguousValue(assignmentNode.get().getValue(), SimpleDefinedValue.class);
