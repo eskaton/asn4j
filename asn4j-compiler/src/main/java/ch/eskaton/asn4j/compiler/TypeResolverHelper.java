@@ -42,11 +42,11 @@ import java.util.Optional;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
-public class TypeResolver {
+public class TypeResolverHelper {
 
     private CompilerContext ctx;
 
-    public TypeResolver(CompilerContext ctx) {
+    public TypeResolverHelper(CompilerContext ctx) {
         this.ctx = ctx;
     }
 
