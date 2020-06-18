@@ -51,7 +51,6 @@ import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BMPString;
@@ -63,7 +62,6 @@ import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.GeneralString;
-import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.GraphicString;
 import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
@@ -86,7 +84,6 @@ import ch.eskaton.asn4j.parser.ast.types.T61String;
 import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UTF8String;
 import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
@@ -133,9 +130,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
-import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class CompilerContext {
 
@@ -146,6 +141,8 @@ public class CompilerContext {
     private ConstraintCompiler constraintCompiler = new ConstraintCompiler(this);
 
     private DefaultsCompiler defaultsCompiler = new DefaultsCompiler(this);
+
+    private TypeResolver typeResolver = new TypeResolver(this);
 
     private Deque<JavaClass> currentClass = new LinkedList<>();
 
@@ -271,65 +268,13 @@ public class CompilerContext {
         return module;
     }
 
-    public Type getBase(String typeName) {
-        return resolveType(currentModule.peek(), typeName);
-    }
-
-    public Type resolveType(String moduleName, String typeName) {
-        return resolveType(getModule(moduleName), typeName);
-    }
-
-    private Type resolveType(ModuleNode module, String typeName) {
-        // TODO: what to do if the type isn't known in the current module
-        while (true) {
-            // Check for implicitly defined types
-            if (GeneralizedTime.class.getSimpleName().equals(typeName)) {
-                return new GeneralizedTime(NO_POSITION, typeName);
-            } else if (UTCTime.class.getSimpleName().equals(typeName)) {
-                return new UTCTime(NO_POSITION, typeName);
-            }
-
-            Optional<TypeAssignmentNode> assignment = getTypeAssignment(module, typeName);
-
-            if (assignment.isEmpty()) {
-                var moduleName = findImport(typeName);
-
-                if (moduleName.isPresent()) {
-                    return resolveType(getModule(moduleName.get()), typeName);
-                }
-
-                throw new CompilerException("Failed to resolve a type: %s", typeName);
-            }
-
-            Type base = assignment.get().getType();
-
-            if (base instanceof TypeReference) {
-                typeName = ((TypeReference) base).getType();
-            } else {
-                return base;
-            }
-        }
-    }
-
-    private Optional<String> findImport(String typeName) {
+    Optional<String> findImport(String typeName) {
         return currentModule.peek().getBody().getImports().stream()
                 .filter(importNode -> importNode.getSymbols().stream()
                         .filter(sym -> sym.getName().equals(typeName))
                         .findFirst().isPresent()
                 ).map(importNode -> importNode.getReference().getName())
                 .findAny();
-    }
-
-    public Type getBase(Type type) {
-        if (type instanceof TypeReference) {
-            return getBase((TypeReference) type);
-        }
-
-        return type;
-    }
-
-    public Type getBase(TypeReference type) {
-        return getBase(type.getType());
     }
 
     public String getTypeName(Type type) {
@@ -410,7 +355,7 @@ public class CompilerContext {
             typeName = getTypeName(type, name, false);
         } else if (type instanceof SelectionType) {
             SelectionType selectionType = (SelectionType) type;
-            Type selectedType = resolveType(type);
+            Type selectedType = resolveBaseType(type);
 
             if (selectedType != type) {
                 return getTypeName(selectedType);
@@ -501,7 +446,7 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    private Optional<TypeAssignmentNode> getTypeAssignment(ModuleNode module, String typeName) {
+    Optional<TypeAssignmentNode> getTypeAssignment(ModuleNode module, String typeName) {
         return module.getBody().getAssignments().stream()
                 .filter(TypeAssignmentNode.class::isInstance)
                 .map(TypeAssignmentNode.class::cast)
@@ -567,59 +512,6 @@ public class CompilerContext {
         return config.getValueResolver(valueClass);
     }
 
-    public Type resolveTypeReference(String reference) {
-        // TODO: what to do if the type isn't known in the current module
-        return Optional.ofNullable(((TypeAssignmentNode) getModule().getBody().getAssignment(reference)))
-                .map(TypeOrObjectClassAssignmentNode::getType)
-                .orElseThrow(() -> new CompilerException("Failed to resolve reference to %s", reference));
-    }
-
-    public <T extends Type> T resolveTypeReference(Class<T> typeClass, String reference) {
-        Type type = resolveTypeReference(reference);
-
-        if (!type.getClass().equals(typeClass)) {
-            throw new CompilerException("Failed to resolve reference %s to type %s. Found type: %s",
-                    reference, typeClass.getSimpleName(), formatTypeName(type));
-        }
-
-        return (T) type;
-    }
-
-    public <T extends Type> T resolveTypeReference(Class<T> typeClass, String moduleName, String reference) {
-        Type type = resolveType(moduleName, reference);
-
-        if (!type.getClass().equals(typeClass)) {
-            throw new CompilerException("Failed to resolve reference %s to type %s. Found type: %s",
-                    reference, typeClass.getSimpleName(), formatTypeName(type));
-        }
-
-        return (T) type;
-    }
-
-    public Type resolveTypeReference(Type typeReference) {
-        while (typeReference instanceof TypeReference) {
-            if (typeReference instanceof GeneralizedTime || typeReference instanceof UTCTime) {
-                return typeReference;
-            }
-
-            Optional<TypeAssignmentNode> assignment = getTypeAssignment(((TypeReference) typeReference).getType());
-
-            if (assignment.isPresent()) {
-                var node = assignment.get().getType();
-
-                if (!(node instanceof Type)) {
-                    throw new CompilerException("Invalid type: %s", node.getClass().getSimpleName());
-                }
-
-                typeReference = node;
-            } else {
-                throw new CompilerException("Failed to resolve reference to %s",
-                        ((TypeReference) typeReference).getType());
-            }
-        }
-
-        return typeReference;
-    }
 
     public ValueOrObjectAssignmentNode resolveDefinedValue(DefinedValue ref) {
         if (ref instanceof ExternalValueReference) {
@@ -769,7 +661,7 @@ public class CompilerContext {
         defaultsCompiler.compileDefault(javaClass, field, typeName, type, value);
     }
 
-    public Type resolveType(Type type) {
+    public Type resolveBaseType(Type type) {
         if (type instanceof SelectionType) {
             String selectedId = ((SelectionType) type).getId();
             Type selectedType = ((SelectionType) type).getType();
@@ -1062,11 +954,6 @@ public class CompilerContext {
             throw new IllegalCompilerStateException("Constructor %s threw an exception", e, compiledTypeClass);
         }
 
-//        if (isSubType && currentClass.size() == 1) {
-//            System.out.println(String.format("Created compiled type %s (%s): isSubType=%s stackSize=%s", compiledType.getName(), type, isSubType, currentClass.size()));
-//        }
-
-        // TODO: Optimize condition
         if (!isSubType && isTopLevelType()) {
             addType(name, compiledType);
         }
@@ -1113,6 +1000,50 @@ public class CompilerContext {
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .findFirst();
+    }
+
+    /*******************************************************************************************************************
+     * T Y P E  R E S O L V E R S
+     ******************************************************************************************************************/
+
+    public Type resolveTypeReference(String reference) {
+        return typeResolver.resolveTypeReference(reference);
+    }
+
+    public <T extends Type> T resolveTypeReference(Class<T> typeClass, String reference) {
+        return typeResolver.resolveTypeReference(typeClass, reference);
+    }
+
+    public <T extends Type> T resolveTypeReference(Class<T> typeClass, String moduleName, String reference) {
+        return typeResolver.resolveTypeReference(typeClass, moduleName, reference);
+    }
+
+    public Type resolveTypeReference(Type typeReference) {
+        return typeResolver.resolveTypeReference(typeReference);
+    }
+
+    public Type resolveBaseType(String moduleName, String typeName) {
+        return resolveBaseType(getModule(moduleName), typeName);
+    }
+
+    private Type resolveBaseType(ModuleNode module, String typeName) {
+        return typeResolver.resolveBaseType(module, typeName);
+    }
+
+    public Type getBase(TypeReference type) {
+        return getBase(type.getType());
+    }
+
+    public Type getBase(String typeName) {
+        return resolveBaseType(currentModule.peek(), typeName);
+    }
+
+    public Type getBase(Type type) {
+        if (type instanceof TypeReference) {
+            return getBase((TypeReference) type);
+        }
+
+        return type;
     }
 
 }
