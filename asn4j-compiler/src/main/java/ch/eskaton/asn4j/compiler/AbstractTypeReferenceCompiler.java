@@ -63,7 +63,7 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
             return true;
         }
 
-        return ctx.isConstructed(ctx.getBase(base));
+        return ctx.isConstructed(ctx.resolveBaseType(base));
     }
 
 }

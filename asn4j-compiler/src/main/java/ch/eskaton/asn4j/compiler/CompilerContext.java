@@ -355,7 +355,7 @@ public class CompilerContext {
             typeName = getTypeName(type, name, false);
         } else if (type instanceof SelectionType) {
             SelectionType selectionType = (SelectionType) type;
-            Type selectedType = resolveBaseType(type);
+            Type selectedType = resolveSelectedType(type);
 
             if (selectedType != type) {
                 return getTypeName(selectedType);
@@ -661,30 +661,6 @@ public class CompilerContext {
         defaultsCompiler.compileDefault(javaClass, field, typeName, type, value);
     }
 
-    public Type resolveBaseType(Type type) {
-        if (type instanceof SelectionType) {
-            String selectedId = ((SelectionType) type).getId();
-            Type selectedType = ((SelectionType) type).getType();
-
-            if (selectedType instanceof TypeReference) {
-                Object assignment = getModule().getBody().getAssignment(((TypeReference) selectedType).getType());
-
-                if (assignment instanceof TypeAssignmentNode) {
-                    Type collectionType = ((TypeAssignmentNode) assignment).getType();
-
-                    if (collectionType instanceof Choice) {
-                        return ((Choice) collectionType).getRootAlternatives().stream()
-                                .filter(t -> t.getName().equals(selectedId))
-                                .findFirst()
-                                .orElseThrow(() -> new CompilerException("Selected type not found")).getType();
-                    }
-                }
-            }
-        }
-
-        return type;
-    }
-
     public TagId getTagId(Type type) {
         Optional<CompiledType> maybeReferencedType = getCompiledType(type, true);
 
@@ -861,7 +837,7 @@ public class CompilerContext {
 
     public String getRuntimeTypeName(String typeName) {
         try {
-            Type type = getBase(typeName);
+            Type type = resolveBaseType(typeName);
 
             return getRuntimeTypeName(type.getClass());
         } catch (CompilerException e) {
@@ -1006,10 +982,6 @@ public class CompilerContext {
      * T Y P E  R E S O L V E R S
      ******************************************************************************************************************/
 
-    public Type resolveTypeReference(String reference) {
-        return typeResolver.resolveTypeReference(reference);
-    }
-
     public <T extends Type> T resolveTypeReference(Class<T> typeClass, String reference) {
         return typeResolver.resolveTypeReference(typeClass, reference);
     }
@@ -1018,32 +990,36 @@ public class CompilerContext {
         return typeResolver.resolveTypeReference(typeClass, moduleName, reference);
     }
 
-    public Type resolveTypeReference(Type typeReference) {
-        return typeResolver.resolveTypeReference(typeReference);
+    public Type resolveTypeReference(String reference) {
+        return typeResolver.resolveTypeReference(reference);
     }
 
-    public Type resolveBaseType(String moduleName, String typeName) {
-        return resolveBaseType(getModule(moduleName), typeName);
+    public Type resolveTypeReference(Type typeReference) {
+        return typeResolver.resolveTypeReference(typeReference);
     }
 
     private Type resolveBaseType(ModuleNode module, String typeName) {
         return typeResolver.resolveBaseType(module, typeName);
     }
 
-    public Type getBase(TypeReference type) {
-        return getBase(type.getType());
+    public Type resolveBaseType(String moduleName, String typeName) {
+        return resolveBaseType(getModule(moduleName), typeName);
     }
 
-    public Type getBase(String typeName) {
+    public Type resolveBaseType(TypeReference type) {
+        return resolveBaseType(type.getType());
+    }
+
+    public Type resolveBaseType(String typeName) {
         return resolveBaseType(currentModule.peek(), typeName);
     }
 
-    public Type getBase(Type type) {
-        if (type instanceof TypeReference) {
-            return getBase((TypeReference) type);
-        }
+    public Type resolveBaseType(Type type) {
+        return typeResolver.resolveBaseType(type);
+    }
 
-        return type;
+    public Type resolveSelectedType(Type type) {
+        return typeResolver.resolveSelectedType(type);
     }
 
 }

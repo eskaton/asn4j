@@ -30,7 +30,9 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
+import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
@@ -112,6 +114,14 @@ public class TypeResolver {
         }
     }
 
+    public Type resolveBaseType(Type type) {
+        if (type instanceof TypeReference) {
+            return resolveBaseType(ctx.getModule(), ((TypeReference) type).getType());
+        }
+
+        return type;
+    }
+
     Type resolveTypeReference(Type typeReference) {
         while (typeReference instanceof TypeReference) {
             if (typeReference instanceof GeneralizedTime || typeReference instanceof UTCTime) {
@@ -145,18 +155,15 @@ public class TypeResolver {
     }
 
     public <T extends Type> T resolveTypeReference(Class<T> typeClass, String reference) {
-        Type type = resolveTypeReference(reference);
-
-        if (!type.getClass().equals(typeClass)) {
-            throw new CompilerException("Failed to resolve reference %s to type %s. Found type: %s",
-                    reference, typeClass.getSimpleName(), formatTypeName(type));
-        }
-
-        return (T) type;
+        return resolveTypeReference(typeClass, ctx.getModule(), reference);
     }
 
     public <T extends Type> T resolveTypeReference(Class<T> typeClass, String moduleName, String reference) {
-        Type type = resolveBaseType(ctx.getModule(moduleName), reference);
+        return resolveTypeReference(typeClass, ctx.getModule(moduleName), reference);
+    }
+
+    public <T extends Type> T resolveTypeReference(Class<T> typeClass, ModuleNode module, String reference) {
+        Type type = resolveBaseType(module, reference);
 
         if (!type.getClass().equals(typeClass)) {
             throw new CompilerException("Failed to resolve reference %s to type %s. Found type: %s",
@@ -166,5 +173,27 @@ public class TypeResolver {
         return (T) type;
     }
 
+    public Type resolveSelectedType(Type type) {
+        if (type instanceof SelectionType) {
+            String selectedId = ((SelectionType) type).getId();
+            Type selectedType = ((SelectionType) type).getType();
+
+            if (selectedType instanceof TypeReference) {
+                var collectionType = resolveTypeReference(selectedType);
+
+                if (collectionType instanceof Choice) {
+                    return ((Choice) collectionType).getRootAlternatives().stream()
+                            .filter(t -> t.getName().equals(selectedId))
+                            .findFirst()
+                            .orElseThrow(() -> new CompilerException("Selected type not found")).getType();
+                }
+
+            }
+
+            throw new CompilerException("Selected type not found");
+        }
+
+        return type;
+    }
 
 }

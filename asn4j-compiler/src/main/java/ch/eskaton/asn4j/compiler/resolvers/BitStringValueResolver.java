@@ -60,7 +60,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
     @Override
     public BitStringValue resolve(Optional<Type> maybeType, BitStringValue value) {
         var type = maybeType.orElseThrow(() -> new IllegalCompilerStateException("Type may not be empty"));
-        var base = ctx.getBase(type);
+        var base = ctx.resolveBaseType(type);
 
         if (base instanceof BitString) {
             BitString bitString = (BitString) base;
