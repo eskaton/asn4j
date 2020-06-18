@@ -89,7 +89,6 @@ import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
-import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -142,7 +141,9 @@ public class CompilerContext {
 
     private DefaultsCompiler defaultsCompiler = new DefaultsCompiler(this);
 
-    private TypeResolver typeResolver = new TypeResolver(this);
+    private TypeResolverHelper typeResolver = new TypeResolverHelper(this);
+
+    private ValueResolverHelper valueResolver = new ValueResolverHelper(this);
 
     private Deque<JavaClass> currentClass = new LinkedList<>();
 
@@ -468,148 +469,6 @@ public class CompilerContext {
 
     public boolean isConstructed(Type type) {
         return config.isConstructed(type.getClass());
-    }
-
-    public <V extends Value> V resolveValue(Class<V> valueClass, Optional<Type> type, V value) {
-        return getValueResolver(valueClass).resolve(type, value);
-    }
-
-    public <V extends Value> V resolveValue(Class<V> valueClass, DefinedValue ref) {
-        return getValueResolver(valueClass).resolve(ref);
-    }
-
-    public <V extends Value> V resolveValue(Class<V> valueClass, String ref) {
-        return getValueResolver(valueClass).resolve(ref);
-    }
-
-    public <V extends Value> V resolveValue(Class<V> valueClass, String moduleName, String reference) {
-        var module = getModule(moduleName);
-
-        if (module != null) {
-            currentModule.push(module);
-
-            try {
-                return getValueResolver(valueClass).resolve(reference);
-            } finally {
-                currentModule.pop();
-            }
-        }
-
-        return null;
-    }
-
-    public <V extends Value> V resolveGenericValue(Class<V> valueClass, Type type, Value value) {
-        var resolvedValue = getValueResolver(valueClass).resolveGeneric(type, value);
-
-        if (resolvedValue instanceof AbstractValue) {
-            ((AbstractValue) resolvedValue).setType(type);
-        }
-
-        return resolvedValue;
-    }
-
-    private <V extends Value> ValueResolver<V> getValueResolver(Class<V> valueClass) {
-        return config.getValueResolver(valueClass);
-    }
-
-
-    public ValueOrObjectAssignmentNode resolveDefinedValue(DefinedValue ref) {
-        if (ref instanceof ExternalValueReference) {
-            return resolveExternalReference(((ExternalValueReference) ref));
-        } else {
-            return resolveValueReference(((SimpleDefinedValue) ref));
-        }
-    }
-
-    private ValueOrObjectAssignmentNode resolveExternalReference(ExternalValueReference reference) {
-        String moduleName = reference.getModule();
-        String symbolName = reference.getValue();
-        ModuleNode module;
-
-        try {
-            module = getModule(moduleName);
-        } catch (CompilerException e) {
-            throw new CompilerException("Failed to resolve external reference %s.%s", moduleName, symbolName, e);
-        }
-
-        ensureSymbolIsExported(module, symbolName);
-
-        AssignmentNode assignment = modules.get(moduleName).getBody().getAssignment(symbolName);
-
-        if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
-            throw new CompilerException("Failed to resolve reference " + reference);
-        }
-
-        return (ValueOrObjectAssignmentNode<?, ?>) assignment;
-    }
-
-    public Optional<ValueOrObjectAssignmentNode> tryResolveAllValueReferences(SimpleDefinedValue reference) {
-        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveValueReference(reference);
-        Optional<ValueOrObjectAssignmentNode> tmpAssignment = assignment;
-
-        while (tmpAssignment.isPresent()) {
-            assignment = tmpAssignment;
-
-            reference = resolveAmbiguousValue(tmpAssignment.get().getValue(), SimpleDefinedValue.class);
-
-            if (reference == null) {
-                break;
-            }
-
-            tmpAssignment = tryResolveValueReference(reference);
-
-            if (tmpAssignment.equals(assignment)) {
-                break;
-            }
-        }
-
-        return assignment;
-    }
-
-    public Optional<ValueOrObjectAssignmentNode> tryResolveValueReference(SimpleDefinedValue reference) {
-        if (reference instanceof ExternalValueReference) {
-            return Optional.ofNullable(resolveExternalReference(((ExternalValueReference) reference)));
-        }
-
-        return tryResolveValueReference(reference.getValue());
-    }
-
-    public Optional<ValueOrObjectAssignmentNode> tryResolveValueReference(String symbolName) {
-        AssignmentNode assignment = getModule().getBody().getAssignment(symbolName);
-
-        if (assignment == null) {
-            Optional<ImportNode> imp = getImport(symbolName);
-
-            if (imp.isPresent()) {
-                ModuleRefNode moduleRef = imp.get().getReference();
-                String moduleName = moduleRef.getName();
-                ModuleNode module = getModule(moduleName);
-
-                ensureSymbolIsExported(module, symbolName);
-
-                assignment = modules.get(moduleName).getBody().getAssignment(symbolName);
-            }
-        }
-
-        if (assignment instanceof ValueOrObjectAssignmentNode) {
-            return Optional.of((ValueOrObjectAssignmentNode) assignment);
-        }
-
-        return Optional.empty();
-    }
-
-    public ValueOrObjectAssignmentNode resolveValueReference(SimpleDefinedValue reference) {
-        return resolveValueReference(reference.getValue());
-    }
-
-    public ValueOrObjectAssignmentNode resolveValueReference(String symbolName) {
-        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveValueReference(symbolName);
-
-        if (!assignment.isPresent()) {
-            throw new CompilerException("Failed to resolve reference " + symbolName);
-        }
-
-        return assignment.get();
     }
 
     public void ensureSymbolIsExported(ModuleNode module, String symbolName) {
@@ -978,6 +837,22 @@ public class CompilerContext {
                 .findFirst();
     }
 
+    <T> T executeWithModule(String moduleName, Supplier<T> supplier) {
+        var module = getModule(moduleName);
+
+        if (module != null) {
+            currentModule.push(module);
+
+            try {
+                return supplier.get();
+            } finally {
+                currentModule.pop();
+            }
+        }
+
+        return null;
+    }
+
     /*******************************************************************************************************************
      * T Y P E  R E S O L V E R S
      ******************************************************************************************************************/
@@ -1020,6 +895,133 @@ public class CompilerContext {
 
     public Type resolveSelectedType(Type type) {
         return typeResolver.resolveSelectedType(type);
+    }
+
+    /*******************************************************************************************************************
+     * V A L U E  R E S O L V E R S
+     ******************************************************************************************************************/
+
+    public ValueOrObjectAssignmentNode resolveDefinedValue(DefinedValue ref) {
+        if (ref instanceof ExternalValueReference) {
+            return resolveExternalReference(((ExternalValueReference) ref));
+        } else {
+            return resolveValueReference(((SimpleDefinedValue) ref));
+        }
+    }
+
+    private ValueOrObjectAssignmentNode resolveExternalReference(ExternalValueReference reference) {
+        String moduleName = reference.getModule();
+        String symbolName = reference.getValue();
+        ModuleNode module;
+
+        try {
+            module = getModule(moduleName);
+        } catch (CompilerException e) {
+            throw new CompilerException("Failed to resolve external reference %s.%s", moduleName, symbolName, e);
+        }
+
+        ensureSymbolIsExported(module, symbolName);
+
+        AssignmentNode assignment = modules.get(moduleName).getBody().getAssignment(symbolName);
+
+        if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
+            throw new CompilerException("Failed to resolve reference " + reference);
+        }
+
+        return (ValueOrObjectAssignmentNode<?, ?>) assignment;
+    }
+
+    public Optional<ValueOrObjectAssignmentNode> tryResolveAllValueReferences(SimpleDefinedValue reference) {
+        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveValueReference(reference);
+        Optional<ValueOrObjectAssignmentNode> tmpAssignment = assignment;
+
+        while (tmpAssignment.isPresent()) {
+            assignment = tmpAssignment;
+
+            reference = resolveAmbiguousValue(tmpAssignment.get().getValue(), SimpleDefinedValue.class);
+
+            if (reference == null) {
+                break;
+            }
+
+            tmpAssignment = tryResolveValueReference(reference);
+
+            if (tmpAssignment.equals(assignment)) {
+                break;
+            }
+        }
+
+        return assignment;
+    }
+
+    public Optional<ValueOrObjectAssignmentNode> tryResolveValueReference(SimpleDefinedValue reference) {
+        if (reference instanceof ExternalValueReference) {
+            return Optional.ofNullable(resolveExternalReference(((ExternalValueReference) reference)));
+        }
+
+        return tryResolveValueReference(reference.getValue());
+    }
+
+    public Optional<ValueOrObjectAssignmentNode> tryResolveValueReference(String symbolName) {
+        AssignmentNode assignment = getModule().getBody().getAssignment(symbolName);
+
+        if (assignment == null) {
+            Optional<ImportNode> imp = getImport(symbolName);
+
+            if (imp.isPresent()) {
+                ModuleRefNode moduleRef = imp.get().getReference();
+                String moduleName = moduleRef.getName();
+                ModuleNode module = getModule(moduleName);
+
+                ensureSymbolIsExported(module, symbolName);
+
+                assignment = modules.get(moduleName).getBody().getAssignment(symbolName);
+            }
+        }
+
+        if (assignment instanceof ValueOrObjectAssignmentNode) {
+            return Optional.of((ValueOrObjectAssignmentNode) assignment);
+        }
+
+        return Optional.empty();
+    }
+
+    public ValueOrObjectAssignmentNode resolveValueReference(SimpleDefinedValue reference) {
+        return resolveValueReference(reference.getValue());
+    }
+
+    public ValueOrObjectAssignmentNode resolveValueReference(String symbolName) {
+        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveValueReference(symbolName);
+
+        if (!assignment.isPresent()) {
+            throw new CompilerException("Failed to resolve reference " + symbolName);
+        }
+
+        return assignment.get();
+    }
+
+    public <V extends Value> V resolveValue(Class<V> valueClass, Optional<Type> type, V value) {
+        return valueResolver.resolveValue(valueClass, type, value);
+    }
+
+    public <V extends Value> V resolveValue(Class<V> valueClass, DefinedValue ref) {
+        return getValueResolver(valueClass).resolve(ref);
+    }
+
+    public <V extends Value> V resolveValue(Class<V> valueClass, String ref) {
+        return getValueResolver(valueClass).resolve(ref);
+    }
+
+    public <V extends Value> V resolveValue(Class<V> valueClass, String moduleName, String reference) {
+        return valueResolver.resolveValue(valueClass, moduleName, reference);
+    }
+
+    public <V extends Value> V resolveGenericValue(Class<V> valueClass, Type type, Value value) {
+        return valueResolver.resolveGenericValue(valueClass, type, value);
+    }
+
+    <V extends Value> ValueResolver<V> getValueResolver(Class<V> valueClass) {
+        return config.getValueResolver(valueClass);
     }
 
 }
