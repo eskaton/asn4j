@@ -30,12 +30,12 @@ package ch.eskaton.asn4j.runtime.encoders;
 import ch.eskaton.asn4j.runtime.Encoder;
 import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class BMPStringEncoder implements TypeEncoder<ASN1BMPString> {
 
     @Override
     public byte[] encode(Encoder encoder, ASN1BMPString obj) {
-        return obj.getValue().getBytes(Charset.forName("UTF16"));
+        return obj.getValue().getBytes(StandardCharsets.UTF_16);
     }
 }

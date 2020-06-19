@@ -35,7 +35,7 @@ public interface StringVerifier {
 
     default Optional<String> verify(String value) {
         return Optional.ofNullable(IntStream.range(0, value.length()).boxed()
-                .map(i -> value.codePointAt(i))
+                .map(value::codePointAt)
                 .filter(c -> !isValidCharacter(c))
                 .map(i -> new String(Character.toChars(i)))
                 .collect(Collectors.joining()))

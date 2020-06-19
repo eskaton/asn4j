@@ -36,9 +36,9 @@ import static org.hamcrest.Matchers.equalTo;
 
 class PrintableStringVerifierTest {
 
-    public static final String ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 \'()+,-./:=?";
+    private static final String ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 \'()+,-./:=?";
 
-    public static final PrintableStringVerifier verifier = new PrintableStringVerifier();
+    private static final PrintableStringVerifier verifier = new PrintableStringVerifier();
 
     @Test
     void testValidCharacters() {

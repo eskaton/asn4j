@@ -54,7 +54,7 @@ public class CompiledCollectionType extends CompiledType implements HasChildComp
 
     @Override
     public List<? extends CompiledType> getChildComponents() {
-        return components.stream().map(t -> t.get_2()).collect(Collectors.toList());
+        return components.stream().map(Tuple2::get_2).collect(Collectors.toList());
     }
 
     @Override

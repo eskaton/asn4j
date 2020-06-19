@@ -239,8 +239,7 @@ public class CompilerContext {
     Optional<String> findImport(String typeName) {
         return currentModule.peek().getBody().getImports().stream()
                 .filter(importNode -> importNode.getSymbols().stream()
-                        .filter(sym -> sym.getName().equals(typeName))
-                        .findFirst().isPresent()
+                        .anyMatch(sym -> sym.getName().equals(typeName))
                 ).map(importNode -> importNode.getReference().getName())
                 .findAny();
     }

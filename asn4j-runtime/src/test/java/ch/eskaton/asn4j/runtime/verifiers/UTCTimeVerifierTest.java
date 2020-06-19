@@ -36,7 +36,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 class UTCTimeVerifierTest {
 
-    public static final UTCTimeVerifier verifier = new UTCTimeVerifier();
+    private static final UTCTimeVerifier verifier = new UTCTimeVerifier();
 
     @Test
     void testValidCharacters() {

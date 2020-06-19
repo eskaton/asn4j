@@ -34,10 +34,10 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public abstract class AbstractDefaultCompiler {
+public abstract class AbstractDefaultCompiler<V extends Value> {
 
     public abstract void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value);
+            V value);
 
     protected String addDefaultField(JavaClass clazz, String typeName, String field) {
         String defaultField = CompilerUtils.getDefaultFieldName(field);
@@ -47,6 +47,6 @@ public abstract class AbstractDefaultCompiler {
         return defaultField;
     }
 
-    protected abstract String getInitializerString(CompilerContext ctx, String typeName, Type type, Value value);
+    protected abstract String getInitializerString(CompilerContext ctx, String typeName, Type type, V value);
 
 }

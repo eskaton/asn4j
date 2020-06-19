@@ -36,9 +36,9 @@ import java.util.stream.IntStream;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class IA5StringVerifierTest {
+class IA5StringVerifierTest {
 
-    public static final IA5StringVerifier verifier = new IA5StringVerifier();
+    private static final IA5StringVerifier verifier = new IA5StringVerifier();
 
     @Test
     void testValidCharacters() {

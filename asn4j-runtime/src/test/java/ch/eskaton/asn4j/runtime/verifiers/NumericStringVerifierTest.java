@@ -36,9 +36,9 @@ import static org.hamcrest.Matchers.equalTo;
 
 class NumericStringVerifierTest {
 
-    public static final String ALLOWED_CHARACTERS = " 0123456789";
+    private static final String ALLOWED_CHARACTERS = " 0123456789";
 
-    public static final NumericStringVerifier verifier = new NumericStringVerifier();
+    private static final NumericStringVerifier verifier = new NumericStringVerifier();
 
     @Test
     void testValidCharacters() {

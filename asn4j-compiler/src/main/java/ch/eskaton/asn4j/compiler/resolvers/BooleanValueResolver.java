@@ -54,7 +54,7 @@ public class BooleanValueResolver extends AbstractValueResolver<BooleanValue> {
 
             throw new CompilerException("%s value expected", TypeName.BOOLEAN);
         } else if (type instanceof TypeReference) {
-            return resolveGeneric((Type) ctx.resolveTypeReference(type), value);
+            return resolveGeneric(ctx.resolveTypeReference(type), value);
         }
 
         throw new CompilerException("Failed to resolve a %s value", TypeName.BOOLEAN);

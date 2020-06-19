@@ -46,7 +46,6 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
@@ -212,7 +211,7 @@ public class WithComponentExpressionBuilder extends InnerTypeExpressionBuilder {
         var compiledBaseType = (CompiledCollectionOfType) ctx.getCompiledBaseType(compiledType);
         var contentType = compiledBaseType.getContentType().getType();
 
-        List<String> typeParameter = ctx.getParameterizedType((Type) ctx.resolveTypeReference(contentType))
+        List<String> typeParameter = ctx.getParameterizedType(ctx.resolveTypeReference(contentType))
                 .stream()
                 .skip(1)
                 .collect(Collectors.toList());
