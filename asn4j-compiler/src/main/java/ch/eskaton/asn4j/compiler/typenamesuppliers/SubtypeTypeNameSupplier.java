@@ -25,24 +25,48 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.resolvers;
+package ch.eskaton.asn4j.compiler.typenamesuppliers;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.GraphicString;
-import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
-import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.asn4j.runtime.verifiers.GraphicStringVerifier;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.TypeConfiguration;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
-public class GraphicStringValueResolver extends AbstractStringValueResolver<GraphicStringValue> {
+public class SubtypeTypeNameSupplier<T extends Type> implements TypeNameSupplier<T> {
 
-    public GraphicStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.GRAPHIC_STRING, GraphicString.class, new GraphicStringVerifier());
+    private final TypeConfiguration config;
+
+    private final boolean subtypeNeeded;
+
+    public SubtypeTypeNameSupplier(TypeConfiguration config) {
+        this.config = config;
+        this.subtypeNeeded = false;
+    }
+
+    public SubtypeTypeNameSupplier(TypeConfiguration config, boolean subtypeNeeded) {
+        this.config = config;
+        this.subtypeNeeded = subtypeNeeded;
     }
 
     @Override
-    protected GraphicStringValue createValue(Position position, String value) {
-        return new GraphicStringValue(position, value);
+    public String getName(T type, String name) {
+        String typeName;
+
+        if (isSubtypeNeeded(type, name)) {
+            typeName = CompilerUtils.formatTypeName(name);
+        } else {
+            typeName = config.getRuntimeTypeClass(type.getClass()).getSimpleName();
+
+            if (typeName == null) {
+                throw new CompilerException("No runtime class available for type: %s", type);
+            }
+        }
+
+        return typeName;
+    }
+
+    protected boolean isSubtypeNeeded(T type, String name) {
+        return subtypeNeeded && name != null;
     }
 
 }

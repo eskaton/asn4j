@@ -57,7 +57,7 @@ public class CompilerUtils {
     private CompilerUtils() {
     }
 
-    static String formatTypeName(String name) {
+    public static String formatTypeName(String name) {
         return StringUtils.initCap(formatName(name));
     }
 

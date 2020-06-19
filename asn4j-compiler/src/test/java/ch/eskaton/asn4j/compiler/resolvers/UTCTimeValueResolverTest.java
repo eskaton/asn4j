@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ParserException;
-import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
 import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import org.junit.jupiter.api.Test;

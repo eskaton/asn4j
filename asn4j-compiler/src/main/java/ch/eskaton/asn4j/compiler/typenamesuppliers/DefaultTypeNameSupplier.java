@@ -25,24 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.resolvers;
+package ch.eskaton.asn4j.compiler.typenamesuppliers;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.GraphicString;
-import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
-import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.asn4j.runtime.verifiers.GraphicStringVerifier;
+import ch.eskaton.asn4j.compiler.TypeConfiguration;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
-public class GraphicStringValueResolver extends AbstractStringValueResolver<GraphicStringValue> {
+public class DefaultTypeNameSupplier implements TypeNameSupplier<Type> {
 
-    public GraphicStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.GRAPHIC_STRING, GraphicString.class, new GraphicStringVerifier());
+    private final TypeConfiguration config;
+
+    public DefaultTypeNameSupplier(TypeConfiguration config) {
+        this.config = config;
     }
 
     @Override
-    protected GraphicStringValue createValue(Position position, String value) {
-        return new GraphicStringValue(position, value);
+    public String getName(Type type, String name) {
+        return config.getRuntimeTypeClass(type.getClass()).getSimpleName();
     }
 
 }
