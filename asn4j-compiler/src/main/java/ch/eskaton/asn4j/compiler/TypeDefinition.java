@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeNameSupplier;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -41,26 +42,32 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
 
     private Class<R> runtimeTypeClass;
 
+    private TypeNameSupplier typeNameSupplier;
+
     private Boolean constructed;
 
     private C compiler;
 
-    public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass, S valueResolver) {
-        this.typeClass = typeClass;
-        this.valueClass = valueClass;
-        this.runtimeTypeClass = runtimeTypeClass;
-        this.valueResolver = valueResolver;
-        this.constructed = false;
-        this.compiler = compiler;
+    public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
+            S valueResolver, TypeNameSupplier typeNameSupplier) {
+        this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier, false);
     }
 
-    public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass, S valueResolver, boolean constructed) {
+    public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
+            S valueResolver, TypeNameSupplier typeNameSupplier, boolean constructed) {
         this.typeClass = typeClass;
+        this.compiler = compiler;
         this.valueClass = valueClass;
         this.runtimeTypeClass = runtimeTypeClass;
         this.valueResolver = valueResolver;
+        this.typeNameSupplier = typeNameSupplier;
         this.constructed = constructed;
-        this.compiler = compiler;
+    }
+
+    public TypeDefinition(Class<T> typeClass, C compiler, TypeNameSupplier typeNameSupplier) {
+        this(typeClass, compiler);
+
+        this.typeNameSupplier = typeNameSupplier;
     }
 
     public TypeDefinition(Class<T> typeClass, C compiler) {
@@ -70,6 +77,14 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
 
     public Class<T> getTypeClass() {
         return typeClass;
+    }
+
+    public C getCompiler() {
+        if (compiler == null) {
+            throw new IllegalCompilerStateException("No compiler for type %s defined", typeClass.getSimpleName());
+        }
+
+        return compiler;
     }
 
     public Class<V> getValueClass() {
@@ -82,7 +97,8 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
 
     public Class<R> getRuntimeTypeClass() {
         if (runtimeTypeClass == null) {
-            throw new IllegalCompilerStateException("Type %s has no associated runtime type", typeClass.getSimpleName());
+            throw new IllegalCompilerStateException("Type %s has no associated runtime type",
+                    typeClass.getSimpleName());
         }
 
         return runtimeTypeClass;
@@ -90,26 +106,29 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
 
     public S getValueResolver() {
         if (valueResolver == null) {
-            throw new IllegalCompilerStateException("Type %s has no associated value resolver", typeClass.getSimpleName());
+            throw new IllegalCompilerStateException("Type %s has no associated value resolver",
+                    typeClass.getSimpleName());
         }
 
         return valueResolver;
     }
 
+    public TypeNameSupplier getTypeNameSupplier() {
+        if (typeNameSupplier == null) {
+            throw new IllegalCompilerStateException("Type %s has no associated type name supplier",
+                    typeClass.getSimpleName());
+        }
+
+        return typeNameSupplier;
+    }
+
     public boolean isConstructed() {
         if (constructed == null) {
-            throw new IllegalCompilerStateException("Constructed attribute for %s is undefined", typeClass.getSimpleName());
+            throw new IllegalCompilerStateException("Constructed attribute for %s is undefined",
+                    typeClass.getSimpleName());
         }
 
         return constructed;
-    }
-
-    public C getCompiler() {
-        if (compiler == null) {
-            throw new IllegalCompilerStateException("No compiler for type %s defined", typeClass.getSimpleName());
-        }
-
-        return compiler;
     }
 
     public boolean matchesType(Class<T> typeClass) {

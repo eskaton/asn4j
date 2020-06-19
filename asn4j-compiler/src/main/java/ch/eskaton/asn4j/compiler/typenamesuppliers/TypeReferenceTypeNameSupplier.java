@@ -25,24 +25,37 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.resolvers;
+package ch.eskaton.asn4j.compiler.typenamesuppliers;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.GraphicString;
-import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
-import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.asn4j.runtime.verifiers.GraphicStringVerifier;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.TypeConfiguration;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.types.UsefulType;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
+import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 
-public class GraphicStringValueResolver extends AbstractStringValueResolver<GraphicStringValue> {
+public class TypeReferenceTypeNameSupplier implements TypeNameSupplier<Type> {
 
-    public GraphicStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.GRAPHIC_STRING, GraphicString.class, new GraphicStringVerifier());
+    private final TypeConfiguration config;
+
+    public TypeReferenceTypeNameSupplier(TypeConfiguration config) {
+        this.config = config;
     }
 
     @Override
-    protected GraphicStringValue createValue(Position position, String value) {
-        return new GraphicStringValue(position, value);
+    public String getName(Type type, String name) {
+        if (type instanceof UsefulType) {
+            return switch (((UsefulType) type).getType()) {
+                case "GeneralizedTime" -> ASN1GeneralizedTime.class.getSimpleName();
+                case "UTCTime" -> ASN1UTCTime.class.getSimpleName();
+                default -> throw new IllegalCompilerStateException("Unsupported UsefulType: %s",
+                        ((UsefulType) type).getType());
+            };
+        } else {
+            return CompilerUtils.formatTypeName(((TypeReference) type).getType());
+        }
     }
 
 }

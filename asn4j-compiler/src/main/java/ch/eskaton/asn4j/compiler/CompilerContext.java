@@ -53,42 +53,25 @@ import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
-import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
-import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
-import ch.eskaton.asn4j.parser.ast.types.GeneralString;
-import ch.eskaton.asn4j.parser.ast.types.GraphicString;
-import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
-import ch.eskaton.asn4j.parser.ast.types.Null;
-import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
-import ch.eskaton.asn4j.parser.ast.types.OctetString;
-import ch.eskaton.asn4j.parser.ast.types.PrintableString;
-import ch.eskaton.asn4j.parser.ast.types.Real;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
-import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
-import ch.eskaton.asn4j.parser.ast.types.T61String;
-import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.parser.ast.types.UTF8String;
-import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
-import ch.eskaton.asn4j.parser.ast.types.VideotexString;
-import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -96,22 +79,6 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
-import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
-import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
-import ch.eskaton.asn4j.runtime.types.ASN1GeneralizedTime;
-import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
-import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
-import ch.eskaton.asn4j.runtime.types.ASN1Null;
-import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
-import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
-import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
-import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
-import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
-import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
-import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
-import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
-import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -290,101 +257,7 @@ public class CompilerContext {
     }
 
     public String getTypeName(Type type, String name) {
-        String typeName;
-
-        if (type instanceof TypeReference) {
-            if (type instanceof UsefulType) {
-                typeName = switch (((UsefulType) type).getType()) {
-                    case "GeneralizedTime" -> ASN1GeneralizedTime.class.getSimpleName();
-                    case "UTCTime" -> ASN1UTCTime.class.getSimpleName();
-                    default -> throw new IllegalCompilerStateException("Unsupported UsefulType: %s",
-                            ((UsefulType) type).getType());
-                };
-            } else {
-                typeName = CompilerUtils.formatTypeName(((TypeReference) type).getType());
-            }
-        } else if (type instanceof ExternalTypeReference) {
-            typeName = CompilerUtils.formatTypeName(((ExternalTypeReference) type).getType());
-        } else if (type instanceof Null) {
-            typeName = ASN1Null.class.getSimpleName();
-        } else if (type instanceof BooleanType) {
-            typeName = ASN1Boolean.class.getSimpleName();
-        } else if (type instanceof VisibleString) {
-            typeName = ASN1VisibleString.class.getSimpleName();
-        } else if (type instanceof NumericString) {
-            typeName = ASN1NumericString.class.getSimpleName();
-        } else if (type instanceof PrintableString) {
-            typeName = ASN1PrintableString.class.getSimpleName();
-        } else if (type instanceof IA5String) {
-            typeName = ASN1IA5String.class.getSimpleName();
-        } else if (type instanceof GraphicString) {
-            typeName = ASN1GraphicString.class.getSimpleName();
-        } else if (type instanceof GeneralString) {
-            typeName = ASN1GeneralString.class.getSimpleName();
-        } else if (type instanceof TeletexString) {
-            typeName = ASN1TeletexString.class.getSimpleName();
-        } else if (type instanceof T61String) {
-            typeName = ASN1TeletexString.class.getSimpleName();
-        } else if (type instanceof VideotexString) {
-            typeName = ASN1VideotexString.class.getSimpleName();
-        } else if (type instanceof UniversalString) {
-            typeName = ASN1UniversalString.class.getSimpleName();
-        } else if (type instanceof UTF8String) {
-            typeName = ASN1UTF8String.class.getSimpleName();
-        } else if (type instanceof BMPString) {
-            typeName = ASN1BMPString.class.getSimpleName();
-        } else if (type instanceof OctetString) {
-            typeName = ASN1OctetString.class.getSimpleName();
-        } else if (type instanceof EnumeratedType) {
-            typeName = getTypeName(type, name, isSubtypeNeeded(type));
-        } else if (type instanceof IntegerType) {
-            typeName = getTypeName(type, name, isSubtypeNeeded(type));
-        } else if (type instanceof Real) {
-            typeName = getTypeName(type, name, false);
-        } else if (type instanceof BitString) {
-            typeName = getTypeName(type, name, isSubtypeNeeded(type));
-        } else if (type instanceof SequenceType
-                || type instanceof SequenceOfType
-                || type instanceof SetType
-                || type instanceof SetOfType
-                || type instanceof Choice) {
-            typeName = getTypeName(type, name, true);
-        } else if (type instanceof ObjectIdentifier
-                || type instanceof RelativeOID
-                || type instanceof IRI
-                || type instanceof RelativeIRI) {
-            typeName = getTypeName(type, name, false);
-        } else if (type instanceof SelectionType) {
-            SelectionType selectionType = (SelectionType) type;
-            Type selectedType = resolveSelectedType(type);
-
-            if (selectedType != type) {
-                return getTypeName(selectedType);
-            }
-
-            throw new CompilerException(String.format("Unknown SelectionType: %s < %s",
-                    selectionType.getId(), ((TypeReference) selectionType.getType()).getType()));
-        } else {
-            throw new CompilerException("Unsupported type: " + type.getClass());
-        }
-
-        return typeName;
-    }
-
-    private String getTypeName(Type type, String name, boolean newType) {
-        String typeName;
-
-        if (newType && name != null) {
-            typeName = CompilerUtils.formatTypeName(name);
-        } else {
-            typeName = getRuntimeTypeName(type.getClass());
-
-            if (typeName == null) {
-                throw new CompilerException("No runtime class available for type " + type);
-            }
-        }
-
-        return typeName;
+        return config.getTypeNameSupplier(type.getClass()).getName(type, name);
     }
 
     public CompiledType defineType(Type type) {
