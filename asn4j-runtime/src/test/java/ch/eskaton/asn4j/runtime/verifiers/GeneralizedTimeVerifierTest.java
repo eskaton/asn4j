@@ -36,7 +36,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 class GeneralizedTimeVerifierTest {
 
-    public static final GeneralizedTimeVerifier verifier = new GeneralizedTimeVerifier();
+    private static final GeneralizedTimeVerifier verifier = new GeneralizedTimeVerifier();
 
     @Test
     void testValidCharacters() {

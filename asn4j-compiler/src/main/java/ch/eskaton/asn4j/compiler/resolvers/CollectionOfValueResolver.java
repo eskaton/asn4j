@@ -81,7 +81,7 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
         }
 
         if (type instanceof TypeReference) {
-            type = (Type) ctx.resolveTypeReference(type);
+            type = ctx.resolveTypeReference(type);
         }
 
         if (collectionOfValue != null) {

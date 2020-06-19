@@ -63,7 +63,7 @@ public class CollectionOfValueExpressionBuilder
     @Override
     protected String getTypeName(Type type) {
         if (type instanceof TypeReference) {
-            type = (Type) ctx.resolveTypeReference(type);
+            type = ctx.resolveTypeReference(type);
         }
 
         Type elementType;

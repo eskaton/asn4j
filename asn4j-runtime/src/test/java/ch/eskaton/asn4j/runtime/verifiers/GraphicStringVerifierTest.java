@@ -38,7 +38,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 class GraphicStringVerifierTest {
 
-    public static final GraphicStringVerifier verifier = new GraphicStringVerifier();
+    private static final GraphicStringVerifier verifier = new GraphicStringVerifier();
 
     @Test
     void testValidCharacters() {

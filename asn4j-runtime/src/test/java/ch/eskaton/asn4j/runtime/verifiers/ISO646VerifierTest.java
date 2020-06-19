@@ -36,9 +36,9 @@ import static org.hamcrest.Matchers.equalTo;
 
 class ISO646VerifierTest {
 
-    public static final String ALLOWED_CHARACTERS = " !\"#$&'()+,./0123456789:;<=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+    private static final String ALLOWED_CHARACTERS = " !\"#$&'()+,./0123456789:;<=?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
-    public static final ISO646Verifier verifier = new ISO646Verifier();
+    private static final ISO646Verifier verifier = new ISO646Verifier();
 
     @Test
     void testValidCharacters() {

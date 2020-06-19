@@ -25,61 +25,10 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.results;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.runtime.utils.ToString;
-import ch.eskaton.commons.collections.Tuple2;
+import ch.eskaton.asn4j.parser.ast.types.T61String;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-public class CompiledChoiceType extends CompiledType implements HasChildComponents {
-
-    private List<Tuple2<String, CompiledType>> components = new ArrayList<>();
-
-    public CompiledChoiceType(Type type, String name) {
-        super(type, name);
-    }
-
-    public List<Tuple2<String, CompiledType>> getComponents() {
-        return components;
-    }
-
-    @Override
-    public List<? extends CompiledType> getChildComponents() {
-        return components.stream().map(Tuple2::get_2).collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(obj)) {
-            return false;
-        }
-
-        CompiledChoiceType that = (CompiledChoiceType) obj;
-
-        return Objects.equals(components, that.components);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), components);
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
-    }
+public class T61StringCompiler extends BuiltinTypeCompiler<T61String> {
 
 }

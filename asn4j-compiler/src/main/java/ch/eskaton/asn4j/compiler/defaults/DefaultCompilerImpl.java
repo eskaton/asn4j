@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaInitializer;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompiler {
+public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompiler<V> {
 
     protected Class<V> valueClass;
 
@@ -44,7 +44,7 @@ public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompile
 
     @Override
     public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            Value value) {
+            V value) {
         var initializerString = getInitializerString(ctx, typeName, type, value);
         var defaultField = addDefaultField(clazz, typeName, field);
 
@@ -54,7 +54,7 @@ public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompile
     }
 
     @Override
-    public String getInitializerString(CompilerContext ctx, String typeName, Type type, Value value) {
+    public String getInitializerString(CompilerContext ctx, String typeName, Type type, V value) {
         var resolvedValue = ctx.resolveGenericValue(valueClass, type, value);
 
         return JavaUtils.getInitializerString(ctx, typeName, resolvedValue);

@@ -38,7 +38,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 class GeneralStringVerifierTest {
 
-    public static final GeneralStringVerifier verifier = new GeneralStringVerifier();
+    private static final GeneralStringVerifier verifier = new GeneralStringVerifier();
 
     @Test
     void testValidCharacters() {

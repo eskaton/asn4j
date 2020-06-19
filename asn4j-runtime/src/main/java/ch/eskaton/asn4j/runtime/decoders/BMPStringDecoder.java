@@ -34,14 +34,14 @@ import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class BMPStringDecoder implements TypeDecoder<ASN1BMPString> {
 
     @Override
     public void decode(DecoderStates states, DecoderState state, ASN1BMPString obj) {
         try {
-            obj.setValue(new String(RuntimeUtils.getValue(states, state), Charset.forName("UTF16")));
+            obj.setValue(new String(RuntimeUtils.getValue(states, state), StandardCharsets.UTF_16));
         } catch (ASN1RuntimeException e) {
             throw new DecodingException(e);
         }

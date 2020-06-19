@@ -51,13 +51,7 @@ public class TypeResolverHelper {
     }
 
     private boolean isUsefulType(Type type) {
-        if (type instanceof GeneralizedTime) {
-            return true;
-        } else if (type instanceof UTCTime) {
-            return true;
-        }
-
-        return false;
+        return isUsefulType(type.getClass().getSimpleName());
     }
 
     boolean isUsefulType(String typeName) {
