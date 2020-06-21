@@ -82,7 +82,7 @@ public class TypeFormatter {
                     .map(t -> formatComponentType(ctx, t))
                     .collect(Collectors.joining(", ")) + "]";
         } else if (type instanceof SetType) {
-            return SET + "[" + ((SequenceType) type).getAllComponents().stream()
+            return SET + "[" + ((SetType) type).getAllComponents().stream()
                     .map(t -> formatComponentType(ctx, t))
                     .collect(Collectors.joining(", ")) + "]";
         } else if (type instanceof SequenceOfType) {
