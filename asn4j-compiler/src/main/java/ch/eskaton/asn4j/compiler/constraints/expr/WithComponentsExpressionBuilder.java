@@ -165,10 +165,12 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
                             .orElseThrow(() -> new IllegalCompilerStateException("Expected maybeValueExpression")));
             var maybePresenceExpression = Optional.ofNullable(componentNode.getPresenceType())
                     .map(presenceType -> {
-                        SequenceType sequenceType = (SequenceType) compiledType.getType();
-                        return buildPresenceExpression(sequenceType.getAllComponents().stream()
-                                        .filter(c -> c.getNamedType().getName().equals(componentNode.getName())).findFirst()
-                                , presenceType);
+                        var sequenceType = (SequenceType) compiledType.getType();
+                        var componentType = sequenceType.getAllComponents().stream()
+                                .filter(c -> c.getNamedType().getName().equals(componentNode.getName()))
+                                .findFirst();
+
+                        return componentType.map(c -> buildPresenceExpression(c, presenceType)).orElse(null);
                     });
             var expression = OptionalUtils.combine(maybeValueExpression, maybePresenceExpression,
                     (l, r) -> new BinaryBooleanExpression(BinaryOperator.AND, l, r));
@@ -196,7 +198,7 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
         }
     }
 
-    private BooleanExpression buildPresenceExpression(Optional<ComponentType> componentType, PresenceType presenceType) {
+    private BooleanExpression buildPresenceExpression(ComponentType componentType, PresenceType presenceType) {
         return switch (presenceType) {
             case PRESENT -> new BinaryBooleanExpression(BinaryOperator.NE, new Variable(VAR_VALUE), new ILValue(null));
             case ABSENT -> getAbsentExpression(componentType);
@@ -204,10 +206,10 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
         };
     }
 
-    private BooleanExpression getAbsentExpression(Optional<ComponentType> componentType) {
-        if (componentType.get().getCompType() != ComponentType.CompType.NAMED_TYPE_OPT) {
+    private BooleanExpression getAbsentExpression(ComponentType componentType) {
+        if (componentType.getCompType() != ComponentType.CompType.NAMED_TYPE_OPT) {
             throw new CompilerException("Component '%s' isn't optional and therefore can't have a presence constraint of ABSENT",
-                    componentType.get().getNamedType().getName());
+                    componentType.getNamedType().getName());
         }
 
         return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE), new ILValue(null));

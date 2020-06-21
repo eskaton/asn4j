@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ObjectIdentifierValue extends AbstractOIDValue {
 
@@ -48,6 +49,30 @@ public class ObjectIdentifierValue extends AbstractOIDValue {
 
     public DefinedValue getReference() {
         return reference;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        ObjectIdentifierValue that = (ObjectIdentifierValue) o;
+
+        return Objects.equals(reference, that.reference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), reference);
     }
 
 }

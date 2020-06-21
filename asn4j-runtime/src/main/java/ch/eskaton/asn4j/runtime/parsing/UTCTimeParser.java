@@ -93,6 +93,7 @@ public class UTCTimeParser extends AbstractDateTimeParser {
         }
     }
 
+    @Override
     protected Integer parseYear(Context ctx) throws IOException {
         return parseComponent(ctx, State.YEAR, 2, null);
     }

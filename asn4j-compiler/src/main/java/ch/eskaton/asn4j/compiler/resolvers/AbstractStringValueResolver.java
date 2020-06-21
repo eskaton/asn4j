@@ -162,7 +162,7 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
         }
     }
 
-    private String getString(Type type, StringValue stringValue) {
+    private String getString(@SuppressWarnings("unused") Type type, StringValue stringValue) {
         return verifyString(stringValue.getCString());
     }
 

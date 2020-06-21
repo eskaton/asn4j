@@ -285,7 +285,8 @@ public class Lexer {
     }
 
     public Token nextToken(Context ctx) throws ParserException {
-        int c, offset;
+        int offset;
+        int c;
         Token token;
 
         if (!tokens.isEmpty()) {
@@ -455,10 +456,8 @@ public class Lexer {
                         return new Token(ctx, TokenType.DOT, offset, position(line, pos));
 
                     default:
-                        if ('0' <= c && c <= '9') {
-                            if ((token = parseNumber(ctx, c)) != null) {
-                                return token;
-                            }
+                        if ('0' <= c && c <= '9' && (token = parseNumber(ctx, c)) != null) {
+                            return token;
                         }
 
                         is.unread();
@@ -527,7 +526,8 @@ public class Lexer {
 
     private Token parseCharString(Context ctx) throws IOException {
         StringBuilder sb = new StringBuilder();
-        int c, cn;
+        int c;
+        int cn;
         int beginOffset = is.getPos() - 1;
         int beginPos = pos;
         int beginLine = line;
@@ -716,7 +716,8 @@ public class Lexer {
 
     private Token parseNumString(Context ctx) throws IOException {
         StringBuilder sb = new StringBuilder();
-        int c, cn;
+        int c;
+        int cn;
         int beginOffset = is.getPos() - 1;
         int beginPos = pos;
         int tmpPos = pos;
@@ -772,12 +773,11 @@ public class Lexer {
         int beginOffset = is.getPos();
         int beginPos = pos + 1;
         int tmpPos = pos;
-        int c, cn;
+        int c;
+        int cn;
         boolean allUc = true;
         boolean digits = false;
         is.mark();
-
-        // is.unread();
 
         while (!eof) {
             c = is.read();

@@ -34,7 +34,7 @@ public class BooleanEncoder implements TypeEncoder<ASN1Boolean> {
 
     @Override
     public byte[] encode(Encoder encoder, ASN1Boolean obj) {
-        return new byte[] { obj.getValue() ? (byte) 0xFF : (byte) 0x00 };
+        return new byte[] { Boolean.TRUE.equals(obj.getValue()) ? (byte) 0xFF : (byte) 0x00 };
     }
 
 }

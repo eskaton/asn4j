@@ -73,13 +73,7 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
                 try {
                     components.add(resolveComponentId(ctx, component));
                 } catch (CompilerException e) {
-                    List<OIDComponentNode> resolvedComponents = resolveComponent(ctx, component, componentPos);
-
-                    if (resolvedComponents != null) {
-                        components.addAll(resolvedComponents);
-                    } else {
-                        throw e;
-                    }
+                    resolveComponent(ctx, component, componentPos).map(c -> components.addAll(c)).orElseThrow(() -> e);
                 }
             } catch (CompilerException e) {
                 throw new CompilerException("Failed to resolve component of %s value", e, getTypeName());
@@ -91,8 +85,8 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
         return components;
     }
 
-    protected abstract List<OIDComponentNode> resolveComponent(CompilerContext ctx, OIDComponentNode component,
-            int componentPos);
+    protected abstract Optional<List<OIDComponentNode>> resolveComponent(CompilerContext ctx,
+            OIDComponentNode component, int componentPos);
 
     protected List<OIDComponentNode> resolveOIDReference(CompilerContext ctx, OIDComponentNode component,
             Class<V> valueClass) {
