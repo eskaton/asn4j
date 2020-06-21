@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
+import java.util.Optional;
 
 public class RelativeOIDValueResolver extends AbstractOIDValueResolver<RelativeOID, RelativeOIDValue> {
 
@@ -47,9 +48,9 @@ public class RelativeOIDValueResolver extends AbstractOIDValueResolver<RelativeO
     }
 
     @Override
-    protected List<OIDComponentNode> resolveComponent(CompilerContext ctx, OIDComponentNode component,
+    protected Optional<List<OIDComponentNode>> resolveComponent(CompilerContext ctx, OIDComponentNode component,
             int componentPos) {
-        return resolveOIDReference(ctx, component, RelativeOIDValue.class);
+        return Optional.of(resolveOIDReference(ctx, component, RelativeOIDValue.class));
     }
 
 }

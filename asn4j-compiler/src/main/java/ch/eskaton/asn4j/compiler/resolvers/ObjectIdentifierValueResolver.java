@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<ObjectIdentifier, ObjectIdentifierValue> {
 
@@ -58,19 +59,19 @@ public class ObjectIdentifierValueResolver extends AbstractOIDValueResolver<Obje
     }
 
     @Override
-    protected List<OIDComponentNode> resolveComponent(CompilerContext ctx, OIDComponentNode component,
+    protected Optional<List<OIDComponentNode>> resolveComponent(CompilerContext ctx, OIDComponentNode component,
             int componentPos) {
         if (componentPos == 1) {
             Integer id = resolveRootArc(component.getName());
 
             if (id != null) {
-                return List.of(new OIDComponentNode(component.getPosition(), id, component.getName()));
+                return Optional.of(List.of(new OIDComponentNode(component.getPosition(), id, component.getName())));
             } else {
-                return resolveOIDReference(ctx, component, ObjectIdentifierValue.class);
+                return Optional.of(resolveOIDReference(ctx, component, ObjectIdentifierValue.class));
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
     protected Integer resolveRootArc(String name) {

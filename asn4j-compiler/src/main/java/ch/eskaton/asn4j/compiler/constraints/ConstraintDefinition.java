@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
 
@@ -110,7 +110,7 @@ public class ConstraintDefinition {
         return new ConstraintDefinition(roots, extensions, extensible);
     }
 
-    public void optimize(Function<Node, Node> optimizer) {
+    public void optimize(UnaryOperator<Node> optimizer) {
         if (this.roots != null) {
             this.roots = optimizer.apply(roots);
         }

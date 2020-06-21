@@ -447,6 +447,7 @@ import java.util.function.Consumer;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -636,7 +637,7 @@ class ParserTest {
         assertNotNull(result);
         assertNotNull(result.getExports());
         assertEquals(Mode.ALL, result.getExports().getMode());
-        assertFalse(0 == result.getImports().size());
+        assertNotEquals(0, result.getImports().size());
         assertTrue(result.getAssignments().isEmpty());
 
         parser = new Parser(new ByteArrayInputStream(
@@ -661,7 +662,7 @@ class ParserTest {
         assertNotNull(result);
         assertNotNull(result.getExports());
         assertEquals(Mode.ALL, result.getExports().getMode());
-        assertFalse(0 == result.getImports().size());
+        assertNotEquals(0, result.getImports().size());
         assertFalse(result.getAssignments().isEmpty());
         assertEquals(1, result.getAssignments().size());
     }
@@ -3226,8 +3227,7 @@ class ParserTest {
     }
 
     @Test
-    void testEmbeddedPDVValueParser() throws IOException,
-            ParserException {
+    void testEmbeddedPDVValueParser() {
         // TODO: implement
     }
 
@@ -3749,8 +3749,7 @@ class ParserTest {
     }
 
     @Test
-    void testUnrestrinctedCharacterStringValueParser()
-            throws IOException, ParserException {
+    void testUnrestrinctedCharacterStringValueParser() {
         // TODO: implement
     }
 

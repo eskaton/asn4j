@@ -96,6 +96,7 @@ import ch.eskaton.commons.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -217,8 +218,8 @@ public class BERDecoder implements Decoder {
         T obj;
 
         try {
-            obj = type.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            obj = type.getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new DecodingException(e);
         }
 
@@ -248,7 +249,7 @@ public class BERDecoder implements Decoder {
         try {
             Class<T> clazz = toClass(type);
 
-            obj = clazz.newInstance();
+            obj = clazz.getDeclaredConstructor().newInstance();
 
             if (obj instanceof ASN1Boolean) {
                 getDecoder(ASN1Boolean.class).decode(states, state, (ASN1Boolean) obj);

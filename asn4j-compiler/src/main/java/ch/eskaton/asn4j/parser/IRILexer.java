@@ -102,7 +102,8 @@ public class IRILexer {
                                 if (c >= '0' && c <= '9' || c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') {
                                     sb.append((char) c);
                                 } else {
-                                    int cp, cn;
+                                    int cp;
+                                    int cn;
 
                                     if (Character.isHighSurrogate((char) c)) {
                                         cn = is.read();

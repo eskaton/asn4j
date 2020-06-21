@@ -86,7 +86,6 @@ public class ConstraintCompiler {
                 .put(SetType.class, new SetConstraintCompiler(ctx))
                 .put(SequenceType.class, new SequenceConstraintCompiler(ctx))
                 .put(Choice.class, new ChoiceConstraintCompiler(ctx))
-//                .put(VisibleString.class, new VisibleStringConstraintCompiler(typeResolver))
                 .build();
     }
 
@@ -129,9 +128,8 @@ public class ConstraintCompiler {
 
     private Optional<AbstractConstraintCompiler> getCompiler(CompiledType compiledType) {
         if (!compilers.containsKey(compiledType.getType().getClass())) {
-//            throw new CompilerException("Constraints for type %s not yet supported",
-//                    compiledType.getType().getClass().getSimpleName());
-            return Optional.empty();
+            throw new CompilerException("Constraints for type %s not yet supported",
+                    compiledType.getType().getClass().getSimpleName());
         }
 
         return Optional.of(compilers.get(compiledType.getType().getClass()));
