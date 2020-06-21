@@ -33,7 +33,6 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString3;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString4;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBoolean2;
-import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration3;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger1;
@@ -58,6 +57,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequence1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSequenceOf2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestSet1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestSet2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf2;
 import org.junit.jupiter.api.Test;
@@ -88,8 +89,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testSequenceFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSetFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSetSuccess;
 import static ch.eskaton.commons.utils.Utils.with;
 
 class TestX680_51_3 {
@@ -307,6 +310,40 @@ class TestX680_51_3 {
                 with(new TestInteger1(), obj -> obj.setValue(BigInteger.valueOf(3L))));
         testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(),
                 with(new TestInteger1(), obj -> obj.setValue(BigInteger.valueOf(4L))));
+    }
+
+    @Test
+    void testSet1() {
+        testSetSuccess(TestSet1.class, new TestSet1(), set -> {
+            set.setA(with(new TestInteger1(), obj -> obj.setValue(BigInteger.valueOf(4L))));
+            set.setB(ASN1Boolean.TRUE);
+        });
+
+        testSetFailure(TestSet1.class, new TestSet1(), set -> {
+            set.setA(with(new TestInteger1(), obj -> obj.setValue(BigInteger.TWO)));
+            set.setB(ASN1Boolean.TRUE);
+        });
+        testSetFailure(TestSet1.class, new TestSet1(), set -> {
+            set.setA(with(new TestInteger1(), obj -> obj.setValue(BigInteger.valueOf(4L))));
+            set.setB(ASN1Boolean.FALSE);
+        });
+    }
+
+    @Test
+    void testSet2() {
+        testSetSuccess(TestSet2.class, new TestSet2(), set -> {
+            set.setA(ASN1Integer.valueOf(4L));
+            set.setB(ASN1Boolean.TRUE);
+        });
+
+        testSetFailure(TestSet2.class, new TestSet2(), set -> {
+            set.setA(ASN1Integer.valueOf(2L));
+            set.setB(ASN1Boolean.TRUE);
+        });
+        testSetFailure(TestSet2.class, new TestSet2(), set -> {
+            set.setA(ASN1Integer.valueOf(4L));
+            set.setB(ASN1Boolean.FALSE);
+        });
     }
 
     @Test
