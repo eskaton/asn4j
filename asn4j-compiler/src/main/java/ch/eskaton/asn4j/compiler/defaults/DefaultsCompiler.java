@@ -30,105 +30,12 @@ package ch.eskaton.asn4j.compiler.defaults;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.parser.ast.types.BMPString;
-import ch.eskaton.asn4j.parser.ast.types.BitString;
-import ch.eskaton.asn4j.parser.ast.types.BooleanType;
-import ch.eskaton.asn4j.parser.ast.types.Choice;
-import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
-import ch.eskaton.asn4j.parser.ast.types.GeneralString;
-import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
-import ch.eskaton.asn4j.parser.ast.types.GraphicString;
-import ch.eskaton.asn4j.parser.ast.types.IA5String;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
-import ch.eskaton.asn4j.parser.ast.types.IntegerType;
-import ch.eskaton.asn4j.parser.ast.types.Null;
-import ch.eskaton.asn4j.parser.ast.types.NumericString;
-import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
-import ch.eskaton.asn4j.parser.ast.types.OctetString;
-import ch.eskaton.asn4j.parser.ast.types.PrintableString;
-import ch.eskaton.asn4j.parser.ast.types.Real;
-import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
-import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
-import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
-import ch.eskaton.asn4j.parser.ast.types.SequenceType;
-import ch.eskaton.asn4j.parser.ast.types.SetOfType;
-import ch.eskaton.asn4j.parser.ast.types.SetType;
-import ch.eskaton.asn4j.parser.ast.types.T61String;
-import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.parser.ast.types.UTCTime;
-import ch.eskaton.asn4j.parser.ast.types.UTF8String;
-import ch.eskaton.asn4j.parser.ast.types.UniversalString;
-import ch.eskaton.asn4j.parser.ast.types.VideotexString;
-import ch.eskaton.asn4j.parser.ast.types.VisibleString;
-import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
-import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
-import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
-import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
-import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
-import ch.eskaton.asn4j.parser.ast.values.GeneralStringValue;
-import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
-import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
-import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
-import ch.eskaton.asn4j.parser.ast.values.IRIValue;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.parser.ast.values.NullValue;
-import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
-import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
-import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
-import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
-import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
-import ch.eskaton.asn4j.parser.ast.values.UniversalStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
-import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
-import ch.eskaton.commons.collections.Maps;
-
-import java.util.Map;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
-import static ch.eskaton.asn4j.compiler.CompilerUtils.getTypeName;
 
 public class DefaultsCompiler {
-
-    private Map<Class<? extends Type>, AbstractDefaultCompiler> compilers =
-            Maps.<Class<? extends Type>, AbstractDefaultCompiler>builder()
-                    .put(Null.class, new DefaultCompilerImpl<>(NullValue.class))
-                    .put(BooleanType.class, new DefaultCompilerImpl<>(BooleanValue.class))
-                    .put(IntegerType.class, new DefaultCompilerImpl<>(IntegerValue.class))
-                    .put(Real.class, new RealDefaultCompiler())
-                    .put(EnumeratedType.class, new DefaultCompilerImpl<>(EnumeratedValue.class))
-                    .put(BitString.class, new BitStringDefaultCompiler())
-                    .put(OctetString.class, new OctetStringDefaultCompiler())
-                    .put(ObjectIdentifier.class, new DefaultCompilerImpl<>(ObjectIdentifierValue.class))
-                    .put(RelativeOID.class, new DefaultCompilerImpl<>(RelativeOIDValue.class))
-                    .put(IRI.class, new DefaultCompilerImpl<>(IRIValue.class))
-                    .put(RelativeIRI.class, new DefaultCompilerImpl<>(RelativeIRIValue.class))
-                    .put(SetType.class, new DefaultCompilerImpl<>(CollectionValue.class))
-                    .put(SetOfType.class, new DefaultCompilerImpl<>(CollectionOfValue.class))
-                    .put(SequenceType.class, new DefaultCompilerImpl<>(CollectionValue.class))
-                    .put(SequenceOfType.class, new DefaultCompilerImpl<>(CollectionOfValue.class))
-                    .put(Choice.class, new DefaultCompilerImpl<>(ChoiceValue.class))
-                    .put(VisibleString.class, new DefaultCompilerImpl<>(VisibleStringValue.class))
-                    .put(UTCTime.class, new DefaultCompilerImpl<>(UTCTimeValue.class))
-                    .put(GeneralizedTime.class, new DefaultCompilerImpl<>(GeneralizedTimeValue.class))
-                    .put(NumericString.class, new DefaultCompilerImpl<>(NumericStringValue.class))
-                    .put(PrintableString.class, new DefaultCompilerImpl<>(PrintableStringValue.class))
-                    .put(IA5String.class, new DefaultCompilerImpl<>(IA5StringValue.class))
-                    .put(GraphicString.class, new DefaultCompilerImpl<>(GraphicStringValue.class))
-                    .put(GeneralString.class, new DefaultCompilerImpl<>(GeneralStringValue.class))
-                    .put(TeletexString.class, new DefaultCompilerImpl<>(TeletexStringValue.class))
-                    .put(T61String.class, new DefaultCompilerImpl<>(TeletexStringValue.class))
-                    .put(VideotexString.class, new DefaultCompilerImpl<>(VideotexStringValue.class))
-                    .put(UniversalString.class, new DefaultCompilerImpl<>(UniversalStringValue.class))
-                    .put(UTF8String.class, new DefaultCompilerImpl<>(UTF8StringValue.class))
-                    .put(BMPString.class, new DefaultCompilerImpl<>(BMPStringValue.class))
-                    .build();
 
     private CompilerContext ctx;
 
@@ -138,19 +45,7 @@ public class DefaultsCompiler {
     }
 
     public void compileDefault(JavaClass clazz, String field, String typeName, Type type, Value value) {
-        Type base;
-
-        if (type instanceof TypeReference) {
-            base = ctx.resolveBaseType((TypeReference) type);
-        } else {
-            base = type;
-        }
-
-        if (!compilers.containsKey(base.getClass())) {
-            throw new CompilerException("Defaults for type %s not yet supported", getTypeName(base));
-        }
-
-        AbstractDefaultCompiler compiler = compilers.get(base.getClass());
+        AbstractDefaultCompiler compiler = ctx.getDefaultCompiler(ctx.resolveBaseType(type).getClass());
 
         try {
             compiler.compileDefault(ctx, clazz, field, typeName, type, value);

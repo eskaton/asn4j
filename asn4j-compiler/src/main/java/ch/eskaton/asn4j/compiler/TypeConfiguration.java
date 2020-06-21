@@ -27,6 +27,10 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.defaults.AbstractDefaultCompiler;
+import ch.eskaton.asn4j.compiler.defaults.BitStringDefaultCompiler;
+import ch.eskaton.asn4j.compiler.defaults.OctetStringDefaultCompiler;
+import ch.eskaton.asn4j.compiler.defaults.RealDefaultCompiler;
 import ch.eskaton.asn4j.compiler.resolvers.BMPStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BitStringValueResolver;
 import ch.eskaton.asn4j.compiler.resolvers.BooleanValueResolver;
@@ -174,7 +178,8 @@ public class TypeConfiguration {
 
     public TypeConfiguration(CompilerContext ctx) {
         types.add(new TypeDefinition<>(BitString.class, new BitStringCompiler(), BitStringValue.class,
-                ASN1BitString.class, new BitStringValueResolver(ctx), new BitStringTypeNameSupplier(this)));
+                ASN1BitString.class, new BitStringValueResolver(ctx), new BitStringTypeNameSupplier(this),
+                new BitStringDefaultCompiler()));
         types.add(new TypeDefinition<>(BooleanType.class, new BooleanCompiler(), BooleanValue.class,
                 ASN1Boolean.class, new BooleanValueResolver(ctx), new DefaultTypeNameSupplier(this)));
         types.add(new TypeDefinition<>(Choice.class, new ChoiceCompiler(), ChoiceValue.class,
@@ -186,9 +191,10 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(Null.class, new NullCompiler(), NullValue.class,
                 ASN1Null.class, new NullValueResolver(ctx), new DefaultTypeNameSupplier(this)));
         types.add(new TypeDefinition<>(OctetString.class, new OctetStringCompiler(), OctetStringValue.class,
-                ASN1OctetString.class, new OctetStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1OctetString.class, new OctetStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new OctetStringDefaultCompiler()));
         types.add(new TypeDefinition<>(Real.class, new RealCompiler(), RealValue.class,
-                ASN1Real.class, new RealValueResolver(ctx), new SubtypeTypeNameSupplier(this)));
+                ASN1Real.class, new RealValueResolver(ctx), new SubtypeTypeNameSupplier(this), new RealDefaultCompiler()));
         types.add(new TypeDefinition<>(SequenceType.class, new SequenceCompiler(), CollectionValue.class,
                 ASN1Sequence.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier(this, true), true));
         types.add(new TypeDefinition<>(SequenceOfType.class, new SequenceOfCompiler(), CollectionOfValue.class,
@@ -263,6 +269,11 @@ public class TypeConfiguration {
 
     public <T extends Type> TypeNameSupplier<Type> getTypeNameSupplier(Class<T> typeClass) {
         return getConfigByType("getTypeNameSupplier", typeClass, TypeDefinition::getTypeNameSupplier);
+    }
+
+    public <V extends Value, T extends Type, D extends AbstractDefaultCompiler<V>> D getDefaultCompiler(
+            Class<T> typeClass) {
+        return (D) getConfigByType("getDefaultCompiler", typeClass, TypeDefinition::getDefaultCompiler);
     }
 
     public <V extends Value, S extends ValueResolver<V>> S getValueResolver(Class<V> valueClass) {

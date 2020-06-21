@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
+import ch.eskaton.asn4j.compiler.defaults.AbstractDefaultCompiler;
 import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
@@ -141,6 +142,10 @@ public class CompilerContext {
     @SuppressWarnings("unchecked")
     public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> clazz) {
         return config.getCompiler(clazz);
+    }
+
+    public <T extends Type, V extends Value> AbstractDefaultCompiler<V> getDefaultCompiler(Class<T> clazz) {
+        return config.getDefaultCompiler(clazz);
     }
 
     public ModuleNode getModule() {
@@ -741,8 +746,8 @@ public class CompilerContext {
         return typeResolver.resolveTypeReference(reference);
     }
 
-    public Type resolveTypeReference(Type typeReference) {
-        return typeResolver.resolveTypeReference(typeReference);
+    public Type resolveTypeReference(Type type) {
+        return typeResolver.resolveTypeReference(type);
     }
 
     private Type resolveBaseType(ModuleNode module, String typeName) {

@@ -27,12 +27,15 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeNameSupplier;
+import ch.eskaton.asn4j.compiler.defaults.AbstractDefaultCompiler;
+import ch.eskaton.asn4j.compiler.defaults.DefaultCompilerImpl;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
+import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeNameSupplier;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueResolver<V>, C extends Compiler<T>> {
+public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueResolver<V>, C extends Compiler<T>,
+        D extends AbstractDefaultCompiler<V>> {
 
     private Class<T> typeClass;
 
@@ -44,23 +47,38 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
 
     private TypeNameSupplier typeNameSupplier;
 
+    private D defaultCompiler;
+
     private Boolean constructed;
 
     private C compiler;
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
+            S valueResolver, TypeNameSupplier typeNameSupplier, D defaultCompiler) {
+        this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier, defaultCompiler, false);
+    }
+
+    public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
             S valueResolver, TypeNameSupplier typeNameSupplier) {
-        this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier, false);
+        this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier,
+                (D) new DefaultCompilerImpl<V>(valueClass), false);
     }
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
             S valueResolver, TypeNameSupplier typeNameSupplier, boolean constructed) {
+        this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier,
+                (D) new DefaultCompilerImpl<V>(valueClass), constructed);
+    }
+
+    public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
+            S valueResolver, TypeNameSupplier typeNameSupplier, D defaultCompiler, boolean constructed) {
         this.typeClass = typeClass;
         this.compiler = compiler;
         this.valueClass = valueClass;
         this.runtimeTypeClass = runtimeTypeClass;
         this.valueResolver = valueResolver;
         this.typeNameSupplier = typeNameSupplier;
+        this.defaultCompiler = defaultCompiler;
         this.constructed = constructed;
     }
 
@@ -120,6 +138,15 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
         }
 
         return typeNameSupplier;
+    }
+
+    public D getDefaultCompiler() {
+        if (defaultCompiler == null) {
+            throw new IllegalCompilerStateException("Type %s has no associated default compiler",
+                    typeClass.getSimpleName());
+        }
+
+        return defaultCompiler;
     }
 
     public boolean isConstructed() {
