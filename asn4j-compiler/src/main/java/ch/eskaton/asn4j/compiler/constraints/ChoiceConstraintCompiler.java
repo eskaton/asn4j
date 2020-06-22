@@ -31,6 +31,8 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.ChoiceContainedSubtypeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.CollectionContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.ChoiceValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
@@ -46,6 +48,7 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
@@ -73,6 +76,7 @@ public class ChoiceConstraintCompiler extends AbstractConstraintCompiler {
         addConstraintHandler(SingleValueConstraint.class,
                 new SingleValueCompiler(ctx, ChoiceValue.class, ValueNode.class, getTypeName(),
                         Set.class)::compile);
+        addConstraintHandler(ContainedSubtype.class, new ChoiceContainedSubtypeCompiler(ctx)::compile);
     }
 
     @Override
@@ -129,7 +133,7 @@ public class ChoiceConstraintCompiler extends AbstractConstraintCompiler {
             if (expression.isPresent()) {
                 builder.statements().returnExpression(expression.get()).build();
             } else {
-                new IllegalCompilerStateException("Expression is empty");
+                builder.statements().returnValue(Boolean.TRUE);
             }
         }
     }

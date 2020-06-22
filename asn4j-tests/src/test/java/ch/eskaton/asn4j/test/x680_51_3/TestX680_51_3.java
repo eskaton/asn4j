@@ -33,6 +33,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString3;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString4;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBoolean2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestChoice1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestChoice2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration3;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger1;
@@ -69,6 +71,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testChoiceFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testChoiceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIRIFailure;
@@ -377,6 +381,34 @@ class TestX680_51_3 {
         testSequenceFailure(TestSequence2.class, new TestSequence2(), seq -> {
             seq.setA(ASN1Integer.valueOf(2));
             seq.setB(ASN1Boolean.TRUE);
+        });
+    }
+
+    @Test
+    void testChoice1() {
+        testChoiceSuccess(TestChoice1.class, new TestChoice1(), choice -> {
+            choice.setA(ASN1Integer.valueOf(12));
+        });
+
+        testChoiceFailure(TestChoice1.class, new TestChoice1(), choice -> {
+            choice.setA(ASN1Integer.valueOf(4));
+        });
+        testChoiceFailure(TestChoice1.class, new TestChoice1(), choice -> {
+            choice.setB(ASN1Boolean.FALSE);
+        });
+    }
+
+    @Test
+    void testChoice2() {
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), choice -> {
+            choice.setA(ASN1Integer.valueOf(12));
+        });
+
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), choice -> {
+            choice.setA(ASN1Integer.valueOf(4));
+        });
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), choice -> {
+            choice.setB(ASN1Boolean.TRUE);
         });
     }
 
