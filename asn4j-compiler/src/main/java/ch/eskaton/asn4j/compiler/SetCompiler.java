@@ -63,12 +63,7 @@ public class SetCompiler extends AbstractCollectionCompiler<SetType> {
         }
 
         private TagId getTagId(CompilerContext ctx, CompiledType component) {
-            var type = component.getType();
-            var tag = ctx.resolveSelectedType(type).getTag();
-
-            if (tag != null) {
-                return CompilerUtils.toTagId(tag);
-            }
+            var type = ctx.resolveSelectedType(component.getType());
 
             return ctx.getTagId(type);
         }
