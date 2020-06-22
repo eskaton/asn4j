@@ -70,6 +70,7 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
@@ -348,6 +349,10 @@ public class CompilerContext {
         return config.isConstructed(type.getClass());
     }
 
+    public boolean isBuiltin(Type type) {
+        return config.isBuiltin(type.getClass());
+    }
+
     public void ensureSymbolIsExported(ModuleNode module, String symbolName) {
         if (!isSymbolExported(module, symbolName)) {
             String format = "Module %s uses the symbol %s from module %s which the latter doesn't export";
@@ -398,10 +403,10 @@ public class CompilerContext {
     }
 
     public TagId getTagId(Type type) {
-        Optional<CompiledType> maybeReferencedType = getCompiledType(type, true);
+        Type compiledType = getCompiledType(type).getType();
 
-        if (maybeReferencedType.isPresent()) {
-            Type referencedType = maybeReferencedType.get().getType();
+        if (compiledType instanceof SimpleDefinedType) {
+            Type referencedType = compiledType;
             Tag tag = referencedType.getTag();
 
             if (tag != null) {
@@ -409,17 +414,25 @@ public class CompilerContext {
             } else {
                 return getTagId(referencedType);
             }
+        } else if (isBuiltin(compiledType)) {
+            Tag tag = compiledType.getTag();
+
+            if (tag != null) {
+                return CompilerUtils.toTagId(tag);
+            }
+
+            String typeName = getTypeName(compiledType);
+
+            try {
+                Class<?> typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
+                ASN1Tag tagAnnotation = typeClazz.getAnnotation(ASN1Tag.class);
+                return TagId.fromTag(tagAnnotation);
+            } catch (ClassNotFoundException e) {
+                throw new CompilerException("Unknown type: %s", type);
+            }
         }
 
-        String typeName = getTypeName(type);
-
-        try {
-            Class<?> typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
-            ASN1Tag tagAnnotation = typeClazz.getAnnotation(ASN1Tag.class);
-            return TagId.fromTag(tagAnnotation);
-        } catch (ClassNotFoundException e) {
-            throw new CompilerException("Unknown type: " + type);
-        }
+        throw new IllegalCompilerStateException("Unexpected type: %s", type);
     }
 
     public CompiledCollectionType getCompiledCollectionType(CompiledType compiledType) {
@@ -441,21 +454,25 @@ public class CompilerContext {
         }
     }
 
-    public Optional<CompiledType> getCompiledType(Type type, boolean isSubType) {
+    /**
+     * Looks up the compiled type for the given type. Type may be compiled if it isn't already.
+     * If no compiled type can be found, it is assumed that type is a builtin type which is
+     * wrapped in a compiled type.
+     *
+     * @param type a type
+     * @return a compiled type
+     */
+    public CompiledType getCompiledType(Type type) {
         if (isResolvableReference(type)) {
             String typeName = ((TypeReference) type).getType();
             HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
             Optional<CompiledType> compiledType = Optional.ofNullable(moduleTypes.get(typeName));
 
-            if (!compiledType.isPresent()) {
-                if (!isSubType) {
-                    compiledType = withNewClass(() -> compiler.compileType(typeName));
-                } else {
-                    compiledType = compiler.compileType(typeName);
-                }
+            if (compiledType.isEmpty()) {
+                compiledType = withNewClass(() -> compiler.compileType(typeName));
             }
 
-            if (!compiledType.isPresent()) {
+            if (compiledType.isEmpty()) {
                 Optional<ImportNode> imp = getImport(typeName);
 
                 if (imp.isPresent()) {
@@ -473,14 +490,12 @@ public class CompilerContext {
                 }
             }
 
-            if (!compiledType.isPresent()) {
-                throw new CompilerException("Failed to resolve type %s in module %s ", typeName, getCurrentModuleName());
+            if (compiledType.isPresent()) {
+                return compiledType.get();
             }
-
-            return compiledType;
         }
 
-        return Optional.empty();
+        return new AnonymousCompiledType(type);
     }
 
     private Optional<ImportNode> getImport(String symbolName) {
@@ -545,18 +560,6 @@ public class CompilerContext {
 
     private boolean isResolvableReference(Type type) {
         return type instanceof TypeReference && !(type instanceof UsefulType);
-    }
-
-    /**
-     * Looks up the compiled type for the given type. Type may be compiled if it isn't already.
-     * If no compiled type can be found, it is assumed that type is a builtin type which is
-     * wrapped in a compiled type.
-     *
-     * @param type a type
-     * @return a compiled type
-     */
-    public CompiledType getCompiledType(Type type) {
-        return getCompiledType(type, false).orElse(new AnonymousCompiledType(type));
     }
 
     private HashMap<String, CompiledType> getTypesOfCurrentModule() {

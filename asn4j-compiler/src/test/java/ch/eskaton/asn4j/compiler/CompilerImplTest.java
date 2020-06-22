@@ -292,7 +292,15 @@ class CompilerImplTest {
                                 b INTEGER
                             }
                         """,
-                        "Test duplicate tags with user defined type in SET")
+                        "Test duplicate tags with user defined type in SET"),
+                Arguments.of("""
+                            Integer ::= [3] INTEGER
+                            Set ::= SET {
+                                a Integer,
+                                b [3] NULL
+                            }
+                        """,
+                        "Test duplicate tags with tagged type in SET")
         );
         // @formatter:on
     }

@@ -158,6 +158,10 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
         return constructed;
     }
 
+    public boolean isBuiltin() {
+        return valueClass != null;
+    }
+
     public boolean matchesType(Class<T> typeClass) {
         return this.typeClass.equals(typeClass);
     }

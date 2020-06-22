@@ -267,6 +267,10 @@ public class TypeConfiguration {
         return getConfigByType("isConstructed", typeClass, TypeDefinition::isConstructed);
     }
 
+    public <T extends Type> boolean isBuiltin(Class<T> typeClass) {
+        return getConfigByType("isBuiltin", typeClass, TypeDefinition::isBuiltin);
+    }
+
     public <T extends Type> TypeNameSupplier<Type> getTypeNameSupplier(Class<T> typeClass) {
         return getConfigByType("getTypeNameSupplier", typeClass, TypeDefinition::getTypeNameSupplier);
     }
