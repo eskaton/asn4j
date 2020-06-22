@@ -86,4 +86,13 @@ TestSequence2 ::= SEQUENCE {
     b BOOLEAN
 } (TestSequence1)
 
+TestChoice1 ::= CHOICE {
+   a INTEGER,
+   b BOOLEAN
+} (a: 12)
+TestChoice2 ::= CHOICE {
+   a INTEGER,
+   b BOOLEAN
+} (TestChoice1)
+
 END
