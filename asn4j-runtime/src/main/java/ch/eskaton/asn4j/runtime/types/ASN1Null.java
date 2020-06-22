@@ -55,7 +55,7 @@ public class ASN1Null implements ASN1Type, HasConstraint {
     }
 
     @Override
-    public boolean doCheckConstraint() {
+    public Boolean doCheckConstraint() {
         return true;
     }
 

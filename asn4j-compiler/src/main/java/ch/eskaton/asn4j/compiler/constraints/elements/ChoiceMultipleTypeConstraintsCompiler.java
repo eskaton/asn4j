@@ -25,20 +25,14 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.compiler.CompilerContext;
 
-public interface HasConstraint {
+public class ChoiceMultipleTypeConstraintsCompiler extends AbstractMultipleTypeConstraintsCompiler {
 
-    default void checkConstraint() {
-        if (!doCheckConstraint()) {
-            throw new ConstraintViolatedException("Value doesn't satisfy a constraint");
-        }
-    }
-
-    default Boolean doCheckConstraint() {
-        return true;
+    public ChoiceMultipleTypeConstraintsCompiler(CompilerContext ctx) {
+        super(ctx, ComponentVerifier::new);
     }
 
 }

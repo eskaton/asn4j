@@ -62,8 +62,7 @@ public class ASN1Integer implements ASN1Type, HasConstraint {
     @Override
     public void checkConstraint() {
         if (!doCheckConstraint()) {
-            throw new ConstraintViolatedException(String.format(
-                    "%d doesn't satisfy a constraint", value));
+            throw new ConstraintViolatedException(String.format("%d doesn't satisfy a constraint", value));
         }
     }
 

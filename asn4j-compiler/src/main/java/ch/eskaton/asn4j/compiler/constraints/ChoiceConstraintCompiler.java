@@ -28,13 +28,15 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ChoiceContainedSubtypeCompiler;
-import ch.eskaton.asn4j.compiler.constraints.elements.CollectionContainedSubtypeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.ChoiceMultipleTypeConstraintsCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.ChoiceValueExpressionBuilder;
+import ch.eskaton.asn4j.compiler.constraints.expr.ChoiceWithComponentsExpressionBuilder;
+import ch.eskaton.asn4j.compiler.constraints.expr.WithComponentsExpressionBuilder;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Expression;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
@@ -49,6 +51,7 @@ import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
+import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
@@ -77,6 +80,7 @@ public class ChoiceConstraintCompiler extends AbstractConstraintCompiler {
                 new SingleValueCompiler(ctx, ChoiceValue.class, ValueNode.class, getTypeName(),
                         Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new ChoiceContainedSubtypeCompiler(ctx)::compile);
+        addConstraintHandler(MultipleTypeConstraints.class, new ChoiceMultipleTypeConstraintsCompiler(ctx)::compile);
     }
 
     @Override
@@ -146,6 +150,8 @@ public class ChoiceConstraintCompiler extends AbstractConstraintCompiler {
 
         return switch (node.getType()) {
             case VALUE -> new ChoiceValueExpressionBuilder(ctx).build(compiledType, (ValueNode<Set<ChoiceValue>>) node);
+            case WITH_COMPONENTS -> new ChoiceWithComponentsExpressionBuilder(ctx)
+                    .build(module, compiledType, (WithComponentsNode) node);
             default -> super.buildExpression(module, compiledType, node);
         };
     }

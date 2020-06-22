@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class SetCompiler extends AbstractCollectionCompiler<SetType> {
 
@@ -52,17 +53,20 @@ public class SetCompiler extends AbstractCollectionCompiler<SetType> {
         }
 
         public void verify(String name, CompiledType component) {
-            var tagId = getTagId(ctx, component);
-            var seenComponent = seenTags.get(tagId);
+            var tagIds = getTagId(ctx, component);
 
-            if (seenComponent != null) {
-                throw new CompilerException("Duplicate tags: %s and %s", seenComponent.get_1(), name);
-            }
+            tagIds.forEach(tagId -> {
+                var seenComponent = seenTags.get(tagId);
 
-            seenTags.put(tagId, Tuple2.of(name, component));
+                if (seenComponent != null) {
+                    throw new CompilerException("Duplicate tags: %s and %s", seenComponent.get_1(), name);
+                }
+            });
+
+            tagIds.stream().forEach(tagId -> seenTags.put(tagId, Tuple2.of(name, component)));
         }
 
-        private TagId getTagId(CompilerContext ctx, CompiledType component) {
+        private Set<TagId> getTagId(CompilerContext ctx, CompiledType component) {
             var type = ctx.resolveSelectedType(component.getType());
 
             return ctx.getTagId(type);
