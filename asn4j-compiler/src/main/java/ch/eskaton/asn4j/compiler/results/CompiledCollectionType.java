@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class CompiledCollectionType extends CompiledType implements HasChildComponents {
+public class CompiledCollectionType extends CompiledType implements HasComponents, HasChildComponents {
 
     private List<Tuple2<String, CompiledType>> components = new ArrayList<>();
 
@@ -44,6 +44,7 @@ public class CompiledCollectionType extends CompiledType implements HasChildComp
         super(type, name);
     }
 
+    @Override
     public List<Tuple2<String, CompiledType>> getComponents() {
         return components;
     }

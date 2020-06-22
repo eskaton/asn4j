@@ -289,7 +289,8 @@ public class TypeConfiguration {
         return memoizer.get(functionName, List.of(typeClass), type -> types.stream()
                 .filter(td -> td.matchesType(typeClass))
                 .map(accessor)
-                .findFirst()).get();
+                .findFirst()).orElseThrow(() ->
+                new IllegalCompilerStateException("Unexpected type: ", typeClass.getSimpleName()));
     }
 
     private <V extends Value, R> R getConfigByValue(String functionName, Class<V> valueClass,
@@ -297,7 +298,8 @@ public class TypeConfiguration {
         return memoizer.get(functionName, List.of(valueClass), type -> types.stream()
                 .filter(td -> td.matchesValue(valueClass))
                 .map(accessor)
-                .findFirst()).get();
+                .findFirst()).orElseThrow(() ->
+                new IllegalCompilerStateException("Unexpected value : ", valueClass.getSimpleName()));
     }
 
     private static class Memoizer {

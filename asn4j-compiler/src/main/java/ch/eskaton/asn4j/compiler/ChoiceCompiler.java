@@ -49,6 +49,7 @@ import ch.eskaton.commons.collections.Tuple2;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PRIVATE;
@@ -79,16 +80,18 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         var seenTags = new HashMap<TagId, NamedType>();
 
         for (NamedType namedType : node.getRootAlternatives()) {
-            var tagId = getTagId(ctx, namedType);
+            var tagIds = getTagId(ctx, namedType);
 
-            var seenComponent = seenTags.get(tagId);
+            tagIds.forEach(tagId -> {
+                var seenComponent = seenTags.get(tagId);
 
-            if (seenComponent != null) {
-                throw new CompilerException("Duplicate tags in %s %s: %s and %s", TypeName.CHOICE, name,
-                        seenComponent.getName(), namedType.getName());
-            }
+                if (seenComponent != null) {
+                    throw new CompilerException("Duplicate tags in %s %s: %s and %s", TypeName.CHOICE, name,
+                            seenComponent.getName(), namedType.getName());
+                }
+            });
 
-            seenTags.put(tagId, namedType);
+            tagIds.stream().forEach(t -> seenTags.put(t, namedType));
 
             var typeConstant = CompilerUtils.formatConstant(namedType.getName());
             var component = compileChoiceNamedType(ctx, javaClass, namedType, typeConstant, clearFields);
@@ -153,13 +156,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
                 .append(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).finish().build();
     }
 
-    private TagId getTagId(CompilerContext ctx, NamedType namedType) {
-        var type = namedType.getType();
-        var tag = ctx.resolveSelectedType(type).getTag();
-
-        if (tag != null) {
-            return CompilerUtils.toTagId(tag);
-        }
+    private Set<TagId> getTagId(CompilerContext ctx, NamedType namedType) {
+        var type = ctx.resolveSelectedType(namedType.getType());
 
         return ctx.getTagId(type);
     }

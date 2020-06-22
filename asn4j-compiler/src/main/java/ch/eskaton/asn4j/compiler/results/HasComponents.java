@@ -25,20 +25,14 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.commons.collections.Tuple2;
 
-public interface HasConstraint {
+import java.util.List;
 
-    default void checkConstraint() {
-        if (!doCheckConstraint()) {
-            throw new ConstraintViolatedException("Value doesn't satisfy a constraint");
-        }
-    }
+public interface HasComponents {
 
-    default Boolean doCheckConstraint() {
-        return true;
-    }
+    List<Tuple2<String, CompiledType>> getComponents();
 
 }

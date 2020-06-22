@@ -201,6 +201,8 @@ public class IL2JavaTranslator {
                 javaClass.addStaticImport(ASN1Null.Value.class, "NULL");
             } else if (value instanceof Long || value instanceof BigInteger) {
                 return value + "L";
+            } else if (value instanceof Integer) {
+                return "Integer.valueOf(" + value + ")";
             } else if (value instanceof Value) {
                 String typeName = ilValue.getTypeName().orElseThrow(
                         () -> new CompilerException("Type name expected for value: %s", ilValue.getValue()));
@@ -208,6 +210,8 @@ public class IL2JavaTranslator {
                 return getInitializerString(ctx, typeName, (Value) value);
             } else if (value instanceof String) {
                 return StringUtils.dquote((String) value);
+            } else if (value instanceof Boolean) {
+                return (boolean) value ? "Boolean.TRUE" : "Boolean.FALSE";
             }
 
             return String.valueOf(value);
@@ -372,7 +376,7 @@ public class IL2JavaTranslator {
     private String toJavaType(JavaClass javaClass, ILType type) {
         switch (type.getBaseType()) {
             case BOOLEAN:
-                return boolean.class.getSimpleName();
+                return Boolean.class.getSimpleName();
             case BIG_INTEGER:
                 return typeWithImport(javaClass, BigInteger.class);
             case BYTE_ARRAY:
@@ -380,7 +384,7 @@ public class IL2JavaTranslator {
             case NULL:
                 return typeWithImport(javaClass, ASN1Null.Value.class);
             case INTEGER:
-                return int.class.getSimpleName();
+                return Integer.class.getSimpleName();
             case INTEGER_ARRAY:
                 return int[].class.getSimpleName();
             case LIST:

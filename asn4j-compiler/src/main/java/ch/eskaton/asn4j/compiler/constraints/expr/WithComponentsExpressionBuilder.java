@@ -101,7 +101,7 @@ import static java.util.Optional.of;
 
 public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder {
 
-    private final Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>> parameterDefinitionDispatcher =
+    protected final Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>> parameterDefinitionDispatcher =
             new Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>>()
                     .withComparator((t, u) -> t.equals(u.getSimpleName()))
                     .withCase(ASN1Integer.class, args -> getValueParameter(BIG_INTEGER))
@@ -120,7 +120,7 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
                     .withCase(ASN1SequenceOf.class, args -> getCollectionOfParameterDefinition(args.get()))
                     .withCase(ASN1SetOf.class, args -> getCollectionOfParameterDefinition(args.get()));
 
-    private final Dispatcher<String, Class<? extends ASN1Type>, Tuple2<ComponentNode, String>, List<Expression>> parametersDispatcher =
+    protected final Dispatcher<String, Class<? extends ASN1Type>, Tuple2<ComponentNode, String>, List<Expression>> parametersDispatcher =
             new Dispatcher<String, Class<? extends ASN1Type>, Tuple2<ComponentNode, String>, List<Expression>>()
                     .withComparator((t, u) -> t.equals(u.getSimpleName()))
                     .withCase(ASN1Integer.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))

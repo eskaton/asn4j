@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestChoice1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestEnumerated1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence105;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence106;
@@ -81,6 +82,8 @@ import ch.eskaton.commons.functional.QuadConsumer;
 import ch.eskaton.commons.functional.TriConsumer;
 import org.junit.jupiter.api.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.testChoiceFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testChoiceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
@@ -539,6 +542,15 @@ class TestX680_51_8 {
             s.setA(ASN1Integer.valueOf(1L));
             s.setB(ASN1Boolean.FALSE);
         });
+    }
+
+    @Test
+    void testChoice1() {
+        testChoiceSuccess(TestChoice1.class, new TestChoice1(), c -> c.setA(ASN1Integer.valueOf(1L)));
+        testChoiceSuccess(TestChoice1.class, new TestChoice1(), c -> c.setB(ASN1Boolean.TRUE));
+
+        testChoiceFailure(TestChoice1.class, new TestChoice1(), c -> c.setA(ASN1Integer.valueOf(2L)));
+        testChoiceFailure(TestChoice1.class, new TestChoice1(), c -> c.setB(ASN1Boolean.FALSE));
     }
 
 }

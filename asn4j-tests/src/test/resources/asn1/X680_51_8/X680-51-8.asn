@@ -116,4 +116,9 @@ TestSequence114 ::= SEQUENCE {
     COMPONENTS OF TestSequence113
 } (WITH COMPONENTS {a (WITH COMPONENT (1..2))})
 
+TestChoice1 ::= CHOICE {
+   a INTEGER,
+   b BOOLEAN
+} (WITH COMPONENTS {a (1), b (TRUE)})
+
 END
