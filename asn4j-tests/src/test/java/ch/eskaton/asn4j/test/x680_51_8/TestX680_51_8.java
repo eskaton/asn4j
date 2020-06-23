@@ -39,6 +39,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestChoice1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestChoice2;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestChoice3;
+import ch.eskaton.asn4j.test.modules.x680_51_8.TestChoice4;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestEnumerated1;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence105;
 import ch.eskaton.asn4j.test.modules.x680_51_8.TestSequence106;
@@ -571,6 +573,24 @@ class TestX680_51_8 {
                         a -> a.setB(with(new TestChoice2.A.B(),
                                 b -> b.setC(new ASN1BitString(new byte[] { 0x4 }, 4)))))));
         testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setB(ASN1Boolean.FALSE));
+    }
+
+    @Test
+    void testChoice3() {
+        testChoiceSuccess(TestChoice3.class, new TestChoice3(),
+                c -> c.setB(ASN1Boolean.TRUE));
+
+        testChoiceFailure(TestChoice3.class, new TestChoice3(),
+                c -> c.setA(ASN1Integer.valueOf(1L)));
+    }
+
+    @Test
+    void testChoice4() {
+        testChoiceSuccess(TestChoice4.class, new TestChoice4(),
+                c -> c.setA(ASN1Integer.valueOf(1L)));
+
+        testChoiceFailure(TestChoice4.class, new TestChoice4(),
+                c -> c.setB(ASN1Boolean.TRUE));
     }
 
 }

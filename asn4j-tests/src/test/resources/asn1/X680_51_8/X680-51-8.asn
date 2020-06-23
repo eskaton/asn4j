@@ -135,4 +135,9 @@ TestChoice3 ::= CHOICE {
    b BOOLEAN
 } (WITH COMPONENTS {a ABSENT})
 
+TestChoice4 ::= CHOICE {
+   a INTEGER,
+   b BOOLEAN
+} (WITH COMPONENTS {a PRESENT})
+
 END
