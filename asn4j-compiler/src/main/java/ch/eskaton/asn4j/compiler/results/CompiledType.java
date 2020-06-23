@@ -35,6 +35,8 @@ import java.util.Objects;
 
 public class CompiledType implements CompilationResult {
 
+    private CompiledType parent;
+
     private Type type;
 
     private String name;
@@ -44,6 +46,14 @@ public class CompiledType implements CompilationResult {
     CompiledType(Type type, String name) {
         this.type = type;
         this.name = name;
+    }
+
+    public CompiledType getParent() {
+        return parent;
+    }
+
+    public void setParent(CompiledType parent) {
+        this.parent = parent;
     }
 
     public Type getType() {
@@ -74,19 +84,20 @@ public class CompiledType implements CompilationResult {
 
         CompiledType that = (CompiledType) obj;
 
-        return Objects.equals(type, that.type) &&
+        return Objects.equals(parent, that.parent) &&
+                Objects.equals(type, that.type) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(constraintDefinition, that.constraintDefinition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, name, constraintDefinition);
+        return Objects.hash(parent, type, name, constraintDefinition);
     }
 
     @Override
     public String toString() {
-        return ToString.get(this);
+        return ToString.getExcept(this, "parent");
     }
 
 }

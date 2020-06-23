@@ -271,6 +271,12 @@ public class TypeConfiguration {
         return getConfigByType("isBuiltin", typeClass, TypeDefinition::isBuiltin);
     }
 
+    public boolean isRuntimeType(String typeName) {
+        return memoizer.get("isRuntimeType", List.of(typeName), type -> types.stream()
+                .filter(td -> td.matchesRuntimeType(typeName))
+                .findAny()).isPresent();
+    }
+
     public <T extends Type> TypeNameSupplier<Type> getTypeNameSupplier(Class<T> typeClass) {
         return getConfigByType("getTypeNameSupplier", typeClass, TypeDefinition::getTypeNameSupplier);
     }

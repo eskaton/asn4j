@@ -170,4 +170,8 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
         return valueClass != null && this.valueClass.equals(valueClass);
     }
 
+    public boolean matchesRuntimeType(String runtimeTypeName) {
+        return runtimeTypeClass != null && this.runtimeTypeClass.getSimpleName().equals(runtimeTypeName);
+    }
+
 }

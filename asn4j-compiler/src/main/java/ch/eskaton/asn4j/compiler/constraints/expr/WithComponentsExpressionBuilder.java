@@ -49,10 +49,12 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
+import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
@@ -71,6 +73,7 @@ import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.OptionalUtils;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -118,10 +121,11 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
                     .withCase(ASN1Sequence.class, args -> singletonList(getMapParameter()))
                     .withCase(ASN1Set.class, args -> singletonList(getMapParameter()))
                     .withCase(ASN1SequenceOf.class, args -> getCollectionOfParameterDefinition(args.get()))
-                    .withCase(ASN1SetOf.class, args -> getCollectionOfParameterDefinition(args.get()));
+                    .withCase(ASN1SetOf.class, args -> getCollectionOfParameterDefinition(args.get()))
+                    .withCase(ASN1Choice.class, args -> singletonList(getMapParameter()));
 
-    protected final Dispatcher<String, Class<? extends ASN1Type>, Tuple2<ComponentNode, String>, List<Expression>> parametersDispatcher =
-            new Dispatcher<String, Class<? extends ASN1Type>, Tuple2<ComponentNode, String>, List<Expression>>()
+    protected final Dispatcher<String, Class<? extends ASN1Type>, Tuple2<ComponentNode, CompiledType>, List<Expression>> parametersDispatcher =
+            new Dispatcher<String, Class<? extends ASN1Type>, Tuple2<ComponentNode, CompiledType>, List<Expression>>()
                     .withComparator((t, u) -> t.equals(u.getSimpleName()))
                     .withCase(ASN1Integer.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
                     .withCase(ASN1Boolean.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
@@ -147,7 +151,9 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
                     .withCase(ASN1Set.class, args -> getCollectionParameters(args.get().get_1(),
                             acc -> getMapValueAccessor(args, acc)))
                     .withCase(ASN1SequenceOf.class, args -> singletonList(getMapValueAccessor(args, GET_VALUES)))
-                    .withCase(ASN1SetOf.class, args -> singletonList(getMapValueAccessor(args, GET_VALUES)));
+                    .withCase(ASN1SetOf.class, args -> singletonList(getMapValueAccessor(args, GET_VALUES)))
+                    .withCase(ASN1Choice.class, args -> getChoiceParameters(args.get().get_1(),
+                            acc -> getMapValueAccessor(args, acc)));
 
     public WithComponentsExpressionBuilder(CompilerContext ctx) {
         super(ctx);
@@ -179,7 +185,7 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
                 var expressionFunction = buildExpressionFunction(module, compiledComponent, e);
 
                 return new BooleanFunctionCall(of(expressionFunction.get_1()),
-                        getParameters(componentNode, compiledComponent.getName(), expressionFunction.get_2()));
+                        getParameters(componentNode, compiledComponent, expressionFunction.get_2()));
             });
         }).filter(Optional::isPresent)
                 .map(Optional::get).collect(Collectors.toList());
@@ -215,19 +221,35 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
         return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE), new ILValue(null));
     }
 
-    private List<Expression> getParameters(ComponentNode component, String typeName, String runtimeType) {
-        return parametersDispatcher.execute(runtimeType, Tuple2.of(component, typeName));
+    private List<Expression> getParameters(ComponentNode component, CompiledType compiledType, String runtimeType) {
+        return parametersDispatcher.execute(runtimeType, Tuple2.of(component, compiledType));
     }
 
-    private FunctionCall getMapValueAccessor(Optional<Tuple2<ComponentNode, String>> args, String accessor) {
+    private FunctionCall getMapValueAccessor(Optional<Tuple2<ComponentNode, CompiledType>> args, String accessor) {
         return getMapValueAccessor(args.get().get_1(), args.get().get_2(), accessor);
     }
 
-    private FunctionCall getMapValueAccessor(ComponentNode component, String typeName, String accessor) {
+    private FunctionCall getMapValueAccessor(ComponentNode component, CompiledType compiledType, String accessor) {
         return new FunctionCall(of(accessor),
                 of(new FunctionCall.GetMapValue(Variable.of(VAR_VALUES),
                         ILValue.of(component.getName()),
-                        ILParameterizedType.of(CUSTOM, singletonList(typeName)))));
+                        ILParameterizedType.of(CUSTOM, singletonList(getTypeName(compiledType))))));
+    }
+
+    private String getTypeName(CompiledType compiledType) {
+        if (ctx.isRuntimeType(compiledType.getName())) {
+            return compiledType.getName();
+        } else {
+            var parent = compiledType;
+            var names = new LinkedList<String>();
+
+            while (parent != null) {
+                names.addFirst(parent.getName());
+                parent = parent.getParent();
+            }
+
+            return names.stream().skip(1).collect(Collectors.joining("."));
+        }
     }
 
     private List<Expression> getCollectionParameters(ComponentNode component, Function<String, FunctionCall> getCall) {
@@ -235,6 +257,18 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
 
         ((SequenceType) ctx.resolveTypeReference(component.getComponentType())).getAllComponents().stream()
                 .map(c -> c.getNamedType().getName())
+                .map(n -> new Tuple2(ILValue.of(n), getCall.apply("get" + initCap(n))))
+                .forEach(associations::add);
+
+        return singletonList(new ILMapValue(ILType.of(ILBuiltinType.STRING),
+                ILParameterizedType.of(CUSTOM, singletonList(ASN1Type.class.getSimpleName())), associations));
+    }
+
+    private List<Expression> getChoiceParameters(ComponentNode component, Function<String, FunctionCall> getCall) {
+        var associations = new HashSet<Tuple2<Expression, Expression>>();
+
+        ((Choice) ctx.resolveTypeReference(component.getComponentType())).getAllAlternatives().stream()
+                .map(c -> c.getName())
                 .map(n -> new Tuple2(ILValue.of(n), getCall.apply("get" + initCap(n))))
                 .forEach(associations::add);
 

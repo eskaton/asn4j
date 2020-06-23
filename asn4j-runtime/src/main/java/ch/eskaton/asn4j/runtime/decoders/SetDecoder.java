@@ -38,7 +38,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.utils.StringUtils;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -61,20 +60,14 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
                 return;
             }
 
-            Field compField = metaData.getField(result.getTags());
+            var setter = metaData.getSetter(result.getTags());
 
-            if (compField == null) {
-                throw new DecodingException("Failed to decode a value of the type " + result.getClass()
-                        .getSimpleName());
+            if (setter == null) {
+                throw new DecodingException("Failed to decode a value of the type " +
+                        result.getClass().getSimpleName());
             }
 
-            compField.setAccessible(true);
-
-            try {
-                compField.set(obj, result.getObj());
-            } catch (IllegalArgumentException | IllegalAccessException e) {
-                throw new DecodingException(e);
-            }
+            setter.accept(result.getObj());
         } while (!tagsToTypes.isEmpty());
     }
 
