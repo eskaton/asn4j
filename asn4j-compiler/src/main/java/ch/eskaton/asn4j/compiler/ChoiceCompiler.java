@@ -76,6 +76,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         builder.append("switch(" + CHOICE_FIELD + ") {");
 
+        var compiledType = ctx.createCompiledType(CompiledChoiceType.class, node, name);
         var components = new ArrayList<Tuple2<String, CompiledType>>();
         var seenTags = new HashMap<TagId, NamedType>();
 
@@ -97,6 +98,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
             var component = compileChoiceNamedType(ctx, javaClass, namedType, typeConstant, clearFields);
             var fieldName = component.get_1();
 
+            component.get_2().setParent(compiledType);
+
             components.add(component);
             fieldNames.add(fieldName);
             typeEnum.addEnumConstant(typeConstant);
@@ -111,8 +114,6 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         javaClass.addField(new JavaDefinedField(CHOICE_ENUM, CHOICE_FIELD), true, false);
 
         addClearFieldsMethod(javaClass, fieldNames);
-
-        CompiledChoiceType compiledType = ctx.createCompiledType(CompiledChoiceType.class, node, name);
 
         compiledType.getComponents().addAll(components);
 

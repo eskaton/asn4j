@@ -80,7 +80,7 @@ public class CompiledChoiceType extends CompiledType implements HasComponents, H
 
     @Override
     public String toString() {
-        return ToString.get(this);
+        return ToString.getExcept(this, "parent");
     }
 
 }

@@ -34,11 +34,8 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class ChoiceDecoder {
 
@@ -57,23 +54,13 @@ public class ChoiceDecoder {
         }
 
         String typeName = result.getClass().getSimpleName();
-        Field altField = metaData.getField(result.getTags());
+        var setter = metaData.getSetter(result.getTags());
 
-        if (altField == null) {
+        if (setter == null) {
             throw new DecodingException("Failed to decode a value of the type " + typeName);
         }
 
-        String setterName = "set" + StringUtils.initCap(altField.getName());
-
-        try {
-            Method setter = obj.getClass().getDeclaredMethod(setterName, result.getObj().getClass());
-
-            setter.invoke(obj, result.getObj());
-        } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
-            throw new DecodingException(e);
-        } catch (NoSuchMethodException e) {
-            throw new DecodingException("Setter '" + setterName + "' missing on type " + typeName);
-        }
+        setter.accept(result.getObj());
 
         return obj;
     }

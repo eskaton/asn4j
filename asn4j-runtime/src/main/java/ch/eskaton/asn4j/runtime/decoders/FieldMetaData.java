@@ -28,18 +28,25 @@
 package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.TagId;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.commons.utils.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class FieldMetaData {
@@ -48,25 +55,65 @@ public class FieldMetaData {
 
     private Map<List<TagId>, Field> tagsToFields = new HashMap<>();
 
+    private Map<List<TagId>, Consumer<ASN1Type>> tagsToSetters = new HashMap<>();
+
     public FieldMetaData(ASN1Type type, Class<? extends Annotation> annotationClass) {
         for (Field field : RuntimeUtils.getComponents(type)) {
             Annotation annotation = field.getAnnotation(annotationClass);
 
             if (annotation != null) {
-                Class<? extends ASN1Type> fieldType = (Class<? extends ASN1Type>) field.getType();
-                List<ASN1Tag> tags = RuntimeUtils.getTags(fieldType, field.getAnnotation(ASN1Tag.class));
-                tagsToFields.put(tags.stream().map(TagId::fromTag).collect(Collectors.toList()), field);
-                tagsToTypes.put(tags, fieldType);
+                Class<ASN1Type> fieldType = (Class<ASN1Type>) field.getType();
+
+                if (ASN1Choice.class.isAssignableFrom(fieldType)) {
+                    try {
+                        ASN1Type obj = fieldType.getDeclaredConstructor().newInstance();
+                        FieldMetaData metaData = new FieldMetaData(obj, ASN1Alternative.class);
+
+                        tagsToFields.putAll(metaData.tagsToFields);
+                        tagsToTypes.putAll(metaData.tagsToTypes);
+
+                        metaData.tagsToSetters.entrySet().stream().forEach(e -> {
+                            Consumer<ASN1Type> setter = (result) -> {
+                                getSetter(field, type).accept(obj);
+                                e.getValue().accept(result);
+                            };
+                            tagsToSetters.put(e.getKey(), setter);
+                        });
+
+                    } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                        throw new DecodingException(e);
+                    }
+                } else {
+                    List<ASN1Tag> tags = RuntimeUtils.getTags(fieldType, field.getAnnotation(ASN1Tag.class));
+                    List<TagId> tagIds = tags.stream().map(TagId::fromTag).collect(Collectors.toList());
+
+                    tagsToFields.put(tagIds, field);
+                    tagsToTypes.put(tags, fieldType);
+                    tagsToSetters.put(tagIds, getSetter(field, type));
+                }
             }
         }
     }
 
-    public Map<List<ASN1Tag>, Class<? extends ASN1Type>> getTagsToTypes() {
-        return tagsToTypes;
+    private Consumer<ASN1Type> getSetter(Field field, ASN1Type obj) {
+        return (result) -> {
+            String setterName = "set" + StringUtils.initCap(field.getName());
+
+            try {
+                Method setter = obj.getClass().getDeclaredMethod(setterName, result.getClass());
+
+                setter.invoke(obj, result);
+            } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
+                throw new DecodingException(e);
+            } catch (NoSuchMethodException e) {
+                throw new DecodingException("Setter '" + setterName + "' missing on type: " +
+                        obj.getClass().getSimpleName());
+            }
+        };
     }
 
-    public Field getField(List<TagId> tags) {
-        return tagsToFields.get(tags);
+    public Map<List<ASN1Tag>, Class<? extends ASN1Type>> getTagsToTypes() {
+        return tagsToTypes;
     }
 
     public Set<List<TagId>> getMandatoryFields() {
@@ -79,6 +126,10 @@ public class FieldMetaData {
         Field field = tagsToFields.get(tags);
 
         return field.getDeclaringClass().getSimpleName() + "." + field.getName();
+    }
+
+    public Consumer<ASN1Type> getSetter(List<TagId> tags) {
+        return tagsToSetters.get(tags);
     }
 
     @Override

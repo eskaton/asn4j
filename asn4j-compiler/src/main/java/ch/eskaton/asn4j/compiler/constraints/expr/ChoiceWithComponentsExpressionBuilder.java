@@ -91,7 +91,7 @@ public class ChoiceWithComponentsExpressionBuilder extends WithComponentsExpress
                 var expressionFunction = buildExpressionFunction(module, compiledComponent, e);
 
                 return new BooleanFunctionCall(of(expressionFunction.get_1()),
-                        getParameters(componentNode, compiledComponent.getName(), expressionFunction.get_2()));
+                        getParameters(componentNode, compiledComponent, expressionFunction.get_2()));
             });
         }).filter(Optional::isPresent)
                 .map(Optional::get).collect(Collectors.toList());
@@ -122,8 +122,8 @@ public class ChoiceWithComponentsExpressionBuilder extends WithComponentsExpress
         return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE), new ILValue(null));
     }
 
-    private List<Expression> getParameters(ComponentNode component, String typeName, String runtimeType) {
-        return parametersDispatcher.execute(runtimeType, Tuple2.of(component, typeName));
+    private List<Expression> getParameters(ComponentNode component, CompiledType compiledType, String runtimeType) {
+        return parametersDispatcher.execute(runtimeType, Tuple2.of(component, compiledType));
     }
 
     private Tuple2<String, String> buildExpressionFunction(Module module, CompiledType compiledType,

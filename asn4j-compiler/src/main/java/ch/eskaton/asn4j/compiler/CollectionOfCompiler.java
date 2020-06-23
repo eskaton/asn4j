@@ -50,6 +50,7 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
         CompiledCollectionOfType compiledType = ctx.createCompiledType(CompiledCollectionOfType.class, node, name);
 
+        contentType.setParent(compiledType);
         compiledType.setContentType(contentType);
 
         ConstraintDefinition constraintDef;

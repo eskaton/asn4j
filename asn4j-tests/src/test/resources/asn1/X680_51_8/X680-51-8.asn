@@ -120,5 +120,14 @@ TestChoice1 ::= CHOICE {
    a INTEGER,
    b BOOLEAN
 } (WITH COMPONENTS {a (1), b (TRUE)})
+TestChoice2 ::= CHOICE {
+   a CHOICE {
+      a INTEGER,
+      b CHOICE {
+         c BIT STRING
+      }
+   },
+   b BOOLEAN
+} (WITH COMPONENTS {a (WITH COMPONENTS {a (11), b (WITH COMPONENTS {c ('0101'B)})}), b (TRUE)})
 
 END

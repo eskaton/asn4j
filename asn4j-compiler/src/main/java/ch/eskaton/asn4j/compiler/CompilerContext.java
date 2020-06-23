@@ -357,6 +357,10 @@ public class CompilerContext {
         return config.isBuiltin(type.getClass());
     }
 
+    public boolean isRuntimeType(String typeName) {
+        return config.isRuntimeType(typeName);
+    }
+
     public void ensureSymbolIsExported(ModuleNode module, String symbolName) {
         if (!isSymbolExported(module, symbolName)) {
             String format = "Module %s uses the symbol %s from module %s which the latter doesn't export";

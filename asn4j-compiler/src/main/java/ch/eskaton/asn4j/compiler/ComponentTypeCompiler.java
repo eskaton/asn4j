@@ -86,6 +86,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         String typeName = ctx.getTypeName(namedType);
         JavaDefinedField field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
 
+        compiledComponent.setParent(compiledType);
         compiledType.getComponents().add(Tuple2.of(namedType.getName(), compiledComponent));
 
         if (component.getCompType() == CompType.NAMED_TYPE_OPT) {
