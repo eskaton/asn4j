@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.utils.ReflectionUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -102,7 +103,7 @@ public class SingleValueCompiler<V extends Value, N extends ValueNode>
     private <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... parameterTypes) {
         try {
             if (Objects.equals(clazz, ValueNode.class)) {
-                return clazz.getDeclaredConstructor(Object.class);
+                 return clazz.getDeclaredConstructor(Object.class);
             }
 
             return clazz.getDeclaredConstructor(parameterTypes);

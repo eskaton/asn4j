@@ -56,7 +56,7 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
             result = decoder.decode(states, tagsToTypes);
 
             if (result == null) {
-                checkMandatoryFields(metaData);
+                checkMandatoryFields(metaData, tagsToTypes);
                 return;
             }
 
@@ -71,8 +71,13 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
         } while (!tagsToTypes.isEmpty());
     }
 
-    protected void checkMandatoryFields(FieldMetaData metaData) {
-        Set<List<TagId>> mandatoryFields = metaData.getMandatoryFields();
+    protected void checkMandatoryFields(FieldMetaData metaData, Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes) {
+        var mandatoryFields = metaData.getMandatoryFields();
+        var missingFields = tagsToTypes.entrySet().stream()
+                .map(e -> metaData.getTagIds(e.getKey()))
+                .collect(Collectors.toSet());
+
+        mandatoryFields.retainAll(missingFields);
 
         if (!mandatoryFields.isEmpty()) {
             throw new DecodingException("Mandatory fields missing: " + StringUtils.join(mandatoryFields.stream()
