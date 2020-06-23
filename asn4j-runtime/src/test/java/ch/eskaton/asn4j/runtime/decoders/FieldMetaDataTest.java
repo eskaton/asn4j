@@ -55,10 +55,12 @@ class FieldMetaDataTest {
 
         FieldMetaData fieldMetaData = new FieldMetaData(testSet, ASN1Component.class);
 
-        Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes =
-                ReflectionUtils.getPrivateFieldValue(fieldMetaData, "tagsToTypes");
+
+        Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = fieldMetaData.getTagsToTypes();
         Map<List<TagId>, Field> tagsToFields =
-                ReflectionUtils.getPrivateFieldValue(fieldMetaData, "tagsToFields");
+                ((List<FieldMetaData.TagData>) ReflectionUtils.getPrivateFieldValue(fieldMetaData, "tagData"))
+                        .stream()
+                        .collect(Collectors.toMap(FieldMetaData.TagData::getTagIds, FieldMetaData.TagData::getField));
 
         assertEquals(2, tagsToTypes.size());
 
@@ -107,25 +109,6 @@ class FieldMetaDataTest {
 
         checkTagsToFieldKey(tags, 0, 0, Clazz.CONTEXT_SPECIFIC);
         checkTagsToFieldKey(tags, 1, 2, Clazz.UNIVERSAL);
-    }
-
-    @Test
-    void testGetMandatoryFieldsComplete() throws NoSuchFieldException, IllegalAccessException {
-        TestSetA testSet = new TestSetA();
-
-        FieldMetaData fieldMetaData = new FieldMetaData(testSet, ASN1Component.class);
-
-        Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes =
-                ReflectionUtils.getPrivateFieldValue(fieldMetaData, "tagsToTypes");
-
-        List<ASN1Tag> mandatoryKey = tagsToTypes.entrySet().stream().filter(
-                e -> e.getValue().isAssignableFrom(ASN1Integer.class)).collect(Collectors.toList()).get(0).getKey();
-
-        tagsToTypes.remove(mandatoryKey);
-
-        Set<List<TagId>> mandatoryFields = fieldMetaData.getMandatoryFields();
-
-        assertEquals(0, mandatoryFields.size());
     }
 
     private Map.Entry<List<ASN1Tag>, Class<? extends ASN1Type>> getTagsToType(Map<List<ASN1Tag>,

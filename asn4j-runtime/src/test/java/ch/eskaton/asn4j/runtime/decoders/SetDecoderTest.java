@@ -46,7 +46,7 @@ class SetDecoderTest {
         FieldMetaData fieldMetaData = new FieldMetaData(testSet, ASN1Component.class);
 
         try {
-            decoder.checkMandatoryFields(fieldMetaData);
+            decoder.checkMandatoryFields(fieldMetaData, fieldMetaData.getTagsToTypes());
             fail("DecodingException expected");
         } catch (DecodingException e) {
             assertThat(e.getMessage(), containsString(TestSetA.class.getSimpleName() + ".a"));
