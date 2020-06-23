@@ -130,4 +130,9 @@ TestChoice2 ::= CHOICE {
    b BOOLEAN
 } (WITH COMPONENTS {a (WITH COMPONENTS {a (11), b (WITH COMPONENTS {c ('0101'B)})}), b (TRUE)})
 
+TestChoice3 ::= CHOICE {
+   a INTEGER,
+   b BOOLEAN
+} (WITH COMPONENTS {a ABSENT})
+
 END
