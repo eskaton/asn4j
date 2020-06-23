@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
@@ -54,6 +53,7 @@ import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Maps;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.Map;
 import java.util.Optional;
@@ -111,11 +111,13 @@ public class ConstraintCompiler {
         return definition;
     }
 
-    private ConstraintDefinition compileConstraintAux(CompiledType compiledType) {
-        CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType);
-        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
+    private AbstractConstraintCompiler getCompiler(CompiledType compiledType) {
+        if (!compilers.containsKey(compiledType.getType().getClass())) {
+            throw new CompilerException("Constraints for type %s not yet supported",
+                    compiledType.getType().getClass().getSimpleName());
+        }
 
-        return maybeCompiler.map(c -> c.compileConstraints(compiledType.getType(), compiledBaseType)).orElse(null);
+        return compilers.get(compiledType.getType().getClass());
     }
 
     public ConstraintDefinition compileConstraint(CompiledType compiledType) {
@@ -126,57 +128,41 @@ public class ConstraintCompiler {
         }
     }
 
-    private Optional<AbstractConstraintCompiler> getCompiler(CompiledType compiledType) {
-        if (!compilers.containsKey(compiledType.getType().getClass())) {
-            throw new CompilerException("Constraints for type %s not yet supported",
-                    compiledType.getType().getClass().getSimpleName());
-        }
+    private Tuple2<AbstractConstraintCompiler, CompiledType> getCompilerAndType(CompiledType compiledType) {
+        var compiledBaseType = ctx.getCompiledBaseType(compiledType);
+        var compiler = getCompiler(compiledBaseType);
 
-        return Optional.of(compilers.get(compiledType.getType().getClass()));
+        return Tuple2.of(compiler, compiledBaseType);
+    }
+
+    private ConstraintDefinition compileConstraintAux(CompiledType compiledType) {
+        var compilerAndType = getCompilerAndType(compiledType);
+
+        return compilerAndType.get_1().compileConstraints(compiledType.getType(), compilerAndType.get_2());
     }
 
     public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {
-        CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType);
-        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
-
-        if (maybeCompiler.isEmpty()) {
-            return;
-        }
-
-        maybeCompiler.get().addConstraint(compiledType, module, definition);
+        getCompilerAndType(compiledType).get_1().addConstraint(compiledType, module, definition);
     }
 
     public ConstraintDefinition compileConstraint(Type type, Constraint constraint) {
-        CompiledType compiledType = ctx.getCompiledBaseType(type);
-        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
+        var compilerAndType = getCompilerAndType(ctx.getCompiledBaseType(type));
 
-        if (maybeCompiler.isEmpty()) {
-            return null;
-        }
-
-        return maybeCompiler.get().compileConstraints(compiledType, singletonList(constraint), Optional.empty());
+        return compilerAndType.get_1().compileConstraints(compilerAndType.get_2(), singletonList(constraint),
+                Optional.empty());
     }
 
     public ConstraintDefinition compileConstraint(CompiledType compiledType, Constraint constraint) {
-        CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType);
-        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
+        var compilerAndType = getCompilerAndType(compiledType);
 
-        if (maybeCompiler.isEmpty()) {
-            return null;
-        }
-
-        return maybeCompiler.get().compileConstraints(compiledBaseType, singletonList(constraint), Optional.empty());
+        return compilerAndType.get_1().compileConstraints(compilerAndType.get_2(), singletonList(constraint),
+                Optional.empty());
     }
 
     public Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
-        CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType.getType());
-        Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
+        var compilerAndType = getCompilerAndType(compiledType);
 
-        if (maybeCompiler.isEmpty()) {
-            throw new IllegalCompilerStateException("Compiler for type %s is missing", compiledType.getType());
-        }
-
-        return maybeCompiler.get().buildExpression(module, compiledType, node);
+        return compilerAndType.get_1().buildExpression(module, compilerAndType.get_2(), node);
     }
 
 }
