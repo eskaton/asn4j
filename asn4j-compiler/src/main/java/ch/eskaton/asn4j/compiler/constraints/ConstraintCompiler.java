@@ -139,7 +139,7 @@ public class ConstraintCompiler {
         CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType);
         Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
 
-        if (!maybeCompiler.isPresent()) {
+        if (maybeCompiler.isEmpty()) {
             return;
         }
 
@@ -150,7 +150,7 @@ public class ConstraintCompiler {
         CompiledType compiledType = ctx.getCompiledBaseType(type);
         Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledType);
 
-        if (!maybeCompiler.isPresent()) {
+        if (maybeCompiler.isEmpty()) {
             return null;
         }
 
@@ -161,7 +161,7 @@ public class ConstraintCompiler {
         CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType);
         Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
 
-        if (!maybeCompiler.isPresent()) {
+        if (maybeCompiler.isEmpty()) {
             return null;
         }
 
@@ -172,7 +172,7 @@ public class ConstraintCompiler {
         CompiledType compiledBaseType = ctx.getCompiledBaseType(compiledType.getType());
         Optional<AbstractConstraintCompiler> maybeCompiler = getCompiler(compiledBaseType);
 
-        if (!maybeCompiler.isPresent()) {
+        if (maybeCompiler.isEmpty()) {
             throw new IllegalCompilerStateException("Compiler for type %s is missing", compiledType.getType());
         }
 
