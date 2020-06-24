@@ -84,6 +84,8 @@ TestSetOf127 ::= SET OF TestSequenceOf2
 TestSetOf128 ::= TestSetOf127 (WITH COMPONENT (WITH COMPONENT (1)))
 TestSetOf129 ::= SET OF TestSequence2
 TestSetOf130 ::= TestSetOf129 (WITH COMPONENT ({ a 1, b TRUE }))
+TestSetOf131 ::= SET OF TestChoice3
+TestSetOf132 ::= TestSetOf131 (WITH COMPONENT (b: TRUE))
 
 TestSequence105 ::= SEQUENCE {
     a ENUMERATED {a, b, c}
@@ -115,6 +117,11 @@ TestSequence113 ::= SEQUENCE {
 TestSequence114 ::= SEQUENCE {
     COMPONENTS OF TestSequence113
 } (WITH COMPONENTS {a (WITH COMPONENT (1..2))})
+TestSequence115 ::= SEQUENCE {
+    a CHOICE {
+        b INTEGER
+    }
+} (WITH COMPONENTS {a (WITH COMPONENTS {b (11)})})
 
 TestChoice1 ::= CHOICE {
    a INTEGER,

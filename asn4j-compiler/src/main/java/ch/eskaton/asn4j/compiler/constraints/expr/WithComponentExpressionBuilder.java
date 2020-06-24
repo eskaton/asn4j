@@ -43,11 +43,14 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
@@ -117,7 +120,8 @@ public class WithComponentExpressionBuilder extends InnerTypeExpressionBuilder {
                     .withCase(ASN1Sequence.class, args -> getCollectionParameters((CompiledCollectionType) args.get()))
                     .withCase(ASN1Set.class, args -> getCollectionParameters((CompiledCollectionType) args.get()))
                     .withCase(ASN1SequenceOf.class, () -> singletonList(getGetValuesCall()))
-                    .withCase(ASN1SetOf.class, () -> singletonList(getGetValuesCall()));
+                    .withCase(ASN1SetOf.class, () -> singletonList(getGetValuesCall()))
+                    .withCase(ASN1Choice.class, args -> getCollectionParameters((CompiledChoiceType) args.get()));
 
 
     private final Dispatcher<String, Class<? extends ASN1Type>, CompiledType, List<Parameter>> parameterDefinitionDispatcher =
@@ -137,7 +141,8 @@ public class WithComponentExpressionBuilder extends InnerTypeExpressionBuilder {
                     .withCase(ASN1Sequence.class, () -> singletonList(getMapParameter()))
                     .withCase(ASN1Set.class, () -> singletonList(getMapParameter()))
                     .withCase(ASN1SequenceOf.class, args -> getCollectionOfParameter(args.get()))
-                    .withCase(ASN1SetOf.class, args -> getCollectionOfParameter(args.get()));
+                    .withCase(ASN1SetOf.class, args -> getCollectionOfParameter(args.get()))
+                    .withCase(ASN1Choice.class, args -> singletonList(getMapParameter()));
 
     public WithComponentExpressionBuilder(CompilerContext ctx) {
         super(ctx);
@@ -219,7 +224,7 @@ public class WithComponentExpressionBuilder extends InnerTypeExpressionBuilder {
         return singletonList(new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameter), VAR_VALUES));
     }
 
-    private List<Expression> getCollectionParameters(CompiledCollectionType compiledContentType) {
+    private List<Expression> getCollectionParameters(HasComponents compiledContentType) {
         var associations = new HashSet<Tuple2<Expression, Expression>>();
 
         compiledContentType.getComponents().stream()
