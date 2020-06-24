@@ -73,9 +73,13 @@ public abstract class CollectionOfDecoder<T extends ASN1CollectionOf> implements
 
                 if (element != null) {
                     elements.add(element);
+                } else {
+                    break;
                 }
+            } else {
+                break;
             }
-        } while (result != null);
+        } while (true);
 
         obj.setValues(elements);
     }
