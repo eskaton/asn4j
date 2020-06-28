@@ -25,62 +25,30 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 
-import java.util.Objects;
+import java.util.Optional;
 
-public class AbstractASN1String implements ASN1Type, HasConstraint {
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-    private String value;
+public class VisibleStringValueExpressionBuilder extends AbstractValueExpressionBuilder<ValueNode> {
 
-    public AbstractASN1String() {
-    }
-
-    public AbstractASN1String(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    public VisibleStringValueExpressionBuilder(CompilerContext ctx) {
+        super(ctx);
     }
 
     @Override
-    public void checkConstraint() {
-        if (!doCheckConstraint()) {
-            throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
-        }
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        AbstractASN1String other = (AbstractASN1String) obj;
-
-        return Objects.equals(value, other.value);
+    public Optional<BooleanExpression> build(CompiledType compiledType, ValueNode node) {
+        return Optional.of(new BooleanFunctionCall.StringEquals(new Variable(VAR_VALUE),
+                new ILValue(getTypeName(compiledType.getType()), node.getValue())));
     }
 
 }

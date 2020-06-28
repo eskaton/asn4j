@@ -24,63 +24,24 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
-package ch.eskaton.asn4j.runtime.types;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
+import ch.eskaton.asn4j.runtime.types.TypeName;
 
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.utils.ToString;
+public class VisibleStringSingleValueCompiler extends SingleValueCompiler<VisibleStringValue, ValueNode> {
 
-import java.util.Objects;
-
-public class AbstractASN1String implements ASN1Type, HasConstraint {
-
-    private String value;
-
-    public AbstractASN1String() {
-    }
-
-    public AbstractASN1String(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    public VisibleStringSingleValueCompiler(CompilerContext ctx, TypeName typeName) {
+        super(ctx, VisibleStringValue.class, ValueNode.class, typeName);
     }
 
     @Override
-    public void checkConstraint() {
-        if (!doCheckConstraint()) {
-            throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
-        }
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        AbstractASN1String other = (AbstractASN1String) obj;
-
-        return Objects.equals(value, other.value);
+    protected Object resolveValue(CompiledType baseType, SingleValueConstraint elements) {
+        return super.<VisibleStringValue>resolveValue(baseType, elements).getValue();
     }
 
 }

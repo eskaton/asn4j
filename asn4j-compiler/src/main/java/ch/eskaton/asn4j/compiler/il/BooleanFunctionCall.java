@@ -86,4 +86,17 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
 
     }
 
+    public static class StringEquals extends BooleanFunctionCall {
+
+        public StringEquals(Expression argument1, Expression argument2) {
+            super(Optional.empty(), argument1, argument2);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+
+    }
+
 }

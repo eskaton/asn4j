@@ -48,6 +48,9 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestBoolean3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBoolean4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBoolean5;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestBoolean6;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestChoice1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestChoice2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestChoice3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestEnumeration1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestEnumeration3;
@@ -84,6 +87,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestRelativeOidIri5;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequence1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequence2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequence3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequenceOfEnumeration1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSequenceOfEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOf1;
@@ -108,12 +113,17 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOidIri1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOidIri2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestVisibleString1;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigInteger;
 
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testChoiceFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testChoiceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIRIFailure;
@@ -136,6 +146,9 @@ import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringSuccess;
+import static ch.eskaton.commons.utils.Utils.with;
 
 class TestX680_51_2 {
 
@@ -697,5 +710,93 @@ class TestX680_51_2 {
             s.setB(ASN1Boolean.TRUE);
         });
     }
+
+
+    @Test
+    void testSequence2() {
+        testSequenceSuccess(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(new TestSequence2.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)));
+            s.setB(new TestSequence2.B(
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(4L))),
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(5L)))));
+        });
+
+        testSequenceFailure(TestSequence2.class, new TestSequence2(), s -> {
+            s.setA(new TestSequence2.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)));
+            s.setB(new TestSequence2.B(
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(3L))),
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(4L)))));
+        });
+    }
+
+    @Test
+    void testSequence3() {
+        testSequenceSuccess(TestSequence3.class, new TestSequence3(), s -> {
+            s.setA(new TestSequence3.A(ASN1Integer.valueOf(1L), ASN1Boolean.TRUE));
+            s.setD(new TestSequence3.D(
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(4L))),
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(5L)))));
+        });
+
+        testSequenceFailure(TestSequence3.class, new TestSequence3(), s -> {
+            s.setA(new TestSequence3.A(ASN1Integer.valueOf(1L), ASN1Boolean.FALSE));
+            s.setD(new TestSequence3.D(
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(4L))),
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(5L)))));
+        });
+        testSequenceFailure(TestSequence3.class, new TestSequence3(), s -> {
+            s.setA(new TestSequence3.A(ASN1Integer.valueOf(2L), ASN1Boolean.TRUE));
+            s.setD(new TestSequence3.D(
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(4L))),
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(5L)))));
+        });
+        testSequenceFailure(TestSequence3.class, new TestSequence3(), s -> {
+            s.setA(new TestSequence3.A(ASN1Integer.valueOf(1L), ASN1Boolean.TRUE));
+            s.setD(new TestSequence3.D(
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(3L))),
+                    with(new TestInteger2(), i -> i.setValue(BigInteger.valueOf(4L)))));
+        });
+    }
+
+    @Test
+    void testChoice1() {
+        testChoiceSuccess(TestChoice1.class, new TestChoice1(), c -> c.setA(ASN1Integer.valueOf(12L)));
+        testChoiceSuccess(TestChoice1.class, new TestChoice1(), c -> c.setB(ASN1Boolean.TRUE));
+
+        testChoiceFailure(TestChoice1.class, new TestChoice1(), c -> c.setA(ASN1Integer.valueOf(13L)));
+        testChoiceFailure(TestChoice1.class, new TestChoice1(), c -> c.setB(ASN1Boolean.FALSE));
+    }
+
+    @Test
+    void testChoice2() {
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(),
+                c -> c.setA(new TestChoice2.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L), ASN1Integer.valueOf(3L))));
+
+        testChoiceFailure(TestChoice2.class, new TestChoice2(),
+                c -> c.setA(new TestChoice2.A(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L))));
+    }
+
+    @Test
+    void testChoice3() {
+        testChoiceSuccess(TestChoice3.class, new TestChoice3(),
+                c -> c.setA(new TestChoice3.A(ASN1Integer.valueOf(1L), ASN1Boolean.TRUE)));
+        testChoiceSuccess(TestChoice3.class, new TestChoice3(),
+                c -> c.setD(new ASN1OctetString(new byte[] { (byte) 0xbe, (byte) 0xef })));
+
+        testChoiceFailure(TestChoice3.class, new TestChoice3(),
+                c -> c.setA(new TestChoice3.A(ASN1Integer.valueOf(1L), ASN1Boolean.FALSE)));
+        testChoiceFailure(TestChoice3.class, new TestChoice3(),
+                c -> c.setA(new TestChoice3.A(ASN1Integer.valueOf(2L), ASN1Boolean.TRUE)));
+        testChoiceFailure(TestChoice3.class, new TestChoice3(),
+                c -> c.setD(new ASN1OctetString(new byte[] { (byte) 0xbe, (byte) 0xee })));
+    }
+
+    @Test
+    void testVisibleString1() {
+        testVisibleStringSuccess(TestVisibleString1.class, new TestVisibleString1("abc"));
+
+        testVisibleStringFailure(TestVisibleString1.class, new TestVisibleString1("def"));
+    }
+
 
 }
