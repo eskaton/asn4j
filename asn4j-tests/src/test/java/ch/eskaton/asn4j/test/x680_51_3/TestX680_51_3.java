@@ -63,6 +63,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestSet1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSet2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestVisibleString1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestVisibleString2;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
@@ -97,6 +99,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testSetFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringSuccess;
 import static ch.eskaton.commons.utils.Utils.with;
 
 class TestX680_51_3 {
@@ -410,6 +414,20 @@ class TestX680_51_3 {
         testChoiceFailure(TestChoice2.class, new TestChoice2(), choice -> {
             choice.setB(ASN1Boolean.TRUE);
         });
+    }
+
+    @Test
+    void testVisibleString1() {
+        testVisibleStringSuccess(TestVisibleString1.class, new TestVisibleString1("def"));
+
+        testVisibleStringFailure(TestVisibleString1.class, new TestVisibleString1("abc"));
+    }
+
+    @Test
+    void testVisibleString2() {
+        testVisibleStringSuccess(TestVisibleString2.class, new TestVisibleString2("def"));
+
+        testVisibleStringFailure(TestVisibleString2.class, new TestVisibleString2("abc"));
     }
 
 }
