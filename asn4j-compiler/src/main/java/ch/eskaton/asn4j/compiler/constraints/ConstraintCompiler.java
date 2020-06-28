@@ -51,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.collections.Tuple2;
@@ -86,6 +87,7 @@ public class ConstraintCompiler {
                 .put(SetType.class, new SetConstraintCompiler(ctx))
                 .put(SequenceType.class, new SequenceConstraintCompiler(ctx))
                 .put(Choice.class, new ChoiceConstraintCompiler(ctx))
+                .put(VisibleString.class, new VisibleStringConstraintCompiler(ctx))
                 .build();
     }
 

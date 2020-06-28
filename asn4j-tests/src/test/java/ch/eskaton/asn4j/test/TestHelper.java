@@ -46,6 +46,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.runtime.types.AbstractASN1IRI;
 import ch.eskaton.asn4j.runtime.types.AbstractASN1OID;
 
@@ -360,6 +361,16 @@ public class TestHelper {
 
         assertThrows(() -> assertValueDecodable(clazz, choiceValue), ConstraintViolatedException.class);
     }
+
+
+    public static <T extends ASN1VisibleString> void testVisibleStringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1VisibleString> void testVisibleStringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
 
     public static byte[] randomBytes(int length) {
         byte[] value = new byte[length];

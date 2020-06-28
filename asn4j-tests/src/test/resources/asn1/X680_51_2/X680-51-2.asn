@@ -122,5 +122,35 @@ TestSequence1 ::= SEQUENCE {
 	a INTEGER,
 	b BOOLEAN
 } ({a testInteger1, b TRUE})
+TestSequence2 ::= SEQUENCE {
+   a SET OF INTEGER,
+   b SET OF TestInteger2
+} ({a {1, 2}, b {4, 5}})
+TestSequence3 ::= SEQUENCE {
+   a SEQUENCE {
+       b INTEGER,
+       c BOOLEAN
+   },
+   d SET OF TestInteger2
+} ({a {b 1, c TRUE}, d {4, 5}})
+
+testChoice1 TestChoice1 ::= a: testInteger1
+
+TestChoice1 ::= CHOICE {
+   a INTEGER,
+   b BOOLEAN
+} (testChoice1 | b: TRUE)
+TestChoice2 ::= CHOICE {
+   a SET OF INTEGER
+} (a: {1, 2, 3})
+TestChoice3 ::= CHOICE {
+   a SEQUENCE {
+       b INTEGER,
+       c BOOLEAN
+   },
+   d OCTET STRING
+} (a: {b 1, c TRUE} | d: 'BEEF'H)
+
+TestVisibleString1 ::= VisibleString ("abc")
 
 END

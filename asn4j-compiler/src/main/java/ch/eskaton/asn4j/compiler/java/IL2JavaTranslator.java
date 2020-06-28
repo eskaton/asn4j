@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.ArrayEquals;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.MapEquals;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.SetEquals;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.StringEquals;
 import ch.eskaton.asn4j.compiler.il.Condition;
 import ch.eskaton.asn4j.compiler.il.Conditions;
 import ch.eskaton.asn4j.compiler.il.Declaration;
@@ -347,7 +348,8 @@ public class IL2JavaTranslator {
                 javaClass.addImport(Arrays.class);
 
                 return "Arrays.equals(" + arguments + ")";
-            } else if (functionCall instanceof SetEquals || functionCall instanceof MapEquals) {
+            } else if (functionCall instanceof SetEquals || functionCall instanceof MapEquals ||
+                    functionCall instanceof StringEquals) {
                 String object = translateArg(ctx, javaClass, functionCall, 0);
                 String argument = translateArg(ctx, javaClass, functionCall, 1);
 
