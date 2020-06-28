@@ -36,4 +36,6 @@ TestSetOf3 ::= SET SIZE (2) OF INTEGER
 TestSequenceOf1 ::= SEQUENCE (SIZE(1..2)) OF INTEGER
 TestSequenceOf2 ::= SEQUENCE SIZE (2) OF INTEGER
 
+TestVisibleString1 ::= VisibleString (SIZE(1..2))
+
 END

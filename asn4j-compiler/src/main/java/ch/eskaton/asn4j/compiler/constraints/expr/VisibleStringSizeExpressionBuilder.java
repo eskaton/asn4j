@@ -32,12 +32,12 @@ import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
 
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUES;
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-public class CollectionOfSizeExpressionBuilder extends AbstractRangeExpressionBuilder {
+public class VisibleStringSizeExpressionBuilder extends AbstractRangeExpressionBuilder {
 
     protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        var expr = new FunctionCall.GetSize(new Variable(VAR_VALUES));
+        var expr = new FunctionCall.GetStringLength(new Variable(VAR_VALUE));
 
         return new BinaryBooleanExpression(operator, expr, new ILValue(value));
     }
