@@ -95,4 +95,7 @@ TestChoice2 ::= CHOICE {
    b BOOLEAN
 } (TestChoice1)
 
+TestVisibleString1 ::= VisibleString ("def")
+TestVisibleString2 ::= VisibleString (TestVisibleString1)
+
 END

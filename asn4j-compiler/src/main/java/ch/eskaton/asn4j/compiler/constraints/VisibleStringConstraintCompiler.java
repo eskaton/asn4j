@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.VisibleStringSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.VisibleStringValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
@@ -38,6 +39,7 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
@@ -53,6 +55,7 @@ public class VisibleStringConstraintCompiler extends AbstractConstraintCompiler 
 
         addConstraintHandler(SingleValueConstraint.class,
                 new VisibleStringSingleValueCompiler(ctx, getTypeName())::compile);
+        addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
     }
 
     @Override
