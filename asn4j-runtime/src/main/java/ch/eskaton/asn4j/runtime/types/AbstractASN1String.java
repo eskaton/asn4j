@@ -30,7 +30,9 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class AbstractASN1String implements ASN1Type, HasConstraint {
 
@@ -51,10 +53,21 @@ public class AbstractASN1String implements ASN1Type, HasConstraint {
         this.value = value;
     }
 
+    protected boolean checkPermittedAlphabet(Integer cp, String lower, String upper) {
+        var lowerCp = lower.codePointAt(0);
+        var upperCp = upper.codePointAt(0);
+
+        return cp >= lowerCp && cp <= upperCp;
+    }
+
+    protected List<Integer> getChars(String value) {
+        return value.codePoints().boxed().collect(Collectors.toList());
+    }
+
     @Override
     public void checkConstraint() {
         if (!doCheckConstraint()) {
-            throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
+            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint", value));
         }
     }
 

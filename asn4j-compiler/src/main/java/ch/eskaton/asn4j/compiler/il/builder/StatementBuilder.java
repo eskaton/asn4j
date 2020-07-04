@@ -55,8 +55,8 @@ public class StatementBuilder<B extends Builder & HasStatements> implements Buil
         return this;
     }
 
-    public ForeachBuilder<StatementBuilder<B>> foreach(ILType type, Variable variable, Variable value) {
-        return new ForeachBuilder<>(this, type, variable, value);
+    public ForeachBuilder<StatementBuilder<B>> foreach(ILType type, Variable variable, Expression expression) {
+        return new ForeachBuilder<>(this, type, variable, expression);
     }
 
     public ConditionsBuilder<StatementBuilder<B>> conditions() {

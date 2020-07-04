@@ -25,57 +25,8 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.il.builder;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.il.Declaration;
-import ch.eskaton.asn4j.compiler.il.Expression;
-import ch.eskaton.asn4j.compiler.il.Foreach;
-import ch.eskaton.asn4j.compiler.il.ILType;
-import ch.eskaton.asn4j.compiler.il.Statement;
-import ch.eskaton.asn4j.compiler.il.Variable;
-import ch.eskaton.asn4j.runtime.utils.ToString;
-
-import java.util.LinkedList;
-import java.util.List;
-
-public class ForeachBuilder<B extends Builder & HasStatements> implements Builder<B>, HasStatements {
-
-    private B builder;
-
-    private ILType type;
-
-    private Variable variable;
-
-    private Expression expression;
-
-    private List<Statement> statements = new LinkedList<>();
-
-    public ForeachBuilder(B builder, ILType type, Variable variable, Expression expression) {
-        this.builder = builder;
-        this.type = type;
-        this.variable = variable;
-        this.expression = expression;
-    }
-
-    public StatementBuilder<ForeachBuilder<B>> statements() {
-        return new StatementBuilder<>(this);
-    }
-
-    @Override
-    public void addStatement(Statement statement) {
-        statements.add(statement);
-    }
-
-    @Override
-    public B build() {
-        builder.addStatement(new Foreach(new Declaration(type, variable), expression, statements));
-
-        return builder;
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
-    }
+public interface StringValueOrRange {
 
 }

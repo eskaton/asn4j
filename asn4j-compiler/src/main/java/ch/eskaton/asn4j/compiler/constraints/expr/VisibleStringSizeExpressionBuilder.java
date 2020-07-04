@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-public class VisibleStringSizeExpressionBuilder extends AbstractRangeExpressionBuilder {
+public class VisibleStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
     protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
         var expr = new FunctionCall.GetStringLength(new Variable(VAR_VALUE));
