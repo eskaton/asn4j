@@ -24,40 +24,43 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package ch.eskaton.asn4j.compiler.constraints.elements;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.Bounds;
-import ch.eskaton.asn4j.compiler.constraints.IntegerValueBounds;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.RangeNode;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import java.util.Optional;
+import java.util.Objects;
 
-import static java.util.Collections.singletonList;
+public class PermittedAlphabetNode extends AbstractNode {
 
-public class ValueRangeCompiler implements ElementsCompiler<RangeNode> {
+    private Node node;
 
-    protected final CompilerContext ctx;
+    public PermittedAlphabetNode(Node node) {
+        super(NodeType.PERMITTED_ALPHABET);
 
-    public ValueRangeCompiler(CompilerContext ctx) {
-        this.ctx = ctx;
+        this.node = node;
+    }
+
+    public Node getNode() {
+        return node;
     }
 
     @Override
-    public Node compile(CompiledType compiledType, RangeNode elements, Optional<Bounds> bounds) {
-        long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
-        long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
 
-        IntegerValue lower = elements.getLower().getLowerEndPointValue(min);
-        IntegerValue upper = elements.getUpper().getUpperEndPointValue(max);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        return new IntegerRangeValueNode(singletonList(new IntegerRange(lower.getValue().longValue(), upper
-                .getValue().longValue())));
+        PermittedAlphabetNode that = (PermittedAlphabetNode) o;
+
+        return Objects.equals(node, that.node);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(node);
     }
 
 }

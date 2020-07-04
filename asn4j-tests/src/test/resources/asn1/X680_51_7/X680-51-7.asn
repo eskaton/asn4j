@@ -1,0 +1,13 @@
+X680-51-7 DEFINITIONS ::=
+BEGIN
+
+TestVisibleString1 ::= VisibleString (FROM ("a"|"b"|"c"))
+TestVisibleString2 ::= VisibleString (FROM ("abc"))
+TestVisibleString3 ::= VisibleString (FROM ("a"))
+TestVisibleString4 ::= VisibleString (FROM ("a".."z"))
+TestVisibleString5 ::= VisibleString (FROM ("a".."d" EXCEPT "c"))
+TestVisibleString6 ::= VisibleString (FROM ("a".."d" | "x".."z"))
+TestVisibleString7 ::= VisibleString (FROM ("a".."d" ^ "c".."f"))
+TestVisibleString8 ::= VisibleString (FROM ("a"<..<"d"))
+
+END

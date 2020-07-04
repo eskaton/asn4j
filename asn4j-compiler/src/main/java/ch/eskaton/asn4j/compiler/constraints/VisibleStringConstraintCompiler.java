@@ -29,12 +29,14 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.VisibleStringPermittedAlphabetConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.VisibleStringSingleValueCompiler;
-import ch.eskaton.asn4j.compiler.constraints.expr.CollectionOfSizeExpressionBuilder;
+import ch.eskaton.asn4j.compiler.constraints.expr.VisibleStringPermittedAlphabetExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.expr.VisibleStringSizeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.expr.VisibleStringValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
@@ -44,6 +46,7 @@ import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
+import ch.eskaton.asn4j.parser.ast.constraints.PermittedAlphabetConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -63,6 +66,8 @@ public class VisibleStringConstraintCompiler extends AbstractConstraintCompiler 
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class,
                 new SizeCompiler(ctx, new IntegerConstraintCompiler(ctx).getDispatcher())::compile);
+        addConstraintHandler(PermittedAlphabetConstraint.class,
+                new VisibleStringPermittedAlphabetConstraintCompiler(ctx)::compile);
     }
 
     @Override
@@ -84,8 +89,10 @@ public class VisibleStringConstraintCompiler extends AbstractConstraintCompiler 
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         return switch (node.getType()) {
-            case VALUE -> new VisibleStringValueExpressionBuilder(ctx).build(compiledType, (ValueNode) node);
+            case VALUE -> new VisibleStringValueExpressionBuilder(ctx).build(compiledType, (StringValueNode) node);
             case SIZE -> new VisibleStringSizeExpressionBuilder().build(((SizeNode) node).getSize());
+            case PERMITTED_ALPHABET -> new VisibleStringPermittedAlphabetExpressionBuilder()
+                    .build(module, ((PermittedAlphabetNode) node).getNode());
             default -> super.buildExpression(module, compiledType, node);
         };
     }

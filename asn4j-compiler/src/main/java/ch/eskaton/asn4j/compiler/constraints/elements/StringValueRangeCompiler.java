@@ -24,50 +24,52 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package ch.eskaton.asn4j.compiler.constraints.expr;
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.constraints.Bounds;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.StringValueOrRange;
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
-import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.EndpointNode;
+import ch.eskaton.asn4j.parser.ast.RangeNode;
+import ch.eskaton.asn4j.parser.ast.values.StringValue;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
-import static java.util.Optional.of;
+import static java.util.Collections.singletonList;
 
-public class VisibleStringValueExpressionBuilder extends AbstractValueExpressionBuilder<StringValueNode> {
+public class StringValueRangeCompiler implements ElementsCompiler<RangeNode> {
 
-    public VisibleStringValueExpressionBuilder(CompilerContext ctx) {
-        super(ctx);
+    protected final CompilerContext ctx;
+
+    public StringValueRangeCompiler(CompilerContext ctx) {
+        this.ctx = ctx;
     }
 
     @Override
-    public Optional<BooleanExpression> build(CompiledType compiledType, StringValueNode node) {
-        var expressions = node.getValue().stream()
-                .map(v -> buildExpression(compiledType, v))
-                .collect(Collectors.toList());
+    public Node compile(CompiledType compiledType, RangeNode elements, Optional<Bounds> bounds) {
+        String lower = resolveEndpoint(elements.getLower(), 1);
+        String upper = resolveEndpoint(elements.getUpper(), -1);
 
-        return of(new BinaryBooleanExpression(BinaryOperator.OR, expressions));
+        return new StringValueNode(singletonList(new StringRange(lower, upper)));
     }
 
-    private BooleanExpression buildExpression(CompiledType compiledType, StringValueOrRange value) {
-        if (value instanceof StringSingleValue) {
-            return new BooleanFunctionCall.StringEquals(new Variable(VAR_VALUE),
-                    new ILValue(getTypeName(compiledType.getType()), ((StringSingleValue) value).getValue()));
+    private String resolveEndpoint(EndpointNode endpoint, int offset) {
+        var value = CompilerUtils.resolveAmbiguousValue(endpoint.getValue(), StringValue.class).getCString();
+
+        if (value.length() != 1) {
+            throw new CompilerException(endpoint.getPosition(), "Invalid value in range: %s", value);
         }
 
-        throw new IllegalCompilerStateException("Unsupported value node: %s", value);
+        if (!endpoint.isInclusive()) {
+            return String.valueOf(Character.toChars(value.codePointAt(0) + offset));
+        }
+
+        return value;
     }
 
 }

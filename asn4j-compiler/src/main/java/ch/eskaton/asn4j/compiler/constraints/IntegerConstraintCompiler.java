@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.IntegerSingleValueCompiler;
-import ch.eskaton.asn4j.compiler.constraints.elements.ValueRangeCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.IntegerValueRangeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.IntegerRangeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.IntegerValueBoundsVisitor;
@@ -64,7 +64,7 @@ public class IntegerConstraintCompiler extends AbstractConstraintCompiler {
 
         addConstraintHandler(SingleValueConstraint.class, new IntegerSingleValueCompiler(ctx, getTypeName())::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
-        addConstraintHandler(RangeNode.class, new ValueRangeCompiler(ctx)::compile);
+        addConstraintHandler(RangeNode.class, new IntegerValueRangeCompiler(ctx)::compile);
     }
 
     @Override

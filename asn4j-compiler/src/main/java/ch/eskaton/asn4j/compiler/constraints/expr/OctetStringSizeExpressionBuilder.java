@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-public class OctetStringSizeExpressionBuilder extends AbstractRangeExpressionBuilder {
+public class OctetStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
     protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
         var expr = new FunctionCall.ArrayLength(new Variable(VAR_VALUE));

@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Optional.of;
 
-public abstract class AbstractRangeExpressionBuilder {
+public abstract class AbstractIntegerRangeExpressionBuilder {
 
     public Optional<BooleanExpression> build(List<IntegerRange> ranges) {
         var expressions = ranges.stream()

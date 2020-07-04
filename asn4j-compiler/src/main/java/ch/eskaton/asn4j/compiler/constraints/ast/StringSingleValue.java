@@ -25,57 +25,47 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.il.builder;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.il.Declaration;
-import ch.eskaton.asn4j.compiler.il.Expression;
-import ch.eskaton.asn4j.compiler.il.Foreach;
-import ch.eskaton.asn4j.compiler.il.ILType;
-import ch.eskaton.asn4j.compiler.il.Statement;
-import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
 
-public class ForeachBuilder<B extends Builder & HasStatements> implements Builder<B>, HasStatements {
+public class StringSingleValue implements StringValueOrRange {
 
-    private B builder;
+    private String value;
 
-    private ILType type;
-
-    private Variable variable;
-
-    private Expression expression;
-
-    private List<Statement> statements = new LinkedList<>();
-
-    public ForeachBuilder(B builder, ILType type, Variable variable, Expression expression) {
-        this.builder = builder;
-        this.type = type;
-        this.variable = variable;
-        this.expression = expression;
+    public StringSingleValue(String value) {
+        this.value = value;
     }
 
-    public StatementBuilder<ForeachBuilder<B>> statements() {
-        return new StatementBuilder<>(this);
-    }
-
-    @Override
-    public void addStatement(Statement statement) {
-        statements.add(statement);
-    }
-
-    @Override
-    public B build() {
-        builder.addStatement(new Foreach(new Declaration(type, variable), expression, statements));
-
-        return builder;
+    public String getValue() {
+        return value;
     }
 
     @Override
     public String toString() {
         return ToString.get(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        StringSingleValue that = (StringSingleValue) o;
+
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
 }

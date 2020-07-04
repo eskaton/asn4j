@@ -32,6 +32,7 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.COMPLEMENT_I
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.COMPONENT_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.INTERSECTION_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.NEGATION_ID;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.PERMITTED_ALPHABET_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.SIZE_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.UNION_ID;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.Id.VALUE_ID;
@@ -42,7 +43,9 @@ public enum NodeType {
 
     UNION(UNION_ID), INTERSECTION(INTERSECTION_ID), COMPLEMENT(COMPLEMENT_ID), NEGATION(NEGATION_ID),
     VALUE(VALUE_ID), ALL_VALUES(ALL_VALUES_ID), SIZE(SIZE_ID), WITH_COMPONENT(WITH_COMPONENT_ID),
-    WITH_COMPONENTS(WITH_COMPONENTS_ID), COMPONENT(COMPONENT_ID);
+    WITH_COMPONENTS(WITH_COMPONENTS_ID), COMPONENT(COMPONENT_ID), PERMITTED_ALPHABET(PERMITTED_ALPHABET_ID);
+
+
 
     private final int id;
 
@@ -65,6 +68,7 @@ public enum NodeType {
         public static final int WITH_COMPONENT_ID = 8;
         public static final int WITH_COMPONENTS_ID = 9;
         public static final int COMPONENT_ID = 10;
+        public static final int PERMITTED_ALPHABET_ID = 11;
 
         private Id() {
         }

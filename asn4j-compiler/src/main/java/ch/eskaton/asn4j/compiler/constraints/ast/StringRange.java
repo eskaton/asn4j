@@ -25,52 +25,49 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.il.builder;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.il.Declaration;
-import ch.eskaton.asn4j.compiler.il.Expression;
-import ch.eskaton.asn4j.compiler.il.Foreach;
-import ch.eskaton.asn4j.compiler.il.ILType;
-import ch.eskaton.asn4j.compiler.il.Statement;
-import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
 
-public class ForeachBuilder<B extends Builder & HasStatements> implements Builder<B>, HasStatements {
+public class StringRange implements StringValueOrRange {
 
-    private B builder;
+    private String lower;
 
-    private ILType type;
+    private String upper;
 
-    private Variable variable;
-
-    private Expression expression;
-
-    private List<Statement> statements = new LinkedList<>();
-
-    public ForeachBuilder(B builder, ILType type, Variable variable, Expression expression) {
-        this.builder = builder;
-        this.type = type;
-        this.variable = variable;
-        this.expression = expression;
+    public StringRange(String lower, String upper) {
+        this.lower = lower;
+        this.upper = upper;
     }
 
-    public StatementBuilder<ForeachBuilder<B>> statements() {
-        return new StatementBuilder<>(this);
+    public String getLower() {
+        return lower;
+    }
+
+    public String getUpper() {
+        return upper;
     }
 
     @Override
-    public void addStatement(Statement statement) {
-        statements.add(statement);
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        StringRange range = (StringRange) other;
+
+        return lower == range.lower && upper == range.upper;
     }
 
     @Override
-    public B build() {
-        builder.addStatement(new Foreach(new Declaration(type, variable), expression, statements));
-
-        return builder;
+    public int hashCode() {
+        return Objects.hash(lower, upper);
     }
 
     @Override

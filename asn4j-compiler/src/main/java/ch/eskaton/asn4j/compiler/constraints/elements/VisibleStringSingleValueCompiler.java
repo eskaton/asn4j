@@ -27,21 +27,26 @@
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
+import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class VisibleStringSingleValueCompiler extends SingleValueCompiler<VisibleStringValue, ValueNode> {
+import java.util.List;
+
+public class VisibleStringSingleValueCompiler extends SingleValueCompiler<VisibleStringValue, StringValueNode> {
 
     public VisibleStringSingleValueCompiler(CompilerContext ctx, TypeName typeName) {
-        super(ctx, VisibleStringValue.class, ValueNode.class, typeName);
+        super(ctx, VisibleStringValue.class, StringValueNode.class, typeName, List.class);
     }
 
     @Override
-    protected Object resolveValue(CompiledType baseType, SingleValueConstraint elements) {
-        return super.<VisibleStringValue>resolveValue(baseType, elements).getValue();
+    protected StringSingleValue resolveValue(CompiledType baseType, SingleValueConstraint elements) {
+        var stringValue = super.<VisibleStringValue>resolveValue(baseType, elements).getValue();
+
+        return new StringSingleValue(stringValue);
     }
 
 }

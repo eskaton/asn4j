@@ -379,6 +379,10 @@ public class IL2JavaTranslator {
     }
 
     private String toJavaType(JavaClass javaClass, ILType type) {
+        if (type == null) {
+            return void.class.getSimpleName();
+        }
+
         switch (type.getBaseType()) {
             case BOOLEAN:
                 return Boolean.class.getSimpleName();

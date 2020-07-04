@@ -35,7 +35,7 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_UNUSED_BITS;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-public class BitStringStringSizeExpressionBuilder extends AbstractRangeExpressionBuilder {
+public class BitStringStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
     protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
         var expr = new FunctionCall.BitStringSize(new Variable(VAR_VALUE), new Variable(VAR_UNUSED_BITS));

@@ -26,6 +26,7 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
@@ -79,7 +80,7 @@ public class ElementSetCompiler implements ElementsCompiler<ElementSet> {
                 return calculateUnion(baseType, operands, bounds);
 
             default:
-                throw new IllegalStateException("Unimplemented node type " + set.getOperation());
+                throw new IllegalCompilerStateException("Unimplemented node type : %s", set.getOperation());
         }
     }
 
