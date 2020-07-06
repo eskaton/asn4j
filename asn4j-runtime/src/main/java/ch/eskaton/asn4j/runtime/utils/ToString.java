@@ -34,6 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,6 +42,8 @@ import java.util.stream.Stream;
 import static ch.eskaton.commons.utils.CollectionUtils.asHashSet;
 
 public class ToString {
+
+    private static ThreadLocal<Stack<Object>> visited = new ThreadLocal<>();
 
     private ToString() {
     }
@@ -87,8 +90,30 @@ public class ToString {
 
     private static String buildPropertiesString(Stream<Tuple2<String, Object>> stream) {
         return stream.filter(property -> Objects.nonNull(property.get_2()))
-                .map(tuple -> tuple.get_1() + "=" + tuple.get_2())
+                .map(tuple -> tuple.get_1() + "=" + getValue(tuple.get_2()))
                 .collect(Collectors.joining(", "));
+    }
+
+    private static String getValue(Object object) {
+        var stack = visited.get();
+
+        if (stack == null) {
+            stack = new Stack<>();
+
+            visited.set(stack);
+        }
+
+        if (stack.contains(object)) {
+            return "...";
+        }
+
+        stack.push(object);
+
+        try {
+            return object.toString();
+        } finally {
+            stack.pop();
+        }
     }
 
     public static Builder builder(Object object) {
