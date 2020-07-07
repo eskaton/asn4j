@@ -11,4 +11,7 @@ TestVisibleString7 ::= VisibleString (FROM ("a".."d" ^ "c".."f"))
 TestVisibleString8 ::= VisibleString (FROM ("a"<..<"e") | "bf")
 TestVisibleString9 ::= TestVisibleString8 (FROM ("c".."f"))
 
+TestGeneralString1 ::= GeneralString (FROM ("a"<..<"e") | "bf")
+TestGeneralString2 ::= TestGeneralString1 (FROM ("c".."f"))
+
 END

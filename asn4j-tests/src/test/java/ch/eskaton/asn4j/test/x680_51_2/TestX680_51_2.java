@@ -55,6 +55,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestEnumeration1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestEnumeration3;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestEnumeration4;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestGeneralString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestInteger1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestInteger2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestInteger3;
@@ -126,6 +127,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testChoiceFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testChoiceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIRIFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
@@ -798,5 +801,11 @@ class TestX680_51_2 {
         testVisibleStringFailure(TestVisibleString1.class, new TestVisibleString1("def"));
     }
 
+    @Test
+    void testGeneralString1() {
+        testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("abc"));
+
+        testGeneralStringFailure(TestGeneralString1.class, new TestGeneralString1("def"));
+    }
 
 }

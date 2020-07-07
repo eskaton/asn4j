@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.test.x680_51_7;
 
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestGeneralString1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestGeneralString2;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString1;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString2;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString3;
@@ -38,6 +40,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString8;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString9;
 import org.junit.jupiter.api.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringSuccess;
 
@@ -116,6 +120,24 @@ class TestX680_51_7 {
 
         testVisibleStringFailure(TestVisibleString9.class, new TestVisibleString9("bc"));
         testVisibleStringFailure(TestVisibleString9.class, new TestVisibleString9("de"));
+    }
+
+    @Test
+    public void testGeneralString1() {
+        testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("bccd"));
+        testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("bf"));
+
+        testGeneralStringFailure(TestGeneralString1.class, new TestGeneralString1("ab"));
+        testGeneralStringFailure(TestGeneralString1.class, new TestGeneralString1("bff"));
+        testGeneralStringFailure(TestGeneralString1.class, new TestGeneralString1("de"));
+    }
+
+    @Test
+    public void testGeneralString2() {
+        testGeneralStringSuccess(TestGeneralString2.class, new TestGeneralString2("cdcd"));
+
+        testGeneralStringFailure(TestGeneralString2.class, new TestGeneralString2("bc"));
+        testGeneralStringFailure(TestGeneralString2.class, new TestGeneralString2("de"));
     }
 
 }

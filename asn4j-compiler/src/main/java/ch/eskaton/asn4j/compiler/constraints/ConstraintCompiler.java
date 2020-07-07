@@ -39,6 +39,7 @@ import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.GeneralString;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
@@ -88,6 +89,7 @@ public class ConstraintCompiler {
                 .put(SequenceType.class, new SequenceConstraintCompiler(ctx))
                 .put(Choice.class, new ChoiceConstraintCompiler(ctx))
                 .put(VisibleString.class, new VisibleStringConstraintCompiler(ctx))
+                .put(GeneralString.class, new GeneralStringConstraintCompiler(ctx))
                 .build();
     }
 

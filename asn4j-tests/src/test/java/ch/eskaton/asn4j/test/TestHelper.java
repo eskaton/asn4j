@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
@@ -362,7 +363,6 @@ public class TestHelper {
         assertThrows(() -> assertValueDecodable(clazz, choiceValue), ConstraintViolatedException.class);
     }
 
-
     public static <T extends ASN1VisibleString> void testVisibleStringSuccess(Class<? extends T> clazz, T stringValue) {
         assertValueDecodable(clazz, stringValue);
     }
@@ -371,6 +371,13 @@ public class TestHelper {
         assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
     }
 
+    public static <T extends ASN1GeneralString> void testGeneralStringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1GeneralString> void testGeneralStringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
 
     public static byte[] randomBytes(int length) {
         byte[] value = new byte[length];
