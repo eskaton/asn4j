@@ -76,6 +76,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf6;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf7;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf8;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf9;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestVisibleString1;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.randomBytes;
@@ -103,6 +104,8 @@ import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringSuccess;
 
 class TestX680_51_1 {
 
@@ -546,6 +549,18 @@ class TestX680_51_1 {
         testSequenceOfFailure(TestSequenceOf2.class, new TestSequenceOf2(),
                 new ASN1SetOf<>(),
                 new ASN1SetOf<>(ASN1Integer.valueOf(1L), ASN1Integer.valueOf(2L)));
+    }
+
+    @Test
+    public void testVisibleString1() {
+        testVisibleStringSuccess(TestVisibleString1.class, new TestVisibleString1("a"));
+        testVisibleStringSuccess(TestVisibleString1.class, new TestVisibleString1("ab"));
+        testVisibleStringSuccess(TestVisibleString1.class, new TestVisibleString1("abc"));
+        testVisibleStringSuccess(TestVisibleString1.class, new TestVisibleString1("def"));
+
+        testVisibleStringFailure(TestVisibleString1.class, new TestVisibleString1(""));
+        testVisibleStringFailure(TestVisibleString1.class, new TestVisibleString1("abcd"));
+        testVisibleStringFailure(TestVisibleString1.class, new TestVisibleString1("bcde"));
     }
 
 }
