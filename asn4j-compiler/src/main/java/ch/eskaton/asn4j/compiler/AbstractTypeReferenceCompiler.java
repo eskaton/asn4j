@@ -38,6 +38,9 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         implements NamedCompiler<T, CompiledType> {
 
     public CompiledType compile(CompilerContext ctx, String name, T node) {
+        // ensure the type is resolvable
+        ctx.resolveTypeReference(node);
+
         JavaClass javaClass = ctx.createClass(name, node, isConstructed(ctx, name));
         CompiledType compiledType = ctx.createCompiledType(node, name);
 

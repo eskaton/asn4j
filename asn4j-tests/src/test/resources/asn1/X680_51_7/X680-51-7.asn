@@ -8,6 +8,7 @@ TestVisibleString4 ::= VisibleString (FROM ("a".."z"))
 TestVisibleString5 ::= VisibleString (FROM ("a".."d" EXCEPT "c"))
 TestVisibleString6 ::= VisibleString (FROM ("a".."d" | "x".."z"))
 TestVisibleString7 ::= VisibleString (FROM ("a".."d" ^ "c".."f"))
-TestVisibleString8 ::= VisibleString (FROM ("a"<..<"d"))
+TestVisibleString8 ::= VisibleString (FROM ("a"<..<"e") | "bf")
+TestVisibleString9 ::= TestVisibleString8 (FROM ("c".."f"))
 
 END

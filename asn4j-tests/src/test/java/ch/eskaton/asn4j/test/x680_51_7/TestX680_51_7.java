@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString5;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString6;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString7;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString8;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString9;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
@@ -101,10 +102,20 @@ class TestX680_51_7 {
 
     @Test
     public void testVisibleString8() {
-        testVisibleStringSuccess(TestVisibleString8.class, new TestVisibleString8("bc"));
+        testVisibleStringSuccess(TestVisibleString8.class, new TestVisibleString8("bccd"));
+        testVisibleStringSuccess(TestVisibleString8.class, new TestVisibleString8("bf"));
 
         testVisibleStringFailure(TestVisibleString8.class, new TestVisibleString8("ab"));
-        testVisibleStringFailure(TestVisibleString8.class, new TestVisibleString8("cd"));
+        testVisibleStringFailure(TestVisibleString8.class, new TestVisibleString8("bff"));
+        testVisibleStringFailure(TestVisibleString8.class, new TestVisibleString8("de"));
+    }
+
+    @Test
+    public void testVisibleString9() {
+        testVisibleStringSuccess(TestVisibleString9.class, new TestVisibleString9("cdcd"));
+
+        testVisibleStringFailure(TestVisibleString9.class, new TestVisibleString9("bc"));
+        testVisibleStringFailure(TestVisibleString9.class, new TestVisibleString9("de"));
     }
 
 }
