@@ -49,6 +49,7 @@ import ch.eskaton.commons.utils.OptionalUtils;
 import java.util.List;
 import java.util.Optional;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_EXPRESSION;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 
 public class VisibleStringPermittedAlphabetExpressionBuilder {
@@ -63,11 +64,12 @@ public class VisibleStringPermittedAlphabetExpressionBuilder {
 
     public Optional<BooleanExpression> build(Module module, Node node) {
         var expression = buildExpression(node);
+        var expressionSym = module.generateSymbol(FUNC_CHECK_ALPHABET);
 
         if (expression.isPresent()) {
             // @formatter:off
             module.function()
-                    .name(FUNC_CHECK_ALPHABET)
+                    .name(expressionSym)
                     .returnType(ILType.of(ILBuiltinType.BOOLEAN))
                     .parameter(ILType.of(ILBuiltinType.INTEGER), VAR_CHR)
                     .statements()
@@ -76,7 +78,7 @@ public class VisibleStringPermittedAlphabetExpressionBuilder {
                     .build();
 
             module.function()
-                    .name(FUNC_CHECK_ALPHABET)
+                    .name(expressionSym)
                     .returnType(ILType.of(ILBuiltinType.BOOLEAN))
                     .parameter(ILType.of(ILBuiltinType.STRING), VAR_VALUE)
                     .statements()
@@ -85,7 +87,7 @@ public class VisibleStringPermittedAlphabetExpressionBuilder {
                             .statements()
                                 .conditions()
                                     .condition(new NegationExpression(new BooleanFunctionCall(
-                                            Optional.of(FUNC_CHECK_ALPHABET), new Variable(VAR_CHR))))
+                                            Optional.of(expressionSym), new Variable(VAR_CHR))))
                                         .statements()
                                             .returnValue(Boolean.FALSE)
                                             .build()
@@ -98,7 +100,7 @@ public class VisibleStringPermittedAlphabetExpressionBuilder {
                     .build();
             // @formatter:on
 
-            return Optional.of(new BooleanFunctionCall(Optional.of(FUNC_CHECK_ALPHABET), new Variable(VAR_VALUE)));
+            return Optional.of(new BooleanFunctionCall(Optional.of(expressionSym), new Variable(VAR_VALUE)));
         }
 
         return Optional.empty();

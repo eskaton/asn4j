@@ -133,8 +133,11 @@ public class TypeResolverHelper {
 
                 typeReference = node;
             } else {
-                throw new CompilerException("Failed to resolve reference to %s",
-                        ((TypeReference) typeReference).getType());
+                Type type = resolveType(ctx.getModule(), ((TypeReference) typeReference).getType());
+
+                if (!(type instanceof TypeReference)) {
+                    return type;
+                }
             }
         }
 
