@@ -51,7 +51,7 @@ import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 
-public class VisibleStringPermittedAlphabetExpressionBuilder {
+public class GeneralStringPermittedAlphabetExpressionBuilder {
 
     private static final String FUNC_CHECK_ALPHABET = "checkPermittedAlphabet";
 

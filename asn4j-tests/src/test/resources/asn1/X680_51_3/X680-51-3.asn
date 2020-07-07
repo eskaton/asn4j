@@ -98,4 +98,7 @@ TestChoice2 ::= CHOICE {
 TestVisibleString1 ::= VisibleString ("def")
 TestVisibleString2 ::= VisibleString (TestVisibleString1)
 
+TestGeneralString1 ::= GeneralString ("efg")
+TestGeneralString2 ::= GeneralString (TestGeneralString1)
+
 END

@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString6;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString7;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString8;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString9;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestGeneralString1;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestOctetString1;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestOctetString10;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestOctetString11;
@@ -63,6 +64,8 @@ import org.junit.jupiter.api.Test;
 import static ch.eskaton.asn4j.test.TestHelper.randomBytes;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testOctetStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testOctetStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
@@ -344,6 +347,15 @@ class TestX680_51_5 {
 
         testVisibleStringFailure(TestVisibleString1.class, new TestVisibleString1(""));
         testVisibleStringFailure(TestVisibleString1.class, new TestVisibleString1("abc"));
+    }
+
+    @Test
+    void testGeneralString1() {
+        testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("a"));
+        testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("ab"));
+
+        testGeneralStringFailure(TestGeneralString1.class, new TestGeneralString1(""));
+        testGeneralStringFailure(TestGeneralString1.class, new TestGeneralString1("abc"));
     }
 
 }

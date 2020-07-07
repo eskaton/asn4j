@@ -38,4 +38,6 @@ TestSequenceOf2 ::= SEQUENCE SIZE (2) OF INTEGER
 
 TestVisibleString1 ::= VisibleString (SIZE(1..2))
 
+TestGeneralString1 ::= GeneralString (SIZE(1..2))
+
 END
