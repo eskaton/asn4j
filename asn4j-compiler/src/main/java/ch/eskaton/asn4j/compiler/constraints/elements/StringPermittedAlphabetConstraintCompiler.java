@@ -24,22 +24,22 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.FunctionCall;
-import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.Variable;
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
+import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class VisibleStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
+public class StringPermittedAlphabetConstraintCompiler<V extends HasStringValue & Value> extends PermittedAlphabetConstraintCompiler {
 
-    protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        var expr = new FunctionCall.GetStringLength(new Variable(VAR_VALUE));
+    public StringPermittedAlphabetConstraintCompiler(CompilerContext ctx, Class<V> valueClass, TypeName typeName) {
+        super(ctx, typeName);
 
-        return new BinaryBooleanExpression(operator, expr, new ILValue(value));
+        addConstraintHandler(SingleValueConstraint.class,
+                new StringSingleValueCompiler(ctx, valueClass, getTypeName())::compile);
     }
 
 }

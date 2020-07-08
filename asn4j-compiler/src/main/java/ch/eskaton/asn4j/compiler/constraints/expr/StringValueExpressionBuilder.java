@@ -46,9 +46,9 @@ import java.util.stream.Collectors;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static java.util.Optional.of;
 
-public class GeneralStringValueExpressionBuilder extends AbstractValueExpressionBuilder<StringValueNode> {
+public class StringValueExpressionBuilder extends AbstractValueExpressionBuilder<StringValueNode> {
 
-    public GeneralStringValueExpressionBuilder(CompilerContext ctx) {
+    public StringValueExpressionBuilder(CompilerContext ctx) {
         super(ctx);
     }
 

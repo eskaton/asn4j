@@ -24,50 +24,22 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
-import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.StringValueOrRange;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
+import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
-import static java.util.Optional.of;
 
-public class VisibleStringValueExpressionBuilder extends AbstractValueExpressionBuilder<StringValueNode> {
+public class StringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
-    public VisibleStringValueExpressionBuilder(CompilerContext ctx) {
-        super(ctx);
-    }
+    protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
+        var expr = new FunctionCall.GetStringLength(new Variable(VAR_VALUE));
 
-    @Override
-    public Optional<BooleanExpression> build(CompiledType compiledType, StringValueNode node) {
-        var expressions = node.getValue().stream()
-                .map(v -> buildExpression(compiledType, v))
-                .collect(Collectors.toList());
-
-        return of(new BinaryBooleanExpression(BinaryOperator.OR, expressions));
-    }
-
-    private BooleanExpression buildExpression(CompiledType compiledType, StringValueOrRange value) {
-        if (value instanceof StringSingleValue) {
-            return new BooleanFunctionCall.StringEquals(new Variable(VAR_VALUE),
-                    new ILValue(getTypeName(compiledType.getType()), ((StringSingleValue) value).getValue()));
-        }
-
-        throw new IllegalCompilerStateException("Unsupported value node: %s", value);
+        return new BinaryBooleanExpression(operator, expr, new ILValue(value));
     }
 
 }
