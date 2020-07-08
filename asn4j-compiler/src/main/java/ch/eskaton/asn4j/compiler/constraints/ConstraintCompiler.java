@@ -40,18 +40,24 @@ import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.GeneralString;
+import ch.eskaton.asn4j.parser.ast.types.GraphicString;
+import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
+import ch.eskaton.asn4j.parser.ast.types.PrintableString;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Maps;
@@ -90,6 +96,12 @@ public class ConstraintCompiler {
                 .put(Choice.class, new ChoiceConstraintCompiler(ctx))
                 .put(VisibleString.class, new VisibleStringConstraintCompiler(ctx))
                 .put(GeneralString.class, new GeneralStringConstraintCompiler(ctx))
+                .put(GraphicString.class, new GraphicStringConstraintCompiler(ctx))
+                .put(IA5String.class, new IA5StringConstraintCompiler(ctx))
+                .put(VideotexString.class, new VideotexStringConstraintCompiler(ctx))
+                .put(TeletexString.class, new TeletexStringConstraintCompiler(ctx))
+                .put(PrintableString.class, new PrintableStringConstraintCompiler(ctx))
+                .put(NumericString.class, new NumericStringConstraintCompiler(ctx))
                 .build();
     }
 
