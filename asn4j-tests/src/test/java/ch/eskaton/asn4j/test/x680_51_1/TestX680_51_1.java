@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.test.x680_51_1;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestBMPString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString3;
@@ -84,11 +85,15 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf8;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf9;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestT61String1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestTeletexString1;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestUTF8String1;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestUniversalString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestVisibleString1;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.randomBytes;
+import static ch.eskaton.asn4j.test.TestHelper.testBMPStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testBMPStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
@@ -125,6 +130,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testUTF8StringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testUTF8StringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testUniversalStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testUniversalStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
@@ -693,6 +702,42 @@ class TestX680_51_1 {
         testNumericStringFailure(TestNumericString1.class, new TestNumericString1("1212"));
         testNumericStringFailure(TestNumericString1.class, new TestNumericString1("0"));
         testNumericStringFailure(TestNumericString1.class, new TestNumericString1("4"));
+    }
+
+    @Test
+    void testUTF8String1() {
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("a"));
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("ab"));
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("abc"));
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("def"));
+
+        testUTF8StringFailure(TestUTF8String1.class, new TestUTF8String1(""));
+        testUTF8StringFailure(TestUTF8String1.class, new TestUTF8String1("abcd"));
+        testUTF8StringFailure(TestUTF8String1.class, new TestUTF8String1("bcde"));
+    }
+
+    @Test
+    void testUniversalString1() {
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("a"));
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("ab"));
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("abc"));
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("def"));
+
+        testUniversalStringFailure(TestUniversalString1.class, new TestUniversalString1(""));
+        testUniversalStringFailure(TestUniversalString1.class, new TestUniversalString1("abcd"));
+        testUniversalStringFailure(TestUniversalString1.class, new TestUniversalString1("bcde"));
+    }
+
+    @Test
+    void testBMPString1() {
+        testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("a"));
+        testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("ab"));
+        testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("abc"));
+        testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("def"));
+
+        testBMPStringFailure(TestBMPString1.class, new TestBMPString1(""));
+        testBMPStringFailure(TestBMPString1.class, new TestBMPString1("abcd"));
+        testBMPStringFailure(TestBMPString1.class, new TestBMPString1("bcde"));
     }
 
 }

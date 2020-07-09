@@ -38,4 +38,13 @@ TestPrintableString2 ::= TestPrintableString1 (FROM ("c".."f"))
 TestNumericString1 ::= NumericString (FROM ("1"<..<"5") | "123")
 TestNumericString2 ::= TestNumericString1 (FROM ("3".."7"))
 
+TestUTF8String1 ::= UTF8String (FROM ("a"<..<"e") | "bf")
+TestUTF8String2 ::= TestUTF8String1 (FROM ("c".."f"))
+
+TestUniversalString1 ::= UniversalString (FROM ("a"<..<"e") | "bf")
+TestUniversalString2 ::= TestUniversalString1 (FROM ("c".."f"))
+
+TestBMPString1 ::= BMPString (FROM ("a"<..<"e") | "bf")
+TestBMPString2 ::= TestBMPString1 (FROM ("c".."f"))
+
 END

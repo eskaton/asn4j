@@ -56,4 +56,10 @@ TestPrintableString1 ::= PrintableString (SIZE(1..2))
 
 TestNumericString1 ::= NumericString (SIZE(1..2))
 
+TestUTF8String1 ::= UTF8String (SIZE(1..2))
+
+TestUniversalString1 ::= UniversalString (SIZE(1..2))
+
+TestBMPString1 ::= BMPString (SIZE(1..2))
+
 END

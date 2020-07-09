@@ -254,6 +254,11 @@ public class IL2JavaTranslator {
             } else if (functionCall instanceof FunctionCall.GetStringLength) {
                 object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
                 function = "length";
+            } else if (functionCall instanceof FunctionCall.GetUnicodeStringLength) {
+                object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
+                function = "codePointCount";
+                arguments = String.format("0, %s.length()",
+                        object.orElseThrow(() -> new CompilerException("object must not be null")));
             } else if (functionCall instanceof ToArray) {
                 object = ofNullable(translateExpression(ctx, javaClass,
                         functionCall.getObject().orElseThrow(() -> new CompilerException("object must not be null"))));

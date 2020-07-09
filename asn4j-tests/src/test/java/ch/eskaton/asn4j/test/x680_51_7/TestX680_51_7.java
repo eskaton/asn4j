@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.test.x680_51_7;
 
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestBMPString1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestBMPString2;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestGeneralString1;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestGeneralString2;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestGraphicString1;
@@ -43,6 +45,10 @@ import ch.eskaton.asn4j.test.modules.x680_51_7.TestT61String1;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestT61String2;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestTeletexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestTeletexString2;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestUTF8String1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestUTF8String2;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestUniversalString1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestUniversalString2;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVideotexString2;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString1;
@@ -56,6 +62,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString8;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString9;
 import org.junit.jupiter.api.Test;
 
+import static ch.eskaton.asn4j.test.TestHelper.testBMPStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testBMPStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testGraphicStringFailure;
@@ -68,6 +76,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testPrintableStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testPrintableStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testUTF8StringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testUTF8StringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testUniversalStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testUniversalStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
@@ -310,6 +322,60 @@ class TestX680_51_7 {
 
         testNumericStringFailure(TestNumericString2.class, new TestNumericString2("12"));
         testNumericStringFailure(TestNumericString2.class, new TestNumericString2("45"));
+    }
+
+    @Test
+    public void testUTF8String1() {
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("bccd"));
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("bf"));
+
+        testUTF8StringFailure(TestUTF8String1.class, new TestUTF8String1("ab"));
+        testUTF8StringFailure(TestUTF8String1.class, new TestUTF8String1("bff"));
+        testUTF8StringFailure(TestUTF8String1.class, new TestUTF8String1("de"));
+    }
+
+    @Test
+    public void testUTF8String2() {
+        testUTF8StringSuccess(TestUTF8String2.class, new TestUTF8String2("cdcd"));
+
+        testUTF8StringFailure(TestUTF8String2.class, new TestUTF8String2("bc"));
+        testUTF8StringFailure(TestUTF8String2.class, new TestUTF8String2("de"));
+    }
+
+    @Test
+    public void testUniversalString1() {
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("bccd"));
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("bf"));
+
+        testUniversalStringFailure(TestUniversalString1.class, new TestUniversalString1("ab"));
+        testUniversalStringFailure(TestUniversalString1.class, new TestUniversalString1("bff"));
+        testUniversalStringFailure(TestUniversalString1.class, new TestUniversalString1("de"));
+    }
+
+    @Test
+    public void testUniversalString2() {
+        testUniversalStringSuccess(TestUniversalString2.class, new TestUniversalString2("cdcd"));
+
+        testUniversalStringFailure(TestUniversalString2.class, new TestUniversalString2("bc"));
+        testUniversalStringFailure(TestUniversalString2.class, new TestUniversalString2("de"));
+    }
+
+    @Test
+    public void testBMPString1() {
+        testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("bccd"));
+        testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("bf"));
+
+        testBMPStringFailure(TestBMPString1.class, new TestBMPString1("ab"));
+        testBMPStringFailure(TestBMPString1.class, new TestBMPString1("bff"));
+        testBMPStringFailure(TestBMPString1.class, new TestBMPString1("de"));
+    }
+
+    @Test
+    public void testBMPString2() {
+        testBMPStringSuccess(TestBMPString2.class, new TestBMPString2("cdcd"));
+
+        testBMPStringFailure(TestBMPString2.class, new TestBMPString2("bc"));
+        testBMPStringFailure(TestBMPString2.class, new TestBMPString2("de"));
     }
 
 }
