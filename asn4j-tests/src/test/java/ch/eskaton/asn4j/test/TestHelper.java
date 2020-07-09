@@ -376,7 +376,7 @@ public class TestHelper {
     public static <T extends ASN1VisibleString> void testVisibleStringFailure(Class<? extends T> clazz, T stringValue) {
         assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
     }
-
+    
     public static <T extends ASN1GeneralString> void testGeneralStringSuccess(Class<? extends T> clazz, T stringValue) {
         assertValueDecodable(clazz, stringValue);
     }

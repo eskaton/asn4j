@@ -98,6 +98,9 @@ TestChoice2 ::= CHOICE {
 TestVisibleString1 ::= VisibleString ("def")
 TestVisibleString2 ::= VisibleString (TestVisibleString1)
 
+TestISO646String1 ::= ISO646String ("def")
+TestISO646String2 ::= ISO646String (TestISO646String1)
+
 TestGeneralString1 ::= GeneralString ("efg")
 TestGeneralString2 ::= GeneralString (TestGeneralString1)
 
@@ -112,6 +115,9 @@ TestVideotexString2 ::= VideotexString (TestVideotexString1)
 
 TestTeletexString1 ::= TeletexString ("abc")
 TestTeletexString2 ::= TeletexString (TestTeletexString1)
+
+TestT61String1 ::= T61String ("abc")
+TestT61String2 ::= T61String (TestT61String1)
 
 TestPrintableString1 ::= PrintableString ("abc")
 TestPrintableString2 ::= PrintableString (TestPrintableString1)

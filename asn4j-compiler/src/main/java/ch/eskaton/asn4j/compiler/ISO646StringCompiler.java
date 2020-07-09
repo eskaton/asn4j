@@ -25,14 +25,10 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.types;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.ISO646String;
 
-public class ISO646String extends VisibleString {
-
-    public ISO646String(Position position) {
-        super(position);
-    }
+public class ISO646StringCompiler extends BuiltinTypeCompiler<ISO646String> {
 
 }

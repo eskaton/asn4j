@@ -153,6 +153,8 @@ TestChoice3 ::= CHOICE {
 
 TestVisibleString1 ::= VisibleString ("abc")
 
+TestISO646String1 ::= ISO646String ("abc")
+
 TestGeneralString1 ::= GeneralString ("abc")
 
 TestGraphicString1 ::= GraphicString ("abc")
@@ -162,6 +164,8 @@ TestIA5String1 ::= IA5String ("abc")
 TestVideotexString1 ::= VideotexString ("abc")
 
 TestTeletexString1 ::= TeletexString ("abc")
+
+TestT61String1 ::= T61String ("abc")
 
 TestPrintableString1 ::= PrintableString ("abc")
 

@@ -43,6 +43,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestGraphicString1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestGraphicString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestIA5String1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestIA5String2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestISO646String1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestISO646String2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull1;
@@ -73,6 +75,8 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestSet1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSet2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestT61String1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestT61String2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestTeletexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestTeletexString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestVideotexString1;
@@ -459,6 +463,20 @@ class TestX680_51_3 {
     }
 
     @Test
+    void testISO646String1() {
+        testVisibleStringSuccess(TestISO646String1.class, new TestISO646String1("def"));
+
+        testVisibleStringFailure(TestISO646String1.class, new TestISO646String1("abc"));
+    }
+
+    @Test
+    void testISO646String2() {
+        testVisibleStringSuccess(TestISO646String2.class, new TestISO646String2("def"));
+
+        testVisibleStringFailure(TestISO646String2.class, new TestISO646String2("abc"));
+    }
+
+    @Test
     void testGeneralString1() {
         testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("efg"));
 
@@ -526,6 +544,20 @@ class TestX680_51_3 {
         testTeletexStringSuccess(TestTeletexString2.class, new TestTeletexString2("abc"));
 
         testTeletexStringFailure(TestTeletexString2.class, new TestTeletexString2("def"));
+    }
+
+    @Test
+    void testT61String1() {
+        testTeletexStringSuccess(TestT61String1.class, new TestT61String1("abc"));
+
+        testTeletexStringFailure(TestT61String1.class, new TestT61String1("def"));
+    }
+
+    @Test
+    void testT61String2() {
+        testTeletexStringSuccess(TestT61String2.class, new TestT61String2("abc"));
+
+        testTeletexStringFailure(TestT61String2.class, new TestT61String2("def"));
     }
 
     @Test

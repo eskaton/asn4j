@@ -81,6 +81,7 @@ import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.GraphicString;
 import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.parser.ast.types.ISO646String;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.NumericString;
@@ -204,6 +205,8 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(SetOfType.class, new SetOfCompiler(), CollectionOfValue.class,
                 ASN1SetOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier(this, true), true));
         types.add(new TypeDefinition<>(VisibleString.class, new VisibleStringCompiler(), VisibleStringValue.class,
+                ASN1VisibleString.class, new VisibleStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+        types.add(new TypeDefinition<>(ISO646String.class, new ISO646StringCompiler(), VisibleStringValue.class,
                 ASN1VisibleString.class, new VisibleStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
         types.add(new TypeDefinition<>(NumericString.class, new NumericStringCompiler(), NumericStringValue.class,
                 ASN1NumericString.class, new NumericStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
