@@ -84,4 +84,32 @@ testVisibleString1 VisibleString ::= "xyz"
 
 TestVisibleString1 ::= VisibleString ((SIZE (1..3) ^ FROM ("a".."f")) | testVisibleString1)
 
+testGeneralString1 GeneralString ::= "xyz"
+
+TestGeneralString1 ::= GeneralString ((SIZE (1..3) ^ FROM ("a".."f")) | testGeneralString1)
+
+testGraphicString1 GraphicString ::= "xyz"
+
+TestGraphicString1 ::= GraphicString ((SIZE (1..3) ^ FROM ("a".."f")) | testGraphicString1)
+
+testIA5String1 IA5String ::= "xyz"
+
+TestIA5String1 ::= IA5String ((SIZE (1..3) ^ FROM ("a".."f")) | testIA5String1)
+
+testVideotexString1 VideotexString ::= "xyz"
+
+TestVideotexString1 ::= VideotexString ((SIZE (1..3) ^ FROM ("a".."f")) | testVideotexString1)
+
+testTeletexString1 TeletexString ::= "xyz"
+
+TestTeletexString1 ::= TeletexString ((SIZE (1..3) ^ FROM ("a".."f")) | testTeletexString1)
+
+testPrintableString1 PrintableString ::= "xyz"
+
+TestPrintableString1 ::= PrintableString ((SIZE (1..3) ^ FROM ("a".."f")) | testPrintableString1)
+
+testNumericString1 NumericString ::= "456"
+
+TestNumericString1 ::= NumericString ((SIZE (1..3) ^ FROM ("1".."3")) | testNumericString1)
+
 END

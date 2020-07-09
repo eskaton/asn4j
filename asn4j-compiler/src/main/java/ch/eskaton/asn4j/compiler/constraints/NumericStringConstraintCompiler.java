@@ -29,12 +29,13 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.types.NumericString;
+import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 public class NumericStringConstraintCompiler extends AbstractStringConstraintCompiler {
 
     public NumericStringConstraintCompiler(CompilerContext ctx) {
-        super(ctx, NumericString.class);
+        super(ctx, NumericStringValue.class);
     }
 
     @Override

@@ -101,4 +101,22 @@ TestVisibleString2 ::= VisibleString (TestVisibleString1)
 TestGeneralString1 ::= GeneralString ("efg")
 TestGeneralString2 ::= GeneralString (TestGeneralString1)
 
+TestGraphicString1 ::= GraphicString ("abc")
+TestGraphicString2 ::= GraphicString (TestGraphicString1)
+
+TestIA5String1 ::= IA5String ("abc")
+TestIA5String2 ::= IA5String (TestIA5String1)
+
+TestVideotexString1 ::= VideotexString ("abc")
+TestVideotexString2 ::= VideotexString (TestVideotexString1)
+
+TestTeletexString1 ::= TeletexString ("abc")
+TestTeletexString2 ::= TeletexString (TestTeletexString1)
+
+TestPrintableString1 ::= PrintableString ("abc")
+TestPrintableString2 ::= PrintableString (TestPrintableString1)
+
+TestNumericString1 ::= NumericString ("123")
+TestNumericString2 ::= NumericString (TestNumericString1)
+
 END
