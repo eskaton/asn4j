@@ -28,6 +28,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.AbstractConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.defaults.AbstractDefaultCompiler;
@@ -151,6 +152,10 @@ public class CompilerContext {
 
     public <T extends Type, V extends Value> AbstractDefaultCompiler<V> getDefaultCompiler(Class<T> clazz) {
         return config.getDefaultCompiler(clazz);
+    }
+
+    public <T extends Type, CC extends AbstractConstraintCompiler> CC getConstraintCompiler(Class<T> clazz) {
+        return config.getConstraintCompiler(clazz);
     }
 
     public ModuleNode getModule() {

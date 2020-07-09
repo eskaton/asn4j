@@ -27,6 +27,33 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.AbstractConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.BMPStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.BitStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.BooleanConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.ChoiceConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.EnumeratedTypeConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.GeneralStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.GraphicStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.IA5StringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.IRIConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.IntegerConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.NullConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.NumericStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.ObjectIdentifierConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.OctetStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.PrintableStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.RelativeIRIConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.RelativeOIDConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.SequenceConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.SequenceOfConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.SetConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.SetOfConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.TeletexStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.UTF8StringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.UniversalStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.VideotexStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.VisibleStringConstraintCompiler;
 import ch.eskaton.asn4j.compiler.defaults.AbstractDefaultCompiler;
 import ch.eskaton.asn4j.compiler.defaults.BitStringDefaultCompiler;
 import ch.eskaton.asn4j.compiler.defaults.OctetStringDefaultCompiler;
@@ -180,68 +207,97 @@ public class TypeConfiguration {
     public TypeConfiguration(CompilerContext ctx) {
         types.add(new TypeDefinition<>(BitString.class, new BitStringCompiler(), BitStringValue.class,
                 ASN1BitString.class, new BitStringValueResolver(ctx), new BitStringTypeNameSupplier(this),
-                new BitStringDefaultCompiler()));
+                new BitStringDefaultCompiler(), new BitStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(BooleanType.class, new BooleanCompiler(), BooleanValue.class,
-                ASN1Boolean.class, new BooleanValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1Boolean.class, new BooleanValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new BooleanConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(Choice.class, new ChoiceCompiler(), ChoiceValue.class,
-                ASN1Choice.class, new ChoiceValueResolver(ctx), new SubtypeTypeNameSupplier(this, true)));
+                ASN1Choice.class, new ChoiceValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                new ChoiceConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(EnumeratedType.class, new EnumeratedTypeCompiler(), EnumeratedValue.class,
-                ASN1EnumeratedType.class, new EnumeratedValueResolver(ctx), new SubtypeTypeNameSupplier(this, true)));
+                ASN1EnumeratedType.class, new EnumeratedValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                new EnumeratedTypeConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(IntegerType.class, new IntegerCompiler(), IntegerValue.class,
-                ASN1Integer.class, new IntegerValueResolver(ctx), new IntegerTypeNameSupplier(this)));
+                ASN1Integer.class, new IntegerValueResolver(ctx), new IntegerTypeNameSupplier(this),
+                new IntegerConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(Null.class, new NullCompiler(), NullValue.class,
-                ASN1Null.class, new NullValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1Null.class, new NullValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new NullConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(OctetString.class, new OctetStringCompiler(), OctetStringValue.class,
                 ASN1OctetString.class, new OctetStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
-                new OctetStringDefaultCompiler()));
+                new OctetStringDefaultCompiler(), new OctetStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(Real.class, new RealCompiler(), RealValue.class,
-                ASN1Real.class, new RealValueResolver(ctx), new SubtypeTypeNameSupplier(this), new RealDefaultCompiler()));
+                ASN1Real.class, new RealValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                new RealDefaultCompiler(), null));
         types.add(new TypeDefinition<>(SequenceType.class, new SequenceCompiler(), CollectionValue.class,
-                ASN1Sequence.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier(this, true), true));
+                ASN1Sequence.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                new SequenceConstraintCompiler(ctx), true));
         types.add(new TypeDefinition<>(SequenceOfType.class, new SequenceOfCompiler(), CollectionOfValue.class,
-                ASN1SequenceOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier(this, true), true));
+                ASN1SequenceOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                new SequenceOfConstraintCompiler(ctx), true));
         types.add(new TypeDefinition<>(SetType.class, new SetCompiler(), CollectionValue.class,
-                ASN1Set.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier(this, true), true));
+                ASN1Set.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                new SetConstraintCompiler(ctx), true));
         types.add(new TypeDefinition<>(SetOfType.class, new SetOfCompiler(), CollectionOfValue.class,
-                ASN1SetOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier(this, true), true));
+                ASN1SetOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                new SetOfConstraintCompiler(ctx), true));
         types.add(new TypeDefinition<>(VisibleString.class, new VisibleStringCompiler(), VisibleStringValue.class,
-                ASN1VisibleString.class, new VisibleStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1VisibleString.class, new VisibleStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new VisibleStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(ISO646String.class, new ISO646StringCompiler(), VisibleStringValue.class,
-                ASN1VisibleString.class, new VisibleStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1VisibleString.class, new VisibleStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new VisibleStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(NumericString.class, new NumericStringCompiler(), NumericStringValue.class,
-                ASN1NumericString.class, new NumericStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1NumericString.class, new NumericStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new NumericStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(PrintableString.class, new PrintableStringCompiler(), PrintableStringValue.class,
-                ASN1PrintableString.class, new PrintableStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1PrintableString.class, new PrintableStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new PrintableStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(IA5String.class, new IA5StringCompiler(), IA5StringValue.class,
-                ASN1IA5String.class, new IA5StringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1IA5String.class, new IA5StringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new IA5StringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(GraphicString.class, new GraphicStringCompiler(), GraphicStringValue.class,
-                ASN1GraphicString.class, new GraphicStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1GraphicString.class, new GraphicStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new GraphicStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(GeneralString.class, new GeneralStringCompiler(), GeneralStringValue.class,
-                ASN1GeneralString.class, new GeneralStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1GeneralString.class, new GeneralStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new GeneralStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(TeletexString.class, new TeletexStringCompiler(), TeletexStringValue.class,
-                ASN1TeletexString.class, new TeletexStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1TeletexString.class, new TeletexStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new TeletexStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(T61String.class, new T61StringCompiler(), TeletexStringValue.class,
-                ASN1TeletexString.class, new TeletexStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1TeletexString.class, new TeletexStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new TeletexStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(VideotexString.class, new VideotexStringCompiler(), VideotexStringValue.class,
-                ASN1VideotexString.class, new VideotexStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1VideotexString.class, new VideotexStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new VideotexStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(UniversalString.class, new UniversalStringCompiler(), UniversalStringValue.class,
-                ASN1UniversalString.class, new UniversalStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1UniversalString.class, new UniversalStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new UniversalStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(UTF8String.class, new UTF8StringCompiler(), UTF8StringValue.class,
-                ASN1UTF8String.class, new UTF8StringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1UTF8String.class, new UTF8StringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new UTF8StringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(BMPString.class, new BMPStringCompiler(), BMPStringValue.class,
-                ASN1BMPString.class, new BMPStringValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1BMPString.class, new BMPStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                new BMPStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(ObjectIdentifier.class, new ObjectIdentifierCompiler(), ObjectIdentifierValue.class,
-                ASN1ObjectIdentifier.class, new ObjectIdentifierValueResolver(ctx), new SubtypeTypeNameSupplier(this)));
+                ASN1ObjectIdentifier.class, new ObjectIdentifierValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                new ObjectIdentifierConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(RelativeOID.class, new RelativeOIDCompiler(), RelativeOIDValue.class,
-                ASN1RelativeOID.class, new RelativeOIDValueResolver(ctx), new SubtypeTypeNameSupplier(this)));
+                ASN1RelativeOID.class, new RelativeOIDValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                new RelativeOIDConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(IRI.class, new IRICompiler(), IRIValue.class,
-                ASN1IRI.class, new IRIValueResolver(ctx), new SubtypeTypeNameSupplier(this)));
+                ASN1IRI.class, new IRIValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                new IRIConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(RelativeIRI.class, new RelativeIRICompiler(), RelativeIRIValue.class,
-                ASN1RelativeIRI.class, new RelativeIRIValueResolver(ctx), new SubtypeTypeNameSupplier(this)));
+                ASN1RelativeIRI.class, new RelativeIRIValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                new RelativeIRIConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(GeneralizedTime.class, new GeneralizedTimeCompiler(), GeneralizedTimeValue.class,
-                ASN1GeneralizedTime.class, new GeneralizedTimeValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1GeneralizedTime.class, new GeneralizedTimeValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                null));
         types.add(new TypeDefinition<>(UTCTime.class, new UTCTimeCompiler(), UTCTimeValue.class,
-                ASN1UTCTime.class, new UTCTimeValueResolver(ctx), new DefaultTypeNameSupplier(this)));
+                ASN1UTCTime.class, new UTCTimeValueResolver(ctx), new DefaultTypeNameSupplier(this),
+                null));
         // special types
         types.add(new TypeDefinition(ComponentType.class, new ComponentTypeCompiler()));
         types.add(new TypeDefinition(Type.class, new TypeCompiler()));
@@ -287,6 +343,10 @@ public class TypeConfiguration {
     public <V extends Value, T extends Type, D extends AbstractDefaultCompiler<V>> D getDefaultCompiler(
             Class<T> typeClass) {
         return (D) getConfigByType("getDefaultCompiler", typeClass, TypeDefinition::getDefaultCompiler);
+    }
+
+    public <T extends Type, CC extends AbstractConstraintCompiler> CC getConstraintCompiler(Class<T> typeClass) {
+        return (CC) getConfigByType("getConstraintCompiler", typeClass, TypeDefinition::getConstraintCompiler);
     }
 
     public <V extends Value, S extends ValueResolver<V>> S getValueResolver(Class<V> valueClass) {
