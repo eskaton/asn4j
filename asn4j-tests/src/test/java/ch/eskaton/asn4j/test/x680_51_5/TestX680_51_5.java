@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.test.x680_51_5;
 
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestBMPString1;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString10;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestBitString11;
@@ -65,11 +66,15 @@ import ch.eskaton.asn4j.test.modules.x680_51_5.TestSetOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestSetOf3;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestT61String1;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestTeletexString1;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestUTF8String1;
+import ch.eskaton.asn4j.test.modules.x680_51_5.TestUniversalString1;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_5.TestVisibleString1;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.randomBytes;
+import static ch.eskaton.asn4j.test.TestHelper.testBMPStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testBMPStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringFailure;
@@ -90,6 +95,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testUTF8StringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testUTF8StringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testUniversalStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testUniversalStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
@@ -448,6 +457,37 @@ class TestX680_51_5 {
 
         testNumericStringFailure(TestNumericString1.class, new TestNumericString1(""));
         testNumericStringFailure(TestNumericString1.class, new TestNumericString1("123"));
+    }
+
+    @Test
+    void testUTF8String1() {
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("a"));
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("ab"));
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("a\uD835\uDCAF"));
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("\uD835\uDCAF\uD835\uDCAF"));
+
+        testUTF8StringFailure(TestUTF8String1.class, new TestUTF8String1(""));
+        testUTF8StringFailure(TestUTF8String1.class, new TestUTF8String1("abc"));
+    }
+
+    @Test
+    void testUniversalString1() {
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("a"));
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("ab"));
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("a\uD835\uDCAF"));
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("\uD835\uDCAF\uD835\uDCAF"));
+
+        testUniversalStringFailure(TestUniversalString1.class, new TestUniversalString1(""));
+        testUniversalStringFailure(TestUniversalString1.class, new TestUniversalString1("abc"));
+    }
+
+    @Test
+    void testBMPString1() {
+        testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("a"));
+        testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("ab"));
+
+        testBMPStringFailure(TestBMPString1.class, new TestBMPString1(""));
+        testBMPStringFailure(TestBMPString1.class, new TestBMPString1("abc"));
     }
 
 }

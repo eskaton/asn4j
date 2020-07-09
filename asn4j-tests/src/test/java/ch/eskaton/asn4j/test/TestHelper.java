@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.test;
 import ch.eskaton.asn4j.runtime.BERDecoder;
 import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
@@ -52,6 +53,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
 import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
+import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.runtime.types.AbstractASN1IRI;
@@ -376,7 +379,7 @@ public class TestHelper {
     public static <T extends ASN1VisibleString> void testVisibleStringFailure(Class<? extends T> clazz, T stringValue) {
         assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
     }
-    
+
     public static <T extends ASN1GeneralString> void testGeneralStringSuccess(Class<? extends T> clazz, T stringValue) {
         assertValueDecodable(clazz, stringValue);
     }
@@ -430,6 +433,30 @@ public class TestHelper {
     }
 
     public static <T extends ASN1NumericString> void testNumericStringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1UTF8String> void testUTF8StringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1UTF8String> void testUTF8StringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1UniversalString> void testUniversalStringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1UniversalString> void testUniversalStringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1BMPString> void testBMPStringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1BMPString> void testBMPStringFailure(Class<? extends T> clazz, T stringValue) {
         assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
     }
 

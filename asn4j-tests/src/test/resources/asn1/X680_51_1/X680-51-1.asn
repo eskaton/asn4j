@@ -120,4 +120,16 @@ testNumericString1 NumericString ::= "456"
 
 TestNumericString1 ::= NumericString ((SIZE (1..3) ^ FROM ("1".."3")) | testNumericString1)
 
+testUTF8String1 UTF8String ::= "xyz"
+
+TestUTF8String1 ::= UTF8String ((SIZE (1..3) ^ FROM ("a".."f")) | testUTF8String1)
+
+testUniversalString1 UniversalString ::= "xyz"
+
+TestUniversalString1 ::= UniversalString ((SIZE (1..3) ^ FROM ("a".."f")) | testUniversalString1)
+
+testBMPString1 BMPString ::= "xyz"
+
+TestBMPString1 ::= BMPString ((SIZE (1..3) ^ FROM ("a".."f")) | testBMPString1)
+
 END

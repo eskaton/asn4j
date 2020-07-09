@@ -171,4 +171,10 @@ TestPrintableString1 ::= PrintableString ("abc")
 
 TestNumericString1 ::= NumericString ("123")
 
+TestUTF8String1 ::= UTF8String ("abc")
+
+TestUniversalString1 ::= UniversalString ("abc")
+
+TestBMPString1 ::= BMPString ("abc")
+
 END

@@ -125,4 +125,13 @@ TestPrintableString2 ::= PrintableString (TestPrintableString1)
 TestNumericString1 ::= NumericString ("123")
 TestNumericString2 ::= NumericString (TestNumericString1)
 
+TestUTF8String1 ::= UTF8String ("abc")
+TestUTF8String2 ::= UTF8String (TestUTF8String1)
+
+TestUniversalString1 ::= UniversalString ("abc")
+TestUniversalString2 ::= UniversalString (TestUniversalString1)
+
+TestBMPString1 ::= BMPString ("abc")
+TestBMPString2 ::= BMPString (TestBMPString1)
+
 END

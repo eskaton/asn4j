@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.test.x680_51_3;
 
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestBMPString1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestBMPString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString3;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestBitString4;
@@ -79,6 +81,10 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestT61String1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestT61String2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestTeletexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestTeletexString2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestUTF8String1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestUTF8String2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestUniversalString1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestUniversalString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestVideotexString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestVisibleString1;
@@ -87,6 +93,8 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 
+import static ch.eskaton.asn4j.test.TestHelper.testBMPStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testBMPStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testBitStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testBooleanFailure;
@@ -129,6 +137,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testUTF8StringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testUTF8StringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testUniversalStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testUniversalStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
@@ -586,6 +598,49 @@ class TestX680_51_3 {
         testNumericStringSuccess(TestNumericString2.class, new TestNumericString2("123"));
 
         testNumericStringFailure(TestNumericString2.class, new TestNumericString2("456"));
+    }
+
+
+    @Test
+    void testUTF8String1() {
+        testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("abc"));
+
+        testUTF8StringFailure(TestUTF8String1.class, new TestUTF8String1("def"));
+    }
+
+    @Test
+    void testUTF8String2() {
+        testUTF8StringSuccess(TestUTF8String2.class, new TestUTF8String2("abc"));
+
+        testUTF8StringFailure(TestUTF8String2.class, new TestUTF8String2("def"));
+    }
+
+    @Test
+    void testUniversalString1() {
+        testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("abc"));
+
+        testUniversalStringFailure(TestUniversalString1.class, new TestUniversalString1("def"));
+    }
+
+    @Test
+    void testUniversalString2() {
+        testUniversalStringSuccess(TestUniversalString2.class, new TestUniversalString2("abc"));
+
+        testUniversalStringFailure(TestUniversalString2.class, new TestUniversalString2("def"));
+    }
+
+    @Test
+    void testBMPString1() {
+        testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("abc"));
+
+        testBMPStringFailure(TestBMPString1.class, new TestBMPString1("def"));
+    }
+
+    @Test
+    void testBMPString2() {
+        testBMPStringSuccess(TestBMPString2.class, new TestBMPString2("abc"));
+
+        testBMPStringFailure(TestBMPString2.class, new TestBMPString2("def"));
     }
 
 }

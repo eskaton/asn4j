@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
+import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
@@ -59,6 +60,8 @@ import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.T61String;
 import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.UTF8String;
+import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
@@ -106,6 +109,9 @@ public class ConstraintCompiler {
                 .put(T61String.class, new TeletexStringConstraintCompiler(ctx))
                 .put(PrintableString.class, new PrintableStringConstraintCompiler(ctx))
                 .put(NumericString.class, new NumericStringConstraintCompiler(ctx))
+                .put(UTF8String.class, new UTF8StringConstraintCompiler(ctx))
+                .put(UniversalString.class, new UniversalStringConstraintCompiler(ctx))
+                .put(BMPString.class, new BMPStringConstraintCompiler(ctx))
                 .build();
     }
 
