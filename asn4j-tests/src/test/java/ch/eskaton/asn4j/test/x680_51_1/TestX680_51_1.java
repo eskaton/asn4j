@@ -44,6 +44,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestEnumeration4;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestGeneralString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestGraphicString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestIA5String1;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestISO646String1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestInteger1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestInteger10;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestInteger11;
@@ -81,6 +82,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf6;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf7;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf8;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf9;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestT61String1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestTeletexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestVisibleString1;
@@ -585,6 +587,18 @@ class TestX680_51_1 {
     }
 
     @Test
+    void testISO646String1() {
+        testVisibleStringSuccess(TestISO646String1.class, new TestISO646String1("a"));
+        testVisibleStringSuccess(TestISO646String1.class, new TestISO646String1("ab"));
+        testVisibleStringSuccess(TestISO646String1.class, new TestISO646String1("abc"));
+        testVisibleStringSuccess(TestISO646String1.class, new TestISO646String1("def"));
+
+        testVisibleStringFailure(TestISO646String1.class, new TestISO646String1(""));
+        testVisibleStringFailure(TestISO646String1.class, new TestISO646String1("abcd"));
+        testVisibleStringFailure(TestISO646String1.class, new TestISO646String1("bcde"));
+    }
+
+    @Test
     void testGeneralString1() {
         testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("a"));
         testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("ab"));
@@ -595,7 +609,6 @@ class TestX680_51_1 {
         testGeneralStringFailure(TestGeneralString1.class, new TestGeneralString1("abcd"));
         testGeneralStringFailure(TestGeneralString1.class, new TestGeneralString1("bcde"));
     }
-
 
     @Test
     void testGraphicString1() {
@@ -643,6 +656,18 @@ class TestX680_51_1 {
         testTeletexStringFailure(TestTeletexString1.class, new TestTeletexString1(""));
         testTeletexStringFailure(TestTeletexString1.class, new TestTeletexString1("abcd"));
         testTeletexStringFailure(TestTeletexString1.class, new TestTeletexString1("bcde"));
+    }
+
+    @Test
+    void testT61String1() {
+        testTeletexStringSuccess(TestT61String1.class, new TestT61String1("a"));
+        testTeletexStringSuccess(TestT61String1.class, new TestT61String1("ab"));
+        testTeletexStringSuccess(TestT61String1.class, new TestT61String1("abc"));
+        testTeletexStringSuccess(TestT61String1.class, new TestT61String1("def"));
+
+        testTeletexStringFailure(TestT61String1.class, new TestT61String1(""));
+        testTeletexStringFailure(TestT61String1.class, new TestT61String1("abcd"));
+        testTeletexStringFailure(TestT61String1.class, new TestT61String1("bcde"));
     }
 
     @Test

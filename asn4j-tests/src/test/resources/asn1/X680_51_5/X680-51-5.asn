@@ -38,6 +38,8 @@ TestSequenceOf2 ::= SEQUENCE SIZE (2) OF INTEGER
 
 TestVisibleString1 ::= VisibleString (SIZE(1..2))
 
+TestISO646String1 ::= ISO646String (SIZE(1..2))
+
 TestGeneralString1 ::= GeneralString (SIZE(1..2))
 
 TestGraphicString1 ::= GraphicString (SIZE(1..2))
@@ -47,6 +49,8 @@ TestIA5String1 ::= IA5String (SIZE(1..2))
 TestVideotexString1 ::= VideotexString (SIZE(1..2))
 
 TestTeletexString1 ::= TeletexString (SIZE(1..2))
+
+TestT61String1 ::= T61String (SIZE(1..2))
 
 TestPrintableString1 ::= PrintableString (SIZE(1..2))
 

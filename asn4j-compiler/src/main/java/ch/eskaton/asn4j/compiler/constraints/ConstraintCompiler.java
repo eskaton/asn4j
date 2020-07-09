@@ -43,6 +43,7 @@ import ch.eskaton.asn4j.parser.ast.types.GeneralString;
 import ch.eskaton.asn4j.parser.ast.types.GraphicString;
 import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.parser.ast.types.ISO646String;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.NumericString;
@@ -55,6 +56,7 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.T61String;
 import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
@@ -95,11 +97,13 @@ public class ConstraintCompiler {
                 .put(SequenceType.class, new SequenceConstraintCompiler(ctx))
                 .put(Choice.class, new ChoiceConstraintCompiler(ctx))
                 .put(VisibleString.class, new VisibleStringConstraintCompiler(ctx))
+                .put(ISO646String.class, new VisibleStringConstraintCompiler(ctx))
                 .put(GeneralString.class, new GeneralStringConstraintCompiler(ctx))
                 .put(GraphicString.class, new GraphicStringConstraintCompiler(ctx))
                 .put(IA5String.class, new IA5StringConstraintCompiler(ctx))
                 .put(VideotexString.class, new VideotexStringConstraintCompiler(ctx))
                 .put(TeletexString.class, new TeletexStringConstraintCompiler(ctx))
+                .put(T61String.class, new TeletexStringConstraintCompiler(ctx))
                 .put(PrintableString.class, new PrintableStringConstraintCompiler(ctx))
                 .put(NumericString.class, new NumericStringConstraintCompiler(ctx))
                 .build();

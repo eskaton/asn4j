@@ -58,6 +58,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestEnumeration4;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestGeneralString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestGraphicString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestIA5String1;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestISO646String1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestInteger1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestInteger2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestInteger3;
@@ -118,6 +119,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOID2;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOidIri1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestSetOfRelativeOidIri2;
+import ch.eskaton.asn4j.test.modules.x680_51_2.TestT61String1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestTeletexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestVideotexString1;
 import ch.eskaton.asn4j.test.modules.x680_51_2.TestVisibleString1;
@@ -820,6 +822,13 @@ class TestX680_51_2 {
     }
 
     @Test
+    void testISO646String1() {
+        testVisibleStringSuccess(TestISO646String1.class, new TestISO646String1("abc"));
+
+        testVisibleStringFailure(TestISO646String1.class, new TestISO646String1("def"));
+    }
+
+    @Test
     void testGeneralString1() {
         testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("abc"));
 
@@ -852,6 +861,13 @@ class TestX680_51_2 {
         testTeletexStringSuccess(TestTeletexString1.class, new TestTeletexString1("abc"));
 
         testTeletexStringFailure(TestTeletexString1.class, new TestTeletexString1("def"));
+    }
+
+    @Test
+    void testT61String1() {
+        testTeletexStringSuccess(TestT61String1.class, new TestT61String1("abc"));
+
+        testTeletexStringFailure(TestT61String1.class, new TestT61String1("def"));
     }
 
     @Test

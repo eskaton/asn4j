@@ -11,6 +11,9 @@ TestVisibleString7 ::= VisibleString (FROM ("a".."d" ^ "c".."f"))
 TestVisibleString8 ::= VisibleString (FROM ("a"<..<"e") | "bf")
 TestVisibleString9 ::= TestVisibleString8 (FROM ("c".."f"))
 
+TestISO646String1 ::= ISO646String (FROM ("a"<..<"e") | "bf")
+TestISO646String2 ::= TestISO646String1 (FROM ("c".."f"))
+
 TestGeneralString1 ::= GeneralString (FROM ("a"<..<"e") | "bf")
 TestGeneralString2 ::= TestGeneralString1 (FROM ("c".."f"))
 
@@ -25,6 +28,9 @@ TestVideotexString2 ::= TestVideotexString1 (FROM ("c".."f"))
 
 TestTeletexString1 ::= TeletexString (FROM ("a"<..<"e") | "bf")
 TestTeletexString2 ::= TestTeletexString1 (FROM ("c".."f"))
+
+TestT61String1 ::= T61String (FROM ("a"<..<"e") | "bf")
+TestT61String2 ::= TestT61String1 (FROM ("c".."f"))
 
 TestPrintableString1 ::= PrintableString (FROM ("a"<..<"e") | "bf")
 TestPrintableString2 ::= TestPrintableString1 (FROM ("c".."f"))
