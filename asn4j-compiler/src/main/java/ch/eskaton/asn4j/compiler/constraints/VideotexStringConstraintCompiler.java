@@ -29,12 +29,13 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
+import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 public class VideotexStringConstraintCompiler extends AbstractStringConstraintCompiler {
 
     public VideotexStringConstraintCompiler(CompilerContext ctx) {
-        super(ctx, VideotexString.class);
+        super(ctx, VideotexStringValue.class);
     }
 
     @Override

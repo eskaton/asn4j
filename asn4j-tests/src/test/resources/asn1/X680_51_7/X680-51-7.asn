@@ -14,4 +14,22 @@ TestVisibleString9 ::= TestVisibleString8 (FROM ("c".."f"))
 TestGeneralString1 ::= GeneralString (FROM ("a"<..<"e") | "bf")
 TestGeneralString2 ::= TestGeneralString1 (FROM ("c".."f"))
 
+TestGraphicString1 ::= GraphicString (FROM ("a"<..<"e") | "bf")
+TestGraphicString2 ::= TestGraphicString1 (FROM ("c".."f"))
+
+TestIA5String1 ::= IA5String (FROM ("a"<..<"e") | "bf")
+TestIA5String2 ::= TestIA5String1 (FROM ("c".."f"))
+
+TestVideotexString1 ::= VideotexString (FROM ("a"<..<"e") | "bf")
+TestVideotexString2 ::= TestVideotexString1 (FROM ("c".."f"))
+
+TestTeletexString1 ::= TeletexString (FROM ("a"<..<"e") | "bf")
+TestTeletexString2 ::= TestTeletexString1 (FROM ("c".."f"))
+
+TestPrintableString1 ::= PrintableString (FROM ("a"<..<"e") | "bf")
+TestPrintableString2 ::= TestPrintableString1 (FROM ("c".."f"))
+
+TestNumericString1 ::= NumericString (FROM ("1"<..<"5") | "123")
+TestNumericString2 ::= TestNumericString1 (FROM ("3".."7"))
+
 END

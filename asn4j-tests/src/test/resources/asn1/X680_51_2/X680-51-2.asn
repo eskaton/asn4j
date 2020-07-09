@@ -155,4 +155,16 @@ TestVisibleString1 ::= VisibleString ("abc")
 
 TestGeneralString1 ::= GeneralString ("abc")
 
+TestGraphicString1 ::= GraphicString ("abc")
+
+TestIA5String1 ::= IA5String ("abc")
+
+TestVideotexString1 ::= VideotexString ("abc")
+
+TestTeletexString1 ::= TeletexString ("abc")
+
+TestPrintableString1 ::= PrintableString ("abc")
+
+TestNumericString1 ::= NumericString ("123")
+
 END

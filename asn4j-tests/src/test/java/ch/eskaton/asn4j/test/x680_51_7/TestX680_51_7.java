@@ -29,6 +29,18 @@ package ch.eskaton.asn4j.test.x680_51_7;
 
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestGeneralString1;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestGeneralString2;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestGraphicString1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestGraphicString2;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestIA5String1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestIA5String2;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestNumericString1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestNumericString2;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestPrintableString1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestPrintableString2;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestTeletexString1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestTeletexString2;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestVideotexString1;
+import ch.eskaton.asn4j.test.modules.x680_51_7.TestVideotexString2;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString1;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString2;
 import ch.eskaton.asn4j.test.modules.x680_51_7.TestVisibleString3;
@@ -42,6 +54,18 @@ import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testGraphicStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testGraphicStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testIA5StringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testIA5StringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testNumericStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testNumericStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testPrintableStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testPrintableStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringSuccess;
 
@@ -138,6 +162,114 @@ class TestX680_51_7 {
 
         testGeneralStringFailure(TestGeneralString2.class, new TestGeneralString2("bc"));
         testGeneralStringFailure(TestGeneralString2.class, new TestGeneralString2("de"));
+    }
+
+    @Test
+    public void testGraphicString1() {
+        testGraphicStringSuccess(TestGraphicString1.class, new TestGraphicString1("bccd"));
+        testGraphicStringSuccess(TestGraphicString1.class, new TestGraphicString1("bf"));
+
+        testGraphicStringFailure(TestGraphicString1.class, new TestGraphicString1("ab"));
+        testGraphicStringFailure(TestGraphicString1.class, new TestGraphicString1("bff"));
+        testGraphicStringFailure(TestGraphicString1.class, new TestGraphicString1("de"));
+    }
+
+    @Test
+    public void testGraphicString2() {
+        testGraphicStringSuccess(TestGraphicString2.class, new TestGraphicString2("cdcd"));
+
+        testGraphicStringFailure(TestGraphicString2.class, new TestGraphicString2("bc"));
+        testGraphicStringFailure(TestGraphicString2.class, new TestGraphicString2("de"));
+    }
+
+    @Test
+    public void testIA5String1() {
+        testIA5StringSuccess(TestIA5String1.class, new TestIA5String1("bccd"));
+        testIA5StringSuccess(TestIA5String1.class, new TestIA5String1("bf"));
+
+        testIA5StringFailure(TestIA5String1.class, new TestIA5String1("ab"));
+        testIA5StringFailure(TestIA5String1.class, new TestIA5String1("bff"));
+        testIA5StringFailure(TestIA5String1.class, new TestIA5String1("de"));
+    }
+
+    @Test
+    public void testIA5String2() {
+        testIA5StringSuccess(TestIA5String2.class, new TestIA5String2("cdcd"));
+
+        testIA5StringFailure(TestIA5String2.class, new TestIA5String2("bc"));
+        testIA5StringFailure(TestIA5String2.class, new TestIA5String2("de"));
+    }
+
+    @Test
+    public void testVideotexString1() {
+        testVideotexStringSuccess(TestVideotexString1.class, new TestVideotexString1("bccd"));
+        testVideotexStringSuccess(TestVideotexString1.class, new TestVideotexString1("bf"));
+
+        testVideotexStringFailure(TestVideotexString1.class, new TestVideotexString1("ab"));
+        testVideotexStringFailure(TestVideotexString1.class, new TestVideotexString1("bff"));
+        testVideotexStringFailure(TestVideotexString1.class, new TestVideotexString1("de"));
+    }
+
+    @Test
+    public void testVideotexString2() {
+        testVideotexStringSuccess(TestVideotexString2.class, new TestVideotexString2("cdcd"));
+
+        testVideotexStringFailure(TestVideotexString2.class, new TestVideotexString2("bc"));
+        testVideotexStringFailure(TestVideotexString2.class, new TestVideotexString2("de"));
+    }
+
+    @Test
+    public void testTeletexString1() {
+        testTeletexStringSuccess(TestTeletexString1.class, new TestTeletexString1("bccd"));
+        testTeletexStringSuccess(TestTeletexString1.class, new TestTeletexString1("bf"));
+
+        testTeletexStringFailure(TestTeletexString1.class, new TestTeletexString1("ab"));
+        testTeletexStringFailure(TestTeletexString1.class, new TestTeletexString1("bff"));
+        testTeletexStringFailure(TestTeletexString1.class, new TestTeletexString1("de"));
+    }
+
+    @Test
+    public void testTeletexString2() {
+        testTeletexStringSuccess(TestTeletexString2.class, new TestTeletexString2("cdcd"));
+
+        testTeletexStringFailure(TestTeletexString2.class, new TestTeletexString2("bc"));
+        testTeletexStringFailure(TestTeletexString2.class, new TestTeletexString2("de"));
+    }
+
+    @Test
+    public void testPrintableString1() {
+        testPrintableStringSuccess(TestPrintableString1.class, new TestPrintableString1("bccd"));
+        testPrintableStringSuccess(TestPrintableString1.class, new TestPrintableString1("bf"));
+
+        testPrintableStringFailure(TestPrintableString1.class, new TestPrintableString1("ab"));
+        testPrintableStringFailure(TestPrintableString1.class, new TestPrintableString1("bff"));
+        testPrintableStringFailure(TestPrintableString1.class, new TestPrintableString1("de"));
+    }
+
+    @Test
+    public void testPrintableString2() {
+        testPrintableStringSuccess(TestPrintableString2.class, new TestPrintableString2("cdcd"));
+
+        testPrintableStringFailure(TestPrintableString2.class, new TestPrintableString2("bc"));
+        testPrintableStringFailure(TestPrintableString2.class, new TestPrintableString2("de"));
+    }
+
+    @Test
+    public void testNumericString1() {
+        testNumericStringSuccess(TestNumericString1.class, new TestNumericString1("2334"));
+        testNumericStringSuccess(TestNumericString1.class, new TestNumericString1("123"));
+
+        testNumericStringFailure(TestNumericString1.class, new TestNumericString1("12"));
+        testNumericStringFailure(TestNumericString1.class, new TestNumericString1("1234"));
+        testNumericStringFailure(TestNumericString1.class, new TestNumericString1("45"));
+    }
+
+    @Test
+    public void testNumericString2() {
+        testNumericStringSuccess(TestNumericString2.class, new TestNumericString2("3344"));
+
+        testNumericStringFailure(TestNumericString2.class, new TestNumericString2("12"));
+        testNumericStringFailure(TestNumericString2.class, new TestNumericString2("45"));
     }
 
 }

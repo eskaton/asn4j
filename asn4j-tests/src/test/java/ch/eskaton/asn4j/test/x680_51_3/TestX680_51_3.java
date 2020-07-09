@@ -39,6 +39,10 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestEnumeration3;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestGeneralString1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestGeneralString2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestGraphicString1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestGraphicString2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestIA5String1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestIA5String2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestInteger2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull1;
@@ -47,12 +51,16 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull3;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull4;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull5;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestNull6;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestNumericString1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestNumericString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestObjectIdentifier2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestOctetString1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestOctetString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestOctetString3;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestOidIri1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestOidIri2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestPrintableString1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestPrintableString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestRelativeOID2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestRelativeOidIri1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestRelativeOidIri2;
@@ -65,6 +73,10 @@ import ch.eskaton.asn4j.test.modules.x680_51_3.TestSet1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSet2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestSetOf2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestTeletexString1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestTeletexString2;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestVideotexString1;
+import ch.eskaton.asn4j.test.modules.x680_51_3.TestVideotexString2;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestVisibleString1;
 import ch.eskaton.asn4j.test.modules.x680_51_3.TestVisibleString2;
 import org.junit.jupiter.api.Test;
@@ -81,16 +93,24 @@ import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testEnumeratedSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testGeneralStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testGraphicStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testGraphicStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testIA5StringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testIA5StringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIRIFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testNullFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testNullSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testNumericStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testNumericStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testObjectIdentifierSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testOctetStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testOctetStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testPrintableStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testPrintableStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRIFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
@@ -103,6 +123,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testSetFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringFailure;
+import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringSuccess;
 import static ch.eskaton.commons.utils.Utils.with;
@@ -446,6 +470,90 @@ class TestX680_51_3 {
         testGeneralStringSuccess(TestGeneralString2.class, new TestGeneralString2("efg"));
 
         testGeneralStringFailure(TestGeneralString2.class, new TestGeneralString2("abc"));
+    }
+
+    @Test
+    void testGraphicString1() {
+        testGraphicStringSuccess(TestGraphicString1.class, new TestGraphicString1("abc"));
+
+        testGraphicStringFailure(TestGraphicString1.class, new TestGraphicString1("def"));
+    }
+
+    @Test
+    void testGraphicString2() {
+        testGraphicStringSuccess(TestGraphicString2.class, new TestGraphicString2("abc"));
+
+        testGraphicStringFailure(TestGraphicString2.class, new TestGraphicString2("def"));
+    }
+
+    @Test
+    void testIA5String1() {
+        testIA5StringSuccess(TestIA5String1.class, new TestIA5String1("abc"));
+
+        testIA5StringFailure(TestIA5String1.class, new TestIA5String1("def"));
+    }
+
+    @Test
+    void testIA5String2() {
+        testIA5StringSuccess(TestIA5String2.class, new TestIA5String2("abc"));
+
+        testIA5StringFailure(TestIA5String2.class, new TestIA5String2("def"));
+    }
+
+    @Test
+    void testVideotexString1() {
+        testVideotexStringSuccess(TestVideotexString1.class, new TestVideotexString1("abc"));
+
+        testVideotexStringFailure(TestVideotexString1.class, new TestVideotexString1("def"));
+    }
+
+    @Test
+    void testVideotexString2() {
+        testVideotexStringSuccess(TestVideotexString2.class, new TestVideotexString2("abc"));
+
+        testVideotexStringFailure(TestVideotexString2.class, new TestVideotexString2("def"));
+    }
+
+    @Test
+    void testTeletexString1() {
+        testTeletexStringSuccess(TestTeletexString1.class, new TestTeletexString1("abc"));
+
+        testTeletexStringFailure(TestTeletexString1.class, new TestTeletexString1("def"));
+    }
+
+    @Test
+    void testTeletexString2() {
+        testTeletexStringSuccess(TestTeletexString2.class, new TestTeletexString2("abc"));
+
+        testTeletexStringFailure(TestTeletexString2.class, new TestTeletexString2("def"));
+    }
+
+    @Test
+    void testPrintableString1() {
+        testPrintableStringSuccess(TestPrintableString1.class, new TestPrintableString1("abc"));
+
+        testPrintableStringFailure(TestPrintableString1.class, new TestPrintableString1("def"));
+    }
+
+    @Test
+    void testPrintableString2() {
+        testPrintableStringSuccess(TestPrintableString2.class, new TestPrintableString2("abc"));
+
+        testPrintableStringFailure(TestPrintableString2.class, new TestPrintableString2("def"));
+    }
+
+    @Test
+    void testNumericString1() {
+        testNumericStringSuccess(TestNumericString1.class, new TestNumericString1("123"));
+
+        testNumericStringFailure(TestNumericString1.class, new TestNumericString1("456"));
+    }
+
+    @Test
+    void testNumericString2() {
+        testNumericStringSuccess(TestNumericString2.class, new TestNumericString2("123"));
+
+        testNumericStringFailure(TestNumericString2.class, new TestNumericString2("456"));
     }
 
 }

@@ -35,18 +35,24 @@ import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
+import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
+import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.runtime.types.AbstractASN1IRI;
 import ch.eskaton.asn4j.runtime.types.AbstractASN1OID;
@@ -376,6 +382,54 @@ public class TestHelper {
     }
 
     public static <T extends ASN1GeneralString> void testGeneralStringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1GraphicString> void testGraphicStringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1GraphicString> void testGraphicStringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1IA5String> void testIA5StringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1IA5String> void testIA5StringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1VideotexString> void testVideotexStringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1VideotexString> void testVideotexStringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1TeletexString> void testTeletexStringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1TeletexString> void testTeletexStringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1PrintableString> void testPrintableStringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1PrintableString> void testPrintableStringFailure(Class<? extends T> clazz, T stringValue) {
+        assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
+    }
+
+    public static <T extends ASN1NumericString> void testNumericStringSuccess(Class<? extends T> clazz, T stringValue) {
+        assertValueDecodable(clazz, stringValue);
+    }
+
+    public static <T extends ASN1NumericString> void testNumericStringFailure(Class<? extends T> clazz, T stringValue) {
         assertThrows(() -> assertValueDecodable(clazz, stringValue), ConstraintViolatedException.class);
     }
 

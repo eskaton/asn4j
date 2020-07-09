@@ -29,12 +29,13 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.types.PrintableString;
+import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 public class PrintableStringConstraintCompiler extends AbstractStringConstraintCompiler {
 
     public PrintableStringConstraintCompiler(CompilerContext ctx) {
-        super(ctx, PrintableString.class);
+        super(ctx, PrintableStringValue.class);
     }
 
     @Override
