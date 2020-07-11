@@ -245,7 +245,7 @@ import ch.eskaton.asn4j.parser.Parser.VariableTypeValueFieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.VariableTypeValueSetFieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.VersionNumberParser;
 import ch.eskaton.asn4j.parser.Parser.WithSyntaxSpecParser;
-import ch.eskaton.asn4j.parser.ast.AbstractASN1FieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.AbstractSyntaxObjectClassReferenceNode;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.AtNotationNode;
@@ -5013,7 +5013,7 @@ class ParserTest {
         FieldSpecParser parser = new Parser(new ByteArrayInputStream(
                 "&Type-Reference OPTIONAL".getBytes())).new FieldSpecParser();
 
-        AbstractASN1FieldSpecNode result = parser.parse();
+        AbstractFieldSpecNode result = parser.parse();
 
         assertNotNull(result);
         assertTrue(result instanceof TypeFieldSpecNode);
@@ -5349,7 +5349,7 @@ class ParserTest {
         FieldSpecParser parser = new Parser(new ByteArrayInputStream(
                 "&object-field OBJECT-CLASS OPTIONAL".getBytes())).new FieldSpecParser();
 
-        AbstractASN1FieldSpecNode result = parser.parse();
+        AbstractFieldSpecNode result = parser.parse();
 
         assertNotNull(result);
         assertTrue(result instanceof FieldSpecNode);

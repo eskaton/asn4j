@@ -25,32 +25,29 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser;
+package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledField;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.parser.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 
-import java.util.List;
+public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, CompiledObjectClass> {
 
-public class ObjectClassDefn extends ObjectClassNode {
+    @Override
+    public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassDefn node) {
+        CompiledObjectClass compiledObjectClass = ctx.createCompiledObjectClass(name);
 
-    private List<AbstractFieldSpecNode> fieldSpec;
+        var fieldSpecs = node.getFieldSpec();
 
-    private List<Object> syntaxSpec;
+        for (var fieldSpec : fieldSpecs) {
+            var compiledField = ctx.<AbstractFieldSpecNode, NamedCompiler<AbstractFieldSpecNode, CompiledField>>getCompiler((Class<AbstractFieldSpecNode>) fieldSpec.getClass())
+                    .compile(ctx, name, fieldSpec);
 
-    public ObjectClassDefn(Position position, List<AbstractFieldSpecNode> fieldSpec, List<Object> syntaxSpec) {
-        super(position);
+            compiledObjectClass.addField(compiledField);
+        }
 
-        this.fieldSpec = fieldSpec;
-        this.syntaxSpec = syntaxSpec;
-    }
-
-    public List<AbstractFieldSpecNode> getFieldSpec() {
-        return fieldSpec;
-    }
-
-    public List<Object> getSyntaxSpec() {
-        return syntaxSpec;
+        return compiledObjectClass;
     }
 
 }

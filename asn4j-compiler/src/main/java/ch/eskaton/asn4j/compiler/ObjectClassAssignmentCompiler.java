@@ -25,32 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 
-import java.util.List;
+public class ObjectClassAssignmentCompiler implements Compiler<ObjectClassAssignmentNode> {
 
-public class ObjectClassDefn extends ObjectClassNode {
+    public CompiledObjectClass compile(CompilerContext ctx, ObjectClassAssignmentNode node) {
+        String objectClassName = node.getReference();
 
-    private List<AbstractFieldSpecNode> fieldSpec;
+        System.out.println("Compiling object class " + objectClassName);
 
-    private List<Object> syntaxSpec;
+        ObjectClassNodeCompiler compiler = ctx.getCompiler(ObjectClassNode.class);
 
-    public ObjectClassDefn(Position position, List<AbstractFieldSpecNode> fieldSpec, List<Object> syntaxSpec) {
-        super(position);
-
-        this.fieldSpec = fieldSpec;
-        this.syntaxSpec = syntaxSpec;
-    }
-
-    public List<AbstractFieldSpecNode> getFieldSpec() {
-        return fieldSpec;
-    }
-
-    public List<Object> getSyntaxSpec() {
-        return syntaxSpec;
+        return compiler.compile(ctx, objectClassName, node.getType());
     }
 
 }

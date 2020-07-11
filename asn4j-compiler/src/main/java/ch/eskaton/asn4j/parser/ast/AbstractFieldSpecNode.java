@@ -29,13 +29,13 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public abstract class AbstractASN1FieldSpecNode extends AbstractNode {
+public abstract class AbstractFieldSpecNode extends AbstractNode {
 
     private String reference;
 
     private OptionalitySpecNode optionalitySpec;
 
-    public AbstractASN1FieldSpecNode(Position position, String reference, OptionalitySpecNode optionalitySpec) {
+    public AbstractFieldSpecNode(Position position, String reference, OptionalitySpecNode optionalitySpec) {
         super(position);
 
         this.reference = reference;

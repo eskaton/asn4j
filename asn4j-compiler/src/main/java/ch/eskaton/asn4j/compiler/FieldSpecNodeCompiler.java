@@ -25,32 +25,36 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+import ch.eskaton.asn4j.compiler.results.CompiledField;
+import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
+import ch.eskaton.asn4j.parser.ast.DefaultValueSpecNode;
+import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.List;
+public class FieldSpecNodeCompiler implements NamedCompiler<FieldSpecNode, CompiledField> {
 
-public class ObjectClassDefn extends ObjectClassNode {
+    @Override
+    public CompiledField compile(CompilerContext ctx, String name, FieldSpecNode node) {
+        var fixedType = node.toFixedTypeValueFieldSpec();
+        var type = fixedType.getType();
+        var compiledType = ctx.getCompiledType(type);
+        var optionalitySpec = node.getOptionalitySpec();
+        var compiledField = new CompiledField(node.getReference(), compiledType, node.isUnique());
 
-    private List<AbstractFieldSpecNode> fieldSpec;
+        if (optionalitySpec instanceof DefaultSpecNode) {
+            var value = (Value) ((DefaultSpecNode) optionalitySpec).getSpec();
+            var valueClass = ctx.getValueType(type);
+            var defaultValue = ctx.resolveGenericValue(valueClass, type, value);
 
-    private List<Object> syntaxSpec;
+            compiledField.setDefaultValue(defaultValue);
+        } else if (optionalitySpec instanceof OptionalSpecNode) {
+            compiledField.setOptional(true);
+        }
 
-    public ObjectClassDefn(Position position, List<AbstractFieldSpecNode> fieldSpec, List<Object> syntaxSpec) {
-        super(position);
-
-        this.fieldSpec = fieldSpec;
-        this.syntaxSpec = syntaxSpec;
-    }
-
-    public List<AbstractFieldSpecNode> getFieldSpec() {
-        return fieldSpec;
-    }
-
-    public List<Object> getSyntaxSpec() {
-        return syntaxSpec;
+        return compiledField;
     }
 
 }

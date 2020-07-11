@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class ObjectFieldSpecNode extends AbstractASN1FieldSpecNode {
+public class ObjectFieldSpecNode extends AbstractFieldSpecNode {
 
     private ObjectClassReferenceNode objectClass;
 

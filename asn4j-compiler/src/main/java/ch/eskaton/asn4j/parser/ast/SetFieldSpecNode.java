@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
-public class SetFieldSpecNode extends AbstractASN1FieldSpecNode {
+public class SetFieldSpecNode extends AbstractFieldSpecNode {
 
     private Node type;
 

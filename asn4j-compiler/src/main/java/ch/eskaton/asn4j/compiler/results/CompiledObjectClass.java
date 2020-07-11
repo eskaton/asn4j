@@ -25,32 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
-
+import java.util.ArrayList;
 import java.util.List;
 
-public class ObjectClassDefn extends ObjectClassNode {
+public class CompiledObjectClass implements CompilationResult {
 
-    private List<AbstractFieldSpecNode> fieldSpec;
+    private String name;
 
-    private List<Object> syntaxSpec;
+    private List<CompiledField> fields = new ArrayList<>();
 
-    public ObjectClassDefn(Position position, List<AbstractFieldSpecNode> fieldSpec, List<Object> syntaxSpec) {
-        super(position);
-
-        this.fieldSpec = fieldSpec;
-        this.syntaxSpec = syntaxSpec;
+    public CompiledObjectClass(String name) {
+        this.name = name;
     }
 
-    public List<AbstractFieldSpecNode> getFieldSpec() {
-        return fieldSpec;
-    }
-
-    public List<Object> getSyntaxSpec() {
-        return syntaxSpec;
+    public void addField(CompiledField compiledField) {
+        fields.add(compiledField);
     }
 
 }

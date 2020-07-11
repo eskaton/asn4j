@@ -25,32 +25,54 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.List;
+public class CompiledField implements CompilationResult {
 
-public class ObjectClassDefn extends ObjectClassNode {
+    private final String name;
 
-    private List<AbstractFieldSpecNode> fieldSpec;
+    private final CompiledType compiledType;
 
-    private List<Object> syntaxSpec;
+    private final boolean unique;
 
-    public ObjectClassDefn(Position position, List<AbstractFieldSpecNode> fieldSpec, List<Object> syntaxSpec) {
-        super(position);
+    private Value defaultValue;
 
-        this.fieldSpec = fieldSpec;
-        this.syntaxSpec = syntaxSpec;
+    private boolean optional;
+
+    public CompiledField(String name, CompiledType compiledType, boolean unique) {
+        this.name = name;
+        this.compiledType = compiledType;
+        this.unique = unique;
     }
 
-    public List<AbstractFieldSpecNode> getFieldSpec() {
-        return fieldSpec;
+    public String getName() {
+        return name;
     }
 
-    public List<Object> getSyntaxSpec() {
-        return syntaxSpec;
+    public CompiledType getCompiledType() {
+        return compiledType;
+    }
+
+    public boolean isUnique() {
+        return unique;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
+
+    public void setDefaultValue(Value defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public Value getDefaultValue() {
+        return defaultValue;
+    }
+
+    public boolean isOptional() {
+        return optional;
     }
 
 }
