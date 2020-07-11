@@ -94,7 +94,11 @@ import ch.eskaton.asn4j.compiler.typenamesuppliers.SelectionTypeTypeNameSupplier
 import ch.eskaton.asn4j.compiler.typenamesuppliers.SubtypeTypeNameSupplier;
 import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeNameSupplier;
 import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeReferenceTypeNameSupplier;
+import ch.eskaton.asn4j.parser.ObjectClassDefn;
+import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
@@ -300,14 +304,18 @@ public class TypeConfiguration {
                 null));
         // special types
         types.add(new TypeDefinition(ComponentType.class, new ComponentTypeCompiler()));
+        types.add(new TypeDefinition(SelectionType.class, new SelectionTypeCompiler(),
+                new SelectionTypeTypeNameSupplier(ctx, this)));
+        types.add(new TypeDefinition(TypeAssignmentNode.class, new TypeAssignmentCompiler()));
         types.add(new TypeDefinition(Type.class, new TypeCompiler()));
         types.add(new TypeDefinition(TypeReference.class, new TypeReferenceCompiler(),
                 new TypeReferenceTypeNameSupplier(this)));
         types.add(new TypeDefinition(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),
                 new ExternalTypeReferenceTypeNameSupplier(this)));
-        types.add(new TypeDefinition(TypeAssignmentNode.class, new TypeAssignmentCompiler()));
-        types.add(new TypeDefinition(SelectionType.class, new SelectionTypeCompiler(),
-                new SelectionTypeTypeNameSupplier(ctx, this)));
+        types.add(new TypeDefinition(ObjectClassAssignmentNode.class, new ObjectClassAssignmentCompiler()));
+        types.add(new TypeDefinition(ObjectClassNode.class, new ObjectClassNodeCompiler()));
+        types.add(new TypeDefinition(ObjectClassDefn.class, new ObjectClassDefnCompiler()));
+        types.add(new TypeDefinition(FieldSpecNode.class, new FieldSpecNodeCompiler()));
     }
 
     public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> typeClass) {
@@ -359,7 +367,7 @@ public class TypeConfiguration {
                 .filter(td -> td.matchesType(typeClass))
                 .map(accessor)
                 .findFirst()).orElseThrow(() ->
-                new IllegalCompilerStateException("Unexpected type: ", typeClass.getSimpleName()));
+                new IllegalCompilerStateException("Unexpected type: %s", typeClass.getSimpleName()));
     }
 
     private <V extends Value, R> R getConfigByValue(String functionName, Class<V> valueClass,
@@ -368,7 +376,7 @@ public class TypeConfiguration {
                 .filter(td -> td.matchesValue(valueClass))
                 .map(accessor)
                 .findFirst()).orElseThrow(() ->
-                new IllegalCompilerStateException("Unexpected value : ", valueClass.getSimpleName()));
+                new IllegalCompilerStateException("Unexpected value: %s", valueClass.getSimpleName()));
     }
 
     private static class Memoizer {

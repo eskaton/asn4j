@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
-public class FieldSpecNode extends AbstractASN1FieldSpecNode {
+public class FieldSpecNode extends AbstractFieldSpecNode {
 
     private Node type;
 
@@ -44,6 +44,14 @@ public class FieldSpecNode extends AbstractASN1FieldSpecNode {
 
         this.type = type;
         this.unique = unique;
+    }
+
+    public Node getType() {
+        return type;
+    }
+
+    public boolean isUnique() {
+        return unique;
     }
 
     public FixedTypeValueFieldSpecNode toFixedTypeValueFieldSpec() {

@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -162,8 +163,9 @@ public class CompilerImpl {
                 .compile(compilerContext, assignment);
     }
 
-    private void compileObjectClassAssignment(ObjectClassAssignmentNode assignment) {
-        // TODO Auto-generated method stub
+    private CompiledObjectClass compileObjectClassAssignment(ObjectClassAssignmentNode assignment) {
+        return compilerContext.<ObjectClassAssignmentNode, ObjectClassAssignmentCompiler>getCompiler(ObjectClassAssignmentNode.class)
+                .compile(compilerContext, assignment);
     }
 
     private void compileObjectSetAssignment(ObjectSetAssignmentNode assignment) {

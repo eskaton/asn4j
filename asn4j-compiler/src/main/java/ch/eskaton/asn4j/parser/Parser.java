@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.parser.Lexer.Context;
 import ch.eskaton.asn4j.parser.Token.TokenType;
 import ch.eskaton.asn4j.parser.accessor.ListAccessor;
 import ch.eskaton.asn4j.parser.accessor.SequenceListAccessor;
-import ch.eskaton.asn4j.parser.ast.AbstractASN1FieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.AbstractSyntaxObjectClassReferenceNode;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.AtNotationNode;
@@ -3988,10 +3988,10 @@ public class Parser {
     // | VariableTypeValueSetFieldSpec
     // | ObjectFieldSpec
     // | ObjectSetFieldSpec
-    protected class FieldSpecParser implements RuleParser<AbstractASN1FieldSpecNode> {
+    protected class FieldSpecParser implements RuleParser<AbstractFieldSpecNode> {
 
         @SuppressWarnings("unchecked")
-        public AbstractASN1FieldSpecNode parse() throws ParserException {
+        public AbstractFieldSpecNode parse() throws ParserException {
             return new ChoiceParser<>(fixedTypeValueFieldSpecParser, variableTypeValueFieldSpecParser,
                     setFieldSpecParser, variableTypeValueSetFieldSpecParser, typeFieldSpecParser).parse();
         }

@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
-public class FixedTypeValueFieldSpecNode extends AbstractASN1FieldSpecNode {
+public class FixedTypeValueFieldSpecNode extends AbstractFieldSpecNode {
 
     private Type type;
 

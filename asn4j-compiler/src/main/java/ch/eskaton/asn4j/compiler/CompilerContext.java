@@ -43,6 +43,7 @@ import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasChildComponents;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -109,6 +110,8 @@ public class CompilerContext {
 
     private HashMap<String, HashMap<String, CompiledType>> definedTypes = new HashMap<>();
 
+    private HashMap<String, HashMap<String, CompiledObjectClass>> definedObjectClasses = new HashMap<>();
+
     private TypeConfiguration config = new TypeConfiguration(this);
 
     private ConstraintCompiler constraintCompiler = new ConstraintCompiler(this);
@@ -143,6 +146,12 @@ public class CompilerContext {
         var moduleTypes = getTypesOfCurrentModule();
 
         moduleTypes.put(typeName, compiledType);
+    }
+
+    private void addObjectClass(String objectClassName, CompiledObjectClass compiledObjectClass) {
+        var moduleObjectClasses = getObjectClassesOfCurrentModule();
+
+        moduleObjectClasses.put(objectClassName, compiledObjectClass);
     }
 
     @SuppressWarnings("unchecked")
@@ -599,6 +608,10 @@ public class CompilerContext {
         return definedTypes.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
     }
 
+    private HashMap<String, CompiledObjectClass> getObjectClassesOfCurrentModule() {
+        return definedObjectClasses.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
+    }
+
     private String getCurrentModuleName() {
         return currentModule.peek().getModuleId().getModuleName();
     }
@@ -711,6 +724,14 @@ public class CompilerContext {
 
     private boolean isTopLevelType() {
         return currentClass.size() == 1;
+    }
+
+    public CompiledObjectClass createCompiledObjectClass(String name) {
+        var compiledObjectClass = new CompiledObjectClass(name);
+
+        addObjectClass(name, compiledObjectClass);
+
+        return compiledObjectClass;
     }
 
     public <T extends CompiledType & HasChildComponents> Optional<T> findCompiledTypeRecursive(Type type) {

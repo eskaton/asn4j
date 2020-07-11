@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class VariableTypeValueFieldSpecNode extends AbstractASN1FieldSpecNode {
+public class VariableTypeValueFieldSpecNode extends AbstractFieldSpecNode {
 
     private FieldNameNode fieldName;
 
