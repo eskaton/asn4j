@@ -31,13 +31,13 @@ import ch.eskaton.asn4j.parser.Position;
 
 import java.util.List;
 
-public class ObjectClassReferenceNode extends ObjectClassNode implements ParameterizedNode {
+public class ObjectClassReference extends ObjectClassNode implements ParameterizedNode {
 
     private String reference;
 
     private List<Node> parameters;
 
-    public ObjectClassReferenceNode(Position position, String reference) {
+    public ObjectClassReference(Position position, String reference) {
         super(position);
 
         this.reference = reference;
@@ -55,7 +55,7 @@ public class ObjectClassReferenceNode extends ObjectClassNode implements Paramet
         return parameters;
     }
 
-    public ObjectClassReferenceNode parameters(List<Node> parameters) {
+    public ObjectClassReference parameters(List<Node> parameters) {
         setParameters(parameters);
 
         return this;

@@ -80,7 +80,7 @@ public class ElementSetCompiler implements ElementsCompiler<ElementSet> {
                 return calculateUnion(baseType, operands, bounds);
 
             default:
-                throw new IllegalCompilerStateException("Unimplemented node type : %s", set.getOperation());
+                throw new IllegalCompilerStateException("Unimplemented node type: %s", set.getOperation());
         }
     }
 

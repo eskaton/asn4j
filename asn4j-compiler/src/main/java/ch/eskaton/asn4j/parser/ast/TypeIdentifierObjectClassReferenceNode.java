@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class TypeIdentifierObjectClassReferenceNode extends ObjectClassReferenceNode {
+public class TypeIdentifierObjectClassReferenceNode extends ObjectClassReference {
 
     public TypeIdentifierObjectClassReferenceNode(Position position) {
         super(position, "TYPE-IDENTIFIER");

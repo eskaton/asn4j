@@ -76,12 +76,12 @@ import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
-import ch.eskaton.asn4j.parser.ast.ObjectSetElementsNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSyntaxNode;
@@ -1471,7 +1471,7 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public AssignmentNode parse() throws ParserException {
-            return new ChoiceParser<>(typeAssignmentParser,    valueAssignmentParser, valueSetTypeAssignmentParser,
+            return new ChoiceParser<>(typeAssignmentParser, valueAssignmentParser, valueSetTypeAssignmentParser,
                     parameterizedAssignmentParser).parse();
         }
 
@@ -1766,7 +1766,7 @@ public class Parser {
                             definedObjectClassParser).parse();
 
                     if (instRule != null) {
-                        type = new InstanceOfType(position, (ObjectClassReferenceNode) instRule.get(1));
+                        type = new InstanceOfType(position, (ObjectClassReference) instRule.get(1));
                     }
                     break;
 
@@ -3266,8 +3266,8 @@ public class Parser {
                     } else {
                         return new ValueAssignmentNode(a.P0(), a.s0(), (Type) type, a.n3());
                     }
-                } else if (type instanceof ObjectClassReferenceNode) {
-                    return new ObjectAssignmentNode(a.P0(), a.s0(), (ObjectClassReferenceNode) type, a.n3());
+                } else if (type instanceof ObjectClassReference) {
+                    return new ObjectAssignmentNode(a.P0(), a.s0(), (ObjectClassReference) type, a.n3());
                 }
 
                 return new ValueOrObjectAssignmentNode<>(a.P0(), a.s0(), type, a.n3());
@@ -3284,7 +3284,7 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public ValueSetTypeOrObjectSetAssignmentNode parse() throws ParserException {
             return super.parse(new SequenceParser(TokenType.TYPE_REFERENCE,
-                            new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
+                            new ChoiceParser<>(typeParser, definedObjectClassParser),
                             TokenType.ASSIGN, new ChoiceParser<Node>(valueSetParser, objectSetParser)),
                     a -> new ValueSetTypeOrObjectSetAssignmentNode(a.P0(), a.s0(), a.n1(), a.n3()));
         }
@@ -3913,15 +3913,15 @@ public class Parser {
     // DefinedObjectClass ::=
     // ExternalObjectClassReference | objectclassreference |
     // UsefulObjectClassReference
-    protected class DefinedObjectClassParser extends ObjectRuleParser<ObjectClassReferenceNode> {
+    protected class DefinedObjectClassParser extends ObjectRuleParser<ObjectClassReference> {
 
         @SuppressWarnings("unchecked")
-        public ObjectClassReferenceNode parse() throws ParserException {
+        public ObjectClassReference parse() throws ParserException {
             return super.parse(new ChoiceParser<>(externalObjectClassReferenceParser,
                     new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.OBJECT_CLASS),
                     usefulObjectClassReferenceParser),
-                    a -> a.n() instanceof  Token ? new ObjectClassReferenceNode(a.P(), a.s())
-                            : (ObjectClassReferenceNode) a.n());
+                    a -> a.n() instanceof  Token ? new ObjectClassReference(a.P(), a.s())
+                            : (ObjectClassReference) a.n());
         }
 
     }
@@ -3940,9 +3940,9 @@ public class Parser {
     // UsefulObjectClassReference ::=
     // TYPE-IDENTIFIER
     // | ABSTRACT-SYNTAX
-    protected class UsefulObjectClassReferenceParser extends ObjectRuleParser<ObjectClassReferenceNode> {
+    protected class UsefulObjectClassReferenceParser extends ObjectRuleParser<ObjectClassReference> {
 
-        public ObjectClassReferenceNode parse() throws ParserException {
+        public ObjectClassReference parse() throws ParserException {
             return super.parse(new ChoiceParser<Token>(TokenType.TYPE_IDENTIFIER_KW, TokenType.ABSTRACT_SYNTAX_KW),
                     a -> {
                         if (a.$() == TokenType.TYPE_IDENTIFIER_KW) {
@@ -4576,15 +4576,15 @@ public class Parser {
 
     // ObjectSetElements ::=
     // Object | DefinedObjectSet | ObjectSetFromObjects | ParameterizedObjectSet
-    protected class ObjectSetElementsParser implements RuleParser<ObjectSetElementsNode> {
+    protected class ObjectSetElementsParser implements RuleParser<ObjectSetElements> {
 
         @SuppressWarnings("unchecked")
-        public ObjectSetElementsNode parse() throws ParserException {
+        public ObjectSetElements parse() throws ParserException {
             Node rule = new ChoiceParser<>(informationFromObjectsParser, parameterizedObjectSetParser, objectParser,
                     definedObjectSetParser).parse();
 
             if (rule != null) {
-                return new ObjectSetElementsNode(rule.getPosition(), rule);
+                return new ObjectSetElements(rule.getPosition(), rule);
             }
 
             return null;
@@ -4914,7 +4914,7 @@ public class Parser {
             return super.parse(new SequenceParser(TokenType.TYPE_REFERENCE, parameterListParser, TokenType.ASSIGN,
                     new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser, objectClassDefnParser)),
                     a -> {
-                        if (a.n3() instanceof ObjectClassDefn || a.n3() instanceof ObjectClassReferenceNode) {
+                        if (a.n3() instanceof ObjectClassDefn || a.n3() instanceof ObjectClassReference) {
                             return new ParameterizedObjectClassAssignmentNode(a.P0(), a.t0().getText(), a.n1(), a.n3());
                         } else if (a.n3() instanceof TypeReference && !(a.n3() instanceof UsefulType)
                                 || a.n3() instanceof ExternalTypeReference) {
@@ -4949,11 +4949,10 @@ public class Parser {
                 Position position = token.getPosition();
                 String tokenText = token.getText();
 
-
                 if (valueNode instanceof ObjectDefnNode    || valueNode instanceof ObjectFromObjectNode) {
                     if (typeNode instanceof TypeReference && !(typeNode instanceof UsefulType)) {
                         return new ParameterizedObjectAssignmentNode(position, tokenText, parameterNodeList,
-                                new ObjectClassReferenceNode(typeNode.getPosition(),
+                                new ObjectClassReference(typeNode.getPosition(),
                                         ((TypeReference) typeNode).getType()),(ObjectNode) valueNode);
                     } else if (typeNode instanceof ExternalTypeReference) {
                         ExternalTypeReference typeReference = (ExternalTypeReference) typeNode;
@@ -4963,7 +4962,7 @@ public class Parser {
                                         typeReference.getModule(), typeReference.getType()), (ObjectNode) valueNode);
                     }
                     // TODO: error
-                } else if (typeNode instanceof ObjectClassReferenceNode) {
+                } else if (typeNode instanceof ObjectClassReference) {
                     Node definedValue = valueNode;
 
                     if (valueNode instanceof AmbiguousValue) {
@@ -4977,7 +4976,7 @@ public class Parser {
                     }
 
                     return new ParameterizedObjectAssignmentNode(position, tokenText, parameterNodeList,
-                            (ObjectClassReferenceNode) typeNode, (ObjectNode) valueNode);
+                            (ObjectClassReference) typeNode, (ObjectNode) valueNode);
                 } else if ((typeNode instanceof TypeReference
                         && !(typeNode instanceof UsefulType) || typeNode instanceof ExternalTypeReference)
                         && valueNode instanceof DefinedValue
@@ -5180,12 +5179,12 @@ public class Parser {
     }
 
     // ParameterizedObjectClass ::= DefinedObjectClass ActualParameterList
-    protected class ParameterizedObjectClassParser extends ListRuleParser<ObjectClassReferenceNode> {
+    protected class ParameterizedObjectClassParser extends ListRuleParser<ObjectClassReference> {
 
         @SuppressWarnings("unchecked")
-        public ObjectClassReferenceNode parse() throws ParserException {
+        public ObjectClassReference parse() throws ParserException {
             return super.parse(new SequenceParser(definedObjectClassParser, actualParameterListParser),
-                    a -> (a.<ObjectClassReferenceNode>n0()).parameters(a.n1()));
+                    a -> (a.<ObjectClassReference>n0()).parameters(a.n1()));
         }
 
     }

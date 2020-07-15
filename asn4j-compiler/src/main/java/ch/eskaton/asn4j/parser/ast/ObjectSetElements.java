@@ -30,11 +30,11 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 
-public class ObjectSetElementsNode extends Elements {
+public class ObjectSetElements extends Elements {
 
     private Node element;
 
-    public ObjectSetElementsNode(Position position, Node element) {
+    public ObjectSetElements(Position position, Node element) {
         super(position);
 
         this.element = element;

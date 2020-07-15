@@ -55,7 +55,7 @@ public class FieldSpecNode extends AbstractFieldSpecNode {
     }
 
     public FixedTypeValueFieldSpecNode toFixedTypeValueFieldSpec() {
-        if ((type instanceof ObjectClassReferenceNode)) {
+        if ((type instanceof ObjectClassReference)) {
             return null;
         }
 
@@ -85,7 +85,7 @@ public class FieldSpecNode extends AbstractFieldSpecNode {
                 return null;
             }
 
-            ObjectClassReferenceNode objRef = new ObjectClassReferenceNode(typeRef.getPosition(), typeRef.getType());
+            ObjectClassReference objRef = new ObjectClassReference(typeRef.getPosition(), typeRef.getType());
 
             objRef.setParameters(typeRef.getParameters());
 
@@ -103,8 +103,8 @@ public class FieldSpecNode extends AbstractFieldSpecNode {
             objRef.setParameters(typeRef.getParameters());
 
             return new ObjectFieldSpecNode(objRef.getPosition(), getReference(), objRef, optionalitySpec);
-        } else if (type instanceof ObjectClassReferenceNode) {
-            return new ObjectFieldSpecNode(type.getPosition(), getReference(), (ObjectClassReferenceNode) type,
+        } else if (type instanceof ObjectClassReference) {
+            return new ObjectFieldSpecNode(type.getPosition(), getReference(), (ObjectClassReference) type,
                     optionalitySpec);
         }
 

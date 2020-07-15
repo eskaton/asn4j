@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class AbstractSyntaxObjectClassReferenceNode extends ObjectClassReferenceNode {
+public class AbstractSyntaxObjectClassReferenceNode extends ObjectClassReference {
 
     public AbstractSyntaxObjectClassReferenceNode(Position position) {
         super(position, "ABSTRACT-SYNTAX");
