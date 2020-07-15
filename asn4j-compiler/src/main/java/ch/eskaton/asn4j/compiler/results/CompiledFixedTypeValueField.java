@@ -27,27 +27,27 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class CompiledObjectClass implements CompilationResult {
+public class CompiledFixedTypeValueField extends AbstractCompiledField<Value> {
 
-    private String name;
+    private final CompiledType compiledType;
 
-    private List<AbstractCompiledField> fields = new ArrayList<>();
+    private final boolean unique;
 
-    public CompiledObjectClass(String name) {
-        this.name = name;
+    public CompiledFixedTypeValueField(String name, CompiledType compiledType, boolean unique) {
+        super(name);
+
+        this.compiledType = compiledType;
+        this.unique = unique;
     }
 
-    public void addField(AbstractCompiledField compiledField) {
-        fields.add(compiledField);
+    public CompiledType getCompiledType() {
+        return compiledType;
     }
 
-    public Optional<AbstractCompiledField> getField(String reference) {
-        return fields.stream().filter(field -> Objects.equals(field.getName(), reference)).findAny();
+    public boolean isUnique() {
+        return unique;
     }
 
 }

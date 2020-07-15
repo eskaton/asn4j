@@ -25,29 +25,31 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.results;
+package ch.eskaton.asn4j.compiler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
+import ch.eskaton.asn4j.parser.ast.DefaultTypeSpecNode;
+import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
+import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 
-public class CompiledObjectClass implements CompilationResult {
+public class TypeFieldSpecNodeCompiler implements NamedCompiler<TypeFieldSpecNode, CompiledTypeField> {
 
-    private String name;
+    @Override
+    public CompiledTypeField compile(CompilerContext ctx, String name, TypeFieldSpecNode node) {
+        var reference = node.getReference();
+        var optionalitySpec = node.getOptionalitySpec();
+        var compiledField = new CompiledTypeField(reference);
 
-    private List<AbstractCompiledField> fields = new ArrayList<>();
+        if (optionalitySpec instanceof DefaultTypeSpecNode) {
+            var type = ((DefaultTypeSpecNode) optionalitySpec).getSpec();
+            var compiledType = ctx.getCompiledType(type);
 
-    public CompiledObjectClass(String name) {
-        this.name = name;
-    }
+            compiledField.setDefaultValue(compiledType);
+        } else if (optionalitySpec instanceof OptionalSpecNode) {
+            compiledField.setOptional(true);
+        }
 
-    public void addField(AbstractCompiledField compiledField) {
-        fields.add(compiledField);
-    }
-
-    public Optional<AbstractCompiledField> getField(String reference) {
-        return fields.stream().filter(field -> Objects.equals(field.getName(), reference)).findAny();
+        return compiledField;
     }
 
 }

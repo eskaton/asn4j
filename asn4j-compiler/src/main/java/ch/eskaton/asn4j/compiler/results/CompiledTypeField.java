@@ -27,27 +27,10 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+public class CompiledTypeField extends AbstractCompiledField<CompiledType> {
 
-public class CompiledObjectClass implements CompilationResult {
-
-    private String name;
-
-    private List<AbstractCompiledField> fields = new ArrayList<>();
-
-    public CompiledObjectClass(String name) {
-        this.name = name;
-    }
-
-    public void addField(AbstractCompiledField compiledField) {
-        fields.add(compiledField);
-    }
-
-    public Optional<AbstractCompiledField> getField(String reference) {
-        return fields.stream().filter(field -> Objects.equals(field.getName(), reference)).findAny();
+    public CompiledTypeField(String name) {
+        super(name);
     }
 
 }

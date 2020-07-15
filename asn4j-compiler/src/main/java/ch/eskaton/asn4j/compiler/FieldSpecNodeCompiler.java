@@ -27,22 +27,21 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledField;
+import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
-import ch.eskaton.asn4j.parser.ast.DefaultValueSpecNode;
 import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class FieldSpecNodeCompiler implements NamedCompiler<FieldSpecNode, CompiledField> {
+public class FieldSpecNodeCompiler implements NamedCompiler<FieldSpecNode, CompiledFixedTypeValueField> {
 
     @Override
-    public CompiledField compile(CompilerContext ctx, String name, FieldSpecNode node) {
+    public CompiledFixedTypeValueField compile(CompilerContext ctx, String name, FieldSpecNode node) {
         var fixedType = node.toFixedTypeValueFieldSpec();
         var type = fixedType.getType();
         var compiledType = ctx.getCompiledType(type);
         var optionalitySpec = node.getOptionalitySpec();
-        var compiledField = new CompiledField(node.getReference(), compiledType, node.isUnique());
+        var compiledField = new CompiledFixedTypeValueField(node.getReference(), compiledType, node.isUnique());
 
         if (optionalitySpec instanceof DefaultSpecNode) {
             var value = (Value) ((DefaultSpecNode) optionalitySpec).getSpec();

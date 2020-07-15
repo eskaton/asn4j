@@ -25,54 +25,23 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.results;
+package ch.eskaton.asn4j.parser.ast;
 
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 
-public class CompiledField implements CompilationResult {
+public class ObjectSetElementsNode extends Elements {
 
-    private final String name;
+    private Node element;
 
-    private final CompiledType compiledType;
+    public ObjectSetElementsNode(Position position, Node element) {
+        super(position);
 
-    private final boolean unique;
-
-    private Value defaultValue;
-
-    private boolean optional;
-
-    public CompiledField(String name, CompiledType compiledType, boolean unique) {
-        this.name = name;
-        this.compiledType = compiledType;
-        this.unique = unique;
+        this.element = element;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public CompiledType getCompiledType() {
-        return compiledType;
-    }
-
-    public boolean isUnique() {
-        return unique;
-    }
-
-    public void setOptional(boolean optional) {
-        this.optional = optional;
-    }
-
-    public void setDefaultValue(Value defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public Value getDefaultValue() {
-        return defaultValue;
-    }
-
-    public boolean isOptional() {
-        return optional;
+    public Node getElement() {
+        return element;
     }
 
 }
