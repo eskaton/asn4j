@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class ObjectSetFieldSpecNode extends SetFieldSpecNode {
 
-    public ObjectSetFieldSpecNode(Position position, String reference, ObjectClassReferenceNode type,
+    public ObjectSetFieldSpecNode(Position position, String reference, ObjectClassReference type,
             OptionalitySpecNode optionalitySpec) {
         super(position, reference, type, optionalitySpec);
     }

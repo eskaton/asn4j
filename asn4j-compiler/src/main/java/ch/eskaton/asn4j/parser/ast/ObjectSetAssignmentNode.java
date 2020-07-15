@@ -31,20 +31,20 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class ObjectSetAssignmentNode extends AssignmentNode {
 
-    private ObjectClassReferenceNode objectClass;
+    private ObjectClassReference objectClassReference;
 
     private SetSpecsNode objectSet;
 
-    public ObjectSetAssignmentNode(Position position, String reference, ObjectClassReferenceNode objectClass,
+    public ObjectSetAssignmentNode(Position position, String reference, ObjectClassReference objectClassReference,
             SetSpecsNode objectSet) {
         super(position, reference);
 
-        this.objectClass = objectClass;
+        this.objectClassReference = objectClassReference;
         this.objectSet = objectSet;
     }
 
-    public ObjectClassReferenceNode getObjectClass() {
-        return objectClass;
+    public ObjectClassReference getObjectClassReference() {
+        return objectClassReference;
     }
 
     public SetSpecsNode getObjectSet() {

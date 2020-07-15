@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
@@ -38,9 +38,9 @@ import java.util.List;
 
 public class InstanceOfType extends AbstractType {
 
-    private ObjectClassReferenceNode objectClass;
+    private ObjectClassReference objectClass;
 
-    public InstanceOfType(Position position, ObjectClassReferenceNode objectClass) {
+    public InstanceOfType(Position position, ObjectClassReference objectClass) {
         super(position);
 
         this.objectClass = objectClass;

@@ -48,7 +48,7 @@ public class SetFieldSpecNode extends AbstractFieldSpecNode {
     }
 
     public FixedTypeValueSetFieldSpecNode toFixedTypeValueSetFieldSpec() {
-        if (type instanceof ObjectClassReferenceNode) {
+        if (type instanceof ObjectClassReference) {
             return null;
         }
 
@@ -66,16 +66,16 @@ public class SetFieldSpecNode extends AbstractFieldSpecNode {
     }
 
     public ObjectSetFieldSpecNode toObjectSetFieldSpec() {
-        ObjectClassReferenceNode reference;
+        ObjectClassReference reference;
 
         if (type instanceof TypeReference && !(type instanceof UsefulType)) {
-            reference = new ObjectClassReferenceNode(type.getPosition(),
+            reference = new ObjectClassReference(type.getPosition(),
                     ((TypeReference) type).getType());
         } else if (type instanceof ExternalTypeReference) {
             reference = new ExternalObjectClassReferenceNode(type.getPosition(),
                     ((ExternalTypeReference) type).getModule(), ((ExternalTypeReference) type).getType());
-        } else if (type instanceof ObjectClassReferenceNode) {
-            reference = (ObjectClassReferenceNode) type;
+        } else if (type instanceof ObjectClassReference) {
+            reference = (ObjectClassReference) type;
         } else {
             return null;
         }

@@ -31,16 +31,16 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class ObjectFieldSpecNode extends AbstractFieldSpecNode {
 
-    private ObjectClassReferenceNode objectClass;
+    private ObjectClassReference objectClass;
 
-    public ObjectFieldSpecNode(Position position, String reference, ObjectClassReferenceNode objectClass,
+    public ObjectFieldSpecNode(Position position, String reference, ObjectClassReference objectClass,
             OptionalitySpecNode optionalitySpec) {
         super(position, reference, optionalitySpec);
 
         this.objectClass = objectClass;
     }
 
-    public ObjectClassReferenceNode getObjectClass() {
+    public ObjectClassReference getObjectClass() {
         return objectClass;
     }
 

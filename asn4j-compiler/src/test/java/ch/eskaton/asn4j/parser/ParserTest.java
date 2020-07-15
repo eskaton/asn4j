@@ -288,12 +288,12 @@ import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.OIDNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
-import ch.eskaton.asn4j.parser.ast.ObjectSetElementsNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReferenceNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalitySpecNode;
@@ -4175,7 +4175,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectSetElementsNode);
+        assertTrue(result instanceof ObjectSetElements);
     }
 
     /**
@@ -4802,7 +4802,7 @@ class ParserTest {
         DefinedObjectClassParser parser = new Parser(new ByteArrayInputStream(
                 "OBJECT-CLASS".getBytes())).new DefinedObjectClassParser();
 
-        ObjectClassReferenceNode result = parser.parse();
+        ObjectClassReference result = parser.parse();
 
         assertNotNull(result);
         assertEquals("OBJECT-CLASS", result.getReference());
@@ -4917,7 +4917,7 @@ class ParserTest {
         UsefulObjectClassReferenceParser parser = new Parser(
                 new ByteArrayInputStream("TYPE-IDENTIFIER".getBytes())).new UsefulObjectClassReferenceParser();
 
-        ObjectClassReferenceNode result = parser.parse();
+        ObjectClassReference result = parser.parse();
 
         assertNotNull(result);
         assertTrue(result instanceof TypeIdentifierObjectClassReferenceNode);
@@ -4969,7 +4969,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectClassReferenceNode);
+        assertTrue(result instanceof ObjectClassReference);
 
         parser = new Parser(new ByteArrayInputStream(
                 "OBJECT-CLASS {VisibleString}".getBytes())).new ObjectClassParser();
@@ -4977,9 +4977,9 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectClassReferenceNode);
-        assertNotNull(((ObjectClassReferenceNode) result).getParameters());
-        assertEquals(1, ((ObjectClassReferenceNode) result).getParameters()
+        assertTrue(result instanceof ObjectClassReference);
+        assertNotNull(((ObjectClassReference) result).getParameters());
+        assertEquals(1, ((ObjectClassReference) result).getParameters()
                 .size());
     }
 
@@ -5947,7 +5947,7 @@ class ParserTest {
         ObjectSetElementsParser parser = new Parser(new ByteArrayInputStream(
                 "object-reference".getBytes())).new ObjectSetElementsParser();
 
-        ObjectSetElementsNode result = parser.parse();
+        ObjectSetElements result = parser.parse();
 
         assertNotNull(result);
         assertTrue(result.getElement() instanceof ObjectNode);
@@ -6570,7 +6570,7 @@ class ParserTest {
         assertEquals("ObjClassReference", result.getReference());
         assertEquals(1, result.getParameters().size());
         assertTrue(result instanceof ParameterizedObjectClassAssignmentNode);
-        assertTrue(((ParameterizedObjectClassAssignmentNode) result).getType() instanceof ObjectClassReferenceNode);
+        assertTrue(((ParameterizedObjectClassAssignmentNode) result).getType() instanceof ObjectClassReference);
     }
 
     @Test
@@ -6586,7 +6586,7 @@ class ParserTest {
         assertNotNull(result);
         assertEquals("objectReference", result.getReference());
         assertTrue(result instanceof ParameterizedObjectAssignmentNode);
-        assertTrue(((ParameterizedObjectAssignmentNode) result).getType() instanceof ObjectClassReferenceNode);
+        assertTrue(((ParameterizedObjectAssignmentNode) result).getType() instanceof ObjectClassReference);
         assertEquals(1, result.getParameters().size());
         assertTrue(((ParameterizedObjectAssignmentNode) result).getValue() instanceof ObjectReferenceNode);
 
@@ -6619,7 +6619,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertEquals("ObjSetReference", result.getReference());
-        assertTrue(result.getObjectClass() instanceof ObjectClassReferenceNode);
+        assertTrue(result.getObjectClass() instanceof ObjectClassReference);
         assertEquals(1, result.getParameters().size());
     }
 
@@ -6828,7 +6828,7 @@ class ParserTest {
                 new ByteArrayInputStream(
                         "OBJECT-CLASS {VisibleString}".getBytes())).new ParameterizedObjectClassParser();
 
-        ObjectClassReferenceNode result = parser.parse();
+        ObjectClassReference result = parser.parse();
 
         assertNotNull(result);
         assertEquals("OBJECT-CLASS", result.getReference());

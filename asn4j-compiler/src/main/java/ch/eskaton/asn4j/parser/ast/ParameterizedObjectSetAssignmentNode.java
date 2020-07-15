@@ -33,19 +33,19 @@ import java.util.List;
 
 public class ParameterizedObjectSetAssignmentNode extends ParameterizedAssignmentNode {
 
-    private ObjectClassReferenceNode objectClass;
+    private ObjectClassReference objectClass;
 
     private ObjectSetSpecNode objectSet;
 
     public ParameterizedObjectSetAssignmentNode(Position position, String reference, List<ParameterNode> parameters,
-            ObjectClassReferenceNode objectClass, ObjectSetSpecNode objectSet) {
+            ObjectClassReference objectClass, ObjectSetSpecNode objectSet) {
         super(position, reference, parameters);
 
         this.objectClass = objectClass;
         this.objectSet = objectSet;
     }
 
-    public ObjectClassReferenceNode getObjectClass() {
+    public ObjectClassReference getObjectClass() {
         return objectClass;
     }
 
