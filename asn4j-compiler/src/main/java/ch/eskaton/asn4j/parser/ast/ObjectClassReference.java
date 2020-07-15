@@ -25,29 +25,40 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.results;
+package ch.eskaton.asn4j.parser.ast;
 
-import java.util.ArrayList;
+import ch.eskaton.asn4j.parser.Position;
+
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
-public class CompiledObjectClass implements CompilationResult {
+public class ObjectClassReferenceNode extends ObjectClassNode implements ParameterizedNode {
 
-    private String name;
+    private String reference;
 
-    private List<AbstractCompiledField> fields = new ArrayList<>();
+    private List<Node> parameters;
 
-    public CompiledObjectClass(String name) {
-        this.name = name;
+    public ObjectClassReferenceNode(Position position, String reference) {
+        super(position);
+
+        this.reference = reference;
     }
 
-    public void addField(AbstractCompiledField compiledField) {
-        fields.add(compiledField);
+    public String getReference() {
+        return reference;
     }
 
-    public Optional<AbstractCompiledField> getField(String reference) {
-        return fields.stream().filter(field -> Objects.equals(field.getName(), reference)).findAny();
+    public void setParameters(List<Node> parameters) {
+        this.parameters = parameters;
+    }
+
+    public List<Node> getParameters() {
+        return parameters;
+    }
+
+    public ObjectClassReferenceNode parameters(List<Node> parameters) {
+        setParameters(parameters);
+
+        return this;
     }
 
 }

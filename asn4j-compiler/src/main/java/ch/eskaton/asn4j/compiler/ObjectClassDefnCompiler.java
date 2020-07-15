@@ -27,7 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledField;
+import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.parser.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
@@ -41,7 +41,8 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
         var fieldSpecs = node.getFieldSpec();
 
         for (var fieldSpec : fieldSpecs) {
-            var compiledField = ctx.<AbstractFieldSpecNode, NamedCompiler<AbstractFieldSpecNode, CompiledField>>getCompiler((Class<AbstractFieldSpecNode>) fieldSpec.getClass())
+            var compiledField = ctx.<AbstractFieldSpecNode, NamedCompiler<AbstractFieldSpecNode, AbstractCompiledField>>getCompiler(
+                    (Class<AbstractFieldSpecNode>) fieldSpec.getClass())
                     .compile(ctx, name, fieldSpec);
 
             compiledObjectClass.addField(compiledField);

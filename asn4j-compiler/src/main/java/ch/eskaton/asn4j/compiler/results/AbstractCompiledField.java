@@ -27,27 +27,36 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-public class CompiledObjectClass implements CompilationResult {
+public abstract class AbstractCompiledField<D> implements CompilationResult {
 
     private String name;
 
-    private List<AbstractCompiledField> fields = new ArrayList<>();
+    private D defaultValue;
 
-    public CompiledObjectClass(String name) {
+    private boolean optional;
+
+    public AbstractCompiledField(String name) {
         this.name = name;
     }
 
-    public void addField(AbstractCompiledField compiledField) {
-        fields.add(compiledField);
+    public String getName() {
+        return name;
     }
 
-    public Optional<AbstractCompiledField> getField(String reference) {
-        return fields.stream().filter(field -> Objects.equals(field.getName(), reference)).findAny();
+    public void setDefaultValue(D defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public D getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
+
+    public boolean isOptional() {
+        return optional;
     }
 
 }
