@@ -137,6 +137,56 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, "NumericString contains invalid characters.*");
     }
 
+    @Test
+    void testObjectSetDuplicateValue() {
+        var body = """
+                TEST ::= CLASS {
+                    &id   INTEGER UNIQUE,
+                    &desc VisibleString
+                }
+
+                TestSet TEST ::= {
+                      {&id 1, &desc "Desc 1"}
+                    | {&id 2, &desc "Desc 2"}
+                    | {&id 1, &desc "Desc 3"}
+                }
+                """;
+
+        testModule(body, CompilerException.class, ".*Duplicate value in object set.*");
+    }
+
+    @Test
+    void testObjectSetMissingValue() {
+        var body = """
+                TEST ::= CLASS {
+                    &id   INTEGER UNIQUE,
+                    &desc VisibleString
+                }
+
+                TestSet TEST ::= {
+                      {&id 1}
+                }
+                """;
+
+        testModule(body, CompilerException.class, ".*Field 'desc' is mandatory.*");
+    }
+
+    @Test
+    void testObjectSetInvalidValue() {
+        var body = """
+                TEST ::= CLASS {
+                    &id   INTEGER UNIQUE,
+                    &desc VisibleString
+                }
+
+                TestSet TEST ::= {
+                      {&id "abcd"}
+                }
+                """;
+
+        testModule(body, CompilerException.class, ".*Failed to resolve an INTEGER value.*");
+    }
+
     private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()
