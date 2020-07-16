@@ -56,10 +56,6 @@ public class VisibleStringValue extends AbstractValue implements HasStringValue 
             return false;
         }
 
-        if (!super.equals(o)) {
-            return false;
-        }
-
         VisibleStringValue that = (VisibleStringValue) o;
 
         return Objects.equals(value, that.value);
@@ -67,7 +63,7 @@ public class VisibleStringValue extends AbstractValue implements HasStringValue 
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), value);
+        return Objects.hash(value);
     }
 
 }

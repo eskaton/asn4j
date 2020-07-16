@@ -63,36 +63,23 @@ public class IntegerValue extends AbstractValue {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
 
-        if (obj == null) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+        IntegerValue that = (IntegerValue) o;
 
-        IntegerValue other = (IntegerValue) obj;
+        return Objects.equals(value, that.value);
+    }
 
-
-        if (value == null) {
-            if (other.value != null) {
-                return false;
-            }
-        } else if (!value.equals(other.value)) {
-            return false;
-        }
-
-        return true;
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 
 }

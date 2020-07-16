@@ -36,12 +36,18 @@ import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleBodyNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
+import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -155,6 +161,37 @@ public class CompilerImpl {
             // ignore objects, they are resolved when needed
         } else if (assignment instanceof ObjectClassAssignmentNode) {
             compileObjectClassAssignment((ObjectClassAssignmentNode) assignment);
+        } else if (assignment instanceof ValueSetTypeOrObjectSetAssignmentNode) {
+            compileValueSetTypeOrObjectSetAssignmentNode((ValueSetTypeOrObjectSetAssignmentNode) assignment);
+        }
+    }
+
+    private void compileValueSetTypeOrObjectSetAssignmentNode(ValueSetTypeOrObjectSetAssignmentNode assignment) {
+        Node node = assignment.getType();
+
+        if (node instanceof Type) {
+            try {
+                compilerContext.resolveTypeReference((Type) node);
+            } catch (CompilerException e) {
+                compileAssignment(new ObjectSetAssignmentNode(assignment.getPosition(), assignment.getReference(),
+                        new ObjectClassReference(node.getPosition(), ((SimpleDefinedType) node).getType()),
+                        assignment.getValueSet()));
+
+                return;
+            }
+
+            var type = (Type) node;
+            var valueSet = assignment.getValueSet();
+
+            type.setConstraints(List.of(new SubtypeConstraint(valueSet.getPosition(), valueSet)));
+
+            var typeAssignment = new TypeAssignmentNode(assignment.getPosition(), assignment.getReference(),
+                    (Type) node);
+
+            compileAssignment(typeAssignment);
+        } else {
+            compileAssignment(new ObjectSetAssignmentNode(assignment.getPosition(), assignment.getReference(),
+                    new ObjectClassReference(node.getPosition(), null), assignment.getValueSet()));
         }
     }
 
@@ -169,7 +206,8 @@ public class CompilerImpl {
     }
 
     private void compileObjectSetAssignment(ObjectSetAssignmentNode assignment) {
-        // TODO Auto-generated method stub
+        compilerContext.<ObjectSetAssignmentNode, ObjectSetAssignmentCompiler>getCompiler(ObjectSetAssignmentNode.class)
+                .compile(compilerContext, assignment);
     }
 
     private void compileParameterizedAssignment(ParameterizedAssignmentNode assignment) {
@@ -248,6 +286,21 @@ public class CompilerImpl {
             assignments.peek().remove(assignment);
 
             return Optional.of(compileTypeAssignment(assignment));
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<CompiledObjectClass> compileObjectClass(String name) {
+        Optional<AssignmentNode> maybeObjectClassAssignment = assignments.peek().stream().filter(
+                obj -> obj instanceof ObjectClassAssignmentNode && name.equals(obj.getReference())).findFirst();
+
+        if (maybeObjectClassAssignment.isPresent()) {
+            ObjectClassAssignmentNode assignment = (ObjectClassAssignmentNode) maybeObjectClassAssignment.get();
+
+            assignments.peek().remove(assignment);
+
+            return Optional.of(compileObjectClassAssignment(assignment));
         }
 
         return Optional.empty();

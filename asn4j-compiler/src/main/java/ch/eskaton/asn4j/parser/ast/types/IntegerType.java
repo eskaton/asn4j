@@ -81,7 +81,7 @@ public class IntegerType extends AbstractType {
 
     @Override
     public int hashCode() {
-        return Objects.hash(namedNumbers);
+        return Objects.hash(this.getClass(), namedNumbers);
     }
 
 }

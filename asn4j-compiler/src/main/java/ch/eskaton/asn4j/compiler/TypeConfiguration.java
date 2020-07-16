@@ -99,6 +99,7 @@ import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.types.BMPString;
@@ -318,6 +319,7 @@ public class TypeConfiguration {
         types.add(new TypeDefinition(ObjectClassDefn.class, new ObjectClassDefnCompiler()));
         types.add(new TypeDefinition(FieldSpecNode.class, new FieldSpecNodeCompiler()));
         types.add(new TypeDefinition(TypeFieldSpecNode.class, new TypeFieldSpecNodeCompiler()));
+        types.add(new TypeDefinition(ObjectSetAssignmentNode.class, new ObjectSetAssignmentCompiler()));
     }
 
     public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> typeClass) {

@@ -25,73 +25,41 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.types;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
-import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
-import ch.eskaton.asn4j.parser.ast.values.Tag;
-import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
-public abstract class AbstractType implements Type {
+public class CompiledObjectSet implements CompilationResult {
 
-    private Position position;
+    private final String name;
 
-    private Tag tag;
+    private final CompiledObjectClass objectClass;
 
-    private TaggingMode taggingMode;
+    private Set<Map<String, Object>> values;
 
-    private List<Constraint> constraints;
-
-    private EncodingPrefixNode encodingPrefix;
-
-    public AbstractType(Position position) {
-        this.position = position;
+    public CompiledObjectSet(String name, CompiledObjectClass objectClass) {
+        this.name = name;
+        this.objectClass = objectClass;
     }
 
-    @Override
-    public Position getPosition() {
-        return position;
+    public String getName() {
+        return name;
     }
 
-    public Tag getTag() {
-        return tag;
+    public CompiledObjectClass getObjectClass() {
+        return objectClass;
     }
 
-    public void setTag(Tag tag) {
-        this.tag = tag;
+    public Set<Map<String, Object>> getValues() {
+        return values;
     }
 
-    public TaggingMode getTaggingMode() {
-        return taggingMode;
-    }
-
-    public void setTaggingMode(TaggingMode taggingMode) {
-        this.taggingMode = taggingMode;
-    }
-
-    public void setConstraints(List<Constraint> constraint) {
-        this.constraints = constraint;
-    }
-
-    public List<Constraint> getConstraints() {
-        return constraints;
-    }
-
-    public boolean hasConstraint() {
-        return constraints != null && !constraints.isEmpty();
-    }
-
-    public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
-        this.encodingPrefix = encodingPrefix;
-    }
-
-    public EncodingPrefixNode getEncodingPrefix() {
-        return encodingPrefix;
+    public void setValues(Set<Map<String, Object>> values) {
+        this.values = values;
     }
 
     @Override
@@ -109,18 +77,16 @@ public abstract class AbstractType implements Type {
             return false;
         }
 
-        AbstractType that = (AbstractType) o;
+        CompiledObjectSet that = (CompiledObjectSet) o;
 
-        return Objects.equals(position, that.position) &&
-                Objects.equals(tag, that.tag) &&
-                taggingMode == that.taggingMode &&
-                Objects.equals(constraints, that.constraints) &&
-                Objects.equals(encodingPrefix, that.encodingPrefix);
+        return Objects.equals(name, that.name) &&
+                Objects.equals(objectClass, that.objectClass) &&
+                Objects.equals(values, that.values);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(position, tag, taggingMode, constraints, encodingPrefix);
+        return Objects.hash(name, objectClass, values);
     }
 
 }

@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.results;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,6 +49,10 @@ public class CompiledObjectClass implements CompilationResult {
 
     public Optional<AbstractCompiledField> getField(String reference) {
         return fields.stream().filter(field -> Objects.equals(field.getName(), reference)).findAny();
+    }
+
+    public List<AbstractCompiledField> getFields() {
+        return Collections.unmodifiableList(fields);
     }
 
 }
