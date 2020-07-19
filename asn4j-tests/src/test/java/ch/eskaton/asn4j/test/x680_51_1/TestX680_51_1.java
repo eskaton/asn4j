@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.test.x680_51_1;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBMPString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestBitString2;
@@ -71,6 +72,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_1.TestOidIri2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestPrintableString1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOID2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestRelativeOidIri2;
+import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequence1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequenceOf1;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSequenceOf2;
 import ch.eskaton.asn4j.test.modules.x680_51_1.TestSetOf1;
@@ -124,8 +126,10 @@ import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRIFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeIRISuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testRelativeOIDSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceOfSuccess;
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testSetOfSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testTeletexStringFailure;
@@ -417,6 +421,39 @@ class TestX680_51_1 {
         testOctetStringSuccess(TestOctetString7.class, new TestOctetString7(), new byte[] { 0x10 });
 
         testOctetStringFailure(TestOctetString7.class, new TestOctetString7(), new byte[] { (byte) 0x0F });
+    }
+
+    @Test
+    void testSequence1() {
+        testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1VisibleString("a"));
+            s.setB(ASN1Integer.valueOf(1L));
+        });
+        testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1VisibleString("ab"));
+            s.setB(ASN1Integer.valueOf(2L));
+        });
+        testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1VisibleString("ab"));
+            s.setB(ASN1Integer.valueOf(3L));
+        });
+
+        testSequenceFailure(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1VisibleString(""));
+            s.setB(ASN1Integer.valueOf(1L));
+        });
+        testSequenceFailure(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1VisibleString("abc"));
+            s.setB(ASN1Integer.valueOf(1L));
+        });
+        testSequenceFailure(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1VisibleString("a"));
+            s.setB(ASN1Integer.valueOf(0L));
+        });
+        testSequenceFailure(TestSequence1.class, new TestSequence1(), s -> {
+            s.setA(new ASN1VisibleString("a"));
+            s.setB(ASN1Integer.valueOf(4L));
+        });
     }
 
     @Test

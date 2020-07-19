@@ -58,6 +58,7 @@ import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.OptionalUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -143,6 +144,8 @@ public abstract class AbstractConstraintCompiler {
                 compiledType = ctx.getCompiledType(node);
             }
 
+            definitions.addAll(compileConstraints(compiledType));
+
             if (compiledType.getConstraintDefinition() != null) {
                 definitions.addLast(compiledType.getConstraintDefinition());
             }
@@ -179,6 +182,10 @@ public abstract class AbstractConstraintCompiler {
         }
 
         return definition;
+    }
+
+    protected List<ConstraintDefinition> compileConstraints(CompiledType compiledType) {
+        return Collections.emptyList();
     }
 
     @SuppressWarnings("squid:S1172")

@@ -414,6 +414,10 @@ public class CompilerContext {
         return constraintCompiler.compileConstraint(javaClass, name, compiledType);
     }
 
+    public ConstraintDefinition compileConstraint(String name, CompiledType compiledType) {
+        return constraintCompiler.compileConstraint(name, compiledType);
+    }
+
     public ConstraintDefinition compileConstraint(CompiledType compiledType) {
         return constraintCompiler.compileConstraint(compiledType);
     }

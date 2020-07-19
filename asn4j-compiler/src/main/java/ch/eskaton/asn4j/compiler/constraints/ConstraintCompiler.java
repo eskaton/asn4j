@@ -53,13 +53,7 @@ public class ConstraintCompiler {
     }
 
     public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, CompiledType compiledType) {
-        ConstraintDefinition definition;
-
-        try {
-            definition = compileConstraintAux(compiledType);
-        } catch (CompilerException e) {
-            throw new CompilerException("Error in constraints for type %s: %s", e, name, e.getMessage());
-        }
+        var definition = compileConstraint(name, compiledType);
 
         if (definition != null) {
             Module module = new Module();
@@ -67,11 +61,18 @@ public class ConstraintCompiler {
             addConstraint(compiledType, module, definition);
 
             javaClass.addModule(ctx, module);
+            javaClass.addImport(ConstraintViolatedException.class);
         }
 
-        javaClass.addImport(ConstraintViolatedException.class);
-
         return definition;
+    }
+
+    public ConstraintDefinition compileConstraint(String name, CompiledType compiledType) {
+        try {
+            return compileConstraintAux(compiledType);
+        } catch (CompilerException e) {
+            throw new CompilerException("Error in constraints for type %s: %s", e, name, e.getMessage());
+        }
     }
 
     private AbstractConstraintCompiler getCompiler(CompiledType compiledType) {

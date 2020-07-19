@@ -35,6 +35,8 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.MutableReference;
+import ch.eskaton.commons.Reference;
 
 import java.util.HashSet;
 import java.util.List;
@@ -90,7 +92,23 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         ctor.setBody(Optional.of(ctorBody.toString()));
         javaClass.addMethod(ctor);
 
-        if (node.hasConstraint()) {
+        var hasComponentConstraint = new MutableReference<>(false);
+
+        compiledType.getComponents().stream().forEach(component -> {
+            var componentName = component.get_1();
+            var compiledComponent = component.get_2();
+            var componentType = compiledComponent.getType();
+
+            if (componentType.getConstraints() != null) {
+                var constraintDef = ctx.compileConstraint(componentName, compiledComponent);
+
+                compiledComponent.setConstraintDefinition(constraintDef);
+
+                hasComponentConstraint.set(true);
+            }
+        });
+
+        if (node.hasConstraint() || hasComponentConstraint.get()) {
             var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
 
             compiledType.setConstraintDefinition(constraintDef);
