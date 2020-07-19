@@ -52,24 +52,37 @@ import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
+import ch.eskaton.asn4j.parser.ast.types.IA5String;
+import ch.eskaton.asn4j.parser.ast.types.PrintableString;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
+import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
+import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
 import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
 import ch.eskaton.asn4j.runtime.types.ASN1SequenceOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1SetOf;
+import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
+import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
+import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
+import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.OptionalUtils;
@@ -121,6 +134,17 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
                     .withCase(ASN1BitString.class, args -> asList(new Parameter(ILType.of(BYTE_ARRAY), VAR_VALUE),
                             new Parameter(ILType.of(INTEGER), VAR_UNUSED_BITS)))
                     .withCase(ASN1OctetString.class, args -> getValueParameter(BYTE_ARRAY))
+                    .withCase(ASN1VisibleString.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1NumericString.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1PrintableString.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1IA5String.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1GraphicString.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1GeneralString.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1TeletexString.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1VideotexString.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1UniversalString.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1UTF8String.class, args -> getValueParameter(STRING))
+                    .withCase(ASN1BMPString.class, args -> getValueParameter(STRING))
                     .withCase(ASN1Sequence.class, args -> singletonList(getMapParameter()))
                     .withCase(ASN1Set.class, args -> singletonList(getMapParameter()))
                     .withCase(ASN1SequenceOf.class, args -> getCollectionOfParameterDefinition(args.get()))
@@ -149,6 +173,17 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
                     .withCase(ASN1BitString.class, args -> List.of(getMapValueAccessor(args, GET_VALUE),
                             getMapValueAccessor(args, GET_UNUSED_BITS)))
                     .withCase(ASN1OctetString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1VisibleString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1NumericString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1PrintableString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1IA5String.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1GraphicString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1GeneralString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1TeletexString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1VideotexString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1UniversalString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1UTF8String.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
+                    .withCase(ASN1BMPString.class, args -> singletonList(getMapValueAccessor(args, GET_VALUE)))
                     .withCase(ASN1Sequence.class, args -> getCollectionParameters(args.get().get_1(),
                             acc -> getMapValueAccessor(args, acc)))
                     .withCase(ASN1Set.class, args -> getCollectionParameters(args.get().get_1(),
