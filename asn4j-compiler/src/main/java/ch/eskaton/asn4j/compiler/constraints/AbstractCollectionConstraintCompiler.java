@@ -63,6 +63,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -119,24 +120,28 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
     }
 
     protected List<ConstraintDefinition> compileConstraints(CompiledType compiledType) {
-        return ((CompiledCollectionType) compiledType).getComponents().stream()
-                .filter(t -> t.get_2().getConstraintDefinition() != null)
-                .map(t -> {
-                    var name = t.get_1();
-                    var compiledComponent = t.get_2();
-                    var componentConstraint = compiledComponent.getConstraintDefinition();
+        if (compiledType instanceof CompiledCollectionType) {
+            return ((CompiledCollectionType) compiledType).getComponents().stream()
+                    .filter(t -> t.get_2().getConstraintDefinition() != null)
+                    .map(t -> {
+                        var name = t.get_1();
+                        var compiledComponent = t.get_2();
+                        var componentConstraint = compiledComponent.getConstraintDefinition();
 
-                    var roots = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
-                            componentConstraint.getRoots(), PresenceConstraint.PresenceType.OPTIONAL)));
-                    Node extensions = null;
-
-                    if (componentConstraint.getExtensions() != null) {
-                        extensions = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
+                        var roots = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
                                 componentConstraint.getRoots(), PresenceConstraint.PresenceType.OPTIONAL)));
-                    }
+                        Node extensions = null;
 
-                    return new ConstraintDefinition(roots, extensions, componentConstraint.isExtensible());
-                }).collect(Collectors.toList());
+                        if (componentConstraint.getExtensions() != null) {
+                            extensions = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
+                                    componentConstraint.getRoots(), PresenceConstraint.PresenceType.OPTIONAL)));
+                        }
+
+                        return new ConstraintDefinition(roots, extensions, componentConstraint.isExtensible());
+                    }).collect(Collectors.toList());
+        }
+
+        return Collections.emptyList();
     }
 
     protected void generateDoCheckConstraint(CompiledCollectionType compiledType, Module module) {
