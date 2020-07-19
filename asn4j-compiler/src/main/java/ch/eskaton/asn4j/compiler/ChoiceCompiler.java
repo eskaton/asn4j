@@ -44,6 +44,7 @@ import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.MutableReference;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
@@ -117,7 +118,23 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         compiledType.getComponents().addAll(components);
 
-        if (node.hasConstraint()) {
+        var hasComponentConstraint = new MutableReference<>(false);
+
+        compiledType.getComponents().stream().forEach(component -> {
+            var componentName = component.get_1();
+            var compiledComponent = component.get_2();
+            var componentType = compiledComponent.getType();
+
+            if (componentType.getConstraints() != null) {
+                var constraintDef = ctx.compileConstraint(componentName, compiledComponent);
+
+                compiledComponent.setConstraintDefinition(constraintDef);
+
+                hasComponentConstraint.set(true);
+            }
+        });
+
+        if (node.hasConstraint() || hasComponentConstraint.get()) {
             var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
 
             compiledType.setConstraintDefinition(constraintDef);

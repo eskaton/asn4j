@@ -101,8 +101,8 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
-        ConstraintDefinition constraintDefinition = super.compileConstraints(node, baseType);
+    ConstraintDefinition compileComponentConstraints(Type node, CompiledType baseType) {
+        ConstraintDefinition constraintDefinition = super.compileComponentConstraints(node, baseType);
         CollectionOfType collectionOfType = (CollectionOfType) baseType.getType();
 
         if (collectionOfType.hasElementConstraint()) {

@@ -85,6 +85,11 @@ TestSetOf10 ::= SET OF SET OF INTEGER (1..2)
 TestSequenceOf1 ::= SEQUENCE SIZE (2) OF SET SIZE (1..2) OF INTEGER
 TestSequenceOf2 ::= TestSequenceOf1
 
+TestChoice1 ::= CHOICE {
+    a BOOLEAN (TRUE),
+    b INTEGER (1)
+}
+
 testVisibleString1 VisibleString ::= "xyz"
 
 TestVisibleString1 ::= VisibleString ((SIZE (1..3) ^ FROM ("a".."f")) | testVisibleString1)
