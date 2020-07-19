@@ -31,8 +31,11 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ElementSetCompiler;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
@@ -44,10 +47,13 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
+import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -58,15 +64,17 @@ import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.OptionalUtils;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_DO_CHECK_CONSTRAINT;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
 import static java.util.Optional.of;
 
@@ -131,7 +139,7 @@ public abstract class AbstractConstraintCompiler {
         return new ConstraintDefinition(node);
     }
 
-    ConstraintDefinition compileConstraints(Type node, CompiledType baseType) {
+    ConstraintDefinition compileComponentConstraints(Type node, CompiledType baseType) {
         LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
         Optional<List<Constraint>> constraint = Optional.ofNullable(node.getConstraints());
         ConstraintDefinition definition = null;
@@ -144,7 +152,9 @@ public abstract class AbstractConstraintCompiler {
                 compiledType = ctx.getCompiledType(node);
             }
 
-            definitions.addAll(compileConstraints(compiledType));
+            if (compiledType instanceof HasComponents) {
+                compileComponentConstraints(compiledType).ifPresent(d -> definitions.addLast(d));
+            }
 
             if (compiledType.getConstraintDefinition() != null) {
                 definitions.addLast(compiledType.getConstraintDefinition());
@@ -155,7 +165,7 @@ public abstract class AbstractConstraintCompiler {
 
         constraint.ifPresent(c -> {
             Optional<Bounds> bounds = getBounds(Optional.ofNullable(definitions.peek()));
-            definitions.addLast(compileConstraints(baseType, c, bounds));
+            definitions.addLast(compileComponentConstraints(baseType, c, bounds));
         });
 
         if (definitions.size() == 1) {
@@ -184,8 +194,44 @@ public abstract class AbstractConstraintCompiler {
         return definition;
     }
 
-    protected List<ConstraintDefinition> compileConstraints(CompiledType compiledType) {
-        return Collections.emptyList();
+    protected Optional<ConstraintDefinition> compileComponentConstraints(CompiledType compiledType) {
+        return ((HasComponents) compiledType).getComponents().stream()
+                .filter(t -> t.get_2().getConstraintDefinition() != null)
+                .map(t -> {
+                    var name = t.get_1();
+                    var compiledComponent = t.get_2();
+                    var componentConstraint = compiledComponent.getConstraintDefinition();
+
+                    var roots = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
+                            componentConstraint.getRoots(), PresenceConstraint.PresenceType.OPTIONAL)));
+                    Node extensions = null;
+
+                    if (componentConstraint.getExtensions() != null) {
+                        extensions = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
+                                componentConstraint.getRoots(), PresenceConstraint.PresenceType.OPTIONAL)));
+                    }
+
+                    return new ConstraintDefinition(roots, extensions, componentConstraint.isExtensible());
+                }).reduce((op1, op2) -> {
+                    Node roots = new BinOpNode(getComponentCombinationOp(), op1.getRoots(), op2.getRoots());
+                    Node extensions = op1.getExtensions();
+
+                    if (extensions == null) {
+                        extensions = op2.getExtensions();
+                    } else {
+                        if (op2.getExtensions() != null) {
+                            extensions = new BinOpNode(getComponentCombinationOp(), extensions, op2.getExtensions());
+                        }
+                    }
+
+                    boolean extensible = op1.isExtensible() || op2.isExtensible();
+
+                    return new ConstraintDefinition(roots, extensions, extensible);
+                });
+    }
+
+    protected NodeType getComponentCombinationOp() {
+        return INTERSECTION;
     }
 
     @SuppressWarnings("squid:S1172")
@@ -193,7 +239,7 @@ public abstract class AbstractConstraintCompiler {
         return Optional.empty();
     }
 
-    ConstraintDefinition compileConstraints(CompiledType baseType, List<Constraint> constraints,
+    ConstraintDefinition compileComponentConstraints(CompiledType baseType, List<Constraint> constraints,
             Optional<Bounds> bounds) {
         ConstraintDefinition constraintDef = null;
 

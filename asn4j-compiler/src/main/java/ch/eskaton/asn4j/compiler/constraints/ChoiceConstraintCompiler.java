@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ChoiceContainedSubtypeCompiler;
@@ -36,7 +37,6 @@ import ch.eskaton.asn4j.compiler.constraints.elements.ChoiceMultipleTypeConstrai
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.ChoiceValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.expr.ChoiceWithComponentsExpressionBuilder;
-import ch.eskaton.asn4j.compiler.constraints.expr.WithComponentsExpressionBuilder;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Expression;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
@@ -65,6 +65,7 @@ import java.util.Set;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_DO_CHECK_CONSTRAINT;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.getMapParameter;
+import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.CUSTOM;
 import static ch.eskaton.commons.utils.StringUtils.initCap;
@@ -97,6 +98,11 @@ public class ChoiceConstraintCompiler extends AbstractConstraintCompiler {
         addConstraintCondition(compiledType, definition, builder, module);
 
         builder.build();
+    }
+
+    @Override
+    protected NodeType getComponentCombinationOp() {
+        return UNION;
     }
 
     protected void generateDoCheckConstraint(CompiledChoiceType compiledType, Module module) {

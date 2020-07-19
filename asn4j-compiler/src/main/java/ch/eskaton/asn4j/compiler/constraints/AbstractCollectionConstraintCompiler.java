@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.CollectionContainedSubtypeCompiler;
@@ -53,7 +52,6 @@ import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
-import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
@@ -63,12 +61,10 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_CHECK_CONSTRAINT_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_DO_CHECK_CONSTRAINT;
@@ -117,31 +113,6 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         addConstraintCondition(compiledType, typeParameter, definition, builder, module);
 
         builder.build();
-    }
-
-    protected List<ConstraintDefinition> compileConstraints(CompiledType compiledType) {
-        if (compiledType instanceof CompiledCollectionType) {
-            return ((CompiledCollectionType) compiledType).getComponents().stream()
-                    .filter(t -> t.get_2().getConstraintDefinition() != null)
-                    .map(t -> {
-                        var name = t.get_1();
-                        var compiledComponent = t.get_2();
-                        var componentConstraint = compiledComponent.getConstraintDefinition();
-
-                        var roots = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
-                                componentConstraint.getRoots(), PresenceConstraint.PresenceType.OPTIONAL)));
-                        Node extensions = null;
-
-                        if (componentConstraint.getExtensions() != null) {
-                            extensions = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
-                                    componentConstraint.getRoots(), PresenceConstraint.PresenceType.OPTIONAL)));
-                        }
-
-                        return new ConstraintDefinition(roots, extensions, componentConstraint.isExtensible());
-                    }).collect(Collectors.toList());
-        }
-
-        return Collections.emptyList();
     }
 
     protected void generateDoCheckConstraint(CompiledCollectionType compiledType, Module module) {

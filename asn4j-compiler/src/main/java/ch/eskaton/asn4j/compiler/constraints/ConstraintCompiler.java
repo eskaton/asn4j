@@ -97,7 +97,7 @@ public class ConstraintCompiler {
     private ConstraintDefinition compileConstraintAux(CompiledType compiledType) {
         var compilerAndType = getCompilerAndType(compiledType);
 
-        return compilerAndType.get_1().compileConstraints(compiledType.getType(), compilerAndType.get_2());
+        return compilerAndType.get_1().compileComponentConstraints(compiledType.getType(), compilerAndType.get_2());
     }
 
     public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {
@@ -107,14 +107,14 @@ public class ConstraintCompiler {
     public ConstraintDefinition compileConstraint(Type type, Constraint constraint) {
         var compilerAndType = getCompilerAndType(ctx.getCompiledBaseType(type));
 
-        return compilerAndType.get_1().compileConstraints(compilerAndType.get_2(), singletonList(constraint),
+        return compilerAndType.get_1().compileComponentConstraints(compilerAndType.get_2(), singletonList(constraint),
                 Optional.empty());
     }
 
     public ConstraintDefinition compileConstraint(CompiledType compiledType, Constraint constraint) {
         var compilerAndType = getCompilerAndType(compiledType);
 
-        return compilerAndType.get_1().compileConstraints(compilerAndType.get_2(), singletonList(constraint),
+        return compilerAndType.get_1().compileComponentConstraints(compilerAndType.get_2(), singletonList(constraint),
                 Optional.empty());
     }
 
