@@ -66,6 +66,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.utils.ConstraintChecks;
 import ch.eskaton.commons.collections.Maps;
 import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
@@ -251,9 +252,6 @@ public class IL2JavaTranslator {
             } else if (functionCall instanceof GetSize) {
                 object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
                 function = "size";
-            } else if (functionCall instanceof FunctionCall.GetStringLength) {
-                object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
-                function = "length";
             } else if (functionCall instanceof FunctionCall.GetUnicodeStringLength) {
                 object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
                 function = "codePointCount";
@@ -316,7 +314,7 @@ public class IL2JavaTranslator {
         if (booleanExpression instanceof BinaryBooleanExpression) {
             BinaryBooleanExpression binaryBooleanExpression = (BinaryBooleanExpression) booleanExpression;
             String operator;
-
+            
             switch (binaryBooleanExpression.getOperator()) {
                 case OR:
                     operator = " || ";
@@ -362,6 +360,46 @@ public class IL2JavaTranslator {
                 String argument = translateArg(ctx, javaClass, functionCall, 1);
 
                 return object + ".equals(" + argument + ")";
+            } else if (functionCall instanceof BooleanFunctionCall.CheckStringMinLength) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkMinLength");
+
+                return String.format("checkMinLength(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckStringMaxLength) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkMaxLength");
+
+                return String.format("checkMaxLength(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckLowerBound) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkLowerBound");
+
+                return String.format("checkLowerBound(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckUpperBound) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkUpperBound");
+
+                return String.format("checkUpperBound(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckEquals) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkEquals");
+
+                return String.format("checkEquals(%s)", arguments);
             } else {
                 String function = functionCall.getFunction()
                         .orElseThrow(() -> new CompilerException("Undefined function of type %s",
