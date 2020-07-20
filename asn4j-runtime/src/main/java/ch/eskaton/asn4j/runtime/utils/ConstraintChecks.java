@@ -24,30 +24,54 @@
  *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
-import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.Variable;
+package ch.eskaton.asn4j.runtime.utils;
 
 import java.math.BigInteger;
 
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
+public class ConstraintChecks {
 
-public class IntegerRangeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
+    private ConstraintChecks() {
+    }
 
-    protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
-        var intValue = BigInteger.valueOf(value);
+    public static boolean checkMinLength(String value, long min) {
+        if (value == null) {
+            return false;
+        }
 
-        return switch (operator) {
-            case GE -> new BooleanFunctionCall.CheckLowerBound(new Variable(VAR_VALUE), new ILValue(intValue));
-            case LE -> new BooleanFunctionCall.CheckUpperBound(new Variable(VAR_VALUE), new ILValue(intValue));
-            case EQ -> new BooleanFunctionCall.CheckEquals(new Variable(VAR_VALUE), new ILValue(intValue));
-            default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
-        };
+        return value.length() >= min;
+    }
+
+    public static boolean checkMaxLength(String value, long max) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.length() <= max;
+    }
+
+    public static boolean checkLowerBound(BigInteger value, long min) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.compareTo(BigInteger.valueOf(min)) >= Integer.valueOf(0);
+    }
+
+    public static boolean checkUpperBound(BigInteger value, long max) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.compareTo(BigInteger.valueOf(max)) <= Integer.valueOf(0);
+    }
+
+    public static boolean checkEquals(BigInteger value, long other) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.compareTo(BigInteger.valueOf(other)) == Integer.valueOf(0);
     }
 
 }

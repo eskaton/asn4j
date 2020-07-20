@@ -89,6 +89,11 @@ TestChoice1 ::= CHOICE {
     a BOOLEAN (TRUE),
     b INTEGER (1)
 }
+TestChoice2 ::= CHOICE {
+    a BOOLEAN (TRUE),
+    b INTEGER (1 | 2 | 3),
+    c VisibleString (SIZE(1..2))
+}
 
 testVisibleString1 VisibleString ::= "xyz"
 

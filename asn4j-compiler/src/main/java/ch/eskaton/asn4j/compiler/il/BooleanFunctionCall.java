@@ -53,22 +53,12 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
             super(Optional.empty(), argument1, argument2);
         }
 
-        @Override
-        public String toString() {
-            return ToString.get(this);
-        }
-
     }
 
     public static class SetEquals extends BooleanFunctionCall {
 
         public SetEquals(Expression argument1, Expression argument2) {
             super(Optional.empty(), argument1, argument2);
-        }
-
-        @Override
-        public String toString() {
-            return ToString.get(this);
         }
 
     }
@@ -79,11 +69,6 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
             super(Optional.empty(), argument1, argument2);
         }
 
-        @Override
-        public String toString() {
-            return ToString.get(this);
-        }
-
     }
 
     public static class StringEquals extends BooleanFunctionCall {
@@ -92,9 +77,44 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
             super(Optional.empty(), argument1, argument2);
         }
 
-        @Override
-        public String toString() {
-            return ToString.get(this);
+    }
+
+    public static class CheckStringMinLength extends BooleanFunctionCall {
+
+        public CheckStringMinLength(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
+    public static class CheckStringMaxLength extends BooleanFunctionCall {
+
+        public CheckStringMaxLength(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
+    public static class CheckLowerBound extends BooleanFunctionCall {
+
+        public CheckLowerBound(Expression argument, Expression bound) {
+            super(Optional.empty(), argument, bound);
+        }
+
+    }
+
+    public static class CheckUpperBound extends BooleanFunctionCall {
+
+        public CheckUpperBound(Expression argument, Expression bound) {
+            super(Optional.empty(), argument, bound);
+        }
+
+    }
+
+    public static class CheckEquals extends BooleanFunctionCall {
+
+        public CheckEquals(Expression argument, Expression bound) {
+            super(Optional.empty(), argument, bound);
         }
 
     }

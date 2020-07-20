@@ -47,7 +47,7 @@ public abstract class AbstractIntegerRangeExpressionBuilder {
         return of(new BinaryBooleanExpression(BinaryOperator.OR, expressions));
     }
 
-    private BinaryBooleanExpression buildExpression(IntegerRange range) {
+    private BooleanExpression buildExpression(IntegerRange range) {
         long lower = range.getLower();
         long upper = range.getUpper();
 
@@ -58,13 +58,13 @@ public abstract class AbstractIntegerRangeExpressionBuilder {
         } else if (upper == Long.MAX_VALUE) {
             return buildExpression(lower, BinaryOperator.GE);
         } else {
-            BinaryBooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
-            BinaryBooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
+            BooleanExpression expr1 = buildExpression(lower, BinaryOperator.GE);
+            BooleanExpression expr2 = buildExpression(upper, BinaryOperator.LE);
 
             return new BinaryBooleanExpression(BinaryOperator.AND, expr1, expr2);
         }
     }
 
-    protected abstract BinaryBooleanExpression buildExpression(long value, BinaryOperator operator);
+    protected abstract BooleanExpression buildExpression(long value, BinaryOperator operator);
 
 }

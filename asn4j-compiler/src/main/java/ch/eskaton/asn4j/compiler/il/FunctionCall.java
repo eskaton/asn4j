@@ -128,19 +128,6 @@ public class FunctionCall implements Expression {
 
     }
 
-    public static class GetStringLength extends FunctionCall {
-
-        public GetStringLength(Expression argument) {
-            super(Optional.empty(), argument);
-        }
-
-        @Override
-        public String toString() {
-            return ToString.get(this);
-        }
-
-    }
-
     public static class GetUnicodeStringLength extends FunctionCall {
 
         public GetUnicodeStringLength(Expression argument) {
