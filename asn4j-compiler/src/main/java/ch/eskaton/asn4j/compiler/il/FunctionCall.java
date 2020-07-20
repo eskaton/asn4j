@@ -76,61 +76,9 @@ public class FunctionCall implements Expression {
         return ToString.get(this);
     }
 
-    public static class BigIntegerCompare extends FunctionCall {
-
-        public BigIntegerCompare(Expression... arguments) {
-            super(Optional.empty(), arguments);
-        }
-
-        @Override
-        public String toString() {
-            return ToString.get(this);
-        }
-
-    }
-
-    public static class ArrayLength extends FunctionCall {
-
-        public ArrayLength(Expression argument) {
-            super(Optional.empty(), argument);
-        }
-
-        @Override
-        public String toString() {
-            return ToString.get(this);
-        }
-
-    }
-
-    public static class BitStringSize extends FunctionCall {
-
-        public BitStringSize(Expression argument1, Expression argument2) {
-            super(Optional.empty(), argument1, argument2);
-        }
-
-        @Override
-        public String toString() {
-            return ToString.get(this);
-        }
-
-    }
-
     public static class GetSize extends FunctionCall {
 
         public GetSize(Expression argument) {
-            super(Optional.empty(), argument);
-        }
-
-        @Override
-        public String toString() {
-            return ToString.get(this);
-        }
-
-    }
-
-    public static class GetUnicodeStringLength extends FunctionCall {
-
-        public GetUnicodeStringLength(Expression argument) {
             super(Optional.empty(), argument);
         }
 

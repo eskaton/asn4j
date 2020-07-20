@@ -45,9 +45,6 @@ import ch.eskaton.asn4j.compiler.il.Expression;
 import ch.eskaton.asn4j.compiler.il.Foreach;
 import ch.eskaton.asn4j.compiler.il.Function;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
-import ch.eskaton.asn4j.compiler.il.FunctionCall.ArrayLength;
-import ch.eskaton.asn4j.compiler.il.FunctionCall.BigIntegerCompare;
-import ch.eskaton.asn4j.compiler.il.FunctionCall.BitStringSize;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.GetMapValue;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.GetSize;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
@@ -240,23 +237,9 @@ public class IL2JavaTranslator {
             Optional<String> object;
             String arguments = "";
 
-            if (functionCall instanceof BigIntegerCompare) {
-                function = "compareTo";
-                object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
-                arguments = "BigInteger.valueOf(" + translateArg(ctx, javaClass, functionCall, 1) + ")";
-            } else if (functionCall instanceof ArrayLength) {
-                return translateArg(ctx, javaClass, functionCall, 0) + ".length";
-            } else if (functionCall instanceof BitStringSize) {
-                return "ASN1BitString.getSize(" + translateArg(ctx, javaClass, functionCall, 0) + ", " +
-                        translateArg(ctx, javaClass, functionCall, 1) + ")";
-            } else if (functionCall instanceof GetSize) {
+            if (functionCall instanceof GetSize) {
                 object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
                 function = "size";
-            } else if (functionCall instanceof FunctionCall.GetUnicodeStringLength) {
-                object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
-                function = "codePointCount";
-                arguments = String.format("0, %s.length()",
-                        object.orElseThrow(() -> new CompilerException("object must not be null")));
             } else if (functionCall instanceof ToArray) {
                 object = ofNullable(translateExpression(ctx, javaClass,
                         functionCall.getObject().orElseThrow(() -> new CompilerException("object must not be null"))));
@@ -314,7 +297,7 @@ public class IL2JavaTranslator {
         if (booleanExpression instanceof BinaryBooleanExpression) {
             BinaryBooleanExpression binaryBooleanExpression = (BinaryBooleanExpression) booleanExpression;
             String operator;
-            
+
             switch (binaryBooleanExpression.getOperator()) {
                 case OR:
                     operator = " || ";
@@ -384,6 +367,30 @@ public class IL2JavaTranslator {
                 javaClass.addStaticImport(ConstraintChecks.class, "checkLengthEquals");
 
                 return String.format("checkLengthEquals(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckUCStringMinLength) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkUCMinLength");
+
+                return String.format("checkUCMinLength(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckUCStringMaxLength) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkUCMaxLength");
+
+                return String.format("checkUCMaxLength(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckUCStringLengthEquals) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkUCLengthEquals");
+
+                return String.format("checkUCLengthEquals(%s)", arguments);
             } else if (functionCall instanceof BooleanFunctionCall.CheckBitStringMinLength) {
                 String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
                         .map(expr -> translateExpression(ctx, javaClass, expr))
@@ -401,6 +408,30 @@ public class IL2JavaTranslator {
 
                 return String.format("checkMaxLength(%s)", arguments);
             } else if (functionCall instanceof BooleanFunctionCall.CheckBitStringLengthEquals) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkLengthEquals");
+
+                return String.format("checkLengthEquals(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckOctetStringMinLength) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkMinLength");
+
+                return String.format("checkMinLength(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckOctetStringMaxLength) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkMaxLength");
+
+                return String.format("checkMaxLength(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckOctetStringLengthEquals) {
                 String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
                         .map(expr -> translateExpression(ctx, javaClass, expr))
                         .collect(joining(", "));

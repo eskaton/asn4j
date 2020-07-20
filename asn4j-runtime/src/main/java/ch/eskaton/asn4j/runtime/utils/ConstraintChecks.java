@@ -60,6 +60,30 @@ public class ConstraintChecks {
         return value.length() == length;
     }
 
+    public static boolean checkUCMinLength(String value, long min) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.codePointCount(0, value.length()) >= min;
+    }
+
+    public static boolean checkUCMaxLength(String value, long max) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.codePointCount(0, value.length()) <= max;
+    }
+
+    public static boolean checkUCLengthEquals(String value, long length) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.codePointCount(0, value.length()) == length;
+    }
+
     public static boolean checkMinLength(byte[] value, Integer unusedBits, long min) {
         if (value == null || unusedBits == null) {
             return false;
@@ -82,6 +106,30 @@ public class ConstraintChecks {
         }
 
         return ASN1BitString.getSize(value, unusedBits) == length;
+    }
+
+    public static boolean checkMinLength(byte[] value, long min) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.length >= min;
+    }
+
+    public static boolean checkMaxLength(byte[] value, long max) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.length <= max;
+    }
+
+    public static boolean checkLengthEquals(byte[] value, long length) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.length == length;
     }
 
     public static boolean checkLowerBound(BigInteger value, long min) {
