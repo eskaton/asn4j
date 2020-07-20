@@ -637,14 +637,19 @@ class TestX680_51_1 {
 
     @Test
     void testChoice2() {
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1Boolean.TRUE));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setB(ASN1Integer.valueOf(1L)));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setB(ASN1Integer.valueOf(2L)));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setB(ASN1Integer.valueOf(3L)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] {0x00}, 7)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] {0x02}, 6)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] {0x07}, 5)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setB(ASN1Boolean.TRUE));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setC(ASN1Integer.valueOf(1L)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setC(ASN1Integer.valueOf(2L)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setC(ASN1Integer.valueOf(3L)));
 
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1Boolean.FALSE));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setB(ASN1Integer.valueOf(0L)));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setB(ASN1Integer.valueOf(4L)));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] {0x00}, 8)));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] {0x07}, 4)));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setB(ASN1Boolean.FALSE));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setC(ASN1Integer.valueOf(0L)));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setC(ASN1Integer.valueOf(4L)));
     }
 
     @Test

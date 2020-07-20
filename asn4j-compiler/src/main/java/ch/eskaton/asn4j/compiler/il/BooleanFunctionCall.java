@@ -95,6 +95,38 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
 
     }
 
+    public static class CheckStringLengthEquals extends BooleanFunctionCall {
+
+        public CheckStringLengthEquals(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
+    public static class CheckBitStringMinLength extends BooleanFunctionCall {
+
+        public CheckBitStringMinLength(Expression value, Expression unusedBits, Expression length) {
+            super(Optional.empty(), value, unusedBits, length);
+        }
+
+    }
+
+    public static class CheckBitStringMaxLength extends BooleanFunctionCall {
+
+        public CheckBitStringMaxLength(Expression value, Expression unusedBits, Expression length) {
+            super(Optional.empty(), value, unusedBits, length);
+        }
+
+    }
+
+    public static class CheckBitStringLengthEquals extends BooleanFunctionCall {
+
+        public CheckBitStringLengthEquals(Expression value, Expression unusedBits, Expression length) {
+            super(Optional.empty(), value, unusedBits, length);
+        }
+
+    }
+
     public static class CheckLowerBound extends BooleanFunctionCall {
 
         public CheckLowerBound(Expression argument, Expression bound) {

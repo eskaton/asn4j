@@ -376,6 +376,38 @@ public class IL2JavaTranslator {
                 javaClass.addStaticImport(ConstraintChecks.class, "checkMaxLength");
 
                 return String.format("checkMaxLength(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckStringLengthEquals) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkLengthEquals");
+
+                return String.format("checkLengthEquals(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckBitStringMinLength) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkMinLength");
+
+                return String.format("checkMinLength(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckBitStringMaxLength) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkMaxLength");
+
+                return String.format("checkMaxLength(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckBitStringLengthEquals) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkLengthEquals");
+
+                return String.format("checkLengthEquals(%s)", arguments);
             } else if (functionCall instanceof BooleanFunctionCall.CheckLowerBound) {
                 String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
                         .map(expr -> translateExpression(ctx, javaClass, expr))

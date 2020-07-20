@@ -41,6 +41,7 @@ public class StringSizeExpressionBuilder extends AbstractIntegerRangeExpressionB
         return switch (operator) {
             case GE -> new BooleanFunctionCall.CheckStringMinLength(new Variable(VAR_VALUE), new ILValue(value));
             case LE -> new BooleanFunctionCall.CheckStringMaxLength(new Variable(VAR_VALUE), new ILValue(value));
+            case EQ -> new BooleanFunctionCall.CheckStringLengthEquals(new Variable(VAR_VALUE), new ILValue(value));
             default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
         };
     }

@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.runtime.utils;
 
+import ch.eskaton.asn4j.runtime.types.ASN1BitString;
+
 import java.math.BigInteger;
 
 public class ConstraintChecks {
@@ -48,6 +50,38 @@ public class ConstraintChecks {
         }
 
         return value.length() <= max;
+    }
+
+    public static boolean checkLengthEquals(String value, long length) {
+        if (value == null) {
+            return false;
+        }
+
+        return value.length() == length;
+    }
+
+    public static boolean checkMinLength(byte[] value, Integer unusedBits, long min) {
+        if (value == null || unusedBits == null) {
+            return false;
+        }
+
+        return ASN1BitString.getSize(value, unusedBits) >= min;
+    }
+
+    public static boolean checkMaxLength(byte[] value, Integer unusedBits, long max) {
+        if (value == null || unusedBits == null) {
+            return false;
+        }
+
+        return ASN1BitString.getSize(value, unusedBits) <= max;
+    }
+
+    public static boolean checkLengthEquals(byte[] value, Integer unusedBits, long length) {
+        if (value == null || unusedBits == null) {
+            return false;
+        }
+
+        return ASN1BitString.getSize(value, unusedBits) == length;
     }
 
     public static boolean checkLowerBound(BigInteger value, long min) {
