@@ -26,9 +26,10 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.FunctionCall;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
 
@@ -37,10 +38,16 @@ import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
 public class BitStringStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
-    protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        var expr = new FunctionCall.BitStringSize(new Variable(VAR_VALUE), new Variable(VAR_UNUSED_BITS));
-
-        return new BinaryBooleanExpression(operator, expr, new ILValue(value));
+    protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
+        return switch (operator) {
+            case GE -> new BooleanFunctionCall.CheckBitStringMinLength(new Variable(VAR_VALUE),
+                    new Variable(VAR_UNUSED_BITS), new ILValue(value));
+            case LE -> new BooleanFunctionCall.CheckBitStringMaxLength(new Variable(VAR_VALUE),
+                    new Variable(VAR_UNUSED_BITS), new ILValue(value));
+            case EQ -> new BooleanFunctionCall.CheckBitStringLengthEquals(new Variable(VAR_VALUE),
+                    new Variable(VAR_UNUSED_BITS), new ILValue(value));
+            default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
+        };
     }
 
 }
