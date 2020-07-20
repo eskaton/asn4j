@@ -103,6 +103,30 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
 
     }
 
+    public static class CheckUCStringMinLength extends BooleanFunctionCall {
+
+        public CheckUCStringMinLength(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
+    public static class CheckUCStringMaxLength extends BooleanFunctionCall {
+
+        public CheckUCStringMaxLength(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
+    public static class CheckUCStringLengthEquals extends BooleanFunctionCall {
+
+        public CheckUCStringLengthEquals(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
     public static class CheckBitStringMinLength extends BooleanFunctionCall {
 
         public CheckBitStringMinLength(Expression value, Expression unusedBits, Expression length) {
@@ -123,6 +147,30 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
 
         public CheckBitStringLengthEquals(Expression value, Expression unusedBits, Expression length) {
             super(Optional.empty(), value, unusedBits, length);
+        }
+
+    }
+
+    public static class CheckOctetStringMinLength extends BooleanFunctionCall {
+
+        public CheckOctetStringMinLength(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
+    public static class CheckOctetStringMaxLength extends BooleanFunctionCall {
+
+        public CheckOctetStringMaxLength(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
+    public static class CheckOctetStringLengthEquals extends BooleanFunctionCall {
+
+        public CheckOctetStringLengthEquals(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
         }
 
     }

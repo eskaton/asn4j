@@ -26,8 +26,11 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
@@ -36,10 +39,13 @@ import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
 public class UnicodeStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
-    protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        var expr = new FunctionCall.GetUnicodeStringLength(new Variable(VAR_VALUE));
-
-        return new BinaryBooleanExpression(operator, expr, new ILValue(value));
+    protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
+        return switch (operator) {
+            case GE -> new BooleanFunctionCall.CheckUCStringMinLength(new Variable(VAR_VALUE), new ILValue(value));
+            case LE -> new BooleanFunctionCall.CheckUCStringMaxLength(new Variable(VAR_VALUE), new ILValue(value));
+            case EQ -> new BooleanFunctionCall.CheckUCStringLengthEquals(new Variable(VAR_VALUE), new ILValue(value));
+            default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
+        };
     }
 
 }

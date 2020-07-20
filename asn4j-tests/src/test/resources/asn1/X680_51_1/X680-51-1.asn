@@ -92,8 +92,20 @@ TestChoice1 ::= CHOICE {
 TestChoice2 ::= CHOICE {
     a BIT STRING (SIZE(1..2) | '111'B),
     b BOOLEAN (TRUE),
-    c INTEGER (1 | 2 | 3),
-    d VisibleString (SIZE(1..2))
+    c TestEnumeration1 (a | b),
+    d INTEGER (1 | 2 | 3),
+    e OCTET STRING (SIZE(1) | '01FF'H),
+    f VisibleString (SIZE(1..2)),
+    g GeneralString (SIZE(1..2)),
+    h GraphicString (SIZE(1..2)),
+    i IA5String (SIZE(1..2)),
+    j VideotexString (SIZE(1..2)),
+    k TeletexString (SIZE(1..2)),
+    l PrintableString (SIZE(1..2)),
+    m NumericString (SIZE(1..2)),
+    n UTF8String (SIZE(1..2)),
+    o UniversalString (SIZE(1..2)),
+    p BMPString (SIZE(1..2))
 }
 
 testVisibleString1 VisibleString ::= "xyz"
