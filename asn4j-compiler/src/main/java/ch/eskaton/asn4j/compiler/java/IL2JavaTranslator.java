@@ -46,7 +46,6 @@ import ch.eskaton.asn4j.compiler.il.Foreach;
 import ch.eskaton.asn4j.compiler.il.Function;
 import ch.eskaton.asn4j.compiler.il.FunctionCall;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.GetMapValue;
-import ch.eskaton.asn4j.compiler.il.FunctionCall.GetSize;
 import ch.eskaton.asn4j.compiler.il.FunctionCall.ToArray;
 import ch.eskaton.asn4j.compiler.il.ILListValue;
 import ch.eskaton.asn4j.compiler.il.ILMapValue;
@@ -237,10 +236,7 @@ public class IL2JavaTranslator {
             Optional<String> object;
             String arguments = "";
 
-            if (functionCall instanceof GetSize) {
-                object = ofNullable(translateArg(ctx, javaClass, functionCall, 0));
-                function = "size";
-            } else if (functionCall instanceof ToArray) {
+            if (functionCall instanceof ToArray) {
                 object = ofNullable(translateExpression(ctx, javaClass,
                         functionCall.getObject().orElseThrow(() -> new CompilerException("object must not be null"))));
                 function = "toArray";
@@ -463,6 +459,30 @@ public class IL2JavaTranslator {
                 javaClass.addStaticImport(ConstraintChecks.class, "checkEquals");
 
                 return String.format("checkEquals(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckCollectionMinSize) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkMinSize");
+
+                return String.format("checkMinSize(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckCollectionMaxSize) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkMaxSize");
+
+                return String.format("checkMaxSize(%s)", arguments);
+            } else if (functionCall instanceof BooleanFunctionCall.CheckCollectionSizeEquals) {
+                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                        .map(expr -> translateExpression(ctx, javaClass, expr))
+                        .collect(joining(", "));
+
+                javaClass.addStaticImport(ConstraintChecks.class, "checkSizeEquals");
+
+                return String.format("checkSizeEquals(%s)", arguments);
             } else {
                 String function = functionCall.getFunction()
                         .orElseThrow(() -> new CompilerException("Undefined function of type %s",

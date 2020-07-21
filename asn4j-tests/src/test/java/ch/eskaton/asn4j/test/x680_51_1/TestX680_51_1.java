@@ -158,6 +158,7 @@ import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testVideotexStringSuccess;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringFailure;
 import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringSuccess;
+import static ch.eskaton.commons.utils.Utils.with;
 
 class TestX680_51_1 {
 
@@ -638,86 +639,96 @@ class TestX680_51_1 {
 
     @Test
     void testChoice1() {
-        testChoiceSuccess(TestChoice1.class, new TestChoice1(), s -> s.setA(ASN1Boolean.TRUE));
-        testChoiceSuccess(TestChoice1.class, new TestChoice1(), s -> s.setB(ASN1Integer.valueOf(1L)));
+        testChoiceSuccess(TestChoice1.class, new TestChoice1(), c -> c.setA(ASN1Boolean.TRUE));
+        testChoiceSuccess(TestChoice1.class, new TestChoice1(), c -> c.setB(ASN1Integer.valueOf(1L)));
 
-        testChoiceFailure(TestChoice1.class, new TestChoice1(), s -> s.setA(ASN1Boolean.FALSE));
-        testChoiceFailure(TestChoice1.class, new TestChoice1(), s -> s.setB(ASN1Integer.valueOf(0L)));
-        testChoiceFailure(TestChoice1.class, new TestChoice1(), s -> s.setB(ASN1Integer.valueOf(2L)));
+        testChoiceFailure(TestChoice1.class, new TestChoice1(), c -> c.setA(ASN1Boolean.FALSE));
+        testChoiceFailure(TestChoice1.class, new TestChoice1(), c -> c.setB(ASN1Integer.valueOf(0L)));
+        testChoiceFailure(TestChoice1.class, new TestChoice1(), c -> c.setB(ASN1Integer.valueOf(2L)));
     }
 
     @Test
     void testChoice2() {
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] { 0x00 }, 7)));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] { 0x02 }, 6)));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] { 0x07 }, 5)));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setB(ASN1Boolean.TRUE));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setC(TestEnumeration1.A));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setC(TestEnumeration1.B));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setD(ASN1Integer.valueOf(1L)));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setD(ASN1Integer.valueOf(2L)));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setD(ASN1Integer.valueOf(3L)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setA(ASN1BitString.of(new byte[] { 0x00 }, 7)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setA(ASN1BitString.of(new byte[] { 0x02 }, 6)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setA(ASN1BitString.of(new byte[] { 0x07 }, 5)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setB(ASN1Boolean.TRUE));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setC(TestEnumeration1.A));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setC(TestEnumeration1.B));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setD(ASN1Integer.valueOf(1L)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setD(ASN1Integer.valueOf(2L)));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setD(ASN1Integer.valueOf(3L)));
         testChoiceSuccess(TestChoice2.class, new TestChoice2(),
-                s -> s.setE(ASN1OctetString.valueOf(new byte[] { 0x01 })));
+                c -> c.setE(ASN1OctetString.valueOf(new byte[] { 0x01 })));
         testChoiceSuccess(TestChoice2.class, new TestChoice2(),
-                s -> s.setE(ASN1OctetString.valueOf(new byte[] { (byte) 0xff })));
+                c -> c.setE(ASN1OctetString.valueOf(new byte[] { (byte) 0xff })));
         testChoiceSuccess(TestChoice2.class, new TestChoice2(),
-                s -> s.setE(ASN1OctetString.valueOf(new byte[] { 0x01, (byte) 0xff })));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setF(new ASN1VisibleString("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setF(new ASN1VisibleString("ab")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setG(new ASN1GeneralString("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setG(new ASN1GeneralString("ab")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setH(new ASN1GraphicString("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setH(new ASN1GraphicString("ab")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setI(new ASN1IA5String("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setI(new ASN1IA5String("ab")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setJ(new ASN1VideotexString("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setJ(new ASN1VideotexString("ab")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setK(new ASN1TeletexString("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setK(new ASN1TeletexString("ab")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setL(new ASN1PrintableString("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setL(new ASN1PrintableString("ab")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setM(new ASN1NumericString("1")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setM(new ASN1NumericString("12")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setN(new ASN1UTF8String("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setN(new ASN1UTF8String("ab")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setO(new ASN1UniversalString("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setO(new ASN1UniversalString("ab")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setP(new ASN1BMPString("a")));
-        testChoiceSuccess(TestChoice2.class, new TestChoice2(), s -> s.setP(new ASN1BMPString("ab")));
+                c -> c.setE(ASN1OctetString.valueOf(new byte[] { 0x01, (byte) 0xff })));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setF(new ASN1VisibleString("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setF(new ASN1VisibleString("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setG(new ASN1GeneralString("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setG(new ASN1GeneralString("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setH(new ASN1GraphicString("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setH(new ASN1GraphicString("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setI(new ASN1IA5String("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setI(new ASN1IA5String("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setJ(new ASN1VideotexString("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setJ(new ASN1VideotexString("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setK(new ASN1TeletexString("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setK(new ASN1TeletexString("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setL(new ASN1PrintableString("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setL(new ASN1PrintableString("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setM(new ASN1NumericString("1")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setM(new ASN1NumericString("12")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setN(new ASN1UTF8String("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setN(new ASN1UTF8String("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setO(new ASN1UniversalString("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setO(new ASN1UniversalString("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setP(new ASN1BMPString("a")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c -> c.setP(new ASN1BMPString("ab")));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c ->
+                c.setQ(with(new TestChoice2.Q(), s -> s.setValues(ASN1Integer.valueOf(3L)))));
+        testChoiceSuccess(TestChoice2.class, new TestChoice2(), c ->
+                c.setQ(with(new TestChoice2.Q(), s -> s.setValues(ASN1Integer.valueOf(3L), ASN1Integer.valueOf(4L)))));
 
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] { 0x00 }, 8)));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setA(ASN1BitString.of(new byte[] { 0x07 }, 4)));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setB(ASN1Boolean.FALSE));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setC(TestEnumeration1.C));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setD(ASN1Integer.valueOf(0L)));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setD(ASN1Integer.valueOf(4L)));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setA(ASN1BitString.of(new byte[] { 0x00 }, 8)));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setA(ASN1BitString.of(new byte[] { 0x07 }, 4)));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setB(ASN1Boolean.FALSE));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setC(TestEnumeration1.C));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setD(ASN1Integer.valueOf(0L)));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setD(ASN1Integer.valueOf(4L)));
         testChoiceFailure(TestChoice2.class, new TestChoice2(),
-                s -> s.setE(ASN1OctetString.valueOf(new byte[] { 0x00, (byte) 0xff })));
+                c -> c.setE(ASN1OctetString.valueOf(new byte[] { 0x00, (byte) 0xff })));
         testChoiceFailure(TestChoice2.class, new TestChoice2(),
-                s -> s.setE(ASN1OctetString.valueOf(new byte[] { 0x02, (byte) 0xff })));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setF(new ASN1VisibleString("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setF(new ASN1VisibleString("abc")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setG(new ASN1GeneralString("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setG(new ASN1GeneralString("abc")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setH(new ASN1GraphicString("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setH(new ASN1GraphicString("abc")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setI(new ASN1IA5String("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setI(new ASN1IA5String("abc")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setJ(new ASN1VideotexString("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setJ(new ASN1VideotexString("abc")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setK(new ASN1TeletexString("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setK(new ASN1TeletexString("abc")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setL(new ASN1PrintableString("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setL(new ASN1PrintableString("abc")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setM(new ASN1NumericString("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setM(new ASN1NumericString("123")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setN(new ASN1UTF8String("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setN(new ASN1UTF8String("abc")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setO(new ASN1UniversalString("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setO(new ASN1UniversalString("abc")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setP(new ASN1BMPString("")));
-        testChoiceFailure(TestChoice2.class, new TestChoice2(), s -> s.setP(new ASN1BMPString("abc")));
+                c -> c.setE(ASN1OctetString.valueOf(new byte[] { 0x02, (byte) 0xff })));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setF(new ASN1VisibleString("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setF(new ASN1VisibleString("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setG(new ASN1GeneralString("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setG(new ASN1GeneralString("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setH(new ASN1GraphicString("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setH(new ASN1GraphicString("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setI(new ASN1IA5String("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setI(new ASN1IA5String("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setJ(new ASN1VideotexString("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setJ(new ASN1VideotexString("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setK(new ASN1TeletexString("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setK(new ASN1TeletexString("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setL(new ASN1PrintableString("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setL(new ASN1PrintableString("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setM(new ASN1NumericString("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setM(new ASN1NumericString("123")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setN(new ASN1UTF8String("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setN(new ASN1UTF8String("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setO(new ASN1UniversalString("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setO(new ASN1UniversalString("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setP(new ASN1BMPString("")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setP(new ASN1BMPString("abc")));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c -> c.setQ(new TestChoice2.Q()));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c ->
+                c.setQ(with(new TestChoice2.Q(), s -> s.setValues(ASN1Integer.valueOf(2L), ASN1Integer.valueOf(5L)))));
+        testChoiceFailure(TestChoice2.class, new TestChoice2(), c ->
+                c.setQ(with(new TestChoice2.Q(), s -> s.setValues(ASN1Integer.valueOf(3L), ASN1Integer.valueOf(4L),
+                        ASN1Integer.valueOf(3L)))));
     }
 
     @Test

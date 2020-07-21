@@ -26,9 +26,10 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.FunctionCall;
+import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
 
@@ -36,10 +37,13 @@ import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUES;
 
 public class CollectionOfSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
-    protected BinaryBooleanExpression buildExpression(long value, BinaryOperator operator) {
-        var expr = new FunctionCall.GetSize(new Variable(VAR_VALUES));
-
-        return new BinaryBooleanExpression(operator, expr, new ILValue(value));
+    protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
+        return switch (operator) {
+            case GE -> new BooleanFunctionCall.CheckCollectionMinSize(new Variable(VAR_VALUES), new ILValue(value));
+            case LE -> new BooleanFunctionCall.CheckCollectionMaxSize(new Variable(VAR_VALUES), new ILValue(value));
+            case EQ -> new BooleanFunctionCall.CheckCollectionSizeEquals(new Variable(VAR_VALUES), new ILValue(value));
+            default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
+        };
     }
 
 }

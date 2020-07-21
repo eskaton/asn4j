@@ -105,7 +105,8 @@ TestChoice2 ::= CHOICE {
     m NumericString (SIZE(1..2)),
     n UTF8String (SIZE(1..2)),
     o UniversalString (SIZE(1..2)),
-    p BMPString (SIZE(1..2))
+    p BMPString (SIZE(1..2)),
+    q SEQUENCE (SIZE (1..2)) OF INTEGER (3..4)
 }
 
 testVisibleString1 VisibleString ::= "xyz"
