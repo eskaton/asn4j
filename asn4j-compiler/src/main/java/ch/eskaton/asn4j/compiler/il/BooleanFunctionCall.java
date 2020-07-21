@@ -199,4 +199,28 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
 
     }
 
+    public static class CheckCollectionMinSize extends BooleanFunctionCall {
+
+        public CheckCollectionMinSize(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
+    public static class CheckCollectionMaxSize extends BooleanFunctionCall {
+
+        public CheckCollectionMaxSize(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
+    public static class CheckCollectionSizeEquals extends BooleanFunctionCall {
+
+        public CheckCollectionSizeEquals(Expression argument, Expression length) {
+            super(Optional.empty(), argument, length);
+        }
+
+    }
+
 }

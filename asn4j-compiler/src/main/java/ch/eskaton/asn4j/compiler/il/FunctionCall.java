@@ -76,19 +76,6 @@ public class FunctionCall implements Expression {
         return ToString.get(this);
     }
 
-    public static class GetSize extends FunctionCall {
-
-        public GetSize(Expression argument) {
-            super(Optional.empty(), argument);
-        }
-
-        @Override
-        public String toString() {
-            return ToString.get(this);
-        }
-
-    }
-
     public static class ToArray extends FunctionCall {
 
         private ILType type;

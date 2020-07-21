@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.runtime.utils;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 public class ConstraintChecks {
 
@@ -130,6 +131,30 @@ public class ConstraintChecks {
         }
 
         return value.length == length;
+    }
+
+    public static boolean checkMinSize(Collection values, long min) {
+        if (values == null) {
+            return false;
+        }
+
+        return values.size() >= min;
+    }
+
+    public static boolean checkMaxSize(Collection values, long max) {
+        if (values == null) {
+            return false;
+        }
+
+        return values.size() <= max;
+    }
+
+    public static boolean checkSizeEquals(Collection values, long size) {
+        if (values == null) {
+            return false;
+        }
+
+        return values.size() == size;
     }
 
     public static boolean checkLowerBound(BigInteger value, long min) {
