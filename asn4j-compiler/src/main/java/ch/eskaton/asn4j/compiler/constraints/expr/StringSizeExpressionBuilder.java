@@ -26,24 +26,14 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
-import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.Variable;
-
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckStringLengthEquals;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckStringMaxLength;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckStringMinLength;
 
 public class StringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
-    protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
-        return switch (operator) {
-            case GE -> new BooleanFunctionCall.CheckStringMinLength(new Variable(VAR_VALUE), new ILValue(value));
-            case LE -> new BooleanFunctionCall.CheckStringMaxLength(new Variable(VAR_VALUE), new ILValue(value));
-            case EQ -> new BooleanFunctionCall.CheckStringLengthEquals(new Variable(VAR_VALUE), new ILValue(value));
-            default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
-        };
+    public StringSizeExpressionBuilder() {
+        super(CheckStringMinLength::new, CheckStringMaxLength::new, CheckStringLengthEquals::new);
     }
 
 }

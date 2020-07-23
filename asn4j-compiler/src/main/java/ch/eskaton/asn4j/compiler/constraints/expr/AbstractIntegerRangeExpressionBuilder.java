@@ -26,18 +26,38 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
+import ch.eskaton.asn4j.compiler.il.Expression;
+import ch.eskaton.asn4j.compiler.il.ILValue;
+import ch.eskaton.asn4j.compiler.il.Variable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static java.util.Optional.of;
 
 public abstract class AbstractIntegerRangeExpressionBuilder {
+
+    protected final Function<List<Expression>, BooleanExpression> checkMin;
+
+    protected final Function<List<Expression>, BooleanExpression> checkMax;
+
+    protected final Function<List<Expression>, BooleanExpression> checkEq;
+
+    public AbstractIntegerRangeExpressionBuilder(Function<List<Expression>, BooleanExpression> checkMin,
+            Function<List<Expression>, BooleanExpression> checkMax,
+            Function<List<Expression>, BooleanExpression> checkEq) {
+        this.checkMin = checkMin;
+        this.checkMax = checkMax;
+        this.checkEq = checkEq;
+    }
 
     public Optional<BooleanExpression> build(List<IntegerRange> ranges) {
         var expressions = ranges.stream()
@@ -65,6 +85,13 @@ public abstract class AbstractIntegerRangeExpressionBuilder {
         }
     }
 
-    protected abstract BooleanExpression buildExpression(long value, BinaryOperator operator);
+    protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
+        return switch (operator) {
+            case GE -> checkMin.apply(List.of(new Variable(VAR_VALUE), new ILValue(value)));
+            case LE -> checkMax.apply(List.of(new Variable(VAR_VALUE), new ILValue(value)));
+            case EQ -> checkEq.apply(List.of(new Variable(VAR_VALUE), new ILValue(value)));
+            default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
+        };
+    }
 
 }

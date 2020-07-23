@@ -26,24 +26,15 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
-import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckOctetStringMaxLength;
+import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckOctetStringMinLength;
 
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckOctetStringLengthEquals;
 
 public class OctetStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
-    protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
-        return switch (operator) {
-            case GE -> new BooleanFunctionCall.CheckOctetStringMinLength(new Variable(VAR_VALUE), new ILValue(value));
-            case LE -> new BooleanFunctionCall.CheckOctetStringMaxLength(new Variable(VAR_VALUE), new ILValue(value));
-            case EQ -> new BooleanFunctionCall.CheckOctetStringLengthEquals(new Variable(VAR_VALUE), new ILValue(value));
-            default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
-        };
+    public OctetStringSizeExpressionBuilder() {
+        super(CheckOctetStringMinLength::new, CheckOctetStringMaxLength::new, CheckOctetStringLengthEquals::new);
     }
 
 }

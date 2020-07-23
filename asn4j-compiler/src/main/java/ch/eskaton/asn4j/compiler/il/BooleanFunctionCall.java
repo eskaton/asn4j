@@ -81,144 +81,144 @@ public class BooleanFunctionCall extends FunctionCall implements BooleanExpressi
 
     public static class CheckStringMinLength extends BooleanFunctionCall {
 
-        public CheckStringMinLength(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckStringMinLength(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckStringMaxLength extends BooleanFunctionCall {
 
-        public CheckStringMaxLength(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckStringMaxLength(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckStringLengthEquals extends BooleanFunctionCall {
 
-        public CheckStringLengthEquals(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckStringLengthEquals(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckUCStringMinLength extends BooleanFunctionCall {
 
-        public CheckUCStringMinLength(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckUCStringMinLength(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckUCStringMaxLength extends BooleanFunctionCall {
 
-        public CheckUCStringMaxLength(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckUCStringMaxLength(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckUCStringLengthEquals extends BooleanFunctionCall {
 
-        public CheckUCStringLengthEquals(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckUCStringLengthEquals(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckBitStringMinLength extends BooleanFunctionCall {
 
-        public CheckBitStringMinLength(Expression value, Expression unusedBits, Expression length) {
-            super(Optional.empty(), value, unusedBits, length);
+        public CheckBitStringMinLength(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckBitStringMaxLength extends BooleanFunctionCall {
 
-        public CheckBitStringMaxLength(Expression value, Expression unusedBits, Expression length) {
-            super(Optional.empty(), value, unusedBits, length);
+        public CheckBitStringMaxLength(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckBitStringLengthEquals extends BooleanFunctionCall {
 
-        public CheckBitStringLengthEquals(Expression value, Expression unusedBits, Expression length) {
-            super(Optional.empty(), value, unusedBits, length);
+        public CheckBitStringLengthEquals(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckOctetStringMinLength extends BooleanFunctionCall {
 
-        public CheckOctetStringMinLength(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckOctetStringMinLength(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckOctetStringMaxLength extends BooleanFunctionCall {
 
-        public CheckOctetStringMaxLength(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckOctetStringMaxLength(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckOctetStringLengthEquals extends BooleanFunctionCall {
 
-        public CheckOctetStringLengthEquals(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckOctetStringLengthEquals(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckLowerBound extends BooleanFunctionCall {
 
-        public CheckLowerBound(Expression argument, Expression bound) {
-            super(Optional.empty(), argument, bound);
+        public CheckLowerBound(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckUpperBound extends BooleanFunctionCall {
 
-        public CheckUpperBound(Expression argument, Expression bound) {
-            super(Optional.empty(), argument, bound);
+        public CheckUpperBound(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckEquals extends BooleanFunctionCall {
 
-        public CheckEquals(Expression argument, Expression bound) {
-            super(Optional.empty(), argument, bound);
+        public CheckEquals(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckCollectionMinSize extends BooleanFunctionCall {
 
-        public CheckCollectionMinSize(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckCollectionMinSize(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckCollectionMaxSize extends BooleanFunctionCall {
 
-        public CheckCollectionMaxSize(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckCollectionMaxSize(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }
 
     public static class CheckCollectionSizeEquals extends BooleanFunctionCall {
 
-        public CheckCollectionSizeEquals(Expression argument, Expression length) {
-            super(Optional.empty(), argument, length);
+        public CheckCollectionSizeEquals(List<Expression> arguments) {
+            super(Optional.empty(), arguments);
         }
 
     }

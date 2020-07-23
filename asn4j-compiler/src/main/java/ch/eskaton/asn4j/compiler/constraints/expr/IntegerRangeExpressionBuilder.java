@@ -26,28 +26,14 @@
  */
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.il.BinaryOperator;
-import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
-import ch.eskaton.asn4j.compiler.il.ILValue;
-import ch.eskaton.asn4j.compiler.il.Variable;
-
-import java.math.BigInteger;
-
-import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckEquals;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckLowerBound;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckUpperBound;
 
 public class IntegerRangeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
-    protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
-        var intValue = BigInteger.valueOf(value);
-
-        return switch (operator) {
-            case GE -> new BooleanFunctionCall.CheckLowerBound(new Variable(VAR_VALUE), new ILValue(intValue));
-            case LE -> new BooleanFunctionCall.CheckUpperBound(new Variable(VAR_VALUE), new ILValue(intValue));
-            case EQ -> new BooleanFunctionCall.CheckEquals(new Variable(VAR_VALUE), new ILValue(intValue));
-            default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
-        };
+    public IntegerRangeExpressionBuilder() {
+        super(CheckLowerBound::new, CheckUpperBound::new, CheckEquals::new);
     }
 
 }
