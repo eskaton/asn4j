@@ -29,23 +29,31 @@ package ch.eskaton.asn4j.compiler.constraints.expr;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
-import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
 
+import java.util.List;
+
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_UNUSED_BITS;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckBitStringLengthEquals;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckBitStringMaxLength;
+import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckBitStringMinLength;
 
 public class BitStringStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
+    public BitStringStringSizeExpressionBuilder() {
+        super(CheckBitStringMinLength::new, CheckBitStringMaxLength::new, CheckBitStringLengthEquals::new);
+    }
+
     protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
         return switch (operator) {
-            case GE -> new BooleanFunctionCall.CheckBitStringMinLength(new Variable(VAR_VALUE),
-                    new Variable(VAR_UNUSED_BITS), new ILValue(value));
-            case LE -> new BooleanFunctionCall.CheckBitStringMaxLength(new Variable(VAR_VALUE),
-                    new Variable(VAR_UNUSED_BITS), new ILValue(value));
-            case EQ -> new BooleanFunctionCall.CheckBitStringLengthEquals(new Variable(VAR_VALUE),
-                    new Variable(VAR_UNUSED_BITS), new ILValue(value));
+            case GE -> checkMin.apply(List.of(new Variable(VAR_VALUE),
+                    new Variable(VAR_UNUSED_BITS), new ILValue(value)));
+            case LE -> checkMax.apply(List.of(new Variable(VAR_VALUE),
+                    new Variable(VAR_UNUSED_BITS), new ILValue(value)));
+            case EQ -> checkEq.apply(List.of(new Variable(VAR_VALUE),
+                    new Variable(VAR_UNUSED_BITS), new ILValue(value)));
             default -> throw new IllegalCompilerStateException("Illegal operator: %s", operator);
         };
     }
