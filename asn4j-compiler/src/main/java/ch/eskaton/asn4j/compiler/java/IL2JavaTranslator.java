@@ -340,149 +340,41 @@ public class IL2JavaTranslator {
 
                 return object + ".equals(" + argument + ")";
             } else if (functionCall instanceof BooleanFunctionCall.CheckStringMinLength) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkMinLength");
-
-                return String.format("checkMinLength(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkMinLength");
             } else if (functionCall instanceof BooleanFunctionCall.CheckStringMaxLength) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkMaxLength");
-
-                return String.format("checkMaxLength(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkMaxLength");
             } else if (functionCall instanceof BooleanFunctionCall.CheckStringLengthEquals) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkLengthEquals");
-
-                return String.format("checkLengthEquals(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkLengthEquals");
             } else if (functionCall instanceof BooleanFunctionCall.CheckUCStringMinLength) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkUCMinLength");
-
-                return String.format("checkUCMinLength(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkUCMinLength");
             } else if (functionCall instanceof BooleanFunctionCall.CheckUCStringMaxLength) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkUCMaxLength");
-
-                return String.format("checkUCMaxLength(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkUCMaxLength");
             } else if (functionCall instanceof BooleanFunctionCall.CheckUCStringLengthEquals) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkUCLengthEquals");
-
-                return String.format("checkUCLengthEquals(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkUCLengthEquals");
             } else if (functionCall instanceof BooleanFunctionCall.CheckBitStringMinLength) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkMinLength");
-
-                return String.format("checkMinLength(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkMinLength");
             } else if (functionCall instanceof BooleanFunctionCall.CheckBitStringMaxLength) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkMaxLength");
-
-                return String.format("checkMaxLength(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkMaxLength");
             } else if (functionCall instanceof BooleanFunctionCall.CheckBitStringLengthEquals) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkLengthEquals");
-
-                return String.format("checkLengthEquals(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkLengthEquals");
             } else if (functionCall instanceof BooleanFunctionCall.CheckOctetStringMinLength) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkMinLength");
-
-                return String.format("checkMinLength(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkMinLength");
             } else if (functionCall instanceof BooleanFunctionCall.CheckOctetStringMaxLength) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkMaxLength");
-
-                return String.format("checkMaxLength(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkMaxLength");
             } else if (functionCall instanceof BooleanFunctionCall.CheckOctetStringLengthEquals) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkLengthEquals");
-
-                return String.format("checkLengthEquals(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkLengthEquals");
             } else if (functionCall instanceof BooleanFunctionCall.CheckLowerBound) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkLowerBound");
-
-                return String.format("checkLowerBound(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkLowerBound");
             } else if (functionCall instanceof BooleanFunctionCall.CheckUpperBound) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkUpperBound");
-
-                return String.format("checkUpperBound(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkUpperBound");
             } else if (functionCall instanceof BooleanFunctionCall.CheckEquals) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkEquals");
-
-                return String.format("checkEquals(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkEquals");
             } else if (functionCall instanceof BooleanFunctionCall.CheckCollectionMinSize) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkMinSize");
-
-                return String.format("checkMinSize(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkMinSize");
             } else if (functionCall instanceof BooleanFunctionCall.CheckCollectionMaxSize) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkMaxSize");
-
-                return String.format("checkMaxSize(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkMaxSize");
             } else if (functionCall instanceof BooleanFunctionCall.CheckCollectionSizeEquals) {
-                String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
-                        .map(expr -> translateExpression(ctx, javaClass, expr))
-                        .collect(joining(", "));
-
-                javaClass.addStaticImport(ConstraintChecks.class, "checkSizeEquals");
-
-                return String.format("checkSizeEquals(%s)", arguments);
+                return getCheckCall(ctx, javaClass, functionCall, "checkSizeEquals");
             } else {
                 String function = functionCall.getFunction()
                         .orElseThrow(() -> new CompilerException("Undefined function of type %s",
@@ -496,6 +388,16 @@ public class IL2JavaTranslator {
             throw new IllegalCompilerStateException("Unhandled boolean expression type: %s",
                     booleanExpression.getClass().getSimpleName());
         }
+    }
+
+    private String getCheckCall(CompilerContext ctx, JavaClass javaClass, BooleanFunctionCall functionCall, String method) {
+        String arguments = StreamsUtils.fromIndex(functionCall.getArguments(), 0)
+                .map(expr -> translateExpression(ctx, javaClass, expr))
+                .collect(joining(", "));
+
+        javaClass.addStaticImport(ConstraintChecks.class, method);
+
+        return String.format("%s(%s)", method, arguments);
     }
 
     private String argumentsToString(CompilerContext ctx, JavaClass javaClass, BooleanFunctionCall functionCall) {
