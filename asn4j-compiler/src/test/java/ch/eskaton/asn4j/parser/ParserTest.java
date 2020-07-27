@@ -315,7 +315,7 @@ import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.SetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
-import ch.eskaton.asn4j.parser.ast.SimpleTableConstraintNode;
+import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
@@ -5970,6 +5970,9 @@ class ParserTest {
 
         parser = new Parser(new ByteArrayInputStream(
                 "ObjectSet-Reference {parameter}".getBytes())).new ObjectSetElementsParser();
+
+        result = parser.parse();
+
         assertNotNull(result);
     }
 
@@ -5989,7 +5992,7 @@ class ParserTest {
         ObjectClassFieldTypeNode result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("OBJECT-CLASS", result.getObjectclass().getReference());
+        assertEquals("OBJECT-CLASS", result.getObjectClass().getReference());
         assertEquals("ObjectSet-Reference", result.getField()
                 .getPrimitiveFieldNames().get(0).getReference());
     }
@@ -6283,7 +6286,7 @@ class ParserTest {
         TableConstraint result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof SimpleTableConstraintNode);
+        assertTrue(result instanceof SimpleTableConstraint);
 
         parser = new Parser(new ByteArrayInputStream(
                 "{ErrorSet} {@errorCategory, @.errorCode}".getBytes())).new TableConstraintParser();
@@ -6300,7 +6303,7 @@ class ParserTest {
         SimpleTableConstraintParser parser = new Parser(
                 new ByteArrayInputStream("{ErrorSet} ".getBytes())).new SimpleTableConstraintParser();
 
-        SimpleTableConstraintNode result = parser.parse();
+        SimpleTableConstraint result = parser.parse();
 
         assertNotNull(result);
     }

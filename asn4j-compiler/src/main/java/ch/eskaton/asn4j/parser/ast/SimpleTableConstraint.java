@@ -30,18 +30,18 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.constraints.TableConstraint;
 
-public class SimpleTableConstraintNode extends TableConstraint {
+public class SimpleTableConstraint extends TableConstraint {
 
-    private SetSpecsNode objectSet;
+    private ObjectSetSpecNode objectSetSpec;
 
-    public SimpleTableConstraintNode(Position position, SetSpecsNode objectSet) {
+    public SimpleTableConstraint(Position position, ObjectSetSpecNode objectSetSpec) {
         super(position);
 
-        this.objectSet = objectSet;
+        this.objectSetSpec = objectSetSpec;
     }
 
-    public SetSpecsNode getObjectSet() {
-        return objectSet;
+    public ObjectSetSpecNode getObjectSetSpec() {
+        return objectSetSpec;
     }
 
 }
