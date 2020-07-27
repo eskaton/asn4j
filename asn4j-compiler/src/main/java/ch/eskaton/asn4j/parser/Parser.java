@@ -104,7 +104,7 @@ import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.SetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
-import ch.eskaton.asn4j.parser.ast.SimpleTableConstraintNode;
+import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeIdentifierObjectClassReferenceNode;
@@ -4769,15 +4769,15 @@ public class Parser {
     }
 
     // SimpleTableConstraint ::= ObjectSet
-    protected class SimpleTableConstraintParser implements RuleParser<SimpleTableConstraintNode> {
+    protected class SimpleTableConstraintParser implements RuleParser<SimpleTableConstraint> {
 
-        public SimpleTableConstraintNode parse() throws ParserException {
+        public SimpleTableConstraint parse() throws ParserException {
             Object rule = objectSetParser.parse();
 
             if (rule != null) {
-                SetSpecsNode node = (SetSpecsNode) rule;
+                ObjectSetSpecNode node = (ObjectSetSpecNode) rule;
 
-                return new SimpleTableConstraintNode(node.getPosition(), node);
+                return new SimpleTableConstraint(node.getPosition(), node);
             }
 
             return null;
