@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 
-public class SetSpecsNode extends AbstractNode {
+public abstract class SetSpecsNode extends AbstractNode {
 
     private ElementSet rootElements;
 
@@ -73,20 +73,6 @@ public class SetSpecsNode extends AbstractNode {
 
     public boolean hasExtensionMarker() {
         return extensionMarker;
-    }
-
-    public ElementSetSpecsNode toElementSetSpecs() {
-        if (rootElements != null) {
-            return new ElementSetSpecsNode(rootElements.getPosition(), rootElements, extensionMarker, extensionElements);
-        }
-
-        return null;
-    }
-
-    public ObjectSetSpecNode toObjectSetSpec() {
-        Position position = Position.of(rootElements, extensionElements);
-
-        return new ObjectSetSpecNode(position, rootElements, extensionMarker, extensionElements);
     }
 
 }

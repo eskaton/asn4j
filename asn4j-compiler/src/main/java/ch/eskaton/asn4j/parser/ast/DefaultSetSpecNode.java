@@ -36,7 +36,7 @@ public class DefaultSetSpecNode extends DefaultOptionalitySpecNode<SetSpecsNode>
     }
 
     public DefaultValueSetSpecNode toDefaultValueSetOptionalitySpec() {
-        ElementSetSpecsNode specs = getSpec().toElementSetSpecs();
+        ElementSetSpecsNode specs = (ElementSetSpecsNode) getSpec();
 
         if (specs != null) {
             return new DefaultValueSetSpecNode(getPosition(), specs);
@@ -46,7 +46,7 @@ public class DefaultSetSpecNode extends DefaultOptionalitySpecNode<SetSpecsNode>
     }
 
     public DefaultObjectSetSpecNode toDefaultObjectSetOptionalitySpec() {
-        ObjectSetSpecNode specs = getSpec().toObjectSetSpec();
+        ObjectSetSpecNode specs = (ObjectSetSpecNode) getSpec();
 
         if (specs != null) {
             return new DefaultObjectSetSpecNode(getPosition(), specs);

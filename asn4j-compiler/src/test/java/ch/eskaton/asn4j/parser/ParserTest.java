@@ -193,8 +193,8 @@ import ch.eskaton.asn4j.parser.Parser.RestrictedCharacterStringTypeParser;
 import ch.eskaton.asn4j.parser.Parser.RestrictedCharacterStringValueParser;
 import ch.eskaton.asn4j.parser.Parser.RootAlternativeTypeListParser;
 import ch.eskaton.asn4j.parser.Parser.SelectionTypeParser;
-import ch.eskaton.asn4j.parser.Parser.SetFieldSpecParser;
-import ch.eskaton.asn4j.parser.Parser.SetSpecsParser;
+import ch.eskaton.asn4j.parser.Parser.FixedTypeValueSetFieldSpecParser;
+import ch.eskaton.asn4j.parser.Parser.ElementSetSpecsParser;
 import ch.eskaton.asn4j.parser.Parser.SettingParser;
 import ch.eskaton.asn4j.parser.Parser.SignedNumberParser;
 import ch.eskaton.asn4j.parser.Parser.SimpleDefinedTypeParser;
@@ -260,6 +260,7 @@ import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefaultValueSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefinedSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.DefinitiveIdentificationNode;
+import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.EncodingControlSectionNode;
 import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
@@ -295,6 +296,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalitySpecNode;
 import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
@@ -4005,8 +4007,8 @@ class ParserTest {
 
     @Test
     void testElementSetSpecsParser() throws IOException, ParserException {
-        SetSpecsParser parser = new Parser(new ByteArrayInputStream(
-                "(1..10) EXCEPT (4..6)".getBytes())).new SetSpecsParser();
+        ElementSetSpecsParser parser = new Parser(new ByteArrayInputStream(
+                "(1..10) EXCEPT (4..6)".getBytes())).new ElementSetSpecsParser();
 
         SetSpecsNode result = parser.parse();
 
@@ -4016,7 +4018,7 @@ class ParserTest {
         assertFalse(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
-                "ALL EXCEPT (4..6), ...".getBytes())).new SetSpecsParser();
+                "ALL EXCEPT (4..6), ...".getBytes())).new ElementSetSpecsParser();
 
         result = parser.parse();
 
@@ -4026,7 +4028,7 @@ class ParserTest {
         assertTrue(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
-                "(1..5) | (12<..<17), ..., ALL EXCEPT (7..77)".getBytes())).new SetSpecsParser();
+                "(1..5) | (12<..<17), ..., ALL EXCEPT (7..77)".getBytes())).new ElementSetSpecsParser();
 
         result = parser.parse();
 
@@ -4168,11 +4170,14 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
+    }
 
-        parser = new Parser(new ByteArrayInputStream(
-                "{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new ElementsParser();
+    @Test
+    void testObjectElementsParser() throws IOException, ParserException {
+        Parser.ObjectElementsParser parser = new Parser(new ByteArrayInputStream(
+                "{ &int-field 4711, &Type-Field VisibleString }".getBytes())).new ObjectElementsParser();
 
-        result = parser.parse();
+        Elements result = parser.parse();
 
         assertNotNull(result);
         assertTrue(result instanceof ObjectSetElements);
@@ -5269,8 +5274,8 @@ class ParserTest {
     @Test
     void testFixedTypeValueSetFieldSpecParser() throws IOException,
             ParserException {
-        SetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
-                "&ValueSet-Reference INTEGER OPTIONAL".getBytes())).new SetFieldSpecParser();
+        FixedTypeValueSetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&ValueSet-Reference INTEGER OPTIONAL".getBytes())).new FixedTypeValueSetFieldSpecParser();
 
         SetFieldSpecNode result = parser.parse();
 
@@ -5280,16 +5285,15 @@ class ParserTest {
         assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
-                "&ValueSet-Reference INTEGER DEFAULT {4711}".getBytes())).new SetFieldSpecParser();
+                "&ValueSet-Reference INTEGER DEFAULT {4711}".getBytes())).new FixedTypeValueSetFieldSpecParser();
 
         result = parser.parse();
 
         assertNotNull(result);
         assertEquals("ValueSet-Reference", result.getReference());
         assertTrue(result.getType() instanceof IntegerType);
-        assertTrue(result.getOptionalitySpec() instanceof DefaultSetSpecNode);
-        assertNotNull(((DefaultSetSpecNode) result.getOptionalitySpec())
-                .toDefaultValueSetOptionalitySpec());
+        assertTrue(result.getOptionalitySpec() instanceof DefaultValueSetSpecNode);
+        assertNotNull((result.getOptionalitySpec()));
     }
 
     @Test
@@ -5397,11 +5401,11 @@ class ParserTest {
         assertTrue((((DefaultSpecNode) result).toDefaultObjectSpec()).getSpec() instanceof ObjectReferenceNode);
     }
 
+    // TODO: Use a different parser then FixedTypeValueSetFieldSpecParser or consolidate
     @Test
-    void testObjectSetFieldSpecParser() throws IOException,
-            ParserException {
-        SetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
-                "&ObjectSet-Field OBJECT-CLASS OPTIONAL".getBytes())).new SetFieldSpecParser();
+    void testObjectSetFieldSpecParser() throws IOException, ParserException {
+        FixedTypeValueSetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&ObjectSet-Field OBJECT-CLASS OPTIONAL".getBytes())).new FixedTypeValueSetFieldSpecParser();
 
         SetFieldSpecNode result = parser.parse();
 
@@ -5413,18 +5417,16 @@ class ParserTest {
         assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
-                "&ObjectSet-Field OBJECT-CLASS DEFAULT {Object1}".getBytes())).new SetFieldSpecParser();
+                "&ObjectSet-Field OBJECT-CLASS DEFAULT {Object1}".getBytes())).new FixedTypeValueSetFieldSpecParser();
 
         result = parser.parse();
 
         assertNotNull(result);
         assertEquals("ObjectSet-Field", result.getReference());
         assertTrue(result.getType() instanceof TypeReference);
-        assertEquals("OBJECT-CLASS",
-                ((TypeReference) result.getType()).getType());
-        assertTrue(result.getOptionalitySpec() instanceof DefaultSetSpecNode);
-        assertNotNull(((DefaultSetSpecNode) result.getOptionalitySpec())
-                .toDefaultObjectSetOptionalitySpec());
+        assertEquals("OBJECT-CLASS", ((TypeReference) result.getType()).getType());
+        assertTrue(result.getOptionalitySpec() instanceof DefaultValueSetSpecNode);
+        assertNotNull(result.getOptionalitySpec());
     }
 
     @Test
@@ -5833,8 +5835,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof SetSpecsNode);
-        assertNotNull(((SetSpecsNode) result).toElementSetSpecs());
+        assertTrue(result instanceof ElementSetSpecsNode);
 
         // Object
         parser = new Parser(new ByteArrayInputStream(
@@ -5852,8 +5853,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof SetSpecsNode);
-        assertNotNull(((SetSpecsNode) result).toObjectSetSpec());
+        assertTrue(result instanceof ObjectSetSpecNode);
     }
 
     /**
@@ -5891,8 +5891,8 @@ class ParserTest {
 
     @Test
     void testObjectSetSpecParser() throws IOException, ParserException {
-        SetSpecsParser parser = new Parser(new ByteArrayInputStream(
-                "(Object1 | Object2)".getBytes())).new SetSpecsParser();
+        Parser.ObjectSetSpecParser parser = new Parser(new ByteArrayInputStream(
+                "(Object1 | Object2)".getBytes())).new ObjectSetSpecParser();
 
         SetSpecsNode result = parser.parse();
 
@@ -5902,7 +5902,7 @@ class ParserTest {
         assertFalse(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
-                "(Object1 | Object2), ...".getBytes())).new SetSpecsParser();
+                "(Object1 | Object2), ...".getBytes())).new ObjectSetSpecParser();
 
         result = parser.parse();
 
@@ -5911,7 +5911,7 @@ class ParserTest {
         assertNull(result.getExtensionElements());
         assertTrue(result.hasExtensionMarker());
 
-        parser = new Parser(new ByteArrayInputStream("...".getBytes())).new SetSpecsParser();
+        parser = new Parser(new ByteArrayInputStream("...".getBytes())).new ObjectSetSpecParser();
 
         result = parser.parse();
 
@@ -5921,7 +5921,7 @@ class ParserTest {
         assertTrue(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
-                "..., (Object1 | Object2)".getBytes())).new SetSpecsParser();
+                "..., (Object1 | Object2)".getBytes())).new ObjectSetSpecParser();
 
         result = parser.parse();
 
@@ -5931,7 +5931,7 @@ class ParserTest {
         assertTrue(result.hasExtensionMarker());
 
         parser = new Parser(new ByteArrayInputStream(
-                "(Object1 | Object2), ..., (Object3 | Object4)".getBytes())).new SetSpecsParser();
+                "(Object1 | Object2), ..., (Object3 | Object4)".getBytes())).new ObjectSetSpecParser();
 
         result = parser.parse();
 
@@ -6449,8 +6449,7 @@ class ParserTest {
      */
 
     @Test
-    void testParameterizedAssignmentParser() throws IOException,
-            ParserException {
+    void testParameterizedAssignmentParser() throws IOException, ParserException {
         ParameterizedAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
                         "TypeReference {VisibleString: String} ::= SEQUENCE { attribute String }"
@@ -6611,8 +6610,7 @@ class ParserTest {
     }
 
     @Test
-    void testParameterizedObjectSetAssignmentParser()
-            throws IOException, ParserException {
+    void testParameterizedObjectSetAssignmentParser() throws IOException, ParserException {
         ParameterizedObjectSetAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
                         "ObjSetReference {aValue} OBJECT-CLASS ::= { object | { TYPE INTEGER } }"

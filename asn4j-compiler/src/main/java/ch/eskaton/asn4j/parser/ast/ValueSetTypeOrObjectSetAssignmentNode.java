@@ -33,9 +33,9 @@ public class ValueSetTypeOrObjectSetAssignmentNode extends AssignmentNode {
 
     private Node type;
 
-    private ElementSetSpecsNode valueSet;
+    private SetSpecsNode valueSet;
 
-    public ValueSetTypeOrObjectSetAssignmentNode(Position position, String reference, Node type, ElementSetSpecsNode valueSet) {
+    public ValueSetTypeOrObjectSetAssignmentNode(Position position, String reference, Node type, SetSpecsNode valueSet) {
         super(position, reference);
 
         this.type = type;
@@ -46,7 +46,7 @@ public class ValueSetTypeOrObjectSetAssignmentNode extends AssignmentNode {
         return type;
     }
 
-    public ElementSetSpecsNode getValueSet() {
+    public SetSpecsNode getValueSet() {
         return valueSet;
     }
 
