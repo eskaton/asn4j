@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleBodyNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
@@ -183,7 +184,7 @@ public class CompilerImpl {
             var type = (Type) node;
             var valueSet = assignment.getValueSet();
 
-            type.setConstraints(List.of(new SubtypeConstraint(valueSet.getPosition(), valueSet)));
+            type.setConstraints(List.of(new SubtypeConstraint(valueSet.getPosition(), (ElementSetSpecsNode) valueSet)));
 
             var typeAssignment = new TypeAssignmentNode(assignment.getPosition(), assignment.getReference(),
                     (Type) node);

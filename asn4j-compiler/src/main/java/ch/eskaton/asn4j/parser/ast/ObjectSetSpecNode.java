@@ -37,4 +37,16 @@ public class ObjectSetSpecNode extends SetSpecsNode {
         super(position, rootElements, extensionMarker, additionalElements);
     }
 
+    public ObjectSetSpecNode(ElementSet rootElements, boolean extensionMarker) {
+        super(rootElements, extensionMarker);
+    }
+
+    public ObjectSetSpecNode(Position position, boolean extensionMarker) {
+        super(position, extensionMarker);
+    }
+
+    public ObjectSetSpecNode(ElementSet rootElements) {
+        super(rootElements);
+    }
+
 }
