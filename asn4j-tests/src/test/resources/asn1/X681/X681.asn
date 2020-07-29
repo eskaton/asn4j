@@ -1,0 +1,16 @@
+X681 DEFINITIONS ::=
+BEGIN
+
+TEST ::= CLASS {
+    &intField   INTEGER
+}
+
+TestSet TEST ::= {
+    { &intField 1 }
+}
+
+TestSequence1 ::= SEQUENCE {
+   intField TEST.&intField
+}
+
+END

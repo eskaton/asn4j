@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.utils.Utils;
 import org.hamcrest.text.MatchesPattern;
@@ -36,6 +37,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
@@ -186,6 +188,78 @@ class CompilerImplTest {
 
         testModule(body, CompilerException.class, ".*Failed to resolve an INTEGER value.*");
     }
+
+//    @Test
+//    void test() throws IOException, ParserException {
+//        var body = """
+//                TEST ::= CLASS {
+//                    &id   INTEGER UNIQUE,
+//                    &desc VisibleString
+//                }
+//
+//                TestSet TEST ::= {
+//                      {&id 1, &desc "Description1"}
+//                    | {&id 2, &desc "Description2"}
+//                }
+//
+//                TestSequence1 ::= SEQUENCE {
+//                --    string VisibleString (SIZE(1..4)),
+//                    id TEST.&id ({TestSet})
+//                }
+//                """;
+//
+//        var module = module("TEST-MODULE", body);
+//
+//        new CompilerImpl().loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+//    }
+
+//    @Test
+//    void testObjectSetDuplicateValueClass() throws IOException, ParserException {
+//        var body = """
+//                String ::= VisibleString (SIZE (1..10))
+//
+//                PRODUCT ::= CLASS {
+//                    &code	        INTEGER UNIQUE OPTIONAL,
+//                    &description    String DEFAULT "test",
+//                    &price	        REAL OPTIONAL,
+//                    &Type           DEFAULT INTEGER
+//                }
+//
+//                ProductCatalog PRODUCT ::= {
+//                      {&code 101, &description "iPhone v4", &price 250.00}
+//                    | {&code 102, &description "iPhone v4", &Type BIT STRING}
+//                    | {&description "iPhone v4", &Type BIT STRING}
+//                }
+//
+//                """;
+//
+//        var module = module("TEST-MODULE", body);
+//
+//        new CompilerImpl().loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+//    }
+
+//    @Test
+//    void testObjectClass() throws IOException, ParserException {
+//        var body = """
+//                String ::= VisibleString (SIZE (1..10))
+//
+//                PRODUCT ::= CLASS {
+//                    &code	        INTEGER UNIQUE,
+//                    &description    String DEFAULT "test",
+//                    &price	        REAL OPTIONAL
+//                }
+//
+//                ProductCatalog PRODUCT ::= {
+//                    ({&code 101, &description "iPhone v4", &price 250.00} |
+//                    {&code 102, &description "iPhone v5", &price 250.00}) EXCEPT {&code 101, &description "iPhone v4", &price 250.00}
+//                }
+//
+//                """;
+//
+//        var module = module("TEST-MODULE", body);
+//
+//        new CompilerImpl().loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+//    }
 
     private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);

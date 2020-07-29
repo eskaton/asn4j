@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ElementSetCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.ObjectSetElementsCompiler;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
@@ -47,9 +48,10 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
-import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
+import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
+import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
@@ -74,7 +76,6 @@ import static ch.eskaton.asn4j.compiler.constraints.Constants.FUNC_DO_CHECK_CONS
 import static ch.eskaton.asn4j.compiler.constraints.Constants.GET_VALUE;
 import static ch.eskaton.asn4j.compiler.constraints.ConstraintUtils.throwUnimplementedNodeType;
 import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.INTERSECTION;
-import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.BOOLEAN;
 import static java.util.Optional.of;
 
@@ -94,6 +95,7 @@ public abstract class AbstractConstraintCompiler {
                         e.getClass().getSimpleName(), getTypeName().getName()));
 
         addConstraintHandler(ElementSet.class, new ElementSetCompiler(dispatcher)::compile);
+        addConstraintHandler(ObjectSetElements.class, new ObjectSetElementsCompiler(ctx)::compile);
     }
 
     protected abstract TypeName getTypeName();
@@ -137,6 +139,22 @@ public abstract class AbstractConstraintCompiler {
         var node = dispatcher.execute(sizeConstraint, Tuple3.of(baseType, sizeConstraint, bounds));
 
         return new ConstraintDefinition(node);
+    }
+
+    private ConstraintDefinition compileConstraint(CompiledType baseType,
+            SimpleTableConstraint simpleTableConstraint, Optional<Bounds> bounds) {
+        var setSpec = simpleTableConstraint.getObjectSetSpec();
+        var rootElements = setSpec.getRootElements();
+        Node root = dispatcher.execute(rootElements, Tuple3.of(baseType, rootElements, bounds));
+        Node extension = null;
+
+        if (setSpec.hasExtensionElements()) {
+            var extensionElements = setSpec.getExtensionElements();
+
+            extension = dispatcher.execute(extensionElements, Tuple3.of(baseType, extensionElements, bounds));
+        }
+
+        return new ConstraintDefinition(root, extension).extensible(setSpec.hasExtensionMarker());
     }
 
     ConstraintDefinition compileComponentConstraints(Type node, CompiledType baseType) {
@@ -249,6 +267,9 @@ public abstract class AbstractConstraintCompiler {
                         this::compileConstraint);
             } else if (constraint instanceof SizeConstraint) {
                 constraintDef = getConstraintDefinition(baseType, bounds, constraintDef, (SizeConstraint) constraint,
+                        this::compileConstraint);
+            } else if (constraint instanceof SimpleTableConstraint) {
+                constraintDef = getConstraintDefinition(baseType, bounds, constraintDef, (SimpleTableConstraint) constraint,
                         this::compileConstraint);
             } else {
                 throw new CompilerException("Constraints of type %s not yet supported",

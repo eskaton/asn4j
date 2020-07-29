@@ -43,6 +43,7 @@ import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
+import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -54,6 +55,7 @@ import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
@@ -291,6 +293,18 @@ public class CompilerContext {
     }
 
     public String getTypeName(Type type, String name) {
+        if (type instanceof ObjectClassFieldTypeNode) {
+            var reference = ((ObjectClassFieldTypeNode) type).getObjectClass().getReference();
+            var compiledObjectClass = this.getCompiledObjectClass(reference);
+            var field = compiledObjectClass.getField(name);
+
+            if (field.isPresent() && field.get() instanceof CompiledFixedTypeValueField) {
+                type = ((CompiledFixedTypeValueField) field.get()).getCompiledType().getType();
+            } else {
+                throw new IllegalCompilerStateException("Unexpected field type: %s", field.getClass().getSimpleName());
+            }
+        }
+
         return config.getTypeNameSupplier(type.getClass()).getName(type, name);
     }
 
@@ -323,6 +337,28 @@ public class CompilerContext {
                 || type instanceof IRI
                 || type instanceof RelativeIRI) {
             return defineType(type, name, false);
+        } else if (type instanceof ObjectClassFieldTypeNode) {
+            var reference = ((ObjectClassFieldTypeNode) type).getObjectClass().getReference();
+            var compiledObjectClass = this.getCompiledObjectClass(reference);
+            var field = compiledObjectClass.getField(name)
+                    .orElseThrow(() -> new CompilerException("Unknown field '%s' in object class %s", name,
+                            compiledObjectClass.getName()));
+
+            if (field instanceof CompiledFixedTypeValueField) {
+                var constraints = type.getConstraints();
+
+                type = (Type) Clone.clone(((CompiledFixedTypeValueField) field).getCompiledType().getType());
+
+                type.setConstraints(constraints);
+
+                var compiledType = defineType(type, name, false);
+
+                compiledType.setObjectClass(compiledObjectClass);
+
+                return compiledType;
+            } else {
+                throw new IllegalCompilerStateException("Unexpected field type: %s", field.getClass().getSimpleName());
+            }
         }
 
         return createCompiledType(type, getTypeName(type, name), true);
