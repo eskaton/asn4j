@@ -25,67 +25,61 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.types;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
+import ch.eskaton.commons.utils.ReflectionUtils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.lang.reflect.InvocationTargetException;
 
-public class IntegerType extends AbstractType {
+public class Clone {
 
-    private List<NamedNumber> namedNumbers;
+    public static Object clone(Object object) {
+        if (object == null) {
+            return null;
+        }
 
-    protected IntegerType() {
-        super();
-    }
+        var clazz = object.getClass();
+        Object copy;
 
-    public IntegerType(Position position) {
-        super(position);
-    }
+        try {
+            var constructor = clazz.getDeclaredConstructor();
 
-    public IntegerType(Position position, List<NamedNumber> namedNumbers) {
-        super(position);
+            constructor.setAccessible(true);
 
-        this.namedNumbers = namedNumbers;
-    }
+            copy = constructor.newInstance();
 
-    public Collection<NamedNumber> getNamedNumbers() {
-        return namedNumbers;
-    }
+            var properties = ReflectionUtils.getPropertiesSource(object);
 
-    public NamedNumber getNamedNumber(String name) {
-        if (namedNumbers != null) {
-            for (NamedNumber namedNumber : namedNumbers) {
-                if (namedNumber.getId().equals(name)) {
-                    return namedNumber;
+            for (var property : properties) {
+                var source = property.get_1().get_1();
+                var name = property.get_1().get_2();
+                var value = property.get_2();
+                var field = source.getDeclaredField(name);
+
+                field.setAccessible(true);
+
+                if (value instanceof String) {
+                    field.set(copy, value);
+                } else if (value instanceof Integer) {
+                    field.set(copy, value);
+                } else {
+                    field.set(copy, clone(value));
                 }
             }
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                NoSuchFieldException e) {
+            throw new CloneException("Failed to clone object of type " + clazz.getSimpleName(), e);
         }
 
-        return null;
+        return copy;
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (this == other) {
-            return true;
+    public static class CloneException extends RuntimeException {
+
+        public CloneException(String message, Throwable cause) {
+            super(message, cause);
         }
 
-        if (other == null || getClass() != other.getClass()) {
-            return false;
-        }
-
-        IntegerType that = (IntegerType) other;
-
-        return Objects.equals(namedNumbers, that.namedNumbers);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.getClass(), namedNumbers);
     }
 
 }

@@ -94,6 +94,9 @@ public abstract class AbstractType implements Type {
         return encodingPrefix;
     }
 
+    protected AbstractType() {
+    }
+
     @Override
     public String toString() {
         return ToString.get(this);

@@ -42,6 +42,9 @@ public class Position {
 
     private int position;
 
+    protected Position() {
+    }
+
     public Position(String file, int line, int position) {
         this.file = file;
         this.line = line;

@@ -479,6 +479,21 @@
                     </execution>
 
                     <execution>
+                        <id>X681</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>asn4j</goal>
+                        </goals>
+                        <configuration>
+                            <module>X681</module>
+                            <pkg>ch.eskaton.asn4j.test.modules.X681</pkg>
+                            <includePaths>
+                                <includePath>src/test/resources/asn1/X681</includePath>
+                            </includePaths>
+                        </configuration>
+                    </execution>
+
+                    <execution>
                         <id>X690_8</id>
                         <phase>generate-sources</phase>
                         <goals>

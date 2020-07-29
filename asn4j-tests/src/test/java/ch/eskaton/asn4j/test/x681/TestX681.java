@@ -25,38 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.results;
+package ch.eskaton.asn4j.test.x681;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import ch.eskaton.asn4j.runtime.types.ASN1Integer;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-public class CompiledObjectClass implements CompilationResult {
+import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 
-    private String name;
 
-    private List<AbstractCompiledField> fields = new ArrayList<>();
+class TestX681 {
 
-    public CompiledObjectClass(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void addField(AbstractCompiledField compiledField) {
-        fields.add(compiledField);
-    }
-
-    public Optional<AbstractCompiledField> getField(String reference) {
-        return fields.stream().filter(field -> Objects.equals(field.getName(), reference)).findAny();
-    }
-
-    public List<AbstractCompiledField> getFields() {
-        return Collections.unmodifiableList(fields);
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to an INTEGER")
+    void testSequence1() {
+        testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> s.setIntField(ASN1Integer.valueOf(1L)));
     }
 
 }

@@ -43,6 +43,8 @@ public class CompiledType implements CompilationResult {
 
     private ConstraintDefinition constraintDefinition;
 
+    private CompiledObjectClass objectClass;
+
     CompiledType(Type type, String name) {
         this.type = type;
         this.name = name;
@@ -72,27 +74,36 @@ public class CompiledType implements CompilationResult {
         this.constraintDefinition = constraintDefinition;
     }
 
+    public CompiledObjectClass getObjectClass() {
+        return objectClass;
+    }
+
+    public void setObjectClass(CompiledObjectClass objectClass) {
+        this.objectClass = objectClass;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
 
-        if (obj == null || getClass() != obj.getClass()) {
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
-        CompiledType that = (CompiledType) obj;
+        CompiledType that = (CompiledType) o;
 
         return Objects.equals(parent, that.parent) &&
                 Objects.equals(type, that.type) &&
                 Objects.equals(name, that.name) &&
-                Objects.equals(constraintDefinition, that.constraintDefinition);
+                Objects.equals(constraintDefinition, that.constraintDefinition) &&
+                Objects.equals(objectClass, that.objectClass);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(parent, type, name, constraintDefinition);
+        return Objects.hash(parent, type, name, constraintDefinition, objectClass);
     }
 
     @Override
