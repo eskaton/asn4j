@@ -83,7 +83,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.ObjectSetReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
@@ -103,7 +103,6 @@ import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.PropertyAndSettingNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
-import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
@@ -4590,20 +4589,20 @@ public class Parser {
     }
 
     // DefinedObjectSet ::= ExternalObjectSetReference | objectsetreference
-    protected class DefinedObjectSetParser implements RuleParser<ObjectSetReferenceNode> {
+    protected class DefinedObjectSetParser implements RuleParser<ObjectSetReference> {
 
         @SuppressWarnings("unchecked")
-        public ObjectSetReferenceNode parse() throws ParserException {
+        public ObjectSetReference parse() throws ParserException {
             Object rule = new ChoiceParser<>(externalObjectSetReferenceParser,
                     new SingleTokenParser(TokenType.TYPE_REFERENCE)).parse();
 
             if (rule != null) {
                 if (rule instanceof ExternalObjectSetReferenceNode) {
-                    return (ObjectSetReferenceNode) rule;
+                    return (ObjectSetReference) rule;
                 } else {
                     Token token = (Token) rule;
 
-                    return new ObjectSetReferenceNode(token.getPosition(), token.getText());
+                    return new ObjectSetReference(token.getPosition(), token.getText());
                 }
             }
 
@@ -5238,12 +5237,12 @@ public class Parser {
     }
 
     // ParameterizedObjectSet ::= DefinedObjectSet ActualParameterList
-    protected class ParameterizedObjectSetParser extends ListRuleParser<ObjectSetReferenceNode> {
+    protected class ParameterizedObjectSetParser extends ListRuleParser<ObjectSetReference> {
 
         @SuppressWarnings("unchecked")
-        public ObjectSetReferenceNode parse() throws ParserException {
+        public ObjectSetReference parse() throws ParserException {
             return super.parse(new SequenceParser(definedObjectSetParser, actualParameterListParser),
-                    a -> (a.<ObjectSetReferenceNode>n0()).parameters(a.n1()));
+                    a -> (a.<ObjectSetReference>n0()).parameters(a.n1()));
         }
 
     }

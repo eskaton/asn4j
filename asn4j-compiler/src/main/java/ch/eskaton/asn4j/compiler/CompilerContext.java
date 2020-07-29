@@ -55,6 +55,7 @@ import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
+import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
@@ -514,12 +515,16 @@ public class CompilerContext {
      * Looks up the compiled object class for the given object class reference. The object class may be compiled if it
      * isn't already.
      *
-     * @param objectClassReference a object class reference
+     * @param objectClassReference an object class reference
      * @return a compiled object class
      */
-
     public CompiledObjectClass getCompiledObjectClass(ObjectClassReference objectClassReference) {
         var reference = objectClassReference.getReference();
+
+        return getCompiledObjectClass(reference);
+    }
+
+    private CompiledObjectClass getCompiledObjectClass(String reference) {
         var moduleObjectClasses = getObjectClassesOfCurrentModule();
         var compiledObjectClass = Optional.ofNullable(moduleObjectClasses.get(reference));
 
@@ -545,8 +550,51 @@ public class CompilerContext {
             }
         }
 
-        return compiledObjectClass.orElseThrow(() -> new CompilerException(objectClassReference.getPosition(),
-                "Failed to resolve object class %s", reference));
+        return compiledObjectClass.orElseThrow(() -> new CompilerException("Failed to resolve object class %s",
+                reference));
+    }
+
+    /**
+     * Looks up the compiled object set for the given object set reference. The object set may be compiled if it
+     * isn't already.
+     *
+     * @param objectSetReference an object set reference
+     * @return a compiled object set
+     */
+    public CompiledObjectSet getCompiledObjectSet(ObjectSetReference objectSetReference) {
+        var reference = objectSetReference.getReference();
+
+        return getCompiledObjectSet(reference);
+    }
+
+    private CompiledObjectSet getCompiledObjectSet(String reference) {
+        var moduleObjectSets = getObjectSetsOfCurrentModule();
+        var compiledObjectSets = Optional.ofNullable(moduleObjectSets.get(reference));
+
+        if (compiledObjectSets.isEmpty()) {
+            compiledObjectSets = compiler.compileObjectSet(reference);
+        }
+
+        if (compiledObjectSets.isEmpty()) {
+            Optional<ImportNode> imp = getImport(reference);
+
+            if (imp.isPresent()) {
+                String moduleName = imp.get().getReference().getName();
+                ModuleNode module = getModule(moduleName);
+
+                if (!isSymbolExported(module, reference)) {
+                    String format = "Module %s uses the object set %s from module %s which the latter doesn't export";
+
+                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
+                }
+
+                moduleObjectSets = definedObjectSets.get(moduleName);
+                compiledObjectSets = Optional.ofNullable(moduleObjectSets.get(reference));
+            }
+        }
+
+        return compiledObjectSets.orElseThrow(() -> new CompilerException("Failed to resolve object set %s",
+                reference));
     }
 
     /**
