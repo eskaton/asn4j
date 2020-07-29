@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
@@ -52,7 +53,7 @@ public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignment
 
     private CompilerContext ctx;
 
-    public void compile(CompilerContext ctx, ObjectSetAssignmentNode node) {
+    public CompiledObjectSet compile(CompilerContext ctx, ObjectSetAssignmentNode node) {
         this.ctx = ctx;
 
         var objectClassReference = node.getObjectClassReference();
@@ -90,6 +91,8 @@ public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignment
                 });
 
         compiledObjectSet.setValues(values);
+
+        return compiledObjectSet;
     }
 
     private Set<Map<String, Object>> compile(CompiledObjectClass objectClass, ElementSet elementSet) {

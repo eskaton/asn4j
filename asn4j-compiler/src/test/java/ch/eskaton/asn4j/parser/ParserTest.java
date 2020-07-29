@@ -252,7 +252,6 @@ import ch.eskaton.asn4j.parser.ast.AtNotationNode;
 import ch.eskaton.asn4j.parser.ast.ComponentIdListNode;
 import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
 import ch.eskaton.asn4j.parser.ast.DefaultObjectSetSpecNode;
-import ch.eskaton.asn4j.parser.ast.DefaultSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.DefaultTypeSpecNode;
@@ -295,7 +294,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
-import ch.eskaton.asn4j.parser.ast.ObjectSetReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalitySpecNode;
@@ -4860,7 +4859,7 @@ class ParserTest {
         DefinedObjectSetParser parser = new Parser(new ByteArrayInputStream(
                 "Object-Set".getBytes())).new DefinedObjectSetParser();
 
-        ObjectSetReferenceNode result = parser.parse();
+        ObjectSetReference result = parser.parse();
 
         assertNotNull(result);
         assertEquals("Object-Set", result.getReference());
@@ -6143,8 +6142,8 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectSetReferenceNode);
-        assertNull(((ObjectSetReferenceNode) result).getParameters());
+        assertTrue(result instanceof ObjectSetReference);
+        assertNull(((ObjectSetReference) result).getParameters());
 
         parser = new Parser(new ByteArrayInputStream(
                 "ObjectSet-Reference {Object}".getBytes())).new ReferencedObjectsParser();
@@ -6152,8 +6151,8 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectSetReferenceNode);
-        assertNotNull(((ObjectSetReferenceNode) result).getParameters());
+        assertTrue(result instanceof ObjectSetReference);
+        assertNotNull(((ObjectSetReference) result).getParameters());
     }
 
     /**
@@ -6842,7 +6841,7 @@ class ParserTest {
         ParameterizedObjectSetParser parser = new Parser(
                 new ByteArrayInputStream("ObjectSet {INTEGER}".getBytes())).new ParameterizedObjectSetParser();
 
-        ObjectSetReferenceNode result = parser.parse();
+        ObjectSetReference result = parser.parse();
 
         assertNotNull(result);
         assertEquals("ObjectSet", result.getReference());

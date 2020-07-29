@@ -29,17 +29,17 @@ package ch.eskaton.asn4j.parser.ast.constraints;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.AtNotationNode;
-import ch.eskaton.asn4j.parser.ast.ObjectSetReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 
 import java.util.List;
 
 public class ComponentRelationConstraint extends TableConstraint {
 
-    private ObjectSetReferenceNode reference;
+    private ObjectSetReference reference;
 
     private List<AtNotationNode> components;
 
-    public ComponentRelationConstraint(Position position, ObjectSetReferenceNode reference,
+    public ComponentRelationConstraint(Position position, ObjectSetReference reference,
             List<AtNotationNode> components) {
         super(position);
 
@@ -47,7 +47,7 @@ public class ComponentRelationConstraint extends TableConstraint {
         this.components = components;
     }
 
-    public ObjectSetReferenceNode getReference() {
+    public ObjectSetReference getReference() {
         return reference;
     }
 

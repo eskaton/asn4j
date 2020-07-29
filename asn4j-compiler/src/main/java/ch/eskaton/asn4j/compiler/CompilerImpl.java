@@ -27,7 +27,9 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -149,36 +151,35 @@ public class CompilerImpl {
         }
     }
 
-    private void compileAssignment(AssignmentNode assignment) {
+    private CompilationResult compileAssignment(AssignmentNode assignment) {
         if (assignment instanceof TypeAssignmentNode) {
-            compileTypeAssignment((TypeAssignmentNode) assignment);
+            return compileTypeAssignment((TypeAssignmentNode) assignment);
         } else if (assignment instanceof ValueAssignmentNode) {
             // ignore values, they are resolved when needed
         } else if (assignment instanceof ParameterizedAssignmentNode) {
-            compileParameterizedAssignment((ParameterizedAssignmentNode) assignment);
+            return compileParameterizedAssignment((ParameterizedAssignmentNode) assignment);
         } else if (assignment instanceof ObjectSetAssignmentNode) {
-            compileObjectSetAssignment((ObjectSetAssignmentNode) assignment);
+            return compileObjectSetAssignment((ObjectSetAssignmentNode) assignment);
         } else if (assignment instanceof ObjectAssignmentNode) {
             // ignore objects, they are resolved when needed
         } else if (assignment instanceof ObjectClassAssignmentNode) {
-            compileObjectClassAssignment((ObjectClassAssignmentNode) assignment);
+            return compileObjectClassAssignment((ObjectClassAssignmentNode) assignment);
         } else if (assignment instanceof ValueSetTypeOrObjectSetAssignmentNode) {
-            compileValueSetTypeOrObjectSetAssignmentNode((ValueSetTypeOrObjectSetAssignmentNode) assignment);
+            return compileValueSetTypeOrObjectSetAssignmentNode((ValueSetTypeOrObjectSetAssignmentNode) assignment);
         }
+        return null;
     }
 
-    private void compileValueSetTypeOrObjectSetAssignmentNode(ValueSetTypeOrObjectSetAssignmentNode assignment) {
+    private CompilationResult compileValueSetTypeOrObjectSetAssignmentNode(ValueSetTypeOrObjectSetAssignmentNode assignment) {
         Node node = assignment.getType();
 
         if (node instanceof Type) {
             try {
                 compilerContext.resolveTypeReference((Type) node);
             } catch (CompilerException e) {
-                compileAssignment(new ObjectSetAssignmentNode(assignment.getPosition(), assignment.getReference(),
+                return compileAssignment(new ObjectSetAssignmentNode(assignment.getPosition(), assignment.getReference(),
                         new ObjectClassReference(node.getPosition(), ((SimpleDefinedType) node).getType()),
                         assignment.getValueSet()));
-
-                return;
             }
 
             var type = (Type) node;
@@ -189,9 +190,9 @@ public class CompilerImpl {
             var typeAssignment = new TypeAssignmentNode(assignment.getPosition(), assignment.getReference(),
                     (Type) node);
 
-            compileAssignment(typeAssignment);
+            return compileAssignment(typeAssignment);
         } else {
-            compileAssignment(new ObjectSetAssignmentNode(assignment.getPosition(), assignment.getReference(),
+            return compileAssignment(new ObjectSetAssignmentNode(assignment.getPosition(), assignment.getReference(),
                     new ObjectClassReference(node.getPosition(), null), assignment.getValueSet()));
         }
     }
@@ -206,13 +207,14 @@ public class CompilerImpl {
                 .compile(compilerContext, assignment);
     }
 
-    private void compileObjectSetAssignment(ObjectSetAssignmentNode assignment) {
-        compilerContext.<ObjectSetAssignmentNode, ObjectSetAssignmentCompiler>getCompiler(ObjectSetAssignmentNode.class)
+    private CompiledObjectSet compileObjectSetAssignment(ObjectSetAssignmentNode assignment) {
+        return compilerContext.<ObjectSetAssignmentNode, ObjectSetAssignmentCompiler>getCompiler(ObjectSetAssignmentNode.class)
                 .compile(compilerContext, assignment);
     }
 
-    private void compileParameterizedAssignment(ParameterizedAssignmentNode assignment) {
+    private CompilationResult compileParameterizedAssignment(ParameterizedAssignmentNode assignment) {
         // TODO Auto-generated method stub
+        return null;
     }
 
     private void compileImports(ModuleNode module) throws IOException, ParserException {
@@ -302,6 +304,33 @@ public class CompilerImpl {
             assignments.peek().remove(assignment);
 
             return Optional.of(compileObjectClassAssignment(assignment));
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<CompiledObjectSet> compileObjectSet(String name) {
+        Optional<AssignmentNode> maybeAmbiguousAssignment = assignments.peek().stream()
+                .filter(obj -> (obj instanceof ObjectSetAssignmentNode ||
+                        obj instanceof ValueSetTypeOrObjectSetAssignmentNode) &&
+                        name.equals(obj.getReference()))
+                .findFirst();
+
+        if (maybeAmbiguousAssignment.isPresent()) {
+            var ambiguousAssignment = maybeAmbiguousAssignment.get();
+
+            if (ambiguousAssignment instanceof ObjectSetAssignmentNode assignment) {
+                assignments.peek().remove(assignment);
+
+                return Optional.of(compileObjectSetAssignment(assignment));
+            } else if (ambiguousAssignment instanceof ValueSetTypeOrObjectSetAssignmentNode assignment) {
+                assignments.peek().remove(assignment);
+
+                var compilationResult = Optional.of(compileValueSetTypeOrObjectSetAssignmentNode(assignment));
+
+                return compilationResult.filter(CompiledObjectSet.class::isInstance)
+                        .map(CompiledObjectSet.class::cast);
+            }
         }
 
         return Optional.empty();
