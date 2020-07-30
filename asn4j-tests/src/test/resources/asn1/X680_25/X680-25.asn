@@ -103,6 +103,10 @@ TestSequence11 ::= SEQUENCE {
    }
 }
 
+TestSequence12 ::= SEQUENCE {
+    childInteger INTEGER {a(1), b(3), c(5)}
+}
+
 -- Test defaults for all types
 
 TestBoolean ::= BOOLEAN
