@@ -65,6 +65,7 @@ import ch.eskaton.asn4j.test.modules.x680_25.TestSequence0;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence10;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence11;
+import ch.eskaton.asn4j.test.modules.x680_25.TestSequence12;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence2;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence3;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence4;
@@ -290,6 +291,14 @@ class TestX680_25 {
                     assertEquals(ASN1Integer.valueOf(4711), value.getChildSequence().getA());
                     assertEquals(ASN1Boolean.TRUE, value.getChildSequence().getB());
                 });
+    }
+
+    @Test
+    @DisplayName("Integer component")
+    void testSequence12() {
+        assertDecodableVerifyAfter(TestSequence12.class,
+                value -> value.setChildInteger(TestSequence12.ChildInteger.A),
+                value -> assertEquals(TestSequence12.ChildInteger.A, value.getChildInteger()));
     }
 
     @Test
