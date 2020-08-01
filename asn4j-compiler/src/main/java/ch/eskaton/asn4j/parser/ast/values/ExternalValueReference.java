@@ -37,6 +37,10 @@ public class ExternalValueReference extends SimpleDefinedValue {
 
     private String module;
 
+    protected ExternalValueReference() {
+        super();
+    }
+
     public ExternalValueReference(Position position, String module, String value) {
         super(position, value);
 

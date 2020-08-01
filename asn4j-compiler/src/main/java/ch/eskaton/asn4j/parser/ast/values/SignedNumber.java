@@ -36,6 +36,10 @@ public class SignedNumber extends AbstractValue {
 
     private BigInteger number;
 
+    protected SignedNumber() {
+        super();
+    }
+
     public SignedNumber(Position position, BigInteger number) {
         super(position);
 

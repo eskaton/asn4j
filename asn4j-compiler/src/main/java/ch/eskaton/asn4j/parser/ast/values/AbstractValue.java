@@ -33,11 +33,17 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
+
 public class AbstractValue implements Value {
 
     private Position position;
 
     private Type type;
+
+    protected AbstractValue() {
+        this.position = NO_POSITION;
+    }
 
     public AbstractValue(Position position) {
         this.position = position;

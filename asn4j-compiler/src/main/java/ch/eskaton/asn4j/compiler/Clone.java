@@ -30,12 +30,22 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.commons.utils.ReflectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Clone {
 
     public static Object clone(Object object) {
         if (object == null) {
             return null;
+        } else if (object instanceof String) {
+            return object;
+        } else if (object instanceof Integer) {
+            return object;
+        } else if (object instanceof BigInteger) {
+            return object;
         }
 
         var clazz = object.getClass();
@@ -48,21 +58,22 @@ public class Clone {
 
             copy = constructor.newInstance();
 
-            var properties = ReflectionUtils.getPropertiesSource(object);
+            if (object instanceof Collection collection) {
+                var list = (List) collection.stream()
+                        .map(Clone::clone)
+                        .collect(Collectors.toList());
 
-            for (var property : properties) {
-                var source = property.get_1().get_1();
-                var name = property.get_1().get_2();
-                var value = property.get_2();
-                var field = source.getDeclaredField(name);
+                ((Collection) copy).addAll(list);
+            } else {
+                var properties = ReflectionUtils.getPropertiesSource(object);
 
-                field.setAccessible(true);
+                for (var property : properties) {
+                    var source = property.get_1().get_1();
+                    var name = property.get_1().get_2();
+                    var value = property.get_2();
+                    var field = source.getDeclaredField(name);
 
-                if (value instanceof String) {
-                    field.set(copy, value);
-                } else if (value instanceof Integer) {
-                    field.set(copy, value);
-                } else {
+                    field.setAccessible(true);
                     field.set(copy, clone(value));
                 }
             }
