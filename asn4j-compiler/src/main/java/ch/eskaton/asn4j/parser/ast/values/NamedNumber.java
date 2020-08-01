@@ -39,6 +39,10 @@ public class NamedNumber extends AbstractValue {
 
     private SignedNumber value;
 
+    protected NamedNumber() {
+        super();
+    }
+
     public NamedNumber(Position position, String id, DefinedValue ref) {
         super(position);
 

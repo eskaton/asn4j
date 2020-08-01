@@ -32,6 +32,10 @@ import ch.eskaton.asn4j.parser.ast.ObjectNode;
 
 public abstract class DefinedValue extends AbstractValue {
 
+    protected DefinedValue() {
+        super();
+    }
+
     public DefinedValue(Position position) {
         super(position);
     }

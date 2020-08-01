@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -36,28 +36,32 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 import java.util.List;
 import java.util.Objects;
 
-public class SimpleDefinedValue extends DefinedValue implements	ParameterizedNode {
+public class SimpleDefinedValue extends DefinedValue implements ParameterizedNode {
 
     private String value;
 
     private List<Node> parameters;
 
+    protected SimpleDefinedValue() {
+        super();
+    }
+
     public SimpleDefinedValue(Position position, String value) {
         super(position);
 
-    	this.value = value;
+        this.value = value;
     }
 
     public String getValue() {
-    	return value;
+        return value;
     }
 
     public void setParameters(List<Node> parameters) {
-    	this.parameters = parameters;
+        this.parameters = parameters;
     }
 
     public List<Node> getParameters() {
-    	return parameters;
+        return parameters;
     }
 
     public SimpleDefinedValue parameters(List<Node> parameters) {
@@ -68,9 +72,9 @@ public class SimpleDefinedValue extends DefinedValue implements	ParameterizedNod
 
     @Override
     public ObjectNode toObjectValue() {
-    	ObjectReferenceNode ref = new ObjectReferenceNode(getPosition(), value);
-    	ref.setParameters(parameters);
-    	return ref;
+        ObjectReferenceNode ref = new ObjectReferenceNode(getPosition(), value);
+        ref.setParameters(parameters);
+        return ref;
     }
 
     @Override
