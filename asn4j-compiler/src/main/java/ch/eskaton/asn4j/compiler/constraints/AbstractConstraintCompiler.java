@@ -37,7 +37,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ElementSetCompiler;
-import ch.eskaton.asn4j.compiler.constraints.elements.ObjectSetElementsCompiler;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
@@ -50,7 +49,6 @@ import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
-import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
@@ -95,7 +93,6 @@ public abstract class AbstractConstraintCompiler {
                         e.getClass().getSimpleName(), getTypeName().getName()));
 
         addConstraintHandler(ElementSet.class, new ElementSetCompiler(dispatcher)::compile);
-        addConstraintHandler(ObjectSetElements.class, new ObjectSetElementsCompiler(ctx)::compile);
     }
 
     protected abstract TypeName getTypeName();

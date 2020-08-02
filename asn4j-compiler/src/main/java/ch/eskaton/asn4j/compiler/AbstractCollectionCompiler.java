@@ -36,7 +36,6 @@ import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.MutableReference;
-import ch.eskaton.commons.Reference;
 
 import java.util.HashSet;
 import java.util.List;
