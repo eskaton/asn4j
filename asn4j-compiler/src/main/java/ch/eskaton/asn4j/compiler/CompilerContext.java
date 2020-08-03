@@ -351,7 +351,7 @@ public class CompilerContext {
 
                 type.setConstraints(constraints);
 
-                var compiledType = defineType(type, name, false);
+                var compiledType = defineType(type, name);
 
                 compiledType.setObjectClass(compiledObjectClass);
 

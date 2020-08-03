@@ -27,20 +27,18 @@
 
 package ch.eskaton.asn4j.test.x681;
 
-import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 
-
 class TestX681 {
 
     @Test
     @DisplayName("Verify that the object class field type is resolved to an INTEGER")
     void testSequence1() {
-        testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> s.setIntField(ASN1Integer.valueOf(1L)));
+        testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> s.setIntField(TestSequence1.IntField.A));
     }
 
 }
