@@ -672,6 +672,10 @@ public class CompilerContext {
             if (compiledType.isPresent()) {
                 return compiledType.get();
             }
+        } else if (type instanceof EnumeratedType enumeratedType) {
+            var compiler = (EnumeratedTypeCompiler) this.getCompiler(type.getClass());
+
+            return compiler.createCompiledType(this, null, enumeratedType);
         }
 
         return new AnonymousCompiledType(type);

@@ -32,9 +32,9 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
 
-    public CompiledType compile(CompilerContext ctx, String name, Type node) {
-        return ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) node.getClass())
-                .compile(ctx, name, node);
+    public CompiledType compile(CompilerContext ctx, String name, Type type) {
+        return ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass())
+                .compile(ctx, name, type);
     }
 
 }
