@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
@@ -52,7 +53,7 @@ public class EnumeratedValueResolver extends AbstractValueResolver<EnumeratedVal
 
     @Override
     public EnumeratedValue resolveGeneric(Type type, Value value) {
-        if (type instanceof TypeReference && value instanceof SimpleDefinedValue) {
+        if ((type instanceof TypeReference || type instanceof EnumeratedType) && value instanceof SimpleDefinedValue) {
             CompiledEnumeratedType compiledType = (CompiledEnumeratedType) ctx.getCompiledType(type);
 
             if (compiledType != null) {

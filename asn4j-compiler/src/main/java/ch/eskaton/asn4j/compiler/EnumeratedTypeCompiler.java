@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
 import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
@@ -46,7 +45,6 @@ import ch.eskaton.commons.collections.Tuple2;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,16 +59,41 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, EnumeratedType node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
-        EnumerationItems rootItems = getRootItems(ctx, name, node.getRootEnum());
-        EnumerationItems additionalItems = getAdditionalItems(ctx, name, rootItems, node.getAdditionalEnum());
-        EnumerationItems allItems = rootItems.copy().addAll(additionalItems.getItems());
-
         if (node.hasExceptionSpec()) {
             // TODO: figure out what to do
         }
 
-        Map<Integer, String> cases = new HashMap<>();
+        var javaClass = ctx.createClass(name, node, true);
+        var compiledType = createCompiledType(ctx, name, node);
+
+        generateJavaClass(javaClass, name, compiledType);
+
+        ConstraintDefinition constraintDef;
+
+        if (node.hasConstraint()) {
+            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            compiledType.setConstraintDefinition(constraintDef);
+        }
+
+        ctx.finishClass(false);
+
+        return compiledType;
+    }
+
+    CompiledEnumeratedType createCompiledType(CompilerContext ctx, String name, EnumeratedType node) {
+        var compiledType = ctx.createCompiledType(CompiledEnumeratedType.class, node, name);
+        var rootItems = getRootItems(ctx, name, node.getRootEnum());
+        var additionalItems = getAdditionalItems(ctx, name, rootItems, node.getAdditionalEnum());
+
+        compiledType.setRoots(rootItems);
+        compiledType.setAdditions(additionalItems);
+
+        return compiledType;
+    }
+
+    private JavaClass generateJavaClass(JavaClass javaClass, String name, CompiledEnumeratedType compiledType) {
+        var allItems = compiledType.getRoots().copy().addAll(compiledType.getAdditions().getItems());
+        var cases = new HashMap<Integer, String>();
 
         allItems.getItems().forEach(item -> {
             String fieldName = CompilerUtils.formatConstant(item.get_1());
@@ -88,7 +111,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, name,
                 asList(new JavaParameter(name, VALUE_PARAMETER)), Optional.of("\t\tsuper.setValue(value.getValue());")));
 
-        BodyBuilder builder = javaClass.method().asStatic().returnType(name).name("valueOf")
+        var builder = javaClass.method().asStatic().returnType(name).name("valueOf")
                 .parameter(INT, VALUE_PARAMETER).exception(ASN1RuntimeException.class).body();
 
         builder.append("switch(value) {");
@@ -106,21 +129,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
 
-        CompiledEnumeratedType compiledType = ctx.createCompiledType(CompiledEnumeratedType.class, node, name);
-
-        compiledType.setRoots(rootItems);
-        compiledType.setAdditions(additionalItems);
-
-        ConstraintDefinition constraintDef;
-
-        if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
-            compiledType.setConstraintDefinition(constraintDef);
-        }
-
-        ctx.finishClass(false);
-
-        return compiledType;
+        return javaClass;
     }
 
     EnumerationItems getRootItems(CompilerContext ctx, String typeName, List<EnumerationItemNode> nodes) {
