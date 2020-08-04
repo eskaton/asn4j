@@ -174,7 +174,8 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         }
 
         return new EnumerationItems().addAll(nodes.stream()
-                .map(node -> Tuple2.of(node.getName(), getNumber(ctx, typeName, node))).collect(Collectors.toList()));
+                .map(node -> Tuple2.of(node.getName(), getNumber(ctx, typeName, node)))
+                .collect(Collectors.toList()));
     }
 
     private Integer getNumber(CompilerContext ctx, String name, EnumerationItemNode item) {
@@ -184,7 +185,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
             BigInteger bigValue = ctx.resolveValue(IntegerValue.class, item.getRef()).getValue();
 
             if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-                throw new CompilerException("Value %s too large in type %s", bigValue, name);
+                throw new CompilerException(item.getPosition(), "Value %s too large in type %s", bigValue, name);
             }
 
             number = bigValue.intValue();
@@ -196,7 +197,11 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
     }
 
     int getNextNumber(List<Tuple2<String, Integer>> numbers, int last) {
-        return numbers.stream().map(Tuple2::get_2).limit(last).collect(Collectors.maxBy(Integer::compare)).orElse(-1) + 1;
+        return numbers.stream()
+                .map(Tuple2::get_2)
+                .limit(last)
+                .collect(Collectors.maxBy(Integer::compare))
+                .orElse(-1) + 1;
     }
 
 }

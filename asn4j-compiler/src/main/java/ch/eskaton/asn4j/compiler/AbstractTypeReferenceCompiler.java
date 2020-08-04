@@ -52,7 +52,7 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         ctx.finishClass();
 
         if (node.getParameters() != null) {
-            throw new CompilerException("ParameterizedTypeReference not yet supported");
+            throw new CompilerException(node.getPosition(), "ParameterizedTypeReference not yet supported");
         }
 
         return compiledType;
