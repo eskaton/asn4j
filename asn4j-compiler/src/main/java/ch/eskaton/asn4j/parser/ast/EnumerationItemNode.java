@@ -38,6 +38,10 @@ public class EnumerationItemNode extends AbstractNode {
 
     private DefinedValue ref;
 
+    protected EnumerationItemNode() {
+        super();
+    }
+
     public EnumerationItemNode(Position position) {
         super(position);
     }

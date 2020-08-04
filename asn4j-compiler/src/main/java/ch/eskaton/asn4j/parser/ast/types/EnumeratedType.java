@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -43,41 +43,44 @@ public class EnumeratedType extends AbstractType {
 
     private boolean extensible = false;
 
+    protected EnumeratedType() {
+    }
+
     public EnumeratedType(Position position, List<EnumerationItemNode> rootEnum) {
         super(position);
 
-    	this.rootEnum = rootEnum;
+        this.rootEnum = rootEnum;
     }
 
     public EnumeratedType(Position position, List<EnumerationItemNode> rootEnum,
             ExceptionIdentificationNode exceptionSpec) {
         super(position);
 
-    	this.rootEnum = rootEnum;
-    	this.exceptionSpec = exceptionSpec;
-    	this.extensible = true;
+        this.rootEnum = rootEnum;
+        this.exceptionSpec = exceptionSpec;
+        this.extensible = true;
     }
 
     public EnumeratedType(Position position, List<EnumerationItemNode> rootEnum,
             ExceptionIdentificationNode exceptionSpec, List<EnumerationItemNode> additionalEnum) {
         super(position);
 
-    	this.rootEnum = rootEnum;
-    	this.exceptionSpec = exceptionSpec;
-    	this.additionalEnum = additionalEnum;
+        this.rootEnum = rootEnum;
+        this.exceptionSpec = exceptionSpec;
+        this.additionalEnum = additionalEnum;
         this.extensible = true;
     }
 
     public List<EnumerationItemNode> getRootEnum() {
-    	return rootEnum;
+        return rootEnum;
     }
 
     public boolean hasExceptionSpec() {
-    	return exceptionSpec != null;
+        return exceptionSpec != null;
     }
 
     public List<EnumerationItemNode> getAdditionalEnum() {
-    	return additionalEnum;
+        return additionalEnum;
     }
 
     public boolean isExtensible() {
