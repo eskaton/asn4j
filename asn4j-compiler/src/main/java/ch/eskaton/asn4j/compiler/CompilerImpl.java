@@ -51,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.commons.io.FileSourceInputStream;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -266,7 +267,7 @@ public class CompilerImpl {
             throw new IOException("Module " + moduleName + " not found in include path");
         }
 
-        return new FileInputStream(moduleFile);
+        return new FileSourceInputStream(moduleFile);
     }
 
     private String stripExtension(String module) {

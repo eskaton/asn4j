@@ -31,9 +31,9 @@ import ch.eskaton.asn4j.parser.Token.TokenType;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.runtime.parsing.LexerInputStream;
 import ch.eskaton.commons.collections.Maps;
+import ch.eskaton.commons.io.FileSourceInputStream;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -139,7 +139,7 @@ public class Lexer {
     public static final String VISIBLESTRING_LIT = "VisibleString";
     public static final String WITH_LIT = "WITH";
     // @formatter:on
-    
+
     /*
      * @formatter:off
      * typereference: 1-n / letters, digits, hyphens / InitCap / !-$ && !--
@@ -277,11 +277,14 @@ public class Lexer {
         }
 
         this.is = new LexerInputStream(baos.toString(StandardCharsets.UTF_8).toCharArray());
+
+        if (is instanceof FileSourceInputStream fsis) {
+            this.moduleFile = fsis.getAbsolutePath();
+        }
     }
 
     public Lexer(String moduleFile) throws IOException {
-        this(new FileInputStream(moduleFile));
-        this.moduleFile = moduleFile;
+        this(new FileSourceInputStream(moduleFile));
     }
 
     public Token nextToken(Context ctx) throws ParserException {
