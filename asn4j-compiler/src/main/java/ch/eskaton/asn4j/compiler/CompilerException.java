@@ -29,8 +29,6 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.parser.Position;
 
-import java.nio.file.Paths;
-
 @SuppressWarnings("serial")
 public class CompilerException extends RuntimeException {
 
@@ -63,7 +61,7 @@ public class CompilerException extends RuntimeException {
     }
 
     public static String formatMessage(Position position, String message) {
-        return String.format("In %s at (%d, %d): %s", Paths.get(position.getFile()).getFileName(), position.getLine(),
+        return String.format("In %s at (%d, %d): %s", position.getFile(), position.getLine(),
                 position.getPosition(), message);
     }
 
