@@ -42,6 +42,8 @@ public class Clone {
             return null;
         } else if (object instanceof String) {
             return object;
+        } else if (object instanceof Boolean) {
+            return object;
         } else if (object instanceof Integer) {
             return object;
         } else if (object instanceof BigInteger) {

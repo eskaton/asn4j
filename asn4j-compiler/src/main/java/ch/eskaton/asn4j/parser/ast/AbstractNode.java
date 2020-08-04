@@ -34,6 +34,9 @@ public abstract class AbstractNode implements Node {
 
     private Position position;
 
+    protected AbstractNode() {
+    }
+
     public AbstractNode(Position position) {
         this.position = position;
     }

@@ -27,7 +27,12 @@
 
 package ch.eskaton.asn4j.test.x681;
 
+import ch.eskaton.asn4j.runtime.types.ASN1BitString;
+import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence2;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +41,28 @@ import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 class TestX681 {
 
     @Test
-    @DisplayName("Verify that the object class field type is resolved to an INTEGER")
+    @DisplayName("Verify that the object class field type is resolved to a BIT STRING")
     void testSequence1() {
-        testSequenceSuccess(TestSequence1.class, new TestSequence1(), s -> s.setIntField(TestSequence1.IntField.A));
+        testSequenceSuccess(TestSequence1.class, new TestSequence1(),
+                s -> s.setBitStringField(ASN1BitString.of(new byte[] { 0x15 })));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a BOOLEAN")
+    void testSequence2() {
+        testSequenceSuccess(TestSequence2.class, new TestSequence2(), s -> s.setBooleanField(ASN1Boolean.TRUE));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to an ENUMERATED type")
+    void testSequence3() {
+        testSequenceSuccess(TestSequence3.class, new TestSequence3(), s -> s.setEnumField(TestSequence3.EnumField.A));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to an INTEGER")
+    void testSequence4() {
+        testSequenceSuccess(TestSequence4.class, new TestSequence4(), s -> s.setIntField(TestSequence4.IntField.A));
     }
 
 }
