@@ -138,7 +138,7 @@ public class UTCTimeValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, UTCTimeValue.class, "testUTCTime1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type UTCTime.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type UTCTime.*"));
     }
 
     @Test
@@ -149,7 +149,7 @@ public class UTCTimeValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, UTCTimeValue.class, "testUTCTime1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type UTCTime.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type UTCTime.*"));
     }
 
 }

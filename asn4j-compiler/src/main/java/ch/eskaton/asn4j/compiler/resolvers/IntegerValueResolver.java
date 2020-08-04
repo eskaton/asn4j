@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -72,7 +73,8 @@ public class IntegerValueResolver extends AbstractValueResolver<IntegerValue> {
             return resolveNamedNumber((SimpleDefinedValue) value, compiledType);
         }
 
-        throw new CompilerException(value.getPosition(), "Failed to resolve an %s value", TypeName.INTEGER);
+        throw new CompilerException(value.getPosition(), "Failed to resolve an %s value: %s", TypeName.INTEGER,
+                ValueFormatter.formatValue(value));
     }
 
     private IntegerValue resolveNamedNumber(SimpleDefinedValue value, CompiledType compiledType) {

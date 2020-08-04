@@ -153,7 +153,7 @@ public class BMPStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, BMPStringValue.class, "testBMPString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type BMPString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type BMPString.*"));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class BMPStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, BMPStringValue.class, "testBMPString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("BMPString contains invalid characters.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*BMPString contains invalid characters.*"));
     }
 
     @Test

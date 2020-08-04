@@ -170,7 +170,7 @@ public class GraphicStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, GraphicStringValue.class, "testGraphicString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type GraphicString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type GraphicString.*"));
     }
 
     @Test
@@ -181,7 +181,7 @@ public class GraphicStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, GraphicStringValue.class, "testGraphicString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type GraphicString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type GraphicString.*"));
     }
 
 }

@@ -60,7 +60,7 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
         Node value = valueAssignment.getValue();
 
         if (!(type instanceof Type)) {
-            throw new CompilerException("Invalid type %s", type.getClass().getSimpleName());
+            throw new CompilerException(type.getPosition(), "Invalid type %s", type.getClass().getSimpleName());
         }
 
         type = ctx.resolveTypeReference((Type) type);
@@ -73,15 +73,15 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
             var resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
 
             if (resolvedValue == null) {
-                throw new CompilerException("Expected a value of type %s but found %s", valueClass.getSimpleName(),
-                        value.getClass().getSimpleName());
+                throw new CompilerException(value.getPosition(), "Expected a value of type %s but found %s",
+                        valueClass.getSimpleName(), value.getClass().getSimpleName());
             }
 
             return resolvedValue;
         }
 
-        throw new CompilerException("Failed to resolve a value of type %s. Found type %s", typeClass.getSimpleName(),
-                type.getClass().getSimpleName());
+        throw new CompilerException(type.getPosition(), "Failed to resolve a value of type %s. Found type %s",
+                typeClass.getSimpleName(), type.getClass().getSimpleName());
     }
 
     @Override

@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
@@ -63,7 +64,8 @@ public class RealValueResolver extends AbstractValueResolver<RealValue> {
             return CompilerUtils.resolveAmbiguousValue(value, RealValue.class);
         }
 
-        throw new CompilerException("Failed to resolve a %s value", TypeName.REAL);
+        throw new CompilerException(value.getPosition(), "Failed to resolve a %s value: %s", TypeName.REAL,
+                ValueFormatter.formatValue(value));
     }
 
     private RealValue resolveCollectionValue(Value value) {

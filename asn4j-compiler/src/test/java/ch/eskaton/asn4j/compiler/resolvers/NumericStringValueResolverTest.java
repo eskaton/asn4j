@@ -170,7 +170,7 @@ public class NumericStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, NumericStringValue.class, "testNumericString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type NumericString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type NumericString.*"));
     }
 
     @Test
@@ -181,7 +181,7 @@ public class NumericStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, NumericStringValue.class, "testNumericString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type NumericString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type NumericString.*"));
     }
 
 }

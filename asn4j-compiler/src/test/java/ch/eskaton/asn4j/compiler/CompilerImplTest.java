@@ -125,7 +125,7 @@ class CompilerImplTest {
                 }
                 """;
 
-        testModule(body, CompilerException.class, "VisibleString contains invalid characters.*");
+        testModule(body, CompilerException.class, ".*VisibleString contains invalid characters.*");
     }
 
     @Test
@@ -136,7 +136,7 @@ class CompilerImplTest {
                 }
                 """;
 
-        testModule(body, CompilerException.class, "NumericString contains invalid characters.*");
+        testModule(body, CompilerException.class, ".*NumericString contains invalid characters.*");
     }
 
     @Test

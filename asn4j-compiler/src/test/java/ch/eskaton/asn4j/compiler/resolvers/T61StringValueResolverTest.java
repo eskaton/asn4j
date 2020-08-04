@@ -153,7 +153,7 @@ public class T61StringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, TeletexStringValue.class, "testT61String1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type TeletexString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type TeletexString.*"));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class T61StringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, TeletexStringValue.class, "testT61String1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type TeletexString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type TeletexString.*"));
     }
 
 }

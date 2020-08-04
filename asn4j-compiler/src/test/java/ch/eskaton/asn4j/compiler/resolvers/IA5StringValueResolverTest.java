@@ -104,7 +104,7 @@ public class IA5StringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, IA5StringValue.class, "testIA5String1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type IA5String.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type IA5String.*"));
     }
 
     @Test

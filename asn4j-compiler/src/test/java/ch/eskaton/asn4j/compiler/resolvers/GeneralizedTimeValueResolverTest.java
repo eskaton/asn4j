@@ -138,7 +138,7 @@ public class GeneralizedTimeValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, GeneralizedTimeValue.class, "testGeneralizedTime1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type GeneralizedTime.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type GeneralizedTime.*"));
     }
 
     @Test
@@ -149,7 +149,7 @@ public class GeneralizedTimeValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, GeneralizedTimeValue.class, "testGeneralizedTime1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type GeneralizedTime.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type GeneralizedTime.*"));
     }
 
 }
