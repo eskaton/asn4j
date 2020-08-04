@@ -170,7 +170,7 @@ public class PrintableStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, PrintableStringValue.class, "testPrintableString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type PrintableString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type PrintableString.*"));
     }
 
     @Test
@@ -181,7 +181,7 @@ public class PrintableStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, PrintableStringValue.class, "testPrintableString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type PrintableString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type PrintableString.*"));
     }
 
 }

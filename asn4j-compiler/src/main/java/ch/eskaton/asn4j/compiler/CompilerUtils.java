@@ -169,7 +169,7 @@ public class CompilerUtils {
                     clazz = Clazz.UNIVERSAL;
                     break;
                 default:
-                    throw new CompilerException("Unknown class type: " + clazzType.name());
+                    throw new CompilerException(tag.getPosition(), "Unknown class type: %s", clazzType.name());
             }
         }
 

@@ -153,7 +153,7 @@ public class UTF8StringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, UTF8StringValue.class, "testUTF8String1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type UTF8String.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type UTF8String.*"));
     }
 
     @Test

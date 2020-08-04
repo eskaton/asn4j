@@ -170,7 +170,7 @@ public class GeneralStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, GeneralStringValue.class, "testGeneralString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type GeneralString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type GeneralString.*"));
     }
 
     @Test
@@ -181,7 +181,7 @@ public class GeneralStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, GeneralStringValue.class, "testGeneralString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type GeneralString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type GeneralString.*"));
     }
 
 }

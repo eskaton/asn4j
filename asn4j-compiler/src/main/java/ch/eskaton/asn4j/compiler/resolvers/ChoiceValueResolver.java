@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -88,18 +89,21 @@ public class ChoiceValueResolver extends AbstractValueResolver<ChoiceValue> {
                     .filter(nt -> nt.getName().equals(choiceValue.getId())).findFirst();
 
             if (!maybeNamedType.isPresent()) {
-                throw new CompilerException("Invalid component %s in %s", choiceValue.getId(), TypeName.CHOICE);
+                throw new CompilerException(choiceValue.getPosition(), "Invalid component %s in %s", choiceValue
+                        .getId(), TypeName.CHOICE);
             }
 
             var namedType = maybeNamedType.get();
-            var resolvedValue = ctx.resolveGenericValue(ctx.getValueType(namedType.getType()), namedType.getType(), choiceValue.getValue());
+            var resolvedValue = ctx.resolveGenericValue(ctx.getValueType(namedType.getType()), namedType.getType(),
+                    choiceValue.getValue());
 
             choiceValue.setValue(resolvedValue);
 
             return choiceValue;
         }
 
-        throw new CompilerException("Failed to resolve a %s value", TypeName.CHOICE);
+        throw new CompilerException(value.getPosition(), "Failed to resolve a %s value: %s", TypeName.CHOICE,
+                ValueFormatter.formatValue(value));
     }
 
     private void checkTypes(Type type1, Type type2) {

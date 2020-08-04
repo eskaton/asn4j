@@ -153,7 +153,7 @@ public class UniversalStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, UniversalStringValue.class, "testUniversalString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type UniversalString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type UniversalString.*"));
     }
 
     @Test

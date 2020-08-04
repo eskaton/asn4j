@@ -170,7 +170,7 @@ public class VisibleStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type VisibleString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type VisibleString.*"));
     }
 
     @Test
@@ -181,7 +181,7 @@ public class VisibleStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, VisibleStringValue.class, "testVisibleString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type VisibleString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type VisibleString.*"));
     }
 
 }

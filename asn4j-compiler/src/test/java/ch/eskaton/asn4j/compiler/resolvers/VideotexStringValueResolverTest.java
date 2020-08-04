@@ -153,7 +153,7 @@ public class VideotexStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, VideotexStringValue.class, "testVideotexString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Tuple values not allowed for type VideotexString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Tuple values not allowed for type VideotexString.*"));
     }
 
     @Test
@@ -164,7 +164,7 @@ public class VideotexStringValueResolverTest {
         var exception = assertThrows(CompilerException.class,
                 () -> resolveValue(body, VideotexStringValue.class, "testVideotexString1"));
 
-        assertThat(exception.getMessage(), matchesPattern("Quadruple values not allowed for type VideotexString.*"));
+        assertThat(exception.getMessage(), matchesPattern(".*Quadruple values not allowed for type VideotexString.*"));
     }
 
 }

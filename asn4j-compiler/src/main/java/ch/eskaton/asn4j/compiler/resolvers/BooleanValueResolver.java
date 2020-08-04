@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -51,13 +52,12 @@ public class BooleanValueResolver extends AbstractValueResolver<BooleanValue> {
             } else if (value instanceof BooleanValue) {
                 return (BooleanValue) value;
             }
-
-            throw new CompilerException("%s value expected", TypeName.BOOLEAN);
         } else if (type instanceof TypeReference) {
             return resolveGeneric(ctx.resolveTypeReference(type), value);
         }
 
-        throw new CompilerException("Failed to resolve a %s value", TypeName.BOOLEAN);
+        throw new CompilerException(value.getPosition(), "Failed to resolve a %s value: %s", TypeName.BOOLEAN,
+                ValueFormatter.formatValue(value));
     }
 
 }

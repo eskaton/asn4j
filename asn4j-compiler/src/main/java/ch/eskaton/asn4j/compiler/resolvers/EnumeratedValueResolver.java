@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -72,7 +73,8 @@ public class EnumeratedValueResolver extends AbstractValueResolver<EnumeratedVal
             }
         }
 
-        throw new CompilerException("Failed to resolve an %s value", TypeName.ENUMERATED);
+        throw new CompilerException(value.getPosition(), "Failed to resolve an %s value: %s", TypeName.ENUMERATED,
+                ValueFormatter.formatValue(value));
     }
 
 }

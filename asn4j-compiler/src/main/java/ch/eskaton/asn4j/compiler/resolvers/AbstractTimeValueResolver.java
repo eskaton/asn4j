@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -48,7 +49,8 @@ public abstract class AbstractTimeValueResolver<T extends HasStringValue & Value
         var resolvedValue = super.resolveCharacterStringList(resolvedType, value);
 
         if (resolvedValue != null) {
-            throw new CompilerException("Unsupported value for %s type: %s", getTypeName(), value);
+            throw new CompilerException(value.getPosition(), "Unsupported value for %s type: %s", getTypeName(),
+                    ValueFormatter.formatValue(value));
         }
 
         return null;
