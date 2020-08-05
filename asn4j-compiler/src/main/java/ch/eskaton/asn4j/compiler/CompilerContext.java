@@ -345,11 +345,19 @@ public class CompilerContext {
                             compiledObjectClass.getName()));
 
             if (field instanceof CompiledFixedTypeValueField) {
-                var constraints = type.getConstraints();
+                var additionalConstraints = type.getConstraints();
 
                 type = (Type) Clone.clone(((CompiledFixedTypeValueField) field).getCompiledType().getType());
 
-                type.setConstraints(constraints);
+                if (additionalConstraints != null) {
+                    var constraints = type.getConstraints();
+
+                    if (constraints == null) {
+                        type.setConstraints(additionalConstraints);
+                    } else {
+                        constraints.addAll(additionalConstraints);
+                    }
+                }
 
                 var compiledType = defineType(type, name);
 
