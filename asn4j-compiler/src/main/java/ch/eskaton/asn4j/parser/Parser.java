@@ -427,6 +427,8 @@ public class Parser {
     private PrefixedTypeParser prefixedTypeParser = new PrefixedTypeParser();
     private PresenceConstraintParser presenceConstraintParser = new PresenceConstraintParser();
     private PrimitiveFieldNameParser primitiveFieldNameParser = new PrimitiveFieldNameParser();
+    private ValuePrimitiveFieldNameParser valuePrimitiveFieldNameParser = new ValuePrimitiveFieldNameParser();
+    private TypePrimitiveFieldNameParser typePrimitiveFieldNameParser = new TypePrimitiveFieldNameParser();
     private PropertyAndSettingPairParser propertyAndSettingPairParser = new PropertyAndSettingPairParser();
     private PropertySettingsParser propertySettingsParser = new PropertySettingsParser();
     private RealValueParser realValueParser = new RealValueParser();
@@ -448,6 +450,8 @@ public class Parser {
     private ElementSetSpecsParser elementSetSpecsParser = new ElementSetSpecsParser();
     private ObjectSetSpecParser objectSetSpecParser = new ObjectSetSpecParser();
     private SettingParser settingParser = new SettingParser();
+    private TypeSettingParser typeSettingParser = new TypeSettingParser();
+    private ValueSettingParser valueSettingParser = new ValueSettingParser();
     private SignedNumberParser signedNumberParser = new SignedNumberParser();
     private SimpleDefinedTypeParser simpleDefinedTypeParser = new SimpleDefinedTypeParser();
     private SimpleDefinedValueParser simpleDefinedValueParser = new SimpleDefinedValueParser();
@@ -4109,6 +4113,47 @@ public class Parser {
 
     }
 
+    // PrimitiveFieldName ::=
+    // typefieldreference
+    // | valuesetfieldreference
+    // | objectsetfieldreference
+    protected class TypePrimitiveFieldNameParser implements RuleParser<PrimitiveFieldNameNode> {
+
+        @SuppressWarnings("unchecked")
+        public PrimitiveFieldNameNode parse() throws ParserException {
+            Token rule = new SingleTokenParser(TokenType.TYPE_FIELD_REFERENCE, Context.TYPE_FIELD).parse();
+
+            if (rule != null) {
+                String reference = rule.getText().substring(1);
+
+                return new PrimitiveFieldNameNode(rule.getPosition(), reference, TokenType.TYPE_FIELD_REFERENCE);
+            }
+
+            return null;
+        }
+
+    }
+
+    // PrimitiveFieldName ::=
+    // valuefieldreference
+    // | objectfieldreference
+    protected class ValuePrimitiveFieldNameParser implements RuleParser<PrimitiveFieldNameNode> {
+
+        @SuppressWarnings("unchecked")
+        public PrimitiveFieldNameNode parse() throws ParserException {
+            Token rule = new SingleTokenParser(TokenType.VALUE_FIELD_REFERENCE, Context.VALUE_FIELD).parse();
+
+            if (rule != null) {
+                String reference = rule.getText().substring(1);
+
+                return new PrimitiveFieldNameNode(rule.getPosition(), reference, TokenType.VALUE_FIELD_REFERENCE);
+            }
+
+            return null;
+        }
+
+    }
+
     // FieldName ::= PrimitiveFieldName "." +
     protected class FieldNameParser implements RuleParser<FieldNameNode> {
 
@@ -4550,8 +4595,17 @@ public class Parser {
     protected class FieldSettingParser extends ListRuleParser<FieldSettingNode> {
 
         public FieldSettingNode parse() throws ParserException {
-            return super.parse(new SequenceParser(primitiveFieldNameParser, settingParser),
-                    a -> new FieldSettingNode(a.P(), a.n0(), a.n1()));
+            List<Object> rule = new ChoiceParser<>(
+                    new SequenceParser(valuePrimitiveFieldNameParser, valueSettingParser),
+                    new SequenceParser(typePrimitiveFieldNameParser, typeSettingParser)).parse();
+
+            if (rule != null) {
+                PrimitiveFieldNameNode fieldName = (PrimitiveFieldNameNode) rule.get(0);
+
+                return new FieldSettingNode(fieldName.getPosition(), fieldName, (Node) rule.get(1));
+            }
+
+            return null;
         }
 
     }
@@ -4578,12 +4632,30 @@ public class Parser {
 
     }
 
-    // Setting ::= Type | Value | ValueSet | Object | ObjectSet
+    // Setting ::= Type | ValueSet | ObjectSet | Value | Object
     protected class SettingParser implements RuleParser<Node> {
+
+        public Node parse() throws ParserException {
+            return new ChoiceParser<>(typeSettingParser, valueSettingParser).parse();
+        }
+
+    }
+
+    // Setting ::= Type | ValueSet | ObjectSet
+    protected class TypeSettingParser implements RuleParser<Node> {
 
         @SuppressWarnings("unchecked")
         public Node parse() throws ParserException {
-            return new ChoiceParser<>(typeParser, valueParser, valueSetParser, objectParser, objectSetParser).parse();
+            return new ChoiceParser<>(typeParser, valueSetParser, objectSetParser).parse();
+        }
+
+    }
+
+    // Setting ::= Value | Object
+    protected class ValueSettingParser implements RuleParser<Node> {
+
+        public Node parse() throws ParserException {
+            return new ChoiceParser<>(valueParser, objectParser).parse();
         }
 
     }

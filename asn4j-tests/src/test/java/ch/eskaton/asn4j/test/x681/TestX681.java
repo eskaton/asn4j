@@ -29,10 +29,12 @@ package ch.eskaton.asn4j.test.x681;
 
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence2;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence5;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -63,6 +65,12 @@ class TestX681 {
     @DisplayName("Verify that the object class field type is resolved to an INTEGER")
     void testSequence4() {
         testSequenceSuccess(TestSequence4.class, new TestSequence4(), s -> s.setIntField(TestSequence4.IntField.A));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a NULL type")
+    void testSequence5() {
+        testSequenceSuccess(TestSequence5.class, new TestSequence5(), s -> s.setNullField(new ASN1Null()));
     }
 
 }
