@@ -72,6 +72,8 @@ public class EnumeratedValueResolver extends AbstractValueResolver<EnumeratedVal
                     return new EnumeratedValue(value.getPosition(), ref, element.get().get_2());
                 }
             }
+        } else if (value instanceof EnumeratedValue enumeratedValue) {
+            return enumeratedValue;
         }
 
         throw new CompilerException(value.getPosition(), "Failed to resolve an %s value: %s", TypeName.ENUMERATED,
