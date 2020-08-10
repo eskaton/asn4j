@@ -5,14 +5,16 @@ TEST ::= CLASS {
     &bitStringField  BIT STRING,
     &booleanField    BOOLEAN,
     &enumField       ENUMERATED {a, b, c},
-    &intField        INTEGER {a(1), b(3), c(5)}
+    &intField        INTEGER {a(1), b(3), c(5)},
+    &nullField       NULL
 }
 
 TestSet TEST ::= {
     { &bitStringField '0101'B,
       &booleanField    TRUE,
       &enumField       a,
-      &intField        c
+      &intField        c,
+      &nullField       NULL
     }
 }
 

@@ -31,6 +31,9 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class Null extends AbstractType {
 
+    protected Null() {
+    }
+
     public Null(Position position) {
         super(position);
     }

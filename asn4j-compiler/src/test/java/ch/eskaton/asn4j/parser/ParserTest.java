@@ -76,6 +76,7 @@ import ch.eskaton.asn4j.parser.Parser.DummyGovernorParser;
 import ch.eskaton.asn4j.parser.Parser.DummyReferenceParser;
 import ch.eskaton.asn4j.parser.Parser.DurationRangeParser;
 import ch.eskaton.asn4j.parser.Parser.ElementSetSpecParser;
+import ch.eskaton.asn4j.parser.Parser.ElementSetSpecsParser;
 import ch.eskaton.asn4j.parser.Parser.ElementsParser;
 import ch.eskaton.asn4j.parser.Parser.EmptyValueParser;
 import ch.eskaton.asn4j.parser.Parser.EncodingControlSectionParser;
@@ -112,6 +113,7 @@ import ch.eskaton.asn4j.parser.Parser.FieldSettingParser;
 import ch.eskaton.asn4j.parser.Parser.FieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.FixedTypeFieldValParser;
 import ch.eskaton.asn4j.parser.Parser.FixedTypeValueOrObjectFieldSpecParser;
+import ch.eskaton.asn4j.parser.Parser.FixedTypeValueSetFieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.FullSpecificationParser;
 import ch.eskaton.asn4j.parser.Parser.GeneralConstraintParser;
 import ch.eskaton.asn4j.parser.Parser.GlobalModuleReferenceParser;
@@ -193,8 +195,6 @@ import ch.eskaton.asn4j.parser.Parser.RestrictedCharacterStringTypeParser;
 import ch.eskaton.asn4j.parser.Parser.RestrictedCharacterStringValueParser;
 import ch.eskaton.asn4j.parser.Parser.RootAlternativeTypeListParser;
 import ch.eskaton.asn4j.parser.Parser.SelectionTypeParser;
-import ch.eskaton.asn4j.parser.Parser.FixedTypeValueSetFieldSpecParser;
-import ch.eskaton.asn4j.parser.Parser.ElementSetSpecsParser;
 import ch.eskaton.asn4j.parser.Parser.SettingParser;
 import ch.eskaton.asn4j.parser.Parser.SignedNumberParser;
 import ch.eskaton.asn4j.parser.Parser.SimpleDefinedTypeParser;
@@ -222,6 +222,7 @@ import ch.eskaton.asn4j.parser.Parser.TypeFieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.TypeFromObjectsParser;
 import ch.eskaton.asn4j.parser.Parser.TypeOptionalitySpecParser;
 import ch.eskaton.asn4j.parser.Parser.TypeParser;
+import ch.eskaton.asn4j.parser.Parser.TypeSettingParser;
 import ch.eskaton.asn4j.parser.Parser.TypeWithConstraintParser;
 import ch.eskaton.asn4j.parser.Parser.UnionsParser;
 import ch.eskaton.asn4j.parser.Parser.UnrestrictedCharacterStringTypeParser;
@@ -5853,6 +5854,28 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ObjectSetSpecNode);
+    }
+
+    @Test
+    void testTypeSettingParser() throws IOException, ParserException {
+        TypeSettingParser parser = new Parser(new ByteArrayInputStream(
+                "NULL".getBytes())).new TypeSettingParser();
+
+        Node result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result instanceof Null);
+    }
+
+    @Test
+    void testValueSettingParser() throws IOException, ParserException {
+        Parser.ValueSettingParser parser = new Parser(new ByteArrayInputStream(
+                "NULL".getBytes())).new ValueSettingParser();
+
+        Node result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result instanceof NullValue);
     }
 
     /**
