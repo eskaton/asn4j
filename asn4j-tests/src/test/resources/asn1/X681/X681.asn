@@ -34,4 +34,8 @@ TestSequence4 ::= SEQUENCE {
    intField TEST.&intField
 }
 
+TestSequence5 ::= SEQUENCE {
+   nullField TEST.&nullField
+}
+
 END
