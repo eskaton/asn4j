@@ -31,6 +31,9 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class NumericString extends AbstractType {
 
+    protected NumericString() {
+    }
+
     public NumericString(Position position) {
         super(position);
     }

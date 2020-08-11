@@ -29,14 +29,30 @@ package ch.eskaton.asn4j.test.x681;
 
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
+import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
+import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
+import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
+import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
+import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
+import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence10;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence11;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence12;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence13;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence14;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence2;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence5;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence6;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence7;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence8;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence9;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -80,6 +96,62 @@ class TestX681 {
     void testSequence6() {
         testSequenceSuccess(TestSequence6.class, new TestSequence6(),
                 s -> s.setOctetStringField(ASN1OctetString.valueOf(new byte[] { (byte) 0xab })));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a VisibleString")
+    void testSequence7() {
+        testSequenceSuccess(TestSequence7.class, new TestSequence7(),
+                s -> s.setVisibleStringField(new ASN1VisibleString("abc")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a GeneralString")
+    void testSequence8() {
+        testSequenceSuccess(TestSequence8.class, new TestSequence8(),
+                s -> s.setGeneralStringField(new ASN1GeneralString("abc")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a GraphicString")
+    void testSequence9() {
+        testSequenceSuccess(TestSequence9.class, new TestSequence9(),
+                s -> s.setGraphicStringField(new ASN1GraphicString("abc")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to an IA5String")
+    void testSequence10() {
+        testSequenceSuccess(TestSequence10.class, new TestSequence10(),
+                s -> s.setIa5StringField(new ASN1IA5String("abc")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a VideotexString")
+    void testSequence11() {
+        testSequenceSuccess(TestSequence11.class, new TestSequence11(),
+                s -> s.setVideotexStringField(new ASN1VideotexString("abc")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a TeletexString")
+    void testSequence12() {
+        testSequenceSuccess(TestSequence12.class, new TestSequence12(),
+                s -> s.setTeletexStringField(new ASN1TeletexString("abc")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a PrintableString")
+    void testSequence13() {
+        testSequenceSuccess(TestSequence13.class, new TestSequence13(),
+                s -> s.setPrintableStringField(new ASN1PrintableString("abc")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a NumericString")
+    void testSequence14() {
+        testSequenceSuccess(TestSequence14.class, new TestSequence14(),
+                s -> s.setNumericStringField(new ASN1NumericString("123")));
     }
 
 }

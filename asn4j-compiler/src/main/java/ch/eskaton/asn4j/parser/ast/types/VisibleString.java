@@ -31,6 +31,10 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class VisibleString extends AbstractType {
 
+    protected VisibleString() {
+        super();
+    }
+
     public VisibleString(Position position) {
         super(position);
     }
