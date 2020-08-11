@@ -31,6 +31,9 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class IA5String extends AbstractType {
 
+    protected IA5String() {
+    }
+
     public IA5String(Position position) {
         super(position);
     }

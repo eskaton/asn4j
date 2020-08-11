@@ -31,6 +31,9 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class GeneralString extends AbstractType {
 
+    protected GeneralString() {
+    }
+
     public GeneralString(Position position) {
         super(position);
     }

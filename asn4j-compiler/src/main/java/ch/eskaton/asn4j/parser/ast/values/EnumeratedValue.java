@@ -36,7 +36,7 @@ public class EnumeratedValue extends AbstractValue {
     private String id;
 
     private Integer value;
-    
+
     public EnumeratedValue(Position position, String id, Integer value) {
         super(position);
 

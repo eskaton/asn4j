@@ -2,21 +2,37 @@ X681 DEFINITIONS ::=
 BEGIN
 
 TEST ::= CLASS {
-    &bitStringField    BIT STRING,
-    &booleanField      BOOLEAN,
-    &enumField         ENUMERATED {a, b, c},
-    &intField          INTEGER {a(1), b(3), c(5)},
-    &nullField         NULL,
-    &octetStringField  OCTET STRING
+    &bitStringField        BIT STRING,
+    &booleanField          BOOLEAN,
+    &enumField             ENUMERATED {a, b, c},
+    &intField              INTEGER {a(1), b(3), c(5)},
+    &nullField             NULL,
+    &octetStringField      OCTET STRING,
+    &visibleStringField    VisibleString,
+    &generalStringField    GeneralString,
+    &graphicStringField    GraphicString,
+    &ia5StringField        IA5String,
+    &videotexStringField   VideotexString,
+    &teletexStringField    TeletexString,
+    &printableStringField  PrintableString,
+    &numericStringField    NumericString
 }
 
 TestSet TEST ::= {
-    { &bitStringField   '0101'B,
-      &booleanField      TRUE,
-      &enumField         a,
-      &intField          c,
-      &nullField         NULL,
-      &octetStringField  '0BD9'H
+    { &bitStringField        '0101'B,
+      &booleanField          TRUE,
+      &enumField             a,
+      &intField              c,
+      &nullField             NULL,
+      &octetStringField      '0BD9'H,
+      &visibleStringField    "abc",
+      &generalStringField    "abc",
+      &graphicStringField    "abc",
+      &ia5StringField        "abc",
+      &videotexStringField   "abc",
+      &teletexStringField    "abc",
+      &printableStringField  "abc",
+      &numericStringField    "123"
     }
 }
 
@@ -42,6 +58,38 @@ TestSequence5 ::= SEQUENCE {
 
 TestSequence6 ::= SEQUENCE {
    octetStringField TEST.&octetStringField
+}
+
+TestSequence7 ::= SEQUENCE {
+   visibleStringField TEST.&visibleStringField
+}
+
+TestSequence8 ::= SEQUENCE {
+   generalStringField TEST.&generalStringField
+}
+
+TestSequence9 ::= SEQUENCE {
+   graphicStringField TEST.&graphicStringField
+}
+
+TestSequence10 ::= SEQUENCE {
+   ia5StringField TEST.&ia5StringField
+}
+
+TestSequence11 ::= SEQUENCE {
+   videotexStringField TEST.&videotexStringField
+}
+
+TestSequence12 ::= SEQUENCE {
+   teletexStringField TEST.&teletexStringField
+}
+
+TestSequence13 ::= SEQUENCE {
+   printableStringField TEST.&printableStringField
+}
+
+TestSequence14 ::= SEQUENCE {
+   numericStringField TEST.&numericStringField
 }
 
 END
