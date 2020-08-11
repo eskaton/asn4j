@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
+import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -53,6 +54,17 @@ public class ValueFormatter {
             return value.getArcIdentifierTexts().stream().collect(Collectors.joining("/"));
         } else if (node instanceof IRIValue value) {
             return "/" + value.getArcIdentifierTexts().stream().collect(Collectors.joining("/"));
+        } else if (node instanceof EnumeratedValue value) {
+            var id = value.getId();
+            var intValue = value.getValue();
+
+            if (id != null && intValue != null) {
+                return String.format("%s(%d)", id, intValue);
+            } else if (id != null) {
+                return id;
+            } else {
+                return String.valueOf(value.getValue());
+            }
         } else if (node instanceof AmbiguousValue value) {
             return value.getValues().stream().map(ValueFormatter::formatValue).collect(Collectors.joining(", "));
         } else if (node instanceof TupleNode value) {

@@ -35,15 +35,9 @@ public class EnumeratedValue extends AbstractValue {
 
     private String id;
 
-    private int value;
-
-    public EnumeratedValue(Position position, String id) {
-        super(position);
-
-        this.id = id;
-    }
-
-    public EnumeratedValue(Position position, String id, int value) {
+    private Integer value;
+    
+    public EnumeratedValue(Position position, String id, Integer value) {
         super(position);
 
         this.id = id;
@@ -54,7 +48,7 @@ public class EnumeratedValue extends AbstractValue {
         return id;
     }
 
-    public int getValue() {
+    public Integer getValue() {
         return value;
     }
 
@@ -68,15 +62,19 @@ public class EnumeratedValue extends AbstractValue {
             return false;
         }
 
+        if (!super.equals(o)) {
+            return false;
+        }
+
         EnumeratedValue that = (EnumeratedValue) o;
 
-        return value == that.value &&
-                Objects.equals(id, that.id);
+        return Objects.equals(id, that.id) &&
+                Objects.equals(value, that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, value);
+        return Objects.hash(super.hashCode(), id, value);
     }
 
 }
