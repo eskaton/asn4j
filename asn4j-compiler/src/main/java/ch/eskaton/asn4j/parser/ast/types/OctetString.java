@@ -31,6 +31,10 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class OctetString extends AbstractType {
 
+    protected OctetString() {
+        super();
+    }
+
     public OctetString(Position position) {
         super(position);
     }

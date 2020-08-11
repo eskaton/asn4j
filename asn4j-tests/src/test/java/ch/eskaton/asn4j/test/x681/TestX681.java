@@ -30,11 +30,13 @@ package ch.eskaton.asn4j.test.x681;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
+import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence2;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence5;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence6;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -71,6 +73,13 @@ class TestX681 {
     @DisplayName("Verify that the object class field type is resolved to a NULL type")
     void testSequence5() {
         testSequenceSuccess(TestSequence5.class, new TestSequence5(), s -> s.setNullField(new ASN1Null()));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to an OCTET STRING")
+    void testSequence6() {
+        testSequenceSuccess(TestSequence6.class, new TestSequence6(),
+                s -> s.setOctetStringField(ASN1OctetString.valueOf(new byte[] { (byte) 0xab })));
     }
 
 }
