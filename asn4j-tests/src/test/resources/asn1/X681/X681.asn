@@ -2,19 +2,21 @@ X681 DEFINITIONS ::=
 BEGIN
 
 TEST ::= CLASS {
-    &bitStringField  BIT STRING,
-    &booleanField    BOOLEAN,
-    &enumField       ENUMERATED {a, b, c},
-    &intField        INTEGER {a(1), b(3), c(5)},
-    &nullField       NULL
+    &bitStringField    BIT STRING,
+    &booleanField      BOOLEAN,
+    &enumField         ENUMERATED {a, b, c},
+    &intField          INTEGER {a(1), b(3), c(5)},
+    &nullField         NULL,
+    &octetStringField  OCTET STRING
 }
 
 TestSet TEST ::= {
-    { &bitStringField '0101'B,
-      &booleanField    TRUE,
-      &enumField       a,
-      &intField        c,
-      &nullField       NULL
+    { &bitStringField   '0101'B,
+      &booleanField      TRUE,
+      &enumField         a,
+      &intField          c,
+      &nullField         NULL,
+      &octetStringField  '0BD9'H
     }
 }
 
@@ -36,6 +38,10 @@ TestSequence4 ::= SEQUENCE {
 
 TestSequence5 ::= SEQUENCE {
    nullField TEST.&nullField
+}
+
+TestSequence6 ::= SEQUENCE {
+   octetStringField TEST.&octetStringField
 }
 
 END
