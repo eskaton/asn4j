@@ -44,8 +44,8 @@ public class DefaultsCompiler {
         this.ctx = ctx;
     }
 
-    public void compileDefault(JavaClass clazz, String field, String typeName, Type type, Value value) {
-        AbstractDefaultCompiler compiler = ctx.getDefaultCompiler(ctx.resolveBaseType(type).getClass());
+    public <V extends Value> void compileDefault(JavaClass clazz, String field, String typeName, Type type, V value) {
+        AbstractDefaultCompiler<V> compiler = ctx.getDefaultCompiler(ctx.resolveBaseType(type).getClass());
 
         try {
             compiler.compileDefault(ctx, clazz, field, typeName, type, value);

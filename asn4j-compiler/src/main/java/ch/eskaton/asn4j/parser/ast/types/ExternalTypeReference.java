@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Objects;
+
 public class ExternalTypeReference extends SimpleDefinedType {
 
     private String module;
@@ -41,6 +43,30 @@ public class ExternalTypeReference extends SimpleDefinedType {
 
     public String getModule() {
         return module;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        ExternalTypeReference that = (ExternalTypeReference) o;
+
+        return Objects.equals(module, that.module);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), module);
     }
 
 }

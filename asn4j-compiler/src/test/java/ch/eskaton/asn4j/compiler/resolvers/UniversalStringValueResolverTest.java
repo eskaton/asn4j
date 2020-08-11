@@ -41,7 +41,7 @@ import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class UniversalStringValueResolverTest {
+class UniversalStringValueResolverTest {
 
     @Test
     void testResolveCStringValue() throws IOException, ParserException {

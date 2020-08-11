@@ -4241,7 +4241,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertNotNull(result instanceof PermittedAlphabetConstraint);
+        assertTrue(result instanceof PermittedAlphabetConstraint);
 
         // InnerTypeConstraints
         parser = new Parser(new ByteArrayInputStream(

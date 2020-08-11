@@ -132,7 +132,7 @@ public class ASN1BitString implements ASN1Type, HasConstraint {
 
     @Override
     public void checkConstraint() {
-        if (!doCheckConstraint()) {
+        if (Boolean.FALSE.equals(doCheckConstraint())) {
             throw new ConstraintViolatedException(String.format("'%s'B (%d unused bits) doesn't satisfy a constraint",
                     StreamsUtils.toIntStream(value)
                             .mapToObj(b -> Integer.toBinaryString((b & 0xFF) + 0x100).substring(1 + unusedBits))

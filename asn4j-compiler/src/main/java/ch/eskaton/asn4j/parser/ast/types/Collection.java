@@ -34,6 +34,7 @@ import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public abstract class Collection extends AbstractType {
 
@@ -162,6 +163,35 @@ public abstract class Collection extends AbstractType {
         }
 
         return StringUtils.concat(getType() + "[", sb.toString(), "]");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        Collection that = (Collection) o;
+
+        return Objects.equals(rootComponents, that.rootComponents) &&
+                Objects.equals(extensionRootComponents, that.extensionRootComponents) &&
+                Objects.equals(extensionAndException, that.extensionAndException) &&
+                Objects.equals(optionalExtensionMarker, that.optionalExtensionMarker) &&
+                Objects.equals(extensionAdditions, that.extensionAdditions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), rootComponents, extensionRootComponents, extensionAndException,
+                optionalExtensionMarker, extensionAdditions);
     }
 
 }

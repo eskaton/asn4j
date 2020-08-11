@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.Assert;
 
 import java.util.Optional;
 
@@ -85,13 +86,16 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
     }
 
     @Override
+    @SuppressWarnings("java:S2259")
     public V resolveGeneric(Type type, Value value) {
+        Assert.notNull(value, "value");
+
         var resolvedValue = value;
 
         if (value instanceof SimpleDefinedValue) {
-            resolvedValue = value = ctx.tryResolveAllValueReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
+            resolvedValue = ctx.tryResolveAllValueReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
         } else if (value instanceof AmbiguousValue) {
-            resolvedValue = value = CompilerUtils.resolveAmbiguousValue(value, valueClass);
+            resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
         }
 
         if (resolvedValue == null || !valueClass.isAssignableFrom(resolvedValue.getClass())) {

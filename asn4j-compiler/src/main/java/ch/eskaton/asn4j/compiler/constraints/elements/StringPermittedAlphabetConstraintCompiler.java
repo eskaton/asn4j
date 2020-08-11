@@ -39,7 +39,7 @@ public class StringPermittedAlphabetConstraintCompiler<V extends HasStringValue 
         super(ctx, typeName);
 
         addConstraintHandler(SingleValueConstraint.class,
-                new StringSingleValueCompiler(ctx, valueClass, getTypeName())::compile);
+                new StringSingleValueCompiler<>(ctx, valueClass, getTypeName())::compile);
     }
 
 }

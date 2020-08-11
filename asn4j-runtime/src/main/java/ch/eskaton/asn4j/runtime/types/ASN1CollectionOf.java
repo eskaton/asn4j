@@ -61,7 +61,7 @@ public abstract class ASN1CollectionOf<C extends Collection<T>, T extends ASN1Ty
 
     @Override
     public void checkConstraint() {
-        if (!doCheckConstraint()) {
+        if (Boolean.FALSE.equals(doCheckConstraint())) {
             throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint", this));
         }
     }

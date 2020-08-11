@@ -68,7 +68,7 @@ public class FieldMetaData {
                 Class<ASN1Type> fieldType = (Class<ASN1Type>) field.getType();
 
                 if (ASN1Choice.class.isAssignableFrom(fieldType)) {
-                    var obj = getInstance(fieldType, (e) -> new DecodingException(e));
+                    var obj = getInstance(fieldType, DecodingException::new);
                     var componentsTagData = getTagData(obj, annotationClass);
 
                     tagData.addAll(componentsTagData.stream().map(t -> {
@@ -112,13 +112,13 @@ public class FieldMetaData {
 
     public Map<List<ASN1Tag>, Class<? extends ASN1Type>> getTagsToTypes() {
         return tagData.stream()
-                .collect(Collectors.toMap(t -> t.getTags(), t -> (Class<? extends ASN1Type>) t.getField().getType()));
+                .collect(Collectors.toMap(TagData::getTags, t -> (Class<? extends ASN1Type>) t.getField().getType()));
     }
 
     public Set<List<TagId>> getMandatoryFields() {
         return tagData.stream()
                 .filter(t -> !t.getField().getAnnotation(ASN1Component.class).optional())
-                .map(t -> t.getTagIds())
+                .map(TagData::getTagIds)
                 .collect(Collectors.toSet());
     }
 
@@ -142,7 +142,7 @@ public class FieldMetaData {
     public List<TagId> getTagIds(List<ASN1Tag> tags) {
         return tagData.stream()
                 .filter(t -> t.getTags().equals(tags))
-                .map(t -> t.getTagIds())
+                .map(TagData::getTagIds)
                 .findAny()
                 .orElseThrow(() -> new DecodingException("Couldn't find tag ids for tags: " + tags));
     }

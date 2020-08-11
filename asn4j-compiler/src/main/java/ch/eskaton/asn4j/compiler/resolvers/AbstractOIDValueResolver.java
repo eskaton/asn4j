@@ -74,7 +74,7 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
                 try {
                     components.add(resolveComponentId(ctx, component));
                 } catch (CompilerException e) {
-                    resolveComponent(ctx, component, componentPos).map(c -> components.addAll(c)).orElseThrow(() -> e);
+                    components.addAll(resolveComponent(ctx, component, componentPos).orElseThrow(() -> e));
                 }
             } catch (CompilerException e) {
                 throw new CompilerException(value.getPosition(), "Failed to resolve component of %s value: %s", e,

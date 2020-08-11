@@ -38,11 +38,11 @@ public class CollectionOfConstraintOptimizingVisitor
 
     public CollectionOfConstraintOptimizingVisitor() {
         super.configureTransformation(BinOpType.VALUE_VALUE,
-                new ValueValueTransformer<>(new DefaultSetOperationsStrategy(), this::createNode));
+                new ValueValueTransformer<>(new DefaultSetOperationsStrategy<>(), this::createNode));
         super.configureTransformation(BinOpType.VALUE_NEGATION,
-                new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, false));
+                new ValueNegationTransformer<>(new DefaultSetOperationsStrategy<>(), this::createNode, false));
         super.configureTransformation(BinOpType.NEGATION_VALUE,
-                new ValueNegationTransformer<>(new DefaultSetOperationsStrategy(), this::createNode, true));
+                new ValueNegationTransformer<>(new DefaultSetOperationsStrategy<>(), this::createNode, true));
         super.configureTransformation(BinOpType.SIZE_SIZE, new SizeSizeTransformer());
         super.configureTransformation(BinOpType.SIZE_NEGATION, new SizeNegationTransformer());
         super.configureTransformation(BinOpType.NEGATION_SIZE, new SizeNegationTransformer());

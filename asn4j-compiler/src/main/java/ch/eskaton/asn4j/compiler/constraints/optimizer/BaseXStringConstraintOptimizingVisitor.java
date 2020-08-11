@@ -41,11 +41,11 @@ public abstract class BaseXStringConstraintOptimizingVisitor<V extends AbstractV
 
     public <T extends Comparator<V>> BaseXStringConstraintOptimizingVisitor(T comparator, Function<C, N> createNode) {
         super.configureTransformation(BinOpType.VALUE_VALUE,
-                new ValueValueTransformer<>(new OrderedSetOperationsStrategy(comparator), createNode));
+                new ValueValueTransformer<>(new OrderedSetOperationsStrategy<>(comparator), createNode));
         super.configureTransformation(BinOpType.VALUE_NEGATION,
-                new ValueNegationTransformer<>(new OrderedSetOperationsStrategy(comparator), createNode, false));
+                new ValueNegationTransformer<>(new OrderedSetOperationsStrategy<>(comparator), createNode, false));
         super.configureTransformation(BinOpType.NEGATION_VALUE,
-                new ValueNegationTransformer<>(new OrderedSetOperationsStrategy(comparator), createNode, true));
+                new ValueNegationTransformer<>(new OrderedSetOperationsStrategy<>(comparator), createNode, true));
         super.configureTransformation(BinOpType.SIZE_SIZE, new SizeSizeTransformer());
         super.configureTransformation(BinOpType.SIZE_NEGATION, new SizeNegationTransformer());
         super.configureTransformation(BinOpType.NEGATION_SIZE, new SizeNegationTransformer());

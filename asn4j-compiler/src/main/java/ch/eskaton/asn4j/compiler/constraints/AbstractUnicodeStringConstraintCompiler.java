@@ -37,7 +37,6 @@ import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.StringPermittedAlphabetConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.StringSingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.expr.StringPermittedAlphabetExpressionBuilder;
-import ch.eskaton.asn4j.compiler.constraints.expr.StringSizeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.expr.StringValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.expr.UnicodeStringSizeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;

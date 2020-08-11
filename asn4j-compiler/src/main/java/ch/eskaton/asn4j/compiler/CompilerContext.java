@@ -497,7 +497,7 @@ public class CompilerContext {
             }
         } else if (compiledType instanceof Choice) {
             return ((Choice) compiledType).getAllAlternatives().stream()
-                    .map(a -> getTagId(a))
+                    .map(this::getTagId)
                     .flatMap(Collection::stream)
                     .collect(Collectors.toSet());
         } else if (compiledType instanceof NamedType) {

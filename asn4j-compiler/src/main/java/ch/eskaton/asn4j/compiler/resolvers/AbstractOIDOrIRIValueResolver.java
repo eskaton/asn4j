@@ -46,13 +46,14 @@ public abstract class AbstractOIDOrIRIValueResolver<T extends Type, V extends Va
 
     public V resolveValue(CompilerContext ctx, Value value, Class<V> valueClass) {
         V idValue;
+        SimpleDefinedValue refValue;
 
         if (valueClass.isAssignableFrom(value.getClass())) {
             idValue = (V) value;
         } else if ((idValue = resolveAmbiguousValue(value, valueClass)) != null) {
             // do nothing
-        } else if ((value = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
-            idValue = ctx.resolveValue(valueClass, (SimpleDefinedValue) value);
+        } else if ((refValue = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
+            idValue = ctx.resolveValue(valueClass, refValue);
         } else {
             throw new CompilerException(value.getPosition(), "Invalid %s value: %s", getTypeName(),
                     ValueFormatter.formatValue(value));

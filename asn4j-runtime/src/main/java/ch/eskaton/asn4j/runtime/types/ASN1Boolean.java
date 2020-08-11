@@ -70,7 +70,7 @@ public class ASN1Boolean implements ASN1Type, HasConstraint {
 
     @Override
     public void checkConstraint() {
-        if (!doCheckConstraint()) {
+        if (Boolean.FALSE.equals(doCheckConstraint())) {
             throw new ConstraintViolatedException(String.format("%b doesn't satisfy a constraint", value));
         }
     }

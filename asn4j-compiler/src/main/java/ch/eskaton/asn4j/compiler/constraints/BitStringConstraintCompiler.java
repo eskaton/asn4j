@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ContainedSubtypeCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SingleValueCompiler;
 import ch.eskaton.asn4j.compiler.constraints.elements.SizeCompiler;
-import ch.eskaton.asn4j.compiler.constraints.expr.BitStringStringSizeExpressionBuilder;
+import ch.eskaton.asn4j.compiler.constraints.expr.BitStringSizeExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.expr.BitStringValueExpressionBuilder;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.BitStringConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.compiler.constraints.optimizer.SizeBoundsVisitor;
@@ -121,7 +121,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         return switch (node.getType()) {
             case VALUE -> new BitStringValueExpressionBuilder(ctx).build(compiledType, (BitStringValueNode) node);
             case ALL_VALUES -> Optional.empty();
-            case SIZE -> new BitStringStringSizeExpressionBuilder().build(((SizeNode) node).getSize());
+            case SIZE -> new BitStringSizeExpressionBuilder().build(((SizeNode) node).getSize());
             default -> super.buildExpression(module, compiledType, node);
         };
     }

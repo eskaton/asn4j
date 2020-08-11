@@ -870,6 +870,8 @@ public class Lexer {
 
                     is.reset();
                     return null;
+                default:
+                    // fall-through
             }
 
             String value = sb.toString();
@@ -978,6 +980,8 @@ public class Lexer {
                     line++;
                     pos = 0;
                     return;
+                default:
+                    // fall through
             }
         }
     }

@@ -27,7 +27,9 @@
 
 package ch.eskaton.asn4j.parser.ast.values;
 
-public class BitStringValueComparator implements java.util.Comparator<BitStringValue> {
+import java.util.Comparator;
+
+public class BitStringValueComparator implements Comparator<BitStringValue> {
 
     @Override
     public int compare(BitStringValue bitString1, BitStringValue bitString2) {

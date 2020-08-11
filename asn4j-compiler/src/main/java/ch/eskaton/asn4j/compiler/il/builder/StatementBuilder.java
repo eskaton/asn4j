@@ -60,7 +60,7 @@ public class StatementBuilder<B extends Builder & HasStatements> implements Buil
     }
 
     public ConditionsBuilder<StatementBuilder<B>> conditions() {
-        return new ConditionsBuilder(this);
+        return new ConditionsBuilder<>(this);
     }
 
     public StatementBuilder<B> statement(Statement statement) {

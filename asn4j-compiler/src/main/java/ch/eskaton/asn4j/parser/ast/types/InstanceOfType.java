@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 
 import java.util.List;
+import java.util.Objects;
 
 public class InstanceOfType extends AbstractType {
 
@@ -98,6 +99,30 @@ public class InstanceOfType extends AbstractType {
     public EncodingPrefixNode getEncodingPrefix() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        InstanceOfType that = (InstanceOfType) o;
+
+        return Objects.equals(objectClass, that.objectClass);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), objectClass);
     }
 
 }

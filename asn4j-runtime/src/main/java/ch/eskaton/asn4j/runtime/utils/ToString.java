@@ -113,6 +113,10 @@ public class ToString {
             return object.toString();
         } finally {
             stack.pop();
+
+            if (stack.isEmpty()) {
+                visited.remove();
+            }
         }
     }
 

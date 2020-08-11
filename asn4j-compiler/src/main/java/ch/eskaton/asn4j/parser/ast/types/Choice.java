@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Choice extends AbstractType {
@@ -97,6 +98,35 @@ public class Choice extends AbstractType {
 
     public boolean isOptionalExtensionMarker() {
         return optionalExtensionMarker;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        Choice choice = (Choice) o;
+
+        return extensible == choice.extensible &&
+                optionalExtensionMarker == choice.optionalExtensionMarker &&
+                Objects.equals(rootAlternatives, choice.rootAlternatives) &&
+                Objects.equals(exceptionId, choice.exceptionId) &&
+                Objects.equals(extensionAdditionAlternatives, choice.extensionAdditionAlternatives);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), rootAlternatives, extensible, exceptionId, extensionAdditionAlternatives,
+                optionalExtensionMarker);
     }
 
 }

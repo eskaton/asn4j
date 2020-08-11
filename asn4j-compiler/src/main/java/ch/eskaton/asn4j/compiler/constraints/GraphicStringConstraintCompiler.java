@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class GraphicStringConstraintCompiler extends AbstractStringConstraintCompiler {
+public class GraphicStringConstraintCompiler extends AbstractStringConstraintCompiler<GraphicStringValue> {
 
     public GraphicStringConstraintCompiler(CompilerContext ctx) {
         super(ctx, GraphicStringValue.class);

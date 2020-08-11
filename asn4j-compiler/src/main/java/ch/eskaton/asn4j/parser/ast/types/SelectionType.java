@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Objects;
+
 public class SelectionType extends AbstractType {
 
     private String id;
@@ -48,6 +50,31 @@ public class SelectionType extends AbstractType {
 
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        SelectionType that = (SelectionType) o;
+
+        return Objects.equals(id, that.id) &&
+                Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), id, type);
     }
 
 }

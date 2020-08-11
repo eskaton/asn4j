@@ -104,13 +104,13 @@ public class JavaDefaultCtorBuilder {
         return !Modifier.isPrivate(ctor.getModifiers()) && !Modifier.isFinal(ctor.getModifiers());
     }
 
-    private static void collectClasses(Set<Class> classes, Type type) {
+    private static void collectClasses(Set<Class<?>> classes, Type type) {
         if (type instanceof Class) {
-            Class clazz = (Class) type;
+            Class<?> clazz = (Class<?>) type;
 
             if (!type.equals(Object.class) && !clazz.isPrimitive()) {
                 if (clazz.isArray()) {
-                    Class componentType = clazz.getComponentType();
+                    Class<?> componentType = clazz.getComponentType();
 
                     if (!componentType.isPrimitive()) {
                         classes.add(componentType);
@@ -141,7 +141,7 @@ public class JavaDefaultCtorBuilder {
     private void generateParentConstructor(JavaClass javaClass, Constructor<?> ctor) {
         JavaConstructor javaCtor = new JavaConstructor(getVisibility(ctor), javaClass.getName());
 
-        Set<Class> classes = new HashSet<>();
+        Set<Class<?>> classes = new HashSet<>();
 
         Arrays.stream(ctor.getGenericParameterTypes()).forEach(type -> collectClasses(classes, type));
 

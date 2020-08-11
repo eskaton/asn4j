@@ -36,7 +36,7 @@ import java.io.IOException;
 
 import static ch.eskaton.asn4j.test.TestUtils.module;
 
-public class ResolverTestUtils {
+class ResolverTestUtils {
 
     public static final String MODULE_NAME = "TEST-MODULE";
 

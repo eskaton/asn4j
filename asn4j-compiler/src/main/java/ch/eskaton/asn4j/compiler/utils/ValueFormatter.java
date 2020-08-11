@@ -54,7 +54,7 @@ public class ValueFormatter {
         } else if (node instanceof IRIValue value) {
             return "/" + value.getArcIdentifierTexts().stream().collect(Collectors.joining("/"));
         } else if (node instanceof AmbiguousValue value) {
-            return value.getValues().stream().map(v -> formatValue(v)).collect(Collectors.joining(", "));
+            return value.getValues().stream().map(ValueFormatter::formatValue).collect(Collectors.joining(", "));
         } else if (node instanceof TupleNode value) {
             return String.format("{%s, %s}", value.getColumn(), value.getRow());
         } else if (node instanceof QuadrupleNode value) {

@@ -88,7 +88,7 @@ import static ch.eskaton.asn4j.test.TestHelper.testVisibleStringSuccess;
 class TestX680_51_7 {
 
     @Test
-    public void testVisibleString1() {
+    void testVisibleString1() {
         testVisibleStringSuccess(TestVisibleString1.class, new TestVisibleString1(""));
         testVisibleStringSuccess(TestVisibleString1.class, new TestVisibleString1("aaa"));
         testVisibleStringSuccess(TestVisibleString1.class, new TestVisibleString1("abc"));
@@ -98,7 +98,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testVisibleString2() {
+    void testVisibleString2() {
         testVisibleStringSuccess(TestVisibleString2.class, new TestVisibleString2("aaa"));
         testVisibleStringSuccess(TestVisibleString2.class, new TestVisibleString2("abc"));
 
@@ -107,7 +107,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testVisibleString3() {
+    void testVisibleString3() {
         testVisibleStringSuccess(TestVisibleString3.class, new TestVisibleString3("a"));
         testVisibleStringSuccess(TestVisibleString3.class, new TestVisibleString3("aaa"));
 
@@ -115,21 +115,21 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testVisibleString4() {
+    void testVisibleString4() {
         testVisibleStringSuccess(TestVisibleString4.class, new TestVisibleString4("abcxyz"));
 
         testVisibleStringFailure(TestVisibleString4.class, new TestVisibleString4("xyzABC"));
     }
 
     @Test
-    public void testVisibleString5() {
+    void testVisibleString5() {
         testVisibleStringSuccess(TestVisibleString5.class, new TestVisibleString5("abd"));
 
         testVisibleStringFailure(TestVisibleString5.class, new TestVisibleString5("abc"));
     }
 
     @Test
-    public void testVisibleString6() {
+    void testVisibleString6() {
         testVisibleStringSuccess(TestVisibleString6.class, new TestVisibleString6("abc"));
         testVisibleStringSuccess(TestVisibleString6.class, new TestVisibleString6("xyz"));
 
@@ -137,7 +137,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testVisibleString7() {
+    void testVisibleString7() {
         testVisibleStringSuccess(TestVisibleString7.class, new TestVisibleString7("cd"));
 
         testVisibleStringFailure(TestVisibleString7.class, new TestVisibleString7("abc"));
@@ -145,7 +145,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testVisibleString8() {
+    void testVisibleString8() {
         testVisibleStringSuccess(TestVisibleString8.class, new TestVisibleString8("bccd"));
         testVisibleStringSuccess(TestVisibleString8.class, new TestVisibleString8("bf"));
 
@@ -155,7 +155,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testVisibleString9() {
+    void testVisibleString9() {
         testVisibleStringSuccess(TestVisibleString9.class, new TestVisibleString9("cdcd"));
 
         testVisibleStringFailure(TestVisibleString9.class, new TestVisibleString9("bc"));
@@ -163,7 +163,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testISO646String1() {
+    void testISO646String1() {
         testVisibleStringSuccess(TestISO646String1.class, new TestISO646String1("bccd"));
         testVisibleStringSuccess(TestISO646String1.class, new TestISO646String1("bf"));
 
@@ -173,7 +173,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testISO646String2() {
+    void testISO646String2() {
         testVisibleStringSuccess(TestISO646String2.class, new TestISO646String2("cdcd"));
 
         testVisibleStringFailure(TestISO646String2.class, new TestISO646String2("bc"));
@@ -181,7 +181,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testGeneralString1() {
+    void testGeneralString1() {
         testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("bccd"));
         testGeneralStringSuccess(TestGeneralString1.class, new TestGeneralString1("bf"));
 
@@ -191,7 +191,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testGeneralString2() {
+    void testGeneralString2() {
         testGeneralStringSuccess(TestGeneralString2.class, new TestGeneralString2("cdcd"));
 
         testGeneralStringFailure(TestGeneralString2.class, new TestGeneralString2("bc"));
@@ -199,7 +199,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testGraphicString1() {
+    void testGraphicString1() {
         testGraphicStringSuccess(TestGraphicString1.class, new TestGraphicString1("bccd"));
         testGraphicStringSuccess(TestGraphicString1.class, new TestGraphicString1("bf"));
 
@@ -209,7 +209,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testGraphicString2() {
+    void testGraphicString2() {
         testGraphicStringSuccess(TestGraphicString2.class, new TestGraphicString2("cdcd"));
 
         testGraphicStringFailure(TestGraphicString2.class, new TestGraphicString2("bc"));
@@ -217,7 +217,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testIA5String1() {
+    void testIA5String1() {
         testIA5StringSuccess(TestIA5String1.class, new TestIA5String1("bccd"));
         testIA5StringSuccess(TestIA5String1.class, new TestIA5String1("bf"));
 
@@ -227,7 +227,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testIA5String2() {
+    void testIA5String2() {
         testIA5StringSuccess(TestIA5String2.class, new TestIA5String2("cdcd"));
 
         testIA5StringFailure(TestIA5String2.class, new TestIA5String2("bc"));
@@ -235,7 +235,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testVideotexString1() {
+    void testVideotexString1() {
         testVideotexStringSuccess(TestVideotexString1.class, new TestVideotexString1("bccd"));
         testVideotexStringSuccess(TestVideotexString1.class, new TestVideotexString1("bf"));
 
@@ -245,7 +245,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testVideotexString2() {
+    void testVideotexString2() {
         testVideotexStringSuccess(TestVideotexString2.class, new TestVideotexString2("cdcd"));
 
         testVideotexStringFailure(TestVideotexString2.class, new TestVideotexString2("bc"));
@@ -253,7 +253,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testTeletexString1() {
+    void testTeletexString1() {
         testTeletexStringSuccess(TestTeletexString1.class, new TestTeletexString1("bccd"));
         testTeletexStringSuccess(TestTeletexString1.class, new TestTeletexString1("bf"));
 
@@ -263,7 +263,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testTeletexString2() {
+    void testTeletexString2() {
         testTeletexStringSuccess(TestTeletexString2.class, new TestTeletexString2("cdcd"));
 
         testTeletexStringFailure(TestTeletexString2.class, new TestTeletexString2("bc"));
@@ -271,7 +271,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testT61String1() {
+    void testT61String1() {
         testTeletexStringSuccess(TestT61String1.class, new TestT61String1("bccd"));
         testTeletexStringSuccess(TestT61String1.class, new TestT61String1("bf"));
 
@@ -281,7 +281,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testT61String2() {
+    void testT61String2() {
         testTeletexStringSuccess(TestT61String2.class, new TestT61String2("cdcd"));
 
         testTeletexStringFailure(TestT61String2.class, new TestT61String2("bc"));
@@ -289,7 +289,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testPrintableString1() {
+    void testPrintableString1() {
         testPrintableStringSuccess(TestPrintableString1.class, new TestPrintableString1("bccd"));
         testPrintableStringSuccess(TestPrintableString1.class, new TestPrintableString1("bf"));
 
@@ -299,7 +299,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testPrintableString2() {
+    void testPrintableString2() {
         testPrintableStringSuccess(TestPrintableString2.class, new TestPrintableString2("cdcd"));
 
         testPrintableStringFailure(TestPrintableString2.class, new TestPrintableString2("bc"));
@@ -307,7 +307,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testNumericString1() {
+    void testNumericString1() {
         testNumericStringSuccess(TestNumericString1.class, new TestNumericString1("2334"));
         testNumericStringSuccess(TestNumericString1.class, new TestNumericString1("123"));
 
@@ -317,7 +317,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testNumericString2() {
+    void testNumericString2() {
         testNumericStringSuccess(TestNumericString2.class, new TestNumericString2("3344"));
 
         testNumericStringFailure(TestNumericString2.class, new TestNumericString2("12"));
@@ -325,7 +325,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testUTF8String1() {
+    void testUTF8String1() {
         testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("bccd"));
         testUTF8StringSuccess(TestUTF8String1.class, new TestUTF8String1("bf"));
 
@@ -335,7 +335,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testUTF8String2() {
+    void testUTF8String2() {
         testUTF8StringSuccess(TestUTF8String2.class, new TestUTF8String2("cdcd"));
 
         testUTF8StringFailure(TestUTF8String2.class, new TestUTF8String2("bc"));
@@ -343,7 +343,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testUniversalString1() {
+    void testUniversalString1() {
         testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("bccd"));
         testUniversalStringSuccess(TestUniversalString1.class, new TestUniversalString1("bf"));
 
@@ -353,7 +353,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testUniversalString2() {
+    void testUniversalString2() {
         testUniversalStringSuccess(TestUniversalString2.class, new TestUniversalString2("cdcd"));
 
         testUniversalStringFailure(TestUniversalString2.class, new TestUniversalString2("bc"));
@@ -361,7 +361,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testBMPString1() {
+    void testBMPString1() {
         testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("bccd"));
         testBMPStringSuccess(TestBMPString1.class, new TestBMPString1("bf"));
 
@@ -371,7 +371,7 @@ class TestX680_51_7 {
     }
 
     @Test
-    public void testBMPString2() {
+    void testBMPString2() {
         testBMPStringSuccess(TestBMPString2.class, new TestBMPString2("cdcd"));
 
         testBMPStringFailure(TestBMPString2.class, new TestBMPString2("bc"));

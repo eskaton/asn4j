@@ -107,7 +107,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
             }
         });
 
-        if (node.hasConstraint() || hasComponentConstraint.get()) {
+        if (node.hasConstraint() || Boolean.TRUE.equals(hasComponentConstraint.get())) {
             var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
 
             compiledType.setConstraintDefinition(constraintDef);

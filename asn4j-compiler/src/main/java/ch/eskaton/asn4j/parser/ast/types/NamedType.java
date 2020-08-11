@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 
+import java.util.Objects;
+
 public class NamedType extends AbstractType {
 
     private String name;
@@ -48,6 +50,31 @@ public class NamedType extends AbstractType {
 
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        NamedType namedType = (NamedType) o;
+
+        return Objects.equals(name, namedType.name) &&
+                Objects.equals(type, namedType.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name, type);
     }
 
 }
