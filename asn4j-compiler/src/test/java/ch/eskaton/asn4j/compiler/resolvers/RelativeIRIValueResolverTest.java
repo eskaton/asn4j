@@ -38,7 +38,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class RelativeIRIValueResolverTest {
+class RelativeIRIValueResolverTest {
 
     @Test
     void testResolveValue() throws IOException, ParserException {

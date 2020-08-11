@@ -31,11 +31,15 @@ import ch.eskaton.commons.utils.ReflectionUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Clone {
+
+    private Clone() {
+    }
 
     public static Object clone(Object object) {
         if (object == null) {

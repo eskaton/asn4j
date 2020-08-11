@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SimpleDefinedType extends AbstractType implements ParameterizedNode {
 
@@ -61,6 +62,31 @@ public class SimpleDefinedType extends AbstractType implements ParameterizedNode
         setParameters(parameters);
 
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        SimpleDefinedType that = (SimpleDefinedType) o;
+
+        return Objects.equals(type, that.type) &&
+                Objects.equals(parameters, that.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), type, parameters);
     }
 
 }

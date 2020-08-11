@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.AbstractType;
 
+import java.util.Objects;
+
 public class ObjectClassFieldTypeNode extends AbstractType {
 
     private ObjectClassReference objectClass;
@@ -49,6 +51,31 @@ public class ObjectClassFieldTypeNode extends AbstractType {
 
     public FieldNameNode getField() {
         return field;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        ObjectClassFieldTypeNode that = (ObjectClassFieldTypeNode) o;
+
+        return Objects.equals(objectClass, that.objectClass) &&
+                Objects.equals(field, that.field);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), objectClass, field);
     }
 
 }

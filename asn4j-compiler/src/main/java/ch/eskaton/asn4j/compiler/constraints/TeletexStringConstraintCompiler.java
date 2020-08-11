@@ -28,11 +28,10 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class TeletexStringConstraintCompiler extends AbstractStringConstraintCompiler {
+public class TeletexStringConstraintCompiler extends AbstractStringConstraintCompiler<TeletexStringValue> {
 
     public TeletexStringConstraintCompiler(CompilerContext ctx) {
         super(ctx, TeletexStringValue.class);

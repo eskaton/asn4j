@@ -168,7 +168,7 @@ public abstract class AbstractConstraintCompiler {
             }
 
             if (compiledType instanceof HasComponents) {
-                compileComponentConstraints(compiledType).ifPresent(d -> definitions.addLast(d));
+                compileComponentConstraints(compiledType).ifPresent(definitions::addLast);
             }
 
             if (compiledType.getConstraintDefinition() != null) {

@@ -92,7 +92,7 @@ public class IRILexer {
                                                 "A non-integerUnicodeLabel must not contain two hyphens in the third and fourth position");
                                     }
                                 }
-                                // fall-through
+                                // fall through
                             case '.':
                             case '_':
                             case '~':

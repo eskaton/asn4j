@@ -214,7 +214,7 @@ public class BERDecoder implements Decoder {
     }
 
     private <T extends ASN1Choice> DecodingResult<T> decodeChoice(Class<T> type, DecoderStates states, boolean optional) {
-        var obj = ReflectionUtils.getInstance(type, (e) -> new DecodingException(e));
+        var obj = ReflectionUtils.getInstance(type, DecodingException::new);
 
         obj = choiceDecoder.decode(this, states, obj, optional);
 

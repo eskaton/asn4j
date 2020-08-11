@@ -32,7 +32,8 @@ import ch.eskaton.asn4j.compiler.il.Condition;
 import ch.eskaton.asn4j.compiler.il.Statement;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class ConditionBuilder<B extends Builder & HasStatements> implements Builder<ConditionsBuilder>, HasStatements {
+public class ConditionBuilder<B extends Builder & HasStatements> implements Builder<ConditionsBuilder<B>>,
+        HasStatements {
 
     private Condition condition;
 

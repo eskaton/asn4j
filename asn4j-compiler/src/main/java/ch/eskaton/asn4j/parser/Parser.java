@@ -1086,6 +1086,8 @@ public class Parser {
                         return ModuleNode.TagMode.IMPLICIT;
                     case AUTOMATIC_KW:
                         return ModuleNode.TagMode.AUTOMATIC;
+                    default:
+                        // fall through
                 }
             }
 
@@ -3305,7 +3307,7 @@ public class Parser {
 
         public ElementSetSpecsNode parse() throws ParserException {
             return super.parse(new SequenceParser(TokenType.L_BRACE, elementSetSpecsParser, TokenType.R_BRACE),
-                    a -> a.n1());
+                    ListAccessor::n1);
         }
 
     }
@@ -3315,7 +3317,7 @@ public class Parser {
 
         public ObjectSetSpecNode parse() throws ParserException {
             return super.parse(new SequenceParser(TokenType.L_BRACE, objectSetSpecParser, TokenType.R_BRACE),
-                    a -> a.n1());
+                    ListAccessor::n1);
         }
 
     }

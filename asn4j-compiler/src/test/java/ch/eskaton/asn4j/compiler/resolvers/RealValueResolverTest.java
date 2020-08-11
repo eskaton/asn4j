@@ -44,7 +44,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class RealValueResolverTest {
+class RealValueResolverTest {
 
     @Test
     void testResolveNumericValue() throws IOException, ParserException {

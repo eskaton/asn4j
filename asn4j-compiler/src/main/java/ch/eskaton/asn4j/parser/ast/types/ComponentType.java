@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+
+import java.util.Objects;
 
 public class ComponentType extends AbstractType {
 
@@ -47,39 +49,66 @@ public class ComponentType extends AbstractType {
     public ComponentType(Position position, CompType compType, Type type) {
         super(position);
 
-    	this.compType = compType;
-    	this.type = type;
+        this.compType = compType;
+        this.type = type;
     }
 
     public ComponentType(Position position, CompType compType, NamedType namedType) {
         super(position);
 
-    	this.compType = compType;
-    	this.namedType = namedType;
+        this.compType = compType;
+        this.namedType = namedType;
     }
 
     public ComponentType(Position position, CompType compType, NamedType namedType, Value value) {
         super(position);
 
-    	this.compType = compType;
-    	this.namedType = namedType;
-    	this.value = value;
+        this.compType = compType;
+        this.namedType = namedType;
+        this.value = value;
     }
 
     public CompType getCompType() {
-    	return compType;
+        return compType;
     }
 
     public NamedType getNamedType() {
-    	return namedType;
+        return namedType;
     }
 
     public Type getType() {
-    	return type;
+        return type;
     }
 
     public Value getValue() {
-    	return value;
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        ComponentType that = (ComponentType) o;
+
+        return compType == that.compType &&
+                Objects.equals(namedType, that.namedType) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), compType, namedType, type, value);
     }
 
 }

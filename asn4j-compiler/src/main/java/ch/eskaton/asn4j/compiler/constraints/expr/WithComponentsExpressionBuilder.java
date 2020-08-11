@@ -52,8 +52,7 @@ import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
-import ch.eskaton.asn4j.parser.ast.types.IA5String;
-import ch.eskaton.asn4j.parser.ast.types.PrintableString;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
@@ -337,7 +336,7 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
         var associations = new HashSet<Tuple2<Expression, Expression>>();
 
         ((Choice) ctx.resolveTypeReference(component.getComponentType())).getAllAlternatives().stream()
-                .map(c -> c.getName())
+                .map(NamedType::getName)
                 .map(n -> new Tuple2(ILValue.of(n), getCall.apply("get" + initCap(n))))
                 .forEach(associations::add);
 

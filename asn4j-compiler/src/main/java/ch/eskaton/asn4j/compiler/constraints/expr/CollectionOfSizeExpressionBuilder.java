@@ -45,6 +45,7 @@ public class CollectionOfSizeExpressionBuilder extends AbstractIntegerRangeExpre
         super(CheckCollectionMinSize::new, CheckCollectionMaxSize::new, CheckCollectionSizeEquals::new);
     }
 
+    @Override
     protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
         return switch (operator) {
             case GE -> checkMin.apply(List.of(new Variable(VAR_VALUES), new ILValue(value)));

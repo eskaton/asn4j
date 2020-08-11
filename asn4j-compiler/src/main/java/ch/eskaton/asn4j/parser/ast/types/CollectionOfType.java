@@ -32,6 +32,7 @@ import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class CollectionOfType extends AbstractType {
 
@@ -53,6 +54,30 @@ public class CollectionOfType extends AbstractType {
 
     public boolean hasElementConstraint() {
         return StreamsUtils.of(new ElementTypeIterator(getType())).anyMatch(Type::hasConstraint);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        CollectionOfType that = (CollectionOfType) o;
+
+        return Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), type);
     }
 
     public static class ElementTypeIterator implements Iterator<Type> {

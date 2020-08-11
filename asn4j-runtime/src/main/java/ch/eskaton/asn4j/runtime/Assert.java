@@ -45,4 +45,10 @@ public class Assert {
         list.forEach(t -> notEmpty(t, name + ":element"));
     }
 
+    public static void notNull(Object obj, String name) {
+        if (obj == null) {
+            throw new IllegalArgumentException(name + " must not be null or empty");
+        }
+    }
+
 }

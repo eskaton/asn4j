@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class VisibleStringConstraintCompiler extends AbstractStringConstraintCompiler {
+public class VisibleStringConstraintCompiler extends AbstractStringConstraintCompiler<VisibleStringValue> {
 
     public VisibleStringConstraintCompiler(CompilerContext ctx) {
         super(ctx, VisibleStringValue.class);

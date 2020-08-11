@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 public interface HasConstraint {
 
     default void checkConstraint() {
-        if (!doCheckConstraint()) {
+        if (Boolean.FALSE.equals(doCheckConstraint())) {
             throw new ConstraintViolatedException("Value doesn't satisfy a constraint");
         }
     }

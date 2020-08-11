@@ -218,10 +218,10 @@ public class TypeConfiguration {
                 ASN1Boolean.class, new BooleanValueResolver(ctx), new DefaultTypeNameSupplier(this),
                 new BooleanConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(Choice.class, new ChoiceCompiler(), ChoiceValue.class,
-                ASN1Choice.class, new ChoiceValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                ASN1Choice.class, new ChoiceValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
                 new ChoiceConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(EnumeratedType.class, new EnumeratedTypeCompiler(), EnumeratedValue.class,
-                ASN1EnumeratedType.class, new EnumeratedValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                ASN1EnumeratedType.class, new EnumeratedValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
                 new EnumeratedTypeConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(IntegerType.class, new IntegerCompiler(), IntegerValue.class,
                 ASN1Integer.class, new IntegerValueResolver(ctx), new IntegerTypeNameSupplier(this),
@@ -233,19 +233,19 @@ public class TypeConfiguration {
                 ASN1OctetString.class, new OctetStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
                 new OctetStringDefaultCompiler(), new OctetStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(Real.class, new RealCompiler(), RealValue.class,
-                ASN1Real.class, new RealValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                ASN1Real.class, new RealValueResolver(ctx), new SubtypeTypeNameSupplier<>(this),
                 new RealDefaultCompiler(), null));
         types.add(new TypeDefinition<>(SequenceType.class, new SequenceCompiler(), CollectionValue.class,
-                ASN1Sequence.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                ASN1Sequence.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
                 new SequenceConstraintCompiler(ctx), true));
         types.add(new TypeDefinition<>(SequenceOfType.class, new SequenceOfCompiler(), CollectionOfValue.class,
-                ASN1SequenceOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                ASN1SequenceOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
                 new SequenceOfConstraintCompiler(ctx), true));
         types.add(new TypeDefinition<>(SetType.class, new SetCompiler(), CollectionValue.class,
-                ASN1Set.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                ASN1Set.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
                 new SetConstraintCompiler(ctx), true));
         types.add(new TypeDefinition<>(SetOfType.class, new SetOfCompiler(), CollectionOfValue.class,
-                ASN1SetOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier(this, true),
+                ASN1SetOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
                 new SetOfConstraintCompiler(ctx), true));
         types.add(new TypeDefinition<>(VisibleString.class, new VisibleStringCompiler(), VisibleStringValue.class,
                 ASN1VisibleString.class, new VisibleStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
@@ -287,16 +287,16 @@ public class TypeConfiguration {
                 ASN1BMPString.class, new BMPStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
                 new BMPStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(ObjectIdentifier.class, new ObjectIdentifierCompiler(), ObjectIdentifierValue.class,
-                ASN1ObjectIdentifier.class, new ObjectIdentifierValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                ASN1ObjectIdentifier.class, new ObjectIdentifierValueResolver(ctx), new SubtypeTypeNameSupplier<>(this),
                 new ObjectIdentifierConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(RelativeOID.class, new RelativeOIDCompiler(), RelativeOIDValue.class,
-                ASN1RelativeOID.class, new RelativeOIDValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                ASN1RelativeOID.class, new RelativeOIDValueResolver(ctx), new SubtypeTypeNameSupplier<>(this),
                 new RelativeOIDConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(IRI.class, new IRICompiler(), IRIValue.class,
-                ASN1IRI.class, new IRIValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                ASN1IRI.class, new IRIValueResolver(ctx), new SubtypeTypeNameSupplier<>(this),
                 new IRIConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(RelativeIRI.class, new RelativeIRICompiler(), RelativeIRIValue.class,
-                ASN1RelativeIRI.class, new RelativeIRIValueResolver(ctx), new SubtypeTypeNameSupplier(this),
+                ASN1RelativeIRI.class, new RelativeIRIValueResolver(ctx), new SubtypeTypeNameSupplier<>(this),
                 new RelativeIRIConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(GeneralizedTime.class, new GeneralizedTimeCompiler(), GeneralizedTimeValue.class,
                 ASN1GeneralizedTime.class, new GeneralizedTimeValueResolver(ctx), new DefaultTypeNameSupplier(this),
@@ -305,21 +305,21 @@ public class TypeConfiguration {
                 ASN1UTCTime.class, new UTCTimeValueResolver(ctx), new DefaultTypeNameSupplier(this),
                 null));
         // special types
-        types.add(new TypeDefinition(ComponentType.class, new ComponentTypeCompiler()));
-        types.add(new TypeDefinition(SelectionType.class, new SelectionTypeCompiler(),
+        types.add(new TypeDefinition<>(ComponentType.class, new ComponentTypeCompiler()));
+        types.add(new TypeDefinition<>(SelectionType.class, new SelectionTypeCompiler(),
                 new SelectionTypeTypeNameSupplier(ctx, this)));
-        types.add(new TypeDefinition(TypeAssignmentNode.class, new TypeAssignmentCompiler()));
-        types.add(new TypeDefinition(Type.class, new TypeCompiler()));
-        types.add(new TypeDefinition(TypeReference.class, new TypeReferenceCompiler(),
+        types.add(new TypeDefinition<>(TypeAssignmentNode.class, new TypeAssignmentCompiler()));
+        types.add(new TypeDefinition<>(Type.class, new TypeCompiler()));
+        types.add(new TypeDefinition<>(TypeReference.class, new TypeReferenceCompiler(),
                 new TypeReferenceTypeNameSupplier(this)));
-        types.add(new TypeDefinition(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),
+        types.add(new TypeDefinition<>(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),
                 new ExternalTypeReferenceTypeNameSupplier(this)));
-        types.add(new TypeDefinition(ObjectClassAssignmentNode.class, new ObjectClassAssignmentCompiler()));
-        types.add(new TypeDefinition(ObjectClassNode.class, new ObjectClassNodeCompiler()));
-        types.add(new TypeDefinition(ObjectClassDefn.class, new ObjectClassDefnCompiler()));
-        types.add(new TypeDefinition(FieldSpecNode.class, new FieldSpecNodeCompiler()));
-        types.add(new TypeDefinition(TypeFieldSpecNode.class, new TypeFieldSpecNodeCompiler()));
-        types.add(new TypeDefinition(ObjectSetAssignmentNode.class, new ObjectSetAssignmentCompiler()));
+        types.add(new TypeDefinition<>(ObjectClassAssignmentNode.class, new ObjectClassAssignmentCompiler()));
+        types.add(new TypeDefinition<>(ObjectClassNode.class, new ObjectClassNodeCompiler()));
+        types.add(new TypeDefinition<>(ObjectClassDefn.class, new ObjectClassDefnCompiler()));
+        types.add(new TypeDefinition<>(FieldSpecNode.class, new FieldSpecNodeCompiler()));
+        types.add(new TypeDefinition<>(TypeFieldSpecNode.class, new TypeFieldSpecNodeCompiler()));
+        types.add(new TypeDefinition<>(ObjectSetAssignmentNode.class, new ObjectSetAssignmentCompiler()));
     }
 
     public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> typeClass) {

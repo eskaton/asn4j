@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class IA5StringConstraintCompiler extends AbstractStringConstraintCompiler {
+public class IA5StringConstraintCompiler extends AbstractStringConstraintCompiler<IA5StringValue> {
 
     public IA5StringConstraintCompiler(CompilerContext ctx) {
         super(ctx, IA5StringValue.class);

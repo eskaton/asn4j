@@ -36,7 +36,7 @@ public abstract class ASN1Sequence implements ASN1Type, HasConstraint {
 
     @Override
     public void checkConstraint() {
-        if (!doCheckConstraint()) {
+        if (Boolean.FALSE.equals(doCheckConstraint())) {
             throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint", this));
         }
     }

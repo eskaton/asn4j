@@ -178,7 +178,7 @@ public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignment
     private Map<String, Object> compile(CompiledObjectClass objectClass, DefaultSyntaxNode syntaxNode) {
         var values = syntaxNode.getFieldSetting().stream()
                 .map(setting -> compile(objectClass, setting))
-                .collect(Collectors.toMap(t -> t.get_1(), t -> t.get_2()));
+                .collect(Collectors.toMap(Tuple2::get_1, Tuple2::get_2));
         var fields = objectClass.getFields();
 
         for (var field : fields) {

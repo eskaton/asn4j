@@ -34,32 +34,32 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ToStringTest {
 
     @Test
-    public void testAllFields() {
+    void testAllFields() {
         assertEquals("A[a=a]", new A().toString());
     }
 
     @Test
-    public void testAllFieldsExplict() {
+    void testAllFieldsExplict() {
         assertEquals("K[a=a, b=b]", new K().toString());
     }
 
     @Test
-    public void testExplicitFields() {
+    void testExplicitFields() {
         assertEquals("B[b=b]", new B().toString());
     }
 
     @Test
-    public void testFieldExclusion() {
+    void testFieldExclusion() {
         assertEquals("C[a=a]", new C().toString());
     }
 
     @Test
-    public void testNested() {
+    void testNested() {
         assertEquals("D[a=A[a=a]]", new D().toString());
     }
 
     @Test
-    public void testRecursion() {
+    void testRecursion() {
         E e = new E();
         F f = new F(e);
 
@@ -69,7 +69,7 @@ class ToStringTest {
     }
 
     @Test
-    public void testRenameProperty() {
+    void testRenameProperty() {
         assertEquals("G[string=a]", new G().toString());
     }
 
@@ -79,7 +79,7 @@ class ToStringTest {
     }
 
     @Test
-    public void testMapRecursion() {
+    void testMapRecursion() {
         I i = new I();
         J j = new J(i);
 

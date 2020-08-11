@@ -53,7 +53,7 @@ public class ASN1EnumeratedType implements ASN1Type, HasConstraint {
 
     @Override
     public void checkConstraint() {
-        if (!doCheckConstraint()) {
+        if (Boolean.FALSE.equals(doCheckConstraint())) {
             throw new ConstraintViolatedException(String.format("%d doesn't satisfy a constraint", value));
         }
     }

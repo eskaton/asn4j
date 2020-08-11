@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.values.GeneralStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class GeneralStringConstraintCompiler extends AbstractStringConstraintCompiler {
+public class GeneralStringConstraintCompiler extends AbstractStringConstraintCompiler<GeneralStringValue> {
 
     public GeneralStringConstraintCompiler(CompilerContext ctx) {
         super(ctx, GeneralStringValue.class);

@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
 
 import java.util.List;
+import java.util.Objects;
 
 public class EnumeratedType extends AbstractType {
 
@@ -85,6 +86,33 @@ public class EnumeratedType extends AbstractType {
 
     public boolean isExtensible() {
         return extensible;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        EnumeratedType that = (EnumeratedType) o;
+
+        return extensible == that.extensible &&
+                Objects.equals(rootEnum, that.rootEnum) &&
+                Objects.equals(exceptionSpec, that.exceptionSpec) &&
+                Objects.equals(additionalEnum, that.additionalEnum);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), rootEnum, exceptionSpec, additionalEnum, extensible);
     }
 
 }

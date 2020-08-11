@@ -95,7 +95,7 @@ public class FunctionBuilder implements Builder<Module>, HasStatements {
     }
 
     public StatementBuilder<FunctionBuilder> statements() {
-        return new StatementBuilder(this);
+        return new StatementBuilder<>(this);
     }
 
     @Override

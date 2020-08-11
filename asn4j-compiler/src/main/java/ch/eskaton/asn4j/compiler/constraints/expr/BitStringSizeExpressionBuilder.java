@@ -40,12 +40,13 @@ import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckBitStringLen
 import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckBitStringMaxLength;
 import static ch.eskaton.asn4j.compiler.il.BooleanFunctionCall.CheckBitStringMinLength;
 
-public class BitStringStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
+public class BitStringSizeExpressionBuilder extends AbstractIntegerRangeExpressionBuilder {
 
-    public BitStringStringSizeExpressionBuilder() {
+    public BitStringSizeExpressionBuilder() {
         super(CheckBitStringMinLength::new, CheckBitStringMaxLength::new, CheckBitStringLengthEquals::new);
     }
 
+    @Override
     protected BooleanExpression buildExpression(long value, BinaryOperator operator) {
         return switch (operator) {
             case GE -> checkMin.apply(List.of(new Variable(VAR_VALUE),

@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ConstrainedType extends AbstractType {
 
@@ -43,6 +44,31 @@ public class ConstrainedType extends AbstractType {
 
         this.type = type;
         this.constraints = constraints;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        ConstrainedType that = (ConstrainedType) o;
+
+        return Objects.equals(type, that.type) &&
+                Objects.equals(constraints, that.constraints);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), type, constraints);
     }
 
 }
