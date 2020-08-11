@@ -52,17 +52,23 @@ public class Clone {
             return object;
         } else if (object instanceof BigInteger) {
             return object;
+        } else if (object instanceof Enum) {
+            return object;
         }
 
         var clazz = object.getClass();
         Object copy;
 
         try {
-            var constructor = clazz.getDeclaredConstructor();
+            if (object.getClass().getName().equals("java.util.Arrays$ArrayList")) {
+                copy = new ArrayList<>();
+            } else {
+                var constructor = clazz.getDeclaredConstructor();
 
-            constructor.setAccessible(true);
+                constructor.setAccessible(true);
 
-            copy = constructor.newInstance();
+                copy = constructor.newInstance();
+            }
 
             if (object instanceof Collection collection) {
                 var list = (List) collection.stream()
