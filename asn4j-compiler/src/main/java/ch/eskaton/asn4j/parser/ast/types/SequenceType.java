@@ -33,6 +33,10 @@ import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
 
 public class SequenceType extends Collection {
 
+    protected SequenceType() {
+        super();
+    }
+
     public SequenceType(Position position) {
         super(position);
     }

@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
@@ -109,7 +110,7 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
             return collectionValue;
         }
 
-        throw error(typeName);
+        throw error(typeName, value);
     }
 
     private Value getValue(String typeName, Map<String, Type> elementTypes, NamedValue value) {
@@ -168,8 +169,9 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
         }
     }
 
-    protected CompilerException error(String typeName) {
-        return new CompilerException("Failed to resolve a %s value", typeName);
+    protected CompilerException error(String typeName, Value value) {
+        return new CompilerException(value.getPosition(), "Failed to resolve a %s value: %s", typeName,
+                ValueFormatter.formatValue(value));
     }
 
 }

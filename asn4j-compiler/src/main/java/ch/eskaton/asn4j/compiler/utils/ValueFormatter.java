@@ -32,8 +32,11 @@ import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
+import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
@@ -65,6 +68,14 @@ public class ValueFormatter {
             } else {
                 return String.valueOf(value.getValue());
             }
+        } else if (node instanceof IntegerValue value) {
+            return value.getValue().toString();
+        } else if (node instanceof BooleanValue value) {
+            return value.getValue() ? "TRUE" : "FALSE";
+        } else if (node instanceof CollectionOfValue value) {
+            return String.format("{%s}", value.getValues().stream()
+                    .map(ValueFormatter::formatValue)
+                    .collect(Collectors.joining(", ")));
         } else if (node instanceof AmbiguousValue value) {
             return value.getValues().stream().map(ValueFormatter::formatValue).collect(Collectors.joining(", "));
         } else if (node instanceof TupleNode value) {

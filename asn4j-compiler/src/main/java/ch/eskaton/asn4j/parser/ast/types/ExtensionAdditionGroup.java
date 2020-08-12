@@ -39,6 +39,10 @@ public class ExtensionAdditionGroup extends AbstractNode {
 
     private List<ComponentType> components;
 
+    protected ExtensionAdditionGroup() {
+        super();
+    }
+
     public ExtensionAdditionGroup(Position position, List<ComponentType> components) {
         super(position);
 

@@ -46,6 +46,10 @@ public class ComponentType extends AbstractType {
 
     private Value value;
 
+    protected ComponentType() {
+        super();
+    }
+
     public ComponentType(Position position, CompType compType, Type type) {
         super(position);
 
