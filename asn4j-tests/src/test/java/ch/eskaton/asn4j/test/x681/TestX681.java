@@ -57,6 +57,10 @@ import ch.eskaton.asn4j.test.modules.X681.TestSequence18.SequenceOfField;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence19;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence19.SetOfField;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence2;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence20;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence20.SequenceField;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence21;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence21.SetField;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence5;
@@ -198,6 +202,20 @@ class TestX681 {
     void testSequence19() {
         testSequenceSuccess(TestSequence19.class, new TestSequence19(),
                 s -> s.setSetOfField(new SetOfField(ASN1Integer.valueOf(1), ASN1Integer.valueOf(2))));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a SEQUENCE type")
+    void testSequence20() {
+        testSequenceSuccess(TestSequence20.class, new TestSequence20(),
+                s -> s.setSequenceField(new SequenceField(ASN1Integer.valueOf(1), ASN1Boolean.TRUE)));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a SET type")
+    void testSequence21() {
+        testSequenceSuccess(TestSequence21.class, new TestSequence21(),
+                s -> s.setSetField(new SetField(ASN1Integer.valueOf(1), ASN1Boolean.TRUE)));
     }
 
 }

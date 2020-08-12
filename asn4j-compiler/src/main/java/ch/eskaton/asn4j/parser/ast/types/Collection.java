@@ -48,6 +48,10 @@ public abstract class Collection extends AbstractType {
 
     private List<ExtensionAdditionGroup> extensionAdditions;
 
+    protected Collection() {
+        super();
+    }
+
     public Collection(Position position) {
         super(position);
     }

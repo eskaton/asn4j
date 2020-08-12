@@ -33,6 +33,10 @@ public class ExtensionAndExceptionNode extends AbstractNode {
 
     private ExceptionIdentificationNode exceptionId;
 
+    protected ExtensionAndExceptionNode() {
+        super();
+    }
+
     public ExtensionAndExceptionNode(Position position) {
         super(position);
     }

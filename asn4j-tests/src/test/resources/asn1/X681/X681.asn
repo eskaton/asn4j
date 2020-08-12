@@ -20,7 +20,9 @@ TEST ::= CLASS {
     &universalStringField  UniversalString,
     &bmpStringField        BMPString,
     &sequenceOfField       SEQUENCE OF INTEGER,
-    &setOfField            SET OF INTEGER
+    &setOfField            SET OF INTEGER,
+    &sequenceField         SEQUENCE { a INTEGER, b BOOLEAN },
+    &setField              SET { a INTEGER, b BOOLEAN }
 }
 
 TestSet TEST ::= {
@@ -42,7 +44,9 @@ TestSet TEST ::= {
       &universalStringField  "äöü",
       &bmpStringField        "äöü",
       &sequenceOfField       {1, 2, 3},
-      &setOfField            {1, 2, 3}
+      &setOfField            {1, 2, 3},
+      &sequenceField         {a 1, b TRUE},
+      &setField              {a 1, b TRUE}
     }
 }
 
@@ -120,6 +124,14 @@ TestSequence18 ::= SEQUENCE {
 
 TestSequence19 ::= SEQUENCE {
    setOfField TEST.&setOfField
+}
+
+TestSequence20 ::= SEQUENCE {
+   sequenceField TEST.&sequenceField
+}
+
+TestSequence21 ::= SEQUENCE {
+   setField TEST.&setField
 }
 
 END

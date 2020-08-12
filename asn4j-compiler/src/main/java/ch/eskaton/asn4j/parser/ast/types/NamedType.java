@@ -37,6 +37,10 @@ public class NamedType extends AbstractType {
 
     private Type type;
 
+    protected NamedType() {
+        super();
+    }
+
     public NamedType(Position position, String name, Type type) {
         super(position);
 

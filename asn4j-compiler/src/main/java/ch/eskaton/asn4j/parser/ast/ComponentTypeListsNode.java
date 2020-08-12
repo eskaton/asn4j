@@ -45,6 +45,10 @@ public class ComponentTypeListsNode extends AbstractNode {
 
     private Boolean optionalExtensionMarker = false;
 
+    protected ComponentTypeListsNode() {
+        super();
+    }
+
     public ComponentTypeListsNode(Position position, List<ComponentType> rootComponents,
             ExtensionAndExceptionNode extensionAndException, List<ExtensionAdditionGroup> extensionAdditions,
             Boolean extensionEndMark) {

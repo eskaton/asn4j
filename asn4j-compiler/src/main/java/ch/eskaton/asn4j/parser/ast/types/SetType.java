@@ -33,6 +33,10 @@ import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
 
 public class SetType extends Collection {
 
+    protected SetType() {
+        super();
+    }
+
     public SetType(Position position) {
         super(position);
     }
