@@ -22,7 +22,8 @@ TEST ::= CLASS {
     &sequenceOfField       SEQUENCE OF INTEGER,
     &setOfField            SET OF INTEGER,
     &sequenceField         SEQUENCE { a INTEGER, b BOOLEAN },
-    &setField              SET { a INTEGER, b BOOLEAN }
+    &setField              SET { a INTEGER, b BOOLEAN },
+    &choiceField           CHOICE { a INTEGER, b BOOLEAN }
 }
 
 TestSet TEST ::= {
@@ -46,7 +47,8 @@ TestSet TEST ::= {
       &sequenceOfField       {1, 2, 3},
       &setOfField            {1, 2, 3},
       &sequenceField         {a 1, b TRUE},
-      &setField              {a 1, b TRUE}
+      &setField              {a 1, b TRUE},
+      &choiceField           b: TRUE
     }
 }
 
@@ -132,6 +134,10 @@ TestSequence20 ::= SEQUENCE {
 
 TestSequence21 ::= SEQUENCE {
    setField TEST.&setField
+}
+
+TestSequence22 ::= SEQUENCE {
+   choiceField TEST.&choiceField
 }
 
 END

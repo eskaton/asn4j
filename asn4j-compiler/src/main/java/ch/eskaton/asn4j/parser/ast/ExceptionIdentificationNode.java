@@ -38,6 +38,7 @@ public class ExceptionIdentificationNode extends AbstractNode {
     private Value value;
 
     protected ExceptionIdentificationNode() {
+        super();
     }
 
     public ExceptionIdentificationNode(Position position, Value value) {

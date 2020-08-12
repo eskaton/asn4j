@@ -61,6 +61,8 @@ import ch.eskaton.asn4j.test.modules.X681.TestSequence20;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence20.SequenceField;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence21;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence21.SetField;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence22;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence22.ChoiceField;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence5;
@@ -72,6 +74,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
+import static ch.eskaton.commons.utils.Utils.with;
 
 class TestX681 {
 
@@ -216,6 +219,13 @@ class TestX681 {
     void testSequence21() {
         testSequenceSuccess(TestSequence21.class, new TestSequence21(),
                 s -> s.setSetField(new SetField(ASN1Integer.valueOf(1), ASN1Boolean.TRUE)));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a CHOICE type")
+    void testSequence22() {
+        testSequenceSuccess(TestSequence22.class, new TestSequence22(),
+                s -> s.setChoiceField(with(new ChoiceField(), c -> c.setB(ASN1Boolean.TRUE))));
     }
 
 }
