@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.test.x681;
 
+import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
@@ -37,6 +38,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
+import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
+import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
@@ -45,6 +48,9 @@ import ch.eskaton.asn4j.test.modules.X681.TestSequence11;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence12;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence13;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence14;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence15;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence16;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence17;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence2;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
@@ -152,6 +158,27 @@ class TestX681 {
     void testSequence14() {
         testSequenceSuccess(TestSequence14.class, new TestSequence14(),
                 s -> s.setNumericStringField(new ASN1NumericString("123")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a UTF8String")
+    void testSequence15() {
+        testSequenceSuccess(TestSequence15.class, new TestSequence15(),
+                s -> s.setUtf8StringField(new ASN1UTF8String("äöü")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a UniversalString")
+    void testSequence16() {
+        testSequenceSuccess(TestSequence16.class, new TestSequence16(),
+                s -> s.setUniversalStringField(new ASN1UniversalString("äöü")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a BMPString")
+    void testSequence17() {
+        testSequenceSuccess(TestSequence17.class, new TestSequence17(),
+                s -> s.setBmpStringField(new ASN1BMPString("äöü")));
     }
 
 }
