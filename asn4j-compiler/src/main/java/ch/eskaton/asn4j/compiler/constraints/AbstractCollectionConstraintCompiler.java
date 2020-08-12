@@ -90,7 +90,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         this.typeName = typeName;
 
         addConstraintHandler(SingleValueConstraint.class,
-                new SingleValueCompiler(ctx, CollectionValue.class, CollectionValueNode.class, getTypeName(),
+                new SingleValueCompiler<>(ctx, CollectionValue.class, CollectionValueNode.class, getTypeName(),
                         Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new CollectionContainedSubtypeCompiler(ctx)::compile);
     }

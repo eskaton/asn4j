@@ -74,7 +74,7 @@ public class BitStringConstraintCompiler extends AbstractConstraintCompiler {
         super(ctx);
 
         addConstraintHandler(SingleValueConstraint.class,
-                new SingleValueCompiler(ctx, BitStringValue.class, BitStringValueNode.class, getTypeName(),
+                new SingleValueCompiler<>(ctx, BitStringValue.class, BitStringValueNode.class, getTypeName(),
                         List.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class,

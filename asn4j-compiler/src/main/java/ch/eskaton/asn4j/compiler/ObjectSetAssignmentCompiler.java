@@ -68,7 +68,8 @@ public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignment
 
         objectClass.getFields().stream()
                 .filter(CompiledFixedTypeValueField.class::isInstance)
-                .filter(f -> ((CompiledFixedTypeValueField) f).isUnique())
+                .map(CompiledFixedTypeValueField.class::cast)
+                .filter(CompiledFixedTypeValueField::isUnique)
                 .forEach(f -> {
                     var fieldName = f.getName();
                     var fieldValues = new HashSet<Value>();

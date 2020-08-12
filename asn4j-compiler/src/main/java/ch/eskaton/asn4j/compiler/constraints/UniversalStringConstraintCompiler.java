@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.values.UniversalStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class UniversalStringConstraintCompiler extends AbstractUnicodeStringConstraintCompiler {
+public class UniversalStringConstraintCompiler extends AbstractUnicodeStringConstraintCompiler<UniversalStringValue> {
 
     public UniversalStringConstraintCompiler(CompilerContext ctx) {
         super(ctx, UniversalStringValue.class);

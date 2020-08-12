@@ -87,7 +87,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
         this.collectionType = collectionType;
 
         addConstraintHandler(SingleValueConstraint.class,
-                new SingleValueCompiler(ctx, CollectionOfValue.class, CollectionOfValueNode.class, getTypeName(),
+                new SingleValueCompiler<>(ctx, CollectionOfValue.class, CollectionOfValueNode.class, getTypeName(),
                         Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new CollectionOfContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class,

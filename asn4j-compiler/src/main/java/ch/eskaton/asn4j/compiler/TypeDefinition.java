@@ -33,10 +33,11 @@ import ch.eskaton.asn4j.compiler.defaults.DefaultCompilerImpl;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeNameSupplier;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueResolver<V>, C extends Compiler<T>,
-        D extends AbstractDefaultCompiler<V>, CC extends AbstractConstraintCompiler> {
+        D extends AbstractDefaultCompiler<V>, K extends AbstractConstraintCompiler> {
 
     private Class<T> typeClass;
 
@@ -46,36 +47,36 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
 
     private Class<R> runtimeTypeClass;
 
-    private TypeNameSupplier typeNameSupplier;
+    private TypeNameSupplier<? extends Type> typeNameSupplier;
 
     private D defaultCompiler;
 
-    private CC constraintCompiler;
+    private K constraintCompiler;
 
     private Boolean constructed;
 
     private C compiler;
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
-            S valueResolver, TypeNameSupplier typeNameSupplier, D defaultCompiler, CC constraintCompiler) {
+            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, D defaultCompiler, K constraintCompiler) {
         this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier, defaultCompiler,
                 constraintCompiler, false);
     }
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
-            S valueResolver, TypeNameSupplier typeNameSupplier, CC constraintCompiler) {
+            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, K constraintCompiler) {
         this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier,
                 (D) new DefaultCompilerImpl<V>(valueClass), constraintCompiler, false);
     }
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
-            S valueResolver, TypeNameSupplier typeNameSupplier, CC constraintCompiler, boolean constructed) {
+            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, K constraintCompiler, boolean constructed) {
         this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier,
-                (D) new DefaultCompilerImpl<V>(valueClass), constraintCompiler, constructed);
+                (D) new DefaultCompilerImpl<>(valueClass), constraintCompiler, constructed);
     }
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
-            S valueResolver, TypeNameSupplier typeNameSupplier, D defaultCompiler, CC constraintCompiler,
+            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, D defaultCompiler, K constraintCompiler,
             boolean constructed) {
         this.typeClass = typeClass;
         this.compiler = compiler;
@@ -88,7 +89,7 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
         this.constructed = constructed;
     }
 
-    public TypeDefinition(Class<T> typeClass, C compiler, TypeNameSupplier typeNameSupplier) {
+    public TypeDefinition(Class<T> typeClass, C compiler, TypeNameSupplier<? extends Type> typeNameSupplier) {
         this(typeClass, compiler);
 
         this.typeNameSupplier = typeNameSupplier;
@@ -155,7 +156,7 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
         return defaultCompiler;
     }
 
-    public CC getConstraintCompiler() {
+    public K getConstraintCompiler() {
         if (constraintCompiler == null) {
             throw new IllegalCompilerStateException("Type %s has no associated constraint compiler",
                     typeClass.getSimpleName());

@@ -78,7 +78,7 @@ public class ChoiceConstraintCompiler extends AbstractConstraintCompiler {
         super(ctx);
 
         addConstraintHandler(SingleValueConstraint.class,
-                new SingleValueCompiler(ctx, ChoiceValue.class, ValueNode.class, getTypeName(),
+                new SingleValueCompiler<>(ctx, ChoiceValue.class, ValueNode.class, getTypeName(),
                         Set.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new ChoiceContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(MultipleTypeConstraints.class, new ChoiceMultipleTypeConstraintsCompiler(ctx)::compile);

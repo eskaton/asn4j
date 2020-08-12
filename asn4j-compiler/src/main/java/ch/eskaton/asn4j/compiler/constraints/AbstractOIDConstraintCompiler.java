@@ -78,7 +78,7 @@ public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNo
     @Override
     protected Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {
         return switch (node.getType()) {
-            case VALUE -> new OIDValueExpressionBuilder(ctx).build(compiledType, (N) node);
+            case VALUE -> new OIDValueExpressionBuilder<>(ctx).build(compiledType, (N) node);
             default -> super.buildExpression(module, compiledType, node);
         };
     }

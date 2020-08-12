@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class UTF8StringConstraintCompiler extends AbstractUnicodeStringConstraintCompiler {
+public class UTF8StringConstraintCompiler extends AbstractUnicodeStringConstraintCompiler<UTF8StringValue> {
 
     public UTF8StringConstraintCompiler(CompilerContext ctx) {
         super(ctx, UTF8StringValue.class);
