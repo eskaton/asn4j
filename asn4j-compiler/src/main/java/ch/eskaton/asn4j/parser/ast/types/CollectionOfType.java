@@ -38,6 +38,9 @@ public class CollectionOfType extends AbstractType {
 
     protected Type type;
 
+    protected CollectionOfType() {
+    }
+
     public CollectionOfType(Position position, Type type) {
         super(position);
 

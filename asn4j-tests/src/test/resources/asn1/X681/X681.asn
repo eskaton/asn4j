@@ -18,7 +18,9 @@ TEST ::= CLASS {
     &numericStringField    NumericString,
     &utf8StringField       UTF8String,
     &universalStringField  UniversalString,
-    &bmpStringField        BMPString
+    &bmpStringField        BMPString,
+    &sequenceOfField       SEQUENCE OF INTEGER,
+    &setOfField            SET OF INTEGER
 }
 
 TestSet TEST ::= {
@@ -38,7 +40,9 @@ TestSet TEST ::= {
       &numericStringField    "123",
       &utf8StringField       "äöü",
       &universalStringField  "äöü",
-      &bmpStringField        "äöü"
+      &bmpStringField        "äöü",
+      &sequenceOfField       {1, 2, 3},
+      &setOfField            {1, 2, 3}
     }
 }
 
@@ -108,6 +112,14 @@ TestSequence16 ::= SEQUENCE {
 
 TestSequence17 ::= SEQUENCE {
    bmpStringField TEST.&bmpStringField
+}
+
+TestSequence18 ::= SEQUENCE {
+   sequenceOfField TEST.&sequenceOfField
+}
+
+TestSequence19 ::= SEQUENCE {
+   setOfField TEST.&setOfField
 }
 
 END

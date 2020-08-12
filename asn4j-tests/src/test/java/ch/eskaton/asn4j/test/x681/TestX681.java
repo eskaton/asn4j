@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
 import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
 import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
+import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
@@ -51,6 +52,10 @@ import ch.eskaton.asn4j.test.modules.X681.TestSequence14;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence15;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence16;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence17;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence18;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence18.SequenceOfField;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence19;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence19.SetOfField;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence2;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
@@ -179,6 +184,20 @@ class TestX681 {
     void testSequence17() {
         testSequenceSuccess(TestSequence17.class, new TestSequence17(),
                 s -> s.setBmpStringField(new ASN1BMPString("äöü")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a SEQUENCE OF type")
+    void testSequence18() {
+        testSequenceSuccess(TestSequence18.class, new TestSequence18(),
+                s -> s.setSequenceOfField(new SequenceOfField(ASN1Integer.valueOf(1), ASN1Integer.valueOf(2))));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a SET OF type")
+    void testSequence19() {
+        testSequenceSuccess(TestSequence19.class, new TestSequence19(),
+                s -> s.setSetOfField(new SetOfField(ASN1Integer.valueOf(1), ASN1Integer.valueOf(2))));
     }
 
 }
