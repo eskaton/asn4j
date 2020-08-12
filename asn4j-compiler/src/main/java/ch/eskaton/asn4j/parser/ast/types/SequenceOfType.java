@@ -31,6 +31,9 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class SequenceOfType extends CollectionOfType {
 
+    protected SequenceOfType() {
+    }
+
     public SequenceOfType(Position position, Type type) {
         super(position, type);
     }

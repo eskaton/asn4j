@@ -31,6 +31,9 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class SetOfType extends CollectionOfType {
 
+    protected SetOfType() {
+    }
+
     public SetOfType(Position position, Type type) {
         super(position, type);
     }
