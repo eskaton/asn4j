@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class BMPStringConstraintCompiler extends AbstractUnicodeStringConstraintCompiler {
+public class BMPStringConstraintCompiler extends AbstractUnicodeStringConstraintCompiler<BMPStringValue> {
 
     public BMPStringConstraintCompiler(CompilerContext ctx) {
         super(ctx, BMPStringValue.class);

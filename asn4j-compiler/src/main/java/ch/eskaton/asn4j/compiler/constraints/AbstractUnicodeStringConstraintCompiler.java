@@ -67,9 +67,9 @@ public class AbstractUnicodeStringConstraintCompiler<V extends HasStringValue & 
         addConstraintHandler(SizeConstraint.class,
                 new SizeCompiler(ctx, new IntegerConstraintCompiler(ctx).getDispatcher())::compile);
         addConstraintHandler(SingleValueConstraint.class,
-                new StringSingleValueCompiler(ctx, valueClass, getTypeName())::compile);
+                new StringSingleValueCompiler<>(ctx, valueClass, getTypeName())::compile);
         addConstraintHandler(PermittedAlphabetConstraint.class,
-                new StringPermittedAlphabetConstraintCompiler(ctx, valueClass, getTypeName())::compile);
+                new StringPermittedAlphabetConstraintCompiler<>(ctx, valueClass, getTypeName())::compile);
     }
 
     @Override

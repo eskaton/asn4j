@@ -34,9 +34,9 @@ import ch.eskaton.asn4j.parser.ast.values.ByteStringValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public abstract class ByteStringDefaultCompiler<T extends ByteStringValue> extends DefaultCompilerImpl {
+public abstract class ByteStringDefaultCompiler<V extends ByteStringValue> extends DefaultCompilerImpl {
 
-    public ByteStringDefaultCompiler(Class<T> valueClass) {
+    public ByteStringDefaultCompiler(Class<V> valueClass) {
         super(valueClass);
     }
 
@@ -46,7 +46,7 @@ public abstract class ByteStringDefaultCompiler<T extends ByteStringValue> exten
             return getEmptyValueInitializer(typeName);
         }
 
-        T resolvedValue = (T) ctx.resolveGenericValue(valueClass, type, value);
+        V resolvedValue = (V) ctx.resolveGenericValue(valueClass, type, value);
 
         return JavaUtils.getInitializerString(ctx, typeName, resolvedValue);
     }

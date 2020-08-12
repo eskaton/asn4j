@@ -67,7 +67,7 @@ public class OctetStringConstraintCompiler extends AbstractConstraintCompiler {
         super(ctx);
 
         addConstraintHandler(SingleValueConstraint.class,
-                new SingleValueCompiler(ctx, OctetStringValue.class, OctetStringValueNode.class, getTypeName(),
+                new SingleValueCompiler<>(ctx, OctetStringValue.class, OctetStringValueNode.class, getTypeName(),
                         List.class)::compile);
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);
         addConstraintHandler(SizeConstraint.class,
