@@ -40,6 +40,10 @@ public class ExtensionAdditionAlternativesGroup implements Node {
 
     private List<NamedType> alternatives;
 
+    public ExtensionAdditionAlternativesGroup() {
+        super();
+    }
+
     public ExtensionAdditionAlternativesGroup(Position position, Integer version, List<NamedType> alternatives) {
         this.position = position;
         this.version = version;

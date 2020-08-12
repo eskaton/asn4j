@@ -48,6 +48,10 @@ public class Choice extends AbstractType {
 
     private boolean optionalExtensionMarker;
 
+    protected Choice() {
+        super();
+    }
+
     public Choice(Position position, AlternativeTypeLists alternatives) {
         super(position);
 

@@ -37,6 +37,10 @@ public class ExtensionAdditionAlternativeNode extends AbstractNode {
 
     private ExtensionAdditionAlternativesGroup extensionAdditionAlternativesGroup;
 
+    protected ExtensionAdditionAlternativeNode() {
+        super();
+    }
+
     public ExtensionAdditionAlternativeNode(Position position, NamedType namedType) {
         super(position);
 
