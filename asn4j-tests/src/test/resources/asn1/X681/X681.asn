@@ -15,7 +15,10 @@ TEST ::= CLASS {
     &videotexStringField   VideotexString,
     &teletexStringField    TeletexString,
     &printableStringField  PrintableString,
-    &numericStringField    NumericString
+    &numericStringField    NumericString,
+    &utf8StringField       UTF8String,
+    &universalStringField  UniversalString,
+    &bmpStringField        BMPString
 }
 
 TestSet TEST ::= {
@@ -32,7 +35,10 @@ TestSet TEST ::= {
       &videotexStringField   "abc",
       &teletexStringField    "abc",
       &printableStringField  "abc",
-      &numericStringField    "123"
+      &numericStringField    "123",
+      &utf8StringField       "äöü",
+      &universalStringField  "äöü",
+      &bmpStringField        "äöü"
     }
 }
 
@@ -90,6 +96,18 @@ TestSequence13 ::= SEQUENCE {
 
 TestSequence14 ::= SEQUENCE {
    numericStringField TEST.&numericStringField
+}
+
+TestSequence15 ::= SEQUENCE {
+   utf8StringField TEST.&utf8StringField
+}
+
+TestSequence16 ::= SEQUENCE {
+   universalStringField TEST.&universalStringField
+}
+
+TestSequence17 ::= SEQUENCE {
+   bmpStringField TEST.&bmpStringField
 }
 
 END
