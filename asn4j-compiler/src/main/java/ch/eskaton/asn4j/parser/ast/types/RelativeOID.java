@@ -31,6 +31,10 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class RelativeOID extends AbstractOID {
 
+    protected RelativeOID() {
+        super();
+    }
+
     public RelativeOID(Position position) {
         super(position);
     }
