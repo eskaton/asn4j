@@ -31,6 +31,10 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class ObjectIdentifier extends AbstractOID {
 
+    protected ObjectIdentifier() {
+        super();
+    }
+
     public ObjectIdentifier(Position position) {
         super(position);
     }
