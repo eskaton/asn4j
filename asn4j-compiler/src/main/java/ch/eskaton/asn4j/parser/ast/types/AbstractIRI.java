@@ -31,6 +31,10 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class AbstractIRI extends AbstractType {
 
+    protected AbstractIRI() {
+        super();
+    }
+
     public AbstractIRI(Position position) {
         super(position);
     }

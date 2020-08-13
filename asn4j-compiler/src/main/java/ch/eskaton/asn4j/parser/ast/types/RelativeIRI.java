@@ -31,6 +31,10 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class RelativeIRI extends AbstractIRI {
 
+    protected RelativeIRI() {
+        super();
+    }
+
     public RelativeIRI(Position position) {
         super(position);
     }

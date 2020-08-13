@@ -33,12 +33,14 @@ import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1GeneralString;
 import ch.eskaton.asn4j.runtime.types.ASN1GraphicString;
 import ch.eskaton.asn4j.runtime.types.ASN1IA5String;
+import ch.eskaton.asn4j.runtime.types.ASN1IRI;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
+import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
 import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
@@ -67,6 +69,8 @@ import ch.eskaton.asn4j.test.modules.X681.TestSequence22;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence22.ChoiceField;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence23;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence24;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence25;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence26;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence5;
@@ -244,6 +248,20 @@ class TestX681 {
     void testSequence24() {
         testSequenceSuccess(TestSequence24.class, new TestSequence24(),
                 s -> s.setRelativeOidField(ASN1RelativeOID.from(2, 5, 2)));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to an OID-IRI type")
+    void testSequence25() {
+        testSequenceSuccess(TestSequence25.class, new TestSequence25(),
+                s -> s.setOidIriField(ASN1IRI.from("ISO", "a", "b", "c")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a RELATIVE-OID-IRI type")
+    void testSequence26() {
+        testSequenceSuccess(TestSequence26.class, new TestSequence26(),
+                s -> s.setRelativeOidIriField(ASN1RelativeIRI.from("a", "b", "c")));
     }
 
 }
