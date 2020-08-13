@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
+import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 import ch.eskaton.asn4j.runtime.types.ASN1TeletexString;
@@ -71,6 +72,7 @@ import ch.eskaton.asn4j.test.modules.X681.TestSequence23;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence24;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence25;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence26;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence27;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence3;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence4;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence5;
@@ -80,6 +82,8 @@ import ch.eskaton.asn4j.test.modules.X681.TestSequence8;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence9;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 import static ch.eskaton.commons.utils.Utils.with;
@@ -262,6 +266,13 @@ class TestX681 {
     void testSequence26() {
         testSequenceSuccess(TestSequence26.class, new TestSequence26(),
                 s -> s.setRelativeOidIriField(ASN1RelativeIRI.from("a", "b", "c")));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to a REAL")
+    void testSequence27() {
+        testSequenceSuccess(TestSequence27.class, new TestSequence27(),
+                s -> s.setRealField(new ASN1Real(BigDecimal.valueOf(1.2))));
     }
 
 }

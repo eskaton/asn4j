@@ -31,6 +31,10 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class Real extends AbstractType {
 
+    protected Real() {
+        super();
+    }
+
     public Real(Position position) {
         super(position);
     }
