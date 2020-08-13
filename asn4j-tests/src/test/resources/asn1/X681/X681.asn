@@ -25,7 +25,9 @@ TEST ::= CLASS {
     &setField              SET { a INTEGER, b BOOLEAN },
     &choiceField           CHOICE { a INTEGER, b BOOLEAN },
     &objectIdentifierField OBJECT IDENTIFIER,
-    &relativeOidField      RELATIVE-OID
+    &relativeOidField      RELATIVE-OID,
+    &oidIriField           OID-IRI,
+    &relativeOidIriField   RELATIVE-OID-IRI
 }
 
 TestSet TEST ::= {
@@ -52,7 +54,9 @@ TestSet TEST ::= {
       &setField              {a 1, b TRUE},
       &choiceField           b: TRUE,
       &objectIdentifierField { 1 3 6 1 },
-      &relativeOidField      { 3 6 1 }
+      &relativeOidField      { 3 6 1 },
+      &oidIriField           "/ISO/a/b/a",
+      &relativeOidIriField   "a/b/a"
     }
 }
 
@@ -150,6 +154,14 @@ TestSequence23 ::= SEQUENCE {
 
 TestSequence24 ::= SEQUENCE {
    relativeOidField TEST.&relativeOidField
+}
+
+TestSequence25 ::= SEQUENCE {
+   oidIriField TEST.&oidIriField
+}
+
+TestSequence26 ::= SEQUENCE {
+   relativeOidIriField TEST.&relativeOidIriField
 }
 
 END
