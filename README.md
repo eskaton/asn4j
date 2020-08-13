@@ -3,7 +3,7 @@
 ASN4J - ASN.1 compiler and runtime for Java
 ========
 
-# Supported types
+## Supported types
 
 - [x] BIT STRING
 - [x] BMPString
@@ -36,7 +36,7 @@ ASN4J - ASN.1 compiler and runtime for Java
 - [x] VideotexString
 - [x] VisibleString
 
-# Supported constraints
+## Supported constraints
 
 | Type (or derived from such a type by tagging or subtyping) | Single value | Contained<br>subtype | Value<br>range | Size | Permitted<br>alphabet | Type<br>constraint | Inner<br>constraint<br>subtyping | Pattern<br>constraint |
 |----------------------------------------------------|--------|-----------|-------|------|-----------|------------|------------|------------|
