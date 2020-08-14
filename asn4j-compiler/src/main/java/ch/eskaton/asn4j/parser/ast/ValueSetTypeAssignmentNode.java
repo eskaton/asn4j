@@ -28,33 +28,27 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
-import java.util.Optional;
+public class ValueSetTypeAssignmentNode extends AssignmentNode {
 
-public class ValueSetTypeOrObjectSetAssignmentNode extends AssignmentNode {
+    private Type type;
 
-    private Optional<ValueSetTypeAssignmentNode> valueSetTypeAssignment = Optional.empty();
+    private SetSpecsNode valueSet;
 
-    private Optional<ObjectSetAssignmentNode> objectSetAssignment = Optional.empty();
-
-    public ValueSetTypeOrObjectSetAssignmentNode(Position position, String reference) {
+    public ValueSetTypeAssignmentNode(Position position, String reference, Type type, SetSpecsNode valueSet) {
         super(position, reference);
+
+        this.type = type;
+        this.valueSet = valueSet;
     }
 
-    public Optional<ValueSetTypeAssignmentNode> getValueSetTypeAssignment() {
-        return valueSetTypeAssignment;
+    public Type getType() {
+        return type;
     }
 
-    public void setValueSetTypeAssignment(ValueSetTypeAssignmentNode valueSetTypeAssignment) {
-        this.valueSetTypeAssignment = Optional.ofNullable(valueSetTypeAssignment);
-    }
-
-    public Optional<ObjectSetAssignmentNode> getObjectSetAssignment() {
-        return objectSetAssignment;
-    }
-
-    public void setObjectSetAssignment(ObjectSetAssignmentNode objectSetAssignment) {
-        this.objectSetAssignment = Optional.ofNullable(objectSetAssignment);
+    public SetSpecsNode getValueSet() {
+        return valueSet;
     }
 
 }

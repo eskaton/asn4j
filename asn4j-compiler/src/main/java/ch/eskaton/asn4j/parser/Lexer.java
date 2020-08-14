@@ -43,7 +43,7 @@ import java.util.Map;
 public class Lexer {
 
     public enum Context {
-        NORMAL, ENCODING, OBJECT_CLASS, SYNTAX, TYPE_FIELD, VALUE_FIELD, LEVEL, PROPERTY_SETTINGS
+        NORMAL, ENCODING, OBJECT_CLASS, OBJECT_SET, SYNTAX, TYPE_FIELD, VALUE_FIELD, LEVEL, PROPERTY_SETTINGS
     }
 
     // @formatter:off
@@ -856,6 +856,15 @@ public class Lexer {
                 case OBJECT_CLASS:
                     if (type == TokenType.TYPE_REFERENCE && allUc) {
                         type = TokenType.OBJECT_CLASS_REFERENCE;
+                        break;
+                    }
+
+                    is.reset();
+                    return null;
+
+                case OBJECT_SET:
+                    if (type == TokenType.TYPE_REFERENCE) {
+                        type = TokenType.OBJECT_SET_REFERENCE;
                         break;
                     }
 

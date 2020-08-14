@@ -294,6 +294,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
@@ -327,6 +328,7 @@ import ch.eskaton.asn4j.parser.ast.UpperEndpointNode;
 import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintNode;
 import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintParamNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueSetFieldSpecNode;
@@ -1034,9 +1036,13 @@ class ParserTest {
         ValueSetTypeOrObjectSetAssignmentNode result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("Type-Reference", result.getReference());
-        assertTrue(result.getType() instanceof IntegerType);
-        assertNotNull(result.getValueSet());
+        assertTrue(result.getValueSetTypeAssignment().isPresent());
+
+        ValueSetTypeAssignmentNode valueSetTypeAssignment = result.getValueSetTypeAssignment().get();
+
+        assertEquals("Type-Reference", valueSetTypeAssignment.getReference());
+        assertTrue(valueSetTypeAssignment.getType() instanceof IntegerType);
+        assertNotNull(valueSetTypeAssignment.getValueSet());
     }
 
     @Test
@@ -5895,10 +5901,14 @@ class ParserTest {
         ValueSetTypeOrObjectSetAssignmentNode result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("ObjectSet-Ref", result.getReference());
-        assertTrue(result.getType() instanceof TypeReference);
-        assertEquals("OBJ-CLASS", ((TypeReference) result.getType()).getType());
-        assertNotNull(result.getValueSet());
+        assertTrue(result.getObjectSetAssignment().isPresent());
+
+        ObjectSetAssignmentNode assignment = result.getObjectSetAssignment().get();
+
+        assertEquals("ObjectSet-Ref", assignment.getReference());
+        assertTrue(assignment.getObjectClassReference() instanceof ObjectClassReference);
+        assertEquals("OBJ-CLASS", assignment.getObjectClassReference().getReference());
+        assertNotNull(assignment.getObjectSet());
     }
 
     @Test
