@@ -81,6 +81,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
@@ -103,6 +104,7 @@ import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.PropertyAndSettingNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
+import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
@@ -113,6 +115,7 @@ import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintNode;
 import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintParamNode;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueSetFieldSpecNode;
@@ -241,6 +244,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -3290,14 +3294,44 @@ public class Parser {
 
     // ValueSetTypeAssignment ::= typereference Type "::=" ValueSet
     // ObjectSetAssignment ::= objectsetreference DefinedObjectClass "::=" ObjectSet
-    protected class ValueSetTypeAssignmentParser extends ListRuleParser<ValueSetTypeOrObjectSetAssignmentNode> {
+    protected class ValueSetTypeAssignmentParser implements RuleParser<ValueSetTypeOrObjectSetAssignmentNode> {
 
         @SuppressWarnings("unchecked")
         public ValueSetTypeOrObjectSetAssignmentNode parse() throws ParserException {
-            return super.parse(new SequenceParser(TokenType.TYPE_REFERENCE,
-                            new ChoiceParser<>(typeParser, definedObjectClassParser),
-                            TokenType.ASSIGN, new ChoiceParser<Node>(valueSetParser, objectSetParser)),
-                    a -> new ValueSetTypeOrObjectSetAssignmentNode(a.P0(), a.s0(), a.n1(), a.n3()));
+
+            Set<List<Object>> rules = new AmbiguousChoiceParser<>(
+                    new SequenceParser(TokenType.TYPE_REFERENCE, typeParser, TokenType.ASSIGN, valueSetParser),
+                    new SequenceParser(new SingleTokenParser(TokenType.OBJECT_SET_REFERENCE, Context.OBJECT_SET),
+                            definedObjectClassParser, TokenType.ASSIGN, objectSetParser)).parse();
+
+            Optional<List<Object>> first = rules.stream().findFirst();
+
+            if (first.isPresent()) {
+                Token token = (Token) first.get().get(0);
+                ValueSetTypeOrObjectSetAssignmentNode rule =
+                        new ValueSetTypeOrObjectSetAssignmentNode(token.getPosition(), token.getText());
+
+                rules.stream().forEach(r -> {
+                    TokenType tokenType = ((Token) r.get(0)).getType();
+
+                    switch (tokenType) {
+                        case TYPE_REFERENCE:
+                            rule.setValueSetTypeAssignment(new ValueSetTypeAssignmentNode(rule.getPosition(),
+                                    rule.getReference(), (Type) r.get(1), (SetSpecsNode) r.get(3)));
+                            break;
+                        case OBJECT_SET_REFERENCE:
+                            rule.setObjectSetAssignment(new ObjectSetAssignmentNode(rule.getPosition(),
+                                    rule.getReference(), (ObjectClassReference) r.get(1), (SetSpecsNode) r.get(3)));
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected token type: " + tokenType.toString());
+                    }
+                });
+
+                return rule;
+            }
+
+            return null;
         }
 
     }
