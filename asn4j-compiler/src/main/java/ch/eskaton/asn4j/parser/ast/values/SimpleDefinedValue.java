@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.parser.ast.values;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
-import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 
 import java.util.List;
@@ -72,7 +72,7 @@ public class SimpleDefinedValue extends DefinedValue implements ParameterizedNod
 
     @Override
     public ObjectNode toObjectValue() {
-        ObjectReferenceNode ref = new ObjectReferenceNode(getPosition(), value);
+        ObjectReference ref = new ObjectReference(getPosition(), value);
         ref.setParameters(parameters);
         return ref;
     }

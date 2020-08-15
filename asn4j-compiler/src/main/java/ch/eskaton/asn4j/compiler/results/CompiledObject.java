@@ -25,40 +25,56 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-public class ObjectReference extends ReferencedObjectsNode implements ParameterizedNode {
+public class CompiledObject implements CompilationResult {
 
-    private String reference;
+    private String name;
 
-    private List<Node> parameters;
+    private final Map<String, Object> objectDefinition;
 
-    public ObjectReference(Position position, String reference) {
-        super(position);
-
-        this.reference = reference;
+    public CompiledObject(String name, Map<String, Object> objectDefinition) {
+        this.name = name;
+        this.objectDefinition = objectDefinition;
     }
 
-    public void setParameters(List<Node> parameters) {
-        this.parameters = parameters;
+    public String getName() {
+        return name;
     }
 
-    public List<Node> getParameters() {
-        return parameters;
+    public Map<String, Object> getObjectDefinition() {
+        return objectDefinition;
     }
 
-    public ObjectReference parameters(List<Node> parameters) {
-        setParameters(parameters);
-
-        return this;
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
-    public String getReference() {
-        return reference;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CompiledObject that = (CompiledObject) o;
+
+        return Objects.equals(name, that.name) &&
+                Objects.equals(objectDefinition, that.objectDefinition);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, objectDefinition);
     }
 
 }

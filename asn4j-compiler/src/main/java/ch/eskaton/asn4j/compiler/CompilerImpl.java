@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
+import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -45,6 +46,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -165,6 +167,7 @@ public class CompilerImpl {
         } else if (assignment instanceof ValueSetTypeOrObjectSetAssignmentNode) {
             return compileValueSetTypeOrObjectSetAssignmentNode((ValueSetTypeOrObjectSetAssignmentNode) assignment);
         }
+
         return null;
     }
 
@@ -184,8 +187,7 @@ public class CompilerImpl {
 
             type.setConstraints(List.of(new SubtypeConstraint(valueSet.getPosition(), (ElementSetSpecsNode) valueSet)));
 
-            var typeAssignment = new TypeAssignmentNode(assignment.getPosition(), assignment.getReference(),
-                    (Type) node);
+            var typeAssignment = new TypeAssignmentNode(assignment.getPosition(), assignment.getReference(), node);
 
             return compileAssignment(typeAssignment);
         } else {
@@ -203,9 +205,14 @@ public class CompilerImpl {
                 .compile(compilerContext, assignment);
     }
 
+    private CompiledObject compileObjectAssignment(ObjectAssignmentNode assignment) {
+        return compilerContext.<ObjectAssignmentNode, ObjectAssignmentCompiler>getCompiler(ObjectAssignmentNode.class)
+                .compile(compilerContext, assignment);
+    }
+
     private CompiledObjectSet compileObjectSetAssignment(ObjectSetAssignmentNode assignment) {
         return compilerContext.<ObjectSetAssignmentNode, ObjectSetAssignmentCompiler>getCompiler(ObjectSetAssignmentNode.class)
-                .compile(compilerContext, assignment);
+                .compile(assignment);
     }
 
     private CompilationResult compileParameterizedAssignment(ParameterizedAssignmentNode assignment) {
@@ -300,6 +307,18 @@ public class CompilerImpl {
             assignments.peek().remove(assignment);
 
             return Optional.of(compileObjectClassAssignment(assignment));
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<CompiledObject> compileObject(String name) {
+        var assignment = compilerContext.getModule().getBody().getAssignment(name);
+
+        if (assignment != null && assignment instanceof ValueOrObjectAssignmentNode) {
+            var objectAssignment = ((ValueOrObjectAssignmentNode) assignment).getObjectAssignment();
+
+            return objectAssignment.map(this::compileObjectAssignment);
         }
 
         return Optional.empty();

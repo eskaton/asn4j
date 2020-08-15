@@ -80,7 +80,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
-import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
@@ -4546,17 +4546,17 @@ public class Parser {
     protected class DefinedObjectParser implements RuleParser<ObjectNode> {
 
         @SuppressWarnings("unchecked")
-        public ObjectReferenceNode parse() throws ParserException {
+        public ObjectReference parse() throws ParserException {
             Object rule = new ChoiceParser<>(externalObjectReferenceParser,
                     new SingleTokenParser(TokenType.IDENTIFIER)).parse();
 
             if (rule != null) {
                 if (rule instanceof ExternalObjectReferenceNode) {
-                    return (ObjectReferenceNode) rule;
+                    return (ObjectReference) rule;
                 } else {
                     Token token = (Token) rule;
 
-                    return new ObjectReferenceNode(token.getPosition(), token.getText());
+                    return new ObjectReference(token.getPosition(), token.getText());
                 }
             }
 
@@ -5361,9 +5361,9 @@ public class Parser {
     protected class ParameterizedObjectParser extends ListRuleParser<ObjectNode> {
 
         @SuppressWarnings("unchecked")
-        public ObjectReferenceNode parse() throws ParserException {
-            return (ObjectReferenceNode) super.parse(new SequenceParser(definedObjectParser, actualParameterListParser),
-                    a -> (a.<ObjectReferenceNode>n0()).parameters(a.n1()));
+        public ObjectReference parse() throws ParserException {
+            return (ObjectReference) super.parse(new SequenceParser(definedObjectParser, actualParameterListParser),
+                    a -> (a.<ObjectReference>n0()).parameters(a.n1()));
         }
 
     }
