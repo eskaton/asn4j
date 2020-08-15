@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;

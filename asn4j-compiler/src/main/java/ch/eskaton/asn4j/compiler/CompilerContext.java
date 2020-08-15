@@ -1136,14 +1136,10 @@ public class CompilerContext {
         if (reference instanceof ExternalValueReference) {
             maybeAssignment = Optional.of(resolveExternalReference(((ExternalValueReference) reference)));
 
-            if (maybeAssignment.isPresent()) {
-                return maybeAssignment.get().getValueAssignment();
-            }
+            return maybeAssignment.get().getValueAssignment();
         } else {
             return tryResolveValueReference(reference.getValue());
         }
-
-        return Optional.empty();
     }
 
     public Optional<ValueAssignmentNode> tryResolveValueReference(String symbolName) {

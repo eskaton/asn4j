@@ -49,7 +49,6 @@ import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.commons.io.FileSourceInputStream;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -174,25 +173,29 @@ public class CompilerImpl {
     private CompilationResult compileValueSetTypeOrObjectSetAssignmentNode(ValueSetTypeOrObjectSetAssignmentNode assignment) {
         if (assignment.getValueSetTypeAssignment().isPresent()) {
             var valueSetTypeAssignment = assignment.getValueSetTypeAssignment().get();
-            var node = valueSetTypeAssignment.getType();
+            var type = valueSetTypeAssignment.getType();
 
             try {
-                compilerContext.resolveTypeReference(node);
+                // check whether node is a valid type
+                compilerContext.resolveTypeReference(type);
+
+                var valueSet = valueSetTypeAssignment.getValueSet();
+
+                type.setConstraints(List.of(new SubtypeConstraint(valueSet.getPosition(), (ElementSetSpecsNode) valueSet)));
+
+                var typeAssignment = new TypeAssignmentNode(assignment.getPosition(), assignment.getReference(), type);
+
+                return compileAssignment(typeAssignment);
             } catch (CompilerException e) {
-                return compileAssignment(assignment.getObjectSetAssignment().get());
+                // ignore
             }
+        }
 
-            var type = (Type) node;
-            var valueSet = valueSetTypeAssignment.getValueSet();
-
-            type.setConstraints(List.of(new SubtypeConstraint(valueSet.getPosition(), (ElementSetSpecsNode) valueSet)));
-
-            var typeAssignment = new TypeAssignmentNode(assignment.getPosition(), assignment.getReference(), node);
-
-            return compileAssignment(typeAssignment);
-        } else {
+        if (assignment.getObjectSetAssignment().isPresent()) {
             return compileAssignment(assignment.getObjectSetAssignment().get());
         }
+
+        return null;
     }
 
     private CompiledType compileTypeAssignment(TypeAssignmentNode assignment) {
@@ -315,7 +318,7 @@ public class CompilerImpl {
     public Optional<CompiledObject> compileObject(String name) {
         var assignment = compilerContext.getModule().getBody().getAssignment(name);
 
-        if (assignment != null && assignment instanceof ValueOrObjectAssignmentNode) {
+        if (assignment instanceof ValueOrObjectAssignmentNode) {
             var objectAssignment = ((ValueOrObjectAssignmentNode) assignment).getObjectAssignment();
 
             return objectAssignment.map(this::compileObjectAssignment);
