@@ -29,11 +29,26 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class ObjectAssignmentNode extends ValueOrObjectAssignmentNode<ObjectClassReference, ObjectNode> {
+public class ObjectAssignmentNode extends AssignmentNode {
 
-    public ObjectAssignmentNode(Position position, String reference, ObjectClassReference objectClass,
+    private ObjectClassReference objectClassReference;
+
+    private ObjectNode object;
+
+    public ObjectAssignmentNode(Position position, String reference, ObjectClassReference objectClassReference,
             ObjectNode object) {
-        super(position, reference, objectClass, object);
+        super(position, reference);
+
+        this.objectClassReference = objectClassReference;
+        this.object = object;
+    }
+
+    public ObjectClassReference getObjectClassReference() {
+        return objectClassReference;
+    }
+
+    public ObjectNode getObject() {
+        return object;
     }
 
 }

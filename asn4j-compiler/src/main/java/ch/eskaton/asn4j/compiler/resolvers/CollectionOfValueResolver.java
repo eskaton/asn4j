@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
@@ -56,9 +57,9 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
     }
 
     @Override
-    protected CollectionOfValue resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
-        Type type = (Type) valueAssignment.getType();
-        Value value = (Value) valueAssignment.getValue();
+    protected CollectionOfValue resolve(ValueAssignmentNode valueAssignment) {
+        Type type = valueAssignment.getType();
+        Value value = valueAssignment.getValue();
 
         return resolveGeneric(type, value);
     }

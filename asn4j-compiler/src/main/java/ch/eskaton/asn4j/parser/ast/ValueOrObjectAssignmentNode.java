@@ -29,25 +29,32 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class ValueOrObjectAssignmentNode<T extends Node, V extends Node> extends AssignmentNode {
+import java.util.Optional;
 
-    private T type;
+public class ValueOrObjectAssignmentNode extends AssignmentNode {
 
-    private V value;
+    private Optional<ValueAssignmentNode> valueAssignment = Optional.empty();
 
-    public ValueOrObjectAssignmentNode(Position position, String reference, T type, V value) {
+    private Optional<ObjectAssignmentNode> objectAssignment = Optional.empty();
+
+    public ValueOrObjectAssignmentNode(Position position, String reference) {
         super(position, reference);
-
-        this.type = type;
-        this.value = value;
     }
 
-    public T getType() {
-        return type;
+    public Optional<ValueAssignmentNode> getValueAssignment() {
+        return valueAssignment;
     }
 
-    public V getValue() {
-        return value;
+    public void setValueAssignment(ValueAssignmentNode valueAssignment) {
+        this.valueAssignment = Optional.ofNullable(valueAssignment);
+    }
+
+    public Optional<ObjectAssignmentNode> getObjectAssignment() {
+        return objectAssignment;
+    }
+
+    public void setObjectAssignment(ObjectAssignmentNode objectAssignment) {
+        this.objectAssignment = Optional.ofNullable(objectAssignment);
     }
 
 }
