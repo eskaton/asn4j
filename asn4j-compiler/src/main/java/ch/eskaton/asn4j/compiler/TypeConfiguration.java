@@ -97,8 +97,10 @@ import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeReferenceTypeNameSupplier
 import ch.eskaton.asn4j.parser.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
@@ -319,7 +321,9 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(ObjectClassDefn.class, new ObjectClassDefnCompiler()));
         types.add(new TypeDefinition<>(FieldSpecNode.class, new FieldSpecNodeCompiler()));
         types.add(new TypeDefinition<>(TypeFieldSpecNode.class, new TypeFieldSpecNodeCompiler()));
-        types.add(new TypeDefinition<>(ObjectSetAssignmentNode.class, new ObjectSetAssignmentCompiler()));
+        types.add(new TypeDefinition<>(ObjectSetAssignmentNode.class, new ObjectSetAssignmentCompiler(ctx)));
+        types.add(new TypeDefinition<>(ObjectAssignmentNode.class, new ObjectAssignmentCompiler()));
+        types.add(new TypeDefinition<>(ObjectDefnNode.class, new ObjectDefnCompiler(ctx)));
     }
 
     public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> typeClass) {

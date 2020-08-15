@@ -44,6 +44,7 @@ import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
+import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -57,6 +58,7 @@ import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
+import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
@@ -116,6 +118,8 @@ public class CompilerContext {
 
     private HashMap<String, HashMap<String, CompiledType>> definedTypes = new HashMap<>();
 
+    private HashMap<String, HashMap<String, CompiledObject>> definedObjects = new HashMap<>();
+
     private HashMap<String, HashMap<String, CompiledObjectClass>> definedObjectClasses = new HashMap<>();
 
     private HashMap<String, HashMap<String, CompiledObjectSet>> definedObjectSets = new HashMap<>();
@@ -166,6 +170,12 @@ public class CompilerContext {
         var definedObjectSets = getObjectSetsOfCurrentModule();
 
         definedObjectSets.put(objectSetName, compiledObjectSet);
+    }
+
+    private void addObject(String objectName, CompiledObject compiledObject) {
+        var definedObjectSets = getObjectsOfCurrentModule();
+
+        definedObjectSets.put(objectName, compiledObject);
     }
 
     @SuppressWarnings("unchecked")
@@ -239,7 +249,7 @@ public class CompilerContext {
     }
 
     public void pushModule(String moduleName) {
-        currentModule.push(modules.get(moduleName));
+        pushModule(modules.get(moduleName));
     }
 
     public void popModule() {
@@ -296,7 +306,7 @@ public class CompilerContext {
     public String getTypeName(Type type, String name) {
         if (type instanceof ObjectClassFieldTypeNode) {
             var reference = ((ObjectClassFieldTypeNode) type).getObjectClass().getReference();
-            var compiledObjectClass = this.getCompiledObjectClass(reference);
+            var compiledObjectClass = getCompiledObjectClass(reference);
             var field = compiledObjectClass.getField(name);
 
             if (field.isPresent() && field.get() instanceof CompiledFixedTypeValueField) {
@@ -557,6 +567,52 @@ public class CompilerContext {
     }
 
     /**
+     * Looks up the compiled object for the given object reference. The object may be compiled if it isn't already.
+     *
+     * @param objectReference an object reference
+     * @return a compiled object
+     */
+    public CompiledObject getCompiledObject(ObjectReference objectReference) {
+        var reference = objectReference.getReference();
+
+        return getCompiledObject(reference);
+    }
+
+    private CompiledObject getCompiledObject(String reference) {
+        var moduleObjects = getObjectsOfCurrentModule();
+        var compiledObject = Optional.ofNullable(moduleObjects.get(reference));
+
+        if (compiledObject.isEmpty()) {
+            compiledObject = compiler.compileObject(reference);
+        }
+
+        if (compiledObject.isEmpty()) {
+            Optional<ImportNode> imp = getImport(reference);
+
+            if (imp.isPresent()) {
+                String moduleName = imp.get().getReference().getName();
+                ModuleNode module = getModule(moduleName);
+
+                if (!isSymbolExported(module, reference)) {
+                    String format = "Module %s uses the object %s from module %s which the latter doesn't export";
+
+                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
+                }
+
+                pushModule(module);
+
+                try {
+                    compiledObject = Optional.ofNullable(getCompiledObject(reference));
+                } finally {
+                    popModule();
+                }
+            }
+        }
+
+        return compiledObject.orElseThrow(() -> new CompilerException("Failed to resolve object %s", reference));
+    }
+
+    /**
      * Looks up the compiled object class for the given object class reference. The object class may be compiled if it
      * isn't already.
      *
@@ -612,7 +668,7 @@ public class CompilerContext {
         return getCompiledObjectSet(reference);
     }
 
-    private CompiledObjectSet getCompiledObjectSet(String reference) {
+    public CompiledObjectSet getCompiledObjectSet(String reference) {
         var moduleObjectSets = getObjectSetsOfCurrentModule();
         var compiledObjectSets = Optional.ofNullable(moduleObjectSets.get(reference));
 
@@ -633,7 +689,7 @@ public class CompilerContext {
                     throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
                 }
 
-                moduleObjectSets = definedObjectSets.get(moduleName);
+                moduleObjectSets = getObjectSetsOfModule(moduleName);
                 compiledObjectSets = Optional.ofNullable(moduleObjectSets.get(reference));
             }
         }
@@ -758,12 +814,20 @@ public class CompilerContext {
         return definedTypes.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
     }
 
+    private HashMap<String, CompiledObject> getObjectsOfCurrentModule() {
+        return definedObjects.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
+    }
+
     private HashMap<String, CompiledObjectClass> getObjectClassesOfCurrentModule() {
         return definedObjectClasses.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
     }
 
     private HashMap<String, CompiledObjectSet> getObjectSetsOfCurrentModule() {
-        return definedObjectSets.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
+        return getObjectSetsOfModule(getCurrentModuleName());
+    }
+
+    private HashMap<String, CompiledObjectSet> getObjectSetsOfModule(String moduleName) {
+        return definedObjectSets.computeIfAbsent(moduleName, key -> new HashMap<>());
     }
 
     private String getCurrentModuleName() {
@@ -894,6 +958,14 @@ public class CompilerContext {
         addObjectSet(name, compiledObjectSet);
 
         return compiledObjectSet;
+    }
+
+    public CompiledObject createCompiledObjectSet(String name, Map<String, Object> objectDefinition) {
+        var compiledObject = new CompiledObject(name, objectDefinition);
+
+        addObject(name, compiledObject);
+
+        return compiledObject;
     }
 
     public <T extends CompiledType & HasChildComponents> Optional<T> findCompiledTypeRecursive(Type type) {

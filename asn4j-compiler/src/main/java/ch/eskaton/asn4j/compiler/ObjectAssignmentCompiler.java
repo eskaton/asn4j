@@ -25,40 +25,30 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.compiler.results.CompiledObject;
+import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 
-import java.util.List;
+public class ObjectAssignmentCompiler implements Compiler<ObjectAssignmentNode> {
 
-public class ObjectReference extends ReferencedObjectsNode implements ParameterizedNode {
+    public CompiledObject compile(CompilerContext ctx, ObjectAssignmentNode node) {
+        String objectName = node.getReference();
 
-    private String reference;
+        System.out.println("Compiling object " + objectName);
 
-    private List<Node> parameters;
+        var objectClass = ctx.getCompiledObjectClass(node.getObjectClassReference());
+        var object = node.getObject();
 
-    public ObjectReference(Position position, String reference) {
-        super(position);
+        if (object instanceof ObjectDefnNode objectDefnNode) {
+            var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
+            var objectDefinition = compiler.compile(objectClass, objectDefnNode);
 
-        this.reference = reference;
-    }
-
-    public void setParameters(List<Node> parameters) {
-        this.parameters = parameters;
-    }
-
-    public List<Node> getParameters() {
-        return parameters;
-    }
-
-    public ObjectReference parameters(List<Node> parameters) {
-        setParameters(parameters);
-
-        return this;
-    }
-
-    public String getReference() {
-        return reference;
+            return ctx.createCompiledObjectSet(objectName, objectDefinition);
+        } else {
+            throw new IllegalCompilerStateException("Node type %s not yet supported", object.getClass().getSimpleName());
+        }
     }
 
 }

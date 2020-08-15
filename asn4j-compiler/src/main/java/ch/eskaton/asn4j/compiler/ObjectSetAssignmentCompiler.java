@@ -30,32 +30,29 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
-import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
-import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
-import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
+import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Sets;
-import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignmentNode> {
 
     private CompilerContext ctx;
 
-    public CompiledObjectSet compile(CompilerContext ctx, ObjectSetAssignmentNode node) {
+    public ObjectSetAssignmentCompiler(CompilerContext ctx) {
         this.ctx = ctx;
+    }
 
+    public CompiledObjectSet compile(ObjectSetAssignmentNode node) {
         var objectClassReference = node.getObjectClassReference();
         var objectSet = node.getObjectSet();
         var objectSetName = node.getReference();
@@ -157,76 +154,14 @@ public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignment
     private Map<String, Object> compile(CompiledObjectClass objectClass, ObjectSetElements elements) {
         var element = elements.getElement();
 
-        if (element instanceof ObjectDefnNode) {
-            return compile(objectClass, (ObjectDefnNode) element);
+        if (element instanceof ObjectDefnNode objectDefn) {
+            return ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class)
+                    .compile(objectClass, objectDefn);
+        } else if (element instanceof ObjectReference objectReference) {
+            return ctx.getCompiledObject(objectReference).getObjectDefinition();
         } else {
             throw new CompilerException(elements.getPosition(), "Unsupported element: %s",
                     element.getClass().getSimpleName());
-        }
-    }
-
-    private Map<String, Object> compile(CompiledObjectClass objectClass, ObjectDefnNode element) {
-        var syntax = element.getSyntax();
-
-        if (syntax instanceof DefaultSyntaxNode) {
-            return compile(objectClass, (DefaultSyntaxNode) syntax);
-        } else {
-            throw new CompilerException(syntax.getPosition(), "Unsupported syntax: %s",
-                    syntax.getClass().getSimpleName());
-        }
-    }
-
-    private Map<String, Object> compile(CompiledObjectClass objectClass, DefaultSyntaxNode syntaxNode) {
-        var values = syntaxNode.getFieldSetting().stream()
-                .map(setting -> compile(objectClass, setting))
-                .collect(Collectors.toMap(Tuple2::get_1, Tuple2::get_2));
-        var fields = objectClass.getFields();
-
-        for (var field : fields) {
-            if (!field.isOptional()) {
-                var fieldName = field.getName();
-
-                if (!values.containsKey(fieldName)) {
-                    var defaultValue = field.getDefaultValue();
-
-                    if (defaultValue != null) {
-                        values.put(fieldName, defaultValue);
-                    } else {
-                        throw new CompilerException(syntaxNode.getPosition(), "Field '%s' is mandatory", fieldName);
-                    }
-                }
-            }
-        }
-
-        return values;
-    }
-
-    private Tuple2<String, Object> compile(CompiledObjectClass objectClass, FieldSettingNode fieldSettingNode) {
-        var fieldName = fieldSettingNode.getFieldName();
-        var reference = fieldName.getReference();
-        var maybeField = objectClass.getField(reference);
-
-        if (maybeField.isPresent()) {
-            var field = maybeField.get();
-
-            if (field instanceof CompiledFixedTypeValueField) {
-                var compiledField = (CompiledFixedTypeValueField) field;
-                var type = compiledField.getCompiledType().getType();
-                var setting = fieldSettingNode.getSetting();
-                var value = (Value) setting;
-
-                return Tuple2.of(reference, ctx.resolveGenericValue(ctx.getValueType(type), type, value));
-            } else if (field instanceof CompiledTypeField) {
-                var setting = fieldSettingNode.getSetting();
-                var type = (Type) setting;
-
-                return Tuple2.of(reference, ctx.getCompiledType(type));
-            } else {
-                throw new IllegalCompilerStateException("Unsupported field of type %s",
-                        field.getClass().getSimpleName());
-            }
-        } else {
-            throw new CompilerException(fieldSettingNode.getPosition(), "Invalid reference %s", reference);
         }
     }
 

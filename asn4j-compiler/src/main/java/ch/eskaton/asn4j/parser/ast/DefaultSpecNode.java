@@ -66,7 +66,7 @@ public class DefaultSpecNode extends DefaultOptionalitySpecNode<Node> {
                 }
 
                 SimpleDefinedValue valueRef = (SimpleDefinedValue) spec;
-                ObjectReferenceNode objectRef = new ObjectReferenceNode(getPosition(), valueRef.getValue());
+                ObjectReference objectRef = new ObjectReference(getPosition(), valueRef.getValue());
                 objectRef.setParameters(valueRef.getParameters());
 
                 return new DefaultObjectSpecNode(getPosition(), objectRef);

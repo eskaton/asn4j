@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +59,32 @@ public class CompiledObjectClass implements CompilationResult {
 
     public List<AbstractCompiledField> getFields() {
         return Collections.unmodifiableList(fields);
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CompiledObjectClass that = (CompiledObjectClass) o;
+
+        return Objects.equals(name, that.name) &&
+                Objects.equals(fields, that.fields);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, fields);
     }
 
 }

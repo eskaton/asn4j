@@ -27,8 +27,10 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.utils.ReflectionUtils;
 import ch.eskaton.commons.utils.Utils;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
@@ -38,6 +40,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
@@ -56,6 +60,8 @@ import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static ch.eskaton.asn4j.test.TestUtils.module;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class CompilerImplTest {
 
@@ -189,77 +195,42 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, ".*Failed to resolve an INTEGER value.*");
     }
 
-//    @Test
-//    void test() throws IOException, ParserException {
-//        var body = """
-//                TEST ::= CLASS {
-//                    &id   INTEGER UNIQUE,
-//                    &desc VisibleString
-//                }
-//
-//                TestSet TEST ::= {
-//                      {&id 1, &desc "Description1"}
-//                    | {&id 2, &desc "Description2"}
-//                }
-//
-//                TestSequence1 ::= SEQUENCE {
-//                --    string VisibleString (SIZE(1..4)),
-//                    id TEST.&id ({TestSet})
-//                }
-//                """;
-//
-//        var module = module("TEST-MODULE", body);
-//
-//        new CompilerImpl().loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
-//    }
+    @Test
+    void testObjects() throws IOException, ParserException, InvocationTargetException, IllegalAccessException {
+        var body = """
+                TEST ::= CLASS {
+                    &booleanField  BOOLEAN,
+                    &intField      INTEGER
+                }
 
-//    @Test
-//    void testObjectSetDuplicateValueClass() throws IOException, ParserException {
-//        var body = """
-//                String ::= VisibleString (SIZE (1..10))
-//
-//                PRODUCT ::= CLASS {
-//                    &code	        INTEGER UNIQUE OPTIONAL,
-//                    &description    String DEFAULT "test",
-//                    &price	        REAL OPTIONAL,
-//                    &Type           DEFAULT INTEGER
-//                }
-//
-//                ProductCatalog PRODUCT ::= {
-//                      {&code 101, &description "iPhone v4", &price 250.00}
-//                    | {&code 102, &description "iPhone v4", &Type BIT STRING}
-//                    | {&description "iPhone v4", &Type BIT STRING}
-//                }
-//
-//                """;
-//
-//        var module = module("TEST-MODULE", body);
-//
-//        new CompilerImpl().loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
-//    }
+                testObject1 TEST ::= {
+                    &booleanField  FALSE,
+                    &intField      23
+                }
 
-//    @Test
-//    void testObjectClass() throws IOException, ParserException {
-//        var body = """
-//                String ::= VisibleString (SIZE (1..10))
-//
-//                PRODUCT ::= CLASS {
-//                    &code	        INTEGER UNIQUE,
-//                    &description    String DEFAULT "test",
-//                    &price	        REAL OPTIONAL
-//                }
-//
-//                ProductCatalog PRODUCT ::= {
-//                    ({&code 101, &description "iPhone v4", &price 250.00} |
-//                    {&code 102, &description "iPhone v5", &price 250.00}) EXCEPT {&code 101, &description "iPhone v4", &price 250.00}
-//                }
-//
-//                """;
-//
-//        var module = module("TEST-MODULE", body);
-//
-//        new CompilerImpl().loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
-//    }
+                testObject2 TEST ::= {
+                    &booleanField  TRUE,
+                    &intField      47
+                }
+
+                TestSet TEST ::= {
+                    testObject1 | testObject2
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectSets = (HashMap<String, CompiledObjectSet>) ReflectionUtils
+                .invokePrivateMethod(ctx, "getObjectSetsOfModule", new Object[] { "TEST-MODULE" });
+        var objectSet = objectSets.get("TestSet");
+
+        assertNotNull(objectSet);
+        assertEquals(2, objectSet.getValues().size());
+    }
 
     private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);

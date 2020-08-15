@@ -294,7 +294,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
-import ch.eskaton.asn4j.parser.ast.ObjectReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
@@ -4853,7 +4853,7 @@ class ParserTest {
         DefinedObjectParser parser = new Parser(new ByteArrayInputStream(
                 "object".getBytes())).new DefinedObjectParser();
 
-        ObjectReferenceNode result = parser.parse();
+        ObjectReference result = parser.parse();
 
         assertNotNull(result);
         assertEquals("object", result.getReference());
@@ -5414,7 +5414,7 @@ class ParserTest {
         assertNotNull(result);
         assertTrue(result instanceof DefaultSpecNode);
         assertNotNull(((DefaultSpecNode) result).toDefaultObjectSpec());
-        assertTrue((((DefaultSpecNode) result).toDefaultObjectSpec()).getSpec() instanceof ObjectReferenceNode);
+        assertTrue((((DefaultSpecNode) result).toDefaultObjectSpec()).getSpec() instanceof ObjectReference);
     }
 
     // TODO: Use a different parser then FixedTypeValueSetFieldSpecParser or consolidate
@@ -5739,8 +5739,8 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectReferenceNode);
-        assertNotNull(((ObjectReferenceNode) result).getParameters());
+        assertTrue(result instanceof ObjectReference);
+        assertNotNull(((ObjectReference) result).getParameters());
     }
 
     @Test
@@ -6170,8 +6170,8 @@ class ParserTest {
         Node result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectReferenceNode);
-        assertNull(((ObjectReferenceNode) result).getParameters());
+        assertTrue(result instanceof ObjectReference);
+        assertNull(((ObjectReference) result).getParameters());
 
         parser = new Parser(new ByteArrayInputStream(
                 "object-reference {Object}".getBytes())).new ReferencedObjectsParser();
@@ -6179,8 +6179,8 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectReferenceNode);
-        assertNotNull(((ObjectReferenceNode) result).getParameters());
+        assertTrue(result instanceof ObjectReference);
+        assertNotNull(((ObjectReference) result).getParameters());
 
         parser = new Parser(new ByteArrayInputStream(
                 "ObjectSet-Reference".getBytes())).new ReferencedObjectsParser();
@@ -6635,7 +6635,7 @@ class ParserTest {
         assertTrue(result instanceof ParameterizedObjectAssignmentNode);
         assertTrue(((ParameterizedObjectAssignmentNode) result).getType() instanceof ObjectClassReference);
         assertEquals(1, result.getParameters().size());
-        assertTrue(((ParameterizedObjectAssignmentNode) result).getValue() instanceof ObjectReferenceNode);
+        assertTrue(((ParameterizedObjectAssignmentNode) result).getValue() instanceof ObjectReference);
 
         parser = new Parser(new ByteArrayInputStream(
                 "object{A-CLASS:class} A-CLASS ::= {ARGUMENT value.&Type}"
@@ -6900,7 +6900,7 @@ class ParserTest {
         ParameterizedObjectParser parser = new Parser(new ByteArrayInputStream(
                 "object {INTEGER}".getBytes())).new ParameterizedObjectParser();
 
-        ObjectReferenceNode result = parser.parse();
+        ObjectReference result = parser.parse();
 
         assertNotNull(result);
         assertEquals("object", result.getReference());
