@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -71,8 +70,8 @@ public abstract class AbstractValueResolver<V extends Value> implements ValueRes
     }
 
     protected V resolve(ValueAssignmentNode valueAssignment) {
-          Type type = (Type) valueAssignment.getType();
-        Value value = (Value) valueAssignment.getValue();
+        var type = valueAssignment.getType();
+        var value = valueAssignment.getValue();
 
         return resolveGeneric(type, value);
     }

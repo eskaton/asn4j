@@ -133,7 +133,7 @@ public class ConstraintChecks {
         return value.length == length;
     }
 
-    public static boolean checkMinSize(Collection values, long min) {
+    public static boolean checkMinSize(Collection<?> values, long min) {
         if (values == null) {
             return false;
         }
@@ -141,7 +141,7 @@ public class ConstraintChecks {
         return values.size() >= min;
     }
 
-    public static boolean checkMaxSize(Collection values, long max) {
+    public static boolean checkMaxSize(Collection<?> values, long max) {
         if (values == null) {
             return false;
         }
@@ -149,7 +149,7 @@ public class ConstraintChecks {
         return values.size() <= max;
     }
 
-    public static boolean checkSizeEquals(Collection values, long size) {
+    public static boolean checkSizeEquals(Collection<?> values, long size) {
         if (values == null) {
             return false;
         }
