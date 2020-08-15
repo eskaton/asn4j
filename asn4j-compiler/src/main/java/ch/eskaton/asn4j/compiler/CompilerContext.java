@@ -44,6 +44,7 @@ import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
+import ch.eskaton.asn4j.compiler.results.CompiledModule;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
@@ -116,13 +117,7 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
 
 public class CompilerContext {
 
-    private HashMap<String, HashMap<String, CompiledType>> definedTypes = new HashMap<>();
-
-    private HashMap<String, HashMap<String, CompiledObject>> definedObjects = new HashMap<>();
-
-    private HashMap<String, HashMap<String, CompiledObjectClass>> definedObjectClasses = new HashMap<>();
-
-    private HashMap<String, HashMap<String, CompiledObjectSet>> definedObjectSets = new HashMap<>();
+    private HashMap<String, CompiledModule> definedModules = new HashMap<>();
 
     private TypeConfiguration config = new TypeConfiguration(this);
 
@@ -154,28 +149,28 @@ public class CompilerContext {
         this.outputDir = outputDir;
     }
 
-    private void addType(String typeName, CompiledType compiledType) {
-        var moduleTypes = getTypesOfCurrentModule();
+    private CompiledModule getCurrentCompiledModule() {
+        return getCompiledModule(getCurrentModuleName());
+    }
 
-        moduleTypes.put(typeName, compiledType);
+    private CompiledModule getCompiledModule(String moduleName) {
+        return definedModules.computeIfAbsent(moduleName, (key) -> new CompiledModule(key));
+    }
+
+    private void addType(String typeName, CompiledType compiledType) {
+        getCurrentCompiledModule().addType(typeName, compiledType);
     }
 
     private void addObjectClass(String objectClassName, CompiledObjectClass compiledObjectClass) {
-        var moduleObjectClasses = getObjectClassesOfCurrentModule();
-
-        moduleObjectClasses.put(objectClassName, compiledObjectClass);
+        getCurrentCompiledModule().addObjectClass(objectClassName, compiledObjectClass);
     }
 
     private void addObjectSet(String objectSetName, CompiledObjectSet compiledObjectSet) {
-        var definedObjectSets = getObjectSetsOfCurrentModule();
-
-        definedObjectSets.put(objectSetName, compiledObjectSet);
+        getCurrentCompiledModule().addObjectSet(objectSetName, compiledObjectSet);
     }
 
     private void addObject(String objectName, CompiledObject compiledObject) {
-        var definedObjectSets = getObjectsOfCurrentModule();
-
-        definedObjectSets.put(objectName, compiledObject);
+        getCurrentCompiledModule().addObject(objectName, compiledObject);
     }
 
     @SuppressWarnings("unchecked")
@@ -646,7 +641,7 @@ public class CompilerContext {
                     throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
                 }
 
-                moduleObjectClasses = definedObjectClasses.get(moduleName);
+                moduleObjectClasses = getObjectClassesOfModule(moduleName);
                 compiledObjectClass = Optional.ofNullable(moduleObjectClasses.get(reference));
             }
         }
@@ -709,7 +704,7 @@ public class CompilerContext {
     public CompiledType getCompiledType(Type type) {
         if (isResolvableReference(type)) {
             String typeName = ((TypeReference) type).getType();
-            HashMap<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
+            Map<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
             Optional<CompiledType> compiledType = Optional.ofNullable(moduleTypes.get(typeName));
 
             if (compiledType.isEmpty()) {
@@ -729,7 +724,7 @@ public class CompilerContext {
                                 typeName, moduleName);
                     }
 
-                    moduleTypes = definedTypes.get(moduleName);
+                    moduleTypes = getTypesOfModule(moduleName);
                     compiledType = Optional.ofNullable(moduleTypes.get(typeName));
                 }
             }
@@ -810,24 +805,44 @@ public class CompilerContext {
         return type instanceof TypeReference && !(type instanceof UsefulType);
     }
 
-    private HashMap<String, CompiledType> getTypesOfCurrentModule() {
-        return definedTypes.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
+    private Map<String, CompiledType> getTypesOfCurrentModule() {
+        return getTypesOfModule(getCurrentModuleName());
     }
 
-    private HashMap<String, CompiledObject> getObjectsOfCurrentModule() {
-        return definedObjects.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
+    private Map<String, CompiledType> getTypesOfModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getTypes)
+                .orElseGet(Map::of);
     }
 
-    private HashMap<String, CompiledObjectClass> getObjectClassesOfCurrentModule() {
-        return definedObjectClasses.computeIfAbsent(getCurrentModuleName(), key -> new HashMap<>());
+    private Map<String, CompiledObject> getObjectsOfCurrentModule() {
+        return getObjectsOfModule(getCurrentModuleName());
     }
 
-    private HashMap<String, CompiledObjectSet> getObjectSetsOfCurrentModule() {
+    private Map<String, CompiledObject> getObjectsOfModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getObjects)
+                .orElseGet(Map::of);
+    }
+
+    private Map<String, CompiledObjectClass> getObjectClassesOfCurrentModule() {
+        return getObjectClassesOfModule(getCurrentModuleName());
+    }
+
+    private Map<String, CompiledObjectClass> getObjectClassesOfModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getObjectClasses)
+                .orElseGet(Map::of);
+    }
+
+    private Map<String, CompiledObjectSet> getObjectSetsOfCurrentModule() {
         return getObjectSetsOfModule(getCurrentModuleName());
     }
 
-    private HashMap<String, CompiledObjectSet> getObjectSetsOfModule(String moduleName) {
-        return definedObjectSets.computeIfAbsent(moduleName, key -> new HashMap<>());
+    private Map<String, CompiledObjectSet> getObjectSetsOfModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getObjectSets)
+                .orElseGet(Map::of);
     }
 
     private String getCurrentModuleName() {

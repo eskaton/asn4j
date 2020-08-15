@@ -41,7 +41,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
@@ -224,7 +224,7 @@ class CompilerImplTest {
         compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
 
         var ctx = compiler.getCompilerContext();
-        var objectSets = (HashMap<String, CompiledObjectSet>) ReflectionUtils
+        var objectSets = (Map<String, CompiledObjectSet>) ReflectionUtils
                 .invokePrivateMethod(ctx, "getObjectSetsOfModule", new Object[] { "TEST-MODULE" });
         var objectSet = objectSets.get("TestSet");
 
