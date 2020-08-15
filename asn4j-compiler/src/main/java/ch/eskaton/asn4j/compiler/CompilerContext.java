@@ -60,6 +60,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
@@ -996,12 +997,20 @@ public class CompilerContext {
      * V A L U E  R E S O L V E R S
      ******************************************************************************************************************/
 
-    public ValueOrObjectAssignmentNode resolveDefinedValue(DefinedValue ref) {
+    public ValueAssignmentNode resolveDefinedValue(DefinedValue ref) {
+        ValueOrObjectAssignmentNode assigment;
+
         if (ref instanceof ExternalValueReference) {
-            return resolveExternalReference(((ExternalValueReference) ref));
+            assigment = resolveExternalReference(((ExternalValueReference) ref));
         } else {
             return resolveValueReference(((SimpleDefinedValue) ref));
         }
+
+        if (assigment.getValueAssignment().isPresent()) {
+            return assigment.getValueAssignment().get();
+        }
+
+        throw new CompilerException(ref.getPosition(), "%s doesn't refer to a value");
     }
 
     private ValueOrObjectAssignmentNode resolveExternalReference(ExternalValueReference reference) {
@@ -1023,12 +1032,12 @@ public class CompilerContext {
             throw new CompilerException("Failed to resolve reference " + reference);
         }
 
-        return (ValueOrObjectAssignmentNode<?, ?>) assignment;
+        return (ValueOrObjectAssignmentNode) assignment;
     }
 
-    public Optional<ValueOrObjectAssignmentNode> tryResolveAllValueReferences(SimpleDefinedValue reference) {
-        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveValueReference(reference);
-        Optional<ValueOrObjectAssignmentNode> tmpAssignment = assignment;
+    public Optional<ValueAssignmentNode> tryResolveAllValueReferences(SimpleDefinedValue reference) {
+        Optional<ValueAssignmentNode> assignment = tryResolveValueReference(reference);
+        Optional<ValueAssignmentNode> tmpAssignment = assignment;
 
         while (tmpAssignment.isPresent()) {
             assignment = tmpAssignment;
@@ -1049,15 +1058,23 @@ public class CompilerContext {
         return assignment;
     }
 
-    public Optional<ValueOrObjectAssignmentNode> tryResolveValueReference(SimpleDefinedValue reference) {
+    public Optional<ValueAssignmentNode> tryResolveValueReference(SimpleDefinedValue reference) {
+        Optional<ValueOrObjectAssignmentNode> maybeAssignment;
+
         if (reference instanceof ExternalValueReference) {
-            return Optional.ofNullable(resolveExternalReference(((ExternalValueReference) reference)));
+            maybeAssignment = Optional.of(resolveExternalReference(((ExternalValueReference) reference)));
+
+            if (maybeAssignment.isPresent()) {
+                return maybeAssignment.get().getValueAssignment();
+            }
+        } else {
+            return tryResolveValueReference(reference.getValue());
         }
 
-        return tryResolveValueReference(reference.getValue());
+        return Optional.empty();
     }
 
-    public Optional<ValueOrObjectAssignmentNode> tryResolveValueReference(String symbolName) {
+    public Optional<ValueAssignmentNode> tryResolveValueReference(String symbolName) {
         AssignmentNode assignment = getModule().getBody().getAssignment(symbolName);
 
         if (assignment == null) {
@@ -1075,18 +1092,18 @@ public class CompilerContext {
         }
 
         if (assignment instanceof ValueOrObjectAssignmentNode) {
-            return Optional.of((ValueOrObjectAssignmentNode) assignment);
+            return ((ValueOrObjectAssignmentNode) assignment).getValueAssignment();
         }
 
         return Optional.empty();
     }
 
-    public ValueOrObjectAssignmentNode resolveValueReference(SimpleDefinedValue reference) {
+    public ValueAssignmentNode resolveValueReference(SimpleDefinedValue reference) {
         return resolveValueReference(reference.getValue());
     }
 
-    public ValueOrObjectAssignmentNode resolveValueReference(String symbolName) {
-        Optional<ValueOrObjectAssignmentNode> assignment = tryResolveValueReference(symbolName);
+    public ValueAssignmentNode resolveValueReference(String symbolName) {
+        Optional<ValueAssignmentNode> assignment = tryResolveValueReference(symbolName);
 
         if (!assignment.isPresent()) {
             throw new CompilerException("Failed to resolve reference " + symbolName);

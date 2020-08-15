@@ -3257,37 +3257,40 @@ public class Parser {
 
     // ValueAssignment ::= valuereference Type "::=" Value
     // ObjectAssignment ::= objectreference DefinedObjectClass "::=" Object
-    protected class ValueAssignmentParser extends ListRuleParser<ValueOrObjectAssignmentNode<?,?>> {
+    protected class ValueAssignmentParser implements RuleParser<ValueOrObjectAssignmentNode> {
 
         @SuppressWarnings("unchecked")
-        public ValueOrObjectAssignmentNode<?, ?> parse() throws ParserException {
-            return super.parse(new SequenceParser(new SingleTokenParser(TokenType.IDENTIFIER),
-                    new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser), TokenType.ASSIGN,
-                    new ChoiceParser<>(valueParser, objectParser)), a-> {
-                Node type = a.n1();
+        public ValueOrObjectAssignmentNode parse() throws ParserException {
+            Set<List<Object>> rules = new AmbiguousChoiceParser<>(
+                    new SequenceParser(TokenType.IDENTIFIER, typeParser, TokenType.ASSIGN, valueParser),
+                    new SequenceParser(TokenType.IDENTIFIER, definedObjectClassParser, TokenType.ASSIGN, objectParser)).parse();
 
-                if (type instanceof Type) {
-                    if (type instanceof SimpleDefinedType) {
-                        if (type instanceof UsefulType) {
-                            return new ValueAssignmentNode(a.P0(), a.s0(), (Type) type, a.n3());
-                        } else {
-                            Node value = a.n3();
+            Optional<List<Object>> first = rules.stream().findFirst();
 
-                            if (value instanceof AbstractValue) {
-                                ((AbstractValue) value).setType((TypeReference) type);
-                            }
+            if (first.isPresent()) {
+                Token token = (Token) first.get().get(0);
 
-                            return new ValueOrObjectAssignmentNode<>(a.P0(), a.s0(), type, value);
-                        }
+                ValueOrObjectAssignmentNode rule =
+                        new ValueOrObjectAssignmentNode(token.getPosition(), token.getText());
+
+                rules.stream().forEach(r -> {
+                    Node node = ((Node) r.get(1));
+
+                    if (node instanceof Type) {
+                        rule.setValueAssignment(new ValueAssignmentNode(rule.getPosition(),
+                                rule.getReference(), (Type) r.get(1), (Value) r.get(3)));
+                    } else if (node instanceof ObjectClassReference){
+                        rule.setObjectAssignment(new ObjectAssignmentNode(rule.getPosition(),
+                                rule.getReference(), (ObjectClassReference) r.get(1), (ObjectNode) r.get(3)));
                     } else {
-                        return new ValueAssignmentNode(a.P0(), a.s0(), (Type) type, a.n3());
+                        throw new IllegalStateException("Unexpected type: " + node.getClass().getSimpleName());
                     }
-                } else if (type instanceof ObjectClassReference) {
-                    return new ObjectAssignmentNode(a.P0(), a.s0(), (ObjectClassReference) type, a.n3());
-                }
+                });
 
-                return new ValueOrObjectAssignmentNode<>(a.P0(), a.s0(), type, a.n3());
-            });
+                return rule;
+            }
+
+            return null;
         }
 
     }
@@ -3298,7 +3301,6 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public ValueSetTypeOrObjectSetAssignmentNode parse() throws ParserException {
-
             Set<List<Object>> rules = new AmbiguousChoiceParser<>(
                     new SequenceParser(TokenType.TYPE_REFERENCE, typeParser, TokenType.ASSIGN, valueSetParser),
                     new SequenceParser(new SingleTokenParser(TokenType.OBJECT_SET_REFERENCE, Context.OBJECT_SET),

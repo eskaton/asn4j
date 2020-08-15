@@ -287,6 +287,7 @@ import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.OIDNode;
+import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
@@ -327,6 +328,7 @@ import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.UpperEndpointNode;
 import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintNode;
 import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintParamNode;
+import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
@@ -861,7 +863,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result.get(0) instanceof TypeAssignmentNode);
-        assertTrue(result.get(1) instanceof ValueOrObjectAssignmentNode<?, ?>);
+        assertTrue(result.get(1) instanceof ValueOrObjectAssignmentNode);
     }
 
     @Test
@@ -880,7 +882,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ValueOrObjectAssignmentNode<?, ?>);
+        assertTrue(result instanceof ValueOrObjectAssignmentNode);
 
         parser = new Parser(new ByteArrayInputStream(
                 "Type-Reference INTEGER ::= { ALL EXCEPT (4..6) }".getBytes())).new AssignmentParser();
@@ -1011,9 +1013,13 @@ class ParserTest {
         ValueOrObjectAssignmentNode result = parser.parse();
 
         assertNotNull(result);
+        assertTrue(result.getValueAssignment().isPresent());
+
+        ValueAssignmentNode valueAssignment = result.getValueAssignment().get();
+
         assertEquals("value-reference", result.getReference());
-        assertTrue(result.getType() instanceof IntegerType);
-        assertTrue(result.getValue() instanceof IntegerValue);
+        assertTrue(valueAssignment.getType() instanceof IntegerType);
+        assertTrue(valueAssignment.getValue() instanceof IntegerValue);
 
         parser = new Parser(new ByteArrayInputStream(
                 "oid OBJECT IDENTIFIER ::= { oid-reference 23 }".getBytes())).new ValueAssignmentParser();
@@ -1021,9 +1027,13 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
+        assertTrue(result.getValueAssignment().isPresent());
+
+        valueAssignment = result.getValueAssignment().get();
+
         assertEquals("oid", result.getReference());
-        assertTrue(result.getType() instanceof ObjectIdentifier);
-        testAmbiguousValue(result.getValue(), ObjectIdentifierValue.class);
+        assertTrue(valueAssignment.getType() instanceof ObjectIdentifier);
+        testAmbiguousValue(valueAssignment.getValue(), ObjectIdentifierValue.class);
     }
 
     @Test
@@ -5687,10 +5697,13 @@ class ParserTest {
         ValueOrObjectAssignmentNode result = parser.parse();
 
         assertNotNull(result);
+        assertTrue(result.getObjectAssignment().isPresent());
+
+        ObjectAssignmentNode assignment = result.getObjectAssignment().get();
+
         assertEquals("invertMatrix", result.getReference());
-        assertTrue(result.getType() instanceof TypeReference);
-        assertEquals("OPERATION", ((TypeReference) result.getType()).getType());
-        assertTrue(result.getValue() instanceof ObjectDefnNode);
+        assertEquals("OPERATION", assignment.getObjectClassReference().getReference());
+        assertNotNull(assignment.getObject());
     }
 
     @Test

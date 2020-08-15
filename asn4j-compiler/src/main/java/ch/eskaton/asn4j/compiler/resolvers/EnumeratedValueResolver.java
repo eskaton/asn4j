@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
+import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -57,7 +58,7 @@ public class EnumeratedValueResolver extends AbstractValueResolver<EnumeratedVal
             CompiledEnumeratedType compiledType = (CompiledEnumeratedType) ctx.getCompiledType(type);
 
             if (compiledType != null) {
-                Optional<ValueOrObjectAssignmentNode> assignmentNode =
+                Optional<ValueAssignmentNode> assignmentNode =
                         ctx.tryResolveAllValueReferences((SimpleDefinedValue) value);
 
                 if (assignmentNode.isPresent()) {

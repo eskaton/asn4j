@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
@@ -56,7 +57,7 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
     }
 
     @Override
-    protected V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
+    protected V resolve(ValueAssignmentNode valueAssignment) {
         Node type = valueAssignment.getType();
         Node value = valueAssignment.getValue();
 

@@ -31,10 +31,25 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class ValueAssignmentNode extends ValueOrObjectAssignmentNode<Type, Value> {
+public class ValueAssignmentNode extends AssignmentNode {
+
+    private Type type;
+
+    private Value value;
 
     public ValueAssignmentNode(Position position, String reference, Type type, Value value) {
-        super(position, reference, type, value);
+        super(position, reference);
+
+        this.type = type;
+        this.value = value;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public Value getValue() {
+        return value;
     }
 
 }

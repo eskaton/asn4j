@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.AbstractOID;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -51,7 +52,7 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
     }
 
     @Override
-    protected V resolve(ValueOrObjectAssignmentNode<?, ?> valueAssignment) {
+    protected V resolve(ValueAssignmentNode valueAssignment) {
         return resolveComponents(super.resolve(valueAssignment), ctx);
     }
 
