@@ -6037,8 +6037,8 @@ class ParserTest {
         ObjectClassFieldTypeNode result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("OBJECT-CLASS", result.getObjectClass().getReference());
-        assertEquals("ObjectSet-Reference", result.getField()
+        assertEquals("OBJECT-CLASS", result.getObjectClassReference().getReference());
+        assertEquals("ObjectSet-Reference", result.getFieldName()
                 .getPrimitiveFieldNames().get(0).getReference());
     }
 

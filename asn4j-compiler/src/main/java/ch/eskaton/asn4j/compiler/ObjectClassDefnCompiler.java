@@ -29,8 +29,13 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.parser.ObjectClassDefn;
-import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, CompiledObjectClass> {
 
@@ -40,12 +45,40 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
 
         var fieldSpecs = node.getFieldSpec();
 
-        for (var fieldSpec : fieldSpecs) {
-            var compiledField = ctx.<AbstractFieldSpecNode, NamedCompiler<AbstractFieldSpecNode, AbstractCompiledField>>getCompiler(
-                    (Class<AbstractFieldSpecNode>) fieldSpec.getClass())
-                    .compile(ctx, name, fieldSpec);
+        for (var unknownFieldSpec : fieldSpecs) {
+            if (unknownFieldSpec instanceof FieldSpecNode fieldSpec) {
+                var type = fieldSpec.getType();
 
-            compiledObjectClass.addField(compiledField);
+                if (type instanceof TypeReference typeReference &&
+                        typeReference.getType().equals(typeReference.getType().toUpperCase())) {
+                    try {
+                        // Check whether reference refers to an object class
+                        ctx.getCompiledObjectClass(typeReference.getType());
+
+                        var objectFieldSpec = fieldSpec.toObjectFieldSpec();
+                        var compiledField = ctx.<ObjectFieldSpecNode, NamedCompiler<ObjectFieldSpecNode, AbstractCompiledField>>getCompiler(
+                                (Class<ObjectFieldSpecNode>) objectFieldSpec.getClass()).compile(ctx, name, objectFieldSpec);
+
+                        compiledObjectClass.addField(compiledField);
+                        continue;
+                    } catch (CompilerException e) {
+                        // ignore
+                        throw e;
+                    }
+                }
+
+                var fixedTypeValueFieldSpecNode = fieldSpec.toFixedTypeValueFieldSpec();
+                var compiledField = ctx.<FixedTypeValueFieldSpecNode, NamedCompiler<FixedTypeValueFieldSpecNode, AbstractCompiledField>>getCompiler(
+                        (Class<FixedTypeValueFieldSpecNode>) fixedTypeValueFieldSpecNode.getClass())
+                        .compile(ctx, name, fixedTypeValueFieldSpecNode);
+
+                compiledObjectClass.addField(compiledField);
+            } else if (unknownFieldSpec instanceof TypeFieldSpecNode typeFieldSpecNode) {
+                compiledObjectClass.addField(new CompiledTypeField(typeFieldSpecNode.getReference()));
+            } else {
+                throw new IllegalCompilerStateException("Field of type %s not yet supported",
+                        unknownFieldSpec.getClass().getSimpleName());
+            }
         }
 
         return compiledObjectClass;

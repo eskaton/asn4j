@@ -27,10 +27,10 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ParserException;
+import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.utils.ReflectionUtils;
 import ch.eskaton.commons.utils.Utils;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
@@ -40,8 +40,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
@@ -62,6 +60,7 @@ import static ch.eskaton.asn4j.test.TestUtils.module;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CompilerImplTest {
 
@@ -196,7 +195,7 @@ class CompilerImplTest {
     }
 
     @Test
-    void testObjects() throws IOException, ParserException, InvocationTargetException, IllegalAccessException {
+    void testObjects() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
                     &booleanField  BOOLEAN,
@@ -224,12 +223,61 @@ class CompilerImplTest {
         compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
 
         var ctx = compiler.getCompilerContext();
-        var objectSets = (Map<String, CompiledObjectSet>) ReflectionUtils
-                .invokePrivateMethod(ctx, "getObjectSetsOfModule", new Object[] { "TEST-MODULE" });
-        var objectSet = objectSets.get("TestSet");
+        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
 
         assertNotNull(objectSet);
         assertEquals(2, objectSet.getValues().size());
+    }
+
+    @Test
+    void testNestedFields() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &booleanField  BOOLEAN
+                }
+                                
+                TEST2 ::= CLASS {
+                    &test TEST
+                }
+                            
+                TestSequence ::= SEQUENCE {
+                    typeField TEST2.&test.&booleanField
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("TestSequence");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledSequence = (CompiledCollectionType) compiledType;
+
+        assertEquals(1, compiledSequence.getComponents().size());
+
+        var compiledComponent = compiledSequence.getComponents().get(0).get_2();
+
+        assertTrue(compiledComponent.getType() instanceof BooleanType);
+    }
+
+    @Test
+    void testNestedFieldsInvalidReference() {
+        var body = """
+                TEST ::= CLASS {
+                    &test  BOOLEAN
+                }
+                 
+                TestSequence ::= SEQUENCE {
+                    typeField TEST.&test.&booleanField
+                }
+                """;
+
+        testModule(body, CompilerException.class, ".*&test doesn't refer to an object class.*");
     }
 
     private void testModule(String body, Class<? extends Exception> expected, String message) {

@@ -25,35 +25,29 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
-import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
-import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class FieldSpecNodeCompiler implements NamedCompiler<FieldSpecNode, CompiledFixedTypeValueField> {
+import java.util.Map;
+
+public class CompiledObjectField extends AbstractCompiledField<Map<String, Object>> {
+
+    private CompiledObjectClass objectClass;
+
+    public CompiledObjectField(String name, CompiledObjectClass objectClass) {
+        super(name);
+
+        this.objectClass = objectClass;
+    }
+
+    public CompiledObjectClass getObjectClass() {
+        return objectClass;
+    }
 
     @Override
-    public CompiledFixedTypeValueField compile(CompilerContext ctx, String name, FieldSpecNode node) {
-        var fixedType = node.toFixedTypeValueFieldSpec();
-        var type = fixedType.getType();
-        var compiledType = ctx.getCompiledType(type);
-        var optionalitySpec = node.getOptionalitySpec();
-        var compiledField = new CompiledFixedTypeValueField(node.getReference(), compiledType, node.isUnique());
-
-        if (optionalitySpec instanceof DefaultSpecNode) {
-            var value = (Value) ((DefaultSpecNode) optionalitySpec).getSpec();
-            var valueClass = ctx.getValueType(type);
-            var defaultValue = ctx.resolveGenericValue(valueClass, type, value);
-
-            compiledField.setDefaultValue(defaultValue);
-        } else if (optionalitySpec instanceof OptionalSpecNode) {
-            compiledField.setOptional(true);
-        }
-
-        return compiledField;
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

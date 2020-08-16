@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
+import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
@@ -47,6 +48,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledModule;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasChildComponents;
@@ -153,7 +155,7 @@ public class CompilerContext {
         return getCompiledModule(getCurrentModuleName());
     }
 
-    private CompiledModule getCompiledModule(String moduleName) {
+    public CompiledModule getCompiledModule(String moduleName) {
         return definedModules.computeIfAbsent(moduleName, (key) -> new CompiledModule(key));
     }
 
@@ -299,18 +301,6 @@ public class CompilerContext {
     }
 
     public String getTypeName(Type type, String name) {
-        if (type instanceof ObjectClassFieldTypeNode) {
-            var reference = ((ObjectClassFieldTypeNode) type).getObjectClass().getReference();
-            var compiledObjectClass = getCompiledObjectClass(reference);
-            var field = compiledObjectClass.getField(name);
-
-            if (field.isPresent() && field.get() instanceof CompiledFixedTypeValueField) {
-                type = ((CompiledFixedTypeValueField) field.get()).getCompiledType().getType();
-            } else {
-                throw new IllegalCompilerStateException("Unexpected field type: %s", field.getClass().getSimpleName());
-            }
-        }
-
         return config.getTypeNameSupplier(type.getClass()).getName(type, name);
     }
 
@@ -343,12 +333,29 @@ public class CompilerContext {
                 || type instanceof IRI
                 || type instanceof RelativeIRI) {
             return defineType(type, name, false);
-        } else if (type instanceof ObjectClassFieldTypeNode) {
-            var reference = ((ObjectClassFieldTypeNode) type).getObjectClass().getReference();
-            var compiledObjectClass = this.getCompiledObjectClass(reference);
-            var field = compiledObjectClass.getField(name)
-                    .orElseThrow(() -> new CompilerException("Unknown field '%s' in object class %s", name,
-                            compiledObjectClass.getName()));
+        } else if (type instanceof ObjectClassFieldTypeNode objectClassFieldType) {
+            var objectClassReference = objectClassFieldType.getObjectClassReference();
+            var compiledObjectClass = getCompiledObjectClass(objectClassReference.getReference());
+            var fieldNames = objectClassFieldType.getFieldName().getPrimitiveFieldNames();
+            AbstractCompiledField field = null;
+
+            for (var i = 0; i < fieldNames.size(); i++) {
+                var fieldName = fieldNames.get(i);
+                var objectClassName = compiledObjectClass.getName();
+
+                field = compiledObjectClass.getField(fieldName.getReference())
+                        .orElseThrow(() -> new CompilerException("Unknown field '%s' in object class %s",
+                                fieldName.getReference(), objectClassName));
+
+                if (i < fieldNames.size() - 1) {
+                    if (field instanceof CompiledObjectField compiledObjectField) {
+                        compiledObjectClass = compiledObjectField.getObjectClass();
+                    } else {
+                        throw new CompilerException(fieldName.getPosition(), "&%s doesn't refer to an object class",
+                                field.getName());
+                    }
+                }
+            }
 
             if (field instanceof CompiledFixedTypeValueField) {
                 var additionalConstraints = type.getConstraints();
@@ -620,7 +627,7 @@ public class CompilerContext {
         return getCompiledObjectClass(reference);
     }
 
-    private CompiledObjectClass getCompiledObjectClass(String reference) {
+    public CompiledObjectClass getCompiledObjectClass(String reference) {
         var moduleObjectClasses = getObjectClassesOfCurrentModule();
         var compiledObjectClass = Optional.ofNullable(moduleObjectClasses.get(reference));
 
