@@ -25,58 +25,35 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.AbstractType;
+import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
+import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.Objects;
-
-public class ObjectClassFieldTypeNode extends AbstractType {
-
-    private ObjectClassReference objectClassReference;
-
-    private FieldNameNode fieldName;
-
-    public ObjectClassFieldTypeNode(Position position, ObjectClassReference objectClassReference,
-            FieldNameNode fieldName) {
-        super(position);
-
-        this.objectClassReference = objectClassReference;
-        this.fieldName = fieldName;
-    }
-
-    public ObjectClassReference getObjectClassReference() {
-        return objectClassReference;
-    }
-
-    public FieldNameNode getFieldName() {
-        return fieldName;
-    }
+public class FixedTypeValueFieldSpecNodeCompiler implements NamedCompiler<FixedTypeValueFieldSpecNode,
+        CompiledFixedTypeValueField> {
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    public CompiledFixedTypeValueField compile(CompilerContext ctx, String name, FixedTypeValueFieldSpecNode node) {
+        var type = node.getType();
+        var compiledType = ctx.getCompiledType(type);
+        var optionalitySpec = node.getOptionalitySpec();
+        var compiledField = new CompiledFixedTypeValueField(node.getReference(), compiledType, node.isUnique());
+
+        if (optionalitySpec instanceof DefaultSpecNode) {
+            var value = (Value) ((DefaultSpecNode) optionalitySpec).getSpec();
+            var valueClass = ctx.getValueType(type);
+            var defaultValue = ctx.resolveGenericValue(valueClass, type, value);
+
+            compiledField.setDefaultValue(defaultValue);
+        } else if (optionalitySpec instanceof OptionalSpecNode) {
+            compiledField.setOptional(true);
         }
 
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(o)) {
-            return false;
-        }
-
-        ObjectClassFieldTypeNode that = (ObjectClassFieldTypeNode) o;
-
-        return Objects.equals(objectClassReference, that.objectClassReference) &&
-                Objects.equals(fieldName, that.fieldName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), objectClassReference, fieldName);
+        return compiledField;
     }
 
 }

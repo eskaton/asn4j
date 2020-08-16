@@ -25,58 +25,39 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.AbstractType;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
+import ch.eskaton.asn4j.parser.ast.DefaultObjectSpecNode;
+import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
+import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 
-import java.util.Objects;
-
-public class ObjectClassFieldTypeNode extends AbstractType {
-
-    private ObjectClassReference objectClassReference;
-
-    private FieldNameNode fieldName;
-
-    public ObjectClassFieldTypeNode(Position position, ObjectClassReference objectClassReference,
-            FieldNameNode fieldName) {
-        super(position);
-
-        this.objectClassReference = objectClassReference;
-        this.fieldName = fieldName;
-    }
-
-    public ObjectClassReference getObjectClassReference() {
-        return objectClassReference;
-    }
-
-    public FieldNameNode getFieldName() {
-        return fieldName;
-    }
+public class ObjectFieldSpecNodeCompiler implements NamedCompiler<ObjectFieldSpecNode, CompiledObjectField> {
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    public CompiledObjectField compile(CompilerContext ctx, String name, ObjectFieldSpecNode node) {
+        var reference = node.getReference();
+        var objectClass = ctx.getCompiledObjectClass(node.getObjectClass());
+        var optionalitySpec = node.getOptionalitySpec();
+        var compiledField = new CompiledObjectField(reference, objectClass);
+
+        if (optionalitySpec instanceof DefaultObjectSpecNode) {
+            var object = ((DefaultObjectSpecNode) optionalitySpec).getSpec();
+
+            if (object instanceof ObjectDefnNode objectDefnNode) {
+                var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
+                var objectDefinition = compiler.compile(objectClass, objectDefnNode);
+
+                compiledField.setDefaultValue(objectDefinition);
+            } else {
+                throw new IllegalCompilerStateException("Unsupported node type %s", object.getClass().getSimpleName());
+            }
+        } else if (optionalitySpec instanceof OptionalSpecNode) {
+            compiledField.setOptional(true);
         }
 
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(o)) {
-            return false;
-        }
-
-        ObjectClassFieldTypeNode that = (ObjectClassFieldTypeNode) o;
-
-        return Objects.equals(objectClassReference, that.objectClassReference) &&
-                Objects.equals(fieldName, that.fieldName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), objectClassReference, fieldName);
+        return compiledField;
     }
 
 }

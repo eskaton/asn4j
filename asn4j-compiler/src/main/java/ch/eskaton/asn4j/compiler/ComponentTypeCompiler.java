@@ -83,7 +83,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
         boolean hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
         CompiledType compiledComponent = ctx.defineType(namedType);
-        String typeName = ctx.getTypeName(namedType);
+        String typeName = compiledComponent.getName();
         JavaDefinedField field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
 
         compiledComponent.setParent(compiledType);
