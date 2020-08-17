@@ -34,6 +34,10 @@ public class ASN1OpenType implements ASN1Type, HasConstraint {
 
     private ASN1Type value;
 
+    public ASN1OpenType(ASN1Type value) {
+        this.value = value;
+    }
+
     public ASN1Type getValue() {
         return value;
     }
