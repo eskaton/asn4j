@@ -27,53 +27,30 @@
 
 package ch.eskaton.asn4j.runtime.types;
 
-public enum TypeName {
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
-    BIT_STRING("BIT STRING"),
-    BOOLEAN("BOOLEAN"),
-    ENUMERATED("ENUMERATED"),
-    INTEGER("INTEGER"),
-    REAL("REAL"),
-    NULL("NULL"),
-    OBJECT_IDENTIFIER("OBJECT IDENTIFIER"),
-    OCTET_STRING("OCTET STRING"),
-    VISIBLE_STRING("VisibleString"),
-    NUMERIC_STRING("NumericString"),
-    PRINTABLE_STRING("PrintableString"),
-    IA5_STRING("IA5String"),
-    GRAPHIC_STRING("GraphicString"),
-    GENERAL_STRING("GeneralString"),
-    TELETEX_STRING("TeletexString"),
-    VIDEOTEX_STRING("VideotexString"),
-    UTF8_STRING("UTF8String"),
-    UNIVERSAL_STRING("UniversalString"),
-    BMP_STRING("BMPString"),
-    UTC_TIME("UTCTime"),
-    GENERALIZED_TIME("GeneralizedTime"),
-    OID("OID"),
-    RELATIVE_OID("RELATIVE OID"),
-    OID_IRI("OID-IRI"),
-    RELATIVE_OID_IRI("RELATIVE-OID-IRI"),
-    SEQUENCE("SEQUENCE"),
-    SEQUENCE_OF("SEQUENCE OF"),
-    SET("SET"),
-    SET_OF("SET OF"),
-    CHOICE("CHOICE"),
-    OPEN_TYPE("open type");
+public class ASN1OpenType implements ASN1Type, HasConstraint {
 
-    private final String name;
+    private ASN1Type value;
 
-    TypeName(String name) {
-        this.name = name;
+    public ASN1Type getValue() {
+        return value;
     }
 
-    public String getName() {
-        return name;
+    public void setValue(ASN1Type value) {
+        if (value instanceof ASN1OpenType) {
+            throw new ASN1RuntimeException("Can't use an open type as a value for an open type");
+        }
+
+        this.value = value;
     }
 
     @Override
-    public String toString() {
-        return name;
+    public void checkConstraint() {
+        if (Boolean.FALSE.equals(doCheckConstraint())) {
+            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint", getValue()));
+        }
     }
 
 }

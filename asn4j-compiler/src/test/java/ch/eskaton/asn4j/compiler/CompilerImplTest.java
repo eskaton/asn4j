@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
+import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.utils.Utils;
 import org.hamcrest.text.MatchesPattern;
@@ -290,6 +291,38 @@ class CompilerImplTest {
 
         testModule(body, CompilerException.class,
                 ".*Default value on field test in object class TEST not allowed because it's unique.*");
+    }
+
+    @Test
+    void testTypeField() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+
+                TestSequence ::= SEQUENCE {
+                    typeField TEST.&TypeField
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("TestSequence");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledSequence = (CompiledCollectionType) compiledType;
+
+        assertEquals(1, compiledSequence.getComponents().size());
+
+        var compiledComponent = compiledSequence.getComponents().get(0).get_2();
+
+        assertTrue(compiledComponent.getType() instanceof OpenType);
     }
 
     private void testModule(String body, Class<? extends Exception> expected, String message) {
