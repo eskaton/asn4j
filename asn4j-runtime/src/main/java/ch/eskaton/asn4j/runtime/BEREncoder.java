@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.runtime.encoders.IntegerEncoder;
 import ch.eskaton.asn4j.runtime.encoders.NullEncoder;
 import ch.eskaton.asn4j.runtime.encoders.ObjectIdentifierEncoder;
 import ch.eskaton.asn4j.runtime.encoders.OctetStringEncoder;
+import ch.eskaton.asn4j.runtime.encoders.OpenTypeEncoder;
 import ch.eskaton.asn4j.runtime.encoders.RealEncoder;
 import ch.eskaton.asn4j.runtime.encoders.RelativeIRIEncoder;
 import ch.eskaton.asn4j.runtime.encoders.RelativeOIDEncoder;
@@ -62,6 +63,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
 import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
@@ -112,6 +114,7 @@ public class BEREncoder implements Encoder {
                     .put(ASN1SequenceOf.class, new SequenceOfEncoder())
                     .put(ASN1Set.class, new SetEncoder())
                     .put(ASN1SetOf.class, new SetOfEncoder())
+                    .put(ASN1OpenType.class, new OpenTypeEncoder())
                     .build();
 
     public byte[] encode(ASN1Type obj) {
@@ -207,6 +210,8 @@ public class BEREncoder implements Encoder {
             buf = this.<ASN1SetOf, SetOfEncoder>getEncoder(ASN1SetOf.class).encode(this, (ASN1SetOf) obj);
         } else if (obj instanceof ASN1Choice) {
             buf = this.<ASN1Choice, ChoiceEncoder>getEncoder(ASN1Choice.class).encode(this, (ASN1Choice) obj);
+        } else if (obj instanceof ASN1OpenType) {
+            buf = this.<ASN1OpenType, OpenTypeEncoder>getEncoder(ASN1OpenType.class).encode(this, (ASN1OpenType) obj);
         } else {
             throw new EncodingException("Unsupported type: " + obj.getClass().getSimpleName());
         }
