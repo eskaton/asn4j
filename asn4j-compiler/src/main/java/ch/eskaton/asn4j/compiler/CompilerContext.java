@@ -51,6 +51,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.HasChildComponents;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
@@ -78,6 +79,7 @@ import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
+import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
@@ -358,31 +360,59 @@ public class CompilerContext {
             }
 
             if (field instanceof CompiledFixedTypeValueField) {
-                var additionalConstraints = type.getConstraints();
-
-                type = (Type) Clone.clone(((CompiledFixedTypeValueField) field).getCompiledType().getType());
-
-                if (additionalConstraints != null) {
-                    var constraints = type.getConstraints();
-
-                    if (constraints == null) {
-                        type.setConstraints(additionalConstraints);
-                    } else {
-                        constraints.addAll(additionalConstraints);
-                    }
-                }
-
-                var compiledType = defineType(type, name);
-
-                compiledType.setObjectClass(compiledObjectClass);
-
-                return compiledType;
+                return defineFixedTypeValueField(type, name, compiledObjectClass, (CompiledFixedTypeValueField) field);
+            } else if (field instanceof CompiledTypeField) {
+                return defineTypeField(type, name, compiledObjectClass);
             } else {
                 throw new IllegalCompilerStateException("Unexpected field type: %s", field.getClass().getSimpleName());
             }
         }
 
         return createCompiledType(type, getTypeName(type, name), true);
+    }
+
+    private CompiledType defineTypeField(Type type, String name, CompiledObjectClass compiledObjectClass) {
+        var additionalConstraints = type.getConstraints();
+
+        type = new OpenType();
+
+        if (additionalConstraints != null) {
+            var constraints = type.getConstraints();
+
+            if (constraints == null) {
+                type.setConstraints(additionalConstraints);
+            } else {
+                constraints.addAll(additionalConstraints);
+            }
+        }
+
+        var compiledType = defineType(type, name);
+
+        compiledType.setObjectClass(compiledObjectClass);
+
+        return compiledType;
+    }
+
+    private CompiledType defineFixedTypeValueField(Type type, String name, CompiledObjectClass compiledObjectClass, CompiledFixedTypeValueField field) {
+        var additionalConstraints = type.getConstraints();
+
+        type = (Type) Clone.clone(field.getCompiledType().getType());
+
+        if (additionalConstraints != null) {
+            var constraints = type.getConstraints();
+
+            if (constraints == null) {
+                type.setConstraints(additionalConstraints);
+            } else {
+                constraints.addAll(additionalConstraints);
+            }
+        }
+
+        var compiledType = defineType(type, name);
+
+        compiledType.setObjectClass(compiledObjectClass);
+
+        return compiledType;
     }
 
     private CompiledType defineType(Type type, String name, boolean newType) {

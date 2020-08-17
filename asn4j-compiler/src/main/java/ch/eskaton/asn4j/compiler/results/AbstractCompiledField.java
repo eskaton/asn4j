@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
+
 public abstract class AbstractCompiledField<D> implements CompilationResult {
 
     private String name;
@@ -57,6 +59,11 @@ public abstract class AbstractCompiledField<D> implements CompilationResult {
 
     public boolean isOptional() {
         return optional;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

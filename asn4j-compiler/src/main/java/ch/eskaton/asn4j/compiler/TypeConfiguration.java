@@ -42,6 +42,7 @@ import ch.eskaton.asn4j.compiler.constraints.NullConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.NumericStringConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.ObjectIdentifierConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.OctetStringConstraintCompiler;
+import ch.eskaton.asn4j.compiler.constraints.OpenTypeConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.PrintableStringConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.RelativeIRIConstraintCompiler;
 import ch.eskaton.asn4j.compiler.constraints.RelativeOIDConstraintCompiler;
@@ -123,6 +124,7 @@ import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
+import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.PrintableString;
 import ch.eskaton.asn4j.parser.ast.types.Real;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
@@ -184,6 +186,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
 import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
@@ -301,6 +304,8 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(RelativeIRI.class, new RelativeIRICompiler(), RelativeIRIValue.class,
                 ASN1RelativeIRI.class, new RelativeIRIValueResolver(ctx), new SubtypeTypeNameSupplier<>(this),
                 new RelativeIRIConstraintCompiler(ctx)));
+        types.add(new TypeDefinition<>(OpenType.class, new OpenTypeCompiler(), null, ASN1OpenType.class, null,
+                new SubtypeTypeNameSupplier<>(this), new OpenTypeConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(GeneralizedTime.class, new GeneralizedTimeCompiler(), GeneralizedTimeValue.class,
                 ASN1GeneralizedTime.class, new GeneralizedTimeValueResolver(ctx), new DefaultTypeNameSupplier(this),
                 null));
