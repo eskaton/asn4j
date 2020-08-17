@@ -44,6 +44,12 @@ public class FixedTypeValueFieldSpecNodeCompiler implements NamedCompiler<FixedT
         var compiledField = new CompiledFixedTypeValueField(node.getReference(), compiledType, node.isUnique());
 
         if (optionalitySpec instanceof DefaultSpecNode) {
+            if (node.isUnique()) {
+                throw new CompilerException(optionalitySpec.getPosition(),
+                        "Default value on field %s in object class %s not allowed because it's unique",
+                        node.getReference(), name);
+            }
+
             var value = (Value) ((DefaultSpecNode) optionalitySpec).getSpec();
             var valueClass = ctx.getValueType(type);
             var defaultValue = ctx.resolveGenericValue(valueClass, type, value);
