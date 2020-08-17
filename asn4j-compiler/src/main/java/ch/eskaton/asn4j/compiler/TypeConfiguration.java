@@ -95,7 +95,6 @@ import ch.eskaton.asn4j.compiler.typenamesuppliers.SubtypeTypeNameSupplier;
 import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeNameSupplier;
 import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeReferenceTypeNameSupplier;
 import ch.eskaton.asn4j.parser.ObjectClassDefn;
-import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;

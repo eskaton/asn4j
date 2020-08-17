@@ -58,7 +58,8 @@ import ch.eskaton.asn4j.parser.ast.ExternalObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReferenceNode;
 import ch.eskaton.asn4j.parser.ast.FieldNameNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
-import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueOrObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.LiteralNode;
@@ -78,6 +79,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
+import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
@@ -197,7 +199,6 @@ import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
-import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
@@ -4246,24 +4247,51 @@ public class Parser {
     // ValueOptionalitySpec ?
     // ObjectFieldSpec ::= objectfieldreference DefinedObjectClass
     // ObjectOptionalitySpec?
-    protected class FixedTypeValueOrObjectFieldSpecParser extends ListRuleParser<FieldSpecNode> {
+    protected class FixedTypeValueOrObjectFieldSpecParser implements RuleParser<FixedTypeValueOrObjectFieldSpecNode> {
 
         @SuppressWarnings("unchecked")
-        public FieldSpecNode parse() throws ParserException {
-            return super.parse(new SequenceParser(new boolean[] { true, true, true, false, false },
-                    TokenType.AMPERSAND, TokenType.IDENTIFIER,
-                    new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser),
-                    TokenType.UNIQUE_KW, optionalitySpecParser),
-                    a -> {
-                        boolean unique = a.n3() != null;
-                        OptionalitySpecNode spec = a.n4();
+        public FixedTypeValueOrObjectFieldSpecNode parse() throws ParserException {
+            Set<List<Object>> rules = new AmbiguousChoiceParser<>(
+                    new SequenceParser(new boolean[] { true, true, true, false, false },
+                            TokenType.AMPERSAND,
+                            TokenType.IDENTIFIER,
+                            typeParser,
+                            TokenType.UNIQUE_KW,
+                            optionalitySpecParser),
+                    new SequenceParser(new boolean[] { true, true, true, false },
+                            TokenType.AMPERSAND,
+                            TokenType.IDENTIFIER,
+                            definedObjectClassParser,
+                            optionalitySpecParser)).parse();
 
-                        if (unique && spec != null && !(spec instanceof OptionalSpecNode)) {
-                            return null;
-                        }
+            Optional<List<Object>> maybeFirst = rules.stream().findFirst();
 
-                        return new FieldSpecNode(a.P0(), a.s1(), a.n2(), unique, spec);
-                    });
+            if (maybeFirst.isPresent()) {
+                List<Object> first = maybeFirst.get();
+                Token token = (Token) first.get(1);
+
+                FixedTypeValueOrObjectFieldSpecNode rule =
+                        new FixedTypeValueOrObjectFieldSpecNode(token.getPosition(), token.getText(),
+                                (OptionalitySpecNode) first.get(first.size() - 1));
+
+                rules.stream().forEach(r -> {
+                    Node node = ((Node) r.get(2));
+
+                    if (node instanceof Type) {
+                        rule.setFixedTypeValueFieldSpec(new FixedTypeValueFieldSpecNode(rule.getPosition(),
+                                rule.getReference(), (Type) r.get(2), r.get(3) != null, rule.getOptionalitySpec()));
+                    } else if (node instanceof ObjectClassReference){
+                        rule.setObjectFieldSpec(new ObjectFieldSpecNode(rule.getPosition(), rule.getReference(),
+                                (ObjectClassReference) r.get(2), rule.getOptionalitySpec()));
+                    } else {
+                        throw new IllegalStateException("Unexpected type: " + node.getClass().getSimpleName());
+                    }
+                });
+
+                return rule;
+            }
+
+            return null;
         }
 
     }

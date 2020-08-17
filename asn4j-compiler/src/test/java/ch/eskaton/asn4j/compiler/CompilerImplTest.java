@@ -280,6 +280,18 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, ".*&test doesn't refer to an object class.*");
     }
 
+    @Test
+    void testFixedTypeValueFieldInvalidDefault() {
+        var body = """
+                TEST ::= CLASS {
+                    &test  INTEGER UNIQUE DEFAULT 10
+                }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*Default value on field test in object class TEST not allowed because it's unique.*");
+    }
+
     private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()

@@ -274,7 +274,8 @@ import ch.eskaton.asn4j.parser.ast.ExternalObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReferenceNode;
 import ch.eskaton.asn4j.parser.ast.FieldNameNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
-import ch.eskaton.asn4j.parser.ast.FieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueOrObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.LiteralNode;
 import ch.eskaton.asn4j.parser.ast.LowerEndpointNode;
@@ -292,6 +293,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
+import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFromObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
@@ -5048,9 +5050,10 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof FieldSpecNode);
-        assertNotNull(((FieldSpecNode) result).toFixedTypeValueFieldSpec());
-        assertTrue(((FieldSpecNode) result).getOptionalitySpec() instanceof OptionalSpecNode);
+        assertTrue(result instanceof FixedTypeValueOrObjectFieldSpecNode);
+        assertTrue(((FixedTypeValueOrObjectFieldSpecNode) result).getFixedTypeValueFieldSpec().isPresent());
+        assertTrue(((FixedTypeValueOrObjectFieldSpecNode) result).getFixedTypeValueFieldSpec().get()
+                .getOptionalitySpec() instanceof OptionalSpecNode);
 
         // VariableTypeValueFieldSpec
         parser = new Parser(new ByteArrayInputStream(
@@ -5088,7 +5091,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertNotNull(((FieldSpecNode) result).toObjectFieldSpec());
+        assertTrue(((FixedTypeValueOrObjectFieldSpecNode) result).getObjectFieldSpec().isPresent());
 
         // ObjectSetFieldSpec
         parser = new Parser(new ByteArrayInputStream(
@@ -5160,15 +5163,18 @@ class ParserTest {
                 new ByteArrayInputStream(
                         "&value-reference INTEGER UNIQUE OPTIONAL".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
 
-        FieldSpecNode result = parser.parse();
+        FixedTypeValueOrObjectFieldSpecNode result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("value-reference", result.getReference());
-        assertNotNull(result.toFixedTypeValueFieldSpec());
-        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-        assertTrue(result.toFixedTypeValueFieldSpec().isUnique());
-        assertNotNull(result.getOptionalitySpec());
-        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertTrue(result.getFixedTypeValueFieldSpec().isPresent());
+
+        FixedTypeValueFieldSpecNode fixedTypeValue = result.getFixedTypeValueFieldSpec().get();
+
+        assertEquals("value-reference", fixedTypeValue.getReference());
+        assertTrue(fixedTypeValue.getType() instanceof IntegerType);
+        assertTrue(fixedTypeValue.isUnique());
+        assertNotNull(fixedTypeValue.getOptionalitySpec());
+        assertTrue(fixedTypeValue.getOptionalitySpec() instanceof OptionalSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
                 "&value-reference INTEGER UNIQUE".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
@@ -5176,19 +5182,14 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("value-reference", result.getReference());
-        assertNotNull(result.toFixedTypeValueFieldSpec());
-        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-        assertTrue(result.toFixedTypeValueFieldSpec().isUnique());
-        assertNull(result.getOptionalitySpec());
+        assertTrue(result.getFixedTypeValueFieldSpec().isPresent());
 
-        // Not allowed
-        parser = new Parser(new ByteArrayInputStream(
-                "&value-reference INTEGER UNIQUE DEFAULT 10".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
+        fixedTypeValue = result.getFixedTypeValueFieldSpec().get();
 
-        result = parser.parse();
-
-        assertNull(result);
+        assertEquals("value-reference", fixedTypeValue.getReference());
+        assertTrue(fixedTypeValue.getType() instanceof IntegerType);
+        assertTrue(fixedTypeValue.isUnique());
+        assertNull(fixedTypeValue.getOptionalitySpec());
 
         parser = new Parser(new ByteArrayInputStream(
                 "&value-reference INTEGER DEFAULT 10".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
@@ -5196,14 +5197,16 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("value-reference", result.getReference());
-        assertNotNull(result.toFixedTypeValueFieldSpec());
-        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-        assertFalse(result.toFixedTypeValueFieldSpec().isUnique());
-        assertNotNull(result.getOptionalitySpec());
-        assertTrue(result.getOptionalitySpec() instanceof DefaultSpecNode);
-        assertNotNull(((DefaultSpecNode) result.getOptionalitySpec())
-                .toDefaultValueSpec());
+        assertTrue(result.getFixedTypeValueFieldSpec().isPresent());
+
+        fixedTypeValue = result.getFixedTypeValueFieldSpec().get();
+
+        assertEquals("value-reference", fixedTypeValue.getReference());
+        assertTrue(fixedTypeValue.getType() instanceof IntegerType);
+        assertFalse(fixedTypeValue.isUnique());
+        assertNotNull(fixedTypeValue.getOptionalitySpec());
+        assertTrue(fixedTypeValue.getOptionalitySpec() instanceof DefaultSpecNode);
+        assertNotNull(((DefaultSpecNode) fixedTypeValue.getOptionalitySpec()).toDefaultValueSpec());
 
         parser = new Parser(new ByteArrayInputStream(
                 "&value-reference INTEGER OPTIONAL".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
@@ -5211,12 +5214,15 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("value-reference", result.getReference());
-        assertNotNull(result.toFixedTypeValueFieldSpec());
-        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-        assertFalse(result.toFixedTypeValueFieldSpec().isUnique());
-        assertNotNull(result.getOptionalitySpec());
-        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertTrue(result.getFixedTypeValueFieldSpec().isPresent());
+
+        fixedTypeValue = result.getFixedTypeValueFieldSpec().get();
+
+        assertEquals("value-reference", fixedTypeValue.getReference());
+        assertTrue(fixedTypeValue.getType() instanceof IntegerType);
+        assertFalse(fixedTypeValue.isUnique());
+        assertNotNull(fixedTypeValue.getOptionalitySpec());
+        assertTrue(fixedTypeValue.getOptionalitySpec() instanceof OptionalSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
                 "&value-reference INTEGER".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
@@ -5224,11 +5230,14 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("value-reference", result.getReference());
-        assertNotNull(result.toFixedTypeValueFieldSpec());
-        assertTrue(result.toFixedTypeValueFieldSpec().getType() instanceof IntegerType);
-        assertFalse(result.toFixedTypeValueFieldSpec().isUnique());
-        assertNull(result.getOptionalitySpec());
+        assertTrue(result.getFixedTypeValueFieldSpec().isPresent());
+
+        fixedTypeValue = result.getFixedTypeValueFieldSpec().get();
+
+        assertEquals("value-reference", fixedTypeValue.getReference());
+        assertTrue(fixedTypeValue.getType() instanceof IntegerType);
+        assertFalse(fixedTypeValue.isUnique());
+        assertNull(fixedTypeValue.getOptionalitySpec());
     }
 
     @Test
@@ -5366,33 +5375,36 @@ class ParserTest {
 
     @Test
     void testObjectFieldSpecParser() throws IOException, ParserException {
-        FieldSpecParser parser = new Parser(new ByteArrayInputStream(
-                "&object-field OBJECT-CLASS OPTIONAL".getBytes())).new FieldSpecParser();
+        FixedTypeValueOrObjectFieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&object-field OBJECT-CLASS OPTIONAL".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
 
-        AbstractFieldSpecNode result = parser.parse();
+        FixedTypeValueOrObjectFieldSpecNode result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof FieldSpecNode);
-        assertEquals("object-field", result.getReference());
-        assertNotNull(((FieldSpecNode) result).toObjectFieldSpec());
-        assertEquals("OBJECT-CLASS", ((FieldSpecNode) result)
-                .toObjectFieldSpec().getObjectClass().getReference());
-        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertTrue(result instanceof FixedTypeValueOrObjectFieldSpecNode);
+        assertTrue(result.getObjectFieldSpec().isPresent());
+
+        ObjectFieldSpecNode objectField = result.getObjectFieldSpec().get();
+
+        assertEquals("object-field", objectField.getReference());
+        assertEquals("OBJECT-CLASS", objectField.getObjectClass().getReference());
+        assertTrue(objectField.getOptionalitySpec() instanceof OptionalSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
-                "&object-field OBJECT-CLASS DEFAULT object-ref".getBytes())).new FieldSpecParser();
+                "&object-field OBJECT-CLASS DEFAULT object-ref".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof FieldSpecNode);
-        assertEquals("object-field", result.getReference());
-        assertNotNull(((FieldSpecNode) result).toObjectFieldSpec());
-        assertEquals("OBJECT-CLASS", ((FieldSpecNode) result)
-                .toObjectFieldSpec().getObjectClass().getReference());
-        assertTrue(result.getOptionalitySpec() instanceof DefaultSpecNode);
-        assertNotNull(((DefaultSpecNode) result.getOptionalitySpec())
-                .toDefaultObjectSpec());
+        assertTrue(result instanceof FixedTypeValueOrObjectFieldSpecNode);
+        assertTrue(result.getObjectFieldSpec().isPresent());
+
+        objectField = result.getObjectFieldSpec().get();
+
+        assertEquals("object-field", objectField.getReference());
+        assertEquals("OBJECT-CLASS", objectField.getObjectClass().getReference());
+        assertTrue(objectField.getOptionalitySpec() instanceof DefaultSpecNode);
+        assertNotNull(((DefaultSpecNode) objectField.getOptionalitySpec()).toDefaultObjectSpec());
     }
 
     @Test
