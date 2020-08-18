@@ -170,4 +170,13 @@ TestSequence27 ::= SEQUENCE {
    realField TEST.&realField
 }
 
+
+TEST2 ::= CLASS {
+    &TypeField
+}
+
+TestSequence101 ::= SEQUENCE {
+   typeField TEST2.&TypeField
+}
+
 END

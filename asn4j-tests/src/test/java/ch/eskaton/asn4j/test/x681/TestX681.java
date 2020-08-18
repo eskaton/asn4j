@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.test.x681;
 
+import ch.eskaton.asn4j.runtime.BERDecoder;
+import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
@@ -39,6 +41,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
 import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
@@ -50,6 +53,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence10;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence101;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence11;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence12;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence13;
@@ -87,6 +91,10 @@ import java.math.BigDecimal;
 
 import static ch.eskaton.asn4j.test.TestHelper.testSequenceSuccess;
 import static ch.eskaton.commons.utils.Utils.with;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestX681 {
 
@@ -273,6 +281,22 @@ class TestX681 {
     void testSequence27() {
         testSequenceSuccess(TestSequence27.class, new TestSequence27(),
                 s -> s.setRealField(new ASN1Real(BigDecimal.valueOf(1.2))));
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type is resolved to an open type of BOOLEAN")
+    void testSequence101() {
+        var value = new TestSequence101();
+
+        value.setTypeField(new ASN1OpenType(ASN1Boolean.TRUE));
+
+        var decoded = new BERDecoder().decode(TestSequence101.class, new BEREncoder().encode(value));
+        var typeField = decoded.getTypeField();
+
+        assertNull(typeField.getValue());
+        assertTrue(typeField.decode(ASN1Boolean.class) instanceof ASN1Boolean);
+        assertNotNull(typeField.getValue());
+        assertEquals(ASN1Boolean.TRUE, typeField.getValue());
     }
 
 }
