@@ -25,43 +25,50 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.runtime.types;
+package ch.eskaton.asn4j.runtime.decoders;
 
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.asn4j.runtime.Decoder;
+import ch.eskaton.asn4j.runtime.DecoderStates;
+import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
+import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
-public class ASN1OpenType implements ASN1Type, HasConstraint {
+public class OpenTypeDecoder {
 
-    private ASN1Type value;
+    public <T extends ASN1Type> T decode(Decoder decoder, DecoderStates states, boolean optional) {
+        var currentState = states.peek();
+        var state = decoder.decode(states);
 
-    public ASN1OpenType() {
-    }
+        if (state == null) {
+            if (optional) {
+                return null;
+            }
 
-    public ASN1OpenType(ASN1Type value) {
-        this.value = value;
-    }
-
-    public ASN1Type getValue() {
-        return value;
-    }
-
-    public void setValue(ASN1Type value) {
-        if (value instanceof ASN1OpenType) {
-            throw new ASN1RuntimeException("Can't use an open type as a value for an open type");
+            throw new DecodingException("Empty open type");
         }
 
-        this.value = value;
+        return (T) new DecodableASN1OpenType(decoder, RuntimeUtils.getValue(states, currentState));
     }
 
-    @Override
-    public void checkConstraint() {
-        if (Boolean.FALSE.equals(doCheckConstraint())) {
-            throw new ConstraintViolatedException(String.format("%s doesn't satisfy a constraint", getValue()));
+    private static class DecodableASN1OpenType extends ASN1OpenType {
+
+        private final Decoder decoder;
+
+        private final byte[] bytes;
+
+        public DecodableASN1OpenType(Decoder decoder, byte[] bytes) {
+            this.decoder = decoder;
+            this.bytes = bytes;
         }
-    }
 
-    public <T extends ASN1Type> T decode(Class<T> type) {
-        throw new ASN1RuntimeException("There's nothing to decode");
+        public <T extends ASN1Type> T decode(Class<T> type) {
+            var value = decoder.decode(type, bytes);
+
+            super.setValue(value);
+
+            return value;
+        }
     }
 
 }

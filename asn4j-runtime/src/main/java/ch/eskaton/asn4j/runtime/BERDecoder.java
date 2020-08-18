@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.runtime.decoders.IntegerDecoder;
 import ch.eskaton.asn4j.runtime.decoders.NumericStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.ObjectIdentifierDecoder;
 import ch.eskaton.asn4j.runtime.decoders.OctetStringDecoder;
+import ch.eskaton.asn4j.runtime.decoders.OpenTypeDecoder;
 import ch.eskaton.asn4j.runtime.decoders.PrintableStringDecoder;
 import ch.eskaton.asn4j.runtime.decoders.RealDecoder;
 import ch.eskaton.asn4j.runtime.decoders.RelativeIRIDecoder;
@@ -73,6 +74,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.ASN1NumericString;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
 import ch.eskaton.asn4j.runtime.types.ASN1PrintableString;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeIRI;
@@ -143,6 +145,8 @@ public class BERDecoder implements Decoder {
 
     private ChoiceDecoder choiceDecoder = new ChoiceDecoder();
 
+    private OpenTypeDecoder openTypeDecoder = new OpenTypeDecoder();
+
     private SequenceDecoder sequenceDecoder = new SequenceDecoder();
 
     private SequenceOfDecoder sequenceOfDecoder = new SequenceOfDecoder();
@@ -182,6 +186,10 @@ public class BERDecoder implements Decoder {
         return null;
     }
 
+    public DecoderState decode(DecoderStates states) {
+        return consumeTags(states);
+    }
+
     public <T extends ASN1Type> DecodingResult<T> decode(Type type, DecoderStates states, ASN1Tag tag,
             boolean optional) {
         List<ASN1Tag> tags;
@@ -190,6 +198,8 @@ public class BERDecoder implements Decoder {
 
         if (ReflectionUtils.extendsClazz(clazz, ASN1Choice.class)) {
             return decodeChoice(clazz, states, optional);
+        } else if (ReflectionUtils.extendsClazz(clazz, ASN1OpenType.class)) {
+            return decodeOpenType(states, optional);
         }
 
         tags = RuntimeUtils.getTags(clazz, tag);
@@ -217,6 +227,12 @@ public class BERDecoder implements Decoder {
         var obj = ReflectionUtils.getInstance(type, DecodingException::new);
 
         obj = choiceDecoder.decode(this, states, obj, optional);
+
+        return new DecodingResult<>(Collections.emptyList(), obj);
+    }
+
+    private <T extends ASN1Type> DecodingResult<T> decodeOpenType(DecoderStates states, boolean optional) {
+        T obj = openTypeDecoder.decode(this, states, optional);
 
         return new DecodingResult<>(Collections.emptyList(), obj);
     }
@@ -369,6 +385,34 @@ public class BERDecoder implements Decoder {
                     LOGGER.trace(StringUtils.concat("Found: tag=", tlv.tag, ", class=", tlv.clazz,
                             ", length=", tlv.length));
                 }
+            }
+
+            return states.push(new DecoderState(tlv, pos, length));
+        } catch (DecodingException e) {
+            throw e;
+        } catch (Exception th) {
+            throw new DecodingException(th);
+        }
+    }
+
+    private DecoderState consumeTags(DecoderStates states) {
+        var lastState = states.peek();
+        var pos = lastState.pos;
+        var length = lastState.length;
+
+        try {
+            if (length <= 0) {
+                return null;
+            }
+
+            var tlv = TLV.getTLV(states.buf, pos, length);
+
+            pos = tlv.pos;
+            length = tlv.length;
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(StringUtils.concat("Found: tag=", tlv.tag, ", class=", tlv.clazz,
+                        ", length=", tlv.length));
             }
 
             return states.push(new DecoderState(tlv, pos, length));

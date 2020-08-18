@@ -32,5 +32,5 @@ public class CompiledTypeField extends AbstractCompiledField<CompiledType> {
     public CompiledTypeField(String name) {
         super(name);
     }
-    
+
 }
