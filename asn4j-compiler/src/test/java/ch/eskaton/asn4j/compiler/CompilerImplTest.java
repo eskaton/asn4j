@@ -98,7 +98,7 @@ class CompilerImplTest {
     @ParameterizedTest(name = "[{index}] {1}")
     @MethodSource("provideSetsWithDuplicateTags")
     void testDuplicateTagsInSet(String body, String description) {
-        testModule(body, CompilerException.class, "Duplicate tags:.*");
+        testModule(body, CompilerException.class, "Duplicate tags in SET .*:.*");
     }
 
     @Test

@@ -41,17 +41,21 @@ public class SequenceCompiler extends AbstractCollectionCompiler<SequenceType> {
 
     private static class OpenTypeVerifier implements ComponentVerifier {
 
+        private final TypeName typeName;
+
         private Tuple2<String, CompiledType> optionalOpenTypeComponent;
 
-        public OpenTypeVerifier(CompilerContext compilerContext) {
+        public OpenTypeVerifier(CompilerContext compilerContext, TypeName typeName) {
+            this.typeName = typeName;
         }
 
         public void verify(String name, CompiledType component) {
             if (component.getType() instanceof OpenType && component.isOptional()) {
                 optionalOpenTypeComponent = Tuple2.of(name, component);
             } else if (optionalOpenTypeComponent != null) {
-                throw new CompilerException("%s contains the optional open type %s which is ambiguous",
-                        optionalOpenTypeComponent.get_2().getParent().getName(), optionalOpenTypeComponent.get_1());
+                throw new CompilerException("%s %s contains the optional open type %s which is ambiguous",
+                        typeName.getName(), optionalOpenTypeComponent.get_2().getParent().getName(),
+                        optionalOpenTypeComponent.get_1());
             }
         }
 

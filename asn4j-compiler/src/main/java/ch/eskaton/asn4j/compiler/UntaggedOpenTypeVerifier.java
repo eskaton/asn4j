@@ -27,13 +27,36 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.collections.Tuple2;
 
-public class SetCompiler extends AbstractCollectionCompiler<SetType> {
+public class UntaggedOpenTypeVerifier implements ComponentVerifier {
 
-    public SetCompiler() {
-        super(TypeName.SET, TagUniquenessVerifier::new, UntaggedOpenTypeVerifier::new);
+    private final TypeName typeName;
+
+    private int componentCount = 0;
+
+    private Tuple2<String, CompiledType> untaggedOpenType;
+
+    public UntaggedOpenTypeVerifier(CompilerContext compilerContext, TypeName typeName) {
+        this.typeName = typeName;
+    }
+
+    public void verify(String name, CompiledType component) {
+        if (component.getType() instanceof OpenType openType) {
+            if (untaggedOpenType == null && openType.getTag() == null) {
+                untaggedOpenType = Tuple2.of(name, component);
+            }
+        }
+
+        if (componentCount >= 1 && untaggedOpenType != null) {
+            throw new CompilerException("%s %s contains the open type %s which is ambiguous", typeName.getName(),
+                    untaggedOpenType.get_2().getParent().getName(), untaggedOpenType.get_1());
+        }
+
+        componentCount++;
     }
 
 }

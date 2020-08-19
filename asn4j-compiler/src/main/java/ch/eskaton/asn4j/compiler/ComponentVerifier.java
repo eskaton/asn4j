@@ -27,13 +27,11 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.types.SetType;
-import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 
-public class SetCompiler extends AbstractCollectionCompiler<SetType> {
+@FunctionalInterface
+interface ComponentVerifier {
 
-    public SetCompiler() {
-        super(TypeName.SET, TagUniquenessVerifier::new, UntaggedOpenTypeVerifier::new);
-    }
+    void verify(String name, CompiledType component);
 
 }
