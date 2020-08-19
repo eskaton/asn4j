@@ -27,13 +27,46 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.collections.Tuple2;
 
-public class SetCompiler extends AbstractCollectionCompiler<SetType> {
+import java.util.HashMap;
+import java.util.Set;
 
-    public SetCompiler() {
-        super(TypeName.SET, TagUniquenessVerifier::new, UntaggedOpenTypeVerifier::new);
+class TagUniquenessVerifier implements ComponentVerifier {
+
+    private final CompilerContext ctx;
+
+    private final TypeName typeName;
+
+    private final HashMap<TagId, Tuple2<String, CompiledType>> seenTags = new HashMap<>();
+
+    public TagUniquenessVerifier(CompilerContext ctx, TypeName typeName) {
+        this.ctx = ctx;
+        this.typeName = typeName;
+    }
+
+    public void verify(String componentName, CompiledType component) {
+        var tagIds = getTagId(ctx, component);
+
+        tagIds.forEach(tagId -> {
+            var seenComponent = seenTags.get(tagId);
+
+            if (seenComponent != null) {
+                throw new CompilerException("Duplicate tags in %s %s: %s and %s", typeName.getName(),
+                        seenComponent.get_2().getParent().getName(), seenComponent.get_1(), componentName);
+            }
+        });
+
+        tagIds.forEach(tagId -> seenTags.put(tagId, Tuple2.of(componentName, component)));
+    }
+
+    private Set<TagId> getTagId(CompilerContext ctx, CompiledType component) {
+        var type = ctx.resolveSelectedType(component.getType());
+
+        return ctx.getTagId(type);
     }
 
 }
