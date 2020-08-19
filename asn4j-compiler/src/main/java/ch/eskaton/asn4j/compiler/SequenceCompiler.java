@@ -27,14 +27,34 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.collections.Tuple2;
 
 public class SequenceCompiler extends AbstractCollectionCompiler<SequenceType> {
 
     public SequenceCompiler() {
-        super(TypeName.SEQUENCE, c -> (name, component) -> {
-        });
+        super(TypeName.SEQUENCE, OpenTypeVerifier::new);
+    }
+
+    private static class OpenTypeVerifier implements ComponentVerifier {
+
+        private Tuple2<String, CompiledType> optionalOpenTypeComponent;
+
+        public OpenTypeVerifier(CompilerContext compilerContext) {
+        }
+
+        public void verify(String name, CompiledType component) {
+            if (component.getType() instanceof OpenType && component.isOptional()) {
+                optionalOpenTypeComponent = Tuple2.of(name, component);
+            } else if (optionalOpenTypeComponent != null) {
+                throw new CompilerException("%s contains the optional open type %s which is ambiguous",
+                        optionalOpenTypeComponent.get_2().getParent().getName(), optionalOpenTypeComponent.get_1());
+            }
+        }
+
     }
 
 }
