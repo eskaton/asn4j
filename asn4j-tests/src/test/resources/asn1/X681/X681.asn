@@ -179,4 +179,19 @@ TestSequence101 ::= SEQUENCE {
    typeField TEST2.&TypeField
 }
 
+TestSequence102 ::= SEQUENCE {
+   typeField TEST2.&TypeField,
+   intField  INTEGER
+}
+
+TestSet101 ::= SET {
+   typeField TEST2.&TypeField
+}
+
+TestSet102 ::= SET {
+   intField        INTEGER,
+   typeField1 [23] TEST2.&TypeField,
+   typeField2 [24] TEST2.&TypeField
+}
+
 END

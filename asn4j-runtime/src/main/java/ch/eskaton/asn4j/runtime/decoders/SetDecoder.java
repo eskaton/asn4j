@@ -30,10 +30,10 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
-import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
+import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.utils.StringUtils;
@@ -41,7 +41,7 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class SetDecoder implements CollectionDecoder<ASN1Set> {
@@ -52,23 +52,31 @@ public class SetDecoder implements CollectionDecoder<ASN1Set> {
         Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = metaData.getTagsToTypes();
         DecodingResult<? extends ASN1Type> result;
 
-        do {
-            result = decoder.decode(states, tagsToTypes);
+        if (tagsToTypes.size() == 1 &&
+                ASN1OpenType.class.isAssignableFrom(tagsToTypes.values().stream().findFirst().get())) {
+            var value = decoder.decodeOpenType(states, states.peek(), metaData.getMandatoryFields().isEmpty());
 
-            if (result == null) {
-                checkMandatoryFields(metaData, tagsToTypes);
-                return;
-            }
+            setValue(value, metaData.getTagData().get(0).getSetter());
+        } else {
+            do {
+                result = decoder.decode(states, tagsToTypes);
 
-            var setter = metaData.getSetter(result.getTags());
+                if (result == null) {
+                    checkMandatoryFields(metaData, tagsToTypes);
+                    return;
+                }
 
-            if (setter == null) {
-                throw new DecodingException("Failed to decode a value of the type " +
-                        result.getClass().getSimpleName());
-            }
+                setValue(result.getObj(), metaData.getSetter(result.getTags()));
+            } while (!tagsToTypes.isEmpty());
+        }
+    }
 
-            setter.accept(result.getObj());
-        } while (!tagsToTypes.isEmpty());
+    private void setValue(ASN1Type value, Consumer<ASN1Type> setter) {
+        if (setter == null) {
+            throw new DecodingException("Failed to decode a value of the type " + value.getClass().getSimpleName());
+        }
+
+        setter.accept(value);
     }
 
     protected void checkMandatoryFields(FieldMetaData metaData, Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes) {

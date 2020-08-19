@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
+import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.asn4j.runtime.utils.ToString;
@@ -40,8 +41,8 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,10 +56,14 @@ public class FieldMetaData {
     private List<TagData> tagData;
 
     public FieldMetaData(ASN1Type type, Class<? extends Annotation> annotationClass) {
-        tagData = getTagData(type, annotationClass);
+        tagData = buildTagData(type, annotationClass);
     }
 
-    private ArrayList<TagData> getTagData(ASN1Type type, Class<? extends Annotation> annotationClass) {
+    public List<TagData> getTagData() {
+        return Collections.unmodifiableList(tagData);
+    }
+
+    private List<TagData> buildTagData(ASN1Type type, Class<? extends Annotation> annotationClass) {
         var tagData = new ArrayList<TagData>();
 
         for (Field field : RuntimeUtils.getComponents(type)) {
@@ -69,7 +74,7 @@ public class FieldMetaData {
 
                 if (ASN1Choice.class.isAssignableFrom(fieldType)) {
                     var obj = getInstance(fieldType, DecodingException::new);
-                    var componentsTagData = getTagData(obj, annotationClass);
+                    var componentsTagData = buildTagData(obj, annotationClass);
 
                     tagData.addAll(componentsTagData.stream().map(t -> {
                         var oldSetter = t.setter;
@@ -81,7 +86,13 @@ public class FieldMetaData {
 
                         return t;
                     }).collect(Collectors.toList()));
+                } else if (ASN1OpenType.class.isAssignableFrom(fieldType)) {
+                    var tagAnnotation = field.getAnnotation(ASN1Tag.class);
+                    var tags = tagAnnotation != null ?
+                            RuntimeUtils.getTags(fieldType, field.getAnnotation(ASN1Tag.class)) :
+                            List.<ASN1Tag>of();
 
+                    tagData.add(new TagData(tags, field, getSetter(field, type)));
                 } else {
                     var tags = RuntimeUtils.getTags(fieldType, field.getAnnotation(ASN1Tag.class));
 
@@ -94,13 +105,17 @@ public class FieldMetaData {
     }
 
     private Consumer<ASN1Type> getSetter(Field field, ASN1Type obj) {
-        return (result) -> {
-            String setterName = "set" + StringUtils.initCap(field.getName());
+        return (value) -> {
+            var setterName = "set" + StringUtils.initCap(field.getName());
 
             try {
-                Method setter = obj.getClass().getDeclaredMethod(setterName, result.getClass());
+                var valueClass = value.getClass();
 
-                setter.invoke(obj, result);
+                if (value instanceof ASN1OpenType) {
+                    valueClass = ASN1OpenType.class;
+                }
+
+                obj.getClass().getDeclaredMethod(setterName, valueClass).invoke(obj, value);
             } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
                 throw new DecodingException(e);
             } catch (NoSuchMethodException e) {

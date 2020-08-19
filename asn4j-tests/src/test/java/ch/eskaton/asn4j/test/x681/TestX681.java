@@ -54,6 +54,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence10;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence101;
+import ch.eskaton.asn4j.test.modules.X681.TestSequence102;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence11;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence12;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence13;
@@ -84,6 +85,8 @@ import ch.eskaton.asn4j.test.modules.X681.TestSequence6;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence7;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence8;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence9;
+import ch.eskaton.asn4j.test.modules.X681.TestSet101;
+import ch.eskaton.asn4j.test.modules.X681.TestSet102;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -284,7 +287,7 @@ class TestX681 {
     }
 
     @Test
-    @DisplayName("Verify that the object class field type is resolved to an open type of BOOLEAN")
+    @DisplayName("Verify that the object class field type in a SEQUENCE is resolved to an open type of BOOLEAN")
     void testSequence101() {
         var value = new TestSequence101();
 
@@ -297,6 +300,66 @@ class TestX681 {
         assertTrue(typeField.decode(ASN1Boolean.class) instanceof ASN1Boolean);
         assertNotNull(typeField.getValue());
         assertEquals(ASN1Boolean.TRUE, typeField.getValue());
+    }
+
+    @Test
+    @DisplayName("Verify that a SEQUENCE is decodable if an open type is followed by another component")
+    void testSequence102() {
+        var value = new TestSequence102();
+
+        value.setTypeField(new ASN1OpenType(ASN1Boolean.TRUE));
+        value.setIntField(ASN1Integer.valueOf(23));
+
+        var decoded = new BERDecoder().decode(TestSequence102.class, new BEREncoder().encode(value));
+        var typeField = decoded.getTypeField();
+
+        assertNull(typeField.getValue());
+        assertTrue(typeField.decode(ASN1Boolean.class) instanceof ASN1Boolean);
+        assertNotNull(typeField.getValue());
+        assertEquals(ASN1Boolean.TRUE, typeField.getValue());
+        assertEquals(ASN1Integer.valueOf(23), decoded.getIntField());
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type in a SET is resolved to an open type of BOOLEAN")
+    void testSet101() {
+        var value = new TestSet101();
+
+        value.setTypeField(new ASN1OpenType(ASN1Boolean.TRUE));
+
+        var decoded = new BERDecoder().decode(TestSet101.class, new BEREncoder().encode(value));
+        var typeField = decoded.getTypeField();
+
+        assertNull(typeField.getValue());
+        assertTrue(typeField.decode(ASN1Boolean.class) instanceof ASN1Boolean);
+        assertNotNull(typeField.getValue());
+        assertEquals(ASN1Boolean.TRUE, typeField.getValue());
+    }
+
+    @Test
+    @DisplayName("Verify that a SET is decodable if it contains multiple tagged open types")
+    void testSet102() {
+        var value = new TestSet102();
+
+        value.setIntField(ASN1Integer.valueOf(47));
+        value.setTypeField1(new ASN1OpenType(ASN1Boolean.TRUE));
+        value.setTypeField2(new ASN1OpenType(ASN1Integer.valueOf(23)));
+
+        var decoded = new BERDecoder().decode(TestSet102.class, new BEREncoder().encode(value));
+        var typeField1 = decoded.getTypeField1();
+        var typeField2 = decoded.getTypeField2();
+
+        assertEquals(ASN1Integer.valueOf(47), decoded.getIntField());
+
+        assertNull(typeField1.getValue());
+        assertTrue(typeField1.decode(ASN1Boolean.class) instanceof ASN1Boolean);
+        assertNotNull(typeField1.getValue());
+        assertEquals(ASN1Boolean.TRUE, typeField1.getValue());
+
+        assertNull(typeField2.getValue());
+        assertTrue(typeField2.decode(ASN1Integer.class) instanceof ASN1Integer);
+        assertNotNull(typeField2.getValue());
+        assertEquals(ASN1Integer.valueOf(23), typeField2.getValue());
     }
 
 }

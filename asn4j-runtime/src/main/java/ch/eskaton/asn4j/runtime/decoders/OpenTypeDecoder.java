@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.Decoder;
+import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
@@ -36,11 +37,10 @@ import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 public class OpenTypeDecoder {
 
-    public <T extends ASN1Type> T decode(Decoder decoder, DecoderStates states, boolean optional) {
-        var currentState = states.peek();
-        var state = decoder.decode(states);
+    public <T extends ASN1Type> T decode(Decoder decoder, DecoderStates states, DecoderState state, boolean optional) {
+        var newState = decoder.decode(states);
 
-        if (state == null) {
+        if (newState == null) {
             if (optional) {
                 return null;
             }
@@ -48,7 +48,7 @@ public class OpenTypeDecoder {
             throw new DecodingException("Empty open type");
         }
 
-        return (T) new DecodableASN1OpenType(decoder, RuntimeUtils.getValue(states, currentState));
+        return (T) new DecodableASN1OpenType(decoder, RuntimeUtils.getValue(states, state));
     }
 
     private static class DecodableASN1OpenType extends ASN1OpenType {
