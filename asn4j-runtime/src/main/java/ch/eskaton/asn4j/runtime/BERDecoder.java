@@ -168,14 +168,13 @@ public class BERDecoder implements Decoder {
         return decode(type, states, null, false);
     }
 
-    public DecodingResult<? extends ASN1Type> decode(DecoderStates states, Map<List<ASN1Tag>,
-            Class<? extends ASN1Type>> tags) {
+    public DecodingResult<? extends ASN1Type> decode(DecoderStates states,
+            Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags) {
         MultipleTagsMatcher matcher = new MultipleTagsMatcher(tags.keySet());
         DecoderState state = consumeMultipleTags(states, matcher);
 
         if (state != null) {
             List<ASN1Tag> match = matcher.getMatch();
-
             Class<? extends ASN1Type> type = tags.remove(match);
 
             state.setTagIds(match.stream().map(TagId::fromTag).collect(Collectors.toList()));
@@ -199,7 +198,7 @@ public class BERDecoder implements Decoder {
         if (ReflectionUtils.extendsClazz(clazz, ASN1Choice.class)) {
             return decodeChoice(clazz, states, optional);
         } else if (ReflectionUtils.extendsClazz(clazz, ASN1OpenType.class)) {
-            return decodeOpenType(states, optional);
+            return new DecodingResult<>(List.of(), decodeOpenType(states, states.peek(), optional));
         }
 
         tags = RuntimeUtils.getTags(clazz, tag);
@@ -231,10 +230,14 @@ public class BERDecoder implements Decoder {
         return new DecodingResult<>(Collections.emptyList(), obj);
     }
 
-    private <T extends ASN1Type> DecodingResult<T> decodeOpenType(DecoderStates states, boolean optional) {
-        T obj = openTypeDecoder.decode(this, states, optional);
+    @Override
+    public  <T extends ASN1Type> T decodeOpenType(DecoderStates states, DecoderState state,
+            boolean optional) {
+        T obj = openTypeDecoder.decode(this, states, state, optional);
 
-        return new DecodingResult<>(Collections.emptyList(), obj);
+        states.back();
+
+        return obj;
     }
 
     public <T extends ASN1Type, C extends TypeDecoder<T>> C getDecoder(Class<T> clazz) {
@@ -254,6 +257,20 @@ public class BERDecoder implements Decoder {
         }
 
         T obj;
+
+        if (type instanceof Class && ASN1OpenType.class.isAssignableFrom((Class) type)) {
+            obj = decodeOpenType(states, state, false);
+
+            if (obj instanceof HasConstraint) {
+                ((HasConstraint) obj).checkConstraint();
+            }
+
+            var decodingResult = new DecodingResult<>(state.getTagIds(), obj);
+
+            states.back();
+
+            return decodingResult;
+        }
 
         try {
             Class<T> clazz = toClass(type);
