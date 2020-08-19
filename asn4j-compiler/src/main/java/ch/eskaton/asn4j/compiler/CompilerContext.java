@@ -373,42 +373,45 @@ public class CompilerContext {
 
     private CompiledType defineTypeField(Type type, String name, CompiledObjectClass compiledObjectClass) {
         var additionalConstraints = type.getConstraints();
+        var openType = new OpenType();
 
-        type = new OpenType();
+        openType.setTag(type.getTag());
 
         if (additionalConstraints != null) {
-            var constraints = type.getConstraints();
+            var constraints = openType.getConstraints();
 
             if (constraints == null) {
-                type.setConstraints(additionalConstraints);
+                openType.setConstraints(additionalConstraints);
             } else {
                 constraints.addAll(additionalConstraints);
             }
         }
 
-        var compiledType = defineType(type, name);
+        var compiledType = defineType(openType, name);
 
         compiledType.setObjectClass(compiledObjectClass);
 
         return compiledType;
     }
 
-    private CompiledType defineFixedTypeValueField(Type type, String name, CompiledObjectClass compiledObjectClass, CompiledFixedTypeValueField field) {
+    private CompiledType defineFixedTypeValueField(Type type, String name, CompiledObjectClass compiledObjectClass,
+            CompiledFixedTypeValueField field) {
         var additionalConstraints = type.getConstraints();
+        var newType = (Type) Clone.clone(field.getCompiledType().getType());
 
-        type = (Type) Clone.clone(field.getCompiledType().getType());
+        newType.setTag(type.getTag());
 
         if (additionalConstraints != null) {
-            var constraints = type.getConstraints();
+            var constraints = newType.getConstraints();
 
             if (constraints == null) {
-                type.setConstraints(additionalConstraints);
+                newType.setConstraints(additionalConstraints);
             } else {
                 constraints.addAll(additionalConstraints);
             }
         }
 
-        var compiledType = defineType(type, name);
+        var compiledType = defineType(newType, name);
 
         compiledType.setObjectClass(compiledObjectClass);
 
@@ -567,6 +570,15 @@ public class CompilerContext {
             } catch (ClassNotFoundException e) {
                 throw new CompilerException("Unknown type: %s", type);
             }
+        } else if (compiledType instanceof OpenType) {
+            var tag = compiledType.getTag();
+
+            if (tag != null) {
+                return Set.of(CompilerUtils.toTagId(tag));
+            }
+
+            // if the type is untagged it's ignored here and verified later
+            return Set.of();
         }
 
         throw new IllegalCompilerStateException("Unexpected type: %s", type);

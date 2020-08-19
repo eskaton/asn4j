@@ -37,6 +37,8 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.MutableReference;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -48,12 +50,14 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
 
     private final TypeName typeName;
 
-    private final List<? extends Function<CompilerContext, ComponentVerifier>> componentVerifierSuppliers;
+    private final List<Function<CompilerContext, ComponentVerifier>> componentVerifierSuppliers;
 
     public AbstractCollectionCompiler(TypeName typeName,
-            Function<CompilerContext, ComponentVerifier> componentVerifierSupplier) {
+            Function<CompilerContext, ComponentVerifier>... componentVerifierSupplier) {
         this.typeName = typeName;
-        this.componentVerifierSuppliers = List.of(componentVerifierSupplier, c -> new NameUniquenessVerifier());
+        this.componentVerifierSuppliers = new ArrayList<>(Arrays.asList(componentVerifierSupplier));
+
+        this.componentVerifierSuppliers.add(NameUniquenessVerifier::new);
     }
 
     public CompiledType compile(CompilerContext ctx, String name, T node) {
@@ -128,6 +132,9 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
     private static class NameUniquenessVerifier implements ComponentVerifier {
 
         private final Set<String> seenNames = new HashSet<>();
+
+        public NameUniquenessVerifier(CompilerContext compilerContext) {
+        }
 
         public void verify(String name, CompiledType component) {
             if (seenNames.contains(name)) {

@@ -325,6 +325,115 @@ class CompilerImplTest {
         assertTrue(compiledComponent.getType() instanceof OpenType);
     }
 
+    @Test
+    void testTypeFieldInvalidOptionalInSequence() {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+                
+                TestSequence ::= SEQUENCE {
+                   typeField TEST.&TypeField OPTIONAL,
+                   intField  INTEGER
+                }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*TestSequence contains the optional open type typeField which is ambiguous.*");
+    }
+
+    @Test
+    void testTypeFieldValidOptionalInSequence() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+                
+                TestSequence ::= SEQUENCE {
+                   intField  INTEGER,
+                   typeField TEST.&TypeField OPTIONAL
+                }
+                """;
+
+        testCompiledCollection(body, "TestSequence");
+    }
+
+    @Test
+    void testTypeFieldInvalidInSet() {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+                
+                TestSet ::= SET {
+                   intField  INTEGER,
+                   typeField TEST.&TypeField
+                }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*TestSet contains the open type typeField which is ambiguous.*");
+
+        body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+                
+                TestSet ::= SET {
+                   typeField TEST.&TypeField,
+                   intField  INTEGER
+                }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*TestSet contains the open type typeField which is ambiguous.*");
+    }
+
+    @Test
+    void testTypeFieldValidInSet() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+                
+                TestSet ::= SET {
+                   typeField TEST.&TypeField
+                }
+                """;
+
+        testCompiledCollection(body, "TestSet");
+    }
+
+    @Test
+    void testTypeFieldTaggedValidInSet() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+                
+                TestSet ::= SET {
+                   intField        INTEGER,
+                   typeField1 [23] TEST.&TypeField,
+                   typeField2 [24] TEST.&TypeField
+                }
+                """;
+
+        testCompiledCollection(body, "TestSet");
+    }
+
+    private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get(collectionName);
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+    }
+
     private void testModule(String body, Class<? extends Exception> expected, String message) {
         var module = module("TEST-MODULE", body);
         var exception = assertThrows(() -> new CompilerImpl()

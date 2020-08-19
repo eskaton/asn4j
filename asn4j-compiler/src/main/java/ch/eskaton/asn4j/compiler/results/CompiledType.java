@@ -45,6 +45,8 @@ public class CompiledType implements CompilationResult {
 
     private CompiledObjectClass objectClass;
 
+    private boolean optional;
+
     CompiledType(Type type, String name) {
         this.type = type;
         this.name = name;
@@ -82,6 +84,14 @@ public class CompiledType implements CompilationResult {
         this.objectClass = objectClass;
     }
 
+    public void setOptional(boolean optional) {
+        this.optional = optional;
+    }
+
+    public boolean isOptional() {
+        return optional;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -94,7 +104,8 @@ public class CompiledType implements CompilationResult {
 
         CompiledType that = (CompiledType) o;
 
-        return Objects.equals(parent, that.parent) &&
+        return optional == that.optional &&
+                Objects.equals(parent, that.parent) &&
                 Objects.equals(type, that.type) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(constraintDefinition, that.constraintDefinition) &&
@@ -103,7 +114,7 @@ public class CompiledType implements CompilationResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(parent, type, name, constraintDefinition, objectClass);
+        return Objects.hash(parent, type, name, constraintDefinition, objectClass, optional);
     }
 
     @Override
