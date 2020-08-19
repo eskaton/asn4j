@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass.BodyBuilder;
 import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.java.objs.JavaEnum;
 import ch.eskaton.asn4j.compiler.java.objs.JavaGetter;
@@ -39,7 +38,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
-import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
@@ -48,9 +46,7 @@ import ch.eskaton.commons.MutableReference;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PRIVATE;
@@ -66,50 +62,39 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, Choice node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
-        List<String> fieldNames = new ArrayList<>();
-        JavaEnum typeEnum = new JavaEnum(CHOICE_ENUM);
-
-        BodyBuilder builder = javaClass.method().modifier(PUBLIC).annotation("@Override")
+        var javaClass = ctx.createClass(name, node, true);
+        var fieldNames = new ArrayList<String>();
+        var typeEnum = new JavaEnum(CHOICE_ENUM);
+        var componentVerifiers = List.of(new TagUniquenessVerifier(ctx, TypeName.CHOICE),
+                new UntaggedOpenTypeVerifier(ctx, TypeName.CHOICE));
+        var bodyBuilder = javaClass.method().modifier(PUBLIC).annotation("@Override")
                 .returnType(ASN1Type.class.getSimpleName()).name("getValue").body();
+        var clearFields = "\t\t" + CLEAR_FIELDS + "();\n";
 
-        String clearFields = "\t\t" + CLEAR_FIELDS + "();\n";
-
-        builder.append("switch(" + CHOICE_FIELD + ") {");
+        bodyBuilder.append("switch(" + CHOICE_FIELD + ") {");
 
         var compiledType = ctx.createCompiledType(CompiledChoiceType.class, node, name);
         var components = new ArrayList<Tuple2<String, CompiledType>>();
-        var seenTags = new HashMap<TagId, NamedType>();
 
         for (NamedType namedType : node.getRootAlternatives()) {
-            var tagIds = getTagId(ctx, namedType);
-
-            tagIds.forEach(tagId -> {
-                var seenComponent = seenTags.get(tagId);
-
-                if (seenComponent != null) {
-                    throw new CompilerException("Duplicate tags in %s %s: %s and %s", TypeName.CHOICE, name,
-                            seenComponent.getName(), namedType.getName());
-                }
-            });
-
-            tagIds.stream().forEach(t -> seenTags.put(t, namedType));
-
             var typeConstant = CompilerUtils.formatConstant(namedType.getName());
-            var component = compileChoiceNamedType(ctx, javaClass, namedType, typeConstant, clearFields);
-            var fieldName = component.get_1();
+            var nameAndComponent = compileChoiceNamedType(ctx, javaClass, namedType, typeConstant, clearFields);
+            var fieldName = nameAndComponent.get_1();
+            var component = nameAndComponent.get_2();
 
-            component.get_2().setParent(compiledType);
+            component.setParent(compiledType);
 
-            components.add(component);
+            componentVerifiers.forEach(v -> v.verify(fieldName, component));
+
+            components.add(nameAndComponent);
             fieldNames.add(fieldName);
             typeEnum.addEnumConstant(typeConstant);
-            builder.append("\tcase " + typeConstant + ":").append("\t\treturn " + fieldName + ";");
+            bodyBuilder.append("\tcase " + typeConstant + ":").append("\t\treturn " + fieldName + ";");
         }
 
-        builder.append("}").append("").append("return null;");
+        bodyBuilder.append("}").append("").append("return null;");
 
-        builder.finish().build();
+        bodyBuilder.finish().build();
 
         javaClass.addEnum(typeEnum);
         javaClass.addField(new JavaDefinedField(CHOICE_ENUM, CHOICE_FIELD), true, false);
@@ -149,7 +134,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
             String typeConstant, String beforeCode) {
         String name = CompilerUtils.formatName(namedType.getName());
         CompiledType compiledType = ctx.defineType(namedType);
-        String typeName = ctx.getTypeName(namedType);
+        String typeName = compiledType.getName();
         Tag tag = namedType.getType().getTag();
         TaggingMode taggingMode = namedType.getType().getTaggingMode();
         JavaDefinedField field = new JavaDefinedField(typeName, name);
@@ -172,12 +157,6 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
     private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
         javaClass.method().modifier(PRIVATE).name(CLEAR_FIELDS).body()
                 .append(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).finish().build();
-    }
-
-    private Set<TagId> getTagId(CompilerContext ctx, NamedType namedType) {
-        var type = ctx.resolveSelectedType(namedType.getType());
-
-        return ctx.getTagId(type);
     }
 
 }

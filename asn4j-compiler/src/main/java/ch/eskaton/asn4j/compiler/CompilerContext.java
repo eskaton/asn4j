@@ -302,7 +302,7 @@ public class CompilerContext {
         return getTypeName(type, name);
     }
 
-    public String getTypeName(Type type, String name) {
+    private String getTypeName(Type type, String name) {
         return config.getTypeNameSupplier(type.getClass()).getName(type, name);
     }
 

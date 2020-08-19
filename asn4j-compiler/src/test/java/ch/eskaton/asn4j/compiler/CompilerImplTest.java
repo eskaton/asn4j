@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
@@ -110,7 +111,7 @@ class CompilerImplTest {
                 }
                 """;
 
-        testModule(body, CompilerException.class, "Duplicate tags in CHOICE.*");
+        testModule(body, CompilerException.class, "Duplicate tags.*");
     }
 
     @Test
@@ -421,6 +422,54 @@ class CompilerImplTest {
         testCompiledCollection(body, "TestSet");
     }
 
+    @Test
+    void testTypeFieldValidInChoice() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+
+                TestChoice ::= CHOICE {
+                   typeField TEST.&TypeField
+                }
+                """;
+
+        testCompiledChoice(body);
+    }
+
+    @Test
+    void testTypeFieldTaggedValidInChoice() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+
+                TestChoice ::= CHOICE {
+                   typeField1 [23] TEST.&TypeField,
+                   typeField2 [24] TEST.&TypeField
+                }
+                """;
+
+        testCompiledChoice(body);
+    }
+
+    @Test
+    void testTypeFieldInvalidInChoice() {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+
+                TestChoice ::= CHOICE {
+                   intField  INTEGER,
+                   typeField TEST.&TypeField
+                }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*TestChoice contains the open type typeField which is ambiguous.*");
+    }
+
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var compiler = new CompilerImpl();
@@ -432,6 +481,19 @@ class CompilerImplTest {
 
         assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
+    }
+
+    private void testCompiledChoice(String body) throws IOException, ParserException {
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("TestChoice");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledChoiceType);
     }
 
     private void testModule(String body, Class<? extends Exception> expected, String message) {
