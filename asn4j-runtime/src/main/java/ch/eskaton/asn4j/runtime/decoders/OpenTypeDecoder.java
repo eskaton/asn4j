@@ -33,7 +33,6 @@ import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 public class OpenTypeDecoder {
 
@@ -48,7 +47,11 @@ public class OpenTypeDecoder {
             throw new DecodingException("Empty open type");
         }
 
-        return (T) new DecodableASN1OpenType(decoder, RuntimeUtils.getValue(states, state));
+        byte[] buf = new byte[state.length];
+
+        System.arraycopy(states.buf, state.pos, buf, 0, state.length);
+
+        return (T) new DecodableASN1OpenType(decoder, buf);
     }
 
     private static class DecodableASN1OpenType extends ASN1OpenType {

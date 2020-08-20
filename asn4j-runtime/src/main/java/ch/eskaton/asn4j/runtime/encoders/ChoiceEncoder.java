@@ -28,11 +28,11 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.asn4j.runtime.utils.TLVUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.reflect.Field;
@@ -46,8 +46,12 @@ public class ChoiceEncoder implements TypeEncoder<ASN1Choice> {
         ASN1Type value = obj.getValue();
         ASN1Tag tag = null;
 
+        var choice = obj.getChoice().name();
+
         for (Field field : obj.getClass().getDeclaredFields()) {
-            if (field.getType().equals(value.getClass())) {
+            var alternative = field.getAnnotation(ASN1Alternative.class);
+
+            if (alternative != null && choice.equals(alternative.name())) {
                 tag = field.getAnnotation(ASN1Tag.class);
                 break;
             }
@@ -55,11 +59,7 @@ public class ChoiceEncoder implements TypeEncoder<ASN1Choice> {
 
         try {
             if (tag != null) {
-                ByteArrayOutputStream fieldContent = new ByteArrayOutputStream();
-                fieldContent.write(encoder.encode(value, tag));
-                content.write(TLVUtils.getTag(tag));
-                content.write(TLVUtils.getLength(fieldContent.size()));
-                content.write(fieldContent.toByteArray());
+                content.write(encoder.encode(value, tag));
             } else {
                 content.write(encoder.encode(value));
             }

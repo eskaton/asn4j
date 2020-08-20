@@ -51,6 +51,8 @@ import ch.eskaton.asn4j.runtime.types.ASN1UTF8String;
 import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 import ch.eskaton.asn4j.runtime.types.ASN1VideotexString;
 import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
+import ch.eskaton.asn4j.test.modules.X681.TestChoice101;
+import ch.eskaton.asn4j.test.modules.X681.TestChoice102;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence1;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence10;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence101;
@@ -355,6 +357,49 @@ class TestX681 {
         assertTrue(typeField1.decode(ASN1Boolean.class) instanceof ASN1Boolean);
         assertNotNull(typeField1.getValue());
         assertEquals(ASN1Boolean.TRUE, typeField1.getValue());
+
+        assertNull(typeField2.getValue());
+        assertTrue(typeField2.decode(ASN1Integer.class) instanceof ASN1Integer);
+        assertNotNull(typeField2.getValue());
+        assertEquals(ASN1Integer.valueOf(23), typeField2.getValue());
+    }
+
+    @Test
+    @DisplayName("Verify that the object class field type in a CHOICE is resolved to an open type of BOOLEAN")
+    void testChoice101() {
+        var value = new TestChoice101();
+
+        value.setTypeField(new ASN1OpenType(ASN1Boolean.TRUE));
+
+        var decoded = new BERDecoder().decode(TestChoice101.class, new BEREncoder().encode(value));
+        var typeField = decoded.getTypeField();
+
+        assertNull(typeField.getValue());
+        assertTrue(typeField.decode(ASN1Boolean.class) instanceof ASN1Boolean);
+        assertNotNull(typeField.getValue());
+        assertEquals(ASN1Boolean.TRUE, typeField.getValue());
+    }
+
+    @Test
+    @DisplayName("Verify that a CHOICE is decodable if it contains multiple tagged open types")
+    void testChoice102() {
+        var value = new TestChoice102();
+
+        value.setTypeField1(new ASN1OpenType(ASN1Boolean.TRUE));
+
+        var decoded = new BERDecoder().decode(TestChoice102.class, new BEREncoder().encode(value));
+        var typeField1 = decoded.getTypeField1();
+
+        assertNull(typeField1.getValue());
+        assertTrue(typeField1.decode(ASN1Boolean.class) instanceof ASN1Boolean);
+        assertNotNull(typeField1.getValue());
+        assertEquals(ASN1Boolean.TRUE, typeField1.getValue());
+
+        value.setTypeField2(new ASN1OpenType(ASN1Integer.valueOf(23)));
+
+        decoded = new BERDecoder().decode(TestChoice102.class, new BEREncoder().encode(value));
+
+        var typeField2 = decoded.getTypeField2();
 
         assertNull(typeField2.getValue());
         assertTrue(typeField2.decode(ASN1Integer.class) instanceof ASN1Integer);
