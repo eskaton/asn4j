@@ -28,42 +28,20 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
-import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
-import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.asn4j.runtime.utils.TLVUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Field;
 
 public class OpenTypeEncoder implements TypeEncoder<ASN1OpenType> {
 
     @Override
     public byte[] encode(Encoder encoder, ASN1OpenType obj) {
-        ByteArrayOutputStream content = new ByteArrayOutputStream();
-
-        ASN1Type value = obj.getValue();
-        ASN1Tag tag = null;
-
-        for (Field field : obj.getClass().getDeclaredFields()) {
-            if (field.getType().equals(value.getClass())) {
-                tag = field.getAnnotation(ASN1Tag.class);
-                break;
-            }
-        }
+        var content = new ByteArrayOutputStream();
+        var value = obj.getValue();
 
         try {
-            if (tag != null) {
-                ByteArrayOutputStream fieldContent = new ByteArrayOutputStream();
-                fieldContent.write(encoder.encode(value, tag));
-                content.write(TLVUtils.getTag(tag));
-                content.write(TLVUtils.getLength(fieldContent.size()));
-                content.write(fieldContent.toByteArray());
-            } else {
-                content.write(encoder.encode(value));
-            }
+            content.write(encoder.encode(value));
         } catch (Exception e) {
             throw new EncodingException(e);
         }

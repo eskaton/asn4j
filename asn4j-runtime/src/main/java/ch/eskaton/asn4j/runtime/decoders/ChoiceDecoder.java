@@ -31,38 +31,55 @@ import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.DecodingResult;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
+import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
-import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class ChoiceDecoder {
 
     public <T extends ASN1Choice> T decode(Decoder decoder, DecoderStates states, T obj, boolean optional) {
         FieldMetaData metaData = new FieldMetaData(obj, ASN1Alternative.class);
+        Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = metaData.getTagsToTypes();
         DecodingResult<? extends ASN1Type> result;
 
-        result = decoder.decode(states, metaData.getTagsToTypes());
+        if (tagsToTypes.size() == 1 &&
+                ASN1OpenType.class.isAssignableFrom(tagsToTypes.values().stream().findFirst().get())) {
+            var value = decoder.decodeOpenType(states, states.peek(), true);
+            var setter = metaData.getTagData().get(0).getSetter();
 
-        if (result == null) {
-            if (optional) {
-                return null;
+            setValue(value, setter);
+        } else {
+
+            result = decoder.decode(states, metaData.getTagsToTypes());
+
+            if (result == null) {
+                if (optional) {
+                    return null;
+                }
+
+                throw new DecodingException("Empty choice");
             }
 
-            throw new DecodingException("Empty choice");
+            var setter = metaData.getSetter(result.getTags());
+
+            setValue(result.getObj(), setter);
         }
-
-        String typeName = result.getClass().getSimpleName();
-        var setter = metaData.getSetter(result.getTags());
-
-        if (setter == null) {
-            throw new DecodingException("Failed to decode a value of the type " + typeName);
-        }
-
-        setter.accept(result.getObj());
 
         return obj;
+    }
+
+    private void setValue(ASN1Type value, Consumer<ASN1Type> setter) {
+        if (setter == null) {
+            throw new DecodingException("Failed to decode a value of the type " + value.getClass().getSimpleName());
+        }
+
+        setter.accept(value);
     }
 
 }

@@ -40,4 +40,6 @@ public abstract class ASN1Choice implements ASN1Type, HasConstraint {
 
     public abstract ASN1Type getValue();
 
+    public abstract <E extends Enum>  E getChoice();
+
 }
