@@ -77,9 +77,9 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
     private List<Tuple2<String, CompiledType>> compileComponentNamedType(CompilerContext ctx,
             CompiledCollectionType compiledType, ComponentType component, NamedType namedType) {
         JavaClass javaClass = ctx.getCurrentClass();
-        Type type = namedType.getType();
+        Type type = ctx.resolveSelectedType(namedType.getType());
         TaggingMode taggingMode = type.getTaggingMode();
-        Tag tag = ctx.resolveSelectedType(type).getTag();
+        Tag tag = type.getTag();
         JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
         boolean hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
         CompiledType compiledComponent = ctx.defineType(namedType);
