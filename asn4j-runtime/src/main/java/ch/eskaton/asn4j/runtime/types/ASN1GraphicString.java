@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.GraphicStringVerifier;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 25, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 25, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1GraphicString extends AbstractASN1String {
 
     private static final GraphicStringVerifier VERIFIER = new GraphicStringVerifier();

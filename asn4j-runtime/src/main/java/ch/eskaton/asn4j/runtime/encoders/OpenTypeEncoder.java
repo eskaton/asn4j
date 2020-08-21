@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
 
@@ -36,7 +37,7 @@ import java.io.ByteArrayOutputStream;
 public class OpenTypeEncoder implements TypeEncoder<ASN1OpenType> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1OpenType obj) {
+    public EncodingResult encode(Encoder encoder, ASN1OpenType obj) {
         var content = new ByteArrayOutputStream();
         var value = obj.getValue();
 
@@ -48,7 +49,7 @@ public class OpenTypeEncoder implements TypeEncoder<ASN1OpenType> {
 
         // Since the open type itself doesn't need to be encoded, we return its
         // value here
-        return content.toByteArray();
+        return EncodingResult.of(content.toByteArray(), false);
     }
 
 }

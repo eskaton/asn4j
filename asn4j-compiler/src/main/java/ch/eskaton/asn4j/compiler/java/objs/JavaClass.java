@@ -94,16 +94,13 @@ public class JavaClass implements JavaStructure {
 
     private ASN1Tag.Mode mode;
 
-    private boolean constructed;
-
     private Optional<List<String>> typeParameter = Optional.empty();
 
-    public JavaClass(String pkg, String name, Tag tag, ASN1Tag.Mode mode, boolean constructed, String parent) {
+    public JavaClass(String pkg, String name, Tag tag, ASN1Tag.Mode mode, String parent) {
         this.pkg = pkg;
         this.name = name;
         this.tag = tag;
         this.mode = mode;
-        this.constructed = constructed;
         this.parent = parent;
     }
 
@@ -296,7 +293,7 @@ public class JavaClass implements JavaStructure {
 
     private void writeClassHeader(BufferedWriter writer, String prefix) throws IOException {
         if (tag != null) {
-            CompilerUtils.getTagAnnotation(tag, mode.toString(), constructed).write(writer, "");
+            CompilerUtils.getTagAnnotation(tag, mode.toString()).write(writer, "");
         }
 
         List<String> clazzDeclaration = new ArrayList<>();

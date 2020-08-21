@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import java.util.List;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 36, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 36, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1RelativeIRI extends AbstractASN1IRI {
 
     public ASN1RelativeIRI() {

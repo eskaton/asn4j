@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 17, mode = ASN1Tag.Mode.EXPLICIT)
 public abstract class ASN1Set implements ASN1Type, HasConstraint {
 
     @Override

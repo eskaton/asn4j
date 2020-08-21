@@ -35,7 +35,7 @@ import java.util.Objects;
 
 import static ch.eskaton.asn4j.runtime.types.ASN1Null.Value.NULL;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 5, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 5, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1Null implements ASN1Type, HasConstraint {
 
     public enum Value {NULL}

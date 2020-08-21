@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
@@ -35,41 +36,39 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.lang.reflect.Field;
-import java.util.List;
 
 public abstract class CollectionEncoder<T extends ASN1Type> implements TypeEncoder<T> {
 
     @Override
     @SuppressWarnings("squid:S3011")
-    public byte[] encode(Encoder encoder, T obj) {
-        ByteArrayOutputStream content = new ByteArrayOutputStream();
-
-        List<Field> compFields = RuntimeUtils.getComponents(obj);
+    public EncodingResult encode(Encoder encoder, T obj) {
+        var content = new ByteArrayOutputStream();
+        var compFields = RuntimeUtils.getComponents(obj);
 
         if (!compFields.isEmpty()) {
-            for (Field compField : compFields) {
-                ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
+            for (var compField : compFields) {
+                var annotation = compField.getAnnotation(ASN1Component.class);
 
                 if (annotation != null) {
                     compField.setAccessible(true);
 
-                    ASN1Tag tag = compField.getDeclaredAnnotation(ASN1Tag.class);
+                    var tag = compField.getDeclaredAnnotation(ASN1Tag.class);
 
                     try {
-                        Object value = compField.get(obj);
+                        var value = compField.get(obj);
 
                         if (value != null) {
                             if (tag != null) {
-                                ByteArrayOutputStream fieldContent = new ByteArrayOutputStream();
+                                var fieldContent = new ByteArrayOutputStream();
+
                                 fieldContent.write(encoder.encode((ASN1Type) value, tag));
                                 content.write(fieldContent.toByteArray());
                             } else {
                                 content.write(encoder.encode((ASN1Type) value));
                             }
                         } else if (!(annotation.optional() || annotation.hasDefault())) {
-                            throw new EncodingException("Value for " + obj.getClass().getSimpleName() + "." +
-                                    compField.getName() + " missing");
+                            throw new EncodingException("Value for %s.%s missing", obj.getClass().getSimpleName(),
+                                    compField.getName());
 
                         }
                     } catch (EncodingException e) {
@@ -80,9 +79,9 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements TypeEncod
                 }
             }
 
-            return content.toByteArray();
+            return EncodingResult.of(content.toByteArray(), true);
         } else {
-            return new byte[0];
+            return EncodingResult.of(new byte[0], true);
         }
     }
 

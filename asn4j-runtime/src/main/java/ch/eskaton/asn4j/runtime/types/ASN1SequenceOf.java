@@ -35,7 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 16, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 16, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1SequenceOf<T extends ASN1Type> extends ASN1CollectionOf<List<T>, T> {
 
     public ASN1SequenceOf() {

@@ -53,31 +53,16 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
 
     private K constraintCompiler;
 
-    private Boolean constructed;
-
     private C compiler;
-
-    public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
-            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, D defaultCompiler, K constraintCompiler) {
-        this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier, defaultCompiler,
-                constraintCompiler, false);
-    }
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
             S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, K constraintCompiler) {
         this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier,
-                (D) new DefaultCompilerImpl<V>(valueClass), constraintCompiler, false);
+                (D) new DefaultCompilerImpl<V>(valueClass), constraintCompiler);
     }
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
-            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, K constraintCompiler, boolean constructed) {
-        this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier,
-                (D) new DefaultCompilerImpl<>(valueClass), constraintCompiler, constructed);
-    }
-
-    public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
-            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, D defaultCompiler, K constraintCompiler,
-            boolean constructed) {
+            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, D defaultCompiler, K constraintCompiler) {
         this.typeClass = typeClass;
         this.compiler = compiler;
         this.valueClass = valueClass;
@@ -86,7 +71,6 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
         this.typeNameSupplier = typeNameSupplier;
         this.defaultCompiler = defaultCompiler;
         this.constraintCompiler = constraintCompiler;
-        this.constructed = constructed;
     }
 
     public TypeDefinition(Class<T> typeClass, C compiler, TypeNameSupplier<? extends Type> typeNameSupplier) {
@@ -163,15 +147,6 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
         }
 
         return constraintCompiler;
-    }
-
-    public boolean isConstructed() {
-        if (constructed == null) {
-            throw new IllegalCompilerStateException("Constructed attribute for %s is undefined",
-                    typeClass.getSimpleName());
-        }
-
-        return constructed;
     }
 
     public boolean isBuiltin() {

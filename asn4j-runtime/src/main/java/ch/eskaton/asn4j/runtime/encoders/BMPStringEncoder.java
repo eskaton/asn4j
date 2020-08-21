@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 
 import java.nio.charset.StandardCharsets;
@@ -35,7 +36,7 @@ import java.nio.charset.StandardCharsets;
 public class BMPStringEncoder implements TypeEncoder<ASN1BMPString> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1BMPString obj) {
-        return obj.getValue().getBytes(StandardCharsets.UTF_16);
+    public EncodingResult encode(Encoder encoder, ASN1BMPString obj) {
+        return EncodingResult.of(obj.getValue().getBytes(StandardCharsets.UTF_16), false);
     }
 }

@@ -38,7 +38,7 @@ import ch.eskaton.commons.utils.StreamsUtils;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1BitString implements ASN1Type, HasConstraint {
 
     protected byte[] value = new byte[0];

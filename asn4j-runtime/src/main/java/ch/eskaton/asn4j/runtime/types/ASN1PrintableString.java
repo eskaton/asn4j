@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.PrintableStringVerifier;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 19, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 19, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1PrintableString extends AbstractASN1String {
 
     private static final PrintableStringVerifier VERIFIER = new PrintableStringVerifier();

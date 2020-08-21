@@ -43,7 +43,7 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, BitString node) {
-        JavaClass javaClass = ctx.createClass(name, node, false);
+        JavaClass javaClass = ctx.createClass(name, node);
         Collection<NamedBitNode> namedBits = node.getNamedBits();
         IdentifierUniquenessChecker<Long> iuc = new IdentifierUniquenessChecker<>(name);
         long msb = 0;

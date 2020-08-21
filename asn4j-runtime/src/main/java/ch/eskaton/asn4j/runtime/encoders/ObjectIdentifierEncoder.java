@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 
@@ -37,16 +38,16 @@ import java.util.List;
 public class ObjectIdentifierEncoder implements AbstractOIDEncoder<ASN1ObjectIdentifier> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1ObjectIdentifier obj) {
-        List<Integer> components = obj.getValue();
-        ByteArrayOutputStream value = new ByteArrayOutputStream();
+    public EncodingResult encode(Encoder encoder, ASN1ObjectIdentifier obj) {
+        var components = obj.getValue();
+        var value = new ByteArrayOutputStream();
         int component = 0;
 
         if (components == null || components.size() < 2) {
-            throw new EncodingException("Invalid OID: " + obj);
+            throw new EncodingException("Invalid OID: %s", obj);
         }
 
-        for (int i = 0; i < components.size(); i++) {
+        for (var i = 0; i < components.size(); i++) {
             if (i == 0) {
                 component = 40 * components.get(i);
             } else if (i == 1) {
@@ -60,7 +61,7 @@ public class ObjectIdentifierEncoder implements AbstractOIDEncoder<ASN1ObjectIde
             }
         }
 
-        return value.toByteArray();
+        return EncodingResult.of(value.toByteArray(), false);
     }
 
 }

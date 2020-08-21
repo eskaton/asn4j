@@ -8,7 +8,7 @@ import java.util.LinkedList;
 public interface AbstractOIDEncoder<T extends ASN1Type> extends TypeEncoder<T> {
 
     default void writeComponent(ByteArrayOutputStream value, int component) {
-        LinkedList<Integer> list = new LinkedList<>();
+        var list = new LinkedList<Integer>();
 
         while (component > 127) {
             list.push(component & 0x7F);
@@ -17,9 +17,9 @@ public interface AbstractOIDEncoder<T extends ASN1Type> extends TypeEncoder<T> {
 
         list.push(component);
 
-        int listSize = list.size();
+        var listSize = list.size();
 
-        for (int j = 0; j < listSize; j++) {
+        for (var j = 0; j < listSize; j++) {
             if (j == listSize - 1) {
                 value.write(list.get(j));
             } else {

@@ -63,7 +63,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
             // TODO: figure out what to do
         }
 
-        var javaClass = ctx.createClass(name, node, true);
+        var javaClass = ctx.createClass(name, node);
         var compiledType = createCompiledType(ctx, name, node);
 
         generateJavaClass(javaClass, name, compiledType);

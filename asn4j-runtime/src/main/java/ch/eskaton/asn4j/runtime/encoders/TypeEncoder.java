@@ -28,10 +28,11 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 public interface TypeEncoder<T extends ASN1Type> {
 
-    byte[] encode(Encoder encoder, T obj);
+    EncodingResult encode(Encoder encoder, T obj);
 
 }

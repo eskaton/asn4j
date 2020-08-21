@@ -51,7 +51,7 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, IntegerType node) {
-        JavaClass javaClass = ctx.createClass(name, node, false);
+        JavaClass javaClass = ctx.createClass(name, node);
         Collection<NamedNumber> namedNumbers = node.getNamedNumbers();
         IdentifierUniquenessChecker<BigInteger> iuc = new IdentifierUniquenessChecker<>(name);
 

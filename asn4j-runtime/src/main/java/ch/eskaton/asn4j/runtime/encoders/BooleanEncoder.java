@@ -28,13 +28,14 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 
 public class BooleanEncoder implements TypeEncoder<ASN1Boolean> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1Boolean obj) {
-        return new byte[] { Boolean.TRUE.equals(obj.getValue()) ? (byte) 0xFF : (byte) 0x00 };
+    public EncodingResult encode(Encoder encoder, ASN1Boolean obj) {
+        return EncodingResult.of(new byte[] { Boolean.TRUE.equals(obj.getValue()) ? (byte) 0xFF : (byte) 0x00 }, false);
     }
 
 }

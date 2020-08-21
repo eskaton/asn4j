@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1CollectionOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
@@ -39,10 +40,9 @@ public abstract class CollectionOfEncoder<O extends ASN1CollectionOf<C, T>, C ex
         T extends ASN1Type> implements TypeEncoder<O> {
 
     @Override
-    public byte[] encode(Encoder encoder, O obj) {
-        ByteArrayOutputStream content = new ByteArrayOutputStream();
-
-        C values = obj.getValues();
+    public EncodingResult encode(Encoder encoder, O obj) {
+        var content = new ByteArrayOutputStream();
+        var values = obj.getValues();
 
         if (values != null) {
             for (T value : values) {
@@ -54,7 +54,7 @@ public abstract class CollectionOfEncoder<O extends ASN1CollectionOf<C, T>, C ex
             }
         }
 
-        return content.toByteArray();
+        return EncodingResult.of(content.toByteArray(), true);
     }
 
 }

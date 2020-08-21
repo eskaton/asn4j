@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.runtime.encoders.BMPStringEncoder;
 import ch.eskaton.asn4j.runtime.encoders.BitStringEncoder;
 import ch.eskaton.asn4j.runtime.encoders.BooleanEncoder;
 import ch.eskaton.asn4j.runtime.encoders.ChoiceEncoder;
+import ch.eskaton.asn4j.runtime.encoders.DefaultStringEncoder;
 import ch.eskaton.asn4j.runtime.encoders.EnumeratedTypeEncoder;
 import ch.eskaton.asn4j.runtime.encoders.IRIEncoder;
 import ch.eskaton.asn4j.runtime.encoders.IntegerEncoder;
@@ -108,12 +109,21 @@ public class BEREncoder implements Encoder {
                     .put(ASN1IRI.class, new IRIEncoder())
                     .put(ASN1RelativeIRI.class, new RelativeIRIEncoder())
                     .put(ASN1OctetString.class, new OctetStringEncoder())
+                    .put(ASN1VisibleString.class, new DefaultStringEncoder<ASN1VisibleString>())
+                    .put(ASN1NumericString.class, new DefaultStringEncoder<ASN1NumericString>())
+                    .put(ASN1PrintableString.class, new DefaultStringEncoder<ASN1PrintableString>())
+                    .put(ASN1IA5String.class, new DefaultStringEncoder<ASN1IA5String>())
+                    .put(ASN1GraphicString.class, new DefaultStringEncoder<ASN1GraphicString>())
+                    .put(ASN1GeneralString.class, new DefaultStringEncoder<ASN1GeneralString>())
+                    .put(ASN1TeletexString.class, new DefaultStringEncoder<ASN1TeletexString>())
+                    .put(ASN1VideotexString.class, new DefaultStringEncoder<ASN1VideotexString>())
+                    .put(ASN1UTF8String.class, new DefaultStringEncoder<ASN1UTF8String>())
                     .put(ASN1UniversalString.class, new UniversalStringEncoder())
                     .put(ASN1BMPString.class, new BMPStringEncoder())
                     .put(ASN1Sequence.class, new SequenceEncoder())
-                    .put(ASN1SequenceOf.class, new SequenceOfEncoder())
+                    .put(ASN1SequenceOf.class, new SequenceOfEncoder<>())
                     .put(ASN1Set.class, new SetEncoder())
-                    .put(ASN1SetOf.class, new SetOfEncoder())
+                    .put(ASN1SetOf.class, new SetOfEncoder<>())
                     .put(ASN1OpenType.class, new OpenTypeEncoder())
                     .build();
 
@@ -140,90 +150,98 @@ public class BEREncoder implements Encoder {
 
     @SuppressWarnings("rawtypes")
     public byte[] encode(ASN1Type obj, ASN1Tag tag) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] buf;
+        var baos = new ByteArrayOutputStream();
+        EncodingResult result;
 
         if (obj instanceof HasConstraint) {
             ((HasConstraint) obj).checkConstraint();
         }
 
         if (obj instanceof ASN1Boolean) {
-            buf = this.<ASN1Boolean, BooleanEncoder>getEncoder(
-                    ASN1Boolean.class).encode(this, (ASN1Boolean) obj);
+            result = this.<ASN1Boolean, BooleanEncoder>getEncoder(ASN1Boolean.class).encode(this, (ASN1Boolean) obj);
         } else if (obj instanceof ASN1Integer) {
-            buf = this.<ASN1Integer, IntegerEncoder>getEncoder(
-                    ASN1Integer.class).encode(this, (ASN1Integer) obj);
+            result = this.<ASN1Integer, IntegerEncoder>getEncoder(ASN1Integer.class).encode(this, (ASN1Integer) obj);
         } else if (obj instanceof ASN1EnumeratedType) {
-            buf = this.<ASN1EnumeratedType, EnumeratedTypeEncoder>getEncoder(ASN1EnumeratedType.class)
+            result = this.<ASN1EnumeratedType, EnumeratedTypeEncoder>getEncoder(ASN1EnumeratedType.class)
                     .encode(this, (ASN1EnumeratedType) obj);
         } else if (obj instanceof ASN1Real) {
-            buf = this.<ASN1Real, RealEncoder>getEncoder(ASN1Real.class).encode(this, (ASN1Real) obj);
+            result = this.<ASN1Real, RealEncoder>getEncoder(ASN1Real.class).encode(this, (ASN1Real) obj);
         } else if (obj instanceof ASN1BitString) {
-            buf = this.<ASN1BitString, BitStringEncoder>getEncoder(
-                    ASN1BitString.class).encode(this, (ASN1BitString) obj);
+            result = this.<ASN1BitString, BitStringEncoder>getEncoder(ASN1BitString.class)
+                    .encode(this, (ASN1BitString) obj);
         } else if (obj instanceof ASN1OctetString) {
-            buf = this.<ASN1OctetString, OctetStringEncoder>getEncoder(ASN1OctetString.class)
+            result = this.<ASN1OctetString, OctetStringEncoder>getEncoder(ASN1OctetString.class)
                     .encode(this, (ASN1OctetString) obj);
         } else if (obj instanceof ASN1VisibleString) {
-            buf = ((ASN1VisibleString) obj).getValue().getBytes();
+            result = this.<ASN1VisibleString, DefaultStringEncoder>getEncoder(ASN1VisibleString.class)
+                    .encode(this, (ASN1VisibleString) obj);
         } else if (obj instanceof ASN1NumericString) {
-            buf = ((ASN1NumericString) obj).getValue().getBytes();
+            result = this.<ASN1NumericString, DefaultStringEncoder>getEncoder(ASN1NumericString.class)
+                    .encode(this, (ASN1NumericString) obj);
         } else if (obj instanceof ASN1PrintableString) {
-            buf = ((ASN1PrintableString) obj).getValue().getBytes();
+            result = this.<ASN1PrintableString, DefaultStringEncoder>getEncoder(ASN1PrintableString.class)
+                    .encode(this, (ASN1PrintableString) obj);
         } else if (obj instanceof ASN1IA5String) {
-            buf = ((ASN1IA5String) obj).getValue().getBytes();
+            result = this.<ASN1IA5String, DefaultStringEncoder>getEncoder(ASN1IA5String.class)
+                    .encode(this, (ASN1IA5String) obj);
         } else if (obj instanceof ASN1GraphicString) {
-            buf = ((ASN1GraphicString) obj).getValue().getBytes();
+            result = this.<ASN1GraphicString, DefaultStringEncoder>getEncoder(ASN1GraphicString.class)
+                    .encode(this, (ASN1GraphicString) obj);
         } else if (obj instanceof ASN1GeneralString) {
-            buf = ((ASN1GeneralString) obj).getValue().getBytes();
+            result = this.<ASN1GeneralString, DefaultStringEncoder>getEncoder(ASN1GeneralString.class)
+                    .encode(this, (ASN1GeneralString) obj);
         } else if (obj instanceof ASN1TeletexString) {
-            buf = ((ASN1TeletexString) obj).getValue().getBytes();
+            result = this.<ASN1TeletexString, DefaultStringEncoder>getEncoder(ASN1TeletexString.class)
+                    .encode(this, (ASN1TeletexString) obj);
         } else if (obj instanceof ASN1VideotexString) {
-            buf = ((ASN1VideotexString) obj).getValue().getBytes();
+            result = this.<ASN1VideotexString, DefaultStringEncoder>getEncoder(ASN1VideotexString.class)
+                    .encode(this, (ASN1VideotexString) obj);
         } else if (obj instanceof ASN1UniversalString) {
-            buf = this.getEncoder(ASN1UniversalString.class).encode(this, (ASN1UniversalString) obj);
+            result = this.getEncoder(ASN1UniversalString.class).encode(this, (ASN1UniversalString) obj);
         } else if (obj instanceof ASN1UTF8String) {
-            buf = ((ASN1UTF8String) obj).getValue().getBytes();
+            result = this.<ASN1UTF8String, DefaultStringEncoder>getEncoder(ASN1UTF8String.class)
+                    .encode(this, (ASN1UTF8String) obj);
         } else if (obj instanceof ASN1BMPString) {
-            buf = this.getEncoder(ASN1BMPString.class).encode(this, (ASN1BMPString) obj);
+            result = this.getEncoder(ASN1BMPString.class).encode(this, (ASN1BMPString) obj);
         } else if (obj instanceof ASN1Null) {
-            buf = this.<ASN1Null, NullEncoder>getEncoder(ASN1Null.class).encode(this, (ASN1Null) obj);
+            result = this.<ASN1Null, NullEncoder>getEncoder(ASN1Null.class).encode(this, (ASN1Null) obj);
         } else if (obj instanceof ASN1ObjectIdentifier) {
-            buf = this.<ASN1ObjectIdentifier, ObjectIdentifierEncoder>getEncoder(ASN1ObjectIdentifier.class)
+            result = this.<ASN1ObjectIdentifier, ObjectIdentifierEncoder>getEncoder(ASN1ObjectIdentifier.class)
                     .encode(this, (ASN1ObjectIdentifier) obj);
         } else if (obj instanceof ASN1RelativeOID) {
-            buf = this.<ASN1RelativeOID, RelativeOIDEncoder>getEncoder(ASN1RelativeOID.class)
+            result = this.<ASN1RelativeOID, RelativeOIDEncoder>getEncoder(ASN1RelativeOID.class)
                     .encode(this, (ASN1RelativeOID) obj);
         } else if (obj instanceof ASN1IRI) {
-            buf = this.<ASN1IRI, IRIEncoder>getEncoder(ASN1IRI.class).encode(this, (ASN1IRI) obj);
+            result = this.<ASN1IRI, IRIEncoder>getEncoder(ASN1IRI.class).encode(this, (ASN1IRI) obj);
         } else if (obj instanceof ASN1RelativeIRI) {
-            buf = this.<ASN1RelativeIRI, RelativeIRIEncoder>getEncoder(ASN1RelativeIRI.class).encode(this, (ASN1RelativeIRI) obj);
+            result = this.<ASN1RelativeIRI, RelativeIRIEncoder>getEncoder(ASN1RelativeIRI.class)
+                    .encode(this, (ASN1RelativeIRI) obj);
         } else if (obj instanceof ASN1Sequence) {
-            buf = this.<ASN1Sequence, SequenceEncoder>getEncoder(
-                    ASN1Sequence.class).encode(this, (ASN1Sequence) obj);
+            result = this.<ASN1Sequence, SequenceEncoder>getEncoder(ASN1Sequence.class)
+                    .encode(this, (ASN1Sequence) obj);
         } else if (obj instanceof ASN1Set) {
-            buf = this.<ASN1Set, SetEncoder>getEncoder(ASN1Set.class).encode(this, (ASN1Set) obj);
+            result = this.<ASN1Set, SetEncoder>getEncoder(ASN1Set.class).encode(this, (ASN1Set) obj);
         } else if (obj instanceof ASN1SequenceOf) {
-            buf = this.<ASN1SequenceOf, SequenceOfEncoder>getEncoder(ASN1SequenceOf.class)
+            result = this.<ASN1SequenceOf, SequenceOfEncoder>getEncoder(ASN1SequenceOf.class)
                     .encode(this, (ASN1SequenceOf) obj);
         } else if (obj instanceof ASN1SetOf) {
-            buf = this.<ASN1SetOf, SetOfEncoder>getEncoder(ASN1SetOf.class).encode(this, (ASN1SetOf) obj);
+            result = this.<ASN1SetOf, SetOfEncoder>getEncoder(ASN1SetOf.class).encode(this, (ASN1SetOf) obj);
         } else if (obj instanceof ASN1Choice) {
-            buf = this.<ASN1Choice, ChoiceEncoder>getEncoder(ASN1Choice.class).encode(this, (ASN1Choice) obj);
+            result = this.<ASN1Choice, ChoiceEncoder>getEncoder(ASN1Choice.class).encode(this, (ASN1Choice) obj);
         } else if (obj instanceof ASN1OpenType) {
-            buf = this.<ASN1OpenType, OpenTypeEncoder>getEncoder(ASN1OpenType.class).encode(this, (ASN1OpenType) obj);
+            result = this.<ASN1OpenType, OpenTypeEncoder>getEncoder(ASN1OpenType.class).encode(this, (ASN1OpenType) obj);
         } else {
-            throw new EncodingException("Unsupported type: " + obj.getClass().getSimpleName());
+            throw new EncodingException("Unsupported type: %s", obj.getClass().getSimpleName());
         }
 
         try {
             if (tag != null) {
-                baos.write(TLVUtils.getTagLength(tag, obj, buf.length));
+                baos.write(TLVUtils.getTagLength(tag, result.isConstructed(), obj, result.getLength()));
             } else {
-                baos.write(TLVUtils.getTagLength(obj, buf.length));
+                baos.write(TLVUtils.getTagLength(result.isConstructed(), obj, result.getLength()));
             }
 
-            baos.write(buf);
+            baos.write(result.getBuffer());
         } catch (IOException e) {
             throw new EncodingException(e);
         }

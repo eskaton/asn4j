@@ -42,7 +42,7 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, T node) {
-        JavaClass javaClass = ctx.createClass(name, node, true);
+        JavaClass javaClass = ctx.createClass(name, node);
 
         javaClass.typeParameter(ctx.getTypeParameter(node, Optional.of(name)));
 

@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
@@ -40,15 +41,14 @@ import java.lang.reflect.Field;
 public class ChoiceEncoder implements TypeEncoder<ASN1Choice> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1Choice obj) {
-        ByteArrayOutputStream content = new ByteArrayOutputStream();
-
-        ASN1Type value = obj.getValue();
+    public EncodingResult encode(Encoder encoder, ASN1Choice obj) {
+        var content = new ByteArrayOutputStream();
+        var value = obj.getValue();
         ASN1Tag tag = null;
 
         var choice = obj.getChoice().name();
 
-        for (Field field : obj.getClass().getDeclaredFields()) {
+        for (var field : obj.getClass().getDeclaredFields()) {
             var alternative = field.getAnnotation(ASN1Alternative.class);
 
             if (alternative != null && choice.equals(alternative.name())) {
@@ -69,7 +69,7 @@ public class ChoiceEncoder implements TypeEncoder<ASN1Choice> {
 
         // Since the choice itself doesn't need to be encoded, we return its
         // value here
-        return content.toByteArray();
+        return EncodingResult.of(content.toByteArray(), false);
     }
 
 }

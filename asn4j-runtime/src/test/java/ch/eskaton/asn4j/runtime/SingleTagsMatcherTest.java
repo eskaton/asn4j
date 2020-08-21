@@ -100,12 +100,12 @@ class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
         assertTrue(matcher.hasNext());
     }
 
-    @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+    @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT)
     private static class TestTag1 implements ASN1Type {
 
     }
 
-    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2, mode = ASN1Tag.Mode.EXPLICIT)
     private static class TestTag2 extends TestTag1 {
 
     }

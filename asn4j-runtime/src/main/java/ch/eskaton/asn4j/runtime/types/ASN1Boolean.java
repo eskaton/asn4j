@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1Boolean implements ASN1Type, HasConstraint {
 
     public static final ASN1Boolean TRUE = new ASN1Boolean(true);

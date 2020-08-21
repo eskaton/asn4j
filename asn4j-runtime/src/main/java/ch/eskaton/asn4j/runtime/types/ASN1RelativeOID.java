@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import java.util.List;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 13, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 13, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1RelativeOID extends AbstractASN1OID {
 
     public ASN1RelativeOID() {

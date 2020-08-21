@@ -62,7 +62,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, Choice node) {
-        var javaClass = ctx.createClass(name, node, true);
+        var javaClass = ctx.createClass(name, node);
         var fieldNames = new ArrayList<String>();
         var typeEnum = new JavaEnum(CHOICE_ENUM);
         var componentVerifiers = List.of(new TagUniquenessVerifier(ctx, TypeName.CHOICE),

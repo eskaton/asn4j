@@ -45,6 +45,4 @@ public @interface ASN1Tag {
 
     int tag();
 
-    boolean constructed();
-
 }

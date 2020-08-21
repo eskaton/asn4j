@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.types.ASN1UniversalString;
 
 import java.nio.charset.Charset;
@@ -35,8 +36,8 @@ import java.nio.charset.Charset;
 public class UniversalStringEncoder implements TypeEncoder<ASN1UniversalString> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1UniversalString obj) {
-        return obj.getValue().getBytes(Charset.forName("UTF32"));
+    public EncodingResult encode(Encoder encoder, ASN1UniversalString obj) {
+        return EncodingResult.of(obj.getValue().getBytes(Charset.forName("UTF32")), false);
     }
 
 }

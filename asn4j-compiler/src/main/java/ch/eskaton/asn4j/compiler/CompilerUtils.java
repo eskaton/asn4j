@@ -134,17 +134,16 @@ public class CompilerUtils {
             taggingModeString = module.getTagMode().toString();
         }
 
-        return getTagAnnotation(tag, taggingModeString, Boolean.TRUE);
+        return getTagAnnotation(tag, taggingModeString);
     }
 
-    public static JavaAnnotation getTagAnnotation(Tag tag, String taggingModeString, Boolean constructed) {
+    public static JavaAnnotation getTagAnnotation(Tag tag, String taggingModeString) {
         JavaAnnotation tagAnnotation = new JavaAnnotation(ASN1Tag.class);
 
         tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz().toString());
         tagAnnotation.addParameter("clazz", "Clazz."
                 + (tag.getClazz() != null ? tag.getClazz().toString()
                 : Clazz.CONTEXT_SPECIFIC.toString()));
-        tagAnnotation.addParameter("constructed", constructed.toString().toLowerCase());
         tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName() + ".Mode." + taggingModeString);
 
         return tagAnnotation;
