@@ -31,8 +31,6 @@ import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
 public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         implements NamedCompiler<T, CompiledType> {
@@ -41,7 +39,7 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         // ensure the type is resolvable
         ctx.resolveTypeReference(node);
 
-        JavaClass javaClass = ctx.createClass(name, node, isConstructed(ctx, name));
+        JavaClass javaClass = ctx.createClass(name, node);
         CompiledType compiledType = ctx.createCompiledType(node, name);
 
         if (node.hasConstraint()) {
@@ -56,17 +54,6 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         }
 
         return compiledType;
-    }
-
-    protected boolean isConstructed(CompilerContext ctx, String typeName) {
-        Type base = ctx.resolveTypeReference(typeName);
-        ASN1Tag.Mode mode = CompilerUtils.getTaggingMode(ctx.getModule(), base);
-
-        if (ASN1Tag.Mode.EXPLICIT.equals(mode)) {
-            return true;
-        }
-
-        return ctx.isConstructed(ctx.resolveBaseType(base));
     }
 
 }

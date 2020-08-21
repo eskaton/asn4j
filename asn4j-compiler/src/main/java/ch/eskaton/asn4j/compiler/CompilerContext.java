@@ -213,7 +213,7 @@ public class CompilerContext {
         }
     }
 
-    public JavaClass createClass(String name, Type type, boolean constructed) {
+    public JavaClass createClass(String name, Type type) {
         String className = formatName(name);
         Tag tag = type.getTag();
 
@@ -221,8 +221,8 @@ public class CompilerContext {
             throw new CompilerException("UNIVERSAL class not allowed in type " + name);
         }
 
-        JavaClass javaClass = new JavaClass(pkg, className, tag, CompilerUtils
-                .getTaggingMode(getModule(), type), constructed, getTypeName(type));
+        JavaClass javaClass = new JavaClass(pkg, className, tag, CompilerUtils.getTaggingMode(getModule(), type),
+                getTypeName(type));
 
         currentClass.push(javaClass);
 
@@ -462,10 +462,6 @@ public class CompilerContext {
         }
 
         return config.getValueClass(typeClass);
-    }
-
-    public boolean isConstructed(Type type) {
-        return config.isConstructed(type.getClass());
     }
 
     public boolean isBuiltin(Type type) {

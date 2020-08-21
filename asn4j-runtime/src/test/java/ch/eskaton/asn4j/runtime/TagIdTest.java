@@ -57,12 +57,12 @@ class TagIdTest {
         return clazz.getAnnotation(ASN1Tag.class);
     }
 
-    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 21, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
+    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 21, mode = ASN1Tag.Mode.EXPLICIT)
     private static class TestA {
 
     }
 
-    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 37, mode = ASN1Tag.Mode.EXPLICIT, constructed = true)
+    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 37, mode = ASN1Tag.Mode.EXPLICIT)
     private static class TestB {
 
     }

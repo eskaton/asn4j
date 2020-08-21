@@ -25,19 +25,17 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.runtime.encoders;
 
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.Real;
+import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
+import ch.eskaton.asn4j.runtime.types.AbstractASN1String;
 
-public class RealCompiler extends BuiltinTypeCompiler<Real> {
+public class DefaultStringEncoder<T extends AbstractASN1String> implements TypeEncoder<T> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, Real node) {
-        ctx.createClass(name, node);
-        ctx.finishClass();
-
-        return ctx.createCompiledType(node, name);
+    public EncodingResult encode(Encoder encoder, T obj) {
+        return EncodingResult.of(obj.getValue().getBytes(), false);
     }
 
 }

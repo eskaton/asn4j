@@ -243,16 +243,16 @@ public class TypeConfiguration {
                 new RealDefaultCompiler(), null));
         types.add(new TypeDefinition<>(SequenceType.class, new SequenceCompiler(), CollectionValue.class,
                 ASN1Sequence.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
-                new SequenceConstraintCompiler(ctx), true));
+                new SequenceConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(SequenceOfType.class, new SequenceOfCompiler(), CollectionOfValue.class,
                 ASN1SequenceOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
-                new SequenceOfConstraintCompiler(ctx), true));
+                new SequenceOfConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(SetType.class, new SetCompiler(), CollectionValue.class,
                 ASN1Set.class, new CollectionValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
-                new SetConstraintCompiler(ctx), true));
+                new SetConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(SetOfType.class, new SetOfCompiler(), CollectionOfValue.class,
                 ASN1SetOf.class, new CollectionOfValueResolver(ctx), new SubtypeTypeNameSupplier<>(this, true),
-                new SetOfConstraintCompiler(ctx), true));
+                new SetOfConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(VisibleString.class, new VisibleStringCompiler(), VisibleStringValue.class,
                 ASN1VisibleString.class, new VisibleStringValueResolver(ctx), new DefaultTypeNameSupplier(this),
                 new VisibleStringConstraintCompiler(ctx)));
@@ -343,10 +343,6 @@ public class TypeConfiguration {
 
     public <T extends Type, R extends ASN1Type> Class<R> getRuntimeTypeClass(Class<T> typeClass) {
         return getConfigByType("getRuntimeTypeClass", typeClass, TypeDefinition::getRuntimeTypeClass);
-    }
-
-    public <T extends Type> boolean isConstructed(Class<T> typeClass) {
-        return getConfigByType("isConstructed", typeClass, TypeDefinition::isConstructed);
     }
 
     public <T extends Type> boolean isBuiltin(Class<T> typeClass) {

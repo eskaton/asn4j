@@ -41,7 +41,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 24, mode = ASN1Tag.Mode.IMPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 24, mode = ASN1Tag.Mode.IMPLICIT)
 public class ASN1GeneralizedTime extends ASN1VisibleString {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");

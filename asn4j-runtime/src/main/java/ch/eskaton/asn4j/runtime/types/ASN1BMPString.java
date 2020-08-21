@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.BMPStringVerifier;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 30, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 30, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1BMPString extends AbstractASN1String {
 
     private static final BMPStringVerifier VERIFIER = new BMPStringVerifier();

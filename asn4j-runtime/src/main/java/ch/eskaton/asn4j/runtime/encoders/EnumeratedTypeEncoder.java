@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.types.ASN1EnumeratedType;
 
 import java.math.BigInteger;
@@ -35,8 +36,8 @@ import java.math.BigInteger;
 public class EnumeratedTypeEncoder implements TypeEncoder<ASN1EnumeratedType> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1EnumeratedType obj) {
-        return BigInteger.valueOf(obj.getValue()).toByteArray();
+    public EncodingResult encode(Encoder encoder, ASN1EnumeratedType obj) {
+        return EncodingResult.of(BigInteger.valueOf(obj.getValue()).toByteArray(), false);
     }
 
 }

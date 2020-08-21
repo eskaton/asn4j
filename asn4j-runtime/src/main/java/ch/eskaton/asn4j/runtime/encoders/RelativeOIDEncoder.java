@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 
@@ -37,9 +38,9 @@ import java.util.List;
 public class RelativeOIDEncoder implements AbstractOIDEncoder<ASN1RelativeOID> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1RelativeOID obj) {
-        List<Integer> components = obj.getValue();
-        ByteArrayOutputStream value = new ByteArrayOutputStream();
+    public EncodingResult encode(Encoder encoder, ASN1RelativeOID obj) {
+        var components = obj.getValue();
+        var value = new ByteArrayOutputStream();
 
         if (components == null) {
             throw new EncodingException("Invalid Relative OID: " + obj);
@@ -49,7 +50,7 @@ public class RelativeOIDEncoder implements AbstractOIDEncoder<ASN1RelativeOID> {
             writeComponent(value, components.get(i));
         }
 
-        return value.toByteArray();
+        return EncodingResult.of(value.toByteArray(), false);
     }
 
 }

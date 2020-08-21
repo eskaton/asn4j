@@ -60,7 +60,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
     }
 
     public CompiledType compile(CompilerContext ctx, String name, T node) {
-        var javaClass = ctx.createClass(name, node, true);
+        var javaClass = ctx.createClass(name, node);
         var componentVerifiers = componentVerifierSuppliers.stream()
                 .map(s -> s.apply(ctx, typeName))
                 .collect(Collectors.toList());

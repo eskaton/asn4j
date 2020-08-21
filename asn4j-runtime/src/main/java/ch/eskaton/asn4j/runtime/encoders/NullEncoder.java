@@ -28,13 +28,14 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 
 public class NullEncoder implements TypeEncoder<ASN1Null> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1Null obj) {
-        return new byte[0];
+    public EncodingResult encode(Encoder encoder, ASN1Null obj) {
+        return EncodingResult.of(new byte[0], false);
     }
 
 }

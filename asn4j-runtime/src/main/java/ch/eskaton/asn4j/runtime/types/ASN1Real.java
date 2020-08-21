@@ -36,7 +36,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 9, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 9, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1Real implements ASN1Type, HasConstraint {
 
     public enum Type {

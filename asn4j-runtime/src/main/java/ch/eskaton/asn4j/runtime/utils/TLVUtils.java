@@ -33,9 +33,9 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 public class TLVUtils {
 
@@ -44,42 +44,43 @@ public class TLVUtils {
     private TLVUtils() {
     }
 
-    public static byte[] getTagLength(ASN1Type obj, int contentLen) {
+    public static byte[] getTagLength(boolean constructed, ASN1Type obj, int contentLen) {
         List<ASN1Tag> tags = RuntimeUtils.getTags(obj.getClass());
 
-        return getTagLength(tags, contentLen);
+        return getTagLength(tags, constructed, contentLen);
     }
 
-    public static byte[] getTagLength(ASN1Tag tag, ASN1Type obj, int contentLength) {
+    public static byte[] getTagLength(ASN1Tag tag, boolean constructed, ASN1Type obj, int contentLength) {
         if (tag.mode() != ASN1Tag.Mode.IMPLICIT) {
             ArrayList<ASN1Tag> tags = new ArrayList<>();
 
             tags.add(tag);
             tags.addAll(RuntimeUtils.getTags(obj.getClass()));
 
-            return getTagLength(tags, contentLength);
+            return getTagLength(tags, constructed, contentLength);
         } else {
-            return getTagLength(tag, contentLength);
+            return getTagLength(tag, constructed, contentLength);
         }
     }
 
-    public static byte[] getTagLength(List<ASN1Tag> tags, int contentLen) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        Stack<byte[]> bufs = new Stack<>();
-        ASN1Tag tag;
+    public static byte[] getTagLength(List<ASN1Tag> tags, boolean constructed, int contentLen) {
+        var baos = new ByteArrayOutputStream();
+        var buffers = new ArrayDeque<byte[]>(2 * tags.size());
+        var lastIndex = tags.size() - 1;
 
-        for (int i = tags.size() - 1; i >= 0; i--) {
-            tag = tags.get(i);
-            byte[] lenBuf = getLength(contentLen);
-            byte[] tagBuf = getTag(tag);
-            bufs.push(lenBuf);
-            bufs.push(tagBuf);
-            contentLen += lenBuf.length + tagBuf.length;
+        for (var i = lastIndex; i >= 0; i--) {
+            var lenBuffer = getLength(contentLen);
+            var tagBuffer = getTag(tags.get(i), i == lastIndex ? constructed : true);
+
+            buffers.push(lenBuffer);
+            buffers.push(tagBuffer);
+
+            contentLen += lenBuffer.length + tagBuffer.length;
         }
 
         try {
-            for (int i = bufs.size() - 1; i >= 0; i--) {
-                baos.write(bufs.get(i));
+            while (!buffers.isEmpty()) {
+                baos.write(buffers.pop());
             }
         } catch (IOException e) {
             throw new EncodingException(e);
@@ -88,11 +89,11 @@ public class TLVUtils {
         return baos.toByteArray();
     }
 
-    public static byte[] getTagLength(ASN1Tag tag, int contentLen) {
+    public static byte[] getTagLength(ASN1Tag tag, boolean constructed, int contentLen) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         try {
-            baos.write(getTag(tag));
+            baos.write(getTag(tag, constructed));
             baos.write(getLength(contentLen));
         } catch (IOException e) {
             throw new EncodingException(e);
@@ -120,7 +121,7 @@ public class TLVUtils {
         return buf;
     }
 
-    public static byte[] getTag(ASN1Tag tag) {
+    public static byte[] getTag(ASN1Tag tag, boolean constructed) {
         byte[] buf;
         int tagNum = tag.tag();
 
@@ -139,7 +140,7 @@ public class TLVUtils {
             buf = new byte[] { (byte) (tagNum & 0x1f) };
         }
 
-        buf[0] |= (byte) ((tag.clazz().ordinal() & 0x3) << 6) | (byte) ((tag.constructed() ? 1 : 0) << 5);
+        buf[0] |= (byte) ((tag.clazz().ordinal() & 0x3) << 6) | (byte) ((constructed ? 1 : 0) << 5);
 
         return buf;
     }

@@ -28,13 +28,14 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 
 public class OctetStringEncoder implements TypeEncoder<ASN1OctetString> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1OctetString obj) {
-        return obj.getValue();
+    public EncodingResult encode(Encoder encoder, ASN1OctetString obj) {
+        return EncodingResult.of(obj.getValue(), false);
     }
 
 }

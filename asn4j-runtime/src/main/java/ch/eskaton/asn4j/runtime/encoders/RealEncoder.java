@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.encoders;
 
 import ch.eskaton.asn4j.runtime.Encoder;
+import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Real;
 
@@ -36,33 +37,33 @@ import java.math.BigDecimal;
 public class RealEncoder implements TypeEncoder<ASN1Real> {
 
     @Override
-    public byte[] encode(Encoder encoder, ASN1Real obj) {
+    public EncodingResult encode(Encoder encoder, ASN1Real obj) {
         switch (obj.getType()) {
             case NORMAL:
                 break;
 
             case PLUS_INFINITY:
-                return new byte[] { 0x40 };
+                return EncodingResult.of(new byte[] { 0x40 }, false);
 
             case MINUS_INFINITY:
-                return new byte[] { 0x41 };
+                return EncodingResult.of(new byte[] { 0x41 }, false);
 
             case NOT_A_NUMBER:
-                return new byte[] { 0x42 };
+                return EncodingResult.of(new byte[] { 0x42 }, false);
 
             case MINUS_ZERO:
-                return new byte[] { 0x43 };
+                return EncodingResult.of(new byte[] { 0x43 }, false);
 
             default:
-                throw new EncodingException("Unsupported ASN1Real " + obj.toString());
+                throw new EncodingException("Unsupported ASN1Real %s", obj.toString());
         }
 
         if (BigDecimal.ZERO.equals(obj.getValue())) {
-            return new byte[] {};
+            return EncodingResult.of(new byte[] {}, false);
         }
 
-        String value = obj.getValue().toString();
-        byte[] source = obj.getValue().toString().getBytes();
+        var value = obj.getValue().toString();
+        var source = value.getBytes();
         byte[] target;
         byte form = 1;
 
@@ -83,6 +84,7 @@ public class RealEncoder implements TypeEncoder<ASN1Real> {
 
         target[0] = form;
 
-        return target;
+        return EncodingResult.of(target, false);
     }
+
 }

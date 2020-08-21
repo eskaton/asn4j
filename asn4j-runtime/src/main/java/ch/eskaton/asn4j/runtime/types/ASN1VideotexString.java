@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 21, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 21, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1VideotexString extends AbstractASN1String {
 
     public ASN1VideotexString() {

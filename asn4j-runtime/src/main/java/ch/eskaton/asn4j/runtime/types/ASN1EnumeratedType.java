@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 10, mode = ASN1Tag.Mode.EXPLICIT, constructed = false)
+@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 10, mode = ASN1Tag.Mode.EXPLICIT)
 public class ASN1EnumeratedType implements ASN1Type, HasConstraint {
 
     private Integer value;

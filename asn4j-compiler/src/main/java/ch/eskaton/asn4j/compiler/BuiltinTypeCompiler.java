@@ -36,7 +36,7 @@ public abstract class BuiltinTypeCompiler<T extends Type> implements NamedCompil
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, T node) {
-        JavaClass javaClass = ctx.createClass(name, node, false);
+        JavaClass javaClass = ctx.createClass(name, node);
 
         CompiledType compiledType = ctx.createCompiledType(node, name);
         ConstraintDefinition constraintDef;
