@@ -529,11 +529,11 @@ public class CompilerContext {
         defaultsCompiler.compileDefault(javaClass, field, typeName, type, value);
     }
 
-    public Set<TagId> getTagId(Type type) {
-        Type compiledType = getCompiledType(type).getType();
+    public Set<TagId> getTagId(Type unresolvedType) {
+        Type type = getCompiledType(unresolvedType).getType();
 
-        if (compiledType instanceof SimpleDefinedType) {
-            Type referencedType = compiledType;
+        if (type instanceof SimpleDefinedType) {
+            Type referencedType = type;
             Tag tag = referencedType.getTag();
 
             if (tag != null) {
@@ -541,37 +541,21 @@ public class CompilerContext {
             } else {
                 return getTagId(referencedType);
             }
-        } else if (compiledType instanceof Choice) {
-            return ((Choice) compiledType).getAllAlternatives().stream()
+        } else if (type instanceof Choice) {
+            return ((Choice) type).getAllAlternatives().stream()
                     .map(this::getTagId)
                     .flatMap(Collection::stream)
                     .collect(Collectors.toSet());
-        } else if (compiledType instanceof NamedType) {
-            var tag = compiledType.getTag();
+        } else if (type instanceof NamedType) {
+            var tag = type.getTag();
 
             if (tag != null) {
                 return Set.of(CompilerUtils.toTagId(tag));
             }
 
-            return getTagId(((NamedType) compiledType).getType());
-        } else if (isBuiltin(compiledType)) {
-            Tag tag = compiledType.getTag();
-
-            if (tag != null) {
-                return Set.of(CompilerUtils.toTagId(tag));
-            }
-
-            String typeName = getTypeName(compiledType);
-
-            try {
-                Class<?> typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
-                ASN1Tag tagAnnotation = typeClazz.getAnnotation(ASN1Tag.class);
-                return Set.of(TagId.fromTag(tagAnnotation));
-            } catch (ClassNotFoundException e) {
-                throw new CompilerException("Unknown type: %s", type);
-            }
-        } else if (compiledType instanceof OpenType) {
-            var tag = compiledType.getTag();
+            return getTagId(((NamedType) type).getType());
+        } else if (type instanceof OpenType) {
+            var tag = type.getTag();
 
             if (tag != null) {
                 return Set.of(CompilerUtils.toTagId(tag));
@@ -579,9 +563,25 @@ public class CompilerContext {
 
             // if the type is untagged it's ignored here and verified later
             return Set.of();
+        } else if (isBuiltin(type)) {
+            Tag tag = type.getTag();
+
+            if (tag != null) {
+                return Set.of(CompilerUtils.toTagId(tag));
+            }
+
+            String typeName = getTypeName(type);
+
+            try {
+                Class<?> typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
+                ASN1Tag tagAnnotation = typeClazz.getAnnotation(ASN1Tag.class);
+                return Set.of(TagId.fromTag(tagAnnotation));
+            } catch (ClassNotFoundException e) {
+                throw new CompilerException("Unknown type: %s", unresolvedType);
+            }
         }
 
-        throw new IllegalCompilerStateException("Unexpected type: %s", type);
+        throw new IllegalCompilerStateException("Unexpected type: %s", unresolvedType);
     }
 
     public CompiledCollectionType getCompiledCollectionType(CompiledType compiledType) {
