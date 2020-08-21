@@ -186,7 +186,7 @@ public class BERDecoder implements Decoder {
     }
 
     public DecoderState decode(DecoderStates states) {
-        return consumeTags(states);
+        return consumeTags(states, new AnyTagsMatcher());
     }
 
     public <T extends ASN1Type> DecodingResult<T> decode(Type type, DecoderStates states, ASN1Tag tag,
@@ -231,7 +231,7 @@ public class BERDecoder implements Decoder {
     }
 
     @Override
-    public  <T extends ASN1Type> T decodeOpenType(DecoderStates states, DecoderState state,
+    public <T extends ASN1Type> T decodeOpenType(DecoderStates states, DecoderState state,
             boolean optional) {
         T obj = openTypeDecoder.decode(this, states, state, optional);
 
@@ -412,39 +412,27 @@ public class BERDecoder implements Decoder {
         }
     }
 
-    private DecoderState consumeTags(DecoderStates states) {
-        var lastState = states.peek();
-        var pos = lastState.pos;
-        var length = lastState.length;
-
-        try {
-            if (length <= 0) {
-                return null;
-            }
-
-            var tlv = TLV.getTLV(states.buf, pos, length);
-
-            pos = tlv.pos;
-            length = tlv.length;
-
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.trace(StringUtils.concat("Found: tag=", tlv.tag, ", class=", tlv.clazz,
-                        ", length=", tlv.length));
-            }
-
-            return states.push(new DecoderState(tlv, pos, length));
-        } catch (DecodingException e) {
-            throw e;
-        } catch (Exception th) {
-            throw new DecodingException(th);
-        }
-    }
-
     private interface TagsMatcher {
 
         boolean hasNext();
 
         boolean accept(TLV tlv);
+
+    }
+
+    static class AnyTagsMatcher implements TagsMatcher {
+
+        private boolean accepted = false;
+
+        public boolean hasNext() {
+            return !accepted;
+        }
+
+        public boolean accept(TLV tlv) {
+            accepted = true;
+
+            return true;
+        }
 
     }
 
