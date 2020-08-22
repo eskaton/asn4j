@@ -97,12 +97,14 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -214,14 +216,14 @@ public class CompilerContext {
     }
 
     public JavaClass createClass(String name, Type type) {
-        String className = formatName(name);
-        Tag tag = type.getTag();
+        var className = formatName(name);
+        var tags = type.getTags();
 
-        if (tag != null && ClassType.UNIVERSAL.equals(tag.getClazz())) {
+        if (tags.stream().anyMatch(tag -> ClassType.UNIVERSAL.equals(tag.getClazz()))) {
             throw new CompilerException("UNIVERSAL class not allowed in type " + name);
         }
 
-        JavaClass javaClass = new JavaClass(pkg, className, tag, CompilerUtils.getTaggingMode(getModule(), type),
+        JavaClass javaClass = new JavaClass(pkg, className, tags, CompilerUtils.getTaggingModes(getModule(), type),
                 getTypeName(type));
 
         currentClass.push(javaClass);
@@ -375,7 +377,7 @@ public class CompilerContext {
         var additionalConstraints = type.getConstraints();
         var openType = new OpenType();
 
-        openType.setTag(type.getTag());
+        openType.setTags(type.getTags());
 
         if (additionalConstraints != null) {
             var constraints = openType.getConstraints();
@@ -399,7 +401,7 @@ public class CompilerContext {
         var additionalConstraints = type.getConstraints();
         var newType = (Type) Clone.clone(field.getCompiledType().getType());
 
-        newType.setTag(type.getTag());
+        newType.setTags(type.getTags());
 
         if (additionalConstraints != null) {
             var constraints = newType.getConstraints();
@@ -526,14 +528,14 @@ public class CompilerContext {
     }
 
     public Set<TagId> getTagId(Type unresolvedType) {
-        Type type = getCompiledType(unresolvedType).getType();
+        var type = getCompiledType(unresolvedType).getType();
 
         if (type instanceof SimpleDefinedType) {
-            Type referencedType = type;
-            Tag tag = referencedType.getTag();
+            var referencedType = type;
+            var tags = referencedType.getTags();
 
-            if (tag != null) {
-                return Set.of(CompilerUtils.toTagId(tag));
+            if (!tags.isEmpty()) {
+                return Set.of(CompilerUtils.toTagId(tags.getFirst()));
             } else {
                 return getTagId(referencedType);
             }
@@ -543,35 +545,36 @@ public class CompilerContext {
                     .flatMap(Collection::stream)
                     .collect(Collectors.toSet());
         } else if (type instanceof NamedType) {
-            var tag = type.getTag();
+            var tags = type.getTags();
 
-            if (tag != null) {
-                return Set.of(CompilerUtils.toTagId(tag));
+            if (!tags.isEmpty()) {
+                return Set.of(CompilerUtils.toTagId(tags.getFirst()));
             }
 
             return getTagId(((NamedType) type).getType());
         } else if (type instanceof OpenType) {
-            var tag = type.getTag();
+            var tags = type.getTags();
 
-            if (tag != null) {
-                return Set.of(CompilerUtils.toTagId(tag));
+            if (!tags.isEmpty()) {
+                return Set.of(CompilerUtils.toTagId(tags.getFirst()));
             }
 
             // if the type is untagged it's ignored here and verified later
             return Set.of();
         } else if (isBuiltin(type)) {
-            Tag tag = type.getTag();
+            var tags = type.getTags();
 
-            if (tag != null) {
-                return Set.of(CompilerUtils.toTagId(tag));
+            if (!tags.isEmpty()) {
+                return Set.of(CompilerUtils.toTagId(tags.getFirst()));
             }
 
-            String typeName = getTypeName(type);
+            var typeName = getTypeName(type);
 
             try {
-                Class<?> typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
-                ASN1Tag tagAnnotation = typeClazz.getAnnotation(ASN1Tag.class);
-                return Set.of(TagId.fromTag(tagAnnotation));
+                var typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
+                var tagAnnotation = typeClazz.getAnnotation(ASN1Tags.class);
+
+                return Set.of(TagId.fromTag(tagAnnotation.tags()[0]));
             } catch (ClassNotFoundException e) {
                 throw new CompilerException("Unknown type: %s", unresolvedType);
             }

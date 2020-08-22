@@ -49,6 +49,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,8 +79,8 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             CompiledCollectionType compiledType, ComponentType component, NamedType namedType) {
         JavaClass javaClass = ctx.getCurrentClass();
         Type type = ctx.resolveSelectedType(namedType.getType());
-        TaggingMode taggingMode = type.getTaggingMode();
-        Tag tag = type.getTag();
+        LinkedList<Optional<TaggingMode>> taggingModes = type.getTaggingModes();
+        LinkedList<Tag> tags = type.getTags();
         JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
         boolean hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
         CompiledType compiledComponent = ctx.defineType(namedType);
@@ -104,8 +105,8 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
         field.addAnnotation(compAnnotation);
 
-        if (tag != null) {
-            field.addAnnotation(CompilerUtils.getTagAnnotation(ctx.getModule(), tag, taggingMode));
+        if (tags != null && !tags.isEmpty()) {
+            field.addAnnotation(CompilerUtils.getTagsAnnotation(ctx.getModule(), tags, taggingModes));
         }
 
         javaClass.addField(field);

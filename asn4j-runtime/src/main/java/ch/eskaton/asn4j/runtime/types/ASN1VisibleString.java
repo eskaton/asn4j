@@ -29,10 +29,11 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 26, mode = ASN1Tag.Mode.EXPLICIT)
+@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 26, mode = ASN1Tag.Mode.EXPLICIT))
 public class ASN1VisibleString extends AbstractASN1String {
 
     private static final ISO646Verifier VERIFIER = new ISO646Verifier();

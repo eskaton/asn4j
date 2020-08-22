@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.test.modules.X690_8.Type3;
 import ch.eskaton.asn4j.test.modules.X690_8.Type4;
 import ch.eskaton.asn4j.test.modules.X690_8.Type5;
 import ch.eskaton.asn4j.test.modules.X690_8.Type6;
+import ch.eskaton.asn4j.test.modules.X690_8.Type7;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -64,7 +65,7 @@ class TestX690_8_14 {
 
         type4.setValue("test");
 
-        assertArrayEquals(new byte[] { 0x47, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type4));
+        assertArrayEquals(new byte[] { 0x67, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 }, encoder.encode(type4));
 
         Type5 type5 = new Type5();
 
@@ -78,6 +79,13 @@ class TestX690_8_14 {
 
         assertArrayEquals(new byte[] { (byte) 0x6b, 0x08, (byte) 0xa2, 0x06, 0x43, 0x04, 0x74, 0x65, 0x73, 0x74 },
                 encoder.encode(type6));
+
+        Type7 type7 = new Type7();
+
+        type7.setValue("test");
+
+        assertArrayEquals(new byte[] { (byte) 0xe3, 0x08, (byte) 0xa2, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 },
+                encoder.encode(type7));
     }
 
     @Test

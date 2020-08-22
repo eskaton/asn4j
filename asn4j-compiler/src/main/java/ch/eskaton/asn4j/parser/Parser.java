@@ -2272,12 +2272,15 @@ public class Parser {
             return super.parse(new SequenceParser(new boolean[] { true, false, true }, tagParser,
                     new ChoiceParser<Token>(TokenType.IMPLICIT_KW, TokenType.EXPLICIT_KW), typeParser), a -> {
                 Type type = a.n2();
-                type.setTag(a.n0());
+                type.addTag(a.n0());
                 Token token = a.t1();
 
-                if (token != null) {
-                    type.setTaggingMode(a.$1() == TokenType.IMPLICIT_KW ?
-                            TaggingMode.IMPLICIT : TaggingMode.EXPLICIT);
+                if (token == null) {
+                    type.addTaggingMode(Optional.empty());
+                } else {
+                    TaggingMode taggingMode = a.$1() == TokenType.IMPLICIT_KW ? TaggingMode.IMPLICIT : TaggingMode.EXPLICIT;
+
+                    type.addTaggingMode(Optional.of(taggingMode));
                 }
 
                 return type;

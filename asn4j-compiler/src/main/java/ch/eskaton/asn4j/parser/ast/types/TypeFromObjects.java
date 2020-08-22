@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -36,57 +36,64 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class TypeFromObjects extends InformationFromObjects implements Type {
 
     public TypeFromObjects(Position position, ReferencedObjectsNode reference, FieldNameNode field) {
-    	super(position, reference, field);
+        super(position, reference, field);
     }
 
-    public Tag getTag() {
-    	// TODO Auto-generated method stub
-    	return null;
+    @Override
+    public LinkedList<Tag> getTags() {
+        return null;
     }
 
-    public void setTag(Tag tag) {
-    	// TODO Auto-generated method stub
-
-    }
-
-    public TaggingMode getTaggingMode() {
-    	// TODO Auto-generated method stub
-    	return null;
-    }
-
-    public void setTaggingMode(TaggingMode mode) {
-    	// TODO Auto-generated method stub
+    @Override
+    public void setTags(LinkedList<Tag> tags) {
 
     }
 
+    @Override
+    public void addTag(Tag tag) {
+
+    }
+
+    @Override
+    public LinkedList<Optional<TaggingMode>> getTaggingModes() {
+        return null;
+    }
+
+    @Override
+    public void addTaggingMode(Optional<TaggingMode> mode) {
+
+    }
+
+    @Override
     public void setConstraints(List<Constraint> constraints) {
-    	// TODO Auto-generated method stub
 
     }
 
+    @Override
     public List<Constraint> getConstraints() {
-    	// TODO Auto-generated method stub
-    	return null;
+        return null;
     }
 
+    @Override
     public boolean hasConstraint() {
-    	// TODO Auto-generated method stub
-    	return false;
+        return false;
     }
 
+    @Override
     public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
-    	// TODO Auto-generated method stub
 
     }
 
+    @Override
     public EncodingPrefixNode getEncodingPrefix() {
-    	// TODO Auto-generated method stub
-    	return null;
+        return null;
     }
 
     @Override

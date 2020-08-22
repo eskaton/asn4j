@@ -46,7 +46,7 @@ public class UntaggedOpenTypeVerifier implements ComponentVerifier {
 
     public void verify(String name, CompiledType component) {
         if (component.getType() instanceof OpenType openType) {
-            if (untaggedOpenType == null && openType.getTag() == null) {
+            if (untaggedOpenType == null && openType.getTags().isEmpty()) {
                 untaggedOpenType = Tuple2.of(name, component);
             }
         }

@@ -55,7 +55,7 @@ public class ChoiceDecoder {
 
             setValue(value, setter);
         } else {
-            result = decoder.decode(states, metaData.getTagsToTypes());
+            result = decoder.decode(states, tagsToTypes);
 
             if (result == null) {
                 if (optional) {

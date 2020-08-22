@@ -1258,7 +1258,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof IntegerType);
-        assertEquals(23, (int) result.getTag().getClassNumber().getClazz());
+        assertEquals(23, (int) result.getTags().getFirst().getClassNumber().getClazz());
 
         parser = new Parser(new ByteArrayInputStream("TIME".getBytes())).new BuiltinTypeParser();
 
@@ -2746,9 +2746,9 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof IntegerType);
-        assertEquals("TAG", result.getTag().getEncodingReference());
-        assertEquals(ClassType.APPLICATION, result.getTag().getClazz());
-        assertEquals(23, (int) result.getTag().getClassNumber().getClazz());
+        assertEquals("TAG", result.getTags().getFirst().getEncodingReference());
+        assertEquals(ClassType.APPLICATION, result.getTags().getFirst().getClazz());
+        assertEquals(23, (int) result.getTags().getFirst().getClassNumber().getClazz());
 
         parser = new Parser(new ByteArrayInputStream(
                 "[TAG: 4711] INTEGER".getBytes())).new PrefixedTypeParser();
@@ -2757,9 +2757,9 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof IntegerType);
-        assertEquals("TAG", result.getTag().getEncodingReference());
-        assertNull(result.getTag().getClazz());
-        assertEquals(4711, (int) result.getTag().getClassNumber().getClazz());
+        assertEquals("TAG", result.getTags().getFirst().getEncodingReference());
+        assertNull(result.getTags().getFirst().getClazz());
+        assertEquals(4711, (int) result.getTags().getFirst().getClassNumber().getClazz());
 
         parser = new Parser(new ByteArrayInputStream(
                 "[4711] INTEGER".getBytes())).new PrefixedTypeParser();
@@ -2768,9 +2768,9 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof IntegerType);
-        assertNull(result.getTag().getEncodingReference());
-        assertNull(result.getTag().getClazz());
-        assertEquals(4711, (int) result.getTag().getClassNumber().getClazz());
+        assertNull(result.getTags().getFirst().getEncodingReference());
+        assertNull(result.getTags().getFirst().getClazz());
+        assertEquals(4711, (int) result.getTags().getFirst().getClassNumber().getClazz());
 
         parser = new Parser(new ByteArrayInputStream(
                 "[PER: \"encoding instructions\"] INTEGER".getBytes())).new PrefixedTypeParser();
@@ -2793,7 +2793,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof IntegerType);
-        assertEquals(ClassType.APPLICATION, result.getTag().getClazz());
+        assertEquals(ClassType.APPLICATION, result.getTags().getFirst().getClazz());
     }
 
     @Test

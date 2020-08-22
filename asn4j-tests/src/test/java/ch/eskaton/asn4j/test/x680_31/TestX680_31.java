@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType3;
 import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType4;
 import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType5;
 import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType6;
+import ch.eskaton.asn4j.test.modules.x680_31.TestPrefixedType7;
 import org.junit.jupiter.api.Test;
 
 import java.util.function.Supplier;
@@ -80,6 +81,11 @@ class TestX680_31 {
     @Test
     void testTestPrefixedType6() throws ASN1RuntimeException {
         testPrefixedType(() -> new TestPrefixedType6(), "test6");
+    }
+
+    @Test
+    void testTestPrefixedType7() throws ASN1RuntimeException {
+        testPrefixedType(() -> new TestPrefixedType7(), "test7");
     }
 
 }

@@ -38,4 +38,8 @@ public class DecodingException extends RuntimeException {
     	super(e);
     }
 
+    public DecodingException(String format, Object... args) {
+        super(String.format(format, args));
+    }
+
 }

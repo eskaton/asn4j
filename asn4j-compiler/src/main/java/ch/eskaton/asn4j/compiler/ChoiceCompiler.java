@@ -46,7 +46,9 @@ import ch.eskaton.commons.MutableReference;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PRIVATE;
@@ -135,15 +137,14 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         String name = CompilerUtils.formatName(namedType.getName());
         CompiledType compiledType = ctx.defineType(namedType);
         String typeName = compiledType.getName();
-        Tag tag = namedType.getType().getTag();
-        TaggingMode taggingMode = namedType.getType().getTaggingMode();
+        LinkedList<Tag> tags = namedType.getType().getTags();
+        LinkedList<Optional<TaggingMode>> taggingModes = namedType.getType().getTaggingModes();
         JavaDefinedField field = new JavaDefinedField(typeName, name);
 
         field.addAnnotation(new JavaAnnotation(ASN1Alternative.class).addParameter("name", '"' + typeConstant + '"'));
 
-        if (tag != null) {
-            JavaAnnotation tagAnnotation = CompilerUtils.getTagAnnotation(ctx.getModule(), tag, taggingMode);
-            field.addAnnotation(tagAnnotation);
+        if (tags != null && !tags.isEmpty()) {
+            field.addAnnotation(CompilerUtils.getTagsAnnotation(ctx.getModule(), tags, taggingModes));
         }
 
         javaClass.addField(field, false, false);

@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -31,6 +31,7 @@ import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,21 +39,61 @@ public class JavaAnnotation implements JavaObject {
 
     private Class<?> annotation;
 
-    private Map<String, String> params = new HashMap<>();
+    private Map<String, Object> params = new HashMap<>();
 
     public JavaAnnotation(Class<?> annotation) {
-    	this.annotation = annotation;
+        this.annotation = annotation;
     }
 
-    public JavaAnnotation addParameter(String name, String value) {
-    	params.put(name, value);
+    public JavaAnnotation addParameter(String name, Object value) {
+        params.put(name, value);
 
-    	return this;
+        return this;
     }
 
     public void write(BufferedWriter writer, String prefix) throws IOException {
-        writer.write(StringUtils.concat(prefix, "@", annotation.getSimpleName(), "(", StringUtils
-                .join(params, " = ", ", "), ")\n"));
+        writer.write(StringUtils.concat(prefix, "@", annotation.getSimpleName(), "("));
+
+        var first = true;
+
+        for (var e : params.entrySet()) {
+            if (first) {
+                first = false;
+            } else {
+                writer.write(", ");
+            }
+
+            writer.write(e.getKey());
+            writer.write(" = ");
+
+            if (e.getValue() instanceof Collection collectionValue) {
+                writer.write("{ ");
+
+                var collectionFirst = true;
+
+                for (var value : collectionValue) {
+                    if (collectionFirst) {
+                        collectionFirst = false;
+                    } else {
+                        writer.write(", ");
+                    }
+
+                    if (value instanceof JavaObject javaObject) {
+                        javaObject.write(writer, "");
+                    } else {
+                        writer.write(value.toString());
+                    }
+                }
+
+                writer.write(" }");
+            } else if (e.getValue() instanceof JavaObject javaObject) {
+                javaObject.write(writer, "");
+            } else {
+                writer.write(e.getValue().toString());
+            }
+        }
+
+        writer.write(")\n");
     }
 
 }

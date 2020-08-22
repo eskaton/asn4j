@@ -28,13 +28,8 @@
 package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
-import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
-import ch.eskaton.asn4j.parser.ast.values.Tag;
-import ch.eskaton.asn4j.runtime.TaggingMode;
 
-import java.util.List;
 import java.util.Objects;
 
 public class InstanceOfType extends AbstractType {
@@ -45,60 +40,6 @@ public class InstanceOfType extends AbstractType {
         super(position);
 
         this.objectClass = objectClass;
-    }
-
-    @Override
-    public Tag getTag() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setTag(Tag tag) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public TaggingMode getTaggingMode() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setTaggingMode(TaggingMode mode) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void setConstraints(List<Constraint> constraints) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public List<Constraint> getConstraints() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean hasConstraint() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public EncodingPrefixNode getEncodingPrefix() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

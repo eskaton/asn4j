@@ -29,13 +29,14 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
 import static ch.eskaton.asn4j.runtime.types.ASN1Null.Value.NULL;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 5, mode = ASN1Tag.Mode.EXPLICIT)
+@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 5, mode = ASN1Tag.Mode.EXPLICIT))
 public class ASN1Null implements ASN1Type, HasConstraint {
 
     public enum Value {NULL}

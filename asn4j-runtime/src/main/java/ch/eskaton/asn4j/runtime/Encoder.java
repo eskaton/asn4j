@@ -30,10 +30,14 @@ package ch.eskaton.asn4j.runtime;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
+import java.util.List;
+
 public interface Encoder {
 
     byte[] encode(ASN1Type obj);
 
     byte[] encode(ASN1Type obj, ASN1Tag tag);
+
+    byte[] encode(ASN1Type obj, List<ASN1Tag> tag);
 
 }

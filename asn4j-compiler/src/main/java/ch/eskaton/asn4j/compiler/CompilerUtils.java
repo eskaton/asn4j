@@ -43,11 +43,13 @@ import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -101,40 +103,50 @@ public class CompilerUtils {
         return sb.toString();
     }
 
-    static Mode getTaggingMode(ModuleNode module, Type type) {
-        TaggingMode taggingMode = type.getTaggingMode();
-
-        if (taggingMode != null) {
-            switch (taggingMode) {
-                case EXPLICIT:
-                    return ASN1Tag.Mode.EXPLICIT;
-                case IMPLICIT:
-                    return ASN1Tag.Mode.IMPLICIT;
-            }
-        }
-
-        switch (module.getTagMode()) {
-            case EXPLICIT:
-                return ASN1Tag.Mode.EXPLICIT;
-            case IMPLICIT:
-                return ASN1Tag.Mode.IMPLICIT;
-            case AUTOMATIC:
-                throw new CompilerException("Automatic tagging not supported");
-            default:
-                return Mode.EXPLICIT;
-        }
+    static List<Mode> getTaggingModes(ModuleNode module, Type type) {
+        return getTaggingModes(module, type.getTaggingModes());
     }
 
-    public static JavaAnnotation getTagAnnotation(ModuleNode module, Tag tag, TaggingMode taggingMode) {
-        String taggingModeString;
+    private static List<Mode> getTaggingModes(ModuleNode module, LinkedList<Optional<TaggingMode>> taggingModes) {
+        return taggingModes.stream()
+                .map(optionalTaggingMode -> optionalTaggingMode
+                        .map(taggingMode ->
+                                switch (taggingMode) {
+                                    case EXPLICIT -> Mode.EXPLICIT;
+                                    case IMPLICIT -> Mode.IMPLICIT;
+                                }).orElseGet(() -> getDefaultTaggingMode(module)))
+                .collect(Collectors.toList());
+    }
 
-        if (taggingMode != null) {
-            taggingModeString = taggingMode.toString();
-        } else {
-            taggingModeString = module.getTagMode().toString();
+    private static Mode getDefaultTaggingMode(ModuleNode module) {
+        return switch (module.getTagMode()) {
+            case EXPLICIT -> Mode.EXPLICIT;
+            case IMPLICIT -> Mode.IMPLICIT;
+            case AUTOMATIC -> throw new CompilerException("Automatic tagging not supported");
+            default -> Mode.EXPLICIT;
+        };
+    }
+
+    public static JavaAnnotation getTagsAnnotation(ModuleNode module, LinkedList<Tag> tags,
+            LinkedList<Optional<TaggingMode>> taggingModes) {
+        return getTagsAnnotation(tags, getTaggingModes(module, taggingModes));
+    }
+
+    public static JavaAnnotation getTagsAnnotation(List<Tag> tags, List<Mode> taggingModes) {
+        var tagAnnotations = new LinkedList<JavaAnnotation>();
+
+        for (var i = 0; i < tags.size(); i++) {
+            var taggingMode = taggingModes.get(i).toString();
+            var tagAnnotation = getTagAnnotation(tags.get(i), taggingMode);
+
+            tagAnnotations.add(tagAnnotation);
         }
 
-        return getTagAnnotation(tag, taggingModeString);
+        var tagsAnnotation = new JavaAnnotation(ASN1Tags.class);
+
+        tagsAnnotation.addParameter("tags", tagAnnotations);
+
+        return tagsAnnotation;
     }
 
     public static JavaAnnotation getTagAnnotation(Tag tag, String taggingModeString) {

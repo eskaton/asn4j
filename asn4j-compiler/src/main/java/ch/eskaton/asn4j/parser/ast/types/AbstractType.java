@@ -34,16 +34,18 @@ import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public abstract class AbstractType implements Type {
 
     private Position position;
 
-    private Tag tag;
+    private LinkedList<Tag> tags = new LinkedList<>();
 
-    private TaggingMode taggingMode;
+    private LinkedList<Optional<TaggingMode>> taggingModes = new LinkedList<>();
 
     private List<Constraint> constraints;
 
@@ -58,38 +60,52 @@ public abstract class AbstractType implements Type {
         return position;
     }
 
-    public Tag getTag() {
-        return tag;
+    @Override
+    public LinkedList<Tag> getTags() {
+        return tags;
     }
 
-    public void setTag(Tag tag) {
-        this.tag = tag;
+    @Override
+    public void setTags(LinkedList<Tag> tags) {
+        this.tags = tags;
     }
 
-    public TaggingMode getTaggingMode() {
-        return taggingMode;
+    @Override
+    public void addTag(Tag tag) {
+        this.tags.addFirst(tag);
     }
 
-    public void setTaggingMode(TaggingMode taggingMode) {
-        this.taggingMode = taggingMode;
+    @Override
+    public LinkedList<Optional<TaggingMode>> getTaggingModes() {
+        return taggingModes;
     }
 
+    @Override
+    public void addTaggingMode(Optional<TaggingMode> taggingMode) {
+        this.taggingModes.addFirst(taggingMode);
+    }
+
+    @Override
     public void setConstraints(List<Constraint> constraint) {
         this.constraints = constraint;
     }
 
+    @Override
     public List<Constraint> getConstraints() {
         return constraints;
     }
 
+    @Override
     public boolean hasConstraint() {
         return constraints != null && !constraints.isEmpty();
     }
 
+    @Override
     public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
         this.encodingPrefix = encodingPrefix;
     }
 
+    @Override
     public EncodingPrefixNode getEncodingPrefix() {
         return encodingPrefix;
     }
@@ -115,15 +131,15 @@ public abstract class AbstractType implements Type {
         AbstractType that = (AbstractType) o;
 
         return Objects.equals(position, that.position) &&
-                Objects.equals(tag, that.tag) &&
-                taggingMode == that.taggingMode &&
+                Objects.equals(tags, that.tags) &&
+                taggingModes == that.taggingModes &&
                 Objects.equals(constraints, that.constraints) &&
                 Objects.equals(encodingPrefix, that.encodingPrefix);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(position, tag, taggingMode, constraints, encodingPrefix);
+        return Objects.hash(position, tags, taggingModes, constraints, encodingPrefix);
     }
 
 }
