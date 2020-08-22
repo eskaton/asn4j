@@ -88,6 +88,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class BEREncoder implements Encoder {
@@ -128,7 +129,7 @@ public class BEREncoder implements Encoder {
                     .build();
 
     public byte[] encode(ASN1Type obj) {
-        byte[] encoded = encode(obj, null);
+        byte[] encoded = encode(obj, List.of());
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace("Encoded value of type {} = {}", obj.getClass().getSimpleName(), HexDump.toHexString(encoded));
@@ -148,8 +149,13 @@ public class BEREncoder implements Encoder {
         return (C) encoder;
     }
 
-    @SuppressWarnings("rawtypes")
+    @Override
     public byte[] encode(ASN1Type obj, ASN1Tag tag) {
+        return encode(obj, List.of(tag));
+    }
+
+    @SuppressWarnings("rawtypes")
+    public byte[] encode(ASN1Type obj, List<ASN1Tag> tags) {
         var baos = new ByteArrayOutputStream();
         EncodingResult result;
 
@@ -235,8 +241,15 @@ public class BEREncoder implements Encoder {
         }
 
         try {
-            if (tag != null) {
-                baos.write(TLVUtils.getTagLength(tag, result.isConstructed(), obj, result.getLength()));
+            if (tags != null && !tags.isEmpty()) {
+                var lastTagIndex = tags.size() - 1;
+                var buffer = TLVUtils.getTagLength(tags.get(lastTagIndex), result.isConstructed(), obj, result.getLength());
+
+                if (lastTagIndex > 0) {
+                    baos.write(TLVUtils.getTagLength(tags.subList(0, lastTagIndex), true, buffer.length));
+                }
+
+                baos.write(buffer);
             } else {
                 baos.write(TLVUtils.getTagLength(result.isConstructed(), obj, result.getLength()));
             }

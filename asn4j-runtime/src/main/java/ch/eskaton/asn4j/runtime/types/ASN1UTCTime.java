@@ -29,13 +29,14 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.parsing.DateTime;
 import ch.eskaton.asn4j.runtime.parsing.UTCTimeParser;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 23, mode = ASN1Tag.Mode.IMPLICIT)
+@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 23, mode = ASN1Tag.Mode.IMPLICIT))
 public class ASN1UTCTime extends ASN1VisibleString {
 
     private static final UTCTimeParser UTC_TIME_PARSER = new UTCTimeParser();

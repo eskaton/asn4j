@@ -332,7 +332,7 @@ class CompilerImplTest {
                 TEST ::= CLASS {
                     &TypeField
                 }
-                
+                                
                 TestSequence ::= SEQUENCE {
                    typeField TEST.&TypeField OPTIONAL,
                    intField  INTEGER
@@ -349,7 +349,7 @@ class CompilerImplTest {
                 TEST ::= CLASS {
                     &TypeField
                 }
-                
+                                
                 TestSequence ::= SEQUENCE {
                    intField  INTEGER,
                    typeField TEST.&TypeField OPTIONAL
@@ -365,7 +365,7 @@ class CompilerImplTest {
                 TEST ::= CLASS {
                     &TypeField
                 }
-                
+                                
                 TestSet ::= SET {
                    intField  INTEGER,
                    typeField TEST.&TypeField
@@ -379,7 +379,7 @@ class CompilerImplTest {
                 TEST ::= CLASS {
                     &TypeField
                 }
-                
+                                
                 TestSet ::= SET {
                    typeField TEST.&TypeField,
                    intField  INTEGER
@@ -396,7 +396,7 @@ class CompilerImplTest {
                 TEST ::= CLASS {
                     &TypeField
                 }
-                
+                                
                 TestSet ::= SET {
                    typeField TEST.&TypeField
                 }
@@ -411,7 +411,7 @@ class CompilerImplTest {
                 TEST ::= CLASS {
                     &TypeField
                 }
-                
+                                
                 TestSet ::= SET {
                    intField        INTEGER,
                    typeField1 [23] TEST.&TypeField,

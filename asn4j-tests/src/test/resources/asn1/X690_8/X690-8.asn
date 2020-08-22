@@ -19,6 +19,8 @@ Type5 ::= [4] Type2
 
 Type6 ::= [APPLICATION 11] Type3
 
+Type7 ::= [PRIVATE 3] EXPLICIT [2] IMPLICIT [APPLICATION 4] EXPLICIT VisibleString
+
 SetType1 ::= SET OF VisibleString
 
 SetType2 ::= [APPLICATION 1] IMPLICIT SetType1

@@ -29,10 +29,11 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.GraphicStringVerifier;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 25, mode = ASN1Tag.Mode.EXPLICIT)
+@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 25, mode = ASN1Tag.Mode.EXPLICIT))
 public class ASN1GraphicString extends AbstractASN1String {
 
     private static final GraphicStringVerifier VERIFIER = new GraphicStringVerifier();

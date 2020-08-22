@@ -30,17 +30,18 @@ package ch.eskaton.asn4j.runtime.objects;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
 import ch.eskaton.asn4j.runtime.types.ASN1Set;
 
 public class TestSetA extends ASN1Set {
 
-    @ASN1Tag(mode = ASN1Tag.Mode.EXPLICIT, tag = 0, clazz = Clazz.CONTEXT_SPECIFIC)
+    @ASN1Tags(tags = @ASN1Tag(mode = ASN1Tag.Mode.EXPLICIT, tag = 0, clazz = Clazz.CONTEXT_SPECIFIC))
     @ASN1Component
     private ASN1Integer a;
 
-    @ASN1Tag(mode = ASN1Tag.Mode.EXPLICIT, tag = 1, clazz = Clazz.CONTEXT_SPECIFIC)
+    @ASN1Tags(tags = @ASN1Tag(mode = ASN1Tag.Mode.EXPLICIT, tag = 1, clazz = Clazz.CONTEXT_SPECIFIC))
     @ASN1Component(optional = true)
     private ASN1OctetString b;
 

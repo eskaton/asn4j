@@ -29,13 +29,14 @@ package ch.eskaton.asn4j.runtime.types;
 
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.commons.utils.CollectionUtils;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-@ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 16, mode = ASN1Tag.Mode.EXPLICIT)
+@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 16, mode = ASN1Tag.Mode.EXPLICIT))
 public class ASN1SequenceOf<T extends ASN1Type> extends ASN1CollectionOf<List<T>, T> {
 
     public ASN1SequenceOf() {

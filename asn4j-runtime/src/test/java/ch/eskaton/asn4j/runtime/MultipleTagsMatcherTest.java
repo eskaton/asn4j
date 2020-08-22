@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime;
 
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import org.junit.jupiter.api.Test;
 
@@ -152,22 +153,22 @@ class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
         assertNull(matcher.getMatch());
     }
 
-    @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT)
+    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT))
     private static class TestTag1a implements ASN1Type {
 
     }
 
-    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2, mode = ASN1Tag.Mode.EXPLICIT)
+    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2, mode = ASN1Tag.Mode.EXPLICIT))
     private static class TestTag1b extends TestTag1a {
 
     }
 
-    @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3, mode = ASN1Tag.Mode.EXPLICIT)
+    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3, mode = ASN1Tag.Mode.EXPLICIT))
     private static class TestTag2a implements ASN1Type {
 
     }
 
-    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 4, mode = ASN1Tag.Mode.EXPLICIT)
+    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.APPLICATION, tag = 4, mode = ASN1Tag.Mode.EXPLICIT))
     private static class TestTag2b extends TestTag2a {
 
     }

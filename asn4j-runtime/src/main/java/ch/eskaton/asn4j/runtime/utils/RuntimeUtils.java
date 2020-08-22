@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.utils.StreamsUtils;
@@ -48,52 +49,62 @@ public class RuntimeUtils {
     }
 
     public static List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
-        List<ASN1Tag> tags = new ArrayList<>(10);
-        ASN1Tag tag;
+        var result = new ArrayList<ASN1Tag>(10);
+        var implicit = false;
 
-        while (true) {
-            tag = clazz.getAnnotation(ASN1Tag.class);
+        while (clazz != null) {
+            var tags = clazz.getAnnotation(ASN1Tags.class);
 
-            while (tag == null) {
+            while (tags == null) {
                 clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
 
                 if (clazz == null) {
-                    return tags;
+                    return result;
                 }
 
-                tag = clazz.getAnnotation(ASN1Tag.class);
+                tags = clazz.getAnnotation(ASN1Tags.class);
             }
 
-            tags.add(tag);
+            for (var tag : tags.tags()) {
+                var newImplicit = tag.mode() == ASN1Tag.Mode.IMPLICIT;
 
-            if (tag.mode() != ASN1Tag.Mode.EXPLICIT || tag.clazz() == Clazz.UNIVERSAL) {
-                break;
+                if (!implicit) {
+                    result.add(tag);
+                }
+
+                if (tag.clazz() == Clazz.UNIVERSAL) {
+                    return result;
+                }
+
+                implicit = newImplicit;
             }
 
             clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
         }
 
-        return tags;
+        return result;
     }
 
     public static <T extends ASN1Type> List<ASN1Tag> getTags(Class<T> type, ASN1Tag tag) {
-        List<ASN1Tag> tags;
+        var tags = getTags(type);
 
         if (tag != null) {
+            var result = new LinkedList<ASN1Tag>();
+
             if (tag.mode() == ASN1Tag.Mode.IMPLICIT) {
-                tags = new LinkedList<>();
-                tags.add(0, tag);
+                result.add(tag);
+                result.addAll(tags.subList(1, tags.size()));
             } else {
-                tags = getTags(type);
-                tags.add(0, tag);
+                result.add(tag);
+                result.addAll(tags);
             }
-        } else {
-            tags = getTags(type);
+
+            tags = result;
         }
 
         if (tags.isEmpty()) {
-            throw new DecodingException("Invalid type provided: " + type.getClass().getSimpleName() +
-                    ". No ASN1Tag annotation found");
+            throw new DecodingException("Invalid type provided: %s. No ASN1Tags annotation found",
+                    type.getClass().getSimpleName());
         }
 
         return tags;

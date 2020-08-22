@@ -55,7 +55,6 @@ class FieldMetaDataTest {
 
         FieldMetaData fieldMetaData = new FieldMetaData(testSet, ASN1Component.class);
 
-
         Map<List<ASN1Tag>, Class<? extends ASN1Type>> tagsToTypes = fieldMetaData.getTagsToTypes();
         Map<List<TagId>, Field> tagsToFields =
                 ((List<FieldMetaData.TagData>) ReflectionUtils.getPrivateFieldValue(fieldMetaData, "tagData"))

@@ -30,12 +30,13 @@ package ch.eskaton.asn4j.runtime.encoders;
 import ch.eskaton.asn4j.runtime.Encoder;
 import ch.eskaton.asn4j.runtime.EncodingResult;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 public abstract class CollectionEncoder<T extends ASN1Type> implements TypeEncoder<T> {
 
@@ -52,17 +53,14 @@ public abstract class CollectionEncoder<T extends ASN1Type> implements TypeEncod
                 if (annotation != null) {
                     compField.setAccessible(true);
 
-                    var tag = compField.getDeclaredAnnotation(ASN1Tag.class);
-
                     try {
                         var value = compField.get(obj);
 
                         if (value != null) {
-                            if (tag != null) {
-                                var fieldContent = new ByteArrayOutputStream();
+                            var tags = compField.getDeclaredAnnotation(ASN1Tags.class);
 
-                                fieldContent.write(encoder.encode((ASN1Type) value, tag));
-                                content.write(fieldContent.toByteArray());
+                            if (tags != null) {
+                                content.write(encoder.encode((ASN1Type) value, List.of(tags.tags())));
                             } else {
                                 content.write(encoder.encode((ASN1Type) value));
                             }

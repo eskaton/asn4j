@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.runtime.decoders;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Choice;
 import ch.eskaton.asn4j.runtime.types.ASN1OpenType;
@@ -45,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -87,14 +89,19 @@ public class FieldMetaData {
                         return t;
                     }).collect(Collectors.toList()));
                 } else if (ASN1OpenType.class.isAssignableFrom(fieldType)) {
-                    var tagAnnotation = field.getAnnotation(ASN1Tag.class);
-                    var tags = tagAnnotation != null ?
-                            RuntimeUtils.getTags(fieldType, field.getAnnotation(ASN1Tag.class)) :
+                    var tagsAnnotation = field.getAnnotation(ASN1Tags.class);
+                    var tags = tagsAnnotation != null ?
+                            RuntimeUtils.getTags(fieldType, tagsAnnotation.tags()[tagsAnnotation.tags().length - 1]) :
                             List.<ASN1Tag>of();
 
                     tagData.add(new TagData(tags, field, getSetter(field, type)));
                 } else {
-                    var tags = RuntimeUtils.getTags(fieldType, field.getAnnotation(ASN1Tag.class));
+                    var fieldTags = Optional.ofNullable(field.getAnnotation(ASN1Tags.class))
+                            .map(ASN1Tags::tags)
+                            .map(List::of)
+                            .orElse(List.of());
+                    var tag = fieldTags.isEmpty() ? null : fieldTags.get(fieldTags.size() - 1);
+                    var tags = RuntimeUtils.getTags(fieldType, tag);
 
                     tagData.add(new TagData(tags, field, getSetter(field, type)));
                 }
@@ -198,6 +205,11 @@ public class FieldMetaData {
 
         public Consumer<ASN1Type> getSetter() {
             return setter;
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
         }
 
     }

@@ -90,17 +90,17 @@ public class JavaClass implements JavaStructure {
 
     private String interf;
 
-    private Tag tag;
+    private LinkedList<Tag> tags;
 
-    private ASN1Tag.Mode mode;
+    private List<ASN1Tag.Mode> modes;
 
     private Optional<List<String>> typeParameter = Optional.empty();
 
-    public JavaClass(String pkg, String name, Tag tag, ASN1Tag.Mode mode, String parent) {
+    public JavaClass(String pkg, String name, LinkedList<Tag> tags, List<ASN1Tag.Mode> modes, String parent) {
         this.pkg = pkg;
         this.name = name;
-        this.tag = tag;
-        this.mode = mode;
+        this.tags = tags;
+        this.modes = modes;
         this.parent = parent;
     }
 
@@ -292,8 +292,8 @@ public class JavaClass implements JavaStructure {
     }
 
     private void writeClassHeader(BufferedWriter writer, String prefix) throws IOException {
-        if (tag != null) {
-            CompilerUtils.getTagAnnotation(tag, mode.toString()).write(writer, "");
+        if (tags != null && !tags.isEmpty()) {
+            CompilerUtils.getTagsAnnotation(tags, modes).write(writer, "");
         }
 
         List<String> clazzDeclaration = new ArrayList<>();

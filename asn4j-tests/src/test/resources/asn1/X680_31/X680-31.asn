@@ -7,5 +7,6 @@ TestPrefixedType3 ::= [APPLICATION 3] IMPLICIT VisibleString
 TestPrefixedType4 ::= [1] IMPLICIT VisibleString
 TestPrefixedType5 ::= [PRIVATE 2] EXPLICIT VisibleString
 TestPrefixedType6 ::= [APPLICATION 3] EXPLICIT VisibleString
+TestPrefixedType7 ::= [PRIVATE 3] EXPLICIT [2] IMPLICIT [APPLICATION 4] EXPLICIT VisibleString
 
 END
