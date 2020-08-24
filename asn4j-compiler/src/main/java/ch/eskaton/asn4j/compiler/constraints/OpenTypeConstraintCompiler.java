@@ -30,7 +30,6 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
-import ch.eskaton.asn4j.compiler.constraints.optimizer.RelativeIRIConstraintOptimizingVisitor;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 public class OpenTypeConstraintCompiler extends AbstractIRIConstraintCompiler<RelativeIRIValueNode> {

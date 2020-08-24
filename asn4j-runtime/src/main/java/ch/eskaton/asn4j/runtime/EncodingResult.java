@@ -63,7 +63,7 @@ public class EncodingResult {
     public String toString() {
         return ToString.builder(this)
                 .addAll()
-                .map("buffer", (b) -> HexDump.toHexString((byte[]) b))
+                .map("buffer", b -> HexDump.toHexString((byte[]) b))
                 .build();
     }
 

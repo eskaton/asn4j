@@ -90,13 +90,13 @@ public class JavaClass implements JavaStructure {
 
     private String interf;
 
-    private LinkedList<Tag> tags;
+    private List<Tag> tags;
 
     private List<ASN1Tag.Mode> modes;
 
     private Optional<List<String>> typeParameter = Optional.empty();
 
-    public JavaClass(String pkg, String name, LinkedList<Tag> tags, List<ASN1Tag.Mode> modes, String parent) {
+    public JavaClass(String pkg, String name, List<Tag> tags, List<ASN1Tag.Mode> modes, String parent) {
         this.pkg = pkg;
         this.name = name;
         this.tags = tags;

@@ -33,7 +33,6 @@ import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1RelativeOID;
 
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 
 public class RelativeOIDEncoder implements AbstractOIDEncoder<ASN1RelativeOID> {
 

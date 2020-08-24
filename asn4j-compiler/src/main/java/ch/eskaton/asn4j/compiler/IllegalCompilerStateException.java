@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.parser.Position;
+
 @SuppressWarnings("serial")
 public class IllegalCompilerStateException extends CompilerException {
 
@@ -40,6 +42,14 @@ public class IllegalCompilerStateException extends CompilerException {
 
     public IllegalCompilerStateException(String format, Throwable e, Object... args) {
         super(format, e, args);
+    }
+
+    public IllegalCompilerStateException(Position position, String message) {
+        super(position, message);
+    }
+
+    public IllegalCompilerStateException(Position position, String format, Object... args) {
+        super(position, format, args);
     }
 
 }

@@ -112,7 +112,7 @@ public class FieldMetaData {
     }
 
     private Consumer<ASN1Type> getSetter(Field field, ASN1Type obj) {
-        return (value) -> {
+        return value -> {
             var setterName = "set" + StringUtils.initCap(field.getName());
 
             try {

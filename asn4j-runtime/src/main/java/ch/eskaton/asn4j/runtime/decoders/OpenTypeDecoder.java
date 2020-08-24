@@ -65,6 +65,7 @@ public class OpenTypeDecoder {
             this.bytes = bytes;
         }
 
+        @Override
         public <T extends ASN1Type> T decode(Class<T> type) {
             var value = decoder.decode(type, bytes);
 
