@@ -33,7 +33,6 @@ import ch.eskaton.asn4j.runtime.exceptions.EncodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1ObjectIdentifier;
 
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 
 public class ObjectIdentifierEncoder implements AbstractOIDEncoder<ASN1ObjectIdentifier> {
 

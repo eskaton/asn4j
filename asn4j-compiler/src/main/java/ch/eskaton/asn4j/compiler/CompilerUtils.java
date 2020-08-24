@@ -107,7 +107,7 @@ public class CompilerUtils {
         return getTaggingModes(module, type.getTaggingModes());
     }
 
-    private static List<Mode> getTaggingModes(ModuleNode module, LinkedList<Optional<TaggingMode>> taggingModes) {
+    private static List<Mode> getTaggingModes(ModuleNode module, List<Optional<TaggingMode>> taggingModes) {
         return taggingModes.stream()
                 .map(optionalTaggingMode -> optionalTaggingMode
                         .map(taggingMode ->
@@ -127,8 +127,8 @@ public class CompilerUtils {
         };
     }
 
-    public static JavaAnnotation getTagsAnnotation(ModuleNode module, LinkedList<Tag> tags,
-            LinkedList<Optional<TaggingMode>> taggingModes) {
+    public static JavaAnnotation getTagsAnnotation(ModuleNode module, List<Tag> tags,
+            List<Optional<TaggingMode>> taggingModes) {
         return getTagsAnnotation(tags, getTaggingModes(module, taggingModes));
     }
 

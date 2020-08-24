@@ -36,12 +36,12 @@ public class CompilerException extends RuntimeException {
         super(message);
     }
 
-    public CompilerException(Position position, String message) {
-        super(formatMessage(position, message));
-    }
-
     public CompilerException(String format, Object... args) {
         super(String.format(format, args));
+    }
+
+    public CompilerException(Position position, String message) {
+        super(formatMessage(position, message));
     }
 
     public CompilerException(Position position, String format, Object... args) {

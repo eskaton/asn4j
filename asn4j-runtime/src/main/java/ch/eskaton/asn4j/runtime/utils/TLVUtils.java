@@ -70,7 +70,7 @@ public class TLVUtils {
 
         for (var i = lastIndex; i >= 0; i--) {
             var lenBuffer = getLength(contentLen);
-            var tagBuffer = getTag(tags.get(i), i == lastIndex ? constructed : true);
+            var tagBuffer = getTag(tags.get(i), i != lastIndex || constructed);
 
             buffers.push(lenBuffer);
             buffers.push(tagBuffer);

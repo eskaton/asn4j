@@ -93,10 +93,8 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -104,7 +102,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -365,8 +362,11 @@ public class CompilerContext {
                 return defineFixedTypeValueField(type, name, compiledObjectClass, (CompiledFixedTypeValueField) field);
             } else if (field instanceof CompiledTypeField) {
                 return defineTypeField(type, name, compiledObjectClass);
+            } else if (field == null) {
+                throw new IllegalCompilerStateException(type.getPosition(), "Failed to resolve field from %s", type);
             } else {
-                throw new IllegalCompilerStateException("Unexpected field type: %s", field.getClass().getSimpleName());
+                throw new IllegalCompilerStateException(type.getPosition(), "Unexpected field type: %s",
+                        field.getClass().getSimpleName());
             }
         }
 
