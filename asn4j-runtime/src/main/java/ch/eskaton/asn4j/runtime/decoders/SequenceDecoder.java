@@ -29,37 +29,34 @@ package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.Decoder;
 import ch.eskaton.asn4j.runtime.DecoderStates;
-import ch.eskaton.asn4j.runtime.DecodingResult;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Sequence;
-import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.util.List;
+import java.util.Arrays;
 
 public class SequenceDecoder implements CollectionDecoder<ASN1Sequence> {
 
     @SuppressWarnings("squid:S3011")
     public void decode(Decoder decoder, DecoderStates states, Type type, ASN1Sequence obj) {
-        List<Field> compFields = RuntimeUtils.getComponents(obj);
+        var compFields = RuntimeUtils.getComponents(obj);
 
-        for (Field compField : compFields) {
-            ASN1Component annotation = compField.getAnnotation(ASN1Component.class);
+        for (var compField : compFields) {
+            var annotation = compField.getAnnotation(ASN1Component.class);
 
             if (annotation != null) {
+                var tags = compField.getAnnotation(ASN1Tags.class);
                 @SuppressWarnings("unchecked")
-                DecodingResult<? extends ASN1Type> result = decoder
-                        .decode(compField.getType(), states,
-                                compField.getAnnotation(ASN1Tag.class),
-                                annotation.optional() || annotation.hasDefault());
+                var result = decoder.decode(compField.getType(), states,
+                        tags != null ? Arrays.asList(tags.tags()) : null,
+                        annotation.optional() || annotation.hasDefault());
 
                 if (result != null) {
-                    ASN1Type comp = result.getObj();
+                    var comp = result.getObj();
 
                     if (comp != null) {
                         compField.setAccessible(true);

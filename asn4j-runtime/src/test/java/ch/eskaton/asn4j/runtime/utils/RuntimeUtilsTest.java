@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -70,7 +71,7 @@ class RuntimeUtilsTest {
         assertTagEquals(tags.get(1), Clazz.CONTEXT_SPECIFIC, ASN1Tag.Mode.IMPLICIT, 2);
         assertTagEquals(tags.get(2), Clazz.UNIVERSAL, ASN1Tag.Mode.EXPLICIT, 26);
 
-        var tag = ExplicitTag.class.getAnnotation(ASN1Tags.class).tags()[0];
+        var tag = Arrays.asList(ExplicitTag.class.getAnnotation(ASN1Tags.class).tags());
 
         tags = RuntimeUtils.getTags(TaggedType.class, tag);
 
@@ -82,7 +83,7 @@ class RuntimeUtilsTest {
         assertTagEquals(tags.get(2), Clazz.CONTEXT_SPECIFIC, ASN1Tag.Mode.IMPLICIT, 2);
         assertTagEquals(tags.get(3), Clazz.UNIVERSAL, ASN1Tag.Mode.EXPLICIT, 26);
 
-        tag = ImplicitTag.class.getAnnotation(ASN1Tags.class).tags()[0];
+        tag = Arrays.asList(ImplicitTag.class.getAnnotation(ASN1Tags.class).tags());
 
         tags = RuntimeUtils.getTags(TaggedType.class, tag);
 

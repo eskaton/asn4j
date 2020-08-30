@@ -42,7 +42,7 @@ public interface Decoder {
 
     DecoderState decode(DecoderStates states);
 
-    <T extends ASN1Type> DecodingResult<T> decode(Type type, DecoderStates states, ASN1Tag tag, boolean optional);
+    <T extends ASN1Type> DecodingResult<T> decode(Type type, DecoderStates states, List<ASN1Tag> tags, boolean optional);
 
     DecodingResult<? extends ASN1Type> decode(DecoderStates states, Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags);
 

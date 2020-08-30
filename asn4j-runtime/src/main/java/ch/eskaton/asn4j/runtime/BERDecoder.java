@@ -189,10 +189,8 @@ public class BERDecoder implements Decoder {
         return consumeTags(states, new AnyTagsMatcher());
     }
 
-    public <T extends ASN1Type> DecodingResult<T> decode(Type type, DecoderStates states, ASN1Tag tag,
+    public <T extends ASN1Type> DecodingResult<T> decode(Type type, DecoderStates states, List<ASN1Tag> tags,
             boolean optional) {
-        List<ASN1Tag> tags;
-
         Class clazz = toClass(type);
 
         if (ReflectionUtils.extendsClazz(clazz, ASN1Choice.class)) {
@@ -201,15 +199,15 @@ public class BERDecoder implements Decoder {
             return new DecodingResult<>(List.of(), decodeOpenType(states, states.peek(), optional));
         }
 
-        tags = RuntimeUtils.getTags(clazz, tag);
+        List<ASN1Tag> allTags = RuntimeUtils.getTags(clazz, tags);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(StringUtils.concat("Expecting: javatype=", clazz.getSimpleName(), ", tags=(", StringUtils
-                    .join(CollectionUtils.map(tags, value -> StringUtils
+                    .join(CollectionUtils.map(allTags, value -> StringUtils
                             .concat("tag=", value.tag(), ", class=", value.clazz())), ", "), ")"));
         }
 
-        return decodeState(type, states, consumeTags(states, tags, optional));
+        return decodeState(type, states, consumeTags(states, allTags, optional));
     }
 
     private Class toClass(Type type) {
