@@ -242,14 +242,9 @@ public class BEREncoder implements Encoder {
 
         try {
             if (tags != null && !tags.isEmpty()) {
-                var lastTagIndex = tags.size() - 1;
-                var buffer = TLVUtils.getTagLength(tags.get(lastTagIndex), result.isConstructed(), obj, result.getLength());
+                var allTags = TLVUtils.addMissingTags(tags, obj);
 
-                if (lastTagIndex > 0) {
-                    baos.write(TLVUtils.getTagLength(tags.subList(0, lastTagIndex), true, buffer.length));
-                }
-
-                baos.write(buffer);
+                baos.write(TLVUtils.getTagLength(allTags, result.isConstructed(), result.getLength()));
             } else {
                 baos.write(TLVUtils.getTagLength(result.isConstructed(), obj, result.getLength()));
             }
