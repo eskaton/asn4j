@@ -43,6 +43,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +92,7 @@ public class FieldMetaData {
                 } else if (ASN1OpenType.class.isAssignableFrom(fieldType)) {
                     var tagsAnnotation = field.getAnnotation(ASN1Tags.class);
                     var tags = tagsAnnotation != null ?
-                            RuntimeUtils.getTags(fieldType, tagsAnnotation.tags()[tagsAnnotation.tags().length - 1]) :
+                            RuntimeUtils.getTags(fieldType, Arrays.asList(tagsAnnotation.tags())) :
                             List.<ASN1Tag>of();
 
                     tagData.add(new TagData(tags, field, getSetter(field, type)));
@@ -100,8 +101,7 @@ public class FieldMetaData {
                             .map(ASN1Tags::tags)
                             .map(List::of)
                             .orElse(List.of());
-                    var tag = fieldTags.isEmpty() ? null : fieldTags.get(fieldTags.size() - 1);
-                    var tags = RuntimeUtils.getTags(fieldType, tag);
+                    var tags = RuntimeUtils.getTags(fieldType, fieldTags);
 
                     tagData.add(new TagData(tags, field, getSetter(field, type)));
                 }

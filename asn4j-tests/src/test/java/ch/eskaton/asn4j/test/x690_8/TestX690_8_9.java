@@ -56,6 +56,18 @@ class TestX690_8_9 {
     }
 
     @Test
+    void testDecodeTestSequence() {
+        BERDecoder decoder = new BERDecoder();
+
+        TestSequence a = new TestSequence();
+
+        a.setA(new ASN1VisibleString("test"));
+
+        assertEquals(a, decoder.decode(TestSequence.class, new byte[] { 0x30, 0x0a, (byte) 0xe3, 0x08,
+                (byte) 0xa2, 0x06, 0x1a, 0x04, 0x74, 0x65, 0x73, 0x74 }));
+    }
+
+    @Test
     void testEncodeTestSequence1() {
         BEREncoder encoder = new BEREncoder();
 
