@@ -45,56 +45,49 @@ public class TLVUtils {
     }
 
     public static byte[] getTagLength(boolean constructed, ASN1Type obj, int contentLen) {
-        List<ASN1Tag> tags = RuntimeUtils.getTags(obj.getClass());
-
-        return getTagLength(tags, constructed, contentLen);
+        return getTagLength(RuntimeUtils.getTags(obj.getClass()), constructed, contentLen);
     }
 
-    public static byte[] getTagLength(ASN1Tag tag, boolean constructed, ASN1Type obj, int contentLength) {
+    public static ArrayList<ASN1Tag> addMissingTags(List<ASN1Tag> tags, ASN1Type obj) {
+        var lastTagIndex = tags.size() - 1;
+        var tag = tags.get(lastTagIndex);
+        var result = new ArrayList<>(tags);
+
         if (tag.mode() != ASN1Tag.Mode.IMPLICIT) {
-            ArrayList<ASN1Tag> tags = new ArrayList<>();
-
-            tags.add(tag);
-            tags.addAll(RuntimeUtils.getTags(obj.getClass()));
-
-            return getTagLength(tags, constructed, contentLength);
-        } else {
-            return getTagLength(tag, constructed, contentLength);
+            result.addAll(RuntimeUtils.getTags(obj.getClass()));
         }
+
+        return result;
     }
 
     public static byte[] getTagLength(List<ASN1Tag> tags, boolean constructed, int contentLen) {
         var baos = new ByteArrayOutputStream();
         var buffers = new ArrayDeque<byte[]>(2 * tags.size());
         var lastIndex = tags.size() - 1;
+        var implicit = new boolean[tags.size()];
+
+        for (var i = 1; i < lastIndex; i++) {
+            implicit[i] = tags.get(i - 1).mode() == ASN1Tag.Mode.IMPLICIT;
+        }
 
         for (var i = lastIndex; i >= 0; i--) {
-            var lenBuffer = getLength(contentLen);
-            var tagBuffer = getTag(tags.get(i), i != lastIndex || constructed);
+            var tag = tags.get(i);
 
-            buffers.push(lenBuffer);
-            buffers.push(tagBuffer);
+            if (!implicit[i]) {
+                var lenBuffer = getLength(contentLen);
+                var tagBuffer = getTag(tag, i != lastIndex || constructed);
 
-            contentLen += lenBuffer.length + tagBuffer.length;
+                buffers.push(lenBuffer);
+                buffers.push(tagBuffer);
+
+                contentLen += lenBuffer.length + tagBuffer.length;
+            }
         }
 
         try {
             while (!buffers.isEmpty()) {
                 baos.write(buffers.pop());
             }
-        } catch (IOException e) {
-            throw new EncodingException(e);
-        }
-
-        return baos.toByteArray();
-    }
-
-    public static byte[] getTagLength(ASN1Tag tag, boolean constructed, int contentLen) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        try {
-            baos.write(getTag(tag, constructed));
-            baos.write(getLength(contentLen));
         } catch (IOException e) {
             throw new EncodingException(e);
         }

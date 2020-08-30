@@ -32,6 +32,8 @@ import ch.eskaton.asn4j.runtime.BEREncoder;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
 import ch.eskaton.asn4j.runtime.types.ASN1Integer;
 import ch.eskaton.asn4j.runtime.types.ASN1OctetString;
+import ch.eskaton.asn4j.runtime.types.ASN1VisibleString;
+import ch.eskaton.asn4j.test.modules.X690_8.TestSequence;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence1;
 import ch.eskaton.asn4j.test.modules.x680_25.TestSequence2;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,18 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestX690_8_9 {
+
+    @Test
+    void testEncodeTestSequence() {
+        BEREncoder encoder = new BEREncoder();
+
+        TestSequence a = new TestSequence();
+
+        a.setA(new ASN1VisibleString("test"));
+
+        assertArrayEquals(new byte[] { 0x30, 0x0a, (byte) 0xe3, 0x08, (byte) 0xa2, 0x06, 0x1a, 0x04, 0x74, 0x65,
+                0x73, 0x74 }, encoder.encode(a));
+    }
 
     @Test
     void testEncodeTestSequence1() {

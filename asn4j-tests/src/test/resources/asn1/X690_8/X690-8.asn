@@ -6,6 +6,11 @@ TestEnumeration ::= ENUMERATED {
 	a(0), b(1), c(128)
 }
 
+-- 8.9
+TestSequence ::= SEQUENCE {
+    a [PRIVATE 3] EXPLICIT [2] IMPLICIT [APPLICATION 4] EXPLICIT VisibleString
+}
+
 -- 8.14
 Type1 ::= VisibleString
 
