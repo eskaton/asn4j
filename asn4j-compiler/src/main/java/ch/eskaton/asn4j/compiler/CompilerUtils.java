@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
@@ -48,6 +49,7 @@ import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,6 +105,7 @@ public class CompilerUtils {
         return sb.toString();
     }
 
+
     static List<Mode> getTaggingModes(ModuleNode module, Type type) {
         return getTaggingModes(module, type.getTaggingModes());
     }
@@ -120,7 +123,6 @@ public class CompilerUtils {
 
     private static Mode getDefaultTaggingMode(ModuleNode module) {
         return switch (module.getTagMode()) {
-            case EXPLICIT -> Mode.EXPLICIT;
             case IMPLICIT -> Mode.IMPLICIT;
             case AUTOMATIC -> throw new CompilerException("Automatic tagging not supported");
             default -> Mode.EXPLICIT;
@@ -188,10 +190,81 @@ public class CompilerUtils {
         return new TagId(clazz, tag.getClassNumber().getClazz());
     }
 
+    public static List<TagId> toTagIds(List<Tag> tags) {
+        if (tags == null) {
+            return Collections.emptyList();
+        }
+
+        return tags.stream().map(CompilerUtils::toTagId).collect(Collectors.toList());
+    }
+
+    public static List<TagId> getTagIds(CompilerContext ctx, Type type) {
+        var typeTags = new ArrayList<>(toTagIds(type.getTags()));
+        var taggingModes = getTaggingModes(ctx.getModule(), type);
+        var tags = new LinkedList<TagId>();
+        var explicit = true;
+
+        for (var i = 0; i < typeTags.size(); i++) {
+            if (explicit) {
+                tags.add(typeTags.get(i));
+            }
+
+            explicit = taggingModes.get(i) == Mode.EXPLICIT;
+        }
+
+        if (ctx.isBuiltin(type)) {
+            // check for built-in types first because some type references (useful types) are treated as built-ins
+            tags.addAll(getTagIdsOfBuiltinType(ctx, type));
+        } else if (type instanceof SimpleDefinedType) {
+            var compiledType = ctx.getCompiledType(type);
+            var maybeCompiledTags = compiledType.getTags();
+
+            if (maybeCompiledTags.isPresent()) {
+                var compiledTags = maybeCompiledTags.get();
+
+                if (explicit) {
+                    tags.addAll(compiledTags);
+                } else {
+                    if (compiledTags.size() > 1) {
+                        tags.addAll(compiledTags.subList(1, compiledTags.size()));
+                    }
+                }
+            }
+        } else if (type instanceof NamedType namedType) {
+            tags.addAll(getTagIds(ctx, namedType.getType()));
+
+        } else {
+            throw new IllegalCompilerStateException("Unexpected type: %s", type);
+        }
+
+        return tags;
+    }
+
+    private static LinkedList<TagId> getTagIdsOfBuiltinType(CompilerContext ctx, Type type) {
+        var tags = new LinkedList<TagId>();
+        var typeName = ctx.getRuntimeTypeName(type);
+
+        try {
+            var typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
+            var tagAnnotation = typeClazz.getAnnotation(ASN1Tags.class);
+
+            if (tagAnnotation != null) {
+                var asn1Tags = tagAnnotation.tags();
+
+                if (asn1Tags != null) {
+                    tags.addAll(TagId.fromTags(Arrays.asList(asn1Tags)));
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            throw new CompilerException("Unknown type: %s", type);
+        }
+
+        return tags;
+    }
+
     public static String getDefaultFieldName(String field) {
         return "$default_" + field;
     }
-
 
     public static <V extends Value> V resolveAmbiguousValue(Node value, Class<V> valueClass) {
         if (value instanceof AmbiguousValue) {
