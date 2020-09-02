@@ -49,7 +49,7 @@ class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    void testImplicit() {
+    void testSingleTag() {
         BERDecoder.SingleTagsMatcher matcher = new BERDecoder.SingleTagsMatcher(getTags(TestTag1.class));
 
         assertTrue(matcher.hasNext());
@@ -61,7 +61,7 @@ class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    void testImplicitFailure() {
+    void testSingleTagFailure() {
         BERDecoder.SingleTagsMatcher matcher = new BERDecoder.SingleTagsMatcher(getTags(TestTag1.class));
 
         assertTrue(matcher.hasNext());
@@ -73,7 +73,7 @@ class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    void testExplicit() {
+    void testMultipleTags() {
         BERDecoder.SingleTagsMatcher matcher = new BERDecoder.SingleTagsMatcher(getTags(TestTag2.class));
 
         assertTrue(matcher.hasNext());
@@ -90,7 +90,7 @@ class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    void testExplicitFailure() {
+    void testMultipleTagsFailure() {
         BERDecoder.SingleTagsMatcher matcher = new BERDecoder.SingleTagsMatcher(getTags(TestTag2.class));
 
         assertTrue(matcher.hasNext());
@@ -101,12 +101,12 @@ class SingleTagsMatcherTest extends AbstractTagsMatcherTest {
         assertTrue(matcher.hasNext());
     }
 
-    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT))
+    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1))
     private static class TestTag1 implements ASN1Type {
 
     }
 
-    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2, mode = ASN1Tag.Mode.EXPLICIT))
+    @ASN1Tags(tags = { @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2), @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1) })
     private static class TestTag2 extends TestTag1 {
 
     }

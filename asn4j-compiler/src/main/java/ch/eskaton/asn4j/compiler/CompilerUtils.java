@@ -28,11 +28,14 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
+import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.OpenType;
+import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
@@ -43,7 +46,6 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag.Mode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
@@ -55,6 +57,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static ch.eskaton.asn4j.runtime.TaggingMode.EXPLICIT;
+import static ch.eskaton.asn4j.runtime.TaggingMode.IMPLICIT;
 
 public class CompilerUtils {
 
@@ -106,42 +111,29 @@ public class CompilerUtils {
     }
 
 
-    static List<Mode> getTaggingModes(ModuleNode module, Type type) {
+    static List<TaggingMode> getTaggingModes(ModuleNode module, Type type) {
         return getTaggingModes(module, type.getTaggingModes());
     }
 
-    private static List<Mode> getTaggingModes(ModuleNode module, List<Optional<TaggingMode>> taggingModes) {
+    private static List<TaggingMode> getTaggingModes(ModuleNode module, List<Optional<TaggingMode>> taggingModes) {
         return taggingModes.stream()
-                .map(optionalTaggingMode -> optionalTaggingMode
-                        .map(taggingMode ->
-                                switch (taggingMode) {
-                                    case EXPLICIT -> Mode.EXPLICIT;
-                                    case IMPLICIT -> Mode.IMPLICIT;
-                                }).orElseGet(() -> getDefaultTaggingMode(module)))
+                .map(optionalTaggingMode -> optionalTaggingMode.orElseGet(() -> getDefaultTaggingMode(module)))
                 .collect(Collectors.toList());
     }
 
-    private static Mode getDefaultTaggingMode(ModuleNode module) {
+    private static TaggingMode getDefaultTaggingMode(ModuleNode module) {
         return switch (module.getTagMode()) {
-            case IMPLICIT -> Mode.IMPLICIT;
+            case IMPLICIT -> IMPLICIT;
             case AUTOMATIC -> throw new CompilerException("Automatic tagging not supported");
-            default -> Mode.EXPLICIT;
+            default -> EXPLICIT;
         };
     }
 
-    public static JavaAnnotation getTagsAnnotation(ModuleNode module, List<Tag> tags,
-            List<Optional<TaggingMode>> taggingModes) {
-        return getTagsAnnotation(tags, getTaggingModes(module, taggingModes));
-    }
-
-    public static JavaAnnotation getTagsAnnotation(List<Tag> tags, List<Mode> taggingModes) {
+    public static JavaAnnotation getTagsAnnotation(List<TagId> tags) {
         var tagAnnotations = new LinkedList<JavaAnnotation>();
 
         for (var i = 0; i < tags.size(); i++) {
-            var taggingMode = taggingModes.get(i).toString();
-            var tagAnnotation = getTagAnnotation(tags.get(i), taggingMode);
-
-            tagAnnotations.add(tagAnnotation);
+            tagAnnotations.add(getTagAnnotation(tags.get(i)));
         }
 
         var tagsAnnotation = new JavaAnnotation(ASN1Tags.class);
@@ -151,14 +143,13 @@ public class CompilerUtils {
         return tagsAnnotation;
     }
 
-    public static JavaAnnotation getTagAnnotation(Tag tag, String taggingModeString) {
+    public static JavaAnnotation getTagAnnotation(TagId tag) {
         JavaAnnotation tagAnnotation = new JavaAnnotation(ASN1Tag.class);
 
-        tagAnnotation.addParameter("tag", tag.getClassNumber().getClazz().toString());
+        tagAnnotation.addParameter("tag", tag.getTag());
         tagAnnotation.addParameter("clazz", "Clazz."
                 + (tag.getClazz() != null ? tag.getClazz().toString()
                 : Clazz.CONTEXT_SPECIFIC.toString()));
-        tagAnnotation.addParameter("mode", ASN1Tag.class.getSimpleName() + ".Mode." + taggingModeString);
 
         return tagAnnotation;
     }
@@ -170,7 +161,6 @@ public class CompilerUtils {
         if (clazzType == null) {
             clazz = Clazz.CONTEXT_SPECIFIC;
         } else {
-
             switch (clazzType) {
                 case APPLICATION:
                     clazz = Clazz.APPLICATION;
@@ -205,39 +195,69 @@ public class CompilerUtils {
         var explicit = true;
 
         for (var i = 0; i < typeTags.size(); i++) {
-            if (explicit) {
-                tags.add(typeTags.get(i));
+            var tag = typeTags.get(i);
+
+            if (tag.getClazz() == Clazz.UNIVERSAL) {
+                throw new CompilerException("UNIVERSAL class not allowed");
             }
 
-            explicit = taggingModes.get(i) == Mode.EXPLICIT;
+            if (explicit) {
+                tags.add(tag);
+            }
+
+            explicit = taggingModes.get(i) == TaggingMode.EXPLICIT;
         }
 
         if (ctx.isBuiltin(type)) {
             // check for built-in types first because some type references (useful types) are treated as built-ins
-            tags.addAll(getTagIdsOfBuiltinType(ctx, type));
+            if (explicit) {
+                tags.addAll(getTagIdsOfBuiltinType(ctx, type));
+            }
         } else if (type instanceof SimpleDefinedType) {
             var compiledType = ctx.getCompiledType(type);
             var maybeCompiledTags = compiledType.getTags();
 
-            if (maybeCompiledTags.isPresent()) {
-                var compiledTags = maybeCompiledTags.get();
-
-                if (explicit) {
-                    tags.addAll(compiledTags);
-                } else {
-                    if (compiledTags.size() > 1) {
-                        tags.addAll(compiledTags.subList(1, compiledTags.size()));
-                    }
-                }
-            }
+            addTags(tags, maybeCompiledTags, explicit);
         } else if (type instanceof NamedType namedType) {
             tags.addAll(getTagIds(ctx, namedType.getType()));
+        } else if (type instanceof SelectionType selectionType) {
+            var compiledType = ctx.getCompiledType(selectionType.getType());
 
+            if (compiledType instanceof CompiledChoiceType compiledChoiceType) {
+                var maybeComponent = compiledChoiceType.getComponent(selectionType.getId());
+
+                if (maybeComponent.isEmpty()) {
+                    throw new CompilerException(type.getPosition(),
+                            "Selection type doesn't refer to known component: %s", type);
+                }
+
+                var maybeCompiledTags = maybeComponent.get().get_2().getTags();
+
+                addTags(tags, maybeCompiledTags, explicit);
+            } else {
+                throw new CompilerException(type.getPosition(), "Selection type doesn't refer to a Choice: %s", type);
+            }
+        } else if (type instanceof OpenType) {
+            // ignore
         } else {
             throw new IllegalCompilerStateException("Unexpected type: %s", type);
         }
 
         return tags;
+    }
+
+    private static void addTags(LinkedList<TagId> tags, Optional<List<TagId>> maybeCompiledTags, boolean explicit) {
+        if (maybeCompiledTags.isPresent()) {
+            var compiledTags = maybeCompiledTags.get();
+
+            if (explicit) {
+                tags.addAll(compiledTags);
+            } else {
+                if (compiledTags.size() > 1) {
+                    tags.addAll(compiledTags.subList(1, compiledTags.size()));
+                }
+            }
+        }
     }
 
     private static LinkedList<TagId> getTagIdsOfBuiltinType(CompilerContext ctx, Type type) {

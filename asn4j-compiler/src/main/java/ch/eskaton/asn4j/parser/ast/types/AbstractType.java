@@ -81,6 +81,11 @@ public abstract class AbstractType implements Type {
     }
 
     @Override
+    public void setTaggingModes(LinkedList<Optional<TaggingMode>> taggingModes) {
+        this.taggingModes = taggingModes;
+    }
+
+    @Override
     public void addTaggingMode(Optional<TaggingMode> taggingMode) {
         this.taggingModes.addFirst(taggingMode);
     }

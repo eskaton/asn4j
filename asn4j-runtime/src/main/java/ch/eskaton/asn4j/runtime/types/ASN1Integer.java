@@ -36,7 +36,7 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import java.math.BigInteger;
 import java.util.Objects;
 
-@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 2, mode = ASN1Tag.Mode.EXPLICIT))
+@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 2))
 public class ASN1Integer implements ASN1Type, HasConstraint {
 
     private BigInteger value;

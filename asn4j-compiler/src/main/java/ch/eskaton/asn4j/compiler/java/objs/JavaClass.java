@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.IL2JavaTranslator;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.commons.utils.CollectionUtils;
 import ch.eskaton.commons.utils.StringUtils;
@@ -90,17 +91,14 @@ public class JavaClass implements JavaStructure {
 
     private String interf;
 
-    private List<Tag> tags;
-
-    private List<ASN1Tag.Mode> modes;
+    private List<TagId> tags;
 
     private Optional<List<String>> typeParameter = Optional.empty();
 
-    public JavaClass(String pkg, String name, List<Tag> tags, List<ASN1Tag.Mode> modes, String parent) {
+    public JavaClass(String pkg, String name, List<TagId> tags, String parent) {
         this.pkg = pkg;
         this.name = name;
         this.tags = tags;
-        this.modes = modes;
         this.parent = parent;
     }
 
@@ -293,7 +291,7 @@ public class JavaClass implements JavaStructure {
 
     private void writeClassHeader(BufferedWriter writer, String prefix) throws IOException {
         if (tags != null && !tags.isEmpty()) {
-            CompilerUtils.getTagsAnnotation(tags, modes).write(writer, "");
+            CompilerUtils.getTagsAnnotation(tags).write(writer, "");
         }
 
         List<String> clazzDeclaration = new ArrayList<>();

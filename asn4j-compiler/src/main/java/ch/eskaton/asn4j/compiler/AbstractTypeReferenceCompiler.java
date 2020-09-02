@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 
@@ -39,11 +37,15 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         // ensure the type is resolvable
         ctx.resolveTypeReference(node);
 
-        JavaClass javaClass = ctx.createClass(name, node);
-        CompiledType compiledType = ctx.createCompiledType(node, name);
+        var tags = CompilerUtils.getTagIds(ctx, node);
+        var javaClass = ctx.createClass(name, node, tags);
+        var compiledType = ctx.createCompiledType(node, name);
+
+        compiledType.setTags(tags);
 
         if (node.hasConstraint()) {
-            ConstraintDefinition constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+
             compiledType.setConstraintDefinition(constraintDef);
         }
 

@@ -35,13 +35,7 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ASN1Tag {
 
-    enum Mode {
-        IMPLICIT, EXPLICIT
-    }
-
     Clazz clazz();
-
-    Mode mode();
 
     int tag();
 

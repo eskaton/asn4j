@@ -64,7 +64,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, Choice node) {
-        var javaClass = ctx.createClass(name, node);
+        var tags = CompilerUtils.getTagIds(ctx, node);
+        var javaClass = ctx.createClass(name, node, tags);
         var fieldNames = new ArrayList<String>();
         var typeEnum = new JavaEnum(CHOICE_ENUM);
         var componentVerifiers = List.of(new TagUniquenessVerifier(ctx, TypeName.CHOICE),
@@ -76,6 +77,9 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         bodyBuilder.append("switch(" + CHOICE_FIELD + ") {");
 
         var compiledType = ctx.createCompiledType(CompiledChoiceType.class, node, name);
+
+        compiledType.setTags(tags);
+
         var components = new ArrayList<Tuple2<String, CompiledType>>();
 
         for (NamedType namedType : node.getRootAlternatives()) {
@@ -132,19 +136,18 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         return compiledType;
     }
 
-    private Tuple2<String, CompiledType> compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass, NamedType namedType,
-            String typeConstant, String beforeCode) {
-        String name = CompilerUtils.formatName(namedType.getName());
-        CompiledType compiledType = ctx.defineType(namedType);
-        String typeName = compiledType.getName();
-        LinkedList<Tag> tags = namedType.getType().getTags();
-        LinkedList<Optional<TaggingMode>> taggingModes = namedType.getType().getTaggingModes();
-        JavaDefinedField field = new JavaDefinedField(typeName, name);
+    private Tuple2<String, CompiledType> compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass,
+            NamedType namedType, String typeConstant, String beforeCode) {
+        var name = CompilerUtils.formatName(namedType.getName());
+        var compiledType = ctx.defineType(namedType);
+        var typeName = compiledType.getName();
+        var field = new JavaDefinedField(typeName, name);
+        var tags = compiledType.getTags();
 
         field.addAnnotation(new JavaAnnotation(ASN1Alternative.class).addParameter("name", '"' + typeConstant + '"'));
 
-        if (tags != null && !tags.isEmpty()) {
-            field.addAnnotation(CompilerUtils.getTagsAnnotation(ctx.getModule(), tags, taggingModes));
+        if (tags.isPresent()) {
+            field.addAnnotation(CompilerUtils.getTagsAnnotation(tags.get()));
         }
 
         javaClass.addField(field, false, false);

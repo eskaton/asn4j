@@ -80,67 +80,67 @@ class TLVUtilsTest {
                 .getTag(PrivatePrimitive16384Test.class.getAnnotation(ASN1Tag.class), false));
     }
 
-    @ASN1Tag(clazz = Clazz.UNIVERSAL, mode = ASN1Tag.Mode.IMPLICIT, tag = 1)
+    @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1)
     private static class UniversalPrimitiveTest {
 
     }
 
-    @ASN1Tag(clazz = Clazz.APPLICATION, mode = ASN1Tag.Mode.IMPLICIT, tag = 1)
+    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 1)
     private static class ApplicationPrimitiveTest {
 
     }
 
-    @ASN1Tag(clazz = Clazz.CONTEXT_SPECIFIC, mode = ASN1Tag.Mode.IMPLICIT, tag = 1)
+    @ASN1Tag(clazz = Clazz.CONTEXT_SPECIFIC, tag = 1)
     private static class ContextSpecificPrimitiveTest {
 
     }
 
-    @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.IMPLICIT, tag = 1)
+    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 1)
     private static class PrivatePrimitiveTest {
 
     }
 
-    @ASN1Tag(clazz = Clazz.UNIVERSAL, mode = ASN1Tag.Mode.IMPLICIT, tag = 1)
+    @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1)
     private static class UniversalConstructedTest {
 
     }
 
-    @ASN1Tag(clazz = Clazz.APPLICATION, mode = ASN1Tag.Mode.IMPLICIT, tag = 1)
+    @ASN1Tag(clazz = Clazz.APPLICATION, tag = 1)
     private static class ApplicationConstructedTest {
 
     }
 
-    @ASN1Tag(clazz = Clazz.CONTEXT_SPECIFIC, mode = ASN1Tag.Mode.IMPLICIT, tag = 1)
+    @ASN1Tag(clazz = Clazz.CONTEXT_SPECIFIC, tag = 1)
     private static class ContextSpecificConstructedTest {
 
     }
 
-    @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.IMPLICIT, tag = 1)
+    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 1)
     private static class PrivateConstructedTest {
 
     }
 
-    @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.IMPLICIT, tag = 30)
+    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 30)
     private static class PrivatePrimitive30Test {
 
     }
 
-    @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.IMPLICIT, tag = 31)
+    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 31)
     private static class PrivatePrimitive31Test {
 
     }
 
-    @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.IMPLICIT, tag = 128)
+    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 128)
     private static class PrivatePrimitive128Test {
 
     }
 
-    @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.IMPLICIT, tag = 16383)
+    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 16383)
     private static class PrivatePrimitive16383Test {
 
     }
 
-    @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.IMPLICIT, tag = 16384)
+    @ASN1Tag(clazz = Clazz.PRIVATE, tag = 16384)
     private static class PrivatePrimitive16384Test {
 
     }

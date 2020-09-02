@@ -36,7 +36,7 @@ import java.util.Objects;
 
 import static ch.eskaton.asn4j.runtime.verifiers.ObjectIdentifierVerifier.verifyComponents;
 
-@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 6, mode = ASN1Tag.Mode.EXPLICIT))
+@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 6))
 public class ASN1ObjectIdentifier extends AbstractASN1OID {
 
     public ASN1ObjectIdentifier() {

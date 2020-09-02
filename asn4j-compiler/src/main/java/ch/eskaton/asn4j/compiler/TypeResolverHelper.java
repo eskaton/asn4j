@@ -118,7 +118,7 @@ public class TypeResolverHelper {
 
     Type resolveTypeReference(Type typeReference) {
         while (typeReference instanceof TypeReference) {
-            if (typeReference instanceof GeneralizedTime || typeReference instanceof UTCTime) {
+            if (isUsefulType(typeReference)) {
                 return typeReference;
             }
 
@@ -145,8 +145,21 @@ public class TypeResolverHelper {
     }
 
     public Type resolveTypeReference(String reference) {
-        // TODO: what to do if the type isn't known in the current module
-        return Optional.ofNullable(((TypeAssignmentNode) ctx.getModule().getBody().getAssignment(reference)))
+        try {
+            return resolveTypeReference(ctx.getModule(), reference);
+        } catch (CompilerException e) {
+            return ctx.findImport(reference)
+                    .map(moduleName -> resolveTypeReference(ctx.getModule(moduleName), reference))
+                    .orElseThrow(() -> new CompilerException("Failed to resolve reference to %s", reference));
+        }
+    }
+
+    public Type resolveTypeReference(String moduleName, String reference) {
+        return resolveTypeReference(ctx.getModule(moduleName), reference);
+    }
+
+    private Type resolveTypeReference(ModuleNode module, String reference) {
+        return Optional.ofNullable(((TypeAssignmentNode) module.getBody().getAssignment(reference)))
                 .map(TypeOrObjectClassAssignmentNode::getType)
                 .orElseThrow(() -> new CompilerException("Failed to resolve reference to %s", reference));
     }

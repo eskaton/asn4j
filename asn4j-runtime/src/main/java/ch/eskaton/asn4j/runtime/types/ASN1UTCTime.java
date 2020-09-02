@@ -36,7 +36,7 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 
-@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 23, mode = ASN1Tag.Mode.IMPLICIT))
+@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 23))
 public class ASN1UTCTime extends ASN1VisibleString {
 
     private static final UTCTimeParser UTC_TIME_PARSER = new UTCTimeParser();

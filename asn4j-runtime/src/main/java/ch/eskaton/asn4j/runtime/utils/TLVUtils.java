@@ -34,7 +34,6 @@ import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TLVUtils {
@@ -48,40 +47,20 @@ public class TLVUtils {
         return getTagLength(RuntimeUtils.getTags(obj.getClass()), constructed, contentLen);
     }
 
-    public static ArrayList<ASN1Tag> addMissingTags(List<ASN1Tag> tags, ASN1Type obj) {
-        var lastTagIndex = tags.size() - 1;
-        var tag = tags.get(lastTagIndex);
-        var result = new ArrayList<>(tags);
-
-        if (tag.mode() != ASN1Tag.Mode.IMPLICIT) {
-            result.addAll(RuntimeUtils.getTags(obj.getClass()));
-        }
-
-        return result;
-    }
-
     public static byte[] getTagLength(List<ASN1Tag> tags, boolean constructed, int contentLen) {
         var baos = new ByteArrayOutputStream();
         var buffers = new ArrayDeque<byte[]>(2 * tags.size());
         var lastIndex = tags.size() - 1;
-        var implicit = new boolean[tags.size()];
-
-        for (var i = 1; i < lastIndex; i++) {
-            implicit[i] = tags.get(i - 1).mode() == ASN1Tag.Mode.IMPLICIT;
-        }
 
         for (var i = lastIndex; i >= 0; i--) {
             var tag = tags.get(i);
+            var lenBuffer = getLength(contentLen);
+            var tagBuffer = getTag(tag, i != lastIndex || constructed);
 
-            if (!implicit[i]) {
-                var lenBuffer = getLength(contentLen);
-                var tagBuffer = getTag(tag, i != lastIndex || constructed);
+            buffers.push(lenBuffer);
+            buffers.push(tagBuffer);
 
-                buffers.push(lenBuffer);
-                buffers.push(tagBuffer);
-
-                contentLen += lenBuffer.length + tagBuffer.length;
-            }
+            contentLen += lenBuffer.length + tagBuffer.length;
         }
 
         try {

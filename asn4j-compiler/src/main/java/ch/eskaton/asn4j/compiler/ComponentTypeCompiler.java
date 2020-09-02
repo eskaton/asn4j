@@ -28,11 +28,9 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.ModuleNode.TagMode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
@@ -43,13 +41,10 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.parser.ast.values.Tag;
-import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,8 +54,6 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
     public List<Tuple2<String, CompiledType>> compile(CompilerContext ctx, CompiledCollectionType compiledType,
             ComponentType node) {
-        TagMode mode = ctx.getModule().getTagMode();
-
         switch (node.getCompType()) {
             case NAMED_TYPE_OPT:
                 // fall through
@@ -69,7 +62,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             case NAMED_TYPE:
                 return compileComponentNamedType(ctx, compiledType, node, node.getNamedType());
             case TYPE:
-                return compileComponentType(ctx, compiledType, mode, node.getType());
+                return compileComponentType(ctx, compiledType, node.getType());
             default:
                 throw new IllegalCompilerStateException("Unsupported component type: %s", node.getCompType());
         }
@@ -77,15 +70,13 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
     private List<Tuple2<String, CompiledType>> compileComponentNamedType(CompilerContext ctx,
             CompiledCollectionType compiledType, ComponentType component, NamedType namedType) {
-        JavaClass javaClass = ctx.getCurrentClass();
-        Type type = ctx.resolveSelectedType(namedType.getType());
-        LinkedList<Optional<TaggingMode>> taggingModes = type.getTaggingModes();
-        LinkedList<Tag> tags = type.getTags();
-        JavaAnnotation compAnnotation = new JavaAnnotation(ASN1Component.class);
-        boolean hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
-        CompiledType compiledComponent = ctx.defineType(namedType);
-        String typeName = compiledComponent.getName();
-        JavaDefinedField field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
+        var javaClass = ctx.getCurrentClass();
+        var type = ctx.resolveSelectedType(namedType.getType());
+        var compAnnotation = new JavaAnnotation(ASN1Component.class);
+        var hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
+        var compiledComponent = ctx.defineType(namedType);
+        var typeName = compiledComponent.getName();
+        var field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
 
         compiledComponent.setParent(compiledType);
         compiledType.getComponents().add(Tuple2.of(namedType.getName(), compiledComponent));
@@ -105,8 +96,10 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
         field.addAnnotation(compAnnotation);
 
-        if (tags != null && !tags.isEmpty()) {
-            field.addAnnotation(CompilerUtils.getTagsAnnotation(ctx.getModule(), tags, taggingModes));
+        var tags = compiledComponent.getTags();
+
+        if (tags.isPresent()) {
+            field.addAnnotation(CompilerUtils.getTagsAnnotation(tags.get()));
         }
 
         javaClass.addField(field);
@@ -115,7 +108,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
     }
 
     private List<Tuple2<String, CompiledType>> compileComponentType(CompilerContext ctx,
-            CompiledCollectionType compiledType, TagMode mode, Type type) {
+            CompiledCollectionType compiledType, Type type) {
         Optional<TypeAssignmentNode> assignment;
 
         if (type instanceof TypeReference) {

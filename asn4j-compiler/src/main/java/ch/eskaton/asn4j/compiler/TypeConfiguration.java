@@ -346,7 +346,11 @@ public class TypeConfiguration {
     }
 
     public <T extends Type> boolean isBuiltin(Class<T> typeClass) {
-        return getConfigByType("isBuiltin", typeClass, TypeDefinition::isBuiltin);
+        try {
+            return getConfigByType("isBuiltin", typeClass, TypeDefinition::isBuiltin);
+        } catch(IllegalCompilerStateException e) {
+            return false;
+        }
     }
 
     public boolean isRuntimeType(String typeName) {

@@ -34,6 +34,7 @@ import ch.eskaton.commons.collections.Tuple2;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CompiledChoiceType extends CompiledType implements HasComponents, HasChildComponents {
@@ -47,6 +48,10 @@ public class CompiledChoiceType extends CompiledType implements HasComponents, H
     @Override
     public List<Tuple2<String, CompiledType>> getComponents() {
         return components;
+    }
+
+    public Optional<Tuple2<String, CompiledType>> getComponent(String componentName) {
+        return components.stream().filter(c -> c.get_1().equals(componentName)).findFirst();
     }
 
     @Override

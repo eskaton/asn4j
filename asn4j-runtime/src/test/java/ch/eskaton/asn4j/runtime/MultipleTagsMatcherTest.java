@@ -60,7 +60,7 @@ class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    void testImplicit() {
+    void testSingleTag() {
         List<ASN1Tag> tags1 = getTags(TestTag1a.class);
         List<ASN1Tag> tags2 = getTags(TestTag2a.class);
         BERDecoder.MultipleTagsMatcher matcher = new BERDecoder.MultipleTagsMatcher(asList(tags1, tags2));
@@ -85,7 +85,7 @@ class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    void testImplicitFailure() {
+    void testSingleTagFailure() {
         BERDecoder.MultipleTagsMatcher matcher = new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1a.class), getTags(TestTag2a.class)));
 
         assertTrue(matcher.hasNext());
@@ -98,7 +98,7 @@ class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    void testExplicit() {
+    void testMultipleTags() {
         List<ASN1Tag> tags1 = getTags(TestTag1b.class);
         List<ASN1Tag> tags2 = getTags(TestTag2b.class);
         BERDecoder.MultipleTagsMatcher matcher = new BERDecoder.MultipleTagsMatcher(asList(tags1, tags2));
@@ -135,7 +135,7 @@ class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
     }
 
     @Test
-    void testExplicitFailure() {
+    void testMultipleTagsFailure() {
         BERDecoder.MultipleTagsMatcher matcher = new BERDecoder.MultipleTagsMatcher(asList(getTags(TestTag1b.class), getTags(TestTag2b.class)));
 
         assertTrue(matcher.hasNext());
@@ -153,22 +153,22 @@ class MultipleTagsMatcherTest extends AbstractTagsMatcherTest {
         assertNull(matcher.getMatch());
     }
 
-    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1, mode = ASN1Tag.Mode.EXPLICIT))
+    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1))
     private static class TestTag1a implements ASN1Type {
 
     }
 
-    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2, mode = ASN1Tag.Mode.EXPLICIT))
+    @ASN1Tags(tags = { @ASN1Tag(clazz = Clazz.APPLICATION, tag = 2), @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 1) })
     private static class TestTag1b extends TestTag1a {
 
     }
 
-    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3, mode = ASN1Tag.Mode.EXPLICIT))
+    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3))
     private static class TestTag2a implements ASN1Type {
 
     }
 
-    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.APPLICATION, tag = 4, mode = ASN1Tag.Mode.EXPLICIT))
+    @ASN1Tags(tags = { @ASN1Tag(clazz = Clazz.APPLICATION, tag = 4), @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 3) })
     private static class TestTag2b extends TestTag2a {
 
     }

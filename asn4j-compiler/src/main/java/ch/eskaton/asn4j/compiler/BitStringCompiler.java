@@ -27,15 +27,12 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 
 import java.math.BigInteger;
-import java.util.Collection;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 
@@ -43,9 +40,10 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, BitString node) {
-        JavaClass javaClass = ctx.createClass(name, node);
-        Collection<NamedBitNode> namedBits = node.getNamedBits();
-        IdentifierUniquenessChecker<Long> iuc = new IdentifierUniquenessChecker<>(name);
+        var tags = CompilerUtils.getTagIds(ctx, node);
+        var javaClass = ctx.createClass(name, node, tags);
+        var namedBits = node.getNamedBits();
+        var uniquenessChecker = new IdentifierUniquenessChecker<>(name);
         long msb = 0;
 
         javaClass.setParent(ch.eskaton.asn4j.runtime.types.ASN1NamedBitString.class.getSimpleName());
@@ -67,7 +65,7 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
                     value = namedBit.getNum();
                 }
 
-                iuc.add(namedBit.getId(), value);
+                uniquenessChecker.add(namedBit.getId(), value);
 
                 msb = value > msb ? value : msb;
 
@@ -78,13 +76,12 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
         javaClass.method().modifier(PUBLIC).name(name).build();
 
-        ctx.createCompiledType(CompiledType.class, node, name);
+        var compiledType = ctx.createCompiledType(node, name);
 
-        CompiledType compiledType = ctx.createCompiledType(node, name);
-        ConstraintDefinition constraintDef;
+        compiledType.setTags(tags);
 
         if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
 
             compiledType.setConstraintDefinition(constraintDef);
         }
