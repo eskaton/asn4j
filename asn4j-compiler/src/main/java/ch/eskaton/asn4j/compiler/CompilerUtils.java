@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
@@ -47,6 +49,8 @@ import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
+import ch.eskaton.commons.MutableReference;
+import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
@@ -56,6 +60,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.runtime.TaggingMode.EXPLICIT;
@@ -282,6 +287,22 @@ public class CompilerUtils {
         return tags;
     }
 
+    public static Set<TagId> getLeadingTagId(CompiledType compiledType) {
+        if (compiledType instanceof CompiledChoiceType compiledChoiceType) {
+            return compiledChoiceType.getComponents().stream()
+                    .map(Tuple2::get_2)
+                    .map(CompiledType::getTags)
+                    .map(tags -> tags.map(t -> t.stream().findFirst())).
+                            flatMap(Optional::stream)
+                    .flatMap(Optional::stream)
+                    .collect(Collectors.toSet());
+        } else {
+            return compiledType.getTags()
+                    .map(tags -> tags.stream().findFirst().map(Set::of).orElse(Set.of()))
+                    .orElse(Set.of());
+        }
+    }
+
     public static String getDefaultFieldName(String field) {
         return "$default_" + field;
     }
@@ -335,6 +356,27 @@ public class CompilerUtils {
 
     public static List<Integer> getComponentIds(List<OIDComponentNode> components) {
         return components.stream().map(OIDComponentNode::getId).collect(Collectors.toList());
+    }
+
+
+    public static boolean compileComponentConstraints(CompilerContext ctx, HasComponents compiledType) {
+        var hasComponentConstraint = new MutableReference<>(false);
+
+        compiledType.getComponents().stream().forEach(component -> {
+            var componentName = component.get_1();
+            var compiledComponent = component.get_2();
+            var componentType = compiledComponent.getType();
+
+            if (componentType.getConstraints() != null) {
+                var constraintDef = ctx.compileConstraint(componentName, compiledComponent);
+
+                compiledComponent.setConstraintDefinition(constraintDef);
+
+                hasComponentConstraint.set(true);
+            }
+        });
+
+        return hasComponentConstraint.get();
     }
 
 }

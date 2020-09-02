@@ -35,7 +35,6 @@ import ch.eskaton.asn4j.runtime.DecodingResult;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1CollectionOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
-import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

@@ -43,17 +43,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public abstract class AbstractCollectionCompiler<T extends Collection> implements NamedCompiler<T, CompiledType> {
 
     private final TypeName typeName;
 
-    private final List<BiFunction<CompilerContext, TypeName, ComponentVerifier>> componentVerifierSuppliers;
+    private final List<Function<TypeName, ComponentVerifier>> componentVerifierSuppliers;
 
     public AbstractCollectionCompiler(TypeName typeName,
-            BiFunction<CompilerContext, TypeName, ComponentVerifier>... componentVerifierSupplier) {
+            Function<TypeName, ComponentVerifier>... componentVerifierSupplier) {
         this.typeName = typeName;
         this.componentVerifierSuppliers = new ArrayList<>(Arrays.asList(componentVerifierSupplier));
         this.componentVerifierSuppliers.add(NameUniquenessVerifier::new);
@@ -63,7 +63,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         var tags = CompilerUtils.getTagIds(ctx, node);
         var javaClass = ctx.createClass(name, node, tags);
         var componentVerifiers = componentVerifierSuppliers.stream()
-                .map(s -> s.apply(ctx, typeName))
+                .map(s -> s.apply(typeName))
                 .collect(Collectors.toList());
         var ctor = new JavaConstructor(JavaVisibility.PUBLIC, name);
         var ctorBody = new StringBuilder();
@@ -99,23 +99,9 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         ctor.setBody(Optional.of(ctorBody.toString()));
         javaClass.addMethod(ctor);
 
-        var hasComponentConstraint = new MutableReference<>(false);
+        var hasComponentConstraint = CompilerUtils.compileComponentConstraints(ctx, compiledType);
 
-        compiledType.getComponents().forEach(component -> {
-            var componentName = component.get_1();
-            var compiledComponent = component.get_2();
-            var componentType = compiledComponent.getType();
-
-            if (componentType.getConstraints() != null) {
-                var constraintDef = ctx.compileConstraint(componentName, compiledComponent);
-
-                compiledComponent.setConstraintDefinition(constraintDef);
-
-                hasComponentConstraint.set(true);
-            }
-        });
-
-        if (node.hasConstraint() || Boolean.TRUE.equals(hasComponentConstraint.get())) {
+        if (node.hasConstraint() || hasComponentConstraint) {
             var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
 
             compiledType.setConstraintDefinition(constraintDef);
@@ -132,7 +118,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
 
         private final Set<String> seenNames = new HashSet<>();
 
-        public NameUniquenessVerifier(CompilerContext compilerContext, TypeName typeName) {
+        public NameUniquenessVerifier(TypeName typeName) {
             this.typeName = typeName;
         }
 

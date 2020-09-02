@@ -32,10 +32,8 @@ import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.il.Function;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.IL2JavaTranslator;
-import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.commons.utils.CollectionUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
