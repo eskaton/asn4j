@@ -37,18 +37,13 @@ import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
-import ch.eskaton.asn4j.parser.ast.values.Tag;
-import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.MutableReference;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PRIVATE;
@@ -68,8 +63,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         var javaClass = ctx.createClass(name, node, tags);
         var fieldNames = new ArrayList<String>();
         var typeEnum = new JavaEnum(CHOICE_ENUM);
-        var componentVerifiers = List.of(new TagUniquenessVerifier(ctx, TypeName.CHOICE),
-                new UntaggedOpenTypeVerifier(ctx, TypeName.CHOICE));
+        var componentVerifiers = List.of(new TagUniquenessVerifier(TypeName.CHOICE),
+                new UntaggedOpenTypeVerifier(TypeName.CHOICE));
         var bodyBuilder = javaClass.method().modifier(PUBLIC).annotation("@Override")
                 .returnType(ASN1Type.class.getSimpleName()).name("getValue").body();
         var clearFields = "\t\t" + CLEAR_FIELDS + "();\n";
@@ -109,23 +104,9 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         compiledType.getComponents().addAll(components);
 
-        var hasComponentConstraint = new MutableReference<>(false);
+        var hasComponentConstraint = CompilerUtils.compileComponentConstraints(ctx, compiledType);
 
-        compiledType.getComponents().stream().forEach(component -> {
-            var componentName = component.get_1();
-            var compiledComponent = component.get_2();
-            var componentType = compiledComponent.getType();
-
-            if (componentType.getConstraints() != null) {
-                var constraintDef = ctx.compileConstraint(componentName, compiledComponent);
-
-                compiledComponent.setConstraintDefinition(constraintDef);
-
-                hasComponentConstraint.set(true);
-            }
-        });
-
-        if (node.hasConstraint() || Boolean.TRUE.equals(hasComponentConstraint.get())) {
+        if (node.hasConstraint() || hasComponentConstraint) {
             var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
 
             compiledType.setConstraintDefinition(constraintDef);
@@ -146,7 +127,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         field.addAnnotation(new JavaAnnotation(ASN1Alternative.class).addParameter("name", '"' + typeConstant + '"'));
 
-        if (tags.isPresent()) {
+        if (tags.isPresent() && !tags.get().isEmpty()) {
             field.addAnnotation(CompilerUtils.getTagsAnnotation(tags.get()));
         }
 

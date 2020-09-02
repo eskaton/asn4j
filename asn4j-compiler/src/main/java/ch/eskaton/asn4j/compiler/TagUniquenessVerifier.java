@@ -33,23 +33,19 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.HashMap;
-import java.util.Set;
 
 class TagUniquenessVerifier implements ComponentVerifier {
-
-    private final CompilerContext ctx;
 
     private final TypeName typeName;
 
     private final HashMap<TagId, Tuple2<String, CompiledType>> seenTags = new HashMap<>();
 
-    public TagUniquenessVerifier(CompilerContext ctx, TypeName typeName) {
-        this.ctx = ctx;
+    public TagUniquenessVerifier(TypeName typeName) {
         this.typeName = typeName;
     }
 
     public void verify(String componentName, CompiledType component) {
-        var tagIds = getTagId(ctx, component);
+        var tagIds = CompilerUtils.getLeadingTagId(component);
 
         tagIds.forEach(tagId -> {
             var seenComponent = seenTags.get(tagId);
@@ -61,12 +57,6 @@ class TagUniquenessVerifier implements ComponentVerifier {
         });
 
         tagIds.forEach(tagId -> seenTags.put(tagId, Tuple2.of(componentName, component)));
-    }
-
-    private Set<TagId> getTagId(CompilerContext ctx, CompiledType component) {
-        var type = ctx.resolveSelectedType(component.getType());
-
-        return ctx.getTagId(type);
     }
 
 }

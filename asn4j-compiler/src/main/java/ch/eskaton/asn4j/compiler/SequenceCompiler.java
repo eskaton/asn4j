@@ -45,7 +45,7 @@ public class SequenceCompiler extends AbstractCollectionCompiler<SequenceType> {
 
         private Tuple2<String, CompiledType> optionalOpenTypeComponent;
 
-        public OpenTypeVerifier(CompilerContext compilerContext, TypeName typeName) {
+        public OpenTypeVerifier(TypeName typeName) {
             this.typeName = typeName;
         }
 

@@ -40,7 +40,7 @@ public class UntaggedOpenTypeVerifier implements ComponentVerifier {
 
     private Tuple2<String, CompiledType> untaggedOpenType;
 
-    public UntaggedOpenTypeVerifier(CompilerContext compilerContext, TypeName typeName) {
+    public UntaggedOpenTypeVerifier(TypeName typeName) {
         this.typeName = typeName;
     }
 

@@ -43,32 +43,31 @@ public class SequenceDecoder implements CollectionDecoder<ASN1Sequence> {
 
     @SuppressWarnings("squid:S3011")
     public void decode(Decoder decoder, DecoderStates states, Type type, ASN1Sequence obj) {
-        var compFields = RuntimeUtils.getComponents(obj);
+        var componentFields = RuntimeUtils.getComponents(obj);
 
-        for (var compField : compFields) {
-            var annotation = compField.getAnnotation(ASN1Component.class);
+        for (var componentField : componentFields) {
+            var annotation = componentField.getAnnotation(ASN1Component.class);
 
             if (annotation != null) {
-                var tags = compField.getAnnotation(ASN1Tags.class);
-                @SuppressWarnings("unchecked")
-                var result = decoder.decode(compField.getType(), states,
-                        tags != null ? Arrays.asList(tags.tags()) : null,
-                        annotation.optional() || annotation.hasDefault());
+                var tagsAnnotation = componentField.getAnnotation(ASN1Tags.class);
+                var tags = tagsAnnotation != null ? Arrays.asList(tagsAnnotation.tags()) : null;
+                var optional = annotation.optional() || annotation.hasDefault();
+                var result = decoder.decode(componentField.getType(), states, tags, optional);
 
                 if (result != null) {
-                    var comp = result.getObj();
+                    var component = result.getObj();
 
-                    if (comp != null) {
-                        compField.setAccessible(true);
+                    if (component != null) {
+                        componentField.setAccessible(true);
 
                         try {
-                            compField.set(obj, comp);
+                            componentField.set(obj, component);
                         } catch (IllegalArgumentException | IllegalAccessException e) {
                             throw new DecodingException(e);
                         }
-                    } else if (!(annotation.optional() || annotation.hasDefault())) {
+                    } else if (!(optional)) {
                         throw new DecodingException(StringUtils.concat("Invalid BER object ", obj.getClass()
-                                .getSimpleName(), ". Component ", compField.getName(), " may not be null"));
+                                .getSimpleName(), ". Component ", componentField.getName(), " may not be null"));
                     }
                 }
             }

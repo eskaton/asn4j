@@ -64,7 +64,8 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             case TYPE:
                 return compileComponentType(ctx, compiledType, node.getType());
             default:
-                throw new IllegalCompilerStateException("Unsupported component type: %s", node.getCompType());
+                throw new IllegalCompilerStateException(node.getPosition(), "Unsupported component type: %s",
+                        node.getCompType());
         }
     }
 
@@ -74,6 +75,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         var type = ctx.resolveSelectedType(namedType.getType());
         var compAnnotation = new JavaAnnotation(ASN1Component.class);
         var hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
+        var isOptional = component.getCompType() == CompType.NAMED_TYPE_OPT;
         var compiledComponent = ctx.defineType(namedType);
         var typeName = compiledComponent.getName();
         var field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
@@ -81,7 +83,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         compiledComponent.setParent(compiledType);
         compiledType.getComponents().add(Tuple2.of(namedType.getName(), compiledComponent));
 
-        if (component.getCompType() == CompType.NAMED_TYPE_OPT) {
+        if (isOptional) {
             compiledComponent.setOptional(true);
             compAnnotation.addParameter("optional", "true");
         } else if (hasDefault) {
@@ -98,7 +100,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
         var tags = compiledComponent.getTags();
 
-        if (tags.isPresent()) {
+        if (tags.isPresent() && !tags.get().isEmpty()) {
             field.addAnnotation(CompilerUtils.getTagsAnnotation(tags.get()));
         }
 
@@ -123,22 +125,23 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
             ctx.duplicateModule();
         } else if (type instanceof ExternalTypeReference) {
-            ExternalTypeReference typeRef = (ExternalTypeReference) type;
-            String refTypeName = typeRef.getType();
-            String refModuleName = typeRef.getModule();
+            ExternalTypeReference typeReference = (ExternalTypeReference) type;
+            String refTypeName = typeReference.getType();
+            String refModuleName = typeReference.getModule();
 
             assignment = ctx.getTypeAssignment(refModuleName, refTypeName);
 
             ctx.resolveBaseType(refModuleName, refTypeName);
 
             if (assignment.isEmpty()) {
-                throw new CompilerException("Type %s from Module %s referenced but not defined or not exported",
+                throw new CompilerException(typeReference.getPosition(),
+                        "Type %s from Module %s referenced but not defined or not exported",
                         refTypeName, refModuleName);
             }
 
             ctx.pushModule(refModuleName);
         } else {
-            throw new CompilerException("Unimplemented type %s", type);
+            throw new CompilerException(type.getPosition(), "Unimplemented type %s", type);
         }
 
         Type referencedType = assignment.get().getType();
@@ -149,7 +152,8 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         } else if (referencedType instanceof SequenceType) {
             componentTypes = ((SequenceType) referencedType).getAllRootComponents();
         } else {
-            throw new CompilerException("Components of type %s not supported", referencedType);
+            throw new CompilerException(referencedType.getPosition(), "Components of type %s not supported",
+                    referencedType);
         }
 
         var components = new ArrayList<Tuple2<String, CompiledType>>();

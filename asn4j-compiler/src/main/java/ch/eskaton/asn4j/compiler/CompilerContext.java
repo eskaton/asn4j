@@ -71,7 +71,6 @@ import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
-import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
@@ -86,7 +85,6 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
-import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
@@ -95,14 +93,13 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
+import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -522,62 +519,6 @@ public class CompilerContext {
 
     public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value) {
         defaultsCompiler.compileDefault(javaClass, field, typeName, type, value);
-    }
-
-    public Set<TagId> getTagId(Type unresolvedType) {
-        var type = getCompiledType(unresolvedType).getType();
-
-        if (type instanceof SimpleDefinedType) {
-            var referencedType = type;
-            var tags = referencedType.getTags();
-
-            if (!tags.isEmpty()) {
-                return Set.of(CompilerUtils.toTagId(tags.getFirst()));
-            } else {
-                return getTagId(referencedType);
-            }
-        } else if (type instanceof Choice) {
-            return ((Choice) type).getAllAlternatives().stream()
-                    .map(this::getTagId)
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toSet());
-        } else if (type instanceof NamedType) {
-            var tags = type.getTags();
-
-            if (!tags.isEmpty()) {
-                return Set.of(CompilerUtils.toTagId(tags.getFirst()));
-            }
-
-            return getTagId(((NamedType) type).getType());
-        } else if (type instanceof OpenType) {
-            var tags = type.getTags();
-
-            if (!tags.isEmpty()) {
-                return Set.of(CompilerUtils.toTagId(tags.getFirst()));
-            }
-
-            // if the type is untagged it's ignored here and verified later
-            return Set.of();
-        } else if (isBuiltin(type)) {
-            var tags = type.getTags();
-
-            if (!tags.isEmpty()) {
-                return Set.of(CompilerUtils.toTagId(tags.getFirst()));
-            }
-
-            var typeName = getTypeName(type);
-
-            try {
-                var typeClazz = Class.forName("ch.eskaton.asn4j.runtime.types." + typeName);
-                var tagAnnotation = typeClazz.getAnnotation(ASN1Tags.class);
-
-                return Set.of(TagId.fromTag(tagAnnotation.tags()[0]));
-            } catch (ClassNotFoundException e) {
-                throw new CompilerException("Unknown type: %s", unresolvedType);
-            }
-        }
-
-        throw new IllegalCompilerStateException("Unexpected type: %s", unresolvedType);
     }
 
     public CompiledCollectionType getCompiledCollectionType(CompiledType compiledType) {
