@@ -67,6 +67,11 @@ public class TypeFromObjects extends InformationFromObjects implements Type {
     }
 
     @Override
+    public void setTaggingModes(LinkedList<Optional<TaggingMode>> taggingModes) {
+
+    }
+
+    @Override
     public void addTaggingMode(Optional<TaggingMode> mode) {
 
     }

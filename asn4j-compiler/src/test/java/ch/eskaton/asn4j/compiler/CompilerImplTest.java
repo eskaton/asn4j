@@ -30,8 +30,40 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ParserException;
+import ch.eskaton.asn4j.parser.ast.types.BMPString;
+import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
+import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.GeneralString;
+import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
+import ch.eskaton.asn4j.parser.ast.types.GraphicString;
+import ch.eskaton.asn4j.parser.ast.types.IA5String;
+import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.parser.ast.types.ISO646String;
+import ch.eskaton.asn4j.parser.ast.types.IntegerType;
+import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.NumericString;
+import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
+import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.OpenType;
+import ch.eskaton.asn4j.parser.ast.types.PrintableString;
+import ch.eskaton.asn4j.parser.ast.types.Real;
+import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
+import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
+import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
+import ch.eskaton.asn4j.parser.ast.types.SequenceType;
+import ch.eskaton.asn4j.parser.ast.types.SetOfType;
+import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.T61String;
+import ch.eskaton.asn4j.parser.ast.types.TeletexString;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.UTCTime;
+import ch.eskaton.asn4j.parser.ast.types.UTF8String;
+import ch.eskaton.asn4j.parser.ast.types.UniversalString;
+import ch.eskaton.asn4j.parser.ast.types.VideotexString;
+import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.asn4j.runtime.Clazz;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.utils.Utils;
 import org.hamcrest.text.MatchesPattern;
@@ -42,21 +74,39 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.BMP_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
 import static ch.eskaton.asn4j.runtime.types.TypeName.ENUMERATED;
+import static ch.eskaton.asn4j.runtime.types.TypeName.GENERALIZED_TIME;
+import static ch.eskaton.asn4j.runtime.types.TypeName.GENERAL_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.GRAPHIC_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.IA5_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.INTEGER;
+import static ch.eskaton.asn4j.runtime.types.TypeName.ISO646_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.NULL;
+import static ch.eskaton.asn4j.runtime.types.TypeName.NUMERIC_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.OBJECT_IDENTIFIER;
 import static ch.eskaton.asn4j.runtime.types.TypeName.OCTET_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.OID;
 import static ch.eskaton.asn4j.runtime.types.TypeName.OID_IRI;
+import static ch.eskaton.asn4j.runtime.types.TypeName.PRINTABLE_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.REAL;
 import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID;
 import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID_IRI;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE_OF;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
+import static ch.eskaton.asn4j.runtime.types.TypeName.T61_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.TELETEX_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.UNIVERSAL_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.UTC_TIME;
+import static ch.eskaton.asn4j.runtime.types.TypeName.UTF8_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.VIDEOTEX_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.VISIBLE_STRING;
 import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static ch.eskaton.asn4j.test.TestUtils.module;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -82,6 +132,83 @@ class CompilerImplTest {
     void testInvalidMultipleTypeConstraints(String body, Class<? extends Exception> expected, String message,
             String description) {
         testModule(body, expected, ".*" + message + ".*");
+    }
+
+    @ParameterizedTest(name = "[{index}] {3}")
+    @MethodSource("provideTagsOnComponents")
+    void testTagsOnComponents(Class<? extends Type> type, String typeName, TagId tag, String description)
+            throws IOException, ParserException {
+        var body = """
+                Seq ::= SEQUENCE {
+                    component %s
+                }
+                """.formatted(typeName);
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledSequence = (CompiledCollectionType) compiledType;
+
+        assertEquals(1, compiledSequence.getComponents().size());
+
+        var compiledComponent = compiledSequence.getComponents().get(0).get_2();
+
+        assertTrue(compiledComponent.getType().getClass().isAssignableFrom(type));
+        assertTrue(compiledComponent.getTags().isPresent());
+        assertEquals(1, compiledComponent.getTags().get().size());
+        assertEquals(tag, compiledComponent.getTags().get().get(0));
+    }
+
+    @ParameterizedTest(name = "[{index}] {2}")
+    @MethodSource("provideCustomTagsOnComponentsExplicit")
+    void testCustomTagsOnComponentsExplicit(String prefixedType, List<TagId> tags, String description)
+            throws IOException, ParserException {
+        testCustomTagsOnComponents(prefixedType, tags, false);
+    }
+
+    @ParameterizedTest(name = "[{index}] {2}")
+    @MethodSource("provideCustomTagsOnComponentsImplicit")
+    void testCustomTagsOnComponentsImplicit(String prefixedType, List<TagId> tags, String description)
+            throws IOException, ParserException {
+        testCustomTagsOnComponents(prefixedType, tags, true);
+    }
+
+    private void testCustomTagsOnComponents(String prefixedType, List<TagId> tags, boolean implicit)
+            throws IOException, ParserException {
+        var body = """
+                Seq ::= SEQUENCE {
+                    component %s
+                }
+                """.formatted(prefixedType);
+
+        var module = module("TEST-MODULE", body, implicit);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledSequence = (CompiledCollectionType) compiledType;
+
+        assertEquals(1, compiledSequence.getComponents().size());
+
+        var compiledComponent = compiledSequence.getComponents().get(0).get_2();
+
+        assertTrue(compiledComponent.getTags().isPresent());
+        assertEquals(tags.size(), compiledComponent.getTags().get().size());
+        assertEquals(tags, compiledComponent.getTags().get());
     }
 
     @Test
@@ -671,6 +798,115 @@ class CompilerImplTest {
     private static String getContainedSubtypeDescription(TypeName type) {
         return "Contained subtype for %s must be derived of the same built-in type as the parent type"
                 .formatted(type);
+    }
+
+
+    private static Stream<Arguments> provideTagsOnComponents() {
+        return Stream.of(
+                getTagsOnComponentsArguments(BooleanType.class, BOOLEAN, 1),
+                getTagsOnComponentsArguments(IntegerType.class, INTEGER, 2),
+                getTagsOnComponentsArguments(BitString.class, BIT_STRING, 3),
+                getTagsOnComponentsArguments(OctetString.class, OCTET_STRING, 4),
+                getTagsOnComponentsArguments(Null.class, NULL, 5),
+                getTagsOnComponentsArguments(ObjectIdentifier.class, OBJECT_IDENTIFIER, 6),
+                getTagsOnComponentsArguments(Real.class, REAL, 9),
+                getTagsOnComponentsArguments(EnumeratedType.class, "ENUMERATED {a, b, c}", 10),
+                getTagsOnComponentsArguments(UTF8String.class, UTF8_STRING, 12),
+                getTagsOnComponentsArguments(RelativeOID.class, RELATIVE_OID, 13),
+                getTagsOnComponentsArguments(SequenceType.class, "SEQUENCE {a NULL}", 16),
+                getTagsOnComponentsArguments(SequenceOfType.class, "SEQUENCE OF BOOLEAN", 16),
+                getTagsOnComponentsArguments(SetType.class, "SET {a NULL}", 17),
+                getTagsOnComponentsArguments(SetOfType.class, "SET OF BOOLEAN", 17),
+                getTagsOnComponentsArguments(NumericString.class, NUMERIC_STRING, 18),
+                getTagsOnComponentsArguments(PrintableString.class, PRINTABLE_STRING, 19),
+                getTagsOnComponentsArguments(TeletexString.class, TELETEX_STRING, 20),
+                getTagsOnComponentsArguments(T61String.class, T61_STRING, 20),
+                getTagsOnComponentsArguments(VideotexString.class, VIDEOTEX_STRING, 21),
+                getTagsOnComponentsArguments(IA5String.class, IA5_STRING, 22),
+                getTagsOnComponentsArguments(UTCTime.class, UTC_TIME, 23),
+                getTagsOnComponentsArguments(GeneralizedTime.class, GENERALIZED_TIME, 24),
+                getTagsOnComponentsArguments(GraphicString.class, GRAPHIC_STRING, 25),
+                getTagsOnComponentsArguments(VisibleString.class, VISIBLE_STRING, 26),
+                getTagsOnComponentsArguments(ISO646String.class, ISO646_STRING, 26),
+                getTagsOnComponentsArguments(GeneralString.class, GENERAL_STRING, 27),
+                getTagsOnComponentsArguments(UniversalString.class, UNIVERSAL_STRING, 28),
+                getTagsOnComponentsArguments(BMPString.class, BMP_STRING, 30),
+                getTagsOnComponentsArguments(IRI.class, OID_IRI, 35),
+                getTagsOnComponentsArguments(RelativeIRI.class, RELATIVE_OID_IRI, 36)
+        );
+    }
+
+    private static Arguments getTagsOnComponentsArguments(Class<? extends Type> type, String typeName, int tag) {
+        return Arguments.of(type, typeName, new TagId(Clazz.UNIVERSAL, tag),
+                "Test tag on %s component".formatted(typeName));
+    }
+
+    private static Arguments getTagsOnComponentsArguments(Class<? extends Type> type, TypeName typeName, int tag) {
+        return getTagsOnComponentsArguments(type, typeName.toString(), tag);
+    }
+
+    private static Stream<Arguments> provideCustomTagsOnComponentsExplicit() {
+        return Stream.of(
+                getCustomTagsOnComponentsArguments("", List.of(new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[2]", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2),
+                        new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[2] EXPLICIT", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2),
+                        new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[2] IMPLICIT", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2))),
+                getCustomTagsOnComponentsArguments("[APPLICATION 2]", List.of(new TagId(Clazz.APPLICATION, 2),
+                        new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[PRIVATE 2]", List.of(new TagId(Clazz.PRIVATE, 2),
+                        new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[2] [3]", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2),
+                        new TagId(Clazz.CONTEXT_SPECIFIC, 3), new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[2] IMPLICIT [3]", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2),
+                        new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[2] EXPLICIT [3]", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2),
+                        new TagId(Clazz.CONTEXT_SPECIFIC, 3), new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[2] EXPLICIT [3] IMPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2), new TagId(Clazz.CONTEXT_SPECIFIC, 3))),
+                getCustomTagsOnComponentsArguments("[2] IMPLICIT [3] IMPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2))),
+                getCustomTagsOnComponentsArguments("[1] IMPLICIT [2] IMPLICIT [3] IMPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 1))),
+                getCustomTagsOnComponentsArguments("[1] EXPLICIT [2] IMPLICIT [3] IMPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 1), new TagId(Clazz.CONTEXT_SPECIFIC, 2))),
+                getCustomTagsOnComponentsArguments("[1] EXPLICIT [2] IMPLICIT [3] EXPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 1), new TagId(Clazz.CONTEXT_SPECIFIC, 2),
+                                new TagId(Clazz.UNIVERSAL, 1)))
+        );
+    }
+
+    private static Stream<Arguments> provideCustomTagsOnComponentsImplicit() {
+        return Stream.of(
+                getCustomTagsOnComponentsArguments("", List.of(new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[2]", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2))),
+                getCustomTagsOnComponentsArguments("[2] EXPLICIT", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2),
+                        new TagId(Clazz.UNIVERSAL, 1))),
+                getCustomTagsOnComponentsArguments("[2] IMPLICIT", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2))),
+                getCustomTagsOnComponentsArguments("[APPLICATION 2]", List.of(new TagId(Clazz.APPLICATION, 2))),
+                getCustomTagsOnComponentsArguments("[PRIVATE 2]", List.of(new TagId(Clazz.PRIVATE, 2))),
+                getCustomTagsOnComponentsArguments("[2] [3]", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2))),
+                getCustomTagsOnComponentsArguments("[2] IMPLICIT [3]", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2))),
+                getCustomTagsOnComponentsArguments("[2] EXPLICIT [3]", List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2),
+                        new TagId(Clazz.CONTEXT_SPECIFIC, 3))),
+                getCustomTagsOnComponentsArguments("[2] EXPLICIT [3] IMPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2), new TagId(Clazz.CONTEXT_SPECIFIC, 3))),
+                getCustomTagsOnComponentsArguments("[2] IMPLICIT [3] IMPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 2))),
+                getCustomTagsOnComponentsArguments("[1] IMPLICIT [2] IMPLICIT [3] IMPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 1))),
+                getCustomTagsOnComponentsArguments("[1] EXPLICIT [2] IMPLICIT [3] IMPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 1), new TagId(Clazz.CONTEXT_SPECIFIC, 2))),
+                getCustomTagsOnComponentsArguments("[1] EXPLICIT [2] IMPLICIT [3] EXPLICIT",
+                        List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 1), new TagId(Clazz.CONTEXT_SPECIFIC, 2),
+                                new TagId(Clazz.UNIVERSAL, 1)))
+        );
+    }
+
+    private static Arguments getCustomTagsOnComponentsArguments(String prefixedType, List<TagId> tags) {
+        return Arguments.of(prefixedType + " BOOLEAN", tags,
+                "Test custom tag '%s' on component".formatted(prefixedType));
     }
 
 }

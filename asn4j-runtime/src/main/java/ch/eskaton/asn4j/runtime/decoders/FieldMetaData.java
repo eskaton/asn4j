@@ -97,11 +97,10 @@ public class FieldMetaData {
 
                     tagData.add(new TagData(tags, field, getSetter(field, type)));
                 } else {
-                    var fieldTags = Optional.ofNullable(field.getAnnotation(ASN1Tags.class))
+                    var tags = Optional.ofNullable(field.getAnnotation(ASN1Tags.class))
                             .map(ASN1Tags::tags)
                             .map(List::of)
                             .orElse(List.of());
-                    var tags = RuntimeUtils.getTags(fieldType, fieldTags);
 
                     tagData.add(new TagData(tags, field, getSetter(field, type)));
                 }

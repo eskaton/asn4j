@@ -155,6 +155,7 @@ public class BERDecoder implements Decoder {
 
     private SetOfDecoder setOfDecoder = new SetOfDecoder();
 
+    @Override
     public <T extends ASN1Type> T decode(Class<T> type, byte[] buf) {
         DecoderStates states = new DecoderStates();
         DecoderState state = new DecoderState(0, buf.length);
@@ -164,10 +165,12 @@ public class BERDecoder implements Decoder {
         return result.getObj();
     }
 
+    @Override
     public <T extends ASN1Type> DecodingResult<T> decode(Class<T> type, DecoderStates states) {
-        return decode(type, states, null, false);
+        return decode(type, states, RuntimeUtils.getTags(type), false);
     }
 
+    @Override
     public DecodingResult<? extends ASN1Type> decode(DecoderStates states,
             Map<List<ASN1Tag>, Class<? extends ASN1Type>> tags) {
         MultipleTagsMatcher matcher = new MultipleTagsMatcher(tags.keySet());
@@ -185,10 +188,17 @@ public class BERDecoder implements Decoder {
         return null;
     }
 
+    @Override
     public DecoderState decode(DecoderStates states) {
         return consumeTags(states, new AnyTagsMatcher());
     }
 
+    @Override
+    public <T extends ASN1Type> DecodingResult<T> decode(Type type, DecoderStates states, boolean optional) {
+        return decode(type, states, RuntimeUtils.getTags(toClass(type)), optional);
+    }
+
+    @Override
     public <T extends ASN1Type> DecodingResult<T> decode(Type type, DecoderStates states, List<ASN1Tag> tags,
             boolean optional) {
         Class clazz = toClass(type);
@@ -199,15 +209,15 @@ public class BERDecoder implements Decoder {
             return new DecodingResult<>(List.of(), decodeOpenType(states, states.peek(), optional));
         }
 
-        List<ASN1Tag> allTags = RuntimeUtils.getTags(clazz, tags);
+        // List<ASN1Tag> allTags = RuntimeUtils.getTags(clazz, tags);
 
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(StringUtils.concat("Expecting: javatype=", clazz.getSimpleName(), ", tags=(", StringUtils
-                    .join(CollectionUtils.map(allTags, value -> StringUtils
+                    .join(CollectionUtils.map(tags, value -> StringUtils
                             .concat("tag=", value.tag(), ", class=", value.clazz())), ", "), ")"));
         }
 
-        return decodeState(type, states, consumeTags(states, allTags, optional));
+        return decodeState(type, states, consumeTags(states, tags, optional));
     }
 
     private Class toClass(Type type) {

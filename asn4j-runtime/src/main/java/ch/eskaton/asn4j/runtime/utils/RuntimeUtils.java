@@ -27,17 +27,17 @@
 
 package ch.eskaton.asn4j.runtime.utils;
 
-import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.DecoderState;
 import ch.eskaton.asn4j.runtime.DecoderStates;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
-import ch.eskaton.asn4j.runtime.exceptions.DecodingException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.commons.utils.StreamsUtils;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -48,61 +48,24 @@ public class RuntimeUtils {
     }
 
     public static List<ASN1Tag> getTags(Class<? extends ASN1Type> clazz) {
-        var result = new ArrayList<ASN1Tag>(10);
-        var explicit = true;
+        var tags = clazz.getAnnotation(ASN1Tags.class);
 
-        while (clazz != null) {
-            var tags = clazz.getAnnotation(ASN1Tags.class);
-
-            while (tags == null) {
-                clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
-
-                if (clazz == null) {
-                    return result;
-                }
-
-                tags = clazz.getAnnotation(ASN1Tags.class);
-            }
-
-            for (var tag : tags.tags()) {
-
-                if (explicit) {
-                    result.add(tag);
-                }
-
-                if (tag.clazz() == Clazz.UNIVERSAL) {
-                    return result;
-                }
-
-                explicit = tag.mode() == ASN1Tag.Mode.EXPLICIT;
-            }
-
-            clazz = (Class<? extends ASN1Type>) clazz.getSuperclass();
+        if (tags != null) {
+            return Arrays.asList(tags.tags());
         }
 
-        return result;
+        return Collections.emptyList();
     }
 
     public static <T extends ASN1Type> List<ASN1Tag> getTags(Class<T> type, List<ASN1Tag> tags) {
         var typeTags = getTags(type);
         var allTags = new ArrayList<ASN1Tag>();
-        var explicit = true;
 
         if (tags != null) {
-            for (var tag : tags) {
-                if (explicit) {
-                    allTags.add(tag);
-                }
-
-                explicit = tag.mode() == ASN1Tag.Mode.EXPLICIT;
-            }
+            allTags.addAll(tags);
         }
 
-        if (explicit) {
-            allTags.addAll(typeTags);
-        } else {
-            allTags.addAll(typeTags.subList(1, typeTags.size()));
-        }
+        allTags.addAll(typeTags);
 
         return allTags;
     }

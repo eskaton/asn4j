@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.compiler.results.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.commons.MutableInteger;
 import ch.eskaton.commons.collections.Tuple2;
@@ -63,15 +64,17 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
             // TODO: figure out what to do
         }
 
-        var javaClass = ctx.createClass(name, node);
+        var tags = CompilerUtils.getTagIds(ctx, node);
+        var javaClass = ctx.createClass(name, node, tags);
         var compiledType = createCompiledType(ctx, name, node);
+
+        compiledType.setTags(tags);
 
         generateJavaClass(javaClass, name, compiledType);
 
-        ConstraintDefinition constraintDef;
-
         if (node.hasConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+
             compiledType.setConstraintDefinition(constraintDef);
         }
 

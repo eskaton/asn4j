@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.runtime.DecodingResult;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.types.ASN1CollectionOf;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
+import ch.eskaton.asn4j.runtime.utils.RuntimeUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -66,7 +67,7 @@ public abstract class CollectionOfDecoder<T extends ASN1CollectionOf> implements
         DecodingResult<ASN1Type> result;
 
         do {
-            result = decoder.decode(paramType, states, null, true);
+            result = decoder.decode(paramType, states, true);
 
             if (result != null) {
                 ASN1Type element = result.getObj();

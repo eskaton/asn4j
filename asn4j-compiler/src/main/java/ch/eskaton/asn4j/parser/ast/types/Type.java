@@ -48,6 +48,8 @@ public interface Type extends Node {
 
     LinkedList<Optional<TaggingMode>> getTaggingModes();
 
+    void setTaggingModes(LinkedList<Optional<TaggingMode>> taggingModes);
+
     void addTaggingMode(Optional<TaggingMode> mode);
 
     void setConstraints(List<Constraint> constraints);

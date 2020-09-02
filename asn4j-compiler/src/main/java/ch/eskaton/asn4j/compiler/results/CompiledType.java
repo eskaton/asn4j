@@ -29,9 +29,12 @@ package ch.eskaton.asn4j.compiler.results;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class CompiledType implements CompilationResult {
 
@@ -40,6 +43,8 @@ public class CompiledType implements CompilationResult {
     private Type type;
 
     private String name;
+
+    private Optional<List<TagId>> tags = Optional.empty();
 
     private ConstraintDefinition constraintDefinition;
 
@@ -66,6 +71,14 @@ public class CompiledType implements CompilationResult {
 
     public String getName() {
         return name;
+    }
+
+    public Optional<List<TagId>> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<TagId> tags) {
+        this.tags = Optional.ofNullable(tags);
     }
 
     public ConstraintDefinition getConstraintDefinition() {
@@ -108,13 +121,14 @@ public class CompiledType implements CompilationResult {
                 Objects.equals(parent, that.parent) &&
                 Objects.equals(type, that.type) &&
                 Objects.equals(name, that.name) &&
+                Objects.equals(tags, that.tags) &&
                 Objects.equals(constraintDefinition, that.constraintDefinition) &&
                 Objects.equals(objectClass, that.objectClass);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(parent, type, name, constraintDefinition, objectClass, optional);
+        return Objects.hash(parent, type, name, tags, constraintDefinition, objectClass, optional);
     }
 
     @Override

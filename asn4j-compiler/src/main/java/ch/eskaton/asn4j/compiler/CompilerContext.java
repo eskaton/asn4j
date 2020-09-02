@@ -212,16 +212,8 @@ public class CompilerContext {
         }
     }
 
-    public JavaClass createClass(String name, Type type) {
-        var className = formatName(name);
-        var tags = type.getTags();
-
-        if (tags.stream().anyMatch(tag -> ClassType.UNIVERSAL.equals(tag.getClazz()))) {
-            throw new CompilerException("UNIVERSAL class not allowed in type " + name);
-        }
-
-        JavaClass javaClass = new JavaClass(pkg, className, tags, CompilerUtils.getTaggingModes(getModule(), type),
-                getTypeName(type));
+    public JavaClass createClass(String name, Type type, List<TagId> tags) {
+        var javaClass = new JavaClass(pkg, formatName(name), tags, getTypeName(type));
 
         currentClass.push(javaClass);
 
@@ -378,6 +370,7 @@ public class CompilerContext {
         var openType = new OpenType();
 
         openType.setTags(type.getTags());
+        openType.setTaggingModes(type.getTaggingModes());
 
         if (additionalConstraints != null) {
             var constraints = openType.getConstraints();
@@ -425,7 +418,11 @@ public class CompilerContext {
             return compileType(type, getTypeName(type, name));
         }
 
-        return createCompiledType(type, getTypeName(type, name));
+        var compiledType = createCompiledType(type, getTypeName(type, name), isBuiltin(type));
+
+        compiledType.setTags(CompilerUtils.getTagIds(this, type));
+
+        return compiledType;
     }
 
     private CompiledType compileType(Type type, String typeName) {
@@ -1000,6 +997,8 @@ public class CompilerContext {
             addType(name, compiledType);
         }
 
+        compiledType.setTags(CompilerUtils.getTagIds(this, type));
+
         return compiledType;
     }
 
@@ -1098,6 +1097,10 @@ public class CompilerContext {
 
     public Type resolveTypeReference(String reference) {
         return typeResolver.resolveTypeReference(reference);
+    }
+
+    public Type resolveTypeReference(String moduleName, String reference) {
+        return typeResolver.resolveTypeReference(moduleName, reference);
     }
 
     public Type resolveTypeReference(Type type) {

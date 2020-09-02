@@ -60,13 +60,16 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
     }
 
     public CompiledType compile(CompilerContext ctx, String name, T node) {
-        var javaClass = ctx.createClass(name, node);
+        var tags = CompilerUtils.getTagIds(ctx, node);
+        var javaClass = ctx.createClass(name, node, tags);
         var componentVerifiers = componentVerifierSuppliers.stream()
                 .map(s -> s.apply(ctx, typeName))
                 .collect(Collectors.toList());
         var ctor = new JavaConstructor(JavaVisibility.PUBLIC, name);
         var ctorBody = new StringBuilder();
         var compiledType = ctx.createCompiledType(CompiledCollectionType.class, node, name);
+
+        compiledType.setTags(tags);
 
         for (ComponentType component : node.getAllComponents()) {
             try {

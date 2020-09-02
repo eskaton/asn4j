@@ -58,66 +58,50 @@ class RuntimeUtilsTest {
         assertNotNull(tags);
         assertEquals(3, tags.size());
 
-        assertTagEquals(tags.get(0), Clazz.PRIVATE, ASN1Tag.Mode.EXPLICIT, 3);
-        assertTagEquals(tags.get(1), Clazz.CONTEXT_SPECIFIC, ASN1Tag.Mode.IMPLICIT, 2);
-        assertTagEquals(tags.get(2), Clazz.UNIVERSAL, ASN1Tag.Mode.EXPLICIT, 26);
+        assertTagEquals(tags.get(0), Clazz.PRIVATE, 3);
+        assertTagEquals(tags.get(1), Clazz.CONTEXT_SPECIFIC, 2);
+        assertTagEquals(tags.get(2), Clazz.UNIVERSAL, 26);
 
         tags = RuntimeUtils.getTags(TaggedType.class, null);
 
         assertNotNull(tags);
         assertEquals(3, tags.size());
 
-        assertTagEquals(tags.get(0), Clazz.PRIVATE, ASN1Tag.Mode.EXPLICIT, 3);
-        assertTagEquals(tags.get(1), Clazz.CONTEXT_SPECIFIC, ASN1Tag.Mode.IMPLICIT, 2);
-        assertTagEquals(tags.get(2), Clazz.UNIVERSAL, ASN1Tag.Mode.EXPLICIT, 26);
+        assertTagEquals(tags.get(0), Clazz.PRIVATE, 3);
+        assertTagEquals(tags.get(1), Clazz.CONTEXT_SPECIFIC, 2);
+        assertTagEquals(tags.get(2), Clazz.UNIVERSAL, 26);
 
-        var tag = Arrays.asList(ExplicitTag.class.getAnnotation(ASN1Tags.class).tags());
+        var tag = Arrays.asList(Tag.class.getAnnotation(ASN1Tags.class).tags());
 
         tags = RuntimeUtils.getTags(TaggedType.class, tag);
 
         assertNotNull(tags);
         assertEquals(4, tags.size());
 
-        assertTagEquals(tags.get(0), Clazz.PRIVATE, ASN1Tag.Mode.EXPLICIT, 1);
-        assertTagEquals(tags.get(1), Clazz.PRIVATE, ASN1Tag.Mode.EXPLICIT, 3);
-        assertTagEquals(tags.get(2), Clazz.CONTEXT_SPECIFIC, ASN1Tag.Mode.IMPLICIT, 2);
-        assertTagEquals(tags.get(3), Clazz.UNIVERSAL, ASN1Tag.Mode.EXPLICIT, 26);
-
-        tag = Arrays.asList(ImplicitTag.class.getAnnotation(ASN1Tags.class).tags());
-
-        tags = RuntimeUtils.getTags(TaggedType.class, tag);
-
-        assertNotNull(tags);
-        assertEquals(3, tags.size());
-
-        assertTagEquals(tags.get(0), Clazz.PRIVATE, ASN1Tag.Mode.IMPLICIT, 1);
-        assertTagEquals(tags.get(1), Clazz.CONTEXT_SPECIFIC, ASN1Tag.Mode.IMPLICIT, 2);
-        assertTagEquals(tags.get(2), Clazz.UNIVERSAL, ASN1Tag.Mode.EXPLICIT, 26);
+        assertTagEquals(tags.get(0), Clazz.PRIVATE, 1);
+        assertTagEquals(tags.get(1), Clazz.PRIVATE, 3);
+        assertTagEquals(tags.get(2), Clazz.CONTEXT_SPECIFIC, 2);
+        assertTagEquals(tags.get(3), Clazz.UNIVERSAL, 26);
     }
 
-    private void assertTagEquals(ASN1Tag annotation, Clazz clazz, ASN1Tag.Mode mode, int tag) {
+    private void assertTagEquals(ASN1Tag annotation, Clazz clazz, int tag) {
         assertEquals(clazz, annotation.clazz());
-        assertEquals(mode, annotation.mode());
         assertEquals(tag, annotation.tag());
     }
 
     @ASN1Tags(tags = {
-            @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.EXPLICIT, tag = 3),
-            @ASN1Tag(clazz = Clazz.CONTEXT_SPECIFIC, mode = ASN1Tag.Mode.IMPLICIT, tag = 2),
-            @ASN1Tag(clazz = Clazz.APPLICATION, mode = ASN1Tag.Mode.EXPLICIT, tag = 3),
+            @ASN1Tag(clazz = Clazz.PRIVATE, tag = 3),
+            @ASN1Tag(clazz = Clazz.CONTEXT_SPECIFIC, tag = 2),
+            @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 26),
     })
     private static class TaggedType extends ASN1VisibleString {
 
     }
 
-    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.EXPLICIT, tag = 1))
-    private static class ExplicitTag {
+    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.PRIVATE, tag = 1))
+    private static class Tag {
 
     }
 
-    @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.PRIVATE, mode = ASN1Tag.Mode.IMPLICIT, tag = 1))
-    private static class ImplicitTag {
-
-    }
 
 }

@@ -103,12 +103,16 @@ public class TestUtils {
     }
 
     public static String module(String name, String body) {
+        return module(name, body, false);
+    }
+
+    public static String module(String name, String body, boolean implicitTags) {
         return """
-                %s DEFINITIONS ::=
+                %s DEFINITIONS %s TAGS ::=
                 BEGIN
                     %s
                 END
-                """.formatted(name, body);
+                """.formatted(name, implicitTags ? "IMPLICIT" : "EXPLICIT", body);
     }
 
 }

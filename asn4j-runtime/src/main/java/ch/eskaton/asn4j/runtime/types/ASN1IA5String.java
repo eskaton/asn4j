@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.IA5StringVerifier;
 
-@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 22, mode = ASN1Tag.Mode.EXPLICIT))
+@ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 22))
 public class ASN1IA5String extends AbstractASN1String {
 
     private static final IA5StringVerifier VERIFIER = new IA5StringVerifier();

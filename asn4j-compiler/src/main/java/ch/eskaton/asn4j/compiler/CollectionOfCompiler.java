@@ -27,8 +27,6 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -42,21 +40,21 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, T node) {
-        JavaClass javaClass = ctx.createClass(name, node);
+        var tags = CompilerUtils.getTagIds(ctx, node);
+        var javaClass = ctx.createClass(name, node, tags);
 
         javaClass.typeParameter(ctx.getTypeParameter(node, Optional.of(name)));
 
         var contentType = compileContentType(ctx, node, name);
-
-        CompiledCollectionOfType compiledType = ctx.createCompiledType(CompiledCollectionOfType.class, node, name);
+        var compiledType = ctx.createCompiledType(CompiledCollectionOfType.class, node, name);
 
         contentType.setParent(compiledType);
         compiledType.setContentType(contentType);
-
-        ConstraintDefinition constraintDef;
+        compiledType.setTags(tags);
 
         if (node.hasAnyConstraint()) {
-            constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+
             compiledType.setConstraintDefinition(constraintDef);
         }
 
