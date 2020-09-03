@@ -209,8 +209,6 @@ public class BERDecoder implements Decoder {
             return new DecodingResult<>(List.of(), decodeOpenType(states, states.peek(), optional));
         }
 
-        // List<ASN1Tag> allTags = RuntimeUtils.getTags(clazz, tags);
-
         if (LOGGER.isTraceEnabled()) {
             LOGGER.trace(StringUtils.concat("Expecting: javatype=", clazz.getSimpleName(), ", tags=(", StringUtils
                     .join(CollectionUtils.map(tags, value -> StringUtils

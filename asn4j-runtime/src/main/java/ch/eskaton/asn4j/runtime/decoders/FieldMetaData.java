@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.runtime.decoders;
 
 import ch.eskaton.asn4j.runtime.TagId;
+import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
@@ -77,7 +78,7 @@ public class FieldMetaData {
 
                 if (ASN1Choice.class.isAssignableFrom(fieldType)) {
                     var obj = getInstance(fieldType, DecodingException::new);
-                    var componentsTagData = buildTagData(obj, annotationClass);
+                    var componentsTagData = buildTagData(obj, ASN1Alternative.class);
 
                     tagData.addAll(componentsTagData.stream().map(t -> {
                         var oldSetter = t.setter;
@@ -138,9 +139,19 @@ public class FieldMetaData {
 
     public Set<List<TagId>> getMandatoryFields() {
         return tagData.stream()
-                .filter(t -> !t.getField().getAnnotation(ASN1Component.class).optional())
+                .filter(this::isNotOptional)
                 .map(TagData::getTagIds)
                 .collect(Collectors.toSet());
+    }
+
+    private boolean isNotOptional(TagData tagData) {
+        var annotation = tagData.getField().getAnnotation(ASN1Component.class);
+
+        if (annotation != null) {
+            return !annotation.optional();
+        }
+
+        return false;
     }
 
     protected String getFieldName(List<TagId> tags) {
