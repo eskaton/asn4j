@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
@@ -300,7 +301,7 @@ class CompilerImplTest {
                 }
 
                 TestSet TEST ::= {
-                      {&id 1}
+                    {&id 1}
                 }
                 """;
 
@@ -316,11 +317,41 @@ class CompilerImplTest {
                 }
 
                 TestSet TEST ::= {
-                      {&id "abcd"}
+                    {&id "abcd"}
                 }
                 """;
 
         testModule(body, CompilerException.class, ".*Failed to resolve an INTEGER value.*");
+    }
+
+    @Test
+    void testObjectSetTypeValue() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &TypeField
+                }
+
+                TestSet TEST ::= {
+                    {&TypeField BOOLEAN}
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
+
+        assertNotNull(objectSet);
+        assertEquals(1, objectSet.getValues().size());
+
+        var value = objectSet.getValues().stream().findFirst().get();
+
+        assertTrue(value.containsKey("TypeField"));
+        assertTrue(value.get("TypeField") instanceof CompiledType);
+        assertTrue(((CompiledType) value.get("TypeField")).getType() instanceof BooleanType);
     }
 
     @Test
