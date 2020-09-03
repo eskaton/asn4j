@@ -89,6 +89,7 @@ import ch.eskaton.asn4j.test.modules.X681.TestSequence8;
 import ch.eskaton.asn4j.test.modules.X681.TestSequence9;
 import ch.eskaton.asn4j.test.modules.X681.TestSet101;
 import ch.eskaton.asn4j.test.modules.X681.TestSet102;
+import ch.eskaton.asn4j.test.modules.X681.TestSet103;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -362,6 +363,23 @@ class TestX681 {
         assertTrue(typeField2.decode(ASN1Integer.class) instanceof ASN1Integer);
         assertNotNull(typeField2.getValue());
         assertEquals(ASN1Integer.valueOf(23), typeField2.getValue());
+    }
+
+    @Test
+    @DisplayName("Verify that a SET is decodable if it contains a choice of an open type")
+    void testSet103() {
+        var value = new TestSet103();
+        var choice = new TestSet103.ChoiceField();
+
+        choice.setTypeField(new ASN1OpenType(ASN1Integer.valueOf(47)));
+        value.setChoiceField(choice);
+
+        var decoded = new BERDecoder().decode(TestSet103.class, new BEREncoder().encode(value));
+
+        assertNotNull(decoded.getChoiceField());
+        assertNotNull(decoded.getChoiceField().getTypeField());
+        assertTrue(decoded.getChoiceField().getTypeField().decode(ASN1Integer.class) instanceof ASN1Integer);
+        assertEquals(ASN1Integer.valueOf(47), decoded.getChoiceField().getTypeField().getValue());
     }
 
     @Test

@@ -194,6 +194,12 @@ TestSet102 ::= SET {
    typeField2 [24] TEST2.&TypeField
 }
 
+TestSet103 ::= SET {
+   choiceField CHOICE {
+                  typeField TEST2.&TypeField
+               }
+}
+
 TestChoice101 ::= CHOICE {
    typeField TEST2.&TypeField
 }
