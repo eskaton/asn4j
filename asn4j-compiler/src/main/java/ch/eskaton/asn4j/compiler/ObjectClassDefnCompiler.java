@@ -30,11 +30,13 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
+import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.parser.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueOrObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
 
 public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, CompiledObjectClass> {
 
@@ -72,9 +74,31 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
                 }
             } else if (unknownFieldSpec instanceof TypeFieldSpecNode typeFieldSpecNode) {
                 compiledObjectClass.addField(new CompiledTypeField(typeFieldSpecNode.getReference()));
+            } else if (unknownFieldSpec instanceof VariableTypeValueFieldSpecNode variableTypeValueFieldSpec) {
+                var compiledField = ctx.<VariableTypeValueFieldSpecNode, NamedCompiler<VariableTypeValueFieldSpecNode, AbstractCompiledField>>getCompiler(
+                        (Class<VariableTypeValueFieldSpecNode>) variableTypeValueFieldSpec.getClass())
+                        .compile(ctx, name, variableTypeValueFieldSpec);
+
+                compiledObjectClass.addField(compiledField);
             } else {
                 throw new IllegalCompilerStateException("Field of type %s not yet supported",
                         unknownFieldSpec.getClass().getSimpleName());
+            }
+        }
+
+        for (var field : compiledObjectClass.getFields()) {
+            if (field instanceof CompiledVariableTypeValueField compiledVariableTypeValueField) {
+                var reference = compiledVariableTypeValueField.getReference();
+                var referencedField = compiledObjectClass.getField(reference);
+
+                if (referencedField.isEmpty()) {
+                    var fieldSpec = fieldSpecs.stream()
+                            .filter(spec -> spec.getReference().equals(compiledVariableTypeValueField.getName()))
+                            .findAny()
+                            .get();
+                    throw new CompilerException(fieldSpec.getPosition(),
+                            "%s in object class %s refers to the inexistent field %s", field.getName(), name, reference);
+                }
             }
         }
 

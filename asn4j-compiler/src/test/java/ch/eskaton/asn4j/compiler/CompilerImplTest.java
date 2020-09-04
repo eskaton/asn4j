@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
@@ -626,6 +627,47 @@ class CompilerImplTest {
 
         testModule(body, CompilerException.class,
                 ".*TestChoice contains the open type typeField which is ambiguous.*");
+    }
+
+    @Test
+    void testVariableTypeField() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &variableTypeField &TypeField,
+                    &TypeField
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
+
+        var field = objectClass.getField("variableTypeField");
+
+        assertTrue(field.isPresent());
+        assertTrue(field.get() instanceof CompiledVariableTypeValueField);
+
+        var variableTypeValueField = (CompiledVariableTypeValueField) field.get();
+
+        assertEquals("TypeField", variableTypeValueField.getReference());
+    }
+
+    @Test
+    void testVariableTypeFieldInvalidReference() {
+        var body = """
+                TEST ::= CLASS {
+                    &variableTypeField &InvalidTypeField,
+                    &TypeField
+                }
+
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*variableTypeField in object class TEST refers to the inexistent field InvalidTypeField.*");
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
