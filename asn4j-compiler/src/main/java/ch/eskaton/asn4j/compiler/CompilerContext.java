@@ -960,7 +960,7 @@ public class CompilerContext {
         return compiledObjectSet;
     }
 
-    public CompiledObject createCompiledObjectSet(String name, Map<String, Object> objectDefinition) {
+    public CompiledObject createCompiledObject(String name, Map<String, Object> objectDefinition) {
         var compiledObject = new CompiledObject(name, objectDefinition);
 
         addObject(name, compiledObject);

@@ -30,14 +30,26 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.PrintableString;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.PrintableStringVerifier;
 
 public class PrintableStringValueResolver extends AbstractStringValueResolver<PrintableStringValue> {
 
     public PrintableStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.PRINTABLE_STRING, PrintableString.class, new PrintableStringVerifier());
+        super(ctx, TypeName.PRINTABLE_STRING, PrintableString.class, PrintableStringValue.class,
+                new PrintableStringVerifier());
+    }
+
+    @Override
+    public PrintableStringValue resolveGeneric(Type type, Value value) {
+        if (type instanceof PrintableString && value instanceof PrintableStringValue resolvedValue) {
+            return resolvedValue;
+        }
+
+        return super.resolveGeneric(type, value);
     }
 
     @Override

@@ -37,7 +37,7 @@ import ch.eskaton.asn4j.runtime.verifiers.UTCTimeVerifier;
 public class UTCTimeValueResolver extends AbstractTimeValueResolver<UTCTimeValue> {
 
     public UTCTimeValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.UTC_TIME, UTCTime.class, new UTCTimeVerifier());
+        super(ctx, TypeName.UTC_TIME, UTCTime.class, UTCTimeValue.class, new UTCTimeVerifier());
     }
 
     @Override

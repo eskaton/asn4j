@@ -29,15 +29,26 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.UTF8String;
 import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.NonRestrictingStringVerifier;
 
 public class UTF8StringValueResolver extends UnicodeStringValueResolver<UTF8StringValue> {
 
     public UTF8StringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.UTF8_STRING, UTF8String.class, new NonRestrictingStringVerifier());
+        super(ctx, TypeName.UTF8_STRING, UTF8String.class, UTF8StringValue.class, new NonRestrictingStringVerifier());
+    }
+
+    @Override
+    public UTF8StringValue resolveGeneric(Type type, Value value) {
+        if (type instanceof UTF8String && value instanceof UTF8StringValue resolvedValue) {
+            return resolvedValue;
+        }
+
+        return super.resolveGeneric(type, value);
     }
 
     @Override

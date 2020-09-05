@@ -37,7 +37,7 @@ import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
 public class VisibleStringValueResolver extends AbstractStringValueResolver<VisibleStringValue> {
 
     public VisibleStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.VISIBLE_STRING, VisibleString.class, new ISO646Verifier());
+        super(ctx, TypeName.VISIBLE_STRING, VisibleString.class, VisibleStringValue.class, new ISO646Verifier());
     }
 
     @Override

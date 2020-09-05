@@ -37,7 +37,7 @@ import ch.eskaton.asn4j.runtime.verifiers.GeneralStringVerifier;
 public class GeneralStringValueResolver extends AbstractStringValueResolver<GeneralStringValue> {
 
     public GeneralStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.GENERAL_STRING, GeneralString.class, new GeneralStringVerifier());
+        super(ctx, TypeName.GENERAL_STRING, GeneralString.class, GeneralStringValue.class, new GeneralStringVerifier());
     }
 
     @Override

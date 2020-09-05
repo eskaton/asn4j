@@ -31,14 +31,25 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
 import ch.eskaton.asn4j.parser.ast.types.IA5String;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.IA5StringVerifier;
 
 public class IA5StringValueResolver extends AbstractStringValueResolver<IA5StringValue> {
 
     public IA5StringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.IA5_STRING, IA5String.class, new IA5StringVerifier());
+        super(ctx, TypeName.IA5_STRING, IA5String.class, IA5StringValue.class, new IA5StringVerifier());
+    }
+
+    @Override
+    public IA5StringValue resolveGeneric(Type type, Value value) {
+        if (type instanceof IA5String && value instanceof IA5StringValue resolvedValue) {
+            return resolvedValue;
+        }
+
+        return super.resolveGeneric(type, value);
     }
 
     @Override

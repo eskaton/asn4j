@@ -45,7 +45,7 @@ public class ObjectAssignmentCompiler implements Compiler<ObjectAssignmentNode> 
             var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
             var objectDefinition = compiler.compile(objectClass, objectDefnNode);
 
-            return ctx.createCompiledObjectSet(objectName, objectDefinition);
+            return ctx.createCompiledObject(objectName, objectDefinition);
         } else {
             throw new IllegalCompilerStateException("Node type %s not yet supported", object.getClass().getSimpleName());
         }
