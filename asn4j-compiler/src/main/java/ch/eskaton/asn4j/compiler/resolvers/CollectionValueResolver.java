@@ -28,8 +28,8 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
@@ -124,7 +124,8 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
         Type elementType = elementTypes.get(value.getName());
 
         if (elementType == null) {
-            throw new CompilerException(value.getPosition(), "SEQUENCE value contains a component '%s' which isn't defined. Must be one of [%s]",
+            throw new ValueResolutionException(value.getPosition(),
+                    "SEQUENCE value contains a component '%s' which isn't defined. Must be one of [%s]",
                     value.getName(), elementTypes.keySet().stream().collect(Collectors.joining(", ")));
         }
 
@@ -146,7 +147,7 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
             }
 
             return ctx.resolveGenericValue(valueClass, elementType, value);
-        } catch (ClassCastException | CompilerException e) {
+        } catch (ClassCastException | ValueResolutionException e) {
             return resolveError(typeName, elementType, namedValue, value, Optional.of(e));
         }
     }
@@ -159,18 +160,21 @@ public class CollectionValueResolver extends AbstractValueResolver<CollectionVal
         return TypeName.SEQUENCE.name();
     }
 
-    private Value resolveError(String typeName, Type elementType, NamedValue namedValue, Value value, Optional<Exception> e) {
+    private Value resolveError(String typeName, Type elementType, NamedValue namedValue, Value value,
+            Optional<Exception> e) {
         final var message = "Failed to resolve value for component '%s' in a %s to type %s: %s";
 
         if (e.isPresent()) {
-            throw new CompilerException(message, e.get(), namedValue.getName(), typeName, formatTypeName(elementType), formatValue(value));
+            throw new ValueResolutionException(message, e.get(), namedValue.getName(), typeName,
+                    formatTypeName(elementType), formatValue(value));
         } else {
-            throw new CompilerException(message, namedValue.getName(), typeName, formatTypeName(elementType), formatValue(value));
+            throw new ValueResolutionException(message, namedValue.getName(), typeName, formatTypeName(elementType),
+                    formatValue(value));
         }
     }
 
-    protected CompilerException error(String typeName, Value value) {
-        return new CompilerException(value.getPosition(), "Failed to resolve a %s value: %s", typeName,
+    protected ValueResolutionException error(String typeName, Value value) {
+        return new ValueResolutionException(value.getPosition(), "Failed to resolve a %s value: %s", typeName,
                 ValueFormatter.formatValue(value));
     }
 

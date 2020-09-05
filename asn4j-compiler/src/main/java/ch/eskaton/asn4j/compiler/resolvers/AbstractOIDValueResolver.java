@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
@@ -73,12 +73,12 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
             try {
                 try {
                     components.add(resolveComponentId(ctx, component));
-                } catch (CompilerException e) {
+                } catch (ValueResolutionException e) {
                     components.addAll(resolveComponent(ctx, component, componentPos).orElseThrow(() -> e));
                 }
-            } catch (CompilerException e) {
-                throw new CompilerException(value.getPosition(), "Failed to resolve component of %s value: %s", e,
-                        getTypeName(), ValueFormatter.formatValue(value));
+            } catch (ValueResolutionException e) {
+                throw new ValueResolutionException(value.getPosition(), "Failed to resolve component of %s value: %s",
+                        e, getTypeName(), ValueFormatter.formatValue(value));
             }
 
             componentPos++;
@@ -96,7 +96,7 @@ public abstract class AbstractOIDValueResolver<T extends AbstractOID, V extends 
 
         try {
             referencedOidValue = ctx.resolveValue(valueClass, component.getName());
-        } catch (CompilerException e2) {
+        } catch (ValueResolutionException e2) {
             referencedOidValue = ctx.resolveValue(valueClass, component.getDefinedValue());
         }
 

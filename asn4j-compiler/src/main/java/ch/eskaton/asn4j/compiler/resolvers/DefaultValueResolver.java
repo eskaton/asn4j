@@ -28,9 +28,9 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.ValueResolutionException;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -61,7 +61,7 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
         Node value = valueAssignment.getValue();
 
         if (!(type instanceof Type)) {
-            throw new CompilerException(type.getPosition(), "Invalid type %s", type.getClass().getSimpleName());
+            throw new ValueResolutionException(type.getPosition(), "Invalid type %s", type.getClass().getSimpleName());
         }
 
         type = ctx.resolveTypeReference((Type) type);
@@ -74,14 +74,14 @@ public class DefaultValueResolver<T extends Type, V extends Value> extends Abstr
             var resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
 
             if (resolvedValue == null) {
-                throw new CompilerException(value.getPosition(), "Expected a value of type %s but found %s",
+                throw new ValueResolutionException(value.getPosition(), "Expected a value of type %s but found %s",
                         valueClass.getSimpleName(), value.getClass().getSimpleName());
             }
 
             return resolvedValue;
         }
 
-        throw new CompilerException(type.getPosition(), "Failed to resolve a value of type %s. Found type %s",
+        throw new ValueResolutionException(type.getPosition(), "Failed to resolve a value of type %s. Found type %s",
                 typeClass.getSimpleName(), type.getClass().getSimpleName());
     }
 

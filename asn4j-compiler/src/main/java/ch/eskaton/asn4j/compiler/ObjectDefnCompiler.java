@@ -70,10 +70,10 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 var fieldName = field.getName();
 
                 if (!values.containsKey(fieldName)) {
-                    var defaultValue = field.getDefaultValue();
+                    var maybeDefaultValue = field.getDefaultValue();
 
-                    if (defaultValue != null) {
-                        values.put(fieldName, defaultValue);
+                    if (maybeDefaultValue.isPresent()) {
+                        values.put(fieldName, maybeDefaultValue.get());
                     } else {
                         throw new CompilerException(syntaxNode.getPosition(), "Field '%s' is mandatory", fieldName);
                     }

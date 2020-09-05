@@ -93,7 +93,6 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
-import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -107,9 +106,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
@@ -1181,7 +1178,7 @@ public class CompilerContext {
         Optional<ValueAssignmentNode> assignment = tryResolveValueReference(symbolName);
 
         if (!assignment.isPresent()) {
-            throw new CompilerException("Failed to resolve reference " + symbolName);
+            throw new ValueResolutionException("Failed to resolve reference " + symbolName);
         }
 
         return assignment.get();

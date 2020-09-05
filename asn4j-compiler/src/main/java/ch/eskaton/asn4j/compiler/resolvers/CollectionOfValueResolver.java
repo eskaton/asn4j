@@ -28,8 +28,8 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.ValueResolutionException;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
@@ -109,14 +109,14 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
                 if (resolvedValue != null) {
                     value = resolvedValue;
                 } else {
-                    throw new CompilerException("Failed to resolve a value in a %s to type %s: %s", typeName,
+                    throw new ValueResolutionException("Failed to resolve a value in a %s to type %s: %s", typeName,
                             formatTypeName(elementType), formatValue(value));
                 }
             }
 
             return ctx.resolveGenericValue(valueClass, elementType, value);
         } catch (ClassCastException e) {
-            throw new CompilerException("Failed to resolve a value in a %s to type %s: %s", typeName,
+            throw new ValueResolutionException("Failed to resolve a value in a %s to type %s: %s", typeName,
                     formatTypeName(elementType), formatValue(value));
         }
     }
@@ -129,8 +129,8 @@ public class CollectionOfValueResolver extends AbstractValueResolver<CollectionO
         return TypeName.SEQUENCE_OF.name();
     }
 
-    protected CompilerException error(String typeName) {
-        return new CompilerException("Failed to resolve a %s value", typeName);
+    protected ValueResolutionException error(String typeName) {
+        return new ValueResolutionException("Failed to resolve a %s value", typeName);
     }
 
 }

@@ -32,44 +32,70 @@ import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.GeneralString;
+import ch.eskaton.asn4j.parser.ast.types.GraphicString;
+import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
+import ch.eskaton.asn4j.parser.ast.types.ISO646String;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
+import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
+import ch.eskaton.asn4j.parser.ast.types.PrintableString;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.T61String;
+import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.types.UTF8String;
+import ch.eskaton.asn4j.parser.ast.types.UniversalString;
+import ch.eskaton.asn4j.parser.ast.types.VideotexString;
+import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.BMP_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
 import static ch.eskaton.asn4j.runtime.types.TypeName.CHOICE;
 import static ch.eskaton.asn4j.runtime.types.TypeName.ENUMERATED;
+import static ch.eskaton.asn4j.runtime.types.TypeName.GENERAL_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.GRAPHIC_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.IA5_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.INTEGER;
+import static ch.eskaton.asn4j.runtime.types.TypeName.ISO646_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.NULL;
+import static ch.eskaton.asn4j.runtime.types.TypeName.NUMERIC_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.OCTET_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.OID;
 import static ch.eskaton.asn4j.runtime.types.TypeName.OID_IRI;
+import static ch.eskaton.asn4j.runtime.types.TypeName.PRINTABLE_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID;
 import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID_IRI;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE_OF;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SET;
 import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
+import static ch.eskaton.asn4j.runtime.types.TypeName.T61_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.TELETEX_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.UNIVERSAL_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.UTF8_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.VIDEOTEX_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.VISIBLE_STRING;
 
 public class TypeFormatter {
 
@@ -113,6 +139,32 @@ public class TypeFormatter {
             return OID_IRI.getName();
         } else if (type instanceof RelativeIRI) {
             return RELATIVE_OID_IRI.getName();
+        } else if (type instanceof VisibleString) {
+            return VISIBLE_STRING.getName();
+        } else if (type instanceof ISO646String) {
+            return ISO646_STRING.getName();
+        } else if (type instanceof NumericString) {
+            return NUMERIC_STRING.getName();
+        } else if (type instanceof PrintableString) {
+            return PRINTABLE_STRING.getName();
+        } else if (type instanceof IA5String) {
+            return IA5_STRING.getName();
+        } else if (type instanceof GraphicString) {
+            return GRAPHIC_STRING.getName();
+        } else if (type instanceof GeneralString) {
+            return GENERAL_STRING.getName();
+        } else if (type instanceof TeletexString) {
+            return TELETEX_STRING.getName();
+        } else if (type instanceof T61String) {
+            return T61_STRING.getName();
+        } else if (type instanceof VideotexString) {
+            return VIDEOTEX_STRING.getName();
+        } else if (type instanceof UTF8String) {
+            return UTF8_STRING.getName();
+        } else if (type instanceof UniversalString) {
+            return UNIVERSAL_STRING.getName();
+        } else if (type instanceof BMPString) {
+            return BMP_STRING.getName();
         } else if (type instanceof TypeReference) {
             return formatType(ctx, ctx.resolveTypeReference((TypeReference) type));
         }

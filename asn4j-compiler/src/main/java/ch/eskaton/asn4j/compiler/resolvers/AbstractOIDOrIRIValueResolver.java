@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -55,7 +55,7 @@ public abstract class AbstractOIDOrIRIValueResolver<T extends Type, V extends Va
         } else if ((refValue = resolveAmbiguousValue(value, SimpleDefinedValue.class)) != null) {
             idValue = ctx.resolveValue(valueClass, refValue);
         } else {
-            throw new CompilerException(value.getPosition(), "Invalid %s value: %s", getTypeName(),
+            throw new ValueResolutionException(value.getPosition(), "Invalid %s value: %s", getTypeName(),
                     ValueFormatter.formatValue(value));
         }
 

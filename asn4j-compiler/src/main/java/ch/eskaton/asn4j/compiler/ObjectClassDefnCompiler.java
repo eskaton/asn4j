@@ -31,12 +31,17 @@ import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
+import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ObjectClassDefn;
+import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueOrObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
+
+import java.util.List;
 
 public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, CompiledObjectClass> {
 
@@ -72,8 +77,12 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
 
                     compiledObjectClass.addField(compiledField);
                 }
-            } else if (unknownFieldSpec instanceof TypeFieldSpecNode typeFieldSpecNode) {
-                compiledObjectClass.addField(new CompiledTypeField(typeFieldSpecNode.getReference()));
+            } else if (unknownFieldSpec instanceof TypeFieldSpecNode typeFieldSpec) {
+                var compiledField = ctx.<TypeFieldSpecNode, NamedCompiler<TypeFieldSpecNode, AbstractCompiledField>>getCompiler(
+                        (Class<TypeFieldSpecNode>) typeFieldSpec.getClass())
+                        .compile(ctx, name, typeFieldSpec);
+
+                compiledObjectClass.addField(compiledField);
             } else if (unknownFieldSpec instanceof VariableTypeValueFieldSpecNode variableTypeValueFieldSpec) {
                 var compiledField = ctx.<VariableTypeValueFieldSpecNode, NamedCompiler<VariableTypeValueFieldSpecNode, AbstractCompiledField>>getCompiler(
                         (Class<VariableTypeValueFieldSpecNode>) variableTypeValueFieldSpec.getClass())
@@ -86,23 +95,82 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
             }
         }
 
-        for (var field : compiledObjectClass.getFields()) {
-            if (field instanceof CompiledVariableTypeValueField compiledVariableTypeValueField) {
-                var reference = compiledVariableTypeValueField.getReference();
-                var referencedField = compiledObjectClass.getField(reference);
-
-                if (referencedField.isEmpty()) {
-                    var fieldSpec = fieldSpecs.stream()
-                            .filter(spec -> spec.getReference().equals(compiledVariableTypeValueField.getName()))
-                            .findAny()
-                            .get();
-                    throw new CompilerException(fieldSpec.getPosition(),
-                            "%s in object class %s refers to the inexistent field %s", field.getName(), name, reference);
-                }
-            }
-        }
+        verifyIntegrity(ctx, name, compiledObjectClass, fieldSpecs);
 
         return compiledObjectClass;
+    }
+
+    private void verifyIntegrity(CompilerContext ctx, String name, CompiledObjectClass compiledObjectClass,
+            List<AbstractFieldSpecNode> fieldSpecs) {
+        for (var field : compiledObjectClass.getFields()) {
+            if (field instanceof CompiledVariableTypeValueField compiledVariableTypeValueField) {
+                verifyVariableTypeValueField(ctx, name, compiledObjectClass, fieldSpecs,
+                        compiledVariableTypeValueField);
+            }
+        }
+    }
+
+    private void verifyVariableTypeValueField(CompilerContext ctx, String name, CompiledObjectClass compiledObjectClass,
+            List<AbstractFieldSpecNode> fieldSpecs, CompiledVariableTypeValueField field) {
+        var reference = field.getReference();
+        var maybeReferencedField = compiledObjectClass.getField(reference);
+
+        if (maybeReferencedField.isEmpty()) {
+            var fieldSpec = getFieldSpecByName(fieldSpecs, field);
+            throw new CompilerException(fieldSpec.getPosition(),
+                    "%s in object class %s refers to the inexistent field %s", field.getName(), name, reference);
+        }
+
+        var maybeDefaultValue = field.getDefaultValue();
+
+        if (maybeDefaultValue.isPresent()) {
+            var referencedField = maybeReferencedField.get();
+
+            if (referencedField instanceof CompiledTypeField typeField) {
+                var maybeReferencedDefault = typeField.getDefaultValue();
+
+                if (maybeReferencedDefault.isEmpty()) {
+                    var fieldSpec = getFieldSpecByName(fieldSpecs, field);
+
+                    throw new CompilerException(fieldSpec.getPosition(),
+                            "%s in object class %s defines a default value, " +
+                                    "but the referenced type field %s has no default",
+                            field.getName(), name, typeField.getName());
+                }
+
+                var compiledType = maybeReferencedDefault.get();
+                var type = compiledType.getType();
+                var valueType = ctx.getValueType(type);
+                var defaultValue = maybeDefaultValue.get();
+
+                try {
+                    var resolvedValue = ctx.resolveGenericValue(valueType, type, defaultValue);
+
+                    field.setDefaultValue(resolvedValue);
+                } catch (ValueResolutionException e) {
+                    var fieldSpec = getFieldSpecByName(fieldSpecs, field);
+
+                    throw new CompilerException(fieldSpec.getPosition(),
+                            "%s in object class %s expects a default value of type %s but found %s",
+                            field.getName(), name, TypeFormatter.formatType(ctx, type),
+                            ValueFormatter.formatValue(defaultValue));
+                }
+            } else {
+                var fieldSpec = getFieldSpecByName(fieldSpecs, field);
+
+                throw new CompilerException(fieldSpec.getPosition(),
+                        "%s in object class %s refers to the field %s which is not a type field", field.getName(), name,
+                        reference);
+            }
+        }
+    }
+
+    private AbstractFieldSpecNode getFieldSpecByName(List<AbstractFieldSpecNode> fieldSpecs,
+            CompiledVariableTypeValueField compiledVariableTypeValueField) {
+        return fieldSpecs.stream()
+                .filter(spec -> spec.getReference().equals(compiledVariableTypeValueField.getName()))
+                .findAny()
+                .get();
     }
 
 }

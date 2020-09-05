@@ -28,8 +28,8 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -64,7 +64,7 @@ public class RealValueResolver extends AbstractValueResolver<RealValue> {
             return CompilerUtils.resolveAmbiguousValue(value, RealValue.class);
         }
 
-        throw new CompilerException(value.getPosition(), "Failed to resolve a %s value: %s", TypeName.REAL,
+        throw new ValueResolutionException(value.getPosition(), "Failed to resolve a %s value: %s", TypeName.REAL,
                 ValueFormatter.formatValue(value));
     }
 
@@ -88,29 +88,33 @@ public class RealValueResolver extends AbstractValueResolver<RealValue> {
                     exponent = resolvedValue.getValue();
                     break;
                 default:
-                    throw new CompilerException("Unknown component in %s value: %s", TypeName.REAL,
+                    throw new ValueResolutionException("Unknown component in %s value: %s", TypeName.REAL,
                             namedValue.getName());
             }
         }
 
         if (mantissa == null || base == null || exponent == null) {
-            throw new CompilerException("Incomplete %s value: %s. It must contain 'mantissa', 'base' and 'exponent'",
+            throw new ValueResolutionException(
+                    "Incomplete %s value: %s. It must contain 'mantissa', 'base' and 'exponent'",
                     TypeName.REAL, value);
         }
 
         if (base.intValue() != 2 && base.intValue() != 10) {
-            throw new CompilerException("Invalid base '%s' in %s value: %s. Only 2 and 10 are allowed",
+            throw new ValueResolutionException(
+                    "Invalid base '%s' in %s value: %s. Only 2 and 10 are allowed",
                     base, TypeName.REAL, value);
         }
 
         if (mantissa.bitLength() > 63) {
-            throw new CompilerException("Mantissa in %s value is out of range: %s. It must be between -2^63 and 2^63",
+            throw new ValueResolutionException(
+                    "Mantissa in %s value is out of range: %s. It must be between -2^63 and 2^63",
                     TypeName.REAL, mantissa);
         }
 
         if (exponent.compareTo(BigInteger.valueOf(-999999999L)) < 0 ||
                 exponent.compareTo(BigInteger.valueOf(999999999L)) > 0) {
-            throw new CompilerException("Exponent in %s value is out of range: %s. It must be between -999999999L and 999999999L",
+            throw new ValueResolutionException(
+                    "Exponent in %s value is out of range: %s. It must be between -999999999L and 999999999L",
                     TypeName.REAL, exponent);
         }
 
