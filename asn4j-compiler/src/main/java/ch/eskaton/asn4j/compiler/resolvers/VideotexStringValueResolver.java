@@ -29,7 +29,9 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.NonRestrictingStringVerifier;
@@ -37,7 +39,17 @@ import ch.eskaton.asn4j.runtime.verifiers.NonRestrictingStringVerifier;
 public class VideotexStringValueResolver extends AbstractStringValueResolver<VideotexStringValue> {
 
     public VideotexStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.VIDEOTEX_STRING, VideotexString.class, new NonRestrictingStringVerifier());
+        super(ctx, TypeName.VIDEOTEX_STRING, VideotexString.class, VideotexStringValue.class,
+                new NonRestrictingStringVerifier());
+    }
+
+    @Override
+    public VideotexStringValue resolveGeneric(Type type, Value value) {
+        if (type instanceof VideotexString && value instanceof VideotexStringValue resolvedValue) {
+            return resolvedValue;
+        }
+
+        return super.resolveGeneric(type, value);
     }
 
     @Override

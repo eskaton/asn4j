@@ -29,15 +29,27 @@ package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.values.UniversalStringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.NonRestrictingStringVerifier;
 
 public class UniversalStringValueResolver extends UnicodeStringValueResolver<UniversalStringValue> {
 
     public UniversalStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.UNIVERSAL_STRING, UniversalString.class, new NonRestrictingStringVerifier());
+        super(ctx, TypeName.UNIVERSAL_STRING, UniversalString.class, UniversalStringValue.class,
+                new NonRestrictingStringVerifier());
+    }
+
+    @Override
+    public UniversalStringValue resolveGeneric(Type type, Value value) {
+        if (type instanceof UniversalString && value instanceof UniversalStringValue resolvedValue) {
+            return resolvedValue;
+        }
+
+        return super.resolveGeneric(type, value);
     }
 
     @Override

@@ -30,14 +30,25 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.BMPString;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.BMPStringVerifier;
 
 public class BMPStringValueResolver extends UnicodeStringValueResolver<BMPStringValue> {
 
     public BMPStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.BMP_STRING, BMPString.class, new BMPStringVerifier());
+        super(ctx, TypeName.BMP_STRING, BMPString.class, BMPStringValue.class, new BMPStringVerifier());
+    }
+
+    @Override
+    public BMPStringValue resolveGeneric(Type type, Value value) {
+        if (type instanceof BMPString && value instanceof BMPStringValue resolvedValue) {
+            return resolvedValue;
+        }
+
+        return super.resolveGeneric(type, value);
     }
 
     @Override

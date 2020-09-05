@@ -30,14 +30,25 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.GraphicString;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.GraphicStringVerifier;
 
 public class GraphicStringValueResolver extends AbstractStringValueResolver<GraphicStringValue> {
 
     public GraphicStringValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.GRAPHIC_STRING, GraphicString.class, new GraphicStringVerifier());
+        super(ctx, TypeName.GRAPHIC_STRING, GraphicString.class, GraphicStringValue.class, new GraphicStringVerifier());
+    }
+
+    @Override
+    public GraphicStringValue resolveGeneric(Type type, Value value) {
+        if (type instanceof GraphicString && value instanceof GraphicStringValue resolvedValue) {
+            return resolvedValue;
+        }
+
+        return super.resolveGeneric(type, value);
     }
 
     @Override

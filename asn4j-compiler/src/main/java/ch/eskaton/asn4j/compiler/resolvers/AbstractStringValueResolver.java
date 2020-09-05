@@ -55,14 +55,17 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
 
     private final Class<? extends Type> typeClass;
 
+    private final Class<? extends Value> valueClass;
+
     private final StringVerifier verifier;
 
     public AbstractStringValueResolver(CompilerContext ctx, TypeName typeName, Class<? extends Type> typeClass,
-            StringVerifier verifier) {
+            Class<? extends Value> valueClass, StringVerifier verifier) {
         super(ctx);
 
         this.typeName = typeName;
         this.typeClass = typeClass;
+        this.valueClass = valueClass;
         this.verifier = verifier;
     }
 
@@ -75,7 +78,9 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
         var valuePosition = value.getPosition();
         var resolvedType = verifyType(type, valuePosition);
 
-        if (value instanceof SimpleDefinedValue) {
+        if (typeClass.isAssignableFrom(resolvedType.getClass()) && valueClass.isAssignableFrom(value.getClass())) {
+            return (T) value;
+        } else if (value instanceof SimpleDefinedValue) {
             return resolve((SimpleDefinedValue) value);
         } else if (value instanceof AmbiguousValue) {
             var stringValue = CompilerUtils.resolveAmbiguousValue(value, StringValue.class);
@@ -86,11 +91,11 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
                 if (characterStringListValue != null) {
                     return characterStringListValue;
                 }
+            } else {
+                var cString = getString(resolvedType, stringValue);
+
+                return createValue(stringValue.getPosition(), cString);
             }
-
-            var cString = getString(resolvedType, stringValue);
-
-            return createValue(stringValue.getPosition(), cString);
         } else if (value instanceof CollectionOfValue) {
             if (((CollectionOfValue) value).getValues().size() == 2) {
                 return createValue(valuePosition,

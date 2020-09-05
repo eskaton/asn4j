@@ -40,8 +40,8 @@ public abstract class AbstractTimeValueResolver<T extends HasStringValue & Value
         extends AbstractStringValueResolver<T> {
 
     public AbstractTimeValueResolver(CompilerContext ctx, TypeName typeName, Class<? extends Type> typeClass,
-            StringVerifier verifier) {
-        super(ctx, typeName, typeClass, verifier);
+            Class<? extends Value> valueClass, StringVerifier verifier) {
+        super(ctx, typeName, typeClass, valueClass, verifier);
     }
 
     @Override

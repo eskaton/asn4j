@@ -65,6 +65,9 @@ import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -715,6 +718,131 @@ class CompilerImplTest {
 
         testModule(body, CompilerException.class,
                 ".*variableTypeField in object class TEST refers to the inexistent field InvalidTypeField.*");
+    }
+
+    @Test
+    void testObjectsWithVariableTypeField() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &variableTypeField &TypeField DEFAULT "abc",
+                    &TypeField DEFAULT VisibleString
+                }
+
+                testObject1 TEST ::= {
+                    &variableTypeField  FALSE,
+                    &TypeField          BOOLEAN
+                }
+
+                testObject2 TEST ::= {
+                    &variableTypeField  4711,
+                    &TypeField          INTEGER
+                }
+
+                TestSet TEST ::= {
+                    testObject1 | testObject2
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
+
+        assertNotNull(objectSet);
+        assertEquals(2, objectSet.getValues().size());
+    }
+
+    @Test
+    void testObjectsWithVariableTypeFieldDefaults() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &variableTypeField &TypeField DEFAULT "abc",
+                    &TypeField DEFAULT VisibleString
+                }
+
+                TestSet TEST ::= {
+                    {}
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
+
+        assertNotNull(objectSet);
+        assertEquals(1, objectSet.getValues().size());
+
+        var objectDefinition = objectSet.getValues().stream().findFirst().get();
+        var compiledType = (CompiledType) objectDefinition.get("TypeField");
+
+        assertEquals(VisibleString.class, compiledType.getType().getClass());
+
+        var value = (Value) objectDefinition.get("variableTypeField");
+
+        assertEquals(VisibleStringValue.class, value.getClass());
+    }
+
+    @Test
+    void testObjectsWithVariableTypeFieldDefaultsSequence() throws IOException, ParserException {
+        var body = """
+                Seq ::= SEQUENCE {
+                    a BOOLEAN,
+                    b INTEGER
+                }
+
+                TEST ::= CLASS {
+                    &variableTypeField &TypeField DEFAULT {a TRUE, b 23},
+                    &TypeField DEFAULT Seq
+                }
+
+                TestSet TEST ::= {
+                    {}
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
+
+        assertNotNull(objectSet);
+        assertEquals(1, objectSet.getValues().size());
+
+        var objectDefinition = objectSet.getValues().stream().findFirst().get();
+        var compiledType = (CompiledType) objectDefinition.get("TypeField");
+
+        assertEquals(SequenceType.class, compiledType.getType().getClass());
+
+        var value = (Value) objectDefinition.get("variableTypeField");
+
+        assertEquals(CollectionValue.class, value.getClass());
+    }
+
+    @Test
+    void testObjectWithVariableTypeFieldWithInvalidType() {
+        var body = """
+                TEST ::= CLASS {
+                    &variableTypeField &TypeField,
+                    &TypeField
+                }
+
+                TestSet TEST ::= {
+                    { &variableTypeField FALSE, &TypeField INTEGER}
+                }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*The value for variableTypeField in the object definition for TEST must be of the type INTEGER but found the value.*");
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {

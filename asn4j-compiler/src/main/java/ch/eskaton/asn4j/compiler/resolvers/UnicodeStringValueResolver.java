@@ -39,8 +39,8 @@ public abstract class UnicodeStringValueResolver<T extends HasStringValue & Valu
         extends AbstractStringValueResolver<T> {
 
     public UnicodeStringValueResolver(CompilerContext ctx, TypeName typeName, Class<? extends Type> typeClass,
-            StringVerifier verifier) {
-        super(ctx, typeName, typeClass, verifier);
+            Class<? extends Value> valueClass, StringVerifier verifier) {
+        super(ctx, typeName, typeClass, valueClass, verifier);
     }
 
     @Override

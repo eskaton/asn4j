@@ -29,7 +29,11 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
+import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
+import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
@@ -48,15 +52,20 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         this.ctx = ctx;
     }
 
-    public Map<String, Object> compile(CompiledObjectClass objectClass, ObjectDefnNode element) {
-        var syntax = element.getSyntax();
+    public Map<String, Object> compile(CompiledObjectClass objectClass, ObjectDefnNode objectDefinition) {
+        var syntax = objectDefinition.getSyntax();
+        Map<String, Object> compiledObject;
 
         if (syntax instanceof DefaultSyntaxNode) {
-            return compile(objectClass, (DefaultSyntaxNode) syntax);
+            compiledObject = compile(objectClass, (DefaultSyntaxNode) syntax);
         } else {
             throw new CompilerException(syntax.getPosition(), "Unsupported syntax: %s",
                     syntax.getClass().getSimpleName());
         }
+
+        verifyIntegrity(objectClass, objectDefinition, compiledObject);
+
+        return compiledObject;
     }
 
     private Map<String, Object> compile(CompiledObjectClass objectClass, DefaultSyntaxNode syntaxNode) {
@@ -104,12 +113,38 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 var type = (Type) setting;
 
                 return Tuple2.of(reference, ctx.getCompiledType(type));
+            } else if (field instanceof CompiledVariableTypeValueField) {
+                var setting = fieldSettingNode.getSetting();
+                var value = (Value) setting;
+
+                return Tuple2.of(reference, value);
             } else {
                 throw new IllegalCompilerStateException("Unsupported field of type %s",
                         field.getClass().getSimpleName());
             }
         } else {
             throw new CompilerException(fieldSettingNode.getPosition(), "Invalid reference %s", reference);
+        }
+    }
+
+    private void verifyIntegrity(CompiledObjectClass objectClass, ObjectDefnNode objectDefinition,
+            Map<String, Object> objectFields) {
+        for (var field : objectClass.getFields()) {
+            if (field instanceof CompiledVariableTypeValueField variableTypeValueField) {
+                var fieldName = field.getName();
+                var fieldValue = (Value) objectFields.get(fieldName);
+                var fieldType = ((CompiledType) objectFields.get(variableTypeValueField.getReference())).getType();
+                var valueType = ctx.getValueType(fieldType);
+
+                try {
+                    ctx.resolveGenericValue(valueType, fieldType, fieldValue);
+                } catch (ValueResolutionException e) {
+                    throw new CompilerException(objectDefinition.getPosition(),
+                            "The value for %s in the object definition for %s must be of the type %s but found the value %s",
+                            fieldName, objectClass.getName(), TypeFormatter.formatType(ctx, fieldType),
+                            ValueFormatter.formatValue(fieldValue));
+                }
+            }
         }
     }
 

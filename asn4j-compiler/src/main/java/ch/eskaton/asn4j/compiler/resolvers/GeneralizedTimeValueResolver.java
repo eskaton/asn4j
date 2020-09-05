@@ -37,7 +37,8 @@ import ch.eskaton.asn4j.runtime.verifiers.GeneralizedTimeVerifier;
 public class GeneralizedTimeValueResolver extends AbstractTimeValueResolver<GeneralizedTimeValue> {
 
     public GeneralizedTimeValueResolver(CompilerContext ctx) {
-        super(ctx, TypeName.GENERALIZED_TIME, GeneralizedTime.class, new GeneralizedTimeVerifier());
+        super(ctx, TypeName.GENERALIZED_TIME, GeneralizedTime.class, GeneralizedTimeValue.class,
+                new GeneralizedTimeVerifier());
     }
 
     @Override
