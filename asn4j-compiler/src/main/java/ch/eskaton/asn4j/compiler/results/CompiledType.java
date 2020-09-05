@@ -118,7 +118,6 @@ public class CompiledType implements CompilationResult {
         CompiledType that = (CompiledType) o;
 
         return optional == that.optional &&
-                Objects.equals(parent, that.parent) &&
                 Objects.equals(type, that.type) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(tags, that.tags) &&
@@ -128,7 +127,7 @@ public class CompiledType implements CompilationResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(parent, type, name, tags, constraintDefinition, objectClass, optional);
+        return Objects.hash(type, name, tags, constraintDefinition, objectClass, optional);
     }
 
     @Override
