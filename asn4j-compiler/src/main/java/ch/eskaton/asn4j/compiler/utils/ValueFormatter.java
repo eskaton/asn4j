@@ -29,15 +29,20 @@ package ch.eskaton.asn4j.compiler.utils;
 
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
 
@@ -53,6 +58,16 @@ public class ValueFormatter {
             return value.getValue();
         } else if (node instanceof StringValue value) {
             return value.getCString();
+        } else if (node instanceof ObjectIdentifierValue value) {
+            return value.getComponents().stream()
+                    .map(OIDComponentNode::getId)
+                    .map(String::valueOf)
+                    .collect(Collectors.joining("."));
+        } else if (node instanceof RelativeOIDValue value) {
+            return value.getComponents().stream()
+                    .map(OIDComponentNode::getId)
+                    .map(String::valueOf)
+                    .collect(Collectors.joining("."));
         } else if (node instanceof RelativeIRIValue value) {
             return value.getArcIdentifierTexts().stream().collect(Collectors.joining("/"));
         } else if (node instanceof IRIValue value) {
@@ -76,6 +91,10 @@ public class ValueFormatter {
             return String.format("{%s}", value.getValues().stream()
                     .map(ValueFormatter::formatValue)
                     .collect(Collectors.joining(", ")));
+        } else if (node instanceof CollectionValue value) {
+            return String.format("{%s}", value.getValues().stream()
+                    .map(namedValue -> "%s: %s".formatted(namedValue.getName(), formatValue(namedValue.getValue())))
+                    .collect(Collectors.joining(", ")));
         } else if (node instanceof AmbiguousValue value) {
             return value.getValues().stream().map(ValueFormatter::formatValue).collect(Collectors.joining(", "));
         } else if (node instanceof TupleNode value) {
@@ -83,6 +102,8 @@ public class ValueFormatter {
         } else if (node instanceof QuadrupleNode value) {
             return String.format("{%s, %s, %s, %s}", value.getGroup(), value.getPlane(), value.getRow(),
                     value.getCell());
+        } else if (node instanceof HasStringValue value) {
+            return value.getValue();
         }
 
         throw new IllegalCompilerStateException("Formatter for value of type %s not defined", node.getClass());

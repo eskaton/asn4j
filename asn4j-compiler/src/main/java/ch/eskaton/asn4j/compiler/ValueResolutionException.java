@@ -30,43 +30,22 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.parser.Position;
 
 @SuppressWarnings("serial")
-public class CompilerException extends RuntimeException {
+public class ValueResolutionException extends CompilerException {
 
-    public CompilerException(String message) {
+    public ValueResolutionException(String message) {
         super(message);
     }
 
-    public CompilerException(String format, Object... args) {
-        super(String.format(format, args));
+    public ValueResolutionException(String format, Object... args) {
+        super(format, args);
     }
 
-    public CompilerException(Position position, String message) {
-        super(formatMessage(position, message));
+    public ValueResolutionException(Position position, String format, Object... args) {
+        super(position, format, args);
     }
 
-    public CompilerException(Position position, String format, Object... args) {
-        super(formatMessage(position, String.format(format, args)));
-    }
-
-    public CompilerException(String format, Throwable cause, Object... args) {
-        super(String.format(format, args), cause);
-    }
-
-    public CompilerException(Position position, String format, Throwable cause, Object... args) {
-        super(formatMessage(position, String.format(format, args)), cause);
-    }
-
-    public CompilerException(Throwable cause) {
-        super(cause);
-    }
-
-    public CompilerException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public static String formatMessage(Position position, String message) {
-        return String.format("In %s at (%d, %d): %s", position.getFile(), position.getLine(),
-                position.getPosition(), message);
+    public ValueResolutionException(String format, Throwable cause, Object... args) {
+        super(format, cause, args);
     }
 
 }

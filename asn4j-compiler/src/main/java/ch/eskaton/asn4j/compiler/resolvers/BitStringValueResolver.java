@@ -28,8 +28,8 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
@@ -70,7 +70,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
             return resolveValue(getTypeName(type), namedBits, value);
         }
 
-        throw new CompilerException(value.getPosition(), "Failed to resolve a %s value", TypeName.BIT_STRING,
+        throw new ValueResolutionException(value.getPosition(), "Failed to resolve a %s value", TypeName.BIT_STRING,
                 ValueFormatter.formatValue(value));
     }
 
@@ -88,7 +88,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
             }
         }
 
-        throw new CompilerException(value.getPosition(), "Failed to resolve a %s value", TypeName.BIT_STRING,
+        throw new ValueResolutionException(value.getPosition(), "Failed to resolve a %s value", TypeName.BIT_STRING,
                 ValueFormatter.formatValue(value));
     }
 
@@ -98,7 +98,7 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
 
         for (String namedValue : bitStringValue.getNamedValues()) {
             if (!namedBits.containsKey(namedValue)) {
-                throw new CompilerException(bitStringValue.getPosition(), "%s has no component %s", typeName,
+                throw new ValueResolutionException(bitStringValue.getPosition(), "%s has no component %s", typeName,
                         namedValue);
             }
 

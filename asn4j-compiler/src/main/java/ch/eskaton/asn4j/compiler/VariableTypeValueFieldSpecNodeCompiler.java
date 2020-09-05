@@ -29,6 +29,8 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
+import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
+import ch.eskaton.asn4j.parser.ast.DefaultValueSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
@@ -40,6 +42,7 @@ public class VariableTypeValueFieldSpecNodeCompiler implements NamedCompiler<Var
 
     @Override
     public CompiledVariableTypeValueField compile(CompilerContext ctx, String name, VariableTypeValueFieldSpecNode node) {
+        var optionalitySpec = node.getOptionalitySpec();
         var reference = node.getReference();
         var primitiveFieldNames = node.getFieldName().getPrimitiveFieldNames();
 
@@ -55,6 +58,14 @@ public class VariableTypeValueFieldSpecNodeCompiler implements NamedCompiler<Var
 
         var fieldName = primitiveFieldNames.get(0).getReference();
         var compiledField = new CompiledVariableTypeValueField(reference, fieldName);
+
+        if (optionalitySpec instanceof DefaultValueSpecNode) {
+            var value = (Value) ((DefaultValueSpecNode) optionalitySpec).getSpec();
+
+            compiledField.setDefaultValue(value);
+        } else if (optionalitySpec instanceof OptionalSpecNode) {
+            compiledField.setOptional(true);
+        }
 
         return compiledField;
     }

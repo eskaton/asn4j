@@ -28,9 +28,9 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
@@ -88,7 +88,9 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
                 }
             }
 
-            value = stringValue;
+            var cString = getString(resolvedType, stringValue);
+
+            return createValue(stringValue.getPosition(), cString);
         } else if (value instanceof CollectionOfValue) {
             if (((CollectionOfValue) value).getValues().size() == 2) {
                 return createValue(valuePosition,
@@ -98,30 +100,26 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
                         verifyString(resolveQuadrupleValue(((CollectionOfValue) value).toQuadruple()), valuePosition));
             }
 
-            throw new CompilerException(valuePosition, "Invalid value for type %s: %s", typeName,
+            throw new ValueResolutionException(valuePosition, "Invalid value for type %s: %s", typeName,
                     ValueFormatter.formatValue(value));
         } else if (value instanceof StringValue) {
-            // value is already a string
+            var stringValue = (StringValue) value;
+            var cString = getString(resolvedType, stringValue);
+
+            return createValue(stringValue.getPosition(), cString);
         }
 
-        if (value == null) {
-            throw new CompilerException(valuePosition, "Failed to resolve a %s value", typeName);
-        }
-
-        var stringValue = (StringValue) value;
-        var cString = getString(resolvedType, stringValue);
-
-        return createValue(stringValue.getPosition(), cString);
+        throw new ValueResolutionException(valuePosition, "Failed to resolve a %s value", typeName);
     }
 
     protected String resolveTupleValue(TupleNode tuple) {
-        throw new CompilerException(tuple.getPosition(), "Tuple values not allowed for type %s: %s", typeName,
+        throw new ValueResolutionException(tuple.getPosition(), "Tuple values not allowed for type %s: %s", typeName,
                 ValueFormatter.formatValue(tuple));
     }
 
     protected String resolveQuadrupleValue(QuadrupleNode quadruple) {
-        throw new CompilerException(quadruple.getPosition(), "Quadruple values not allowed for type %s: %s", typeName,
-                ValueFormatter.formatValue(quadruple));
+        throw new ValueResolutionException(quadruple.getPosition(), "Quadruple values not allowed for type %s: %s",
+                typeName, ValueFormatter.formatValue(quadruple));
     }
 
     protected T resolveCharacterStringList(Type resolvedType, Value value) {
@@ -141,7 +139,7 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
         var resolvedType = resolveTypeReference(type);
 
         if (!typeClass.isAssignableFrom(resolvedType.getClass())) {
-            throw new CompilerException(valuePosition, "Failed to resolve a value. Expected %s but found %s.",
+            throw new ValueResolutionException(valuePosition, "Failed to resolve a value. Expected %s but found %s.",
                     typeName, type.getClass().getSimpleName());
         }
 
@@ -174,7 +172,7 @@ public abstract class AbstractStringValueResolver<T extends HasStringValue & Val
 
     private String verifyString(String str, Position position) {
         verifier.verify(str).ifPresent(v -> {
-            throw new CompilerException(position, "%s contains invalid characters: %s", typeName, v);
+            throw new ValueResolutionException(position, "%s contains invalid characters: %s", typeName, v);
         });
 
         return str;

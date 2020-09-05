@@ -29,11 +29,13 @@ package ch.eskaton.asn4j.compiler.results;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
+import java.util.Optional;
+
 public abstract class AbstractCompiledField<D> implements CompilationResult {
 
     private String name;
 
-    private D defaultValue;
+    private Optional<D> defaultValue = Optional.empty();
 
     private boolean optional;
 
@@ -46,10 +48,10 @@ public abstract class AbstractCompiledField<D> implements CompilationResult {
     }
 
     public void setDefaultValue(D defaultValue) {
-        this.defaultValue = defaultValue;
+        this.defaultValue = Optional.ofNullable(defaultValue);
     }
 
-    public D getDefaultValue() {
+    public Optional<D> getDefaultValue() {
         return defaultValue;
     }
 
