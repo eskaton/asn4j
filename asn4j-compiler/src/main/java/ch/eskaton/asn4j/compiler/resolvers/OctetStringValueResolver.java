@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.resolvers;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
+import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractBaseXStringValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
@@ -45,6 +46,11 @@ public class OctetStringValueResolver extends AbstractValueResolver<OctetStringV
 
     @Override
     public OctetStringValue resolveGeneric(Type type, Value value) {
+        if (OctetString.class.isAssignableFrom(type.getClass()) &&
+                OctetStringValue.class.isAssignableFrom(value.getClass())) {
+            return (OctetStringValue) value;
+        }
+
         if (value instanceof SimpleDefinedValue) {
             return ctx.tryResolveAllValueReferences((SimpleDefinedValue) value).map(this::resolve).orElse(null);
         } else if (value instanceof AbstractBaseXStringValue) {

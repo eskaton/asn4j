@@ -1,7 +1,7 @@
 X681 DEFINITIONS ::=
 BEGIN
 
-TEST ::= CLASS {
+TEST-FIXED-TYPE-VALUES ::= CLASS {
     &bitStringField        BIT STRING,
     &booleanField          BOOLEAN,
     &enumField             ENUMERATED {a, b, c},
@@ -31,7 +31,7 @@ TEST ::= CLASS {
     &realField             REAL
 }
 
-TestSet TEST ::= {
+TestFixedTypeValuesSet TEST-FIXED-TYPE-VALUES ::= {
     { &bitStringField        '0101'B,
       &booleanField          TRUE,
       &enumField             a,
@@ -63,150 +63,212 @@ TestSet TEST ::= {
 }
 
 TestSequence1 ::= SEQUENCE {
-   bitStringField TEST.&bitStringField
+   bitStringField TEST-FIXED-TYPE-VALUES.&bitStringField
 }
 
 TestSequence2 ::= SEQUENCE {
-   booleanField TEST.&booleanField
+   booleanField TEST-FIXED-TYPE-VALUES.&booleanField
 }
 
 TestSequence3 ::= SEQUENCE {
-   enumField TEST.&enumField
+   enumField TEST-FIXED-TYPE-VALUES.&enumField
 }
 
 TestSequence4 ::= SEQUENCE {
-   intField TEST.&intField
+   intField TEST-FIXED-TYPE-VALUES.&intField
 }
 
 TestSequence5 ::= SEQUENCE {
-   nullField TEST.&nullField
+   nullField TEST-FIXED-TYPE-VALUES.&nullField
 }
 
 TestSequence6 ::= SEQUENCE {
-   octetStringField TEST.&octetStringField
+   octetStringField TEST-FIXED-TYPE-VALUES.&octetStringField
 }
 
 TestSequence7 ::= SEQUENCE {
-   visibleStringField TEST.&visibleStringField
+   visibleStringField TEST-FIXED-TYPE-VALUES.&visibleStringField
 }
 
 TestSequence8 ::= SEQUENCE {
-   generalStringField TEST.&generalStringField
+   generalStringField TEST-FIXED-TYPE-VALUES.&generalStringField
 }
 
 TestSequence9 ::= SEQUENCE {
-   graphicStringField TEST.&graphicStringField
+   graphicStringField TEST-FIXED-TYPE-VALUES.&graphicStringField
 }
 
 TestSequence10 ::= SEQUENCE {
-   ia5StringField TEST.&ia5StringField
+   ia5StringField TEST-FIXED-TYPE-VALUES.&ia5StringField
 }
 
 TestSequence11 ::= SEQUENCE {
-   videotexStringField TEST.&videotexStringField
+   videotexStringField TEST-FIXED-TYPE-VALUES.&videotexStringField
 }
 
 TestSequence12 ::= SEQUENCE {
-   teletexStringField TEST.&teletexStringField
+   teletexStringField TEST-FIXED-TYPE-VALUES.&teletexStringField
 }
 
 TestSequence13 ::= SEQUENCE {
-   printableStringField TEST.&printableStringField
+   printableStringField TEST-FIXED-TYPE-VALUES.&printableStringField
 }
 
 TestSequence14 ::= SEQUENCE {
-   numericStringField TEST.&numericStringField
+   numericStringField TEST-FIXED-TYPE-VALUES.&numericStringField
 }
 
 TestSequence15 ::= SEQUENCE {
-   utf8StringField TEST.&utf8StringField
+   utf8StringField TEST-FIXED-TYPE-VALUES.&utf8StringField
 }
 
 TestSequence16 ::= SEQUENCE {
-   universalStringField TEST.&universalStringField
+   universalStringField TEST-FIXED-TYPE-VALUES.&universalStringField
 }
 
 TestSequence17 ::= SEQUENCE {
-   bmpStringField TEST.&bmpStringField
+   bmpStringField TEST-FIXED-TYPE-VALUES.&bmpStringField
 }
 
 TestSequence18 ::= SEQUENCE {
-   sequenceOfField TEST.&sequenceOfField
+   sequenceOfField TEST-FIXED-TYPE-VALUES.&sequenceOfField
 }
 
 TestSequence19 ::= SEQUENCE {
-   setOfField TEST.&setOfField
+   setOfField TEST-FIXED-TYPE-VALUES.&setOfField
 }
 
 TestSequence20 ::= SEQUENCE {
-   sequenceField TEST.&sequenceField
+   sequenceField TEST-FIXED-TYPE-VALUES.&sequenceField
 }
 
 TestSequence21 ::= SEQUENCE {
-   setField TEST.&setField
+   setField TEST-FIXED-TYPE-VALUES.&setField
 }
 
 TestSequence22 ::= SEQUENCE {
-   choiceField TEST.&choiceField
+   choiceField TEST-FIXED-TYPE-VALUES.&choiceField
 }
 
 TestSequence23 ::= SEQUENCE {
-   objectIdentifierField TEST.&objectIdentifierField
+   objectIdentifierField TEST-FIXED-TYPE-VALUES.&objectIdentifierField
 }
 
 TestSequence24 ::= SEQUENCE {
-   relativeOidField TEST.&relativeOidField
+   relativeOidField TEST-FIXED-TYPE-VALUES.&relativeOidField
 }
 
 TestSequence25 ::= SEQUENCE {
-   oidIriField TEST.&oidIriField
+   oidIriField TEST-FIXED-TYPE-VALUES.&oidIriField
 }
 
 TestSequence26 ::= SEQUENCE {
-   relativeOidIriField TEST.&relativeOidIriField
+   relativeOidIriField TEST-FIXED-TYPE-VALUES.&relativeOidIriField
 }
 
 TestSequence27 ::= SEQUENCE {
-   realField TEST.&realField
+   realField TEST-FIXED-TYPE-VALUES.&realField
 }
 
 
-TEST2 ::= CLASS {
+TEST-TYPE ::= CLASS {
     &TypeField
 }
 
 TestSequence101 ::= SEQUENCE {
-   typeField TEST2.&TypeField
+   typeField TEST-TYPE.&TypeField
 }
 
 TestSequence102 ::= SEQUENCE {
-   typeField TEST2.&TypeField,
+   typeField TEST-TYPE.&TypeField,
    intField  INTEGER
 }
 
 TestSet101 ::= SET {
-   typeField TEST2.&TypeField
+   typeField TEST-TYPE.&TypeField
 }
 
 TestSet102 ::= SET {
    intField        INTEGER,
-   typeField1 [23] TEST2.&TypeField,
-   typeField2 [24] TEST2.&TypeField
+   typeField1 [23] TEST-TYPE.&TypeField,
+   typeField2 [24] TEST-TYPE.&TypeField
 }
 
 TestSet103 ::= SET {
    choiceField CHOICE {
-                  typeField TEST2.&TypeField
+                  typeField TEST-TYPE.&TypeField
                }
 }
 
 TestChoice101 ::= CHOICE {
-   typeField TEST2.&TypeField
+   typeField TEST-TYPE.&TypeField
 }
 
 TestChoice102 ::= CHOICE {
-   typeField1 [23] TEST2.&TypeField,
-   typeField2 [24] TEST2.&TypeField
+   typeField1 [23] TEST-TYPE.&TypeField,
+   typeField2 [24] TEST-TYPE.&TypeField
+}
+
+
+TEST-VARIABLE-TYPE-VALUES ::= CLASS {
+    &bitStringField        &BitStringField        DEFAULT '0101'B,
+    &booleanField          &BooleanField          DEFAULT TRUE,
+    &enumField             &EnumField             DEFAULT a,
+    &intField              &IntField              DEFAULT c,
+    &nullField             &NullField             DEFAULT NULL,
+    &octetStringField      &OctetStringField      DEFAULT '0BD9'H,
+    &visibleStringField    &VisibleStringField    DEFAULT "abc",
+    &generalStringField    &GeneralStringField    DEFAULT "abc",
+    &graphicStringField    &GraphicStringField    DEFAULT "abc",
+    &ia5StringField        &Ia5StringField        DEFAULT "abc",
+    &videotexStringField   &VideotexStringField   DEFAULT "abc",
+    &teletexStringField    &TeletexStringField    DEFAULT "abc",
+    &printableStringField  &PrintableStringField  DEFAULT "abc",
+    &numericStringField    &NumericStringField    DEFAULT "123",
+    &utf8StringField       &Utf8StringField       DEFAULT "äöü",
+    &universalStringField  &UniversalStringField  DEFAULT "äöü",
+    &bmpStringField        &BmpStringField        DEFAULT "äöü",
+    &sequenceOfField       &SequenceOfField       DEFAULT {1, 2, 3},
+    &setOfField            &SetOfField            DEFAULT {1, 2, 3},
+    &sequenceField         &SequenceField         DEFAULT {a 1, b TRUE},
+    &setField              &SetField              DEFAULT {a 1, b TRUE},
+    &choiceField           &ChoiceField           DEFAULT b: TRUE,
+    &objectIdentifierField &ObjectIdentifierField DEFAULT { 1 3 6 1 },
+    &relativeOidField      &RelativeOidField      DEFAULT { 3 6 1 },
+    &oidIriField           &OidIriField           DEFAULT "/ISO/a/b/a",
+    &relativeOidIriField   &RelativeOidIriField   DEFAULT "a/b/a",
+    &realField             &RealField             DEFAULT 2.3,
+    &BitStringField        DEFAULT BIT STRING,
+    &BooleanField          DEFAULT BOOLEAN,
+    &EnumField             DEFAULT ENUMERATED {a, b, c},
+    &IntField              DEFAULT INTEGER {a(1), b(3), c(5)},
+    &NullField             DEFAULT NULL,
+    &OctetStringField      DEFAULT OCTET STRING,
+    &VisibleStringField    DEFAULT VisibleString,
+    &GeneralStringField    DEFAULT GeneralString,
+    &GraphicStringField    DEFAULT GraphicString,
+    &Ia5StringField        DEFAULT IA5String,
+    &VideotexStringField   DEFAULT VideotexString,
+    &TeletexStringField    DEFAULT TeletexString,
+    &PrintableStringField  DEFAULT PrintableString,
+    &NumericStringField    DEFAULT NumericString,
+    &Utf8StringField       DEFAULT UTF8String,
+    &UniversalStringField  DEFAULT UniversalString,
+    &BmpStringField        DEFAULT BMPString,
+    &SequenceOfField       DEFAULT SEQUENCE OF INTEGER,
+    &SetOfField            DEFAULT SET OF INTEGER,
+    &SequenceField         DEFAULT SEQUENCE { a INTEGER, b BOOLEAN },
+    &SetField              DEFAULT SET { a INTEGER, b BOOLEAN },
+    &ChoiceField           DEFAULT CHOICE { a INTEGER, b BOOLEAN },
+    &ObjectIdentifierField DEFAULT OBJECT IDENTIFIER,
+    &RelativeOidField      DEFAULT RELATIVE-OID,
+    &OidIriField           DEFAULT OID-IRI,
+    &RelativeOidIriField   DEFAULT RELATIVE-OID-IRI,
+    &RealField             DEFAULT REAL
+}
+
+TestVariableTypeValuesSet TEST-VARIABLE-TYPE-VALUES ::= {
+    {}
 }
 
 END

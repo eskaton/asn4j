@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.commons.utils.HexDump;
 import ch.eskaton.commons.utils.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,7 +41,7 @@ public class BitStringValue extends ByteStringValue {
 
     private int unusedBits;
 
-    private List<String> namedValues;
+    private List<String> namedValues = List.of();
 
     private Value value;
 

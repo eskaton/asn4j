@@ -41,10 +41,12 @@ import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
+import ch.eskaton.commons.utils.HexDump;
 
 import java.util.stream.Collectors;
 
@@ -83,6 +85,8 @@ public class ValueFormatter {
             } else {
                 return String.valueOf(value.getValue());
             }
+        } else if (node instanceof OctetStringValue value) {
+            return "'%s'H".formatted(HexDump.toHexString(value.getByteValue()).toUpperCase());
         } else if (node instanceof IntegerValue value) {
             return value.getValue().toString();
         } else if (node instanceof BooleanValue value) {
