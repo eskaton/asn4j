@@ -45,7 +45,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -94,9 +93,15 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
 
     private BitStringValue resolveValue(String typeName, Map<String, BigInteger> namedBits,
             BitStringValue bitStringValue) {
-        List<BigInteger> bits = new ArrayList<>(bitStringValue.getNamedValues().size());
+        var namedValues = bitStringValue.getNamedValues();
 
-        for (String namedValue : bitStringValue.getNamedValues()) {
+        if (namedValues.isEmpty()) {
+            return bitStringValue;
+        }
+
+        var bits = new ArrayList<BigInteger>(namedValues.size());
+
+        for (var namedValue : namedValues) {
             if (!namedBits.containsKey(namedValue)) {
                 throw new ValueResolutionException(bitStringValue.getPosition(), "%s has no component %s", typeName,
                         namedValue);
@@ -107,11 +112,12 @@ public class BitStringValueResolver extends AbstractValueResolver<BitStringValue
 
         bits.sort(Comparator.reverseOrder());
 
-        int length = bits.get(0).intValue() / 8 + 1;
-        byte[] byteValue = new byte[length];
+        var length = bits.get(0).intValue() / 8 + 1;
+        var byteValue = new byte[length];
 
-        for (BigInteger bit : bits) {
-            int pos = bit.intValue() / 8;
+        for (var bit : bits) {
+            var pos = bit.intValue() / 8;
+
             byteValue[pos] = byteValue[pos] |= 1 << 7 - (bit.intValue() % 8);
         }
 
