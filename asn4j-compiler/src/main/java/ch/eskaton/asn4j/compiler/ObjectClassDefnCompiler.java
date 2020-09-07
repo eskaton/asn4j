@@ -38,7 +38,9 @@ import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueOrObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetOrObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueSetFieldSpecNode;
@@ -59,7 +61,7 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
 
                     try {
                         // Check whether reference refers to an object class
-                        ctx.getCompiledObjectClass(objectFieldSpec.getObjectClass());
+                        ctx.getCompiledObjectClass(objectFieldSpec.getObjectClassReference());
                     } catch (CompilerException e) {
                         // ignore
                     }
@@ -91,12 +93,32 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
                         .compile(ctx, name, variableTypeValueFieldSpec);
 
                 compiledObjectClass.addField(compiledField);
-            } else if (unknownFieldSpec instanceof FixedTypeValueSetFieldSpecNode fixedTypeValueSetFieldSpec) {
-                var compiledField = ctx.<FixedTypeValueSetFieldSpecNode, NamedCompiler<FixedTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
-                        (Class<FixedTypeValueSetFieldSpecNode>) fixedTypeValueSetFieldSpec.getClass())
-                        .compile(ctx, name, fixedTypeValueSetFieldSpec);
+            } else if (unknownFieldSpec instanceof FixedTypeValueSetOrObjectSetFieldSpecNode fixedTypeValueSetOrObjectSetFieldSpec) {
+                if (fixedTypeValueSetOrObjectSetFieldSpec.getObjectSetFieldSpec().isPresent()) {
+                    var objectSetFieldSpec = fixedTypeValueSetOrObjectSetFieldSpec.getObjectSetFieldSpec().get();
 
-                compiledObjectClass.addField(compiledField);
+                    try {
+                        // Check whether reference refers to an object set
+                        ctx.getCompiledObjectSet(objectSetFieldSpec.getReference());
+                    } catch (CompilerException e) {
+                        // ignore
+                    }
+
+                    var compiledField = ctx.<ObjectSetFieldSpecNode, NamedCompiler<ObjectSetFieldSpecNode, AbstractCompiledField>>getCompiler(
+                            (Class<ObjectSetFieldSpecNode>) objectSetFieldSpec.getClass()).compile(ctx, name, objectSetFieldSpec);
+
+                    compiledObjectClass.addField(compiledField);
+                    continue;
+                }
+
+                if (fixedTypeValueSetOrObjectSetFieldSpec.getFixedTypeValueSetFieldSpec().isPresent()) {
+                    var fixedTypeValueSetFieldSpec = fixedTypeValueSetOrObjectSetFieldSpec.getFixedTypeValueSetFieldSpec().get();
+                    var compiledField = ctx.<FixedTypeValueSetFieldSpecNode, NamedCompiler<FixedTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
+                            (Class<FixedTypeValueSetFieldSpecNode>) fixedTypeValueSetFieldSpec.getClass())
+                            .compile(ctx, name, fixedTypeValueSetFieldSpec);
+
+                    compiledObjectClass.addField(compiledField);
+                }
             } else if (unknownFieldSpec instanceof VariableTypeValueSetFieldSpecNode variableTypeValueSetFieldSpec) {
                 var compiledField = ctx.<VariableTypeValueSetFieldSpecNode, NamedCompiler<VariableTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
                         (Class<VariableTypeValueSetFieldSpecNode>) variableTypeValueSetFieldSpec.getClass())

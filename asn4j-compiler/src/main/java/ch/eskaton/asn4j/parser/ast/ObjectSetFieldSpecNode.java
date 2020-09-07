@@ -29,11 +29,19 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class ObjectSetFieldSpecNode extends SetFieldSpecNode {
+public class ObjectSetFieldSpecNode extends AbstractFieldSpecNode {
 
-    public ObjectSetFieldSpecNode(Position position, String reference, ObjectClassReference type,
+    private ObjectClassReference objectClassReference;
+
+    public ObjectSetFieldSpecNode(Position position, String reference, ObjectClassReference objectClassReference,
             OptionalitySpecNode optionalitySpec) {
-        super(position, reference, type, optionalitySpec);
+        super(position, reference, optionalitySpec);
+
+        this.objectClassReference = objectClassReference;
+    }
+
+    public ObjectClassReference getObjectClassReference() {
+        return objectClassReference;
     }
 
 }

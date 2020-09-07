@@ -113,7 +113,7 @@ import ch.eskaton.asn4j.parser.Parser.FieldSettingParser;
 import ch.eskaton.asn4j.parser.Parser.FieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.FixedTypeFieldValParser;
 import ch.eskaton.asn4j.parser.Parser.FixedTypeValueOrObjectFieldSpecParser;
-import ch.eskaton.asn4j.parser.Parser.FixedTypeValueSetFieldSpecParser;
+import ch.eskaton.asn4j.parser.Parser.FixedTypeValueSetOrObjectSetFieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.FullSpecificationParser;
 import ch.eskaton.asn4j.parser.Parser.GeneralConstraintParser;
 import ch.eskaton.asn4j.parser.Parser.GlobalModuleReferenceParser;
@@ -276,6 +276,8 @@ import ch.eskaton.asn4j.parser.ast.FieldNameNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueOrObjectFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetOrObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.LiteralNode;
 import ch.eskaton.asn4j.parser.ast.LowerEndpointNode;
@@ -299,6 +301,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
+import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
@@ -319,7 +322,6 @@ import ch.eskaton.asn4j.parser.ast.PropertyAndSettingNode;
 import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
-import ch.eskaton.asn4j.parser.ast.SetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
@@ -5071,9 +5073,10 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof SetFieldSpecNode);
-        assertNotNull(((SetFieldSpecNode) result)
-                .toFixedTypeValueSetFieldSpec());
+        assertTrue(result instanceof FixedTypeValueSetOrObjectSetFieldSpecNode);
+        assertTrue(((FixedTypeValueSetOrObjectSetFieldSpecNode) result).getFixedTypeValueSetFieldSpec().isPresent());
+        assertTrue(((FixedTypeValueSetOrObjectSetFieldSpecNode) result).getFixedTypeValueSetFieldSpec().get()
+                .getOptionalitySpec() instanceof OptionalSpecNode);
 
         // VariableTypeValueSetFieldSpec
         parser = new Parser(new ByteArrayInputStream(
@@ -5101,8 +5104,10 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof SetFieldSpecNode);
-        assertNotNull(((SetFieldSpecNode) result).toObjectSetFieldSpec());
+        assertTrue(result instanceof FixedTypeValueSetOrObjectSetFieldSpecNode);
+        assertTrue(((FixedTypeValueSetOrObjectSetFieldSpecNode) result).getObjectSetFieldSpec().isPresent());
+        assertTrue(((FixedTypeValueSetOrObjectSetFieldSpecNode) result).getObjectSetFieldSpec().get()
+                .getOptionalitySpec() instanceof DefaultObjectSetSpecNode);
     }
 
     @Test
@@ -5299,26 +5304,34 @@ class ParserTest {
     @Test
     void testFixedTypeValueSetFieldSpecParser() throws IOException,
             ParserException {
-        FixedTypeValueSetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
-                "&ValueSet-Reference INTEGER OPTIONAL".getBytes())).new FixedTypeValueSetFieldSpecParser();
+        FixedTypeValueSetOrObjectSetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&ValueSet-Reference INTEGER OPTIONAL".getBytes())).new FixedTypeValueSetOrObjectSetFieldSpecParser();
 
-        SetFieldSpecNode result = parser.parse();
+        FixedTypeValueSetOrObjectSetFieldSpecNode result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("ValueSet-Reference", result.getReference());
-        assertTrue(result.getType() instanceof IntegerType);
-        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertTrue(result.getFixedTypeValueSetFieldSpec().isPresent());
+
+        FixedTypeValueSetFieldSpecNode fixedTypeValueSetFieldSpecNode = result.getFixedTypeValueSetFieldSpec().get();
+
+        assertEquals("ValueSet-Reference", fixedTypeValueSetFieldSpecNode.getReference());
+        assertTrue(fixedTypeValueSetFieldSpecNode.getType() instanceof IntegerType);
+        assertTrue(fixedTypeValueSetFieldSpecNode.getOptionalitySpec() instanceof OptionalSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
-                "&ValueSet-Reference INTEGER DEFAULT {4711}".getBytes())).new FixedTypeValueSetFieldSpecParser();
+                "&ValueSet-Reference INTEGER DEFAULT {4711}".getBytes())).new FixedTypeValueSetOrObjectSetFieldSpecParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("ValueSet-Reference", result.getReference());
-        assertTrue(result.getType() instanceof IntegerType);
-        assertTrue(result.getOptionalitySpec() instanceof DefaultValueSetSpecNode);
-        assertNotNull((result.getOptionalitySpec()));
+        assertTrue(result.getFixedTypeValueSetFieldSpec().isPresent());
+
+        fixedTypeValueSetFieldSpecNode = result.getFixedTypeValueSetFieldSpec().get();
+
+        assertEquals("ValueSet-Reference", fixedTypeValueSetFieldSpecNode.getReference());
+        assertTrue(fixedTypeValueSetFieldSpecNode.getType() instanceof IntegerType);
+        assertTrue(fixedTypeValueSetFieldSpecNode.getOptionalitySpec() instanceof DefaultValueSetSpecNode);
+        assertNotNull((fixedTypeValueSetFieldSpecNode.getOptionalitySpec()));
     }
 
     @Test
@@ -5387,7 +5400,7 @@ class ParserTest {
         ObjectFieldSpecNode objectField = result.getObjectFieldSpec().get();
 
         assertEquals("object-field", objectField.getReference());
-        assertEquals("OBJECT-CLASS", objectField.getObjectClass().getReference());
+        assertEquals("OBJECT-CLASS", objectField.getObjectClassReference().getReference());
         assertTrue(objectField.getOptionalitySpec() instanceof OptionalSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
@@ -5402,7 +5415,7 @@ class ParserTest {
         objectField = result.getObjectFieldSpec().get();
 
         assertEquals("object-field", objectField.getReference());
-        assertEquals("OBJECT-CLASS", objectField.getObjectClass().getReference());
+        assertEquals("OBJECT-CLASS", objectField.getObjectClassReference().getReference());
         assertTrue(objectField.getOptionalitySpec() instanceof DefaultSpecNode);
         assertNotNull(((DefaultSpecNode) objectField.getOptionalitySpec()).toDefaultObjectSpec());
     }
@@ -5429,32 +5442,38 @@ class ParserTest {
         assertTrue((((DefaultSpecNode) result).toDefaultObjectSpec()).getSpec() instanceof ObjectReference);
     }
 
-    // TODO: Use a different parser then FixedTypeValueSetFieldSpecParser or consolidate
     @Test
     void testObjectSetFieldSpecParser() throws IOException, ParserException {
-        FixedTypeValueSetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
-                "&ObjectSet-Field OBJECT-CLASS OPTIONAL".getBytes())).new FixedTypeValueSetFieldSpecParser();
+        FixedTypeValueSetOrObjectSetFieldSpecParser parser = new Parser(new ByteArrayInputStream(
+                "&ObjectSet-Field OBJECT-CLASS OPTIONAL".getBytes())).new FixedTypeValueSetOrObjectSetFieldSpecParser();
 
-        SetFieldSpecNode result = parser.parse();
+        FixedTypeValueSetOrObjectSetFieldSpecNode result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("ObjectSet-Field", result.getReference());
-        assertTrue(result.getType() instanceof TypeReference);
-        assertEquals("OBJECT-CLASS",
-                ((TypeReference) result.getType()).getType());
-        assertTrue(result.getOptionalitySpec() instanceof OptionalSpecNode);
+        assertTrue(result.getObjectSetFieldSpec().isPresent());
+
+        ObjectSetFieldSpecNode objectSetFieldSpecNode = result.getObjectSetFieldSpec().get();
+
+        assertEquals("ObjectSet-Field", objectSetFieldSpecNode.getReference());
+        assertTrue(objectSetFieldSpecNode.getObjectClassReference() instanceof ObjectClassReference);
+        assertEquals("OBJECT-CLASS", objectSetFieldSpecNode.getObjectClassReference().getReference());
+        assertTrue(objectSetFieldSpecNode.getOptionalitySpec() instanceof OptionalSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
-                "&ObjectSet-Field OBJECT-CLASS DEFAULT {Object1}".getBytes())).new FixedTypeValueSetFieldSpecParser();
+                "&ObjectSet-Field OBJECT-CLASS DEFAULT {Object1}".getBytes())).new FixedTypeValueSetOrObjectSetFieldSpecParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertEquals("ObjectSet-Field", result.getReference());
-        assertTrue(result.getType() instanceof TypeReference);
-        assertEquals("OBJECT-CLASS", ((TypeReference) result.getType()).getType());
-        assertTrue(result.getOptionalitySpec() instanceof DefaultValueSetSpecNode);
-        assertNotNull(result.getOptionalitySpec());
+        assertTrue(result.getObjectSetFieldSpec().isPresent());
+
+        objectSetFieldSpecNode = result.getObjectSetFieldSpec().get();
+
+        assertEquals("ObjectSet-Field", objectSetFieldSpecNode.getReference());
+        assertTrue(objectSetFieldSpecNode.getObjectClassReference() instanceof ObjectClassReference);
+        assertEquals("OBJECT-CLASS", objectSetFieldSpecNode.getObjectClassReference().getReference());
+        assertTrue(objectSetFieldSpecNode.getOptionalitySpec() instanceof DefaultObjectSetSpecNode);
+        assertNotNull(objectSetFieldSpecNode.getOptionalitySpec());
     }
 
     @Test

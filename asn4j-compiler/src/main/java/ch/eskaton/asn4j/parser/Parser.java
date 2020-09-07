@@ -61,6 +61,7 @@ import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueOrObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetOrObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.LiteralNode;
 import ch.eskaton.asn4j.parser.ast.LowerEndpointNode;
@@ -450,8 +451,7 @@ public class Parser {
     private RestrictedCharacterStringValueParser restrictedCharacterStringValueParser = new RestrictedCharacterStringValueParser();
     private RootAlternativeTypeListParser rootAlternativeTypeListParser = new RootAlternativeTypeListParser();
     private SelectionTypeParser selectionTypeParser = new SelectionTypeParser();
-    private FixedTypeValueSetFieldSpecParser fixedTypeValueSetFieldSpecParser = new FixedTypeValueSetFieldSpecParser();
-    private ObjectSetFieldSpecParser objectSetFieldSpecParser = new ObjectSetFieldSpecParser();
+    private FixedTypeValueSetOrObjectSetFieldSpecParser fixedTypeValueSetOrObjectSetFieldSpecParser = new FixedTypeValueSetOrObjectSetFieldSpecParser();
     private ElementSetSpecsParser elementSetSpecsParser = new ElementSetSpecsParser();
     private ObjectSetSpecParser objectSetSpecParser = new ObjectSetSpecParser();
     private SettingParser settingParser = new SettingParser();
@@ -4116,9 +4116,8 @@ public class Parser {
         public AbstractFieldSpecNode parse() throws ParserException {
             return new ChoiceParser<>(fixedTypeValueFieldSpecParser,
                     variableTypeValueFieldSpecParser,
-                    fixedTypeValueSetFieldSpecParser,
+                    fixedTypeValueSetOrObjectSetFieldSpecParser,
                     variableTypeValueSetFieldSpecParser,
-                    objectSetFieldSpecParser,
                     typeFieldSpecParser).parse();
         }
 
@@ -4280,6 +4279,7 @@ public class Parser {
                 rules.stream().forEach(r -> {
                     Node node = ((Node) r.get(2));
 
+
                     if (node instanceof Type) {
                         rule.setFixedTypeValueFieldSpec(new FixedTypeValueFieldSpecNode(rule.getPosition(),
                                 rule.getReference(), (Type) r.get(2), r.get(3) != null, rule.getOptionalitySpec()));
@@ -4376,36 +4376,51 @@ public class Parser {
 
     // FixedTypeValueSetFieldSpec ::= valuesetfieldreference Type
     // ValueSetOptionalitySpec ?
-    protected class FixedTypeValueSetFieldSpecParser implements RuleParser<FixedTypeValueSetFieldSpecNode> {
-
-        @SuppressWarnings("unchecked")
-        public FixedTypeValueSetFieldSpecNode parse() throws ParserException {
-            List<Object> rule = new SequenceParser(new boolean[] { true, true, true, false }, TokenType.AMPERSAND,
-                    TokenType.TYPE_REFERENCE, typeParser, valueSetOptionalitySpecParser).parse();
-
-            if (rule != null) {
-                return new FixedTypeValueSetFieldSpecNode(getPosition(rule), ((Token) rule.get(1)).getText(),
-                        (Type) rule.get(2), (OptionalitySpecNode) rule.get(3));
-            }
-
-            return null;
-        }
-
-    }
-
     // ObjectSetFieldSpec ::= objectsetfieldreference DefinedObjectClass
     // ObjectSetOptionalitySpec ?
-    protected class ObjectSetFieldSpecParser implements RuleParser<ObjectSetFieldSpecNode> {
+    protected class FixedTypeValueSetOrObjectSetFieldSpecParser
+            implements RuleParser<FixedTypeValueSetOrObjectSetFieldSpecNode> {
 
         @SuppressWarnings("unchecked")
-        public ObjectSetFieldSpecNode parse() throws ParserException {
-            List<Object> rule = new SequenceParser(new boolean[] { true, true, true, false }, TokenType.AMPERSAND,
-                    TokenType.TYPE_REFERENCE, new ChoiceParser<>(typeParser, definedObjectClassParser),
-                    objectSetOptionalitySpecParser).parse();
+        public FixedTypeValueSetOrObjectSetFieldSpecNode parse() throws ParserException {
+            Set<List<Object>> rules = new AmbiguousChoiceParser<>(
+                    new SequenceParser(new boolean[] { true, true, true, false },
+                            TokenType.AMPERSAND,
+                            TokenType.TYPE_REFERENCE,
+                            typeParser,
+                            valueSetOptionalitySpecParser),
+                    new SequenceParser(new boolean[] { true, true, true, false },
+                            TokenType.AMPERSAND,
+                            TokenType.TYPE_REFERENCE,
+                            definedObjectClassParser,
+                            objectSetOptionalitySpecParser)).parse();
 
-            if (rule != null) {
-                return new ObjectSetFieldSpecNode(getPosition(rule), ((Token) rule.get(1)).getText(),
-                        (ObjectClassReference) rule.get(2), (OptionalitySpecNode) rule.get(3));
+            Optional<List<Object>> maybeFirst = rules.stream().findFirst();
+
+            if (maybeFirst.isPresent()) {
+                List<Object> first = maybeFirst.get();
+                Token token = (Token) first.get(1);
+
+                FixedTypeValueSetOrObjectSetFieldSpecNode rule =
+                        new FixedTypeValueSetOrObjectSetFieldSpecNode(token.getPosition(), token.getText(),
+                                (OptionalitySpecNode) first.get(first.size() - 1));
+
+                rules.stream().forEach(r -> {
+                    Node node = ((Node) r.get(2));
+                    OptionalitySpecNode optionalitySpec = (OptionalitySpecNode) r.get(3);
+                    boolean isNotDefault = optionalitySpec == null || optionalitySpec instanceof OptionalSpecNode;
+
+                    if (node instanceof Type && (isNotDefault || optionalitySpec instanceof DefaultValueSetSpecNode)) {
+                        rule.setFixedTypeValueSetFieldSpec(new FixedTypeValueSetFieldSpecNode(rule.getPosition(),
+                                rule.getReference(), (Type) r.get(2), optionalitySpec));
+                    } else if (node instanceof ObjectClassReference
+                            && (isNotDefault || optionalitySpec instanceof DefaultObjectSetSpecNode)) {
+                        rule.setObjectSetFieldSpec(new ObjectSetFieldSpecNode(rule.getPosition(), rule.getReference(),
+                                (ObjectClassReference) r.get(2), optionalitySpec));
+                    }
+                });
+
+                return rule;
             }
 
             return null;

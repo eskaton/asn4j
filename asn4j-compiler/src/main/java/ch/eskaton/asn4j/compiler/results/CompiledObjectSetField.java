@@ -25,24 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class FixedTypeValueSetFieldSpecNode extends AbstractFieldSpecNode {
+public class CompiledObjectSetField extends AbstractCompiledField<Value> {
 
-    private Type type;
+    private final CompiledObjectClass objectClass;
 
-    public FixedTypeValueSetFieldSpecNode(Position position, String reference, Type type,
-            OptionalitySpecNode optionalitySpec) {
-        super(position, reference, optionalitySpec);
+    public CompiledObjectSetField(String name, CompiledObjectClass objectClass) {
+        super(name);
 
-        this.type = type;
+        this.objectClass = objectClass;
     }
 
-    public Type getType() {
-        return type;
+    public CompiledObjectClass getObjectClass() {
+        return objectClass;
     }
 
 }

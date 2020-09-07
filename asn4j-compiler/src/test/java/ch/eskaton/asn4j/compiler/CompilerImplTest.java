@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueSetField;
@@ -948,6 +949,49 @@ class CompilerImplTest {
                 ".*The object field 'objectField' that refers to its defining object class 'TEST' must be marked as OPTIONAL.*");
     }
 
+    @Test
+    void testObjectSetField() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &ObjectSetField TEST2
+                }
+                                
+                TEST2 ::= CLASS {
+                    &fixedTypeValueField INTEGER
+                }
+                """;
+
+        var objectSetField = getCompiledObjectSetField(body, "TEST", "ObjectSetField");
+
+        assertNotNull(objectSetField.getObjectClass());
+
+        var referencedObjectClass = objectSetField.getObjectClass();
+
+        assertEquals("TEST2", referencedObjectClass.getName());
+    }
+
+    @Test
+    void testObjectSetFieldIsOptional() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &ObjectSetField TEST2 OPTIONAL
+                }
+                                
+                TEST2 ::= CLASS {
+                    &fixedTypeValueField INTEGER
+                }
+                """;
+
+        var objectSetField = getCompiledObjectSetField(body, "TEST", "ObjectSetField");
+
+        assertNotNull(objectSetField.getObjectClass());
+
+        var referencedObjectClass = objectSetField.getObjectClass();
+
+        assertEquals("TEST2", referencedObjectClass.getName());
+        assertTrue(objectSetField.isOptional());
+    }
+
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var compiler = new CompilerImpl();
@@ -1002,7 +1046,6 @@ class CompilerImplTest {
         return (CompiledVariableTypeValueSetField) field.get();
     }
 
-
     private CompiledObjectField getCompiledObjectField(String body, String objectClassName, String fieldName)
             throws IOException, ParserException {
         var field = getCompiledField(body, objectClassName, fieldName);
@@ -1010,6 +1053,15 @@ class CompilerImplTest {
         assertTrue(field.get() instanceof CompiledObjectField);
 
         return (CompiledObjectField) field.get();
+    }
+
+    private CompiledObjectSetField getCompiledObjectSetField(String body, String objectClassName, String fieldName)
+            throws IOException, ParserException {
+        var field = getCompiledField(body, objectClassName, fieldName);
+
+        assertTrue(field.get() instanceof CompiledObjectSetField);
+
+        return (CompiledObjectSetField) field.get();
     }
 
     private Optional<AbstractCompiledField> getCompiledField(String body, String objectClassName, String fieldName)
