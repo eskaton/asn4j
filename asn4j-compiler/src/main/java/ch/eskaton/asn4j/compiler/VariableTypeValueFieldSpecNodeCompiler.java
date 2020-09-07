@@ -28,15 +28,10 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
-import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
-import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefaultValueSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
-import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-
-import java.util.List;
 
 public class VariableTypeValueFieldSpecNodeCompiler implements NamedCompiler<VariableTypeValueFieldSpecNode, CompiledVariableTypeValueField> {
 
@@ -65,6 +60,8 @@ public class VariableTypeValueFieldSpecNodeCompiler implements NamedCompiler<Var
             compiledField.setDefaultValue(value);
         } else if (optionalitySpec instanceof OptionalSpecNode) {
             compiledField.setOptional(true);
+        } else if (optionalitySpec != null) {
+            throw new IllegalCompilerStateException("Invalid optionality spec for VariableTypeValueField");
         }
 
         return compiledField;

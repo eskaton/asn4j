@@ -25,33 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
-import ch.eskaton.asn4j.parser.ast.DefaultTypeSpecNode;
-import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
-import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class TypeFieldSpecNodeCompiler implements NamedCompiler<TypeFieldSpecNode, CompiledTypeField> {
+public class CompiledFixedTypeValueSetField extends AbstractCompiledField<Value> {
 
-    @Override
-    public CompiledTypeField compile(CompilerContext ctx, String name, TypeFieldSpecNode node) {
-        var reference = node.getReference();
-        var optionalitySpec = node.getOptionalitySpec();
-        var compiledField = new CompiledTypeField(reference);
+    private final CompiledType compiledType;
 
-        if (optionalitySpec instanceof DefaultTypeSpecNode) {
-            var type = ((DefaultTypeSpecNode) optionalitySpec).getSpec();
-            var compiledType = ctx.getCompiledType(type);
+    public CompiledFixedTypeValueSetField(String name, CompiledType compiledType) {
+        super(name);
 
-            compiledField.setDefaultValue(compiledType);
-        } else if (optionalitySpec instanceof OptionalSpecNode) {
-            compiledField.setOptional(true);
-        } else if (optionalitySpec != null) {
-            throw new IllegalCompilerStateException("Invalid optionality spec for TypeField");
-        }
+        this.compiledType = compiledType;
+    }
 
-        return compiledField;
+    public CompiledType getCompiledType() {
+        return compiledType;
     }
 
 }

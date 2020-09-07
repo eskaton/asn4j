@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.parser.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueOrObjectFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
@@ -87,6 +88,12 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
                 var compiledField = ctx.<VariableTypeValueFieldSpecNode, NamedCompiler<VariableTypeValueFieldSpecNode, AbstractCompiledField>>getCompiler(
                         (Class<VariableTypeValueFieldSpecNode>) variableTypeValueFieldSpec.getClass())
                         .compile(ctx, name, variableTypeValueFieldSpec);
+
+                compiledObjectClass.addField(compiledField);
+            } else if (unknownFieldSpec instanceof FixedTypeValueSetFieldSpecNode fixedTypeValueSetFieldSpec) {
+                var compiledField = ctx.<FixedTypeValueSetFieldSpecNode, NamedCompiler<FixedTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
+                        (Class<FixedTypeValueSetFieldSpecNode>) fixedTypeValueSetFieldSpec.getClass())
+                        .compile(ctx, name, fixedTypeValueSetFieldSpec);
 
                 compiledObjectClass.addField(compiledField);
             } else {
