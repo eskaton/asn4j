@@ -27,9 +27,11 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueSetField;
@@ -83,6 +85,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
@@ -857,17 +860,7 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var compiler = new CompilerImpl();
-
-        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
-
-        var ctx = compiler.getCompilerContext();
-        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
-
-        var field = objectClass.getField("FixedTypeValueSetField");
-
-        assertTrue(field.isPresent());
+        Optional<AbstractCompiledField> field = getCompiledField(body, "TEST", "FixedTypeValueSetField");
         assertTrue(field.get() instanceof CompiledFixedTypeValueSetField);
 
         var fixedTypeValueSetField = (CompiledFixedTypeValueSetField) field.get();
@@ -903,6 +896,56 @@ class CompilerImplTest {
 
         assertEquals("TypeField", variableTypeValueSetField.getReference());
         assertTrue(variableTypeValueSetField.isOptional());
+    }
+
+    @Test
+    void testObjectField() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &objectField TEST2
+                }
+                                
+                TEST2 ::= CLASS {
+                    &TypeField
+                }
+                """;
+
+        var objectField = getCompiledObjectField(body, "TEST", "objectField");
+
+        assertNotNull(objectField.getObjectClass());
+
+        var referencedObjectClass = objectField.getObjectClass();
+
+        assertEquals("TEST2", referencedObjectClass.getName());
+    }
+
+    @Test
+    void testObjectFieldRecursion() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &objectField TEST OPTIONAL
+                }
+                """;
+
+        var objectField = getCompiledObjectField(body, "TEST", "objectField");
+
+        assertNotNull(objectField.getObjectClass());
+
+        var referencedObjectClass = objectField.getObjectClass();
+
+        assertEquals("TEST", referencedObjectClass.getName());
+    }
+
+    @Test
+    void testObjectFieldInvalidRecursion() {
+        var body = """
+                TEST ::= CLASS {
+                    &objectField TEST
+                }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*The object field 'objectField' that refers to its defining object class 'TEST' must be marked as OPTIONAL.*");
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
@@ -943,17 +986,8 @@ class CompilerImplTest {
     private CompiledVariableTypeValueField getCompiledVariableTypeValueField(String body, String objectClassName,
             String fieldName) throws IOException,
             ParserException {
-        var module = module("TEST-MODULE", body);
-        var compiler = new CompilerImpl();
+        var field = getCompiledField(body, objectClassName, fieldName);
 
-        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
-
-        var ctx = compiler.getCompilerContext();
-        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get(objectClassName);
-
-        var field = objectClass.getField(fieldName);
-
-        assertTrue(field.isPresent());
         assertTrue(field.get() instanceof CompiledVariableTypeValueField);
 
         return (CompiledVariableTypeValueField) field.get();
@@ -961,6 +995,25 @@ class CompilerImplTest {
 
     private CompiledVariableTypeValueSetField getCompiledVariableTypeValueSetField(String body, String objectClassName,
             String fieldName) throws IOException, ParserException {
+        var field = getCompiledField(body, objectClassName, fieldName);
+
+        assertTrue(field.get() instanceof CompiledVariableTypeValueSetField);
+
+        return (CompiledVariableTypeValueSetField) field.get();
+    }
+
+
+    private CompiledObjectField getCompiledObjectField(String body, String objectClassName, String fieldName)
+            throws IOException, ParserException {
+        var field = getCompiledField(body, objectClassName, fieldName);
+
+        assertTrue(field.get() instanceof CompiledObjectField);
+
+        return (CompiledObjectField) field.get();
+    }
+
+    private Optional<AbstractCompiledField> getCompiledField(String body, String objectClassName, String fieldName)
+            throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var compiler = new CompilerImpl();
 
@@ -972,9 +1025,8 @@ class CompilerImplTest {
         var field = objectClass.getField(fieldName);
 
         assertTrue(field.isPresent());
-        assertTrue(field.get() instanceof CompiledVariableTypeValueSetField);
 
-        return (CompiledVariableTypeValueSetField) field.get();
+        return field;
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {

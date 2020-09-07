@@ -60,15 +60,15 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
                     try {
                         // Check whether reference refers to an object class
                         ctx.getCompiledObjectClass(objectFieldSpec.getObjectClass());
-
-                        var compiledField = ctx.<ObjectFieldSpecNode, NamedCompiler<ObjectFieldSpecNode, AbstractCompiledField>>getCompiler(
-                                (Class<ObjectFieldSpecNode>) objectFieldSpec.getClass()).compile(ctx, name, objectFieldSpec);
-
-                        compiledObjectClass.addField(compiledField);
-                        continue;
                     } catch (CompilerException e) {
                         // ignore
                     }
+
+                    var compiledField = ctx.<ObjectFieldSpecNode, NamedCompiler<ObjectFieldSpecNode, AbstractCompiledField>>getCompiler(
+                            (Class<ObjectFieldSpecNode>) objectFieldSpec.getClass()).compile(ctx, name, objectFieldSpec);
+
+                    compiledObjectClass.addField(compiledField);
+                    continue;
                 }
 
                 if (fieldSpec.getFixedTypeValueFieldSpec().isPresent()) {
