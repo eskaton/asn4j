@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.parser.ast.DefaultObjectSpecNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
@@ -38,7 +39,8 @@ public class ObjectFieldSpecNodeCompiler implements NamedCompiler<ObjectFieldSpe
     @Override
     public CompiledObjectField compile(CompilerContext ctx, String name, ObjectFieldSpecNode node) {
         var reference = node.getReference();
-        var objectClass = ctx.getCompiledObjectClass(node.getObjectClass());
+        var objectClassReference = node.getObjectClass();
+        var objectClass = ctx.getCompiledObjectClass(objectClassReference);
         var optionalitySpec = node.getOptionalitySpec();
         var compiledField = new CompiledObjectField(reference, objectClass);
 
@@ -51,12 +53,23 @@ public class ObjectFieldSpecNodeCompiler implements NamedCompiler<ObjectFieldSpe
 
                 compiledField.setDefaultValue(objectDefinition);
             } else {
-                throw new IllegalCompilerStateException("Unsupported node type %s", object.getClass().getSimpleName());
+                throw new IllegalCompilerStateException(optionalitySpec.getPosition(), "Unsupported node type %s",
+                        object.getClass().getSimpleName());
             }
         } else if (optionalitySpec instanceof OptionalSpecNode) {
             compiledField.setOptional(true);
         } else if (optionalitySpec != null) {
-            throw new IllegalCompilerStateException("Invalid optionality spec for ObjectField");
+            throw new IllegalCompilerStateException(optionalitySpec.getPosition(),
+                    "Invalid optionality spec for ObjectField");
+        }
+
+
+        if (!compiledField.isOptional() &&
+                ObjectClassReference.class.equals(objectClassReference.getClass()) &&
+                name.equals(objectClassReference.getReference())) {
+            throw new CompilerException(node.getPosition(),
+                    "The object field '%s' that refers to its defining object class '%s' must be marked as OPTIONAL",
+                    reference, name);
         }
 
         return compiledField;
