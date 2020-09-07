@@ -57,6 +57,8 @@ public class FixedTypeValueFieldSpecNodeCompiler implements NamedCompiler<FixedT
             compiledField.setDefaultValue(defaultValue);
         } else if (optionalitySpec instanceof OptionalSpecNode) {
             compiledField.setOptional(true);
+        } else if (optionalitySpec != null) {
+            throw new IllegalCompilerStateException("Invalid optionality spec for FixedTypeValueField");
         }
 
         return compiledField;

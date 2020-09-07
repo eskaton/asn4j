@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
+import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -843,6 +844,32 @@ class CompilerImplTest {
 
         testModule(body, CompilerException.class,
                 ".*The value for variableTypeField in the object definition for TEST must be of the type INTEGER but found the value.*");
+    }
+
+    @Test
+    void testFixedTypeValueSetField() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &FixedTypeValueSetField INTEGER
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
+
+        var field = objectClass.getField("FixedTypeValueSetField");
+
+        assertTrue(field.isPresent());
+        assertTrue(field.get() instanceof CompiledFixedTypeValueSetField);
+
+        var fixedTypeValueSetField = (CompiledFixedTypeValueSetField) field.get();
+
+        assertTrue(fixedTypeValueSetField.getCompiledType().getType() instanceof IntegerType);
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {

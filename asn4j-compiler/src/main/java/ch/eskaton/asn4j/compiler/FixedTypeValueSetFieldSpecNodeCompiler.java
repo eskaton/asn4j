@@ -27,36 +27,27 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
-import ch.eskaton.asn4j.parser.ast.DefaultObjectSpecNode;
-import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
-import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
+import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
+import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
-public class ObjectFieldSpecNodeCompiler implements NamedCompiler<ObjectFieldSpecNode, CompiledObjectField> {
+public class FixedTypeValueSetFieldSpecNodeCompiler implements NamedCompiler<FixedTypeValueSetFieldSpecNode, CompiledFixedTypeValueSetField> {
 
     @Override
-    public CompiledObjectField compile(CompilerContext ctx, String name, ObjectFieldSpecNode node) {
-        var reference = node.getReference();
-        var objectClass = ctx.getCompiledObjectClass(node.getObjectClass());
+    public CompiledFixedTypeValueSetField compile(CompilerContext ctx, String name, FixedTypeValueSetFieldSpecNode node) {
+        var type = (Type) node.getType();
+        var compiledType = ctx.getCompiledType(type);
         var optionalitySpec = node.getOptionalitySpec();
-        var compiledField = new CompiledObjectField(reference, objectClass);
+        var compiledField = new CompiledFixedTypeValueSetField(node.getReference(), compiledType);
 
-        if (optionalitySpec instanceof DefaultObjectSpecNode) {
-            var object = ((DefaultObjectSpecNode) optionalitySpec).getSpec();
-
-            if (object instanceof ObjectDefnNode objectDefnNode) {
-                var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
-                var objectDefinition = compiler.compile(objectClass, objectDefnNode);
-
-                compiledField.setDefaultValue(objectDefinition);
-            } else {
-                throw new IllegalCompilerStateException("Unsupported node type %s", object.getClass().getSimpleName());
-            }
+        if (optionalitySpec instanceof DefaultValueSetSpecNode) {
+            throw new IllegalCompilerStateException("Default values for FixedTypeValueSetFields not supported");
         } else if (optionalitySpec instanceof OptionalSpecNode) {
             compiledField.setOptional(true);
         } else if (optionalitySpec != null) {
-            throw new IllegalCompilerStateException("Invalid optionality spec for ObjectField");
+            throw new IllegalCompilerStateException("Invalid optionality spec for FixedTypeValueSetField");
         }
 
         return compiledField;

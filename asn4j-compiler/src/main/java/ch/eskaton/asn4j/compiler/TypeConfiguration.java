@@ -97,6 +97,7 @@ import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeNameSupplier;
 import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeReferenceTypeNameSupplier;
 import ch.eskaton.asn4j.parser.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
@@ -329,6 +330,7 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(TypeFieldSpecNode.class, new TypeFieldSpecNodeCompiler()));
         types.add(new TypeDefinition<>(FixedTypeValueFieldSpecNode.class, new FixedTypeValueFieldSpecNodeCompiler()));
         types.add(new TypeDefinition<>(VariableTypeValueFieldSpecNode.class, new VariableTypeValueFieldSpecNodeCompiler()));
+        types.add(new TypeDefinition<>(FixedTypeValueSetFieldSpecNode.class, new FixedTypeValueSetFieldSpecNodeCompiler()));
         types.add(new TypeDefinition<>(ObjectFieldSpecNode.class, new ObjectFieldSpecNodeCompiler()));
         types.add(new TypeDefinition<>(ObjectSetAssignmentNode.class, new ObjectSetAssignmentCompiler(ctx)));
         types.add(new TypeDefinition<>(ObjectAssignmentNode.class, new ObjectAssignmentCompiler()));
@@ -350,7 +352,7 @@ public class TypeConfiguration {
     public <T extends Type> boolean isBuiltin(Class<T> typeClass) {
         try {
             return getConfigByType("isBuiltin", typeClass, TypeDefinition::isBuiltin);
-        } catch(IllegalCompilerStateException e) {
+        } catch (IllegalCompilerStateException e) {
             return false;
         }
     }
