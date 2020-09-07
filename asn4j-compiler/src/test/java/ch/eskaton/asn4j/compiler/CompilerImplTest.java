@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
+import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueSetField;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
@@ -118,6 +119,7 @@ import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static ch.eskaton.asn4j.test.TestUtils.module;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -635,44 +637,45 @@ class CompilerImplTest {
     }
 
     @Test
-    void testVariableTypeField() throws IOException, ParserException {
+    void testVariableTypeValueField() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
-                    &variableTypeField &TypeField,
+                    &variableTypeValueField &TypeField,
                     &TypeField
                 }
                 """;
 
-        CompiledVariableTypeValueField variableTypeValueField = getCompiledVariableTypeValueField(body, "TEST", "variableTypeField");
+        var variableTypeValueField = getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
 
         assertEquals("TypeField", variableTypeValueField.getReference());
+        assertFalse(variableTypeValueField.isOptional());
     }
 
     @Test
-    void testVariableTypeFieldIsOptional() throws IOException, ParserException {
+    void testVariableTypeValueFieldIsOptional() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
-                    &variableTypeField &TypeField OPTIONAL,
+                    &variableTypeValueField &TypeField OPTIONAL,
                     &TypeField
                 }
                 """;
 
-        var variableTypeValueField = getCompiledVariableTypeValueField(body, "TEST", "variableTypeField");
+        var variableTypeValueField = getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
 
         assertEquals("TypeField", variableTypeValueField.getReference());
         assertTrue(variableTypeValueField.isOptional());
     }
 
     @Test
-    void testVariableTypeFieldHasDefault() throws IOException, ParserException {
+    void testVariableTypeValueFieldHasDefault() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
-                    &variableTypeField &TypeField DEFAULT TRUE,
+                    &variableTypeValueField &TypeField DEFAULT TRUE,
                     &TypeField DEFAULT BOOLEAN
                 }
                 """;
 
-        var variableTypeValueField = getCompiledVariableTypeValueField(body, "TEST", "variableTypeField");
+        var variableTypeValueField = getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
 
         assertEquals("TypeField", variableTypeValueField.getReference());
 
@@ -683,59 +686,59 @@ class CompilerImplTest {
     }
 
     @Test
-    void testVariableTypeFieldHasDisallowedDefault() {
+    void testVariableTypeValueFieldHasDisallowedDefault() {
         var body = """
                 TEST ::= CLASS {
-                    &variableTypeField &TypeField DEFAULT TRUE,
+                    &variableTypeValueField &TypeField DEFAULT TRUE,
                     &TypeField
                 }
                 """;
 
         testModule(body, CompilerException.class,
-                ".*variableTypeField in object class TEST defines a default value, but the referenced type field TypeField has no default.*");
+                ".*variableTypeValueField in object class TEST defines a default value, but the referenced type field TypeField has no default.*");
     }
 
     @Test
-    void testVariableTypeFieldHasInvalidDefault() {
+    void testVariableTypeValueFieldHasInvalidDefault() {
         var body = """
                 TEST ::= CLASS {
-                    &variableTypeField &TypeField DEFAULT 4711,
+                    &variableTypeValueField &TypeField DEFAULT 4711,
                     &TypeField DEFAULT VisibleString
                 }
                 """;
 
         testModule(body, CompilerException.class,
-                ".*variableTypeField in object class TEST expects a default value of type VisibleString but found 4711.*");
+                ".*variableTypeValueField in object class TEST expects a default value of type VisibleString but found 4711.*");
     }
 
     @Test
-    void testVariableTypeFieldInvalidReference() {
+    void testVariableTypeValueFieldInvalidReference() {
         var body = """
                 TEST ::= CLASS {
-                    &variableTypeField &InvalidTypeField,
+                    &variableTypeValueField &InvalidTypeField,
                     &TypeField
                 }
                 """;
 
         testModule(body, CompilerException.class,
-                ".*variableTypeField in object class TEST refers to the inexistent field InvalidTypeField.*");
+                ".*variableTypeValueField in object class TEST refers to the inexistent field InvalidTypeField.*");
     }
 
     @Test
-    void testObjectsWithVariableTypeField() throws IOException, ParserException {
+    void testObjectsWithVariableTypeValueField() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
-                    &variableTypeField &TypeField DEFAULT "abc",
+                    &variableTypeValueField &TypeField DEFAULT "abc",
                     &TypeField DEFAULT VisibleString
                 }
 
                 testObject1 TEST ::= {
-                    &variableTypeField  FALSE,
+                    &variableTypeValueField  FALSE,
                     &TypeField          BOOLEAN
                 }
 
                 testObject2 TEST ::= {
-                    &variableTypeField  4711,
+                    &variableTypeValueField  4711,
                     &TypeField          INTEGER
                 }
 
@@ -757,10 +760,10 @@ class CompilerImplTest {
     }
 
     @Test
-    void testObjectsWithVariableTypeFieldDefaults() throws IOException, ParserException {
+    void testObjectsWithVariableTypeValueFieldDefaults() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
-                    &variableTypeField &TypeField DEFAULT "abc",
+                    &variableTypeValueField &TypeField DEFAULT "abc",
                     &TypeField DEFAULT VisibleString
                 }
 
@@ -785,13 +788,13 @@ class CompilerImplTest {
 
         assertEquals(VisibleString.class, compiledType.getType().getClass());
 
-        var value = (Value) objectDefinition.get("variableTypeField");
+        var value = (Value) objectDefinition.get("variableTypeValueField");
 
         assertEquals(VisibleStringValue.class, value.getClass());
     }
 
     @Test
-    void testObjectsWithVariableTypeFieldDefaultsSequence() throws IOException, ParserException {
+    void testObjectsWithVariableTypeValueFieldDefaultsSequence() throws IOException, ParserException {
         var body = """
                 Seq ::= SEQUENCE {
                     a BOOLEAN,
@@ -799,7 +802,7 @@ class CompilerImplTest {
                 }
 
                 TEST ::= CLASS {
-                    &variableTypeField &TypeField DEFAULT {a TRUE, b 23},
+                    &variableTypeValueField &TypeField DEFAULT {a TRUE, b 23},
                     &TypeField DEFAULT Seq
                 }
 
@@ -824,26 +827,26 @@ class CompilerImplTest {
 
         assertEquals(SequenceType.class, compiledType.getType().getClass());
 
-        var value = (Value) objectDefinition.get("variableTypeField");
+        var value = (Value) objectDefinition.get("variableTypeValueField");
 
         assertEquals(CollectionValue.class, value.getClass());
     }
 
     @Test
-    void testObjectWithVariableTypeFieldWithInvalidType() {
+    void testObjectWithVariableTypeValueFieldWithInvalidType() {
         var body = """
                 TEST ::= CLASS {
-                    &variableTypeField &TypeField,
+                    &variableTypeValueField &TypeField,
                     &TypeField
                 }
 
                 TestSet TEST ::= {
-                    { &variableTypeField FALSE, &TypeField INTEGER}
+                    { &variableTypeValueField FALSE, &TypeField INTEGER}
                 }
                 """;
 
         testModule(body, CompilerException.class,
-                ".*The value for variableTypeField in the object definition for TEST must be of the type INTEGER but found the value.*");
+                ".*The value for variableTypeValueField in the object definition for TEST must be of the type INTEGER but found the value.*");
     }
 
     @Test
@@ -870,6 +873,36 @@ class CompilerImplTest {
         var fixedTypeValueSetField = (CompiledFixedTypeValueSetField) field.get();
 
         assertTrue(fixedTypeValueSetField.getCompiledType().getType() instanceof IntegerType);
+    }
+
+    @Test
+    void testVariableTypeValueSetField() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &VariableTypeValueSetField &TypeField,
+                    &TypeField
+                }
+                """;
+
+        var variableTypeValueSetField = getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
+
+        assertEquals("TypeField", variableTypeValueSetField.getReference());
+        assertFalse(variableTypeValueSetField.isOptional());
+    }
+
+    @Test
+    void testVariableTypeValueSetFieldIsOptional() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &VariableTypeValueSetField &TypeField OPTIONAL,
+                    &TypeField
+                }
+                """;
+
+        var variableTypeValueSetField = getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
+
+        assertEquals("TypeField", variableTypeValueSetField.getReference());
+        assertTrue(variableTypeValueSetField.isOptional());
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
@@ -924,6 +957,24 @@ class CompilerImplTest {
         assertTrue(field.get() instanceof CompiledVariableTypeValueField);
 
         return (CompiledVariableTypeValueField) field.get();
+    }
+
+    private CompiledVariableTypeValueSetField getCompiledVariableTypeValueSetField(String body, String objectClassName,
+            String fieldName) throws IOException, ParserException {
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get(objectClassName);
+
+        var field = objectClass.getField(fieldName);
+
+        assertTrue(field.isPresent());
+        assertTrue(field.get() instanceof CompiledVariableTypeValueSetField);
+
+        return (CompiledVariableTypeValueSetField) field.get();
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {

@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.VariableTypeValueSetFieldSpecNode;
 
 import java.util.List;
 
@@ -94,6 +95,12 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
                 var compiledField = ctx.<FixedTypeValueSetFieldSpecNode, NamedCompiler<FixedTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
                         (Class<FixedTypeValueSetFieldSpecNode>) fixedTypeValueSetFieldSpec.getClass())
                         .compile(ctx, name, fixedTypeValueSetFieldSpec);
+
+                compiledObjectClass.addField(compiledField);
+            } else if (unknownFieldSpec instanceof VariableTypeValueSetFieldSpecNode variableTypeValueSetFieldSpec) {
+                var compiledField = ctx.<VariableTypeValueSetFieldSpecNode, NamedCompiler<VariableTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
+                        (Class<VariableTypeValueSetFieldSpecNode>) variableTypeValueSetFieldSpec.getClass())
+                        .compile(ctx, name, variableTypeValueSetFieldSpec);
 
                 compiledObjectClass.addField(compiledField);
             } else {

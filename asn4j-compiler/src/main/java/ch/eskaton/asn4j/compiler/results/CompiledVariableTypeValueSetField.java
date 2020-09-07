@@ -25,34 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
-import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
-import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class FixedTypeValueSetFieldSpecNodeCompiler
-        implements NamedCompiler<FixedTypeValueSetFieldSpecNode, CompiledFixedTypeValueSetField> {
+public class CompiledVariableTypeValueSetField extends AbstractCompiledField<Value> {
 
-    @Override
-    public CompiledFixedTypeValueSetField compile(CompilerContext ctx, String name,
-            FixedTypeValueSetFieldSpecNode node) {
-        var type = (Type) node.getType();
-        var compiledType = ctx.getCompiledType(type);
-        var optionalitySpec = node.getOptionalitySpec();
-        var compiledField = new CompiledFixedTypeValueSetField(node.getReference(), compiledType);
+    private final String reference;
 
-        if (optionalitySpec instanceof DefaultValueSetSpecNode) {
-            throw new IllegalCompilerStateException("Default values for FixedTypeValueSetFields not supported");
-        } else if (optionalitySpec instanceof OptionalSpecNode) {
-            compiledField.setOptional(true);
-        } else if (optionalitySpec != null) {
-            throw new IllegalCompilerStateException("Invalid optionality spec for FixedTypeValueSetField");
-        }
+    public CompiledVariableTypeValueSetField(String name, String reference) {
+        super(name);
 
-        return compiledField;
+        this.reference = reference;
+    }
+
+    public String getReference() {
+        return reference;
     }
 
 }
