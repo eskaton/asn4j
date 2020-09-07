@@ -33,7 +33,8 @@ import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class VariableTypeValueFieldSpecNodeCompiler implements NamedCompiler<VariableTypeValueFieldSpecNode, CompiledVariableTypeValueField> {
+public class VariableTypeValueFieldSpecNodeCompiler
+        implements NamedCompiler<VariableTypeValueFieldSpecNode, CompiledVariableTypeValueField> {
 
     @Override
     public CompiledVariableTypeValueField compile(CompilerContext ctx, String name, VariableTypeValueFieldSpecNode node) {

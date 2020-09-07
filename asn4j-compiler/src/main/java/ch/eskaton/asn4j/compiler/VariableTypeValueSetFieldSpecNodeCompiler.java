@@ -27,29 +27,40 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
+import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueSetField;
 import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
-import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.VariableTypeValueSetFieldSpecNode;
 
-public class FixedTypeValueSetFieldSpecNodeCompiler
-        implements NamedCompiler<FixedTypeValueSetFieldSpecNode, CompiledFixedTypeValueSetField> {
+public class VariableTypeValueSetFieldSpecNodeCompiler
+        implements NamedCompiler<VariableTypeValueSetFieldSpecNode, CompiledVariableTypeValueSetField> {
 
     @Override
-    public CompiledFixedTypeValueSetField compile(CompilerContext ctx, String name,
-            FixedTypeValueSetFieldSpecNode node) {
-        var type = (Type) node.getType();
-        var compiledType = ctx.getCompiledType(type);
+    public CompiledVariableTypeValueSetField compile(CompilerContext ctx, String name,
+            VariableTypeValueSetFieldSpecNode node) {
         var optionalitySpec = node.getOptionalitySpec();
-        var compiledField = new CompiledFixedTypeValueSetField(node.getReference(), compiledType);
+        var reference = node.getReference();
+        var primitiveFieldNames = node.getFieldName().getPrimitiveFieldNames();
+
+        if (primitiveFieldNames.size() != 1) {
+            throw new IllegalCompilerStateException(node.getFieldName().getPosition(),
+                    "Nested references not yet supported");
+        }
+
+        if (!primitiveFieldNames.get(0).isTypeFieldReference()) {
+            throw new IllegalCompilerStateException(node.getFieldName().getPosition(),
+                    "Only references to type fields are supported at the moment");
+        }
+
+        var fieldName = primitiveFieldNames.get(0).getReference();
+        var compiledField = new CompiledVariableTypeValueSetField(reference, fieldName);
 
         if (optionalitySpec instanceof DefaultValueSetSpecNode) {
-            throw new IllegalCompilerStateException("Default values for FixedTypeValueSetFields not supported");
+            throw new IllegalCompilerStateException("Default values for VariableTypeValueSetFields not supported");
         } else if (optionalitySpec instanceof OptionalSpecNode) {
             compiledField.setOptional(true);
         } else if (optionalitySpec != null) {
-            throw new IllegalCompilerStateException("Invalid optionality spec for FixedTypeValueSetField");
+            throw new IllegalCompilerStateException("Invalid optionality spec for VariableTypeValueSetField");
         }
 
         return compiledField;
