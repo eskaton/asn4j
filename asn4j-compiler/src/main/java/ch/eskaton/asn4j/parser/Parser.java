@@ -38,7 +38,7 @@ import ch.eskaton.asn4j.parser.ast.AtNotationNode;
 import ch.eskaton.asn4j.parser.ast.ComponentIdListNode;
 import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
 import ch.eskaton.asn4j.parser.ast.DefaultObjectSetSpecNode;
-import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
+import ch.eskaton.asn4j.parser.ast.DefaultObjectSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.DefaultTypeSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
@@ -413,7 +413,6 @@ public class Parser {
     private OpenTypeFieldValParser openTypeFieldValParser = new OpenTypeFieldValParser();
     private OptionalExtensionMarkerParser optionalExtensionMarkerParser = new OptionalExtensionMarkerParser();
     private OptionalGroupParser optionalGroupParser = new OptionalGroupParser();
-    private OptionalitySpecParser optionalitySpecParser = new OptionalitySpecParser();
     private ParamGovernorParser paramGovernorParser = new ParamGovernorParser();
     private ParameterListParser parameterListParser = new ParameterListParser();
     private ParameterParser parameterParser = new ParameterParser();
@@ -503,6 +502,7 @@ public class Parser {
     private ValueFromObjectParser valueFromObjectParser = new ValueFromObjectParser();
     private ValueListParser valueListParser = new ValueListParser();
     private ValueOptionalitySpecParser valueOptionalitySpecParser = new ValueOptionalitySpecParser();
+    private ObjectOptionalitySpecParser objectOptionalitySpecParser = new ObjectOptionalitySpecParser();
     private ValueParser valueParser = new ValueParser();
     private ValueRangeParser valueRangeParser = new ValueRangeParser();
     private ValueReferenceParser valueReferenceParser = new ValueReferenceParser();
@@ -2940,18 +2940,6 @@ public class Parser {
             });
         }
 
-        private BigInteger getValue(List<NamedValue> values, int i, String name) {
-            if (values.size() > i) {
-                NamedValue value = values.get(i);
-
-                if (name.equals(value.getName()) && value.getValue() instanceof IntegerValue) {
-                    return ((IntegerValue) value.getValue()).getValue();
-                }
-            }
-
-            return null;
-        }
-
     }
 
     // SpecialRealValue ::=
@@ -4259,12 +4247,12 @@ public class Parser {
                             TokenType.IDENTIFIER,
                             typeParser,
                             TokenType.UNIQUE_KW,
-                            optionalitySpecParser),
+                            valueOptionalitySpecParser),
                     new SequenceParser(new boolean[] { true, true, true, false },
                             TokenType.AMPERSAND,
                             TokenType.IDENTIFIER,
                             definedObjectClassParser,
-                            optionalitySpecParser)).parse();
+                            objectOptionalitySpecParser)).parse();
 
             Optional<List<Object>> maybeFirst = rules.stream().findFirst();
 
@@ -4278,16 +4266,16 @@ public class Parser {
 
                 rules.stream().forEach(r -> {
                     Node node = ((Node) r.get(2));
+                    OptionalitySpecNode optionalitySpec = (OptionalitySpecNode) r.get(r.size() - 1);
+                    boolean isNotDefault = optionalitySpec == null || optionalitySpec instanceof OptionalSpecNode;
 
-
-                    if (node instanceof Type) {
+                    if (node instanceof Type && (isNotDefault || optionalitySpec instanceof DefaultValueSpecNode)) {
                         rule.setFixedTypeValueFieldSpec(new FixedTypeValueFieldSpecNode(rule.getPosition(),
-                                rule.getReference(), (Type) r.get(2), r.get(3) != null, rule.getOptionalitySpec()));
-                    } else if (node instanceof ObjectClassReference){
+                                rule.getReference(), (Type) r.get(2), r.get(3) != null, optionalitySpec));
+                    } else if (node instanceof ObjectClassReference
+                            && (isNotDefault || optionalitySpec instanceof DefaultObjectSpecNode)) {
                         rule.setObjectFieldSpec(new ObjectFieldSpecNode(rule.getPosition(), rule.getReference(),
-                                (ObjectClassReference) r.get(2), rule.getOptionalitySpec()));
-                    } else {
-                        throw new IllegalStateException("Unexpected type: " + node.getClass().getSimpleName());
+                                (ObjectClassReference) r.get(2), optionalitySpec));
                     }
                 });
 
@@ -4302,29 +4290,19 @@ public class Parser {
     // ValueOptionalitySpec ::= OPTIONAL | DEFAULT Value
     protected class ValueOptionalitySpecParser implements RuleParser<OptionalitySpecNode> {
 
+        @SuppressWarnings("unchecked")
         public OptionalitySpecNode parse() throws ParserException {
-            mark();
+            Object rule = new ChoiceParser<>(new SingleTokenParser(TokenType.OPTIONAL_KW),
+                    new SequenceParser(TokenType.DEFAULT_KW, valueParser)).parse();
 
-            try {
-                OptionalitySpecNode rule = optionalitySpecParser.parse();
+            if (rule != null) {
+                if (rule instanceof List) {
+                    List<Object> list = (List<Object>) rule;
 
-                if (rule != null) {
-                    if (rule instanceof DefaultSpecNode) {
-                        DefaultValueSpecNode spec = ((DefaultSpecNode) rule).toDefaultValueSpec();
-
-                        if (spec != null) {
-                            clearMark();
-                            return spec;
-                        }
-                    } else {
-                        clearMark();
-                        return rule;
-                    }
+                    return new DefaultValueSpecNode(getPosition(list), (Value) list.get(1));
+                } else {
+                    return new OptionalSpecNode(((Token)rule).getPosition());
                 }
-
-                resetToMark();
-            } catch (ParserException e) {
-                resetToMark();
             }
 
             return null;
@@ -4332,26 +4310,19 @@ public class Parser {
 
     }
 
-    // OptionalitySpec :: =
-    // OPTIONAL
-    // | DEFAULT Value
-    // | DEFAULT Object
-    //
-    // Merges the following productions:
-    // ValueOptionalitySpec ::= OPTIONAL | DEFAULT Value
     // ObjectOptionalitySpec ::= OPTIONAL | DEFAULT Object
-    protected class OptionalitySpecParser implements RuleParser<OptionalitySpecNode> {
+    protected class ObjectOptionalitySpecParser implements RuleParser<OptionalitySpecNode> {
 
         @SuppressWarnings("unchecked")
         public OptionalitySpecNode parse() throws ParserException {
             Object rule = new ChoiceParser<>(new SingleTokenParser(TokenType.OPTIONAL_KW),
-                    new SequenceParser(TokenType.DEFAULT_KW, new ChoiceParser<>(valueParser, objectParser))).parse();
+                    new SequenceParser(TokenType.DEFAULT_KW, objectParser)).parse();
 
             if (rule != null) {
                 if (rule instanceof List) {
                     List<Object> list = (List<Object>) rule;
 
-                    return new DefaultSpecNode(getPosition(list), (Node) list.get(1));
+                    return new DefaultObjectSpecNode(getPosition(list), (ObjectNode) list.get(1));
                 } else {
                     return new OptionalSpecNode(((Token)rule).getPosition());
                 }

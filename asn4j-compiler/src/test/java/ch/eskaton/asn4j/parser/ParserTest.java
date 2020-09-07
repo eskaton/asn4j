@@ -160,7 +160,6 @@ import ch.eskaton.asn4j.parser.Parser.ObjectSetParser;
 import ch.eskaton.asn4j.parser.Parser.OpenTypeFieldValParser;
 import ch.eskaton.asn4j.parser.Parser.OptionalExtensionMarkerParser;
 import ch.eskaton.asn4j.parser.Parser.OptionalGroupParser;
-import ch.eskaton.asn4j.parser.Parser.OptionalitySpecParser;
 import ch.eskaton.asn4j.parser.Parser.ParamGovernorParser;
 import ch.eskaton.asn4j.parser.Parser.ParameterListParser;
 import ch.eskaton.asn4j.parser.Parser.ParameterParser;
@@ -253,7 +252,7 @@ import ch.eskaton.asn4j.parser.ast.AtNotationNode;
 import ch.eskaton.asn4j.parser.ast.ComponentIdListNode;
 import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
 import ch.eskaton.asn4j.parser.ast.DefaultObjectSetSpecNode;
-import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
+import ch.eskaton.asn4j.parser.ast.DefaultObjectSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.DefaultTypeSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
@@ -5210,8 +5209,7 @@ class ParserTest {
         assertTrue(fixedTypeValue.getType() instanceof IntegerType);
         assertFalse(fixedTypeValue.isUnique());
         assertNotNull(fixedTypeValue.getOptionalitySpec());
-        assertTrue(fixedTypeValue.getOptionalitySpec() instanceof DefaultSpecNode);
-        assertNotNull(((DefaultSpecNode) fixedTypeValue.getOptionalitySpec()).toDefaultValueSpec());
+        assertTrue(fixedTypeValue.getOptionalitySpec() instanceof DefaultValueSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
                 "&value-reference INTEGER OPTIONAL".getBytes())).new FixedTypeValueOrObjectFieldSpecParser();
@@ -5416,15 +5414,13 @@ class ParserTest {
 
         assertEquals("object-field", objectField.getReference());
         assertEquals("OBJECT-CLASS", objectField.getObjectClassReference().getReference());
-        assertTrue(objectField.getOptionalitySpec() instanceof DefaultSpecNode);
-        assertNotNull(((DefaultSpecNode) objectField.getOptionalitySpec()).toDefaultObjectSpec());
+        assertTrue(objectField.getOptionalitySpec() instanceof DefaultObjectSpecNode);
     }
 
     @Test
-    void testObjectOptionalitySpecParser() throws IOException,
-            ParserException {
-        OptionalitySpecParser parser = new Parser(new ByteArrayInputStream(
-                "OPTIONAL".getBytes())).new OptionalitySpecParser();
+    void testObjectOptionalitySpecParser() throws IOException, ParserException {
+        Parser.ObjectOptionalitySpecParser parser = new Parser(new ByteArrayInputStream(
+                "OPTIONAL".getBytes())).new ObjectOptionalitySpecParser();
 
         OptionalitySpecNode result = parser.parse();
 
@@ -5432,14 +5428,13 @@ class ParserTest {
         assertTrue(result instanceof OptionalSpecNode);
 
         parser = new Parser(new ByteArrayInputStream(
-                "DEFAULT object-ref".getBytes())).new OptionalitySpecParser();
+                "DEFAULT object-ref".getBytes())).new ObjectOptionalitySpecParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof DefaultSpecNode);
-        assertNotNull(((DefaultSpecNode) result).toDefaultObjectSpec());
-        assertTrue((((DefaultSpecNode) result).toDefaultObjectSpec()).getSpec() instanceof ObjectReference);
+        assertTrue(result instanceof DefaultObjectSpecNode);
+        assertTrue(((DefaultObjectSpecNode) result).getSpec() instanceof ObjectReference);
     }
 
     @Test

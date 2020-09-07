@@ -28,10 +28,9 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
-import ch.eskaton.asn4j.parser.ast.DefaultSpecNode;
+import ch.eskaton.asn4j.parser.ast.DefaultValueSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class FixedTypeValueFieldSpecNodeCompiler implements NamedCompiler<FixedTypeValueFieldSpecNode,
         CompiledFixedTypeValueField> {
@@ -43,14 +42,14 @@ public class FixedTypeValueFieldSpecNodeCompiler implements NamedCompiler<FixedT
         var optionalitySpec = node.getOptionalitySpec();
         var compiledField = new CompiledFixedTypeValueField(node.getReference(), compiledType, node.isUnique());
 
-        if (optionalitySpec instanceof DefaultSpecNode) {
+        if (optionalitySpec instanceof DefaultValueSpecNode valueSpecNode) {
             if (node.isUnique()) {
                 throw new CompilerException(optionalitySpec.getPosition(),
                         "Default value on field %s in object class %s not allowed because it's unique",
                         node.getReference(), name);
             }
 
-            var value = (Value) ((DefaultSpecNode) optionalitySpec).getSpec();
+            var value = valueSpecNode.getSpec();
             var valueClass = ctx.getValueType(type);
             var defaultValue = ctx.resolveGenericValue(valueClass, type, value);
 
