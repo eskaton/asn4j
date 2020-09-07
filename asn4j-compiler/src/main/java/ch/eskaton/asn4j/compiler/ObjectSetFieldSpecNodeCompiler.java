@@ -27,48 +27,27 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
-import ch.eskaton.asn4j.parser.ast.DefaultObjectSpecNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
-import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
-import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectSetField;
+import ch.eskaton.asn4j.parser.ast.DefaultObjectSetSpecNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 
-public class ObjectFieldSpecNodeCompiler implements NamedCompiler<ObjectFieldSpecNode, CompiledObjectField> {
+public class ObjectSetFieldSpecNodeCompiler implements NamedCompiler<ObjectSetFieldSpecNode, CompiledObjectSetField> {
 
     @Override
-    public CompiledObjectField compile(CompilerContext ctx, String name, ObjectFieldSpecNode node) {
+    public CompiledObjectSetField compile(CompilerContext ctx, String name, ObjectSetFieldSpecNode node) {
         var reference = node.getReference();
         var objectClassReference = node.getObjectClassReference();
         var objectClass = ctx.getCompiledObjectClass(objectClassReference);
         var optionalitySpec = node.getOptionalitySpec();
-        var compiledField = new CompiledObjectField(reference, objectClass);
+        var compiledField = new CompiledObjectSetField(reference, objectClass);
 
-        if (optionalitySpec instanceof DefaultObjectSpecNode) {
-            var object = ((DefaultObjectSpecNode) optionalitySpec).getSpec();
-
-            if (object instanceof ObjectDefnNode objectDefnNode) {
-                var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
-                var objectDefinition = compiler.compile(objectClass, objectDefnNode);
-
-                compiledField.setDefaultValue(objectDefinition);
-            } else {
-                throw new IllegalCompilerStateException(optionalitySpec.getPosition(), "Unsupported node type %s",
-                        object.getClass().getSimpleName());
-            }
+        if (optionalitySpec instanceof DefaultObjectSetSpecNode) {
+            throw new IllegalCompilerStateException("Default values for ObjectSetFields not supported");
         } else if (optionalitySpec instanceof OptionalSpecNode) {
             compiledField.setOptional(true);
         } else if (optionalitySpec != null) {
-            throw new IllegalCompilerStateException(optionalitySpec.getPosition(),
-                    "Invalid optionality spec for ObjectField");
-        }
-
-        if (!compiledField.isOptional() &&
-                ObjectClassReference.class.equals(objectClassReference.getClass()) &&
-                name.equals(objectClassReference.getReference())) {
-            throw new CompilerException(node.getPosition(),
-                    "The object field '%s' that refers to its defining object class '%s' must be marked as OPTIONAL",
-                    reference, name);
+            throw new IllegalCompilerStateException("Invalid optionality spec for ObjectSetField");
         }
 
         return compiledField;

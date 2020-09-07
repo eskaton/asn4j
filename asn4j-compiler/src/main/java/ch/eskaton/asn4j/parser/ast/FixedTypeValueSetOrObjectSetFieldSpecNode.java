@@ -28,21 +28,34 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 
-public class FixedTypeValueSetFieldSpecNode extends AbstractFieldSpecNode {
+import java.util.Optional;
 
-    private Type type;
+public class FixedTypeValueSetOrObjectSetFieldSpecNode extends AbstractFieldSpecNode {
 
-    public FixedTypeValueSetFieldSpecNode(Position position, String reference, Type type,
+    private Optional<FixedTypeValueSetFieldSpecNode> fixedTypeValueSetFieldSpec = Optional.empty();
+
+    private Optional<ObjectSetFieldSpecNode> objectSetFieldSpec = Optional.empty();
+
+    public FixedTypeValueSetOrObjectSetFieldSpecNode(Position position, String reference,
             OptionalitySpecNode optionalitySpec) {
         super(position, reference, optionalitySpec);
-
-        this.type = type;
     }
 
-    public Type getType() {
-        return type;
+    public void setFixedTypeValueSetFieldSpec(FixedTypeValueSetFieldSpecNode fixedTypeValueSetFieldSpec) {
+        this.fixedTypeValueSetFieldSpec = Optional.ofNullable(fixedTypeValueSetFieldSpec);
+    }
+
+    public Optional<FixedTypeValueSetFieldSpecNode> getFixedTypeValueSetFieldSpec() {
+        return fixedTypeValueSetFieldSpec;
+    }
+
+    public void setObjectSetFieldSpec(ObjectSetFieldSpecNode objectSetFieldSpec) {
+        this.objectSetFieldSpec = Optional.ofNullable(objectSetFieldSpec);
+    }
+
+    public Optional<ObjectSetFieldSpecNode> getObjectSetFieldSpec() {
+        return objectSetFieldSpec;
     }
 
 }
