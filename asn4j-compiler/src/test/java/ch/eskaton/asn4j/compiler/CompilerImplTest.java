@@ -992,6 +992,27 @@ class CompilerImplTest {
         assertTrue(objectSetField.isOptional());
     }
 
+    @Test
+    void testObjectClassWithSyntax() throws IOException, ParserException {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField BOOLEAN
+                   } WITH SYNTAX {
+                       [FIXED TYPE VALUE &fixedTypeValueField]
+                   }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
+
+        assertTrue(objectClass.getSyntax().isPresent());
+    }
+
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var compiler = new CompilerImpl();

@@ -53,6 +53,11 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
     public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassDefn node) {
         var compiledObjectClass = ctx.createCompiledObjectClass(name);
         var fieldSpecs = node.getFieldSpec();
+        var syntax = node.getSyntaxSpec();
+
+        if (syntax != null) {
+            compiledObjectClass.setSyntax(syntax);
+        }
 
         for (var unknownFieldSpec : fieldSpecs) {
             if (unknownFieldSpec instanceof FixedTypeValueOrObjectFieldSpecNode fieldSpec) {
