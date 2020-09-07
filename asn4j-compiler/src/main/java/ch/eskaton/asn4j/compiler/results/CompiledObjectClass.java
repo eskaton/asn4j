@@ -41,6 +41,8 @@ public class CompiledObjectClass implements CompilationResult {
 
     private List<AbstractCompiledField> fields = new ArrayList<>();
 
+    private Optional<List<Object>> syntax = Optional.empty();
+
     public CompiledObjectClass(String name) {
         this.name = name;
     }
@@ -61,6 +63,14 @@ public class CompiledObjectClass implements CompilationResult {
         return Collections.unmodifiableList(fields);
     }
 
+    public void setSyntax(List<Object> syntax) {
+        this.syntax = Optional.ofNullable(syntax);
+    }
+
+    public Optional<List<Object>> getSyntax() {
+        return syntax;
+    }
+
     @Override
     public String toString() {
         return ToString.get(this);
@@ -79,12 +89,13 @@ public class CompiledObjectClass implements CompilationResult {
         CompiledObjectClass that = (CompiledObjectClass) o;
 
         return Objects.equals(name, that.name) &&
-                Objects.equals(fields, that.fields);
+                Objects.equals(fields, that.fields) &&
+                Objects.equals(syntax, that.syntax);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, fields);
+        return Objects.hash(name, fields, syntax);
     }
 
 }
