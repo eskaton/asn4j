@@ -699,7 +699,7 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class,
-                ".*variableTypeValueField in object class TEST defines a default value, but the referenced type field TypeField has no default.*");
+                ".*'variableTypeValueField' in object class 'TEST' defines a default value, but the referenced type field 'TypeField' has no default.*");
     }
 
     @Test
@@ -712,7 +712,7 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class,
-                ".*variableTypeValueField in object class TEST expects a default value of type VisibleString but found 4711.*");
+                ".*'variableTypeValueField' in object class 'TEST' expects a default value of type VisibleString but found '4711'.*");
     }
 
     @Test
@@ -725,7 +725,7 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class,
-                ".*variableTypeValueField in object class TEST refers to the inexistent field InvalidTypeField.*");
+                ".*'variableTypeValueField' in object class 'TEST' refers to the inexistent field 'InvalidTypeField'.*");
     }
 
     @Test
@@ -998,6 +998,55 @@ class CompilerImplTest {
                    TEST ::= CLASS {
                        &fixedTypeValueField BOOLEAN
                    } WITH SYNTAX {
+                       FIXED TYPE VALUE &fixedTypeValueField
+                   }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
+
+        assertTrue(objectClass.getSyntax().isPresent());
+    }
+
+    @Test
+    void testObjectClassWithSyntaxInvalidField() {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField BOOLEAN
+                   } WITH SYNTAX {
+                       FIXED TYPE VALUE &nonExistentField
+                   }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*Syntax of object class 'TEST' references the undefined field 'nonExistentField'.*");
+    }
+
+    @Test
+    void testObjectClassWithSyntaxInvalidOptionalField() {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField BOOLEAN
+                   } WITH SYNTAX {
+                       [FIXED TYPE VALUE &fixedTypeValueField]
+                   }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*'fixedTypeValueField' in object class 'TEST' is defined in an optional group but refers to a mandatory field.*");
+    }
+
+    @Test
+    void testObjectClassWithSyntaxOptionalField() throws IOException, ParserException {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField BOOLEAN OPTIONAL
+                   } WITH SYNTAX {
                        [FIXED TYPE VALUE &fixedTypeValueField]
                    }
                 """;
@@ -1011,6 +1060,98 @@ class CompilerImplTest {
         var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
 
         assertTrue(objectClass.getSyntax().isPresent());
+    }
+
+    @Test
+    void testObjectClassWithSyntaxDefaultField() throws IOException, ParserException {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField BOOLEAN DEFAULT TRUE
+                   } WITH SYNTAX {
+                       [FIXED TYPE VALUE &fixedTypeValueField]
+                   }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
+
+        assertTrue(objectClass.getSyntax().isPresent());
+    }
+
+    @Test
+    void testObjectClassWithSyntaxInvalidLiteralAfterOptionalGroup() {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                       &fixedTypeValueField2 BOOLEAN OPTIONAL
+                   } WITH SYNTAX {
+                       [FIXED TYPE VALUE &fixedTypeValueField1]
+                       [FIXED TYPE VALUE &fixedTypeValueField2]
+                   }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*Literal 'FIXED' in object class 'TEST' is illegal at this position because it's also used as the first literal of a preceding optional group.*");
+
+        body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                       &fixedTypeValueField2 BOOLEAN OPTIONAL
+                   } WITH SYNTAX {
+                       [FIXED TYPE VALUE &fixedTypeValueField1]
+                       FIXED TYPE VALUE &fixedTypeValueField2
+                   }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*Literal 'FIXED' in object class 'TEST' is illegal at this position because it's also used as the first literal of a preceding optional group.*");
+
+        body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                       &fixedTypeValueField2 BOOLEAN OPTIONAL
+                   } WITH SYNTAX {
+                       [FIXED [TYPE [VALUE &fixedTypeValueField1] [VALUE &fixedTypeValueField2]]]
+                   }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*Literal 'VALUE' in object class 'TEST' is illegal at this position because it's also used as the first literal of a preceding optional group.*");
+    }
+
+    @Test
+    void testObjectClassWithSyntaxDuplicateField() {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField BOOLEAN
+                   } WITH SYNTAX {
+                       FIELD &fixedTypeValueField 
+                       FIELD &fixedTypeValueField 
+                   }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*Field 'fixedTypeValueField' already used in the syntax definition of object class 'TEST'.*");
+    }
+
+    @Test
+    void testObjectClassWithSyntaxMissingMandatoryField() {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN,
+                       &fixedTypeValueField2 BOOLEAN
+                   } WITH SYNTAX {
+                       FIELD &fixedTypeValueField1
+                   }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*Not all mandatory fields are defined in the syntax for object class 'TEST': fixedTypeValueField2.*");
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {

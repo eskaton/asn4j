@@ -33,19 +33,29 @@ import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
+import ch.eskaton.asn4j.parser.Group;
 import ch.eskaton.asn4j.parser.ObjectClassDefn;
+import ch.eskaton.asn4j.parser.RequiredToken;
 import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueOrObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetOrObjectSetFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.LiteralNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueSetFieldSpecNode;
 
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, CompiledObjectClass> {
 
@@ -53,11 +63,6 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
     public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassDefn node) {
         var compiledObjectClass = ctx.createCompiledObjectClass(name);
         var fieldSpecs = node.getFieldSpec();
-        var syntax = node.getSyntaxSpec();
-
-        if (syntax != null) {
-            compiledObjectClass.setSyntax(syntax);
-        }
 
         for (var unknownFieldSpec : fieldSpecs) {
             if (unknownFieldSpec instanceof FixedTypeValueOrObjectFieldSpecNode fieldSpec) {
@@ -138,7 +143,105 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
 
         verifyIntegrity(ctx, name, compiledObjectClass, fieldSpecs);
 
+        var syntax = node.getSyntaxSpec();
+
+        if (syntax != null) {
+            validateSyntax(compiledObjectClass, syntax);
+
+            compiledObjectClass.setSyntax(syntax);
+        }
+
         return compiledObjectClass;
+    }
+
+    private void validateSyntax(CompiledObjectClass compiledObjectClass, List<? extends Object> syntax) {
+        var definedFields = new HashSet<String>();
+        var groupLeaders = new LinkedList<Set<String>>();
+
+        groupLeaders.add(new HashSet<>());
+
+        validateSyntax(compiledObjectClass, syntax, false, groupLeaders, definedFields);
+
+        var mandatoryFields = compiledObjectClass.getFields().stream()
+                .filter(field -> !(field.isOptional() || field.getDefaultValue().isPresent()))
+                .map(field -> field.getName())
+                .collect(Collectors.toSet());
+
+        mandatoryFields.removeAll(definedFields);
+
+        if (!mandatoryFields.isEmpty()) {
+            var fieldNames = mandatoryFields.stream().collect(Collectors.joining(", "));
+
+            throw new CompilerException("Not all mandatory fields are defined in the syntax for object class '%s': %s",
+                    compiledObjectClass.getName(), fieldNames);
+        }
+    }
+
+    private void validateSyntax(CompiledObjectClass compiledObjectClass, List<? extends Object> syntax,
+            boolean optional, Deque<Set<String>> groupLeaders, HashSet<String> definedFields) {
+        var thisGroupLeader = Optional.<String>empty();
+        var first = true;
+
+        for (var spec : syntax) {
+            if (spec instanceof Group group) {
+                validateSyntax(compiledObjectClass, group.getGroup(), true, groupLeaders, definedFields);
+            } else if (spec instanceof RequiredToken requiredToken) {
+                var token = requiredToken.getToken();
+
+                if (token instanceof PrimitiveFieldNameNode fieldNameNode) {
+                    var fieldName = fieldNameNode.getReference();
+                    var maybeField = compiledObjectClass.getField(fieldName);
+
+                    if (maybeField.isEmpty()) {
+                        throw new CompilerException(fieldNameNode.getPosition(),
+                                "Syntax of object class '%s' references the undefined field '%s'",
+                                compiledObjectClass.getName(), fieldName);
+                    }
+
+                    if (definedFields.contains(fieldName)) {
+                        throw new CompilerException(fieldNameNode.getPosition(),
+                                "Field '%s' already used in the syntax definition of object class '%s'",
+                                fieldName, compiledObjectClass.getName());
+                    }
+
+                    definedFields.add(fieldName);
+
+                    var field = maybeField.get();
+
+                    if (optional && !(field.isOptional() || field.getDefaultValue().isPresent())) {
+                        throw new CompilerException(fieldNameNode.getPosition(),
+                                "'%s' in object class '%s' is defined in an optional group but refers to a mandatory field",
+                                fieldName, compiledObjectClass.getName());
+                    }
+                } else if (token instanceof LiteralNode literal) {
+                    if (groupLeaders.peek().contains(literal.getText())) {
+                        throw new CompilerException(literal.getPosition(),
+                                "Literal '%s' in object class '%s' is illegal at this position because it's also " +
+                                        "used as the first literal of a preceding optional group",
+                                literal.getText(), compiledObjectClass.getName());
+                    }
+
+                    if (!first) {
+                        groupLeaders.peek().clear();
+                    }
+
+                    if (first == true && optional) {
+                        thisGroupLeader = Optional.of(literal.getText());
+                    }
+                }
+
+                if (first) {
+                    groupLeaders.push(new HashSet<>());
+                    first = false;
+                }
+            }
+        }
+
+        groupLeaders.pop();
+
+        if (thisGroupLeader.isPresent()) {
+            groupLeaders.peek().add(thisGroupLeader.get());
+        }
     }
 
     private void verifyIntegrity(CompilerContext ctx, String name, CompiledObjectClass compiledObjectClass,
@@ -159,7 +262,8 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
         if (maybeReferencedField.isEmpty()) {
             var fieldSpec = getFieldSpecByName(fieldSpecs, field);
             throw new CompilerException(fieldSpec.getPosition(),
-                    "%s in object class %s refers to the inexistent field %s", field.getName(), name, reference);
+                    "'%s' in object class '%s' refers to the inexistent field '%s'",
+                    field.getName(), name, reference);
         }
 
         var maybeDefaultValue = field.getDefaultValue();
@@ -174,8 +278,8 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
                     var fieldSpec = getFieldSpecByName(fieldSpecs, field);
 
                     throw new CompilerException(fieldSpec.getPosition(),
-                            "%s in object class %s defines a default value, " +
-                                    "but the referenced type field %s has no default",
+                            "'%s' in object class '%s' defines a default value, " +
+                                    "but the referenced type field '%s' has no default",
                             field.getName(), name, typeField.getName());
                 }
 
@@ -190,18 +294,19 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
                     field.setDefaultValue(resolvedValue);
                 } catch (ValueResolutionException e) {
                     var fieldSpec = getFieldSpecByName(fieldSpecs, field);
+                    var formattedType = TypeFormatter.formatType(ctx, type);
+                    var formattedValue = ValueFormatter.formatValue(defaultValue);
 
                     throw new CompilerException(fieldSpec.getPosition(),
-                            "%s in object class %s expects a default value of type %s but found %s",
-                            field.getName(), name, TypeFormatter.formatType(ctx, type),
-                            ValueFormatter.formatValue(defaultValue));
+                            "'%s' in object class '%s' expects a default value of type %s but found '%s'",
+                            field.getName(), name, formattedType, formattedValue);
                 }
             } else {
                 var fieldSpec = getFieldSpecByName(fieldSpecs, field);
 
                 throw new CompilerException(fieldSpec.getPosition(),
-                        "%s in object class %s refers to the field %s which is not a type field", field.getName(), name,
-                        reference);
+                        "'%s' in object class '%s' refers to the field '%s' which is not a type field",
+                        field.getName(), name, reference);
             }
         }
     }
