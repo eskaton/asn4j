@@ -1130,7 +1130,7 @@ class CompilerImplTest {
                    TEST ::= CLASS {
                        &fixedTypeValueField BOOLEAN
                    } WITH SYNTAX {
-                       FIELD &fixedTypeValueField 
+                       FIELD &fixedTypeValueField
                        FIELD &fixedTypeValueField 
                    }
                 """;
@@ -1152,6 +1152,21 @@ class CompilerImplTest {
 
         testModule(body, CompilerException.class,
                 ".*Not all mandatory fields are defined in the syntax for object class 'TEST': fixedTypeValueField2.*");
+    }
+
+    @ParameterizedTest(name = "[{index}] {1}")
+    @MethodSource("getObjectClassWithSyntaxForbiddenLiteralsArgument")
+    void testObjectClassWithSyntaxForbiddenLiterals(String reservedWord, String description) {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField BOOLEAN
+                   } WITH SYNTAX {
+                       %s &fixedTypeValueField
+                   }
+                """.formatted(reservedWord);
+
+        testModule(body, CompilerException.class,
+                ".*Literal '%s' in object class 'TEST' is a reserved word and may not be used.*".formatted(reservedWord));
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
@@ -1518,6 +1533,42 @@ class CompilerImplTest {
     private static Arguments getCustomTagsOnComponentsArguments(String prefixedType, List<TagId> tags) {
         return Arguments.of(prefixedType + " BOOLEAN", tags,
                 "Test custom tag '%s' on component".formatted(prefixedType));
+    }
+
+    private static Stream<Arguments> getObjectClassWithSyntaxForbiddenLiteralsArgument() {
+        return Stream.of(
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("BIT"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("BOOLEAN"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("CHARACTER"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("CHOICE"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("DATE"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("DATE-TIME"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("DURATION"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("EMBEDDED"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("END"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("ENUMERATED"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("EXTERNAL"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("FALSE"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("INSTANCE"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("INTEGER"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("INTERSECTION"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("MINUS-INFINITY"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("NULL"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("OBJECT"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("OCTET"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("PLUS-INFINITY"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("RELATIVE-OID"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("SEQUENCE"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("SET"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("TIME"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("TIME-OF-DAY"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("TRUE"),
+                getObjectClassWithSyntaxForbiddenLiteralsArgument("UNION")
+        );
+    }
+
+    private static Arguments getObjectClassWithSyntaxForbiddenLiteralsArgument(String reservedWord) {
+        return Arguments.of(reservedWord, "Test that '%s' is forbidden in DefinedSyntax".formatted(reservedWord));
     }
 
 }

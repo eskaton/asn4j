@@ -5661,41 +5661,11 @@ class ParserTest {
     void testLiteralParser() throws IOException, ParserException {
         assertEquals(",", getLiteral(","));
         assertEquals("A-WORD", getLiteral("A-WORD"));
-
-        assertNull(getLiteral("BIT"));
-        assertNull(getLiteral("BOOLEAN"));
-        assertNull(getLiteral("CHARACTER"));
-        assertNull(getLiteral("CHOICE"));
-        assertNull(getLiteral("DATE"));
-        assertNull(getLiteral("DATE-TIME"));
-        assertNull(getLiteral("DURATION"));
-        assertNull(getLiteral("EMBEDDED"));
-        assertNull(getLiteral("END"));
-        assertNull(getLiteral("ENUMERATED"));
-        assertNull(getLiteral("EXTERNAL"));
-        assertNull(getLiteral("FALSE"));
-        assertNull(getLiteral("INSTANCE"));
-        assertNull(getLiteral("INTEGER"));
-        assertNull(getLiteral("INTERSECTION"));
-        assertNull(getLiteral("MINUS-INFINITY"));
-        assertNull(getLiteral("NULL"));
-        assertNull(getLiteral("OBJECT"));
-        assertNull(getLiteral("OCTET"));
-        assertNull(getLiteral("PLUS-INFINITY"));
-        assertNull(getLiteral("REAL"));
-        assertNull(getLiteral("RELATIVE-OID"));
-        assertNull(getLiteral("SEQUENCE"));
-        assertNull(getLiteral("SET"));
-        assertNull(getLiteral("TIME"));
-        assertNull(getLiteral("TIME-OF-DAY"));
-        assertNull(getLiteral("TRUE"));
-        assertNull(getLiteral("UNION"));
     }
 
     private String getLiteral(String literal) throws ParserException,
             IOException {
-        LiteralParser parser = new Parser(new ByteArrayInputStream(
-                literal.getBytes())).new LiteralParser();
+        LiteralParser parser = new Parser(new ByteArrayInputStream(literal.getBytes())).new LiteralParser();
 
         LiteralNode result = parser.parse();
 

@@ -59,6 +59,12 @@ import java.util.stream.Collectors;
 
 public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, CompiledObjectClass> {
 
+    private static final Set<String> RESERVED_WORDS = Set.of(
+            "BIT", "BOOLEAN", "CHARACTER", "CHOICE", "DATE", "DATE-TIME", "DURATION", "EMBEDDED",
+            "END", "ENUMERATED", "EXTERNAL", "FALSE", "INSTANCE", "INTEGER", "INTERSECTION",
+            "MINUS-INFINITY", "NULL", "OBJECT", "OCTET", "PLUS-INFINITY", "REAL", "RELATIVE-OID",
+            "SEQUENCE", "SET", "TIME", "TIME-OF-DAY", "TRUE", "UNION");
+
     @Override
     public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassDefn node) {
         var compiledObjectClass = ctx.createCompiledObjectClass(name);
@@ -214,11 +220,19 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
                                 fieldName, compiledObjectClass.getName());
                     }
                 } else if (token instanceof LiteralNode literal) {
-                    if (groupLeaders.peek().contains(literal.getText())) {
+                    var literalText = literal.getText();
+
+                    if (RESERVED_WORDS.contains(literalText)) {
+                        throw new CompilerException(literal.getPosition(),
+                                "Literal '%s' in object class '%s' is a reserved word and may not be used",
+                                literalText, compiledObjectClass.getName());
+                    }
+
+                    if (groupLeaders.peek().contains(literalText)) {
                         throw new CompilerException(literal.getPosition(),
                                 "Literal '%s' in object class '%s' is illegal at this position because it's also " +
                                         "used as the first literal of a preceding optional group",
-                                literal.getText(), compiledObjectClass.getName());
+                                literalText, compiledObjectClass.getName());
                     }
 
                     if (!first) {
@@ -226,7 +240,7 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
                     }
 
                     if (first == true && optional) {
-                        thisGroupLeader = Optional.of(literal.getText());
+                        thisGroupLeader = Optional.of(literalText);
                     }
                 }
 
