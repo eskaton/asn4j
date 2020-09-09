@@ -381,6 +381,7 @@ public class Parser {
     private ObjectIntersectionsParser objectIntersectionsParser = new ObjectIntersectionsParser();
     private LevelParser levelParser = new LevelParser();
     private LiteralParser literalParser = new LiteralParser();
+    private LiteralDefinitionParser literalDefinitionParser = new LiteralDefinitionParser();
     private LowerEndValueParser lowerEndValueParser = new LowerEndValueParser();
     private LowerEndpointParser lowerEndpointParser = new LowerEndpointParser();
     private ModuleBodyParser moduleBodyParser = new ModuleBodyParser();
@@ -4509,10 +4510,33 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public RequiredToken parse() throws ParserException {
-            Node rule = new ChoiceParser<>(primitiveFieldNameParser, literalParser).parse();
+            Node rule = new ChoiceParser<>(primitiveFieldNameParser, literalDefinitionParser).parse();
 
             if (rule != null) {
                 return new RequiredToken(rule.getPosition(), rule);
+            }
+
+            return null;
+        }
+
+    }
+
+    // Literal ::= word | ","
+    protected class LiteralDefinitionParser implements RuleParser<LiteralNode> {
+
+        @SuppressWarnings("unchecked")
+        public LiteralNode parse() throws ParserException {
+            Token token = new ChoiceParser<>(new ValueExtractor<>(0,
+                    new SequenceParser(new SingleTokenParser(TokenType.WORD, Context.SYNTAX),
+                            new NegativeLookaheadParser(TokenType.DOT))),
+                    new SingleTokenParser(TokenType.COMMA)).parse();
+
+            if (token != null) {
+                if (TokenType.WORD == token.getType()) {
+                    return new LiteralNode(token.getPosition(), token.getText());
+                } else {
+                    return new LiteralNode(token.getPosition(), ",");
+                }
             }
 
             return null;
