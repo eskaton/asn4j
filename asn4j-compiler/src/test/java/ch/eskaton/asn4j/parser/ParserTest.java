@@ -126,6 +126,7 @@ import ch.eskaton.asn4j.parser.Parser.InnerTypeConstraintsParser;
 import ch.eskaton.asn4j.parser.Parser.IntegerValueParser;
 import ch.eskaton.asn4j.parser.Parser.IntersectionElementsParser;
 import ch.eskaton.asn4j.parser.Parser.IntersectionsParser;
+import ch.eskaton.asn4j.parser.Parser.LiteralDefinitionParser;
 import ch.eskaton.asn4j.parser.Parser.LiteralParser;
 import ch.eskaton.asn4j.parser.Parser.LowerEndValueParser;
 import ch.eskaton.asn4j.parser.Parser.LowerEndpointParser;
@@ -5658,13 +5659,59 @@ class ParserTest {
     }
 
     @Test
+    void testLiteralDefinitionParser() throws IOException, ParserException {
+        assertEquals(",", getLiteralDefinition(","));
+        assertEquals("A-WORD", getLiteralDefinition("A-WORD"));
+    }
+
+    private String getLiteralDefinition(String literal) throws ParserException, IOException {
+        LiteralDefinitionParser parser = new Parser(new ByteArrayInputStream(literal.getBytes())).new LiteralDefinitionParser();
+
+        LiteralNode result = parser.parse();
+
+        if (result != null) {
+            return result.getText();
+        }
+
+        return null;
+    }
+
+    @Test
     void testLiteralParser() throws IOException, ParserException {
         assertEquals(",", getLiteral(","));
         assertEquals("A-WORD", getLiteral("A-WORD"));
+
+        assertNull(getLiteral("BIT"));
+        assertNull(getLiteral("BOOLEAN"));
+        assertNull(getLiteral("CHARACTER"));
+        assertNull(getLiteral("CHOICE"));
+        assertNull(getLiteral("DATE"));
+        assertNull(getLiteral("DATE-TIME"));
+        assertNull(getLiteral("DURATION"));
+        assertNull(getLiteral("EMBEDDED"));
+        assertNull(getLiteral("END"));
+        assertNull(getLiteral("ENUMERATED"));
+        assertNull(getLiteral("EXTERNAL"));
+        assertNull(getLiteral("FALSE"));
+        assertNull(getLiteral("INSTANCE"));
+        assertNull(getLiteral("INTEGER"));
+        assertNull(getLiteral("INTERSECTION"));
+        assertNull(getLiteral("MINUS-INFINITY"));
+        assertNull(getLiteral("NULL"));
+        assertNull(getLiteral("OBJECT"));
+        assertNull(getLiteral("OCTET"));
+        assertNull(getLiteral("PLUS-INFINITY"));
+        assertNull(getLiteral("REAL"));
+        assertNull(getLiteral("RELATIVE-OID"));
+        assertNull(getLiteral("SEQUENCE"));
+        assertNull(getLiteral("SET"));
+        assertNull(getLiteral("TIME"));
+        assertNull(getLiteral("TIME-OF-DAY"));
+        assertNull(getLiteral("TRUE"));
+        assertNull(getLiteral("UNION"));
     }
 
-    private String getLiteral(String literal) throws ParserException,
-            IOException {
+    private String getLiteral(String literal) throws IOException, ParserException {
         LiteralParser parser = new Parser(new ByteArrayInputStream(literal.getBytes())).new LiteralParser();
 
         LiteralNode result = parser.parse();
@@ -5675,6 +5722,7 @@ class ParserTest {
 
         return null;
     }
+
 
     /**
      * ************************************************************************
