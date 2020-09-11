@@ -72,75 +72,15 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
 
         for (var unknownFieldSpec : fieldSpecs) {
             if (unknownFieldSpec instanceof FixedTypeValueOrObjectFieldSpecNode fieldSpec) {
-                if (fieldSpec.getObjectFieldSpec().isPresent()) {
-                    var objectFieldSpec = fieldSpec.getObjectFieldSpec().get();
-
-                    try {
-                        // Check whether reference refers to an object class
-                        ctx.getCompiledObjectClass(objectFieldSpec.getObjectClassReference());
-                    } catch (CompilerException e) {
-                        // ignore
-                    }
-
-                    var compiledField = ctx.<ObjectFieldSpecNode, NamedCompiler<ObjectFieldSpecNode, AbstractCompiledField>>getCompiler(
-                            (Class<ObjectFieldSpecNode>) objectFieldSpec.getClass()).compile(ctx, name, objectFieldSpec);
-
-                    compiledObjectClass.addField(compiledField);
-                    continue;
-                }
-
-                if (fieldSpec.getFixedTypeValueFieldSpec().isPresent()) {
-                    var fixedTypeValueFieldSpec = fieldSpec.getFixedTypeValueFieldSpec().get();
-                    var compiledField = ctx.<FixedTypeValueFieldSpecNode, NamedCompiler<FixedTypeValueFieldSpecNode, AbstractCompiledField>>getCompiler(
-                            (Class<FixedTypeValueFieldSpecNode>) fixedTypeValueFieldSpec.getClass())
-                            .compile(ctx, name, fixedTypeValueFieldSpec);
-
-                    compiledObjectClass.addField(compiledField);
-                }
-            } else if (unknownFieldSpec instanceof TypeFieldSpecNode typeFieldSpec) {
-                var compiledField = ctx.<TypeFieldSpecNode, NamedCompiler<TypeFieldSpecNode, AbstractCompiledField>>getCompiler(
-                        (Class<TypeFieldSpecNode>) typeFieldSpec.getClass())
-                        .compile(ctx, name, typeFieldSpec);
-
-                compiledObjectClass.addField(compiledField);
-            } else if (unknownFieldSpec instanceof VariableTypeValueFieldSpecNode variableTypeValueFieldSpec) {
-                var compiledField = ctx.<VariableTypeValueFieldSpecNode, NamedCompiler<VariableTypeValueFieldSpecNode, AbstractCompiledField>>getCompiler(
-                        (Class<VariableTypeValueFieldSpecNode>) variableTypeValueFieldSpec.getClass())
-                        .compile(ctx, name, variableTypeValueFieldSpec);
-
-                compiledObjectClass.addField(compiledField);
-            } else if (unknownFieldSpec instanceof FixedTypeValueSetOrObjectSetFieldSpecNode fixedTypeValueSetOrObjectSetFieldSpec) {
-                if (fixedTypeValueSetOrObjectSetFieldSpec.getObjectSetFieldSpec().isPresent()) {
-                    var objectSetFieldSpec = fixedTypeValueSetOrObjectSetFieldSpec.getObjectSetFieldSpec().get();
-
-                    try {
-                        // Check whether reference refers to an object set
-                        ctx.getCompiledObjectSet(objectSetFieldSpec.getReference());
-                    } catch (CompilerException e) {
-                        // ignore
-                    }
-
-                    var compiledField = ctx.<ObjectSetFieldSpecNode, NamedCompiler<ObjectSetFieldSpecNode, AbstractCompiledField>>getCompiler(
-                            (Class<ObjectSetFieldSpecNode>) objectSetFieldSpec.getClass()).compile(ctx, name, objectSetFieldSpec);
-
-                    compiledObjectClass.addField(compiledField);
-                    continue;
-                }
-
-                if (fixedTypeValueSetOrObjectSetFieldSpec.getFixedTypeValueSetFieldSpec().isPresent()) {
-                    var fixedTypeValueSetFieldSpec = fixedTypeValueSetOrObjectSetFieldSpec.getFixedTypeValueSetFieldSpec().get();
-                    var compiledField = ctx.<FixedTypeValueSetFieldSpecNode, NamedCompiler<FixedTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
-                            (Class<FixedTypeValueSetFieldSpecNode>) fixedTypeValueSetFieldSpec.getClass())
-                            .compile(ctx, name, fixedTypeValueSetFieldSpec);
-
-                    compiledObjectClass.addField(compiledField);
-                }
-            } else if (unknownFieldSpec instanceof VariableTypeValueSetFieldSpecNode variableTypeValueSetFieldSpec) {
-                var compiledField = ctx.<VariableTypeValueSetFieldSpecNode, NamedCompiler<VariableTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
-                        (Class<VariableTypeValueSetFieldSpecNode>) variableTypeValueSetFieldSpec.getClass())
-                        .compile(ctx, name, variableTypeValueSetFieldSpec);
-
-                compiledObjectClass.addField(compiledField);
+                compileFixedTypeValueOrObjectFieldSpec(ctx, name, compiledObjectClass, fieldSpec);
+            } else if (unknownFieldSpec instanceof TypeFieldSpecNode fieldSpec) {
+                compileTypeFieldSpec(ctx, name, compiledObjectClass, fieldSpec);
+            } else if (unknownFieldSpec instanceof VariableTypeValueFieldSpecNode fieldSpec) {
+                compileVariableTypeValueFieldSpec(ctx, name, compiledObjectClass, fieldSpec);
+            } else if (unknownFieldSpec instanceof FixedTypeValueSetOrObjectSetFieldSpecNode fieldSpec) {
+                compileFixedTypeValueSetOrObjectSetFieldSpec(ctx, name, compiledObjectClass, fieldSpec);
+            } else if (unknownFieldSpec instanceof VariableTypeValueSetFieldSpecNode fieldSpec) {
+                compileVariableTypeValueSetFieldSpec(ctx, name, compiledObjectClass, fieldSpec);
             } else {
                 throw new IllegalCompilerStateException("Field of type %s not yet supported",
                         unknownFieldSpec.getClass().getSimpleName());
@@ -158,6 +98,119 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
         }
 
         return compiledObjectClass;
+    }
+
+    private void compileVariableTypeValueSetFieldSpec(CompilerContext ctx, String name,
+            CompiledObjectClass compiledObjectClass, VariableTypeValueSetFieldSpecNode fieldSpec) {
+        var compiledField = ctx.<VariableTypeValueSetFieldSpecNode, NamedCompiler<VariableTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
+                (Class<VariableTypeValueSetFieldSpecNode>) fieldSpec.getClass())
+                .compile(ctx, name, fieldSpec);
+
+        compiledObjectClass.addField(compiledField);
+    }
+
+    private void compileFixedTypeValueSetOrObjectSetFieldSpec(CompilerContext ctx, String name,
+            CompiledObjectClass compiledObjectClass, FixedTypeValueSetOrObjectSetFieldSpecNode fieldSpec) {
+        if (!compileObjectSetFieldSpec(ctx, name, compiledObjectClass, fieldSpec)) {
+            compileFixedTypeValueSetField(ctx, name, compiledObjectClass, fieldSpec);
+        }
+    }
+
+    private void compileFixedTypeValueSetField(CompilerContext ctx, String name, CompiledObjectClass compiledObjectClass,
+            FixedTypeValueSetOrObjectSetFieldSpecNode fieldSpec) {
+        if (fieldSpec.getFixedTypeValueSetFieldSpec().isPresent()) {
+            var fixedTypeValueSetFieldSpec = fieldSpec.getFixedTypeValueSetFieldSpec().get();
+            var compiledField = ctx.<FixedTypeValueSetFieldSpecNode, NamedCompiler<FixedTypeValueSetFieldSpecNode, AbstractCompiledField>>getCompiler(
+                    (Class<FixedTypeValueSetFieldSpecNode>) fixedTypeValueSetFieldSpec.getClass())
+                    .compile(ctx, name, fixedTypeValueSetFieldSpec);
+
+            compiledObjectClass.addField(compiledField);
+        }
+    }
+
+    private boolean compileObjectSetFieldSpec(CompilerContext ctx, String name, CompiledObjectClass compiledObjectClass,
+            FixedTypeValueSetOrObjectSetFieldSpecNode fieldSpec) {
+        if (fieldSpec.getObjectSetFieldSpec().isEmpty()) {
+            return false;
+        }
+
+        var objectSetFieldSpec = fieldSpec.getObjectSetFieldSpec().get();
+
+        try {
+            // Check whether reference refers to an object class
+            ctx.getCompiledObjectClass(objectSetFieldSpec.getObjectClassReference());
+        } catch (CompilerException e) {
+            return false;
+        }
+
+        var compiledField = ctx.<ObjectSetFieldSpecNode, NamedCompiler<ObjectSetFieldSpecNode, AbstractCompiledField>>getCompiler((Class<ObjectSetFieldSpecNode>) objectSetFieldSpec.getClass())
+                .compile(ctx, name, objectSetFieldSpec);
+
+        compiledObjectClass.addField(compiledField);
+
+        return true;
+
+    }
+
+    private void compileVariableTypeValueFieldSpec(CompilerContext ctx, String name,
+            CompiledObjectClass compiledObjectClass, VariableTypeValueFieldSpecNode fieldSpec) {
+        var compiledField = ctx.<VariableTypeValueFieldSpecNode, NamedCompiler<VariableTypeValueFieldSpecNode, AbstractCompiledField>>getCompiler(
+                (Class<VariableTypeValueFieldSpecNode>) fieldSpec.getClass())
+                .compile(ctx, name, fieldSpec);
+
+        compiledObjectClass.addField(compiledField);
+    }
+
+    private void compileTypeFieldSpec(CompilerContext ctx, String name, CompiledObjectClass compiledObjectClass,
+            TypeFieldSpecNode fieldSpec) {
+        var compiledField = ctx.<TypeFieldSpecNode, NamedCompiler<TypeFieldSpecNode, AbstractCompiledField>>getCompiler(
+                (Class<TypeFieldSpecNode>) fieldSpec.getClass())
+                .compile(ctx, name, fieldSpec);
+
+        compiledObjectClass.addField(compiledField);
+    }
+
+    private void compileFixedTypeValueOrObjectFieldSpec(CompilerContext ctx, String name,
+            CompiledObjectClass compiledObjectClass, FixedTypeValueOrObjectFieldSpecNode fieldSpec) {
+        if (!compileObjectField(ctx, name, compiledObjectClass, fieldSpec)) {
+            compileFixedTypeValueField(ctx, name, compiledObjectClass, fieldSpec);
+        }
+    }
+
+    private void compileFixedTypeValueField(CompilerContext ctx, String name, CompiledObjectClass compiledObjectClass,
+            FixedTypeValueOrObjectFieldSpecNode fieldSpec) {
+        if (fieldSpec.getFixedTypeValueFieldSpec().isPresent()) {
+            var fixedTypeValueFieldSpec = fieldSpec.getFixedTypeValueFieldSpec().get();
+            var compiledField = ctx.<FixedTypeValueFieldSpecNode, NamedCompiler<FixedTypeValueFieldSpecNode, AbstractCompiledField>>getCompiler(
+                    (Class<FixedTypeValueFieldSpecNode>) fixedTypeValueFieldSpec.getClass())
+                    .compile(ctx, name, fixedTypeValueFieldSpec);
+
+            compiledObjectClass.addField(compiledField);
+        }
+    }
+
+    private boolean compileObjectField(CompilerContext ctx, String name, CompiledObjectClass compiledObjectClass,
+            FixedTypeValueOrObjectFieldSpecNode fieldSpec) {
+        if (fieldSpec.getObjectFieldSpec().isEmpty()) {
+            return false;
+        }
+
+        var objectFieldSpec = fieldSpec.getObjectFieldSpec().get();
+
+        try {
+            // Check whether reference refers to an object class
+            ctx.getCompiledObjectClass(objectFieldSpec.getObjectClassReference());
+        } catch (CompilerException e) {
+            return false;
+        }
+
+        var compiledField = ctx.<ObjectFieldSpecNode, NamedCompiler<ObjectFieldSpecNode, AbstractCompiledField>>getCompiler(
+                (Class<ObjectFieldSpecNode>) objectFieldSpec.getClass()).compile(ctx, name, objectFieldSpec);
+
+        compiledObjectClass.addField(compiledField);
+
+        return true;
+
     }
 
     private void validateSyntax(CompiledObjectClass compiledObjectClass, List<? extends Object> syntax) {
@@ -192,57 +245,8 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
             if (spec instanceof Group group) {
                 validateSyntax(compiledObjectClass, group.getGroup(), true, groupLeaders, definedFields);
             } else if (spec instanceof RequiredToken requiredToken) {
-                var token = requiredToken.getToken();
-
-                if (token instanceof PrimitiveFieldNameNode fieldNameNode) {
-                    var fieldName = fieldNameNode.getReference();
-                    var maybeField = compiledObjectClass.getField(fieldName);
-
-                    if (maybeField.isEmpty()) {
-                        throw new CompilerException(fieldNameNode.getPosition(),
-                                "Syntax of object class '%s' references the undefined field '%s'",
-                                compiledObjectClass.getName(), fieldName);
-                    }
-
-                    if (definedFields.contains(fieldName)) {
-                        throw new CompilerException(fieldNameNode.getPosition(),
-                                "Field '%s' already used in the syntax definition of object class '%s'",
-                                fieldName, compiledObjectClass.getName());
-                    }
-
-                    definedFields.add(fieldName);
-
-                    var field = maybeField.get();
-
-                    if (optional && !(field.isOptional() || field.getDefaultValue().isPresent())) {
-                        throw new CompilerException(fieldNameNode.getPosition(),
-                                "'%s' in object class '%s' is defined in an optional group but refers to a mandatory field",
-                                fieldName, compiledObjectClass.getName());
-                    }
-                } else if (token instanceof LiteralNode literal) {
-                    var literalText = literal.getText();
-
-                    if (RESERVED_WORDS.contains(literalText)) {
-                        throw new CompilerException(literal.getPosition(),
-                                "Literal '%s' in object class '%s' is a reserved word and may not be used",
-                                literalText, compiledObjectClass.getName());
-                    }
-
-                    if (groupLeaders.peek().contains(literalText)) {
-                        throw new CompilerException(literal.getPosition(),
-                                "Literal '%s' in object class '%s' is illegal at this position because it's also " +
-                                        "used as the first literal of a preceding optional group",
-                                literalText, compiledObjectClass.getName());
-                    }
-
-                    if (!first) {
-                        groupLeaders.peek().clear();
-                    }
-
-                    if (first == true && optional) {
-                        thisGroupLeader = Optional.of(literalText);
-                    }
-                }
+                thisGroupLeader = validateRequiredToken(compiledObjectClass, optional, groupLeaders, definedFields,
+                        thisGroupLeader, first, requiredToken);
 
                 if (first) {
                     groupLeaders.push(new HashSet<>());
@@ -255,6 +259,77 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
 
         if (thisGroupLeader.isPresent()) {
             groupLeaders.peek().add(thisGroupLeader.get());
+        }
+    }
+
+    private Optional<String> validateRequiredToken(CompiledObjectClass compiledObjectClass, boolean optional,
+            Deque<Set<String>> groupLeaders, HashSet<String> definedFields, Optional<String> thisGroupLeader,
+            boolean first, RequiredToken requiredToken) {
+        var token = requiredToken.getToken();
+
+        if (token instanceof PrimitiveFieldNameNode fieldNameNode) {
+            validatePrimitiveFieldName(compiledObjectClass, optional, definedFields, fieldNameNode);
+        } else if (token instanceof LiteralNode literal) {
+            thisGroupLeader = validateLiteral(compiledObjectClass, optional, groupLeaders, thisGroupLeader, first,
+                    literal);
+        }
+
+        return thisGroupLeader;
+    }
+
+    private Optional<String> validateLiteral(CompiledObjectClass compiledObjectClass, boolean optional,
+            Deque<Set<String>> groupLeaders, Optional<String> thisGroupLeader, boolean first, LiteralNode literal) {
+        var literalText = literal.getText();
+
+        if (RESERVED_WORDS.contains(literalText)) {
+            throw new CompilerException(literal.getPosition(),
+                    "Literal '%s' in object class '%s' is a reserved word and may not be used",
+                    literalText, compiledObjectClass.getName());
+        }
+
+        if (groupLeaders.peek().contains(literalText)) {
+            throw new CompilerException(literal.getPosition(),
+                    "Literal '%s' in object class '%s' is illegal at this position because it's also " +
+                            "used as the first literal of a preceding optional group",
+                    literalText, compiledObjectClass.getName());
+        }
+
+        if (!first) {
+            groupLeaders.peek().clear();
+        }
+
+        if (first == true && optional) {
+            thisGroupLeader = Optional.of(literalText);
+        }
+
+        return thisGroupLeader;
+    }
+
+    private void validatePrimitiveFieldName(CompiledObjectClass compiledObjectClass, boolean optional,
+            HashSet<String> definedFields, PrimitiveFieldNameNode fieldNameNode) {
+        var fieldName = fieldNameNode.getReference();
+        var maybeField = compiledObjectClass.getField(fieldName);
+
+        if (maybeField.isEmpty()) {
+            throw new CompilerException(fieldNameNode.getPosition(),
+                    "Syntax of object class '%s' references the undefined field '%s'",
+                    compiledObjectClass.getName(), fieldName);
+        }
+
+        if (definedFields.contains(fieldName)) {
+            throw new CompilerException(fieldNameNode.getPosition(),
+                    "Field '%s' already used in the syntax definition of object class '%s'",
+                    fieldName, compiledObjectClass.getName());
+        }
+
+        definedFields.add(fieldName);
+
+        var field = maybeField.get();
+
+        if (optional && !(field.isOptional() || field.getDefaultValue().isPresent())) {
+            throw new CompilerException(fieldNameNode.getPosition(),
+                    "'%s' in object class '%s' is defined in an optional group but refers to a mandatory field",
+                    fieldName, compiledObjectClass.getName());
         }
     }
 
