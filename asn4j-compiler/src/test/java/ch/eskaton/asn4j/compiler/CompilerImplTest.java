@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
@@ -71,11 +72,13 @@ import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.Utils;
 import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
@@ -1169,6 +1172,98 @@ class CompilerImplTest {
                 ".*Literal '%s' in object class 'TEST' is a reserved word and may not be used.*".formatted(reservedWord));
     }
 
+    @Test
+    void testObjectWithSyntax() throws IOException, ParserException {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN,
+                       &fixedTypeValueField2 INTEGER
+                   } WITH SYNTAX {
+                       FIXED TYPE VALUE-A &fixedTypeValueField1
+                       FIXED TYPE VALUE-B &fixedTypeValueField2
+                   }
+                   
+                   testObject TEST ::= {
+                       FIXED TYPE VALUE-A TRUE
+                       FIXED TYPE VALUE-B 1
+                   }
+                   
+                   TestSet TEST ::= { testObject }
+                """;
+
+        CompiledObjectSet objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+
+        assertEquals(1, objectSet.getValues().size());
+
+        var object = objectSet.getValues().stream().findFirst().get();
+        var field1 = (Tuple2<String, Object>) object.get("fixedTypeValueField1");
+
+        assertNotNull(field1);
+        assertTrue(field1.get_2() instanceof BooleanValue);
+
+        var field2 = (Tuple2<String, Object>) object.get("fixedTypeValueField2");
+
+        assertNotNull(field2);
+        assertTrue(field2.get_2() instanceof IntegerValue);
+    }
+
+    @Test
+    void testObjectWithSyntaxOptionalPresent() throws IOException, ParserException {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                       &fixedTypeValueField2 INTEGER
+                   } WITH SYNTAX {
+                       [VALUE-A FIELD &fixedTypeValueField1]
+                       VALUE-B FIELD &fixedTypeValueField2
+                   }
+                   
+                   testObject TEST ::= {
+                       VALUE-A FIELD TRUE
+                       VALUE-B FIELD 1
+                   }
+                   
+                   TestSet TEST ::= { testObject }
+                """;
+
+        var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+
+        assertEquals(1, objectSet.getValues().size());
+
+        var object = objectSet.getValues().stream().findFirst().get();
+        var field1 = (Tuple2<String, Object>) object.get("fixedTypeValueField1");
+
+        assertNotNull(field1);
+        assertTrue(field1.get_2() instanceof BooleanValue);
+
+        var field2 = (Tuple2<String, Object>) object.get("fixedTypeValueField2");
+
+        assertNotNull(field2);
+        assertTrue(field2.get_2() instanceof IntegerValue);
+    }
+
+    @Test
+    void testObjectWithSyntaxIncompleteOptionalGroup() {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                       &fixedTypeValueField2 INTEGER
+                   } WITH SYNTAX {
+                       [VALUE-A FIELD &fixedTypeValueField1]
+                       VALUE-B FIELD &fixedTypeValueField2
+                   }
+                   
+                   testObject TEST ::= {
+                       VALUE-A TRUE
+                       VALUE-B FIELD 1
+                   }
+                   
+                   TestSet TEST ::= { testObject }
+                """;
+
+        testModule(body, CompilerException.class, ".*Expected literal 'FIELD' but found 'TRUE'.*");
+    }
+
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var compiler = new CompilerImpl();
@@ -1256,6 +1351,21 @@ class CompilerImplTest {
         assertTrue(field.isPresent());
 
         return field;
+    }
+
+    private CompiledObjectSet getCompiledObjectSet(String body, String objectClassName, String setName)
+            throws IOException, ParserException {
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get(objectClassName);
+
+        assertTrue(objectClass.getSyntax().isPresent());
+
+        return ctx.getCompiledModule("TEST-MODULE").getObjectSets().get(setName);
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {
