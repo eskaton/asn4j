@@ -34,13 +34,23 @@ import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
+import ch.eskaton.asn4j.parser.Group;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.RequiredToken;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
+import ch.eskaton.asn4j.parser.ast.DefinedSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
+import ch.eskaton.asn4j.parser.ast.LiteralNode;
+import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
+import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -57,7 +67,9 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         Map<String, Object> compiledObject;
 
         if (syntax instanceof DefaultSyntaxNode) {
-            compiledObject = compile(objectClass, (DefaultSyntaxNode) syntax);
+            compiledObject = compileDefault(objectClass, (DefaultSyntaxNode) syntax);
+        } else if (syntax instanceof DefinedSyntaxNode) {
+            compiledObject = compileDefined(objectClass, (DefinedSyntaxNode) syntax);
         } else {
             throw new CompilerException(syntax.getPosition(), "Unsupported syntax: %s",
                     syntax.getClass().getSimpleName());
@@ -68,10 +80,99 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         return compiledObject;
     }
 
-    private Map<String, Object> compile(CompiledObjectClass objectClass, DefaultSyntaxNode syntaxNode) {
+    private Map<String, Object> compileDefined(CompiledObjectClass objectClass, DefinedSyntaxNode syntax) {
+        var maybeSyntaxSpec = objectClass.getSyntax();
+
+        if (maybeSyntaxSpec.isEmpty()) {
+            throw new CompilerException(syntax.getPosition(),
+                    "Object definition for object of object class '%s' uses defined syntax notation which isn't specified",
+                    objectClass.getName());
+        }
+
+        var syntaxSpec = maybeSyntaxSpec.get();
+
+        var definedSyntax = new LinkedList<>(syntax.getNodes());
+        var values = new HashMap<String, Object>();
+
+        compileDefined(objectClass, syntaxSpec, definedSyntax, values, false);
+
+        if (!definedSyntax.isEmpty()) {
+            var node = definedSyntax.peek();
+
+            throw new CompilerException(node.getPosition(),
+                    "Unexpected data in defined syntax: %s", node);
+        }
+
+        verifyValues(objectClass, syntax.getPosition(), values);
+
+        return values;
+    }
+
+    private void compileDefined(CompiledObjectClass objectClass, List<? extends Object> syntaxSpec,
+            LinkedList<Node> definedSyntax, HashMap<String, Object> values, boolean optional) {
+        var accepted = false;
+
+        for (var spec : syntaxSpec) {
+            if (spec instanceof Group) {
+                compileDefined(objectClass, ((Group) spec).getGroup(), definedSyntax, values, true);
+            } else if (spec instanceof RequiredToken requiredToken) {
+                var element = definedSyntax.pop();
+                var token = requiredToken.getToken();
+
+                if (token instanceof LiteralNode literalNodeSpec) {
+                    if (!(element instanceof LiteralNode literalNode)) {
+                        var formattedElement = element instanceof Value ?
+                                ValueFormatter.formatValue(element) :
+                                element.toString();
+
+                        throw new CompilerException(element.getPosition(), "Expected literal '%s' but found '%s'",
+                                literalNodeSpec.getText(), formattedElement);
+                    }
+
+                    if (!literalNodeSpec.getText().equals(literalNode.getText())) {
+                        if (optional && !accepted) {
+                            definedSyntax.push(element);
+
+                            return;
+                        }
+
+                        throw new CompilerException(element.getPosition(), "Expected literal '%s' but found '%s'",
+                                literalNodeSpec.getText(), literalNode.getText());
+                    }
+
+                    accepted = true;
+                } else if (token instanceof PrimitiveFieldNameNode fieldNameNode) {
+                    var fieldName = fieldNameNode.getReference();
+                    var maybeField = objectClass.getField(fieldName);
+
+                    if (maybeField.isEmpty()) {
+                        throw new IllegalCompilerStateException(fieldNameNode.getPosition(),
+                                "Syntax of object class '%s' references the undefined field '%s'. " +
+                                        "This should never happen, since the existence of fields is verified " +
+                                        "when an object class is compiled",
+                                objectClass.getName(), fieldNameNode);
+                    }
+
+                    values.put(fieldName, compile(objectClass, element, fieldNameNode));
+                }
+            } else {
+                throw new IllegalCompilerStateException(((Node) spec).getPosition(),
+                        "Unsupported type in defined syntax: %s", spec);
+            }
+        }
+    }
+
+    private Map<String, Object> compileDefault(CompiledObjectClass objectClass, DefaultSyntaxNode syntaxNode) {
         var values = syntaxNode.getFieldSetting().stream()
                 .map(setting -> compile(objectClass, setting))
                 .collect(Collectors.toMap(Tuple2::get_1, Tuple2::get_2));
+
+        verifyValues(objectClass, syntaxNode.getPosition(), values);
+
+        return values;
+    }
+
+    private void verifyValues(CompiledObjectClass objectClass, Position position, Map<String, Object> values) {
         var fields = objectClass.getFields();
 
         for (var field : fields) {
@@ -84,17 +185,22 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                     if (maybeDefaultValue.isPresent()) {
                         values.put(fieldName, maybeDefaultValue.get());
                     } else {
-                        throw new CompilerException(syntaxNode.getPosition(), "Field '%s' is mandatory", fieldName);
+                        throw new CompilerException(position, "Field '%s' is mandatory", fieldName);
                     }
                 }
             }
         }
-
-        return values;
     }
 
     private Tuple2<String, Object> compile(CompiledObjectClass objectClass, FieldSettingNode fieldSettingNode) {
         var fieldName = fieldSettingNode.getFieldName();
+        var setting = fieldSettingNode.getSetting();
+
+        return compile(objectClass, setting, fieldName);
+    }
+
+    private Tuple2<String, Object> compile(CompiledObjectClass objectClass, Node setting,
+            PrimitiveFieldNameNode fieldName) {
         var reference = fieldName.getReference();
         var maybeField = objectClass.getField(reference);
 
@@ -104,17 +210,14 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
             if (field instanceof CompiledFixedTypeValueField) {
                 var compiledField = (CompiledFixedTypeValueField) field;
                 var type = compiledField.getCompiledType().getType();
-                var setting = fieldSettingNode.getSetting();
                 var value = (Value) setting;
 
                 return Tuple2.of(reference, ctx.resolveGenericValue(ctx.getValueType(type), type, value));
             } else if (field instanceof CompiledTypeField) {
-                var setting = fieldSettingNode.getSetting();
                 var type = (Type) setting;
 
                 return Tuple2.of(reference, ctx.getCompiledType(type));
             } else if (field instanceof CompiledVariableTypeValueField) {
-                var setting = fieldSettingNode.getSetting();
                 var value = (Value) setting;
 
                 return Tuple2.of(reference, value);
@@ -123,7 +226,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                         field.getClass().getSimpleName());
             }
         } else {
-            throw new CompilerException(fieldSettingNode.getPosition(), "Invalid reference %s", reference);
+            throw new CompilerException(fieldName.getPosition(), "Invalid reference %s", reference);
         }
     }
 
