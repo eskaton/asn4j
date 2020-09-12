@@ -35,12 +35,13 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class SimpleDefinedValue extends DefinedValue implements ParameterizedNode {
 
     private String value;
 
-    private List<Node> parameters;
+    private Optional<List<Node>> parameters = Optional.empty();
 
     protected SimpleDefinedValue() {
         super();
@@ -57,10 +58,10 @@ public class SimpleDefinedValue extends DefinedValue implements ParameterizedNod
     }
 
     public void setParameters(List<Node> parameters) {
-        this.parameters = parameters;
+        this.parameters = Optional.ofNullable(parameters);
     }
 
-    public List<Node> getParameters() {
+    public Optional<List<Node>> getParameters() {
         return parameters;
     }
 
@@ -73,7 +74,11 @@ public class SimpleDefinedValue extends DefinedValue implements ParameterizedNod
     @Override
     public ObjectNode toObjectValue() {
         ObjectReference ref = new ObjectReference(getPosition(), value);
-        ref.setParameters(parameters);
+
+        if (parameters.isPresent()) {
+            ref.setParameters(parameters.get());
+        }
+
         return ref;
     }
 

@@ -30,12 +30,13 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 
 import java.util.List;
+import java.util.Optional;
 
 public class ObjectClassReference extends ObjectClassNode implements ParameterizedNode {
 
     private String reference;
 
-    private List<Node> parameters;
+    private Optional<List<Node>> parameters = Optional.empty();
 
     public ObjectClassReference(Position position, String reference) {
         super(position);
@@ -48,10 +49,10 @@ public class ObjectClassReference extends ObjectClassNode implements Parameteriz
     }
 
     public void setParameters(List<Node> parameters) {
-        this.parameters = parameters;
+        this.parameters = Optional.ofNullable(parameters);
     }
 
-    public List<Node> getParameters() {
+    public Optional<List<Node>> getParameters() {
         return parameters;
     }
 
