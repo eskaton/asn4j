@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSetField;
@@ -128,6 +129,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CompilerImplTest {
@@ -1005,13 +1007,7 @@ class CompilerImplTest {
                    }
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var compiler = new CompilerImpl();
-
-        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
-
-        var ctx = compiler.getCompilerContext();
-        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
+        var objectClass = getCompiledObjectClass(body, "TEST");
 
         assertTrue(objectClass.getSyntax().isPresent());
     }
@@ -1054,13 +1050,7 @@ class CompilerImplTest {
                    }
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var compiler = new CompilerImpl();
-
-        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
-
-        var ctx = compiler.getCompilerContext();
-        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
+        var objectClass = getCompiledObjectClass(body, "TEST");
 
         assertTrue(objectClass.getSyntax().isPresent());
     }
@@ -1075,13 +1065,7 @@ class CompilerImplTest {
                    }
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var compiler = new CompilerImpl();
-
-        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
-
-        var ctx = compiler.getCompilerContext();
-        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get("TEST");
+        var objectClass = getCompiledObjectClass(body, "TEST");
 
         assertTrue(objectClass.getSyntax().isPresent());
     }
@@ -1264,6 +1248,79 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, ".*Expected literal 'FIELD' but found 'TRUE'.*");
     }
 
+    @Test
+    void testObjectWithSyntaxMandatoryOptionalGroupMissing() {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                       &fixedTypeValueField2 INTEGER OPTIONAL
+                   } WITH SYNTAX {
+                       [LITERAL [A &fixedTypeValueField1] [B &fixedTypeValueField2]]
+                   }
+                   
+                   testObject TEST ::= {
+                       LITERAL
+                   }
+                   
+                   TestSet TEST ::= { testObject }
+                """;
+
+        testModule(body, CompilerException.class, ".*There must be at least one field in an optional group.*");
+    }
+
+    @Test
+    void testObjectWithSyntaxMandatoryOptionalGroupMissingRecursively() {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                       &fixedTypeValueField2 INTEGER OPTIONAL
+                   } WITH SYNTAX {
+                       [LITERAL [LITERAL [A &fixedTypeValueField1] [B &fixedTypeValueField2]]]
+                   }
+                   
+                   testObject TEST ::= {
+                       LITERAL LITERAL
+                   }
+                   
+                   TestSet TEST ::= { testObject }
+                """;
+
+        testModule(body, CompilerException.class, ".*There must be at least one field in an optional group.*");
+    }
+
+    @Test
+    void testObjectWithSyntaxMandatoryOptionalGroupPresent() throws IOException, ParserException {
+        var body = """
+                   TEST ::= CLASS {
+                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                       &fixedTypeValueField2 INTEGER OPTIONAL
+                   } WITH SYNTAX {
+                       [LITERAL [A &fixedTypeValueField1] [B &fixedTypeValueField2]]
+                   }
+                   
+                   testObject TEST ::= {
+                       LITERAL B 12
+                   }
+                   
+                   TestSet TEST ::= { testObject }
+                """;
+
+        var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+
+        assertEquals(1, objectSet.getValues().size());
+
+        var object = objectSet.getValues().stream().findFirst().get();
+        var field1 = (Tuple2<String, Object>) object.get("fixedTypeValueField1");
+
+        assertNull(field1);
+
+        var field2 = (Tuple2<String, Object>) object.get("fixedTypeValueField2");
+
+        assertNotNull(field2);
+
+        assertTrue(field2.get_2() instanceof IntegerValue);
+    }
+
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var compiler = new CompilerImpl();
@@ -1297,6 +1354,19 @@ class CompilerImplTest {
                 expected);
 
         exception.ifPresent(e -> assertThat(Utils.rootCause(e).getMessage(), MatchesPattern.matchesPattern(message)));
+    }
+
+
+    private CompiledObjectClass getCompiledObjectClass(String body, String objectClassName)
+            throws IOException, ParserException {
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+
+        return ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get(objectClassName);
     }
 
     private CompiledVariableTypeValueField getCompiledVariableTypeValueField(String body, String objectClassName,
@@ -1338,13 +1408,7 @@ class CompilerImplTest {
 
     private Optional<AbstractCompiledField> getCompiledField(String body, String objectClassName, String fieldName)
             throws IOException, ParserException {
-        var module = module("TEST-MODULE", body);
-        var compiler = new CompilerImpl();
-
-        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
-
-        var ctx = compiler.getCompilerContext();
-        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get(objectClassName);
+        var objectClass = getCompiledObjectClass(body, objectClassName);
 
         var field = objectClass.getField(fieldName);
 

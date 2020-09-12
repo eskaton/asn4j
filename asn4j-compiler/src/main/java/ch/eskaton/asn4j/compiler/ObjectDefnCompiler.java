@@ -46,6 +46,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.HashMap;
@@ -94,7 +95,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         var definedSyntax = new LinkedList<>(syntax.getNodes());
         var values = new HashMap<String, Object>();
 
-        compile(objectClass, syntaxSpec, definedSyntax, values, false);
+        compile(objectClass, syntaxSpec, definedSyntax, values, new GroupState(false, false, false));
 
         if (!definedSyntax.isEmpty()) {
             var node = definedSyntax.peek();
@@ -107,24 +108,85 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         return values;
     }
 
-    private void compile(CompiledObjectClass objectClass, List<? extends Object> syntaxSpec,
-            LinkedList<Node> definedSyntax, HashMap<String, Object> values, boolean optional) {
-        var accepted = false;
+    private static class GroupState {
+
+        boolean optional;
+
+        boolean accepted;
+
+        boolean hasField;
+
+        public GroupState(boolean optional, boolean accepted, boolean hasField) {
+            this.optional = optional;
+            this.accepted = accepted;
+            this.hasField = hasField;
+        }
+
+        GroupState accepted(boolean accepted) {
+            return new GroupState(optional, accepted, hasField);
+        }
+
+        GroupState optional(boolean optional) {
+            return new GroupState(optional, accepted, hasField);
+        }
+
+        public GroupState hasField(boolean hasField) {
+            return new GroupState(optional, accepted, hasField);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
+        }
+    }
+
+    private GroupState compile(CompiledObjectClass objectClass, List<? extends Object> syntaxSpec,
+            LinkedList<Node> definedSyntax, HashMap<String, Object> values, GroupState state) {
+        if (definedSyntax.isEmpty()) {
+            return state;
+        }
+
+        var position = definedSyntax.get(0).getPosition();
+        var currentState = state.accepted(false);
+        var hasField = false;
 
         for (var spec : syntaxSpec) {
             if (spec instanceof Group) {
-                compile(objectClass, ((Group) spec).getGroup(), definedSyntax, values, true);
+                currentState = compile(objectClass, ((Group) spec).getGroup(), definedSyntax, values,
+                        currentState.optional(true));
+
+                hasField = currentState.hasField ? true : hasField;
             } else if (spec instanceof RequiredToken requiredToken) {
-                accepted = compileRequiredToken(objectClass, definedSyntax, values, optional, accepted, requiredToken);
+                currentState = compileRequiredToken(objectClass, definedSyntax, values, currentState, requiredToken);
+
+                if (!currentState.accepted) {
+                    return currentState;
+                }
+
+                hasField = currentState.hasField ? true : hasField;
             } else {
                 throw new IllegalCompilerStateException(((Node) spec).getPosition(),
                         "Unsupported type in defined syntax: %s", spec);
             }
         }
+
+        if (currentState.optional) {
+            if (!hasField) {
+                throw new CompilerException(position, "There must be at least one field in an optional group");
+            } else {
+                currentState = currentState.hasField(true);
+            }
+        }
+
+        return currentState;
     }
 
-    private boolean compileRequiredToken(CompiledObjectClass objectClass, LinkedList<Node> definedSyntax,
-            HashMap<String, Object> values, boolean optional, boolean accepted, RequiredToken requiredToken) {
+    private GroupState compileRequiredToken(CompiledObjectClass objectClass, LinkedList<Node> definedSyntax,
+            HashMap<String, Object> values, GroupState state, RequiredToken requiredToken) {
+        if (definedSyntax.isEmpty()) {
+            return state;
+        }
+
         var element = definedSyntax.pop();
         var token = requiredToken.getToken();
 
@@ -139,20 +201,24 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
             }
 
             if (!literalNodeSpec.getText().equals(literalNode.getText())) {
-                if (optional && !accepted) {
+                if (state.optional && !state.accepted) {
                     definedSyntax.push(element);
+
+                    return state;
                 }
 
                 throw new CompilerException(element.getPosition(), "Expected literal '%s' but found '%s'",
                         literalNodeSpec.getText(), literalNode.getText());
             } else {
-                accepted = true;
+                state = state.accepted(true);
             }
         } else if (token instanceof PrimitiveFieldNameNode fieldNameNode) {
             compilePrimitiveFieldName(objectClass, values, element, fieldNameNode);
+
+            state = state.hasField(true);
         }
 
-        return accepted;
+        return state;
     }
 
     private void compilePrimitiveFieldName(CompiledObjectClass objectClass, HashMap<String, Object> values,
