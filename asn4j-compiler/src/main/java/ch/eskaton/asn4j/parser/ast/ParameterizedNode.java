@@ -28,11 +28,12 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ParameterizedNode {
 
     void setParameters(List<Node> parameters);
 
-    List<Node> getParameters();
+    Optional<List<Node>> getParameters();
 
 }

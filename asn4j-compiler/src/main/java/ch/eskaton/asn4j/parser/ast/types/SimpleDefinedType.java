@@ -33,12 +33,13 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class SimpleDefinedType extends AbstractType implements ParameterizedNode {
 
     private String type;
 
-    private List<Node> parameters;
+    private Optional<List<Node>> parameters = Optional.empty();
 
     public SimpleDefinedType(Position position, String type) {
         super(position);
@@ -51,10 +52,10 @@ public class SimpleDefinedType extends AbstractType implements ParameterizedNode
     }
 
     public void setParameters(List<Node> parameters) {
-        this.parameters = parameters;
+        this.parameters = Optional.ofNullable(parameters);
     }
 
-    public List<Node> getParameters() {
+    public Optional<List<Node>> getParameters() {
         return parameters;
     }
 

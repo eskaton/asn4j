@@ -957,8 +957,8 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ExternalValueReference);
-        assertEquals(1, ((ExternalValueReference) result).getParameters()
-                .size());
+        assertTrue(((ExternalValueReference) result).getParameters().isPresent());
+        assertEquals(1, ((ExternalValueReference) result).getParameters().get().size());
     }
 
     @Test
@@ -5004,8 +5004,8 @@ class ParserTest {
         assertNotNull(result);
         assertTrue(result instanceof ObjectClassReference);
         assertNotNull(((ObjectClassReference) result).getParameters());
-        assertEquals(1, ((ObjectClassReference) result).getParameters()
-                .size());
+        assertTrue(((ObjectClassReference) result).getParameters().isPresent());
+        assertEquals(1, ((ObjectClassReference) result).getParameters().get().size());
     }
 
     @Test
@@ -6215,7 +6215,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ObjectReference);
-        assertNull(((ObjectReference) result).getParameters());
+        assertTrue(((ObjectReference) result).getParameters().isEmpty());
 
         parser = new Parser(new ByteArrayInputStream(
                 "object-reference {Object}".getBytes())).new ReferencedObjectsParser();
@@ -6224,7 +6224,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ObjectReference);
-        assertNotNull(((ObjectReference) result).getParameters());
+        assertTrue(((ObjectReference) result).getParameters().isPresent());
 
         parser = new Parser(new ByteArrayInputStream(
                 "ObjectSet-Reference".getBytes())).new ReferencedObjectsParser();
@@ -6233,7 +6233,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ObjectSetReference);
-        assertNull(((ObjectSetReference) result).getParameters());
+        assertTrue(((ObjectSetReference) result).getParameters().isEmpty());
 
         parser = new Parser(new ByteArrayInputStream(
                 "ObjectSet-Reference {Object}".getBytes())).new ReferencedObjectsParser();
@@ -6242,7 +6242,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof ObjectSetReference);
-        assertNotNull(((ObjectSetReference) result).getParameters());
+        assertTrue(((ObjectSetReference) result).getParameters().isPresent());
     }
 
     /**
@@ -6832,7 +6832,8 @@ class ParserTest {
 
         assertEquals("Module", ((ExternalTypeReference) result).getModule());
         assertEquals("Type", result.getType());
-        assertEquals(1, result.getParameters().size());
+        assertTrue(result.getParameters().isPresent());
+        assertEquals(1, result.getParameters().get().size());
     }
 
     @Test
@@ -6872,7 +6873,8 @@ class ParserTest {
 
         assertEquals("Module", ((ExternalValueReference) result).getModule());
         assertEquals("value", result.getValue());
-        assertEquals(1, result.getParameters().size());
+        assertTrue(result.getParameters().isPresent());
+        assertEquals(1, result.getParameters().get().size());
     }
 
     @Test
@@ -6908,7 +6910,8 @@ class ParserTest {
 
         assertNotNull(result);
         assertEquals("ValueSet", result.getType());
-        assertEquals(1, result.getParameters().size());
+        assertTrue(result.getParameters().isPresent());
+        assertEquals(1, result.getParameters().get().size());
     }
 
     @Test
@@ -6922,7 +6925,8 @@ class ParserTest {
 
         assertNotNull(result);
         assertEquals("OBJECT-CLASS", result.getReference());
-        assertEquals(1, result.getParameters().size());
+        assertTrue(result.getParameters().isPresent());
+        assertEquals(1, result.getParameters().get().size());
     }
 
     @Test
@@ -6935,7 +6939,8 @@ class ParserTest {
 
         assertNotNull(result);
         assertEquals("ObjectSet", result.getReference());
-        assertEquals(1, result.getParameters().size());
+        assertTrue(result.getParameters().isPresent());
+        assertEquals(1, result.getParameters().get().size());
     }
 
     @Test
@@ -6948,7 +6953,8 @@ class ParserTest {
 
         assertNotNull(result);
         assertEquals("object", result.getReference());
-        assertEquals(1, result.getParameters().size());
+        assertTrue(result.getParameters().isPresent());
+        assertEquals(1, result.getParameters().get().size());
     }
 
     @Test
@@ -6974,7 +6980,8 @@ class ParserTest {
         assertNotNull(result);
         assertTrue(result instanceof TypeReference);
         assertNotNull(((TypeReference) result).getParameters());
-        assertEquals(1, ((TypeReference) result).getParameters().size());
+        assertTrue(((TypeReference) result).getParameters().isPresent());
+        assertEquals(1, ((TypeReference) result).getParameters().get().size());
 
         parser = new Parser(new ByteArrayInputStream(
                 "Object {OBJECT-CLASS.&Type({ObjectSet})}".getBytes())).new ActualParameterParser();
@@ -6984,10 +6991,11 @@ class ParserTest {
         assertNotNull(result);
         assertTrue(result instanceof TypeReference);
         assertNotNull(((TypeReference) result).getParameters());
-        assertEquals(1, ((TypeReference) result).getParameters().size());
-        assertTrue(((TypeReference) result).getParameters().get(0) instanceof ObjectClassFieldTypeNode);
+        assertTrue(((TypeReference) result).getParameters().isPresent());
+        assertEquals(1, ((TypeReference) result).getParameters().get().size());
+        assertTrue(((TypeReference) result).getParameters().get().get(0) instanceof ObjectClassFieldTypeNode);
         assertTrue(((ObjectClassFieldTypeNode) ((TypeReference) result)
-                .getParameters().get(0)).hasConstraint());
+                .getParameters().get().get(0)).hasConstraint());
     }
 
     private <T extends Value> void testAmbiguousValue(Object value, Class<T> valueClass) {
