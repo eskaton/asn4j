@@ -25,34 +25,66 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+import ch.eskaton.asn4j.parser.ast.ParameterNode;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
-public class ParameterizedValueSetTypeAssignmentNode extends
-        ParameterizedAssignmentNode {
+public class CompiledParameterizedObjectClass implements CompilationResult {
 
-    private Type type;
+    private final String name;
 
-    private ElementSetSpecsNode elementSet;
+    private final ObjectClassNode objectClass;
 
-    public ParameterizedValueSetTypeAssignmentNode(Position position, String reference, List<ParameterNode> parameters,
-            Type type, ElementSetSpecsNode elementSet) {
-        super(position, reference, parameters);
+    private final List<ParameterNode> parameters;
 
-        this.type = type;
-        this.elementSet = elementSet;
+    public CompiledParameterizedObjectClass(String name, ObjectClassNode objectClass, List<ParameterNode> parameters) {
+        this.name = name;
+        this.objectClass = objectClass;
+        this.parameters = parameters;
     }
 
-    public Type getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
-    public ElementSetSpecsNode getElementSet() {
-        return elementSet;
+    public ObjectClassNode getObjectClass() {
+        return objectClass;
+    }
+
+    public List<ParameterNode> getParameters() {
+        return parameters;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CompiledParameterizedObjectClass that = (CompiledParameterizedObjectClass) o;
+
+        return Objects.equals(name, that.name) &&
+                Objects.equals(objectClass, that.objectClass) &&
+                Objects.equals(parameters, that.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, objectClass, parameters);
     }
 
 }

@@ -50,20 +50,28 @@ import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectClass;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectSet;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedValueSetType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.HasChildComponents;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
+import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
+import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
@@ -154,20 +162,39 @@ public class CompilerContext {
         return definedModules.computeIfAbsent(moduleName, (key) -> new CompiledModule(key));
     }
 
-    private void addType(String typeName, CompiledType compiledType) {
-        getCurrentCompiledModule().addType(typeName, compiledType);
+    private void addType(String name, CompiledType compiledType) {
+        getCurrentCompiledModule().addType(name, compiledType);
     }
 
-    private void addObjectClass(String objectClassName, CompiledObjectClass compiledObjectClass) {
-        getCurrentCompiledModule().addObjectClass(objectClassName, compiledObjectClass);
+    private void addObjectClass(String name, CompiledObjectClass compiledObjectClass) {
+        getCurrentCompiledModule().addObjectClass(name, compiledObjectClass);
     }
 
-    private void addObjectSet(String objectSetName, CompiledObjectSet compiledObjectSet) {
-        getCurrentCompiledModule().addObjectSet(objectSetName, compiledObjectSet);
+    private void addObjectSet(String name, CompiledObjectSet compiledObjectSet) {
+        getCurrentCompiledModule().addObjectSet(name, compiledObjectSet);
     }
 
-    private void addObject(String objectName, CompiledObject compiledObject) {
-        getCurrentCompiledModule().addObject(objectName, compiledObject);
+    private void addObject(String name, CompiledObject compiledObject) {
+        getCurrentCompiledModule().addObject(name, compiledObject);
+    }
+
+    private void addParameterizedType(String name, CompiledParameterizedType compiledParameterizedType) {
+        getCurrentCompiledModule().addParameterizedType(name, compiledParameterizedType);
+    }
+
+    private void addParameterizedObjectClass(String name,
+            CompiledParameterizedObjectClass compiledParameterizedObjectClass) {
+        getCurrentCompiledModule().addParameterizedObjectClass(name, compiledParameterizedObjectClass);
+    }
+
+    private void addParameterizedObjectSet(String name,
+            CompiledParameterizedObjectSet compiledParameterizedObjectSet) {
+        getCurrentCompiledModule().addParameterizedObjectSet(name, compiledParameterizedObjectSet);
+    }
+
+    private void addParameterizedValueSetType(String name,
+            CompiledParameterizedValueSetType compiledParameterizedValueSetType) {
+        getCurrentCompiledModule().addParameterizedValueSetType(name, compiledParameterizedValueSetType);
     }
 
     @SuppressWarnings("unchecked")
@@ -968,6 +995,44 @@ public class CompilerContext {
         return compiledObject;
     }
 
+    public CompiledParameterizedType createCompiledParameterizedType(String name, Type type,
+            List<ParameterNode> parameters) {
+        var compiledParameterizedType = new CompiledParameterizedType(name, type, parameters);
+
+        addParameterizedType(name, compiledParameterizedType);
+
+        return compiledParameterizedType;
+    }
+
+    public CompiledParameterizedObjectClass createCompiledParameterizedObjectClass(String name,
+            ObjectClassNode objectClass, List<ParameterNode> parameters) {
+        var compiledParameterizedObjectClass = new CompiledParameterizedObjectClass(name, objectClass, parameters);
+
+        addParameterizedObjectClass(name, compiledParameterizedObjectClass);
+
+        return compiledParameterizedObjectClass;
+    }
+
+    public CompiledParameterizedObjectSet createCompiledParameterizedObjectSet(String name, ObjectClassNode objectClass,
+            ObjectSetSpecNode objectSet, List<ParameterNode> parameters) {
+        var compiledParameterizedObjectSet = new CompiledParameterizedObjectSet(name, objectClass, objectSet,
+                parameters);
+
+        addParameterizedObjectSet(name, compiledParameterizedObjectSet);
+
+        return compiledParameterizedObjectSet;
+    }
+
+    public CompiledParameterizedValueSetType createCompiledParameterizedValueSetType(String name, Type type,
+            ElementSetSpecsNode elementSet, List<ParameterNode> parameters) {
+        var compiledParameterizedValueSetType = new CompiledParameterizedValueSetType(name, type, elementSet,
+                parameters);
+
+        addParameterizedValueSetType(name, compiledParameterizedValueSetType);
+
+        return compiledParameterizedValueSetType;
+    }
+
     public <T extends CompiledType & HasChildComponents> Optional<T> findCompiledTypeRecursive(Type type) {
         if (type instanceof TypeReference) {
             // type references are not nested, but may not yet be compiled, so we force the compilation here
@@ -980,7 +1045,8 @@ public class CompilerContext {
             return Optional.empty();
         }
 
-        var componentStream = getTypesOfCurrentModule().entrySet().stream().map(Map.Entry::getValue);
+        var componentStream = getTypesOfCurrentModule().entrySet().stream()
+                .map(Map.Entry::getValue);
 
         return findCompiledTypeRecursiveAux(type, componentStream);
     }

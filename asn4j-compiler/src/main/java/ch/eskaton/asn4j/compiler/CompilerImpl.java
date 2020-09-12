@@ -43,9 +43,13 @@ import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ParameterizedAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedObjectClassAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedObjectSetAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedTypeAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedValueAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
@@ -150,24 +154,36 @@ public class CompilerImpl {
         }
     }
 
-    private CompilationResult compileAssignment(AssignmentNode assignment) {
-        if (assignment instanceof TypeAssignmentNode) {
-            return compileTypeAssignment((TypeAssignmentNode) assignment);
-        } else if (assignment instanceof ValueAssignmentNode) {
+    private CompilationResult compileAssignment(AssignmentNode unknownAssignment) {
+        if (unknownAssignment instanceof TypeAssignmentNode assignment) {
+            return compileTypeAssignment(assignment);
+        } else if (unknownAssignment instanceof ValueOrObjectAssignmentNode) {
             // ignore values, they are resolved when needed
-        } else if (assignment instanceof ParameterizedAssignmentNode) {
-            return compileParameterizedAssignment((ParameterizedAssignmentNode) assignment);
-        } else if (assignment instanceof ObjectSetAssignmentNode) {
-            return compileObjectSetAssignment((ObjectSetAssignmentNode) assignment);
-        } else if (assignment instanceof ObjectAssignmentNode) {
+            return null;
+        } else if (unknownAssignment instanceof ObjectSetAssignmentNode assignment) {
+            return compileObjectSetAssignment(assignment);
+        } else if (unknownAssignment instanceof ObjectClassAssignmentNode assignment) {
+            return compileObjectClassAssignment(assignment);
+        } else if (unknownAssignment instanceof ValueSetTypeOrObjectSetAssignmentNode assignment) {
+            return compileValueSetTypeOrObjectSetAssignmentNode(assignment);
+        } else if (unknownAssignment instanceof ParameterizedTypeAssignmentNode assignment) {
+            return compileParameterizedTypeAssignment(assignment);
+        } else if (unknownAssignment instanceof ParameterizedValueAssignmentNode) {
+            // ignore values, they are resolved when needed
+            return null;
+        } else if (unknownAssignment instanceof ParameterizedValueSetTypeAssignmentNode assignment) {
+            return compileParameterizedValueSetTypeAssignment(assignment);
+        } else if (unknownAssignment instanceof ParameterizedObjectAssignmentNode) {
             // ignore objects, they are resolved when needed
-        } else if (assignment instanceof ObjectClassAssignmentNode) {
-            return compileObjectClassAssignment((ObjectClassAssignmentNode) assignment);
-        } else if (assignment instanceof ValueSetTypeOrObjectSetAssignmentNode) {
-            return compileValueSetTypeOrObjectSetAssignmentNode((ValueSetTypeOrObjectSetAssignmentNode) assignment);
+            return null;
+        } else if (unknownAssignment instanceof ParameterizedObjectClassAssignmentNode assignment) {
+            return compileParameterizedObjectClassAssignment(assignment);
+        } else if (unknownAssignment instanceof ParameterizedObjectSetAssignmentNode assignment) {
+            return compileParameterizedObjectSetAssignment(assignment);
         }
 
-        return null;
+        throw new IllegalCompilerStateException(unknownAssignment.getPosition(), "Unsupported assignment: %s",
+                unknownAssignment.getClass().getSimpleName());
     }
 
     private CompilationResult compileValueSetTypeOrObjectSetAssignmentNode(ValueSetTypeOrObjectSetAssignmentNode assignment) {
@@ -204,23 +220,38 @@ public class CompilerImpl {
     }
 
     private CompiledObjectClass compileObjectClassAssignment(ObjectClassAssignmentNode assignment) {
-        return compilerContext.<ObjectClassAssignmentNode, ObjectClassAssignmentCompiler>getCompiler(ObjectClassAssignmentNode.class)
-                .compile(compilerContext, assignment);
+        return compilerContext.<ObjectClassAssignmentNode, ObjectClassAssignmentCompiler>
+                getCompiler(ObjectClassAssignmentNode.class).compile(compilerContext, assignment);
     }
 
     private CompiledObject compileObjectAssignment(ObjectAssignmentNode assignment) {
-        return compilerContext.<ObjectAssignmentNode, ObjectAssignmentCompiler>getCompiler(ObjectAssignmentNode.class)
-                .compile(compilerContext, assignment);
+        return compilerContext.<ObjectAssignmentNode, ObjectAssignmentCompiler>
+                getCompiler(ObjectAssignmentNode.class).compile(compilerContext, assignment);
     }
 
     private CompiledObjectSet compileObjectSetAssignment(ObjectSetAssignmentNode assignment) {
-        return compilerContext.<ObjectSetAssignmentNode, ObjectSetAssignmentCompiler>getCompiler(ObjectSetAssignmentNode.class)
-                .compile(assignment);
+        return compilerContext.<ObjectSetAssignmentNode, ObjectSetAssignmentCompiler>
+                getCompiler(ObjectSetAssignmentNode.class).compile(assignment);
     }
 
-    private CompilationResult compileParameterizedAssignment(ParameterizedAssignmentNode assignment) {
-        // TODO Auto-generated method stub
-        return null;
+    private CompilationResult compileParameterizedTypeAssignment(ParameterizedTypeAssignmentNode assignment) {
+        return compilerContext.<ParameterizedTypeAssignmentNode, ParameterizedTypeAssignmentCompiler>
+                getCompiler(ParameterizedTypeAssignmentNode.class).compile(compilerContext, assignment);
+    }
+
+    private CompilationResult compileParameterizedObjectSetAssignment(ParameterizedObjectSetAssignmentNode assignment) {
+        return compilerContext.<ParameterizedObjectSetAssignmentNode, ParameterizedObjectSetAssignmentCompiler>
+                getCompiler(ParameterizedObjectSetAssignmentNode.class).compile(compilerContext, assignment);
+    }
+
+    private CompilationResult compileParameterizedObjectClassAssignment(ParameterizedObjectClassAssignmentNode assignment) {
+        return compilerContext.<ParameterizedObjectClassAssignmentNode, ParameterizedObjectClassAssignmentCompiler>
+                getCompiler(ParameterizedObjectClassAssignmentNode.class).compile(compilerContext, assignment);
+    }
+
+    private CompilationResult compileParameterizedValueSetTypeAssignment(ParameterizedValueSetTypeAssignmentNode assignment) {
+        return compilerContext.<ParameterizedValueSetTypeAssignmentNode, ParameterizedValueSetTypeAssignmentCompiler>
+                getCompiler(ParameterizedValueSetTypeAssignmentNode.class).compile(compilerContext, assignment);
     }
 
     private void compileImports(ModuleNode module) throws IOException, ParserException {
