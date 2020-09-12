@@ -6642,7 +6642,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertEquals("TypeReference", result.getReference());
-        assertTrue(result.getTypeClass() instanceof IntegerType);
+        assertTrue(result.getType() instanceof IntegerType);
         assertEquals(1, result.getParameters().size());
     }
 

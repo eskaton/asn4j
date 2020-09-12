@@ -106,6 +106,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
@@ -320,13 +321,11 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(ComponentType.class, new ComponentTypeCompiler()));
         types.add(new TypeDefinition<>(SelectionType.class, new SelectionTypeCompiler(),
                 new SelectionTypeTypeNameSupplier(ctx, this)));
-        types.add(new TypeDefinition<>(TypeAssignmentNode.class, new TypeAssignmentCompiler()));
         types.add(new TypeDefinition<>(Type.class, new TypeCompiler()));
         types.add(new TypeDefinition<>(TypeReference.class, new TypeReferenceCompiler(),
                 new TypeReferenceTypeNameSupplier(this)));
         types.add(new TypeDefinition<>(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),
                 new ExternalTypeReferenceTypeNameSupplier(this)));
-        types.add(new TypeDefinition<>(ObjectClassAssignmentNode.class, new ObjectClassAssignmentCompiler()));
         types.add(new TypeDefinition<>(ObjectClassNode.class, new ObjectClassNodeCompiler()));
         types.add(new TypeDefinition<>(ObjectClassDefn.class, new ObjectClassDefnCompiler()));
         types.add(new TypeDefinition<>(TypeFieldSpecNode.class, new TypeFieldSpecNodeCompiler()));
@@ -336,9 +335,13 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(VariableTypeValueSetFieldSpecNode.class, new VariableTypeValueSetFieldSpecNodeCompiler()));
         types.add(new TypeDefinition<>(ObjectFieldSpecNode.class, new ObjectFieldSpecNodeCompiler()));
         types.add(new TypeDefinition<>(ObjectSetFieldSpecNode.class, new ObjectSetFieldSpecNodeCompiler()));
-        types.add(new TypeDefinition<>(ObjectSetAssignmentNode.class, new ObjectSetAssignmentCompiler(ctx)));
-        types.add(new TypeDefinition<>(ObjectAssignmentNode.class, new ObjectAssignmentCompiler()));
         types.add(new TypeDefinition<>(ObjectDefnNode.class, new ObjectDefnCompiler(ctx)));
+        // assignments
+        types.add(new TypeDefinition<>(TypeAssignmentNode.class, new TypeAssignmentCompiler()));
+        types.add(new TypeDefinition<>(ObjectClassAssignmentNode.class, new ObjectClassAssignmentCompiler()));
+        types.add(new TypeDefinition<>(ObjectAssignmentNode.class, new ObjectAssignmentCompiler()));
+        types.add(new TypeDefinition<>(ObjectSetAssignmentNode.class, new ObjectSetAssignmentCompiler(ctx)));
+        types.add(new TypeDefinition<>(ParameterizedTypeAssignmentNode.class, new ParameterizedTypeAssignmentCompiler()));
     }
 
     public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> typeClass) {

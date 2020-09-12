@@ -25,26 +25,36 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
+import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
-public class ParameterizedValueSetTypeAssignmentNode extends
-        ParameterizedAssignmentNode {
+public class CompiledParameterizedValueSetType implements CompilationResult {
 
-    private Type type;
+    private final String name;
 
-    private ElementSetSpecsNode elementSet;
+    private final Type type;
 
-    public ParameterizedValueSetTypeAssignmentNode(Position position, String reference, List<ParameterNode> parameters,
-            Type type, ElementSetSpecsNode elementSet) {
-        super(position, reference, parameters);
+    private final ElementSetSpecsNode elementSet;
 
+    private final List<ParameterNode> parameters;
+
+    public CompiledParameterizedValueSetType(String name, Type type, ElementSetSpecsNode elementSet,
+            List<ParameterNode> parameters) {
+        this.name = name;
         this.type = type;
         this.elementSet = elementSet;
+        this.parameters = parameters;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Type getType() {
@@ -53,6 +63,38 @@ public class ParameterizedValueSetTypeAssignmentNode extends
 
     public ElementSetSpecsNode getElementSet() {
         return elementSet;
+    }
+
+    public List<ParameterNode> getParameters() {
+        return parameters;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        CompiledParameterizedValueSetType that = (CompiledParameterizedValueSetType) o;
+
+        return Objects.equals(name, that.name) &&
+                Objects.equals(type, that.type) &&
+                Objects.equals(elementSet, that.elementSet) &&
+                Objects.equals(parameters, that.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, elementSet, parameters);
     }
 
 }

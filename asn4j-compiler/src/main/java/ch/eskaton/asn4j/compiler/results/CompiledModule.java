@@ -27,6 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
+import ch.eskaton.asn4j.runtime.utils.ToString;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +45,14 @@ public class CompiledModule implements CompilationResult {
     private HashMap<String, CompiledObjectClass> objectClasses = new HashMap<>();
 
     private HashMap<String, CompiledObjectSet> objectSets = new HashMap<>();
+
+    private HashMap<String, CompiledParameterizedType> parameterizedTypes = new HashMap<>();
+
+    private HashMap<String, CompiledParameterizedObjectClass> parameterizedObjectClass = new HashMap<>();
+
+    private HashMap<String, CompiledParameterizedObjectSet> parameterizedObjectSet = new HashMap<>();
+
+    private HashMap<String, CompiledParameterizedValueSetType> parameterizedValueSetType = new HashMap<>();
 
     public CompiledModule(String name) {
         this.name = name;
@@ -84,6 +94,43 @@ public class CompiledModule implements CompilationResult {
         return Collections.unmodifiableMap(objectSets);
     }
 
+    public void addParameterizedType(String name, CompiledParameterizedType compiledParameterizedType) {
+        parameterizedTypes.put(name, compiledParameterizedType);
+    }
+
+    public Map<String, CompiledParameterizedType> getParameterizedTypes() {
+        return Collections.unmodifiableMap(parameterizedTypes);
+    }
+
+    public void addParameterizedObjectClass(String name, CompiledParameterizedObjectClass compiledParameterizedObjectClass) {
+        parameterizedObjectClass.put(name, compiledParameterizedObjectClass);
+    }
+
+    public Map<String, CompiledParameterizedObjectClass> getParameterizedObjectClass() {
+        return Collections.unmodifiableMap(parameterizedObjectClass);
+    }
+
+    public void addParameterizedObjectSet(String name, CompiledParameterizedObjectSet compiledParameterizedObjectSet) {
+        parameterizedObjectSet.put(name, compiledParameterizedObjectSet);
+    }
+
+    public Map<String, CompiledParameterizedObjectSet> getParameterizedObjectSet() {
+        return Collections.unmodifiableMap(parameterizedObjectSet);
+    }
+
+    public void addParameterizedValueSetType(String name, CompiledParameterizedValueSetType compiledParameterizedValueSetType) {
+        parameterizedValueSetType.put(name, compiledParameterizedValueSetType);
+    }
+
+    public Map<String, CompiledParameterizedValueSetType> getParameterizedValueSetType() {
+        return Collections.unmodifiableMap(parameterizedValueSetType);
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -100,12 +147,17 @@ public class CompiledModule implements CompilationResult {
                 Objects.equals(types, that.types) &&
                 Objects.equals(objects, that.objects) &&
                 Objects.equals(objectClasses, that.objectClasses) &&
-                Objects.equals(objectSets, that.objectSets);
+                Objects.equals(objectSets, that.objectSets) &&
+                Objects.equals(parameterizedTypes, that.parameterizedTypes) &&
+                Objects.equals(parameterizedObjectClass, that.parameterizedObjectClass) &&
+                Objects.equals(parameterizedObjectSet, that.parameterizedObjectSet) &&
+                Objects.equals(parameterizedValueSetType, that.parameterizedValueSetType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, types, objects, objectClasses, objectSets);
+        return Objects.hash(name, types, objects, objectClasses, objectSets, parameterizedTypes,
+                parameterizedObjectClass, parameterizedObjectSet, parameterizedValueSetType);
     }
 
 }

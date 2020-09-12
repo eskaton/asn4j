@@ -25,34 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedValueSetType;
+import ch.eskaton.asn4j.parser.ast.ParameterizedValueSetTypeAssignmentNode;
 
-import java.util.List;
+public class ParameterizedValueSetTypeAssignmentCompiler implements Compiler<ParameterizedValueSetTypeAssignmentNode> {
 
-public class ParameterizedValueSetTypeAssignmentNode extends
-        ParameterizedAssignmentNode {
+    public CompiledParameterizedValueSetType compile(CompilerContext ctx, ParameterizedValueSetTypeAssignmentNode node) {
+        var typeName = node.getReference();
+        var type = node.getType();
+        var elementSet = node.getElementSet();
+        var parameters = node.getParameters();
 
-    private Type type;
+        System.out.println("Compiling parameterized value set type " + typeName);
 
-    private ElementSetSpecsNode elementSet;
-
-    public ParameterizedValueSetTypeAssignmentNode(Position position, String reference, List<ParameterNode> parameters,
-            Type type, ElementSetSpecsNode elementSet) {
-        super(position, reference, parameters);
-
-        this.type = type;
-        this.elementSet = elementSet;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public ElementSetSpecsNode getElementSet() {
-        return elementSet;
+        return ctx.createCompiledParameterizedValueSetType(typeName, type, elementSet, parameters);
     }
 
 }
