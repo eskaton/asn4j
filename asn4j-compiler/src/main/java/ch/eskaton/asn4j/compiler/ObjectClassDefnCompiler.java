@@ -57,13 +57,42 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.parser.Lexer.BIT_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.BOOLEAN_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.CHARACTER_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.CHOICE_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.DATE_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.DATE_TIME_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.DURATION_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.EMBEDDED_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.END_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.ENUMERATED_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.EXTERNAL_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.FALSE_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.INSTANCE_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.INTEGER_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.INTERSECTION_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.MINUS_INFINITY_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.NULL_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.OBJECT_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.OCTET_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.PLUS_INFINITY_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.REAL_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.RELATIVE_OID_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.SEQUENCE_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.SET_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.TIME_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.TIME_OF_DAY_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.TRUE_LIT;
+import static ch.eskaton.asn4j.parser.Lexer.UNION_LIT;
+
 public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, CompiledObjectClass> {
 
     private static final Set<String> RESERVED_WORDS = Set.of(
-            "BIT", "BOOLEAN", "CHARACTER", "CHOICE", "DATE", "DATE-TIME", "DURATION", "EMBEDDED",
-            "END", "ENUMERATED", "EXTERNAL", "FALSE", "INSTANCE", "INTEGER", "INTERSECTION",
-            "MINUS-INFINITY", "NULL", "OBJECT", "OCTET", "PLUS-INFINITY", "REAL", "RELATIVE-OID",
-            "SEQUENCE", "SET", "TIME", "TIME-OF-DAY", "TRUE", "UNION");
+            BIT_LIT, BOOLEAN_LIT, CHARACTER_LIT, CHOICE_LIT, DATE_LIT, DATE_TIME_LIT, DURATION_LIT, EMBEDDED_LIT,
+            END_LIT, ENUMERATED_LIT, EXTERNAL_LIT, FALSE_LIT, INSTANCE_LIT, INTEGER_LIT, INTERSECTION_LIT,
+            MINUS_INFINITY_LIT, NULL_LIT, OBJECT_LIT, OCTET_LIT, PLUS_INFINITY_LIT, REAL_LIT, RELATIVE_OID_LIT,
+            SEQUENCE_LIT, SET_LIT, TIME_LIT, TIME_OF_DAY_LIT, TRUE_LIT, UNION_LIT);
 
     @Override
     public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassDefn node) {
