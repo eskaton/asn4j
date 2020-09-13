@@ -855,6 +855,46 @@ public class CompilerContext {
                 .orElseGet(Map::of);
     }
 
+    private Map<String, CompiledParameterizedType> getParameterizedTypesOfCurrentModule() {
+        return getParameterizedTypesOfCurrentModule(getCurrentModuleName());
+    }
+
+    private Map<String, CompiledParameterizedType> getParameterizedTypesOfCurrentModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getParameterizedTypes)
+                .orElseGet(Map::of);
+    }
+
+    private Map<String, CompiledParameterizedObjectClass> getParameterizedObjectClassesOfCurrentModule() {
+        return getParameterizedObjectClassesOfCurrentModule(getCurrentModuleName());
+    }
+
+    private Map<String, CompiledParameterizedObjectClass> getParameterizedObjectClassesOfCurrentModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getParameterizedObjectClass)
+                .orElseGet(Map::of);
+    }
+
+    private Map<String, CompiledParameterizedObjectSet> getParameterizedObjectSetsOfCurrentModule() {
+        return getParameterizedObjectSetsOfCurrentModule(getCurrentModuleName());
+    }
+
+    private Map<String, CompiledParameterizedObjectSet> getParameterizedObjectSetsOfCurrentModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getParameterizedObjectSet)
+                .orElseGet(Map::of);
+    }
+
+    private Map<String, CompiledParameterizedValueSetType> getParameterizedValueSetTypesOfCurrentModule() {
+        return getParameterizedValueSetTypesOfCurrentModule(getCurrentModuleName());
+    }
+
+    private Map<String, CompiledParameterizedValueSetType> getParameterizedValueSetTypesOfCurrentModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getParameterizedValueSetType)
+                .orElseGet(Map::of);
+    }
+
     private String getCurrentModuleName() {
         return currentModule.peek().getModuleId().getModuleName();
     }
