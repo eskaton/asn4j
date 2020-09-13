@@ -583,35 +583,9 @@ public class CompilerContext {
      */
     public CompiledType getCompiledType(Type type) {
         if (isResolvableReference(type)) {
-            String typeName = ((TypeReference) type).getType();
-            Map<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
-            Optional<CompiledType> compiledType = Optional.ofNullable(moduleTypes.get(typeName));
+            var typeName = ((TypeReference) type).getType();
 
-            if (compiledType.isEmpty()) {
-                compiledType = withNewClass(() -> compiler.compileType(typeName));
-            }
-
-            if (compiledType.isEmpty()) {
-                Optional<ImportNode> imp = getImport(typeName);
-
-                if (imp.isPresent()) {
-                    String moduleName = imp.get().getReference().getName();
-                    ModuleNode module = getModule(moduleName);
-
-                    if (!isSymbolExported(module, typeName)) {
-                        String format = "Module %s uses the type %s from module %s which the latter doesn't export";
-                        throw new CompilerException(format, getCurrentModuleName(),
-                                typeName, moduleName);
-                    }
-
-                    moduleTypes = getTypesOfModule(moduleName);
-                    compiledType = Optional.ofNullable(moduleTypes.get(typeName));
-                }
-            }
-
-            if (compiledType.isPresent()) {
-                return compiledType.get();
-            }
+            return getCompiledType(typeName);
         } else if (type instanceof EnumeratedType enumeratedType) {
             var enumeratedTypeCompiler = (EnumeratedTypeCompiler) this.getCompiler(type.getClass());
 
@@ -619,6 +593,23 @@ public class CompilerContext {
         }
 
         return new AnonymousCompiledType(type);
+    }
+
+    public CompiledType getCompiledType(String reference) {
+        var moduleCompilationResult = getTypesOfCurrentModule();
+        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
+        var nodeName = "Type";
+
+        if (compilationResult.isEmpty()) {
+            compilationResult = withNewClass(() -> compiler.compileType(reference));
+        }
+
+        if (compilationResult.isEmpty()) {
+            compilationResult = getImportedCompilationResult(reference, nodeName, this::getTypesOfModule);
+        }
+
+        return compilationResult.orElseThrow(
+                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
     }
 
     /**
@@ -634,37 +625,20 @@ public class CompilerContext {
     }
 
     private CompiledObject getCompiledObject(String reference) {
-        var moduleObjects = getObjectsOfCurrentModule();
-        var compiledObject = Optional.ofNullable(moduleObjects.get(reference));
+        var moduleCompilationResult = getObjectsOfCurrentModule();
+        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
+        var nodeName = "Object";
 
-        if (compiledObject.isEmpty()) {
-            compiledObject = compiler.compileObject(reference);
+        if (compilationResult.isEmpty()) {
+            compilationResult = compiler.compileObject(reference);
         }
 
-        if (compiledObject.isEmpty()) {
-            Optional<ImportNode> imp = getImport(reference);
-
-            if (imp.isPresent()) {
-                String moduleName = imp.get().getReference().getName();
-                ModuleNode module = getModule(moduleName);
-
-                if (!isSymbolExported(module, reference)) {
-                    String format = "Module %s uses the object %s from module %s which the latter doesn't export";
-
-                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
-                }
-
-                pushModule(module);
-
-                try {
-                    compiledObject = Optional.ofNullable(getCompiledObject(reference));
-                } finally {
-                    popModule();
-                }
-            }
+        if (compilationResult.isEmpty()) {
+            compilationResult = getImportedCompilationResult(reference, nodeName, this::getObjectsOfModule);
         }
 
-        return compiledObject.orElseThrow(() -> new CompilerException("Failed to resolve object %s", reference));
+        return compilationResult.orElseThrow(() -> new CompilerException("Failed to resolve %s '%s'", nodeName,
+                reference));
     }
 
     /**
