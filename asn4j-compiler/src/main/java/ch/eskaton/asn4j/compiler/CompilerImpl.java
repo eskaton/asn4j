@@ -31,6 +31,10 @@ import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectClass;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectSet;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedValueSetType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -234,22 +238,25 @@ public class CompilerImpl {
                 getCompiler(ObjectSetAssignmentNode.class).compile(assignment);
     }
 
-    private CompilationResult compileParameterizedTypeAssignment(ParameterizedTypeAssignmentNode assignment) {
+    private CompiledParameterizedType compileParameterizedTypeAssignment(ParameterizedTypeAssignmentNode assignment) {
         return compilerContext.<ParameterizedTypeAssignmentNode, ParameterizedTypeAssignmentCompiler>
                 getCompiler(ParameterizedTypeAssignmentNode.class).compile(compilerContext, assignment);
     }
 
-    private CompilationResult compileParameterizedObjectSetAssignment(ParameterizedObjectSetAssignmentNode assignment) {
+    private CompiledParameterizedObjectSet compileParameterizedObjectSetAssignment(
+            ParameterizedObjectSetAssignmentNode assignment) {
         return compilerContext.<ParameterizedObjectSetAssignmentNode, ParameterizedObjectSetAssignmentCompiler>
                 getCompiler(ParameterizedObjectSetAssignmentNode.class).compile(compilerContext, assignment);
     }
 
-    private CompilationResult compileParameterizedObjectClassAssignment(ParameterizedObjectClassAssignmentNode assignment) {
+    private CompiledParameterizedObjectClass compileParameterizedObjectClassAssignment(
+            ParameterizedObjectClassAssignmentNode assignment) {
         return compilerContext.<ParameterizedObjectClassAssignmentNode, ParameterizedObjectClassAssignmentCompiler>
                 getCompiler(ParameterizedObjectClassAssignmentNode.class).compile(compilerContext, assignment);
     }
 
-    private CompilationResult compileParameterizedValueSetTypeAssignment(ParameterizedValueSetTypeAssignmentNode assignment) {
+    private CompiledParameterizedValueSetType compileParameterizedValueSetTypeAssignment(
+            ParameterizedValueSetTypeAssignmentNode assignment) {
         return compilerContext.<ParameterizedValueSetTypeAssignmentNode, ParameterizedValueSetTypeAssignmentCompiler>
                 getCompiler(ParameterizedValueSetTypeAssignmentNode.class).compile(compilerContext, assignment);
     }
