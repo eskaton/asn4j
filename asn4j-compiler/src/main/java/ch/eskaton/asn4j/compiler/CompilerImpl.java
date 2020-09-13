@@ -138,10 +138,10 @@ public class CompilerImpl {
     private void compileModuleAux(String moduleName) throws IOException, ParserException {
         System.out.println("Compiling module " + moduleName + "...");
 
-        ModuleNode module = compilerContext.getModule(moduleName);
+        var moduleNode = compilerContext.getModule(moduleName);
 
-        compileImports(module);
-        compileBody(module);
+        compileImports(moduleNode);
+        compileBody(moduleNode);
     }
 
     private void compileBody(ModuleNode module) {
@@ -286,8 +286,10 @@ public class CompilerImpl {
         Parser parser = new Parser(moduleInputStream);
 
         try {
-            ModuleNode module = parser.parse();
-            compilerContext.addModule(moduleName, module);
+            var moduleNode = parser.parse();
+
+            compilerContext.addModule(moduleName, moduleNode);
+
             System.out.println("Loaded module " + moduleName);
         } catch (ParserException e) {
             throw new ParserException("Failed to load module " + moduleName, e);
@@ -302,7 +304,7 @@ public class CompilerImpl {
             if (new File(file + ASN_1_EXTENSION).exists()) {
                 moduleFile = file + ASN_1_EXTENSION;
             } else if (new File(file + ASN_EXTENSION).exists()) {
-                moduleFile = file + ".asn";
+                moduleFile = file + ASN_EXTENSION;
             }
         }
 
@@ -316,7 +318,7 @@ public class CompilerImpl {
     private String stripExtension(String module) {
         if (module.endsWith(ASN_1_EXTENSION)) {
             module = module.substring(0, module.length() - 5);
-        } else if (module.endsWith(".asn")) {
+        } else if (module.endsWith(ASN_EXTENSION)) {
             module = module.substring(0, module.length() - 4);
         }
 
@@ -387,6 +389,46 @@ public class CompilerImpl {
                 return compilationResult.filter(CompiledObjectSet.class::isInstance)
                         .map(CompiledObjectSet.class::cast);
             }
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<CompiledParameterizedType> compileParameterizedType(String name) {
+        var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
+
+        if (unknownAssignment instanceof ParameterizedTypeAssignmentNode assignment) {
+            return Optional.of(compileParameterizedTypeAssignment(assignment));
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<CompiledParameterizedObjectClass> compiledParameterizedObjectClass(String name) {
+        var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
+
+        if (unknownAssignment instanceof ParameterizedObjectClassAssignmentNode assignment) {
+            return Optional.of(compileParameterizedObjectClassAssignment(assignment));
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<CompiledParameterizedObjectSet> compiledParameterizedObjectSet(String name) {
+        var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
+
+        if (unknownAssignment instanceof ParameterizedObjectSetAssignmentNode assignment) {
+            return Optional.of(compileParameterizedObjectSetAssignment(assignment));
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<CompiledParameterizedValueSetType> compiledParameterizedValueSetType(String name) {
+        var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
+
+        if (unknownAssignment instanceof ParameterizedValueSetTypeAssignmentNode assignment) {
+            return Optional.of(compileParameterizedValueSetTypeAssignment(assignment));
         }
 
         return Optional.empty();
