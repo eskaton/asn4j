@@ -572,6 +572,54 @@ public class CompilerContext {
     }
 
     /**
+     * Looks up the compiled type for the given type. Type may be compiled if it isn't already.
+     * If no compiled type can be found, it is assumed that type is a builtin type which is
+     * wrapped in a compiled type.
+     *
+     * @param type a type
+     * @return a compiled type
+     */
+    public CompiledType getCompiledType(Type type) {
+        if (isResolvableReference(type)) {
+            String typeName = ((TypeReference) type).getType();
+            Map<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
+            Optional<CompiledType> compiledType = Optional.ofNullable(moduleTypes.get(typeName));
+
+            if (compiledType.isEmpty()) {
+                compiledType = withNewClass(() -> compiler.compileType(typeName));
+            }
+
+            if (compiledType.isEmpty()) {
+                Optional<ImportNode> imp = getImport(typeName);
+
+                if (imp.isPresent()) {
+                    String moduleName = imp.get().getReference().getName();
+                    ModuleNode module = getModule(moduleName);
+
+                    if (!isSymbolExported(module, typeName)) {
+                        String format = "Module %s uses the type %s from module %s which the latter doesn't export";
+                        throw new CompilerException(format, getCurrentModuleName(),
+                                typeName, moduleName);
+                    }
+
+                    moduleTypes = getTypesOfModule(moduleName);
+                    compiledType = Optional.ofNullable(moduleTypes.get(typeName));
+                }
+            }
+
+            if (compiledType.isPresent()) {
+                return compiledType.get();
+            }
+        } else if (type instanceof EnumeratedType enumeratedType) {
+            var enumeratedTypeCompiler = (EnumeratedTypeCompiler) this.getCompiler(type.getClass());
+
+            return enumeratedTypeCompiler.createCompiledType(this, null, enumeratedType);
+        }
+
+        return new AnonymousCompiledType(type);
+    }
+
+    /**
      * Looks up the compiled object for the given object reference. The object may be compiled if it isn't already.
      *
      * @param objectReference an object reference
@@ -704,51 +752,151 @@ public class CompilerContext {
     }
 
     /**
-     * Looks up the compiled type for the given type. Type may be compiled if it isn't already.
-     * If no compiled type can be found, it is assumed that type is a builtin type which is
-     * wrapped in a compiled type.
+     * Looks up the compiled parameterized type for the given parameterized type reference reference. The compiled
+     * parameterized type may be compiled if it isn't already.
      *
-     * @param type a type
-     * @return a compiled type
+     * @param reference a parameterized type reference
+     * @return a compiled parameterized type
      */
-    public CompiledType getCompiledType(Type type) {
-        if (isResolvableReference(type)) {
-            String typeName = ((TypeReference) type).getType();
-            Map<String, CompiledType> moduleTypes = getTypesOfCurrentModule();
-            Optional<CompiledType> compiledType = Optional.ofNullable(moduleTypes.get(typeName));
+    public CompiledParameterizedType getCompiledParameterizedType(String reference) {
+        var moduleParameterizedTypes = getParameterizedTypesOfCurrentModule();
+        var compiledParameterizedTypes = Optional.ofNullable(moduleParameterizedTypes.get(reference));
 
-            if (compiledType.isEmpty()) {
-                compiledType = withNewClass(() -> compiler.compileType(typeName));
-            }
-
-            if (compiledType.isEmpty()) {
-                Optional<ImportNode> imp = getImport(typeName);
-
-                if (imp.isPresent()) {
-                    String moduleName = imp.get().getReference().getName();
-                    ModuleNode module = getModule(moduleName);
-
-                    if (!isSymbolExported(module, typeName)) {
-                        String format = "Module %s uses the type %s from module %s which the latter doesn't export";
-                        throw new CompilerException(format, getCurrentModuleName(),
-                                typeName, moduleName);
-                    }
-
-                    moduleTypes = getTypesOfModule(moduleName);
-                    compiledType = Optional.ofNullable(moduleTypes.get(typeName));
-                }
-            }
-
-            if (compiledType.isPresent()) {
-                return compiledType.get();
-            }
-        } else if (type instanceof EnumeratedType enumeratedType) {
-            var enumeratedTypeCompiler = (EnumeratedTypeCompiler) this.getCompiler(type.getClass());
-
-            return enumeratedTypeCompiler.createCompiledType(this, null, enumeratedType);
+        if (compiledParameterizedTypes.isEmpty()) {
+            compiledParameterizedTypes = compiler.compileParameterizedType(reference);
         }
 
-        return new AnonymousCompiledType(type);
+        if (compiledParameterizedTypes.isEmpty()) {
+            Optional<ImportNode> imp = getImport(reference);
+
+            if (imp.isPresent()) {
+                var moduleName = imp.get().getReference().getName();
+                var module = getModule(moduleName);
+
+                if (!isSymbolExported(module, reference)) {
+                    var format = "Module %s uses the parameterized type %s from module %s which the latter doesn't export";
+
+                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
+                }
+
+                moduleParameterizedTypes = getParameterizedTypesOfModule(moduleName);
+                compiledParameterizedTypes = Optional.ofNullable(moduleParameterizedTypes.get(reference));
+            }
+        }
+
+        return compiledParameterizedTypes.orElseThrow(
+                () -> new CompilerException("Failed to resolve parameterized type %s", reference));
+    }
+
+    /**
+     * Looks up the compiled parameterized object class for the given parameterized object class reference. The compiled
+     * parameterized object class may be compiled if it isn't already.
+     *
+     * @param reference an parameterized object class reference
+     * @return a compiled parameterized object class reference type
+     */
+    public CompiledParameterizedObjectClass getCompiledParameterizedObjectClass(String reference) {
+        var moduleParameterizedObjectClasses = getParameterizedObjectClassesOfCurrentModule();
+        var compiledParameterizedObjectClasses = Optional.ofNullable(moduleParameterizedObjectClasses.get(reference));
+
+        if (compiledParameterizedObjectClasses.isEmpty()) {
+            compiledParameterizedObjectClasses = compiler.compiledParameterizedObjectClass(reference);
+        }
+
+        if (compiledParameterizedObjectClasses.isEmpty()) {
+            Optional<ImportNode> imp = getImport(reference);
+
+            if (imp.isPresent()) {
+                var moduleName = imp.get().getReference().getName();
+                var module = getModule(moduleName);
+
+                if (!isSymbolExported(module, reference)) {
+                    var format = "Module %s uses the parameterized object class %s from module %s which the latter doesn't export";
+
+                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
+                }
+
+                moduleParameterizedObjectClasses = getParameterizedObjectClassesOfModule(moduleName);
+                compiledParameterizedObjectClasses = Optional.ofNullable(moduleParameterizedObjectClasses.get(reference));
+            }
+        }
+
+        return compiledParameterizedObjectClasses.orElseThrow(
+                () -> new CompilerException("Failed to resolve parameterized object class %s", reference));
+    }
+
+    /**
+     * Looks up the compiled parameterized object set for the given parameterized object set reference. The compiled
+     * parameterized object set may be compiled if it isn't already.
+     *
+     * @param reference a parameterized object set reference
+     * @return a compiled parameterized object set
+     */
+    public CompiledParameterizedObjectSet getCompiledParameterizedObjectSet(String reference) {
+        var moduleParameterizedObjectSets = getParameterizedObjectSetsOfCurrentModule();
+        var compiledParameterizedObjectSets = Optional.ofNullable(moduleParameterizedObjectSets.get(reference));
+
+        if (compiledParameterizedObjectSets.isEmpty()) {
+            compiledParameterizedObjectSets = compiler.compiledParameterizedObjectSet(reference);
+        }
+
+        if (compiledParameterizedObjectSets.isEmpty()) {
+            Optional<ImportNode> imp = getImport(reference);
+
+            if (imp.isPresent()) {
+                var moduleName = imp.get().getReference().getName();
+                var module = getModule(moduleName);
+
+                if (!isSymbolExported(module, reference)) {
+                    var format = "Module %s uses the parameterized object set %s from module %s which the latter doesn't export";
+
+                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
+                }
+
+                moduleParameterizedObjectSets = getParameterizedObjectSetsOfModule(moduleName);
+                compiledParameterizedObjectSets = Optional.ofNullable(moduleParameterizedObjectSets.get(reference));
+            }
+        }
+
+        return compiledParameterizedObjectSets.orElseThrow(
+                () -> new CompilerException("Failed to resolve parameterized object set %s", reference));
+    }
+
+    /**
+     * Looks up the compiled parameterized value set type for the given parameterized value set type reference. The
+     * compiled parameterized value set type may be compiled if it isn't already.
+     *
+     * @param reference a parameterized value set type reference
+     * @return a compiled parameterized value set type
+     */
+    public CompiledParameterizedValueSetType getCompiledParameterizedValueSetType(String reference) {
+        var moduleParameterizedValueSetTypes = getParameterizedValueSetTypesOfCurrentModule();
+        var compiledParameterizedValueSetTypes = Optional.ofNullable(moduleParameterizedValueSetTypes.get(reference));
+
+        if (compiledParameterizedValueSetTypes.isEmpty()) {
+            compiledParameterizedValueSetTypes = compiler.compiledParameterizedValueSetType(reference);
+        }
+
+        if (compiledParameterizedValueSetTypes.isEmpty()) {
+            Optional<ImportNode> imp = getImport(reference);
+
+            if (imp.isPresent()) {
+                var moduleName = imp.get().getReference().getName();
+                var module = getModule(moduleName);
+
+                if (!isSymbolExported(module, reference)) {
+                    var format = "Module %s uses the parameterized value set type %s from module %s which the latter doesn't export";
+
+                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
+                }
+
+                moduleParameterizedValueSetTypes = getParameterizedValueSetTypesOfModule(moduleName);
+                compiledParameterizedValueSetTypes = Optional.ofNullable(moduleParameterizedValueSetTypes.get(reference));
+            }
+        }
+
+        return compiledParameterizedValueSetTypes.orElseThrow(
+                () -> new CompilerException("Failed to resolve parameterized value set type %s", reference));
     }
 
     private Optional<ImportNode> getImport(String symbolName) {
