@@ -25,37 +25,57 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.OpenType;
-import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
+import ch.eskaton.asn4j.parser.ast.ParameterNode;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class UntaggedOpenTypeVerifier implements ComponentVerifier {
+import java.util.List;
+import java.util.Objects;
 
-    private final TypeName typeName;
+public class AbstractCompiledParameterizedResult implements CompilationResult {
 
-    private int componentCount = 0;
+    protected final String name;
 
-    private Tuple2<String, CompiledType> untaggedOpenType;
+    protected final List<ParameterNode> parameters;
 
-    public UntaggedOpenTypeVerifier(TypeName typeName) {
-        this.typeName = typeName;
+    public AbstractCompiledParameterizedResult(String name, List<ParameterNode> parameters) {
+        this.name = name;
+        this.parameters = parameters;
     }
 
-    public void verify(String name, CompiledType component) {
-        if (untaggedOpenType == null && component.getType() instanceof OpenType openType &&
-                openType.getTags().isEmpty()) {
-            untaggedOpenType = Tuple2.of(name, component);
+    public String getName() {
+        return name;
+    }
+
+    public List<ParameterNode> getParameters() {
+        return parameters;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
 
-        if (componentCount >= 1 && untaggedOpenType != null) {
-            throw new CompilerException("%s %s contains the open type %s which is ambiguous", typeName.getName(),
-                    untaggedOpenType.get_2().getParent().getName(), untaggedOpenType.get_1());
+        if (o == null || getClass() != o.getClass()) {
+            return false;
         }
 
-        componentCount++;
+        AbstractCompiledParameterizedResult that = (AbstractCompiledParameterizedResult) o;
+
+        return Objects.equals(name, that.name) &&
+                Objects.equals(parameters, that.parameters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, parameters);
     }
 
 }

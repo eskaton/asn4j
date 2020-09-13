@@ -83,7 +83,7 @@ public class FieldMetaData {
                     tagData.addAll(componentsTagData.stream().map(t -> {
                         var oldSetter = t.setter;
 
-                        t.setter = (result) -> {
+                        t.setter = result -> {
                             getSetter(field, type).accept(obj);
                             oldSetter.accept(result);
                         };

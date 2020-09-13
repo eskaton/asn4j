@@ -28,17 +28,10 @@
 package ch.eskaton.asn4j.compiler.typenamesuppliers;
 
 import ch.eskaton.asn4j.compiler.CompilerUtils;
-import ch.eskaton.asn4j.compiler.TypeConfiguration;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class ExternalTypeReferenceTypeNameSupplier implements TypeNameSupplier<Type> {
-
-    private final TypeConfiguration config;
-
-    public ExternalTypeReferenceTypeNameSupplier(TypeConfiguration config) {
-        this.config = config;
-    }
 
     @Override
     public String getName(Type type, String name) {

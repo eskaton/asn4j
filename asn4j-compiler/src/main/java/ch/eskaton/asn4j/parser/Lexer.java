@@ -634,7 +634,8 @@ public class Lexer {
         int beginOffset = is.getPos() - 1;
         int beginPos = pos;
         int tmpPos = pos;
-        int fractional = -1, exp = -1;
+        int fractional = -1;
+        int exp = -1;
         int cn;
         is.mark();
 

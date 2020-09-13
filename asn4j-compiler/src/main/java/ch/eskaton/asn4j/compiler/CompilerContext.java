@@ -159,7 +159,7 @@ public class CompilerContext {
     }
 
     public CompiledModule getCompiledModule(String moduleName) {
-        return definedModules.computeIfAbsent(moduleName, (key) -> new CompiledModule(key));
+        return definedModules.computeIfAbsent(moduleName, CompiledModule::new);
     }
 
     private void addType(String name, CompiledType compiledType) {
@@ -206,7 +206,7 @@ public class CompilerContext {
         return config.getDefaultCompiler(clazz);
     }
 
-    public <T extends Type, CC extends AbstractConstraintCompiler> CC getConstraintCompiler(Class<T> clazz) {
+    public <T extends Type, C extends AbstractConstraintCompiler> C getConstraintCompiler(Class<T> clazz) {
         return config.getConstraintCompiler(clazz);
     }
 
@@ -351,7 +351,7 @@ public class CompilerContext {
             var objectClassReference = objectClassFieldType.getObjectClassReference();
             var compiledObjectClass = getCompiledObjectClass(objectClassReference.getReference());
             var fieldNames = objectClassFieldType.getFieldName().getPrimitiveFieldNames();
-            AbstractCompiledField field = null;
+            AbstractCompiledField<?> field = null;
 
             for (var i = 0; i < fieldNames.size(); i++) {
                 var fieldName = fieldNames.get(i);
@@ -743,9 +743,9 @@ public class CompilerContext {
                 return compiledType.get();
             }
         } else if (type instanceof EnumeratedType enumeratedType) {
-            var compiler = (EnumeratedTypeCompiler) this.getCompiler(type.getClass());
+            var enumeratedTypeCompiler = (EnumeratedTypeCompiler) this.getCompiler(type.getClass());
 
-            return compiler.createCompiledType(this, null, enumeratedType);
+            return enumeratedTypeCompiler.createCompiledType(this, null, enumeratedType);
         }
 
         return new AnonymousCompiledType(type);

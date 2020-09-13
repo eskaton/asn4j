@@ -35,26 +35,18 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import java.util.List;
 import java.util.Objects;
 
-public class CompiledParameterizedValueSetType implements CompilationResult {
-
-    private final String name;
+public class CompiledParameterizedValueSetType extends AbstractCompiledParameterizedResult {
 
     private final Type type;
 
     private final ElementSetSpecsNode elementSet;
 
-    private final List<ParameterNode> parameters;
-
     public CompiledParameterizedValueSetType(String name, Type type, ElementSetSpecsNode elementSet,
             List<ParameterNode> parameters) {
-        this.name = name;
+        super(name, parameters);
+
         this.type = type;
         this.elementSet = elementSet;
-        this.parameters = parameters;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Type getType() {
@@ -63,10 +55,6 @@ public class CompiledParameterizedValueSetType implements CompilationResult {
 
     public ElementSetSpecsNode getElementSet() {
         return elementSet;
-    }
-
-    public List<ParameterNode> getParameters() {
-        return parameters;
     }
 
     @Override
@@ -84,17 +72,19 @@ public class CompiledParameterizedValueSetType implements CompilationResult {
             return false;
         }
 
+        if (!super.equals(o)) {
+            return false;
+        }
+
         CompiledParameterizedValueSetType that = (CompiledParameterizedValueSetType) o;
 
-        return Objects.equals(name, that.name) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(elementSet, that.elementSet) &&
-                Objects.equals(parameters, that.parameters);
+        return Objects.equals(type, that.type) &&
+                Objects.equals(elementSet, that.elementSet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, elementSet, parameters);
+        return Objects.hash(super.hashCode(), type, elementSet);
     }
 
 }

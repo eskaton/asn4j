@@ -65,6 +65,7 @@ public class SubtypeTypeNameSupplier<T extends Type> implements TypeNameSupplier
         return typeName;
     }
 
+    @SuppressWarnings("unused")
     protected boolean isSubtypeNeeded(T type, String name) {
         return subtypeNeeded && name != null;
     }

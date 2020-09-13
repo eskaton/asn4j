@@ -35,26 +35,18 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import java.util.List;
 import java.util.Objects;
 
-public class CompiledParameterizedObjectSet implements CompilationResult {
-
-    private final String name;
+public class CompiledParameterizedObjectSet extends AbstractCompiledParameterizedResult {
 
     private final ObjectClassNode objectClass;
 
     private final ObjectSetSpecNode objectSet;
 
-    private final List<ParameterNode> parameters;
-
     public CompiledParameterizedObjectSet(String name, ObjectClassNode objectClass, ObjectSetSpecNode objectSet,
             List<ParameterNode> parameters) {
-        this.name = name;
+        super(name, parameters);
+
         this.objectClass = objectClass;
         this.objectSet = objectSet;
-        this.parameters = parameters;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public ObjectClassNode getObjectClass() {
@@ -63,10 +55,6 @@ public class CompiledParameterizedObjectSet implements CompilationResult {
 
     public ObjectSetSpecNode getObjectSet() {
         return objectSet;
-    }
-
-    public List<ParameterNode> getParameters() {
-        return parameters;
     }
 
     @Override
@@ -84,17 +72,19 @@ public class CompiledParameterizedObjectSet implements CompilationResult {
             return false;
         }
 
+        if (!super.equals(o)) {
+            return false;
+        }
+
         CompiledParameterizedObjectSet that = (CompiledParameterizedObjectSet) o;
 
-        return Objects.equals(name, that.name) &&
-                Objects.equals(objectClass, that.objectClass) &&
-                Objects.equals(objectSet, that.objectSet) &&
-                Objects.equals(parameters, that.parameters);
+        return Objects.equals(objectClass, that.objectClass) &&
+                Objects.equals(objectSet, that.objectSet);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, objectClass, objectSet, parameters);
+        return Objects.hash(super.hashCode(), objectClass, objectSet);
     }
 
 }

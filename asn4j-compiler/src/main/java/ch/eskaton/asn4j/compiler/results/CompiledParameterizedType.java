@@ -34,30 +34,18 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import java.util.List;
 import java.util.Objects;
 
-public class CompiledParameterizedType implements CompilationResult {
-
-    private final String name;
+public class CompiledParameterizedType extends AbstractCompiledParameterizedResult {
 
     private final Type type;
 
-    private final List<ParameterNode> parameters;
-
     public CompiledParameterizedType(String name, Type type, List<ParameterNode> parameters) {
-        this.name = name;
-        this.type = type;
-        this.parameters = parameters;
-    }
+        super(name, parameters);
 
-    public String getName() {
-        return name;
+        this.type = type;
     }
 
     public Type getType() {
         return type;
-    }
-
-    public List<ParameterNode> getParameters() {
-        return parameters;
     }
 
     @Override
@@ -75,16 +63,18 @@ public class CompiledParameterizedType implements CompilationResult {
             return false;
         }
 
+        if (!super.equals(o)) {
+            return false;
+        }
+
         CompiledParameterizedType that = (CompiledParameterizedType) o;
 
-        return Objects.equals(name, that.name) &&
-                Objects.equals(type, that.type) &&
-                Objects.equals(parameters, that.parameters);
+        return Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, type, parameters);
+        return Objects.hash(super.hashCode(), type);
     }
 
 }

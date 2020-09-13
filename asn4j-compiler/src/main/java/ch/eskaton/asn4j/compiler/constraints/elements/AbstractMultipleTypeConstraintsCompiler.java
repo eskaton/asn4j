@@ -59,8 +59,7 @@ public abstract class AbstractMultipleTypeConstraintsCompiler implements Element
     }
 
     @Override
-    public Node compile(CompiledType baseType, MultipleTypeConstraints elements, Optional<Bounds> bounds) {
-        var compiledType = (CompiledType) baseType;
+    public Node compile(CompiledType compiledType, MultipleTypeConstraints elements, Optional<Bounds> bounds) {
         var components = ((HasComponents) compiledType).getComponents();
         var componentNodes = new HashSet<ComponentNode>();
         var verifier = verifierSupplier.get();
@@ -80,8 +79,10 @@ public abstract class AbstractMultipleTypeConstraintsCompiler implements Element
     protected ComponentNode compileComponentConstraint(CompiledType compiledType, NamedConstraint namedConstraint) {
         var name = namedConstraint.getName();
         var constraint = namedConstraint.getConstraint();
-        var presence = Optional.ofNullable(constraint.getPresence()).map(PresenceConstraint::getType).orElse(null);
-        var maybeValueConstraint = Optional.ofNullable(constraint.getValue()).map(ValueConstraint::getConstraint);
+        var presence = Optional.ofNullable(constraint.getPresence())
+                .map(PresenceConstraint::getType).orElse(null);
+        var maybeValueConstraint = Optional.ofNullable(constraint.getValue())
+                .map(ValueConstraint::getConstraint);
         var definition = ctx.compileConstraint(compiledType);
         Node roots = null;
 

@@ -40,7 +40,7 @@ import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 
-public class ScalarValueExpressionBuilder extends AbstractValueExpressionBuilder<ValueNode> {
+public class ScalarValueExpressionBuilder extends AbstractValueExpressionBuilder<ValueNode<?>> {
 
     public ScalarValueExpressionBuilder(CompilerContext ctx) {
         super(ctx);

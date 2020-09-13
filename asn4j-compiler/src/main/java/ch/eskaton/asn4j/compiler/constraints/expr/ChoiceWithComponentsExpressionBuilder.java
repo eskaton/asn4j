@@ -50,6 +50,7 @@ public class ChoiceWithComponentsExpressionBuilder extends WithComponentsExpress
         super(ctx);
     }
 
+    @Override
     protected HasComponents getTypeWithComponents(CompiledType compiledType) {
         return ctx.getCompiledChoiceType(compiledType);
     }
