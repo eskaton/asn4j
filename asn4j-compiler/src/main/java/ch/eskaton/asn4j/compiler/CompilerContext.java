@@ -856,40 +856,40 @@ public class CompilerContext {
     }
 
     private Map<String, CompiledParameterizedType> getParameterizedTypesOfCurrentModule() {
-        return getParameterizedTypesOfCurrentModule(getCurrentModuleName());
+        return getParameterizedTypesOfModule(getCurrentModuleName());
     }
 
-    private Map<String, CompiledParameterizedType> getParameterizedTypesOfCurrentModule(String moduleName) {
+    private Map<String, CompiledParameterizedType> getParameterizedTypesOfModule(String moduleName) {
         return Optional.ofNullable(definedModules.get(moduleName))
                 .map(CompiledModule::getParameterizedTypes)
                 .orElseGet(Map::of);
     }
 
     private Map<String, CompiledParameterizedObjectClass> getParameterizedObjectClassesOfCurrentModule() {
-        return getParameterizedObjectClassesOfCurrentModule(getCurrentModuleName());
+        return getParameterizedObjectClassesOfModule(getCurrentModuleName());
     }
 
-    private Map<String, CompiledParameterizedObjectClass> getParameterizedObjectClassesOfCurrentModule(String moduleName) {
+    private Map<String, CompiledParameterizedObjectClass> getParameterizedObjectClassesOfModule(String moduleName) {
         return Optional.ofNullable(definedModules.get(moduleName))
                 .map(CompiledModule::getParameterizedObjectClass)
                 .orElseGet(Map::of);
     }
 
     private Map<String, CompiledParameterizedObjectSet> getParameterizedObjectSetsOfCurrentModule() {
-        return getParameterizedObjectSetsOfCurrentModule(getCurrentModuleName());
+        return getParameterizedObjectSetsOfModule(getCurrentModuleName());
     }
 
-    private Map<String, CompiledParameterizedObjectSet> getParameterizedObjectSetsOfCurrentModule(String moduleName) {
+    private Map<String, CompiledParameterizedObjectSet> getParameterizedObjectSetsOfModule(String moduleName) {
         return Optional.ofNullable(definedModules.get(moduleName))
                 .map(CompiledModule::getParameterizedObjectSet)
                 .orElseGet(Map::of);
     }
 
     private Map<String, CompiledParameterizedValueSetType> getParameterizedValueSetTypesOfCurrentModule() {
-        return getParameterizedValueSetTypesOfCurrentModule(getCurrentModuleName());
+        return getParameterizedValueSetTypesOfModule(getCurrentModuleName());
     }
 
-    private Map<String, CompiledParameterizedValueSetType> getParameterizedValueSetTypesOfCurrentModule(String moduleName) {
+    private Map<String, CompiledParameterizedValueSetType> getParameterizedValueSetTypesOfModule(String moduleName) {
         return Optional.ofNullable(definedModules.get(moduleName))
                 .map(CompiledModule::getParameterizedValueSetType)
                 .orElseGet(Map::of);
