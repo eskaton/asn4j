@@ -325,7 +325,7 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(TypeReference.class, new TypeReferenceCompiler(),
                 new TypeReferenceTypeNameSupplier(this)));
         types.add(new TypeDefinition<>(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),
-                new ExternalTypeReferenceTypeNameSupplier(this)));
+                new ExternalTypeReferenceTypeNameSupplier()));
         types.add(new TypeDefinition<>(ObjectClassNode.class, new ObjectClassNodeCompiler()));
         types.add(new TypeDefinition<>(ObjectClassDefn.class, new ObjectClassDefnCompiler()));
         types.add(new TypeDefinition<>(TypeFieldSpecNode.class, new TypeFieldSpecNodeCompiler()));
@@ -379,8 +379,8 @@ public class TypeConfiguration {
         return (D) getConfigByType("getDefaultCompiler", typeClass, TypeDefinition::getDefaultCompiler);
     }
 
-    public <T extends Type, CC extends AbstractConstraintCompiler> CC getConstraintCompiler(Class<T> typeClass) {
-        return (CC) getConfigByType("getConstraintCompiler", typeClass, TypeDefinition::getConstraintCompiler);
+    public <T extends Type, C extends AbstractConstraintCompiler> C getConstraintCompiler(Class<T> typeClass) {
+        return (C) getConfigByType("getConstraintCompiler", typeClass, TypeDefinition::getConstraintCompiler);
     }
 
     public <V extends Value, S extends ValueResolver<V>> S getValueResolver(Class<V> valueClass) {

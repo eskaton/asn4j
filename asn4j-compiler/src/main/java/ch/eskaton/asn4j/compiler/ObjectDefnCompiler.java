@@ -108,38 +108,6 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         return values;
     }
 
-    private static class GroupState {
-
-        boolean optional;
-
-        boolean accepted;
-
-        boolean hasField;
-
-        public GroupState(boolean optional, boolean accepted, boolean hasField) {
-            this.optional = optional;
-            this.accepted = accepted;
-            this.hasField = hasField;
-        }
-
-        GroupState accepted(boolean accepted) {
-            return new GroupState(optional, accepted, hasField);
-        }
-
-        GroupState optional(boolean optional) {
-            return new GroupState(optional, accepted, hasField);
-        }
-
-        public GroupState hasField(boolean hasField) {
-            return new GroupState(optional, accepted, hasField);
-        }
-
-        @Override
-        public String toString() {
-            return ToString.get(this);
-        }
-    }
-
     private GroupState compile(CompiledObjectClass objectClass, List<? extends Object> syntaxSpec,
             LinkedList<Node> definedSyntax, HashMap<String, Object> values, GroupState state) {
         if (definedSyntax.isEmpty()) {
@@ -155,7 +123,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 currentState = compile(objectClass, ((Group) spec).getGroup(), definedSyntax, values,
                         currentState.optional(true));
 
-                hasField = currentState.hasField ? true : hasField;
+                hasField = currentState.hasField || hasField;
             } else if (spec instanceof RequiredToken requiredToken) {
                 currentState = compileRequiredToken(objectClass, definedSyntax, values, currentState, requiredToken);
 
@@ -163,7 +131,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                     return currentState;
                 }
 
-                hasField = currentState.hasField ? true : hasField;
+                hasField = currentState.hasField || hasField;
             } else {
                 throw new IllegalCompilerStateException(((Node) spec).getPosition(),
                         "Unsupported type in defined syntax: %s", spec);
@@ -323,6 +291,38 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                             ValueFormatter.formatValue(fieldValue));
                 }
             }
+        }
+    }
+
+    private static class GroupState {
+
+        boolean optional;
+
+        boolean accepted;
+
+        boolean hasField;
+
+        public GroupState(boolean optional, boolean accepted, boolean hasField) {
+            this.optional = optional;
+            this.accepted = accepted;
+            this.hasField = hasField;
+        }
+
+        GroupState accepted(boolean accepted) {
+            return new GroupState(optional, accepted, hasField);
+        }
+
+        GroupState optional(boolean optional) {
+            return new GroupState(optional, accepted, hasField);
+        }
+
+        GroupState hasField(boolean hasField) {
+            return new GroupState(optional, accepted, hasField);
+        }
+
+        @Override
+        public String toString() {
+            return ToString.get(this);
         }
     }
 

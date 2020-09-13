@@ -35,7 +35,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.MutableReference;
 
 import java.util.ArrayList;
 import java.util.Arrays;

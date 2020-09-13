@@ -34,57 +34,18 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import java.util.List;
 import java.util.Objects;
 
-public class CompiledParameterizedObjectClass implements CompilationResult {
-
-    private final String name;
+public class CompiledParameterizedObjectClass extends AbstractCompiledParameterizedResult {
 
     private final ObjectClassNode objectClass;
 
-    private final List<ParameterNode> parameters;
-
     public CompiledParameterizedObjectClass(String name, ObjectClassNode objectClass, List<ParameterNode> parameters) {
-        this.name = name;
-        this.objectClass = objectClass;
-        this.parameters = parameters;
-    }
+        super(name, parameters);
 
-    public String getName() {
-        return name;
+        this.objectClass = objectClass;
     }
 
     public ObjectClassNode getObjectClass() {
         return objectClass;
-    }
-
-    public List<ParameterNode> getParameters() {
-        return parameters;
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        CompiledParameterizedObjectClass that = (CompiledParameterizedObjectClass) o;
-
-        return Objects.equals(name, that.name) &&
-                Objects.equals(objectClass, that.objectClass) &&
-                Objects.equals(parameters, that.parameters);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, objectClass, parameters);
     }
 
 }

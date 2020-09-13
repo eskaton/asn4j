@@ -31,7 +31,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
 import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 
 public class FixedTypeValueSetFieldSpecNodeCompiler
         implements NamedCompiler<FixedTypeValueSetFieldSpecNode, CompiledFixedTypeValueSetField> {
@@ -39,7 +38,7 @@ public class FixedTypeValueSetFieldSpecNodeCompiler
     @Override
     public CompiledFixedTypeValueSetField compile(CompilerContext ctx, String name,
             FixedTypeValueSetFieldSpecNode node) {
-        var type = (Type) node.getType();
+        var type = node.getType();
         var compiledType = ctx.getCompiledType(type);
         var optionalitySpec = node.getOptionalitySpec();
         var compiledField = new CompiledFixedTypeValueSetField(node.getReference(), compiledType);

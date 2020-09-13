@@ -84,9 +84,10 @@ public class JavaUtils {
     }
 
     public static String getInitializerString(CompilerContext ctx, String typeName, Value value) {
-        var dispatcher = new Dispatcher<Value, Class<? extends Value>, Tuple3<CompilerContext, String, ? extends Value>, String>()
-                .withComparator((t, u) -> u.isInstance(t))
-                .withException(t -> new CompilerException("Failed to get initializer string for type %s", t));
+        var dispatcher =
+                new Dispatcher<Value, Class<? extends Value>, Tuple3<CompilerContext, String, ? extends Value>, String>()
+                        .withComparator((t, u) -> u.isInstance(t))
+                        .withException(t -> new CompilerException("Failed to get initializer string for type %s", t));
 
         addCase(dispatcher, BooleanValue.class, JavaUtils::getBooleanInitializerString);
         addCase(dispatcher, BitStringValue.class, JavaUtils::getBitStringInitializerString);
@@ -192,7 +193,8 @@ public class JavaUtils {
         return "new " + typeName + "()";
     }
 
-    private static String getObjectIdentifierInitializerString(CompilerContext ctx, String typeName, ObjectIdentifierValue value) {
+    private static String getObjectIdentifierInitializerString(CompilerContext ctx, String typeName,
+            ObjectIdentifierValue value) {
         return getOIDInitializerString(typeName, getComponentIds(value.getComponents()));
     }
 
@@ -226,7 +228,8 @@ public class JavaUtils {
         var maybeCompiledType = ctx.findCompiledTypeRecursive(value.getType())
                 .filter(CompiledCollectionType.class::isInstance)
                 .map(CompiledCollectionType.class::cast);
-        var values = value.getValues().stream().collect(Collectors.toMap(NamedValue::getName, NamedValue::getValue));
+        var values = value.getValues().stream().collect(Collectors.toMap(NamedValue::getName,
+                NamedValue::getValue));
 
         return maybeCompiledType.map(compiledType -> {
             var initString = compiledType.getComponents().stream()
@@ -323,6 +326,7 @@ public class JavaUtils {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 
+    @SuppressWarnings("unused")
     private static String getGenericStringInitializerString(CompilerContext ctx, String typeName,
             String value) {
         var escaped = value.chars().boxed().map(JavaUtils::escapeCharacter).collect(Collectors.joining());
