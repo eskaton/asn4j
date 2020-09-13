@@ -42,6 +42,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
+import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
@@ -114,6 +115,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -679,32 +681,19 @@ public class CompilerContext {
     }
 
     public CompiledObjectClass getCompiledObjectClass(String reference) {
-        var moduleObjectClasses = getObjectClassesOfCurrentModule();
-        var compiledObjectClass = Optional.ofNullable(moduleObjectClasses.get(reference));
+        var moduleCompilationResult = getObjectClassesOfCurrentModule();
+        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
+        var nodeName = "ObjectClass";
 
-        if (compiledObjectClass.isEmpty()) {
-            compiledObjectClass = compiler.compileObjectClass(reference);
+        if (compilationResult.isEmpty()) {
+            compilationResult = compiler.compileObjectClass(reference);
         }
 
-        if (compiledObjectClass.isEmpty()) {
-            Optional<ImportNode> imp = getImport(reference);
-
-            if (imp.isPresent()) {
-                String moduleName = imp.get().getReference().getName();
-                ModuleNode module = getModule(moduleName);
-
-                if (!isSymbolExported(module, reference)) {
-                    String format = "Module %s uses the object class %s from module %s which the latter doesn't export";
-
-                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
-                }
-
-                moduleObjectClasses = getObjectClassesOfModule(moduleName);
-                compiledObjectClass = Optional.ofNullable(moduleObjectClasses.get(reference));
-            }
+        if (compilationResult.isEmpty()) {
+            compilationResult = getImportedCompilationResult(reference, nodeName, this::getObjectClassesOfModule);
         }
 
-        return compiledObjectClass.orElseThrow(() -> new CompilerException("Failed to resolve object class %s",
+        return compilationResult.orElseThrow(() -> new CompilerException("Failed to resolve %s '%s'", nodeName,
                 reference));
     }
 
@@ -722,32 +711,19 @@ public class CompilerContext {
     }
 
     public CompiledObjectSet getCompiledObjectSet(String reference) {
-        var moduleObjectSets = getObjectSetsOfCurrentModule();
-        var compiledObjectSets = Optional.ofNullable(moduleObjectSets.get(reference));
+        var moduleCompilationResult = getObjectSetsOfCurrentModule();
+        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
+        var nodeName = "ObjectSet";
 
-        if (compiledObjectSets.isEmpty()) {
-            compiledObjectSets = compiler.compileObjectSet(reference);
+        if (compilationResult.isEmpty()) {
+            compilationResult = compiler.compileObjectSet(reference);
         }
 
-        if (compiledObjectSets.isEmpty()) {
-            Optional<ImportNode> imp = getImport(reference);
-
-            if (imp.isPresent()) {
-                String moduleName = imp.get().getReference().getName();
-                ModuleNode module = getModule(moduleName);
-
-                if (!isSymbolExported(module, reference)) {
-                    String format = "Module %s uses the object set %s from module %s which the latter doesn't export";
-
-                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
-                }
-
-                moduleObjectSets = getObjectSetsOfModule(moduleName);
-                compiledObjectSets = Optional.ofNullable(moduleObjectSets.get(reference));
-            }
+        if (compilationResult.isEmpty()) {
+            compilationResult = getImportedCompilationResult(reference, nodeName, this::getObjectSetsOfModule);
         }
 
-        return compiledObjectSets.orElseThrow(() -> new CompilerException("Failed to resolve object set %s",
+        return compilationResult.orElseThrow(() -> new CompilerException("Failed to resolve %s '%s'", nodeName,
                 reference));
     }
 
@@ -759,33 +735,20 @@ public class CompilerContext {
      * @return a compiled parameterized type
      */
     public CompiledParameterizedType getCompiledParameterizedType(String reference) {
-        var moduleParameterizedTypes = getParameterizedTypesOfCurrentModule();
-        var compiledParameterizedTypes = Optional.ofNullable(moduleParameterizedTypes.get(reference));
+        var moduleCompilationResult = getParameterizedTypesOfCurrentModule();
+        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
+        var nodeName = "ParameterizedType";
 
-        if (compiledParameterizedTypes.isEmpty()) {
-            compiledParameterizedTypes = compiler.compileParameterizedType(reference);
+        if (compilationResult.isEmpty()) {
+            compilationResult = compiler.compileParameterizedType(reference);
         }
 
-        if (compiledParameterizedTypes.isEmpty()) {
-            Optional<ImportNode> imp = getImport(reference);
-
-            if (imp.isPresent()) {
-                var moduleName = imp.get().getReference().getName();
-                var module = getModule(moduleName);
-
-                if (!isSymbolExported(module, reference)) {
-                    var format = "Module %s uses the parameterized type %s from module %s which the latter doesn't export";
-
-                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
-                }
-
-                moduleParameterizedTypes = getParameterizedTypesOfModule(moduleName);
-                compiledParameterizedTypes = Optional.ofNullable(moduleParameterizedTypes.get(reference));
-            }
+        if (compilationResult.isEmpty()) {
+            compilationResult = getImportedCompilationResult(reference, nodeName, this::getParameterizedTypesOfModule);
         }
 
-        return compiledParameterizedTypes.orElseThrow(
-                () -> new CompilerException("Failed to resolve parameterized type %s", reference));
+        return compilationResult.orElseThrow(
+                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
     }
 
     /**
@@ -796,33 +759,21 @@ public class CompilerContext {
      * @return a compiled parameterized object class reference type
      */
     public CompiledParameterizedObjectClass getCompiledParameterizedObjectClass(String reference) {
-        var moduleParameterizedObjectClasses = getParameterizedObjectClassesOfCurrentModule();
-        var compiledParameterizedObjectClasses = Optional.ofNullable(moduleParameterizedObjectClasses.get(reference));
+        var moduleCompilationResult = getParameterizedObjectClassesOfCurrentModule();
+        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
+        var nodeName = "ParameterizedObjectClass";
 
-        if (compiledParameterizedObjectClasses.isEmpty()) {
-            compiledParameterizedObjectClasses = compiler.compiledParameterizedObjectClass(reference);
+        if (compilationResult.isEmpty()) {
+            compilationResult = compiler.compiledParameterizedObjectClass(reference);
         }
 
-        if (compiledParameterizedObjectClasses.isEmpty()) {
-            Optional<ImportNode> imp = getImport(reference);
-
-            if (imp.isPresent()) {
-                var moduleName = imp.get().getReference().getName();
-                var module = getModule(moduleName);
-
-                if (!isSymbolExported(module, reference)) {
-                    var format = "Module %s uses the parameterized object class %s from module %s which the latter doesn't export";
-
-                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
-                }
-
-                moduleParameterizedObjectClasses = getParameterizedObjectClassesOfModule(moduleName);
-                compiledParameterizedObjectClasses = Optional.ofNullable(moduleParameterizedObjectClasses.get(reference));
-            }
+        if (compilationResult.isEmpty()) {
+            compilationResult = getImportedCompilationResult(reference, nodeName,
+                    this::getParameterizedObjectClassesOfModule);
         }
 
-        return compiledParameterizedObjectClasses.orElseThrow(
-                () -> new CompilerException("Failed to resolve parameterized object class %s", reference));
+        return compilationResult.orElseThrow(
+                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
     }
 
     /**
@@ -833,33 +784,21 @@ public class CompilerContext {
      * @return a compiled parameterized object set
      */
     public CompiledParameterizedObjectSet getCompiledParameterizedObjectSet(String reference) {
-        var moduleParameterizedObjectSets = getParameterizedObjectSetsOfCurrentModule();
-        var compiledParameterizedObjectSets = Optional.ofNullable(moduleParameterizedObjectSets.get(reference));
+        var moduleCompilationResult = getParameterizedObjectSetsOfCurrentModule();
+        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
+        var nodeName = "ParameterizedObjectSet";
 
-        if (compiledParameterizedObjectSets.isEmpty()) {
-            compiledParameterizedObjectSets = compiler.compiledParameterizedObjectSet(reference);
+        if (compilationResult.isEmpty()) {
+            compilationResult = compiler.compiledParameterizedObjectSet(reference);
         }
 
-        if (compiledParameterizedObjectSets.isEmpty()) {
-            Optional<ImportNode> imp = getImport(reference);
-
-            if (imp.isPresent()) {
-                var moduleName = imp.get().getReference().getName();
-                var module = getModule(moduleName);
-
-                if (!isSymbolExported(module, reference)) {
-                    var format = "Module %s uses the parameterized object set %s from module %s which the latter doesn't export";
-
-                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
-                }
-
-                moduleParameterizedObjectSets = getParameterizedObjectSetsOfModule(moduleName);
-                compiledParameterizedObjectSets = Optional.ofNullable(moduleParameterizedObjectSets.get(reference));
-            }
+        if (compilationResult.isEmpty()) {
+            compilationResult = getImportedCompilationResult(reference, nodeName,
+                    this::getParameterizedObjectSetsOfModule);
         }
 
-        return compiledParameterizedObjectSets.orElseThrow(
-                () -> new CompilerException("Failed to resolve parameterized object set %s", reference));
+        return compilationResult.orElseThrow(
+                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
     }
 
     /**
@@ -870,33 +809,43 @@ public class CompilerContext {
      * @return a compiled parameterized value set type
      */
     public CompiledParameterizedValueSetType getCompiledParameterizedValueSetType(String reference) {
-        var moduleParameterizedValueSetTypes = getParameterizedValueSetTypesOfCurrentModule();
-        var compiledParameterizedValueSetTypes = Optional.ofNullable(moduleParameterizedValueSetTypes.get(reference));
+        var moduleCompilationResult = getParameterizedValueSetTypesOfCurrentModule();
+        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
+        var nodeName = "ParameterizedValueSetType";
 
-        if (compiledParameterizedValueSetTypes.isEmpty()) {
-            compiledParameterizedValueSetTypes = compiler.compiledParameterizedValueSetType(reference);
+        if (compilationResult.isEmpty()) {
+            compilationResult = compiler.compiledParameterizedValueSetType(reference);
         }
 
-        if (compiledParameterizedValueSetTypes.isEmpty()) {
-            Optional<ImportNode> imp = getImport(reference);
+        if (compilationResult.isEmpty()) {
+            compilationResult = getImportedCompilationResult(reference, nodeName,
+                    this::getParameterizedValueSetTypesOfModule);
+        }
 
-            if (imp.isPresent()) {
-                var moduleName = imp.get().getReference().getName();
-                var module = getModule(moduleName);
+        return compilationResult.orElseThrow(
+                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
+    }
 
-                if (!isSymbolExported(module, reference)) {
-                    var format = "Module %s uses the parameterized value set type %s from module %s which the latter doesn't export";
+    private <T extends CompilationResult> Optional<T> getImportedCompilationResult(String reference, String nodeName,
+            Function<String, Map<String, T>> resultAccessor) {
+        var maybeImport = getImport(reference);
 
-                    throw new CompilerException(format, getCurrentModuleName(), reference, moduleName);
-                }
+        if (maybeImport.isPresent()) {
+            var moduleName = maybeImport.get().getReference().getName();
+            var module = getModule(moduleName);
 
-                moduleParameterizedValueSetTypes = getParameterizedValueSetTypesOfModule(moduleName);
-                compiledParameterizedValueSetTypes = Optional.ofNullable(moduleParameterizedValueSetTypes.get(reference));
+            if (!isSymbolExported(module, reference)) {
+                var format = "Module '%s' uses the %s '%s' from module '%s' which the latter doesn't export";
+
+                throw new CompilerException(format, getCurrentModuleName(), reference, nodeName, moduleName);
             }
+
+            var moduleCompilationResult = resultAccessor.apply(moduleName);
+
+            return Optional.ofNullable(moduleCompilationResult.get(reference));
         }
 
-        return compiledParameterizedValueSetTypes.orElseThrow(
-                () -> new CompilerException("Failed to resolve parameterized value set type %s", reference));
+        return Optional.empty();
     }
 
     private Optional<ImportNode> getImport(String symbolName) {
