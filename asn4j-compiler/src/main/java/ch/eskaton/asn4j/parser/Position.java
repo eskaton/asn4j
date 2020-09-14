@@ -34,7 +34,7 @@ import java.util.Objects;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
-public class Position {
+public class Position implements Comparable<Position> {
 
     private String file;
 
@@ -75,6 +75,23 @@ public class Position {
 
     public void decrementPosition() {
         position--;
+    }
+
+    @Override
+    public int compareTo(Position other) {
+        if (!file.equals(other.file)) {
+            return file.compareTo(other.file);
+        }
+
+        if (line != other.line) {
+            return line - other.line;
+        }
+
+        if (position != other.position) {
+            return position - other.position;
+        }
+
+        return 0;
     }
 
     @Override

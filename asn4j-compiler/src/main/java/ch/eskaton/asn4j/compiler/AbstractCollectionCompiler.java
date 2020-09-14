@@ -32,6 +32,8 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.ParameterNode;
+import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -95,6 +97,8 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
             }
         }
 
+        checkUnusedParameters(maybeParameters);
+
         ctor.setBody(Optional.of(ctorBody.toString()));
         javaClass.addMethod(ctor);
 
@@ -109,6 +113,29 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         ctx.finishClass();
 
         return compiledType;
+    }
+
+    private void checkUnusedParameters(Optional<Parameters> maybeParameters) {
+        if (maybeParameters.isEmpty()) {
+            return;
+        }
+
+        var parameters = maybeParameters.get();
+        var unusedParameters = parameters.getUnusedParameters();
+
+        if (unusedParameters.isEmpty()) {
+            return;
+        }
+
+        var position = unusedParameters.get(0).getPosition();
+        var parameterizedName = parameters.getParameterizedName();
+        var parameterNames = unusedParameters.stream()
+                .map(ParameterNode::getReference)
+                .map(ReferenceNode::getName)
+                .collect(Collectors.joining(", "));
+
+        throw new CompilerException(position, "Unused parameters in type '%s': %s", parameterizedName,
+                parameterNames);
     }
 
     private static class NameUniquenessVerifier implements ComponentVerifier {

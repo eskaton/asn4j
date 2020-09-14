@@ -46,7 +46,7 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
             var compiledType = ctx.getCompiledParameterizedType(typeName);
             var type = compiledType.getType();
             var parameterDefinitions = compiledType.getParameters();
-            var parameters = Optional.of(new Parameters(parameterDefinitions, parameterValues));
+            var parameters = Optional.of(new Parameters(typeName, parameterDefinitions, parameterValues));
             var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
 
             return compiler.compile(ctx, name, type, parameters);
