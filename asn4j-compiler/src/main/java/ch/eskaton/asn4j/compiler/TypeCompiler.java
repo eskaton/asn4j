@@ -36,7 +36,7 @@ public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
 
     public CompiledType compile(CompilerContext ctx, String name, Type type, Optional<Parameters> maybeParameters) {
         return ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass())
-                .compile(ctx, name, type, Optional.empty());
+                .compile(ctx, name, type ,maybeParameters);
     }
 
 }
