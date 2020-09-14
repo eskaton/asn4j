@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -45,12 +46,14 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
         javaClass.typeParameter(ctx.getTypeParameter(node, Optional.of(name)));
 
-        var contentType = compileContentType(ctx, node, name);
+        var contentType = compileContentType(ctx, node, name, maybeParameters);
         var compiledType = ctx.createCompiledType(CompiledCollectionOfType.class, node, name);
 
         contentType.setParent(compiledType);
         compiledType.setContentType(contentType);
         compiledType.setTags(tags);
+
+        ParameterUsageVerifier.checkUnusedParameters(maybeParameters);
 
         if (node.hasAnyConstraint()) {
             var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
@@ -63,13 +66,18 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
         return compiledType;
     }
 
-    private CompiledType compileContentType(CompilerContext ctx, T node, String name) {
+    private CompiledType compileContentType(CompilerContext ctx, T node, String name,
+            Optional<Parameters> maybeParameters) {
         var type = node.getType();
         var types = new LinkedList<Type>();
 
         while (type instanceof CollectionOfType) {
             types.push(type);
             type = ((CollectionOfType) type).getType();
+        }
+
+        if (maybeParameters.isPresent() && type instanceof TypeReference typeReference) {
+            type = ctx.getTypeParameter(maybeParameters.get(), typeReference).orElse(type);
         }
 
         var compiledType = ctx.isSubtypeNeeded(type) ?
