@@ -150,7 +150,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
 
         public void verify(String name, CompiledType component) {
             if (seenNames.contains(name)) {
-                throw new CompilerException("Duplicate component name in %s %s: %s", typeName.getName(),
+                throw new CompilerException("Duplicate component name in %s '%s': %s", typeName.getName(),
                         component.getParent().getName(), name);
             }
 

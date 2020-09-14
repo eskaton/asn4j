@@ -51,7 +51,7 @@ class TagUniquenessVerifier implements ComponentVerifier {
             var seenComponent = seenTags.get(tagId);
 
             if (seenComponent != null) {
-                throw new CompilerException("Duplicate tags in %s %s: %s and %s", typeName.getName(),
+                throw new CompilerException("Duplicate tags in %s '%s': %s and %s", typeName.getName(),
                         seenComponent.get_2().getParent().getName(), seenComponent.get_1(), componentName);
             }
         });

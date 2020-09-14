@@ -515,7 +515,7 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class,
-                ".*TestSequence contains the optional open type typeField which is ambiguous.*");
+                ".*'TestSequence' contains the optional open type 'typeField' which is ambiguous.*");
     }
 
     @Test
@@ -548,7 +548,7 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class,
-                ".*TestSet contains the open type typeField which is ambiguous.*");
+                ".*'TestSet' contains the open type 'typeField' which is ambiguous.*");
 
         body = """
                 TEST ::= CLASS {
@@ -562,7 +562,7 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class,
-                ".*TestSet contains the open type typeField which is ambiguous.*");
+                ".*'TestSet' contains the open type 'typeField' which is ambiguous.*");
     }
 
     @Test
@@ -642,7 +642,7 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class,
-                ".*TestChoice contains the open type typeField which is ambiguous.*");
+                ".*'TestChoice' contains the open type 'typeField' which is ambiguous.*");
     }
 
     @Test
@@ -1378,7 +1378,7 @@ class CompilerImplTest {
     }
 
     @Test
-    void testParameterizedSequenceWithUnusedParameters() {
+    void testParameterizedTypeWithSequenceUnusedParameters() {
         var body = """
                    AbstractSeq {Type1, Type2, Type3} ::= SEQUENCE {
                        field Type2
@@ -1388,6 +1388,57 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSeq': Type1, Type3.*");
+    }
+
+    @Test
+    void testParameterizedTypeWithSetComponentsOf() throws IOException, ParserException {
+        var body = """
+                   TestSet ::= SET {
+                       field2 INTEGER,
+                       field3 VisibleString
+                   }
+                   
+                   AbstractSet {Type, SetType} ::= SET {
+                       field1 Type,
+                       COMPONENTS OF SetType
+                   }
+                   
+                   Set ::= AbstractSet {BOOLEAN, TestSet}
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Set");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
+        testCollectionField((CompiledCollectionType) compiledType, "field2", IntegerType.class);
+        testCollectionField((CompiledCollectionType) compiledType, "field3", VisibleString.class);
+    }
+
+    @Test
+    void testParameterizedTypeWithSetComponentsOfDuplicateTags() {
+        var body = """
+                   TestSet ::= SET {
+                       field2 INTEGER,
+                       field3 VisibleString
+                   }
+                   
+                   AbstractSet {Type, SetType} ::= SET {
+                       field1 Type,
+                       COMPONENTS OF SetType
+                   }
+                   
+                   Set ::= AbstractSet {INTEGER, TestSet}
+                """;
+
+        testModule(body, CompilerException.class, ".*Duplicate tags in SET 'Set': field1 and field2.*");
     }
 
     private void testCollectionField(CompiledCollectionType collection, String fieldName,
