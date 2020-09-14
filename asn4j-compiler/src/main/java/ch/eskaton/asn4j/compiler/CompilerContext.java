@@ -102,7 +102,6 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
-import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -327,9 +326,7 @@ public class CompilerContext {
 
         if (type instanceof TypeReference typeReference && maybeParameters.isPresent()) {
             var parameters = maybeParameters.get();
-            var definitionsStream = parameters.getDefinitions().stream();
-            var valuesStream = parameters.getValues().stream();
-            var maybeParameter = StreamsUtils.zip(definitionsStream, valuesStream).
+            var maybeParameter = parameters.getDefinitionsAndValues().stream().
                     filter(tuple -> isTypeParameter(tuple.get_1(), typeReference))
                     .findAny();
 
@@ -338,6 +335,8 @@ public class CompilerContext {
                 var node = parameter.get_2();
 
                 if (node instanceof Type typeNode) {
+                    parameters.markAsUsed(parameter.get_1());
+
                     type = typeNode;
                 }
             }

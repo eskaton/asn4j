@@ -27,21 +27,38 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.parser.ast.AbstractNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.runtime.utils.ToString;
+import ch.eskaton.commons.collections.Tuple2;
+import ch.eskaton.commons.utils.StreamsUtils;
 
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Parameters {
+
+    private final String parameterizedName;
 
     private final List<ParameterNode> definitions;
 
     private final List<Node> values;
 
-    public Parameters(List<ParameterNode> definitions, List<Node> values) {
+    private final Set<ParameterNode> usedParameters = new HashSet<>();
+
+    public Parameters(String parameterizedName, List<ParameterNode> definitions, List<Node> values) {
+        this.parameterizedName = parameterizedName;
         this.definitions = definitions;
         this.values = values;
+    }
+
+    public String getParameterizedName() {
+        return parameterizedName;
     }
 
     public List<ParameterNode> getDefinitions() {
@@ -50,6 +67,27 @@ public class Parameters {
 
     public List<Node> getValues() {
         return values;
+    }
+
+    public List<Tuple2<ParameterNode, Node>> getDefinitionsAndValues() {
+        var definitionsStream = getDefinitions().stream();
+        var valuesStream = getValues().stream();
+
+        return StreamsUtils.zip(definitionsStream, valuesStream).collect(Collectors.toList());
+    }
+
+    public void markAsUsed(ParameterNode parameter) {
+        usedParameters.add(parameter);
+    }
+
+    public List<ParameterNode> getUnusedParameters() {
+        var unusedParameters = new LinkedList<>(definitions);
+
+        unusedParameters.removeAll(usedParameters);
+
+        return unusedParameters.stream()
+                .sorted(Comparator.comparing(AbstractNode::getPosition))
+                .collect(Collectors.toUnmodifiableList());
     }
 
     @Override

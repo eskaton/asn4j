@@ -1322,7 +1322,7 @@ class CompilerImplTest {
     }
 
     @Test
-    void testParameterizedTypeWithType() throws IOException, ParserException {
+    void testParameterizedSequenceWithType() throws IOException, ParserException {
         var body = """
                    AbstractSeq {Type} ::= SEQUENCE {
                        field Type
@@ -1351,6 +1351,19 @@ class CompilerImplTest {
         var field = maybeField.get();
 
         assertTrue(field.get_2().getType() instanceof BooleanType);
+    }
+
+    @Test
+    void testParameterizedSequenceWithUnusedParameters() {
+        var body = """
+                   AbstractSeq {Type1, Type2, Type3} ::= SEQUENCE {
+                       field Type2
+                   }
+                   
+                   Seq ::= AbstractSeq {INTEGER, BOOLEAN, VisibleString}
+                """;
+
+        testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSeq': Type1, Type2.*");
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
