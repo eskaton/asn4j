@@ -53,8 +53,6 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
         compiledType.setContentType(contentType);
         compiledType.setTags(tags);
 
-        ParameterUsageVerifier.checkUnusedParameters(maybeParameters);
-
         if (node.hasAnyConstraint()) {
             var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
 

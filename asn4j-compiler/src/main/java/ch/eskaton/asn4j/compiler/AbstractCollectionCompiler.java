@@ -96,8 +96,6 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
             }
         }
 
-        ParameterUsageVerifier.checkUnusedParameters(maybeParameters);
-
         ctor.setBody(Optional.of(ctorBody.toString()));
         javaClass.addMethod(ctor);
 
