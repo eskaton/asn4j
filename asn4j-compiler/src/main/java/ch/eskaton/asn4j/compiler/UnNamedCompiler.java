@@ -30,12 +30,15 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UnNamedCompiler<T extends Node> extends Compiler<T> {
 
-    List<Tuple2<String, CompiledType>> compile(CompilerContext ctx, CompiledCollectionType compiledType, T node);
+    List<Tuple2<String, CompiledType>> compile(CompilerContext ctx, CompiledCollectionType compiledType,
+            ComponentType node, Optional<Parameters> maybeParameters);
 
 }

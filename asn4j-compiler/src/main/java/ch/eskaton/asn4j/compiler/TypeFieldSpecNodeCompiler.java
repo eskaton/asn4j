@@ -32,10 +32,13 @@ import ch.eskaton.asn4j.parser.ast.DefaultTypeSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 
+import java.util.Optional;
+
 public class TypeFieldSpecNodeCompiler implements NamedCompiler<TypeFieldSpecNode, CompiledTypeField> {
 
     @Override
-    public CompiledTypeField compile(CompilerContext ctx, String name, TypeFieldSpecNode node) {
+    public CompiledTypeField compile(CompilerContext ctx, String name, TypeFieldSpecNode node,
+            Optional<Parameters> maybeParameters) {
         var reference = node.getReference();
         var optionalitySpec = node.getOptionalitySpec();
         var compiledField = new CompiledTypeField(reference);

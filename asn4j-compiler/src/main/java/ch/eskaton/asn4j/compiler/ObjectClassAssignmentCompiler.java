@@ -31,6 +31,8 @@ import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 
+import java.util.Optional;
+
 public class ObjectClassAssignmentCompiler implements Compiler<ObjectClassAssignmentNode> {
 
     public CompiledObjectClass compile(CompilerContext ctx, ObjectClassAssignmentNode node) {
@@ -40,7 +42,7 @@ public class ObjectClassAssignmentCompiler implements Compiler<ObjectClassAssign
 
         ObjectClassNodeCompiler compiler = ctx.getCompiler(ObjectClassNode.class);
 
-        return compiler.compile(ctx, objectClassName, node.getType());
+        return compiler.compile(ctx, objectClassName, node.getType(), Optional.empty());
     }
 
 }

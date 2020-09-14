@@ -30,11 +30,13 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
+import java.util.Optional;
+
 public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
 
-    public CompiledType compile(CompilerContext ctx, String name, Type type) {
+    public CompiledType compile(CompilerContext ctx, String name, Type type, Optional<Parameters> maybeParameters) {
         return ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass())
-                .compile(ctx, name, type);
+                .compile(ctx, name, type, Optional.empty());
     }
 
 }

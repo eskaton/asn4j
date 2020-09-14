@@ -39,7 +39,7 @@ import java.util.Optional;
 public abstract class CollectionOfCompiler<T extends CollectionOfType> implements NamedCompiler<T, CompiledType> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, T node) {
+    public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
         var javaClass = ctx.createClass(name, node, tags);
 

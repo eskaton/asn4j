@@ -31,10 +31,12 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 
+import java.util.Optional;
+
 public class GeneralizedTimeCompiler extends BuiltinTypeCompiler<GeneralizedTime> {
 
     public CompiledType compile(CompilerContext ctx, String name, UsefulType node) {
-        return super.compile(ctx, name, (GeneralizedTime) node);
+        return super.compile(ctx, name, (GeneralizedTime) node, Optional.empty());
     }
 
 }

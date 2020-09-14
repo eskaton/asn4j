@@ -30,8 +30,10 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.parser.ast.Node;
 
+import java.util.Optional;
+
 public interface NamedCompiler<T extends Node, R extends CompilationResult> extends Compiler<T> {
 
-    R compile(CompilerContext ctx, String name, T node);
+    R compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters);
 
 }

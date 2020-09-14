@@ -1321,6 +1321,38 @@ class CompilerImplTest {
         assertTrue(field2.get_2() instanceof IntegerValue);
     }
 
+    @Test
+    void testParameterizedTypeWithType() throws IOException, ParserException {
+        var body = """
+                   AbstractSeq {Type} ::= SEQUENCE {
+                       field Type
+                   }
+                   
+                   Seq ::= AbstractSeq {BOOLEAN}
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var maybeField = ((CompiledCollectionType) compiledType).getComponents().stream()
+                .filter(tuple -> tuple.get_1().equals("field"))
+                .findAny();
+
+        assertTrue(maybeField.isPresent());
+
+        var field = maybeField.get();
+
+        assertTrue(field.get_2().getType() instanceof BooleanType);
+    }
+
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var compiler = new CompilerImpl();

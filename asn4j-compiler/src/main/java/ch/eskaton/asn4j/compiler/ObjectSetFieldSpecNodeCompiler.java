@@ -32,10 +32,13 @@ import ch.eskaton.asn4j.parser.ast.DefaultObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 
+import java.util.Optional;
+
 public class ObjectSetFieldSpecNodeCompiler implements NamedCompiler<ObjectSetFieldSpecNode, CompiledObjectSetField> {
 
     @Override
-    public CompiledObjectSetField compile(CompilerContext ctx, String name, ObjectSetFieldSpecNode node) {
+    public CompiledObjectSetField compile(CompilerContext ctx, String name, ObjectSetFieldSpecNode node,
+            Optional<Parameters> maybeParameters) {
         var reference = node.getReference();
         var objectClassReference = node.getObjectClassReference();
         var objectClass = ctx.getCompiledObjectClass(objectClassReference);

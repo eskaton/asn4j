@@ -102,6 +102,7 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
+import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -320,6 +321,35 @@ public class CompilerContext {
         return config.getTypeNameSupplier(type.getClass()).getName(type, name);
     }
 
+    protected CompiledType defineType(CompilerContext ctx, NamedType namedType, Optional<Parameters> maybeParameters) {
+        var name = namedType.getName();
+        var type = namedType.getType();
+
+        if (type instanceof TypeReference typeReference && maybeParameters.isPresent()) {
+            var parameters = maybeParameters.get();
+            var definitionsStream = parameters.getDefinitions().stream();
+            var valuesStream = parameters.getValues().stream();
+            var maybeParameter = StreamsUtils.zip(definitionsStream, valuesStream).
+                    filter(tuple -> isTypeParameter(tuple.get_1(), typeReference))
+                    .findAny();
+
+            if (maybeParameter.isPresent()) {
+                var parameter = maybeParameter.get();
+                var node = parameter.get_2();
+
+                if (node instanceof Type typeNode) {
+                    type = typeNode;
+                }
+            }
+        }
+
+        return ctx.defineType(type, name);
+    }
+
+    private boolean isTypeParameter(ParameterNode definition, TypeReference reference) {
+        return definition.getGovernor() == null && definition.getReference().getName().equals(reference.getType());
+    }
+
     public CompiledType defineType(Type type) {
         String name = null;
 
@@ -449,7 +479,7 @@ public class CompilerContext {
     }
 
     private CompiledType compileType(Type type, String typeName) {
-        return this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type);
+        return this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type, Optional.empty());
     }
 
     public Optional<TypeAssignmentNode> getTypeAssignment(String typeName) {
