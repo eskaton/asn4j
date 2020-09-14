@@ -51,7 +51,7 @@ public class UntaggedOpenTypeVerifier implements ComponentVerifier {
         }
 
         if (componentCount >= 1 && untaggedOpenType != null) {
-            throw new CompilerException("%s %s contains the open type %s which is ambiguous", typeName.getName(),
+            throw new CompilerException("%s '%s' contains the open type '%s' which is ambiguous", typeName.getName(),
                     untaggedOpenType.get_2().getParent().getName(), untaggedOpenType.get_1());
         }
 

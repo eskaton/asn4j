@@ -53,7 +53,7 @@ public class SequenceCompiler extends AbstractCollectionCompiler<SequenceType> {
             if (component.getType() instanceof OpenType && component.isOptional()) {
                 optionalOpenTypeComponent = Tuple2.of(name, component);
             } else if (optionalOpenTypeComponent != null) {
-                throw new CompilerException("%s %s contains the optional open type %s which is ambiguous",
+                throw new CompilerException("%s '%s' contains the optional open type '%s' which is ambiguous",
                         typeName.getName(), optionalOpenTypeComponent.get_2().getParent().getName(),
                         optionalOpenTypeComponent.get_1());
             }
