@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
@@ -1492,6 +1493,65 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractChoice': Type1, Type3.*");
+    }
+
+    @Test
+    void testParameterizedTypeWithSequenceOf() throws IOException, ParserException {
+        var body = """
+                   AbstractSequenceOf {Type} ::= SEQUENCE OF Type
+                   
+                   SequenceOf ::= AbstractSequenceOf {BOOLEAN}
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("SequenceOf");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionOfType);
+
+        var collectionOf = (CompiledCollectionOfType) compiledType;
+
+        assertTrue(collectionOf.getContentType().getType() instanceof BooleanType);
+    }
+
+    @Test
+    void testParameterizedTypeWithSequenceOfUnusedParameters() {
+        var body = """
+                   AbstractSequenceOf {Type1, Type2, Type3} ::= SEQUENCE OF Type2
+                   
+                   SequenceOf ::= AbstractSequenceOf {INTEGER, BOOLEAN, VisibleString}
+                """;
+
+        testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSequenceOf': Type1, Type3.*");
+    }
+
+    @Test
+    void testParameterizedTypeWithSetOf() throws IOException, ParserException {
+        var body = """
+                   AbstractSetOf {Type} ::= SET OF Type
+                   
+                   SetOf ::= AbstractSetOf {BOOLEAN}
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("SetOf");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionOfType);
+
+        var collectionOf = (CompiledCollectionOfType) compiledType;
+
+        assertTrue(collectionOf.getContentType().getType() instanceof BooleanType);
     }
 
     private void testChoiceField(CompiledChoiceType choice, String fieldName,
