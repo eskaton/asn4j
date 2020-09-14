@@ -79,7 +79,7 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
         }
 
         var compiledType = ctx.isSubtypeNeeded(type) ?
-                ctx.defineType(type, name + "Content") :
+                ctx.defineType(type, name + "Content", maybeParameters) :
                 ctx.getCompiledType(type);
 
         while (!types.isEmpty()) {

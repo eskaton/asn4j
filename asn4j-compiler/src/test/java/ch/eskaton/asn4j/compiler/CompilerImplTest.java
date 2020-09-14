@@ -1379,6 +1379,39 @@ class CompilerImplTest {
     }
 
     @Test
+    void testParameterizedTypeWithSequenceNested() throws IOException, ParserException {
+        var body = """
+                   AbstractSeq {Type1, Type2} ::= SEQUENCE {
+                       field1 Type1,
+                       field2 SEQUENCE {
+                                  field3 Type2
+                              }
+                   }
+                   
+                   Seq ::= AbstractSeq {BOOLEAN, INTEGER}
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var collection = (CompiledCollectionType) compiledType;
+
+        testCollectionField(collection, "field1", BooleanType.class);
+
+        var field2 = testCollectionField(collection, "field2", SequenceType.class);
+
+        testCollectionField((CompiledCollectionType) field2, "field3", IntegerType.class);
+    }
+
+    @Test
     void testParameterizedTypeWithSequenceUnusedParameters() {
         var body = """
                    AbstractSeq {Type1, Type2, Type3} ::= SEQUENCE {
@@ -1568,7 +1601,7 @@ class CompilerImplTest {
         assertTrue(fieldType.isAssignableFrom(field.get_2().getType().getClass()));
     }
 
-    private void testCollectionField(CompiledCollectionType collection, String fieldName,
+    private CompiledType testCollectionField(CompiledCollectionType collection, String fieldName,
             Class<? extends Type> fieldType) {
         var components = collection.getComponents();
         var maybeField = components.stream()
@@ -1580,6 +1613,8 @@ class CompilerImplTest {
         var field = maybeField.get();
 
         assertTrue(fieldType.isAssignableFrom(field.get_2().getType().getClass()));
+
+        return field.get_2();
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {

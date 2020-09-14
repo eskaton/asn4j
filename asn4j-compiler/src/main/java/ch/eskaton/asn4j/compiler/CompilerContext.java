@@ -328,7 +328,7 @@ public class CompilerContext {
             type = getTypeParameter(maybeParameters.get(), typeReference).orElse(type);
         }
 
-        return defineType(type, name);
+        return defineType(type, name, maybeParameters);
     }
 
     protected Optional<Type> getTypeParameter(Parameters maybeParameters, TypeReference typeReference) {
@@ -355,35 +355,24 @@ public class CompilerContext {
         return definition.getGovernor() == null && definition.getReference().getName().equals(reference.getType());
     }
 
-    public CompiledType defineType(Type type) {
-        String name = null;
-
-        if (type instanceof NamedType) {
-            name = ((NamedType) type).getName();
-            type = ((NamedType) type).getType();
-        }
-
-        return defineType(type, name);
-    }
-
-    public CompiledType defineType(Type type, String name) {
+    public CompiledType defineType(Type type, String name, Optional<Parameters> maybeParameters) {
         if (type instanceof EnumeratedType) {
-            return defineType(type, name, isSubtypeNeeded(type));
+            return defineType(type, name, maybeParameters, isSubtypeNeeded(type));
         } else if (type instanceof IntegerType) {
-            return defineType(type, name, isSubtypeNeeded(type));
+            return defineType(type, name, maybeParameters, isSubtypeNeeded(type));
         } else if (type instanceof BitString) {
-            return defineType(type, name, isSubtypeNeeded(type));
+            return defineType(type, name, maybeParameters, isSubtypeNeeded(type));
         } else if (type instanceof SequenceType
                 || type instanceof SequenceOfType
                 || type instanceof SetType
                 || type instanceof SetOfType
                 || type instanceof Choice) {
-            return defineType(type, name, true);
+            return defineType(type, name, maybeParameters, true);
         } else if (type instanceof ObjectIdentifier
                 || type instanceof RelativeOID
                 || type instanceof IRI
                 || type instanceof RelativeIRI) {
-            return defineType(type, name, false);
+            return defineType(type, name, maybeParameters, false);
         } else if (type instanceof ObjectClassFieldTypeNode objectClassFieldType) {
             var objectClassReference = objectClassFieldType.getObjectClassReference();
             var compiledObjectClass = getCompiledObjectClass(objectClassReference.getReference());
@@ -409,9 +398,10 @@ public class CompilerContext {
             }
 
             if (field instanceof CompiledFixedTypeValueField) {
-                return defineFixedTypeValueField(type, name, compiledObjectClass, (CompiledFixedTypeValueField) field);
+                return defineFixedTypeValueField(type, name, compiledObjectClass, (CompiledFixedTypeValueField) field,
+                        maybeParameters);
             } else if (field instanceof CompiledTypeField) {
-                return defineTypeField(type, name, compiledObjectClass);
+                return defineTypeField(type, name, compiledObjectClass, maybeParameters);
             } else if (field == null) {
                 throw new IllegalCompilerStateException(type.getPosition(), "Failed to resolve field from %s", type);
             } else {
@@ -423,7 +413,8 @@ public class CompilerContext {
         return createCompiledType(type, getTypeName(type, name), true);
     }
 
-    private CompiledType defineTypeField(Type type, String name, CompiledObjectClass compiledObjectClass) {
+    private CompiledType defineTypeField(Type type, String name, CompiledObjectClass compiledObjectClass,
+            Optional<Parameters> maybeParameters) {
         var additionalConstraints = type.getConstraints();
         var openType = new OpenType();
 
@@ -440,7 +431,7 @@ public class CompilerContext {
             }
         }
 
-        var compiledType = defineType(openType, name);
+        var compiledType = defineType(openType, name, maybeParameters);
 
         compiledType.setObjectClass(compiledObjectClass);
 
@@ -448,7 +439,7 @@ public class CompilerContext {
     }
 
     private CompiledType defineFixedTypeValueField(Type type, String name, CompiledObjectClass compiledObjectClass,
-            CompiledFixedTypeValueField field) {
+            CompiledFixedTypeValueField field, Optional<Parameters> maybeParameters) {
         var additionalConstraints = type.getConstraints();
         var newType = (Type) Clone.clone(field.getCompiledType().getType());
 
@@ -464,16 +455,16 @@ public class CompilerContext {
             }
         }
 
-        var compiledType = defineType(newType, name);
+        var compiledType = defineType(newType, name, maybeParameters);
 
         compiledType.setObjectClass(compiledObjectClass);
 
         return compiledType;
     }
 
-    private CompiledType defineType(Type type, String name, boolean newType) {
+    private CompiledType defineType(Type type, String name, Optional<Parameters> maybeParameters, boolean newType) {
         if (newType && name != null) {
-            return compileType(type, getTypeName(type, name));
+            return compileType(type, getTypeName(type, name), maybeParameters);
         }
 
         var compiledType = createCompiledType(type, getTypeName(type, name), isBuiltin(type));
@@ -483,8 +474,8 @@ public class CompilerContext {
         return compiledType;
     }
 
-    private CompiledType compileType(Type type, String typeName) {
-        return this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type, Optional.empty());
+    private CompiledType compileType(Type type, String typeName, Optional<Parameters> maybeParameters) {
+        return this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type, maybeParameters);
     }
 
     public Optional<TypeAssignmentNode> getTypeAssignment(String typeName) {
