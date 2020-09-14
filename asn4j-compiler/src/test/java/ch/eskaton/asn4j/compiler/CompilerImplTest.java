@@ -1363,7 +1363,7 @@ class CompilerImplTest {
                    Seq ::= AbstractSeq {INTEGER, BOOLEAN, VisibleString}
                 """;
 
-        testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSeq': Type1, Type2.*");
+        testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSeq': Type1, Type3.*");
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
