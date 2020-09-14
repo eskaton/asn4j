@@ -64,7 +64,9 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         var javaClass = ctx.createClass(name, node, tags);
         var fieldNames = new ArrayList<String>();
         var typeEnum = new JavaEnum(CHOICE_ENUM);
-        var componentVerifiers = List.of(new TagUniquenessVerifier(TypeName.CHOICE),
+        var componentVerifiers = List.of(
+                new NameUniquenessVerifier(TypeName.CHOICE),
+                new TagUniquenessVerifier(TypeName.CHOICE),
                 new UntaggedOpenTypeVerifier(TypeName.CHOICE));
         var bodyBuilder = javaClass.method().modifier(PUBLIC).annotation("@Override")
                 .returnType(ASN1Type.class.getSimpleName()).name("getValue").body();

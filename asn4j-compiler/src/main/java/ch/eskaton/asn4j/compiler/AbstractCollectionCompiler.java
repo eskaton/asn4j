@@ -32,18 +32,14 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.ParameterNode;
-import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -110,27 +106,6 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         ctx.finishClass();
 
         return compiledType;
-    }
-
-    private static class NameUniquenessVerifier implements ComponentVerifier {
-
-        private final TypeName typeName;
-
-        private final Set<String> seenNames = new HashSet<>();
-
-        public NameUniquenessVerifier(TypeName typeName) {
-            this.typeName = typeName;
-        }
-
-        public void verify(String name, CompiledType component) {
-            if (seenNames.contains(name)) {
-                throw new CompilerException("Duplicate component name in %s '%s': %s", typeName.getName(),
-                        component.getParent().getName(), name);
-            }
-
-            seenNames.add(name);
-        }
-
     }
 
 }
