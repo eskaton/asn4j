@@ -1322,7 +1322,7 @@ class CompilerImplTest {
     }
 
     @Test
-    void testParameterizedSequenceWithType() throws IOException, ParserException {
+    void testParameterizedTypeWithSequence() throws IOException, ParserException {
         var body = """
                    AbstractSeq {Type} ::= SEQUENCE {
                        field Type
@@ -1342,15 +1342,39 @@ class CompilerImplTest {
         assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
-        var maybeField = ((CompiledCollectionType) compiledType).getComponents().stream()
-                .filter(tuple -> tuple.get_1().equals("field"))
-                .findAny();
+        testCollectionField((CompiledCollectionType) compiledType, "field", BooleanType.class);
+    }
 
-        assertTrue(maybeField.isPresent());
+    @Test
+    void testParameterizedTypeWithSequenceComponentsOf() throws IOException, ParserException {
+        var body = """
+                   TestSequence ::= SEQUENCE {
+                       field2 INTEGER,
+                       field3 VisibleString
+                   }
+                   
+                   AbstractSeq {Type, SequenceType} ::= SEQUENCE {
+                       field1 Type,
+                       COMPONENTS OF SequenceType
+                   }
+                   
+                   Seq ::= AbstractSeq {BOOLEAN, TestSequence}
+                """;
 
-        var field = maybeField.get();
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
 
-        assertTrue(field.get_2().getType() instanceof BooleanType);
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
+        testCollectionField((CompiledCollectionType) compiledType, "field2", IntegerType.class);
+        testCollectionField((CompiledCollectionType) compiledType, "field3", VisibleString.class);
     }
 
     @Test
@@ -1364,6 +1388,20 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSeq': Type1, Type3.*");
+    }
+
+    private void testCollectionField(CompiledCollectionType collection, String fieldName,
+            Class<? extends Type> fieldType) {
+        var components = collection.getComponents();
+        var maybeField = components.stream()
+                .filter(tuple -> tuple.get_1().equals(fieldName))
+                .findAny();
+
+        assertTrue(maybeField.isPresent());
+
+        var field = maybeField.get();
+
+        assertTrue(fieldType.isAssignableFrom(field.get_2().getType().getClass()));
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {

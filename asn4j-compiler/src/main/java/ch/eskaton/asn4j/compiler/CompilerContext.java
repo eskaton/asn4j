@@ -325,27 +325,33 @@ public class CompilerContext {
         var type = namedType.getType();
 
         if (type instanceof TypeReference typeReference && maybeParameters.isPresent()) {
-            var parameters = maybeParameters.get();
-            var maybeParameter = parameters.getDefinitionsAndValues().stream().
-                    filter(tuple -> isTypeParameter(tuple.get_1(), typeReference))
-                    .findAny();
-
-            if (maybeParameter.isPresent()) {
-                var parameter = maybeParameter.get();
-                var node = parameter.get_2();
-
-                if (node instanceof Type typeNode) {
-                    parameters.markAsUsed(parameter.get_1());
-
-                    type = typeNode;
-                }
-            }
+            type = getTypeParameter(maybeParameters.get(), typeReference).orElse(type);
         }
 
         return ctx.defineType(type, name);
     }
 
-    private boolean isTypeParameter(ParameterNode definition, TypeReference reference) {
+    protected Optional<Type> getTypeParameter(Parameters maybeParameters, TypeReference typeReference) {
+        var parameters = maybeParameters;
+        var maybeParameter = parameters.getDefinitionsAndValues().stream().
+                filter(tuple -> isTypeParameter(tuple.get_1(), typeReference))
+                .findAny();
+
+        if (maybeParameter.isPresent()) {
+            var parameter = maybeParameter.get();
+            var node = parameter.get_2();
+
+            if (node instanceof Type typeNode) {
+                parameters.markAsUsed(parameter.get_1());
+
+                return Optional.of(typeNode);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    protected boolean isTypeParameter(ParameterNode definition, TypeReference reference) {
         return definition.getGovernor() == null && definition.getReference().getName().equals(reference.getType());
     }
 
