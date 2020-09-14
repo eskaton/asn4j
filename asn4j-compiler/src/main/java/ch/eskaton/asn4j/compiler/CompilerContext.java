@@ -320,7 +320,7 @@ public class CompilerContext {
         return config.getTypeNameSupplier(type.getClass()).getName(type, name);
     }
 
-    protected CompiledType defineType(CompilerContext ctx, NamedType namedType, Optional<Parameters> maybeParameters) {
+    protected CompiledType defineType(NamedType namedType, Optional<Parameters> maybeParameters) {
         var name = namedType.getName();
         var type = namedType.getType();
 
@@ -328,7 +328,7 @@ public class CompilerContext {
             type = getTypeParameter(maybeParameters.get(), typeReference).orElse(type);
         }
 
-        return ctx.defineType(type, name);
+        return defineType(type, name);
     }
 
     protected Optional<Type> getTypeParameter(Parameters maybeParameters, TypeReference typeReference) {

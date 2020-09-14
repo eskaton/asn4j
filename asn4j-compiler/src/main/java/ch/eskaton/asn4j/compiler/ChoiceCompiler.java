@@ -80,7 +80,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         for (NamedType namedType : node.getRootAlternatives()) {
             var typeConstant = CompilerUtils.formatConstant(namedType.getName());
-            var nameAndComponent = compileChoiceNamedType(ctx, javaClass, namedType, typeConstant, clearFields);
+            var nameAndComponent = compileChoiceNamedType(ctx, javaClass, namedType,
+                    maybeParameters, typeConstant, clearFields);
             var fieldName = nameAndComponent.get_1();
             var component = nameAndComponent.get_2();
 
@@ -103,6 +104,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         addClearFieldsMethod(javaClass, fieldNames);
 
+        ParameterUsageVerifier.checkUnusedParameters(maybeParameters);
+
         compiledType.getComponents().addAll(components);
 
         var hasComponentConstraint = CompilerUtils.compileComponentConstraints(ctx, compiledType);
@@ -119,9 +122,9 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
     }
 
     private Tuple2<String, CompiledType> compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass,
-            NamedType namedType, String typeConstant, String beforeCode) {
+            NamedType namedType, Optional<Parameters> maybeParameters, String typeConstant, String beforeCode) {
         var name = CompilerUtils.formatName(namedType.getName());
-        var compiledType = ctx.defineType(namedType);
+        var compiledType = ctx.defineType(namedType, maybeParameters);
         var typeName = compiledType.getName();
         var field = new JavaDefinedField(typeName, name);
         var tags = compiledType.getTags();

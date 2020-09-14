@@ -86,7 +86,6 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
                     ctor.getParameters().add(new JavaParameter(argType, argName));
                     ctorBody.append("\t\tthis." + argName + " = " + argName + ";\n");
                 });
-
             } catch (CompilerException e) {
                 if (component.getNamedType() != null) {
                     throw new CompilerException("Failed to compile component %s in %s %s", e,
@@ -97,7 +96,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
             }
         }
 
-        checkUnusedParameters(maybeParameters);
+        ParameterUsageVerifier.checkUnusedParameters(maybeParameters);
 
         ctor.setBody(Optional.of(ctorBody.toString()));
         javaClass.addMethod(ctor);
@@ -113,29 +112,6 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         ctx.finishClass();
 
         return compiledType;
-    }
-
-    private void checkUnusedParameters(Optional<Parameters> maybeParameters) {
-        if (maybeParameters.isEmpty()) {
-            return;
-        }
-
-        var parameters = maybeParameters.get();
-        var unusedParameters = parameters.getUnusedParameters();
-
-        if (unusedParameters.isEmpty()) {
-            return;
-        }
-
-        var position = unusedParameters.get(0).getPosition();
-        var parameterizedName = parameters.getParameterizedName();
-        var parameterNames = unusedParameters.stream()
-                .map(ParameterNode::getReference)
-                .map(ReferenceNode::getName)
-                .collect(Collectors.joining(", "));
-
-        throw new CompilerException(position, "Unused parameters in type '%s': %s", parameterizedName,
-                parameterNames);
     }
 
     private static class NameUniquenessVerifier implements ComponentVerifier {
