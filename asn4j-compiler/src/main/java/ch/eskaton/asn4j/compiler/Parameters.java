@@ -27,22 +27,34 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ParameterNode;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.Optional;
+import java.util.List;
 
-public class TypeAssignmentCompiler implements Compiler<TypeAssignmentNode> {
+public class Parameters {
 
-    public CompiledType compile(CompilerContext ctx, TypeAssignmentNode node) {
-        String typeName = node.getReference();
+    private final List<ParameterNode> definitions;
 
-        System.out.println("Compiling type " + typeName);
+    private final List<Node> values;
 
-        TypeCompiler compiler = ctx.getCompiler(Type.class);
+    public Parameters(List<ParameterNode> definitions, List<Node> values) {
+        this.definitions = definitions;
+        this.values = values;
+    }
 
-        return compiler.compile(ctx, typeName, node.getType(), Optional.empty());
+    public List<ParameterNode> getDefinitions() {
+        return definitions;
+    }
+
+    public List<Node> getValues() {
+        return values;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }

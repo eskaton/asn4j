@@ -53,14 +53,14 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
     public List<Tuple2<String, CompiledType>> compile(CompilerContext ctx, CompiledCollectionType compiledType,
-            ComponentType node) {
+            ComponentType node, Optional<Parameters> maybeParameters) {
         switch (node.getCompType()) {
             case NAMED_TYPE_OPT:
                 // fall through
             case NAMED_TYPE_DEF:
                 // fall through
             case NAMED_TYPE:
-                return compileComponentNamedType(ctx, compiledType, node, node.getNamedType());
+                return compileComponentNamedType(ctx, compiledType, node, node.getNamedType(), maybeParameters);
             case TYPE:
                 return compileComponentType(ctx, compiledType, node.getType());
             default:
@@ -70,13 +70,14 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
     }
 
     private List<Tuple2<String, CompiledType>> compileComponentNamedType(CompilerContext ctx,
-            CompiledCollectionType compiledType, ComponentType component, NamedType namedType) {
+            CompiledCollectionType compiledType, ComponentType component, NamedType namedType,
+            Optional<Parameters> maybeParameters) {
         var javaClass = ctx.getCurrentClass();
         var type = ctx.resolveSelectedType(namedType.getType());
         var compAnnotation = new JavaAnnotation(ASN1Component.class);
         var hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
         var isOptional = component.getCompType() == CompType.NAMED_TYPE_OPT;
-        var compiledComponent = ctx.defineType(namedType);
+        var compiledComponent = ctx.defineType(ctx, namedType, maybeParameters);
         var typeName = compiledComponent.getName();
         var field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
 
@@ -160,7 +161,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
         for (ComponentType referencedComponent : componentTypes) {
             components.addAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
-                    .compile(ctx, compiledType, referencedComponent));
+                    .compile(ctx, compiledType, referencedComponent, Optional.empty()));
         }
 
         ctx.popModule();

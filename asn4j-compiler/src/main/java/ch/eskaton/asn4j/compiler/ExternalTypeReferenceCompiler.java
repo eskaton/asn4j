@@ -31,15 +31,18 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 
+import java.util.Optional;
+
 public class ExternalTypeReferenceCompiler extends AbstractTypeReferenceCompiler<ExternalTypeReference> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, ExternalTypeReference node) {
+    public CompiledType compile(CompilerContext ctx, String name, ExternalTypeReference node,
+            Optional<Parameters> maybeParameters) {
         ModuleNode module = ctx.getModule(node.getModule());
 
         ctx.ensureSymbolIsExported(module, node.getType());
 
-        return super.compile(ctx, name, node);
+        return super.compile(ctx, name, node, maybeParameters);
     }
 
 }

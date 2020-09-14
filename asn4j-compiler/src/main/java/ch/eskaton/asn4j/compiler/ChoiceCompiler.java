@@ -44,6 +44,7 @@ import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PRIVATE;
@@ -58,7 +59,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
     private static final String CHOICE_FIELD = "choice";
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, Choice node) {
+    public CompiledType compile(CompilerContext ctx, String name, Choice node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
         var javaClass = ctx.createClass(name, node, tags);
         var fieldNames = new ArrayList<String>();

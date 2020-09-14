@@ -32,12 +32,14 @@ import ch.eskaton.asn4j.parser.ast.DefaultValueSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueSetFieldSpecNode;
 
+import java.util.Optional;
+
 public class VariableTypeValueSetFieldSpecNodeCompiler
         implements NamedCompiler<VariableTypeValueSetFieldSpecNode, CompiledVariableTypeValueSetField> {
 
     @Override
     public CompiledVariableTypeValueSetField compile(CompilerContext ctx, String name,
-            VariableTypeValueSetFieldSpecNode node) {
+            VariableTypeValueSetFieldSpecNode node, Optional<Parameters> maybeParameters) {
         var optionalitySpec = node.getOptionalitySpec();
         var reference = node.getReference();
         var primitiveFieldNames = node.getFieldName().getPrimitiveFieldNames();

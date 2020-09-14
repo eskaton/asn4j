@@ -33,13 +33,15 @@ import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 
 import java.math.BigInteger;
+import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 
 public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, BitString node) {
+    public CompiledType compile(CompilerContext ctx, String name, BitString node,
+            Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
         var javaClass = ctx.createClass(name, node, tags);
         var namedBits = node.getNamedBits();

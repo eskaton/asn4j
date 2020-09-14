@@ -30,10 +30,12 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Real;
 
+import java.util.Optional;
+
 public class RealCompiler extends BuiltinTypeCompiler<Real> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, Real node) {
+    public CompiledType compile(CompilerContext ctx, String name, Real node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
 
         ctx.createClass(name, node, tags);

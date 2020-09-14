@@ -47,7 +47,8 @@ import static java.util.Collections.singletonList;
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, IntegerType node) {
+    public CompiledType compile(CompilerContext ctx, String name, IntegerType node,
+            Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
         var javaClass = ctx.createClass(name, node, tags);
         var namedNumbers = node.getNamedNumbers();

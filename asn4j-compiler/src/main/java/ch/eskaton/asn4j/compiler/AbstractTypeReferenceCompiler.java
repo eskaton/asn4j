@@ -29,13 +29,28 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+
+import java.util.Optional;
 
 public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         implements NamedCompiler<T, CompiledType> {
 
-    public CompiledType compile(CompilerContext ctx, String name, T node) {
-        // ensure the type is resolvable
-        ctx.resolveTypeReference(node);
+    public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
+        if (node.getParameters().isEmpty()) {
+            // ensure the type is resolvable
+            ctx.resolveTypeReference(node);
+        } else {
+            var parameterValues = node.getParameters().get();
+            var typeName = node.getType();
+            var compiledType = ctx.getCompiledParameterizedType(typeName);
+            var type = compiledType.getType();
+            var parameterDefinitions = compiledType.getParameters();
+            var parameters = Optional.of(new Parameters(parameterDefinitions, parameterValues));
+            var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
+
+            return compiler.compile(ctx, name, type, parameters);
+        }
 
         var tags = CompilerUtils.getTagIds(ctx, node);
         var javaClass = ctx.createClass(name, node, tags);
@@ -50,10 +65,6 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         }
 
         ctx.finishClass();
-
-        if (node.getParameters().isPresent()) {
-            throw new CompilerException(node.getPosition(), "ParameterizedTypeReference not yet supported");
-        }
 
         return compiledType;
     }

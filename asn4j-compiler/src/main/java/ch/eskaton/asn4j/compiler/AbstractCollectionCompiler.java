@@ -58,7 +58,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         this.componentVerifierSuppliers.add(NameUniquenessVerifier::new);
     }
 
-    public CompiledType compile(CompilerContext ctx, String name, T node) {
+    public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
         var javaClass = ctx.createClass(name, node, tags);
         var componentVerifiers = componentVerifierSuppliers.stream()
@@ -73,7 +73,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         for (ComponentType component : node.getAllComponents()) {
             try {
                 var compiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
-                var compiledComponents = compiler.compile(ctx, compiledType, component);
+                var compiledComponents = compiler.compile(ctx, compiledType, component, maybeParameters);
 
                 compiledComponents.forEach(c -> {
                     var argType = c.get_2().getName();

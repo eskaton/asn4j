@@ -95,7 +95,8 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
             SEQUENCE_LIT, SET_LIT, TIME_LIT, TIME_OF_DAY_LIT, TRUE_LIT, UNION_LIT);
 
     @Override
-    public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassDefn node) {
+    public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassDefn node,
+            Optional<Parameters> maybeParameters) {
         var compiledObjectClass = ctx.createCompiledObjectClass(name);
         var fieldSpecs = node.getFieldSpec();
 
@@ -134,7 +135,7 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
         var compiledField = ctx.<VariableTypeValueSetFieldSpecNode,
                 NamedCompiler<VariableTypeValueSetFieldSpecNode, AbstractCompiledField<?>>>getCompiler(
                 (Class<VariableTypeValueSetFieldSpecNode>) fieldSpec.getClass())
-                .compile(ctx, name, fieldSpec);
+                .compile(ctx, name, fieldSpec, Optional.empty());
 
         compiledObjectClass.addField(compiledField);
     }
@@ -153,7 +154,7 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
             var compiledField = ctx.<FixedTypeValueSetFieldSpecNode,
                     NamedCompiler<FixedTypeValueSetFieldSpecNode, AbstractCompiledField<?>>>getCompiler(
                     (Class<FixedTypeValueSetFieldSpecNode>) fixedTypeValueSetFieldSpec.getClass())
-                    .compile(ctx, name, fixedTypeValueSetFieldSpec);
+                    .compile(ctx, name, fixedTypeValueSetFieldSpec, Optional.empty());
 
             compiledObjectClass.addField(compiledField);
         }
@@ -176,7 +177,7 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
 
         var compiledField = ctx.<ObjectSetFieldSpecNode, NamedCompiler<ObjectSetFieldSpecNode,
                 AbstractCompiledField<?>>>getCompiler((Class<ObjectSetFieldSpecNode>) objectSetFieldSpec.getClass())
-                .compile(ctx, name, objectSetFieldSpec);
+                .compile(ctx, name, objectSetFieldSpec, Optional.empty());
 
         compiledObjectClass.addField(compiledField);
 
@@ -189,7 +190,7 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
         var compiledField = ctx.<VariableTypeValueFieldSpecNode,
                 NamedCompiler<VariableTypeValueFieldSpecNode, AbstractCompiledField<?>>>getCompiler(
                 (Class<VariableTypeValueFieldSpecNode>) fieldSpec.getClass())
-                .compile(ctx, name, fieldSpec);
+                .compile(ctx, name, fieldSpec, Optional.empty());
 
         compiledObjectClass.addField(compiledField);
     }
@@ -198,7 +199,7 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
             TypeFieldSpecNode fieldSpec) {
         var compiledField = ctx.<TypeFieldSpecNode, NamedCompiler<TypeFieldSpecNode,
                 AbstractCompiledField<?>>>getCompiler((Class<TypeFieldSpecNode>) fieldSpec.getClass())
-                .compile(ctx, name, fieldSpec);
+                .compile(ctx, name, fieldSpec, Optional.empty());
 
         compiledObjectClass.addField(compiledField);
     }
@@ -217,7 +218,7 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
             var compiledField = ctx.<FixedTypeValueFieldSpecNode,
                     NamedCompiler<FixedTypeValueFieldSpecNode, AbstractCompiledField<?>>>getCompiler(
                     (Class<FixedTypeValueFieldSpecNode>) fixedTypeValueFieldSpec.getClass())
-                    .compile(ctx, name, fixedTypeValueFieldSpec);
+                    .compile(ctx, name, fixedTypeValueFieldSpec, Optional.empty());
 
             compiledObjectClass.addField(compiledField);
         }
@@ -240,7 +241,7 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
 
         var compiledField = ctx.<ObjectFieldSpecNode, NamedCompiler<ObjectFieldSpecNode,
                 AbstractCompiledField<?>>>getCompiler((Class<ObjectFieldSpecNode>) objectFieldSpec.getClass())
-                .compile(ctx, name, objectFieldSpec);
+                .compile(ctx, name, objectFieldSpec, Optional.empty());
 
         compiledObjectClass.addField(compiledField);
 

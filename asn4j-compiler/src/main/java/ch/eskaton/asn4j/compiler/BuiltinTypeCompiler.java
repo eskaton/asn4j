@@ -30,10 +30,12 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
+import java.util.Optional;
+
 public abstract class BuiltinTypeCompiler<T extends Type> implements NamedCompiler<T, CompiledType> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, T node) {
+    public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
         var javaClass = ctx.createClass(name, node, tags);
         var compiledType = ctx.createCompiledType(node, name);

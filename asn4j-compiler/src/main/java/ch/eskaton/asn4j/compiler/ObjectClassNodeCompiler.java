@@ -30,11 +30,14 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 
+import java.util.Optional;
+
 public class ObjectClassNodeCompiler implements NamedCompiler<ObjectClassNode, CompiledObjectClass> {
 
-    public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassNode node) {
+    public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassNode node,
+            Optional<Parameters> maybeParameters) {
         return ctx.<ObjectClassNode, NamedCompiler<ObjectClassNode, CompiledObjectClass>>getCompiler((Class<ObjectClassNode>) node.getClass())
-                .compile(ctx, name, node);
+                .compile(ctx, name, node, Optional.empty());
     }
 
 }

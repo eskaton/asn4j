@@ -57,7 +57,8 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
     public static final String VALUE_PARAMETER = "value";
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, EnumeratedType node) {
+    public CompiledType compile(CompilerContext ctx, String name, EnumeratedType node,
+            Optional<Parameters> maybeParameters) {
         if (node.hasExceptionSpec()) {
             // TODO: figure out what to do
         }
