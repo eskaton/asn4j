@@ -104,8 +104,6 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         addClearFieldsMethod(javaClass, fieldNames);
 
-        ParameterUsageVerifier.checkUnusedParameters(maybeParameters);
-
         compiledType.getComponents().addAll(components);
 
         var hasComponentConstraint = CompilerUtils.compileComponentConstraints(ctx, compiledType);

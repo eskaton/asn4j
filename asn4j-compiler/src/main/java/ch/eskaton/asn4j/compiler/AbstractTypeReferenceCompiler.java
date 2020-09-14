@@ -33,6 +33,8 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Optional;
 
+import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
+
 public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         implements NamedCompiler<T, CompiledType> {
 
@@ -43,13 +45,16 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         } else {
             var parameterValues = node.getParameters().get();
             var typeName = node.getType();
-            var compiledType = ctx.getCompiledParameterizedType(typeName);
-            var type = compiledType.getType();
-            var parameterDefinitions = compiledType.getParameters();
+            var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
+            var type = compiledParameterizedType.getType();
+            var parameterDefinitions = compiledParameterizedType.getParameters();
             var parameters = Optional.of(new Parameters(typeName, parameterDefinitions, parameterValues));
             var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
+            var compiledType = compiler.compile(ctx, name, type, parameters);
 
-            return compiler.compile(ctx, name, type, parameters);
+            checkUnusedParameters(parameters);
+
+            return compiledType;
         }
 
         var tags = CompilerUtils.getTagIds(ctx, node);
