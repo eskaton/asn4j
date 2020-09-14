@@ -62,7 +62,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             case NAMED_TYPE:
                 return compileComponentNamedType(ctx, compiledType, node, node.getNamedType(), maybeParameters);
             case TYPE:
-                return compileComponentType(ctx, compiledType, node.getType());
+                return compileComponentType(ctx, compiledType, node.getType(), maybeParameters);
             default:
                 throw new IllegalCompilerStateException(node.getPosition(), "Unsupported component type: %s",
                         node.getCompType());
@@ -111,12 +111,20 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
     }
 
     private List<Tuple2<String, CompiledType>> compileComponentType(CompilerContext ctx,
-            CompiledCollectionType compiledType, Type type) {
+            CompiledCollectionType compiledType, Type type, Optional<Parameters> maybeParameters) {
         Optional<TypeAssignmentNode> assignment;
+        Type referencedType;
 
-        if (type instanceof TypeReference) {
-            TypeReference typeRef = (TypeReference) type;
-            String refTypeName = typeRef.getType();
+        if (type instanceof TypeReference typeReference) {
+            var refTypeName = typeReference.getType();
+
+            if (maybeParameters.isPresent()) {
+                refTypeName = ctx.getTypeParameter(maybeParameters.get(), typeReference)
+                        .filter(TypeReference.class::isInstance)
+                        .map(TypeReference.class::cast)
+                        .map(TypeReference::getType)
+                        .orElse(refTypeName);
+            }
 
             assignment = ctx.getTypeAssignment(refTypeName);
 
@@ -124,11 +132,12 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
                 throw new CompilerException("Type %s referenced but not defined", refTypeName);
             }
 
+            referencedType = assignment.get().getType();
+
             ctx.duplicateModule();
-        } else if (type instanceof ExternalTypeReference) {
-            ExternalTypeReference typeReference = (ExternalTypeReference) type;
-            String refTypeName = typeReference.getType();
-            String refModuleName = typeReference.getModule();
+        } else if (type instanceof ExternalTypeReference typeReference) {
+            var refTypeName = typeReference.getType();
+            var refModuleName = typeReference.getModule();
 
             assignment = ctx.getTypeAssignment(refModuleName, refTypeName);
 
@@ -140,12 +149,13 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
                         refTypeName, refModuleName);
             }
 
+            referencedType = assignment.get().getType();
+
             ctx.pushModule(refModuleName);
         } else {
             throw new CompilerException(type.getPosition(), "Unimplemented type %s", type);
         }
 
-        Type referencedType = assignment.get().getType();
         List<ComponentType> componentTypes;
 
         if (referencedType instanceof SetType) {
