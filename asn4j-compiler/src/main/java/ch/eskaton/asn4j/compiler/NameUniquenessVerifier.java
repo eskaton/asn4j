@@ -28,34 +28,28 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
-class UntaggedOpenTypeVerifier implements ComponentVerifier {
+import java.util.HashSet;
+import java.util.Set;
+
+class NameUniquenessVerifier implements ComponentVerifier {
 
     private final TypeName typeName;
 
-    private int componentCount = 0;
+    private final Set<String> seenNames = new HashSet<>();
 
-    private Tuple2<String, CompiledType> untaggedOpenType;
-
-    public UntaggedOpenTypeVerifier(TypeName typeName) {
+    public NameUniquenessVerifier(TypeName typeName) {
         this.typeName = typeName;
     }
 
     public void verify(String name, CompiledType component) {
-        if (untaggedOpenType == null && component.getType() instanceof OpenType openType &&
-                openType.getTags().isEmpty()) {
-            untaggedOpenType = Tuple2.of(name, component);
+        if (seenNames.contains(name)) {
+            throw new CompilerException("Duplicate component name in %s '%s': %s", typeName.getName(),
+                    component.getParent().getName(), name);
         }
 
-        if (componentCount >= 1 && untaggedOpenType != null) {
-            throw new CompilerException("%s '%s' contains the open type '%s' which is ambiguous", typeName.getName(),
-                    untaggedOpenType.get_2().getParent().getName(), untaggedOpenType.get_1());
-        }
-
-        componentCount++;
+        seenNames.add(name);
     }
 
 }

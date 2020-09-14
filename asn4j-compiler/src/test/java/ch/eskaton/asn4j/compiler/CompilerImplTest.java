@@ -261,6 +261,42 @@ class CompilerImplTest {
     }
 
     @Test
+    void testDuplicateNamesInChoice() {
+        var body = """
+                Choice ::= CHOICE {
+                    a INTEGER,
+                    a BOOLEAN
+                }
+                """;
+
+        testModule(body, CompilerException.class, "Duplicate component name in CHOICE 'Choice': a.*");
+    }
+
+    @Test
+    void testDuplicateNamesInSet() {
+        var body = """
+                Set ::= SET {
+                    a INTEGER,
+                    a BOOLEAN
+                }
+                """;
+
+        testModule(body, CompilerException.class, "Duplicate component name in SET 'Set': a.*");
+    }
+
+    @Test
+    void testDuplicateNamesInSequence() {
+        var body = """
+                Sequence ::= SEQUENCE {
+                    a INTEGER,
+                    a BOOLEAN
+                }
+                """;
+
+        testModule(body, CompilerException.class, "Duplicate component name in SEQUENCE 'Sequence': a.*");
+    }
+
+    @Test
     void testRedefinitionOfType() {
         var body = """
                 Integer ::= INTEGER
