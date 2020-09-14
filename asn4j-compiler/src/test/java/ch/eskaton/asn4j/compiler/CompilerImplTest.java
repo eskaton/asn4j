@@ -1441,6 +1441,73 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, ".*Duplicate tags in SET 'Set': field1 and field2.*");
     }
 
+    @Test
+    void testParameterizedTypeWithChoice() throws IOException, ParserException {
+        var body = """
+                   AbstractChoice {Type} ::= CHOICE {
+                       field1 Type,
+                       field2 INTEGER
+                   }
+                   
+                   Choice ::= AbstractChoice {BOOLEAN}
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Choice");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledChoiceType);
+
+        testChoiceField((CompiledChoiceType) compiledType, "field1", BooleanType.class);
+        testChoiceField((CompiledChoiceType) compiledType, "field2", IntegerType.class);
+    }
+
+    @Test
+    void testParameterizedTypeWithChoiceDuplicateTags() {
+        var body = """
+                   AbstractChoice {Type} ::= CHOICE {
+                       field1 Type,
+                       field2 INTEGER
+                   }
+                   
+                   Choice ::= AbstractChoice {INTEGER}
+                """;
+
+        testModule(body, CompilerException.class, ".*Duplicate tags in CHOICE 'Choice': field1 and field2.*");
+    }
+
+    @Test
+    void testParameterizedTypeWithChoiceUnusedParameters() {
+        var body = """
+                   AbstractChoice {Type1, Type2, Type3} ::= CHOICE {
+                       field Type2
+                   }
+                   
+                   Choice ::= AbstractChoice {INTEGER, BOOLEAN, VisibleString}
+                """;
+
+        testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractChoice': Type1, Type3.*");
+    }
+
+    private void testChoiceField(CompiledChoiceType choice, String fieldName,
+            Class<? extends Type> fieldType) {
+        var components = choice.getComponents();
+        var maybeField = components.stream()
+                .filter(tuple -> tuple.get_1().equals(fieldName))
+                .findAny();
+
+        assertTrue(maybeField.isPresent());
+
+        var field = maybeField.get();
+
+        assertTrue(fieldType.isAssignableFrom(field.get_2().getType().getClass()));
+    }
+
     private void testCollectionField(CompiledCollectionType collection, String fieldName,
             Class<? extends Type> fieldType) {
         var components = collection.getComponents();
