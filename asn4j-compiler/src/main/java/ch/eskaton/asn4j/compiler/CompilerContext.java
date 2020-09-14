@@ -596,20 +596,8 @@ public class CompilerContext {
     }
 
     public CompiledType getCompiledType(String reference) {
-        var moduleCompilationResult = getTypesOfCurrentModule();
-        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
-        var nodeName = "Type";
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = withNewClass(() -> compiler.compileType(reference));
-        }
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = getImportedCompilationResult(reference, nodeName, this::getTypesOfModule);
-        }
-
-        return compilationResult.orElseThrow(
-                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
+        return getCompilationResult(reference, "Type", this::getTypesOfCurrentModule,
+                typeReference -> withNewClass(() -> compiler.compileType(typeReference)), this::getTypesOfModule);
     }
 
     /**
@@ -625,20 +613,8 @@ public class CompilerContext {
     }
 
     private CompiledObject getCompiledObject(String reference) {
-        var moduleCompilationResult = getObjectsOfCurrentModule();
-        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
-        var nodeName = "Object";
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = compiler.compileObject(reference);
-        }
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = getImportedCompilationResult(reference, nodeName, this::getObjectsOfModule);
-        }
-
-        return compilationResult.orElseThrow(() -> new CompilerException("Failed to resolve %s '%s'", nodeName,
-                reference));
+        return getCompilationResult(reference, "Object", this::getObjectsOfCurrentModule,
+                compiler::compileObject, this::getObjectsOfModule);
     }
 
     /**
@@ -655,20 +631,8 @@ public class CompilerContext {
     }
 
     public CompiledObjectClass getCompiledObjectClass(String reference) {
-        var moduleCompilationResult = getObjectClassesOfCurrentModule();
-        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
-        var nodeName = "ObjectClass";
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = compiler.compileObjectClass(reference);
-        }
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = getImportedCompilationResult(reference, nodeName, this::getObjectClassesOfModule);
-        }
-
-        return compilationResult.orElseThrow(() -> new CompilerException("Failed to resolve %s '%s'", nodeName,
-                reference));
+        return getCompilationResult(reference, "ObjectClass", this::getObjectClassesOfCurrentModule,
+                compiler::compileObjectClass, this::getObjectClassesOfModule);
     }
 
     /**
@@ -685,20 +649,8 @@ public class CompilerContext {
     }
 
     public CompiledObjectSet getCompiledObjectSet(String reference) {
-        var moduleCompilationResult = getObjectSetsOfCurrentModule();
-        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
-        var nodeName = "ObjectSet";
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = compiler.compileObjectSet(reference);
-        }
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = getImportedCompilationResult(reference, nodeName, this::getObjectSetsOfModule);
-        }
-
-        return compilationResult.orElseThrow(() -> new CompilerException("Failed to resolve %s '%s'", nodeName,
-                reference));
+        return getCompilationResult(reference, "ParameterizedObjectSet", this::getObjectSetsOfCurrentModule,
+                compiler::compileObjectSet, this::getObjectSetsOfModule);
     }
 
     /**
@@ -709,20 +661,9 @@ public class CompilerContext {
      * @return a compiled parameterized type
      */
     public CompiledParameterizedType getCompiledParameterizedType(String reference) {
-        var moduleCompilationResult = getParameterizedTypesOfCurrentModule();
-        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
-        var nodeName = "ParameterizedType";
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = compiler.compileParameterizedType(reference);
-        }
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = getImportedCompilationResult(reference, nodeName, this::getParameterizedTypesOfModule);
-        }
-
-        return compilationResult.orElseThrow(
-                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
+        return getCompilationResult(reference, "ParameterizedType",
+                this::getParameterizedTypesOfCurrentModule, compiler::compileParameterizedType,
+                this::getParameterizedTypesOfModule);
     }
 
     /**
@@ -733,21 +674,9 @@ public class CompilerContext {
      * @return a compiled parameterized object class reference type
      */
     public CompiledParameterizedObjectClass getCompiledParameterizedObjectClass(String reference) {
-        var moduleCompilationResult = getParameterizedObjectClassesOfCurrentModule();
-        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
-        var nodeName = "ParameterizedObjectClass";
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = compiler.compiledParameterizedObjectClass(reference);
-        }
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = getImportedCompilationResult(reference, nodeName,
-                    this::getParameterizedObjectClassesOfModule);
-        }
-
-        return compilationResult.orElseThrow(
-                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
+        return getCompilationResult(reference, "ParameterizedObjectClass",
+                this::getParameterizedObjectClassesOfCurrentModule, compiler::compiledParameterizedObjectClass,
+                this::getParameterizedObjectClassesOfModule);
     }
 
     /**
@@ -758,21 +687,9 @@ public class CompilerContext {
      * @return a compiled parameterized object set
      */
     public CompiledParameterizedObjectSet getCompiledParameterizedObjectSet(String reference) {
-        var moduleCompilationResult = getParameterizedObjectSetsOfCurrentModule();
-        var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
-        var nodeName = "ParameterizedObjectSet";
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = compiler.compiledParameterizedObjectSet(reference);
-        }
-
-        if (compilationResult.isEmpty()) {
-            compilationResult = getImportedCompilationResult(reference, nodeName,
-                    this::getParameterizedObjectSetsOfModule);
-        }
-
-        return compilationResult.orElseThrow(
-                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
+        return getCompilationResult(reference, "ParameterizedObjectSet",
+                this::getParameterizedObjectSetsOfCurrentModule, compiler::compiledParameterizedObjectSet,
+                this::getParameterizedObjectSetsOfModule);
     }
 
     /**
@@ -783,17 +700,24 @@ public class CompilerContext {
      * @return a compiled parameterized value set type
      */
     public CompiledParameterizedValueSetType getCompiledParameterizedValueSetType(String reference) {
-        var moduleCompilationResult = getParameterizedValueSetTypesOfCurrentModule();
+        return getCompilationResult(reference, "ParameterizedValueSetType",
+                this::getParameterizedValueSetTypesOfCurrentModule, compiler::compiledParameterizedValueSetType,
+                this::getParameterizedValueSetTypesOfModule);
+    }
+
+    private <T extends CompilationResult> T getCompilationResult(String reference, String nodeName,
+            Supplier<Map<String, T>> moduleAccessor,
+            Function<String, Optional<T>> compiler,
+            Function<String, Map<String, T>> importAccessor) {
+        var moduleCompilationResult = moduleAccessor.get();
         var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
-        var nodeName = "ParameterizedValueSetType";
 
         if (compilationResult.isEmpty()) {
-            compilationResult = compiler.compiledParameterizedValueSetType(reference);
+            compilationResult = compiler.apply(reference);
         }
 
         if (compilationResult.isEmpty()) {
-            compilationResult = getImportedCompilationResult(reference, nodeName,
-                    this::getParameterizedValueSetTypesOfModule);
+            compilationResult = getImportedCompilationResult(reference, nodeName, importAccessor);
         }
 
         return compilationResult.orElseThrow(
