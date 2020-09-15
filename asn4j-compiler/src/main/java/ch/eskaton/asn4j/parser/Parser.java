@@ -5274,7 +5274,7 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public ParamGovernorNode parse() throws ParserException {
-            return new ChoiceParser<>(governorParser, dummyGovernorParser).parse();
+            return new ChoiceParser<>(dummyGovernorParser, governorParser).parse();
         }
 
     }
