@@ -691,7 +691,8 @@ class CompilerImplTest {
                 }
                 """;
 
-        var variableTypeValueField = getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
+        var variableTypeValueField =
+                getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
 
         assertEquals("TypeField", variableTypeValueField.getReference());
         assertFalse(variableTypeValueField.isOptional());
@@ -706,7 +707,8 @@ class CompilerImplTest {
                 }
                 """;
 
-        var variableTypeValueField = getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
+        var variableTypeValueField =
+                getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
 
         assertEquals("TypeField", variableTypeValueField.getReference());
         assertTrue(variableTypeValueField.isOptional());
@@ -721,7 +723,8 @@ class CompilerImplTest {
                 }
                 """;
 
-        var variableTypeValueField = getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
+        var variableTypeValueField =
+                getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
 
         assertEquals("TypeField", variableTypeValueField.getReference());
 
@@ -920,7 +923,8 @@ class CompilerImplTest {
                 }
                 """;
 
-        var variableTypeValueSetField = getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
+        var variableTypeValueSetField =
+                getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
 
         assertEquals("TypeField", variableTypeValueSetField.getReference());
         assertFalse(variableTypeValueSetField.isOptional());
@@ -935,7 +939,8 @@ class CompilerImplTest {
                 }
                 """;
 
-        var variableTypeValueSetField = getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
+        var variableTypeValueSetField =
+                getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
 
         assertEquals("TypeField", variableTypeValueSetField.getReference());
         assertTrue(variableTypeValueSetField.isOptional());
@@ -1458,6 +1463,20 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSeq': Type1, Type3.*");
+    }
+
+    @Test
+    void testParameterizedTypeWithSequenceParameterCount() {
+        var body = """
+                   AbstractSeq {Type1, Type2, Type3} ::= SEQUENCE {
+                       field Type2
+                   }
+                   
+                   Seq ::= AbstractSeq {INTEGER}
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*'Seq' passes 1 parameters but 'AbstractSeq' expects: Type1, Type2, Type3.*");
     }
 
     @Test

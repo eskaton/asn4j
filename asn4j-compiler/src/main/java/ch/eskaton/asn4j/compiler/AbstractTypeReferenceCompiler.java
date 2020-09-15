@@ -27,11 +27,15 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.ParameterNode;
+import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
 
@@ -43,12 +47,10 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
             // ensure the type is resolvable
             ctx.resolveTypeReference(node);
         } else {
-            var parameterValues = node.getParameters().get();
             var typeName = node.getType();
             var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
+            var parameters = createParameters(node, name, compiledParameterizedType);
             var type = compiledParameterizedType.getType();
-            var parameterDefinitions = compiledParameterizedType.getParameters();
-            var parameters = Optional.of(new Parameters(typeName, parameterDefinitions, parameterValues));
             var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
             var compiledType = compiler.compile(ctx, name, type, parameters);
 
@@ -72,6 +74,26 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         ctx.finishClass();
 
         return compiledType;
+    }
+
+    private Optional<Parameters> createParameters(T node, String typeName,
+            CompiledParameterizedType compiledParameterizedType) {
+        var parameterizedTypeName = compiledParameterizedType.getName();
+        var parameterValues = node.getParameters().get();
+        var parameterValueCount = parameterValues.size();
+        var parameterDefinitions = compiledParameterizedType.getParameters();
+
+        if (parameterValueCount != parameterDefinitions.size()) {
+            var parameterNames = parameterDefinitions.stream()
+                    .map(ParameterNode::getReference)
+                    .map(ReferenceNode::getName)
+                    .collect(Collectors.joining(", "));
+
+            throw new CompilerException(node.getPosition(), "'%s' passes %d parameters but '%s' expects: %s",
+                    typeName, parameterValueCount, parameterizedTypeName, parameterNames);
+        }
+
+        return Optional.of(new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues));
     }
 
 }
