@@ -397,7 +397,7 @@ public class CompilerContext {
     protected boolean isValueParameter(ParameterNode definition, SimpleDefinedValue simpleDefinedValue) {
         var value = simpleDefinedValue.getValue();
         var paramGovernor = definition.getGovernor();
-        Node type = getParameterType(paramGovernor);
+        var type = getParameterType(paramGovernor);
 
         return paramGovernor != null &&
                 type instanceof Type &&
@@ -412,7 +412,21 @@ public class CompilerContext {
         if (paramGovernor instanceof Governor governor) {
             type = governor.getType();
         } else if (paramGovernor instanceof DummyGovernor dummyGovernor) {
+            var reference = dummyGovernor.getReference();
+            var typeReference = reference.getName();
+            var firstChar = typeReference.substring(0, 1);
 
+            if (firstChar.equals(firstChar.toUpperCase())) {
+                try {
+                    type = resolveTypeReference(typeReference);
+                } catch (CompilerException e) {
+                    throw new CompilerException(dummyGovernor.getPosition(),
+                            "The Governor references the type %s which can't be resolved", typeReference);
+                }
+            } else {
+                throw new CompilerException(dummyGovernor.getPosition(),
+                        "The Governor '%s' is not a valid typereference", typeReference);
+            }
         }
 
         if (type instanceof Type) {

@@ -1669,6 +1669,62 @@ class CompilerImplTest {
     }
 
     @Test
+    void testParameterizedValueWithTypeReferenceWithSequence() throws IOException, ParserException {
+        var body = """
+                   Integer ::= INTEGER
+                   
+                   AbstractSequence {Integer:value} ::= SEQUENCE {
+                       field INTEGER DEFAULT value
+                   }
+                   
+                   Sequence ::= AbstractSequence {23}
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Sequence");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var collection = (CompiledCollectionType) compiledType;
+
+        testCollectionField(collection, "field", IntegerType.class);
+    }
+
+    @Test
+    void testParameterizedValueWithSequenceUnresolvableTypeReference() {
+        var body = """
+                   AbstractSequence {Integer:value} ::= SEQUENCE {
+                       field INTEGER DEFAULT value
+                   }
+                   
+                   Sequence ::= AbstractSequence {TRUE}
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*The Governor references the type Integer which can't be resolved.*");
+    }
+
+    @Test
+    void testParameterizedValueWithSequenceInvalidTypeReference() {
+        var body = """
+                   AbstractSequence {integer:value} ::= SEQUENCE {
+                       field INTEGER DEFAULT value
+                   }
+                   
+                   Sequence ::= AbstractSequence {23}
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*The Governor 'integer' is not a valid typereference.*");
+    }
+
+    @Test
     void testParameterizedValueWithSequenceWrongValueType() {
         var body = """
                    AbstractSequence {INTEGER:value} ::= SEQUENCE {
