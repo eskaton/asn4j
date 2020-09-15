@@ -58,6 +58,10 @@ import ch.eskaton.asn4j.compiler.results.CompiledParameterizedValueSetType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.HasChildComponents;
+import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
+import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
+import ch.eskaton.asn4j.parser.DummyGovernor;
+import ch.eskaton.asn4j.parser.Governor;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
@@ -72,6 +76,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
+import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
@@ -331,7 +336,7 @@ public class CompilerContext {
         return defineType(type, name, maybeParameters);
     }
 
-    protected Optional<Type> getTypeParameter(Parameters maybeParameters, TypeReference typeReference) {
+    public Optional<Type> getTypeParameter(Parameters maybeParameters, TypeReference typeReference) {
         var parameters = maybeParameters;
         var maybeParameter = parameters.getDefinitionsAndValues().stream().
                 filter(tuple -> isTypeParameter(tuple.get_1(), typeReference))
@@ -353,6 +358,68 @@ public class CompilerContext {
 
     protected boolean isTypeParameter(ParameterNode definition, TypeReference reference) {
         return definition.getGovernor() == null && definition.getReference().getName().equals(reference.getType());
+    }
+
+    public Optional<Value> getValueParameter(Parameters maybeParameters, SimpleDefinedValue simpleDefinedValue) {
+        var parameters = maybeParameters;
+        var maybeParameter = parameters.getDefinitionsAndValues().stream().
+                filter(tuple -> isValueParameter(tuple.get_1(), simpleDefinedValue))
+                .findAny();
+
+        if (maybeParameter.isPresent()) {
+            var parameter = maybeParameter.get();
+            var parameterDefinition = parameter.get_1();
+            var parameterValue = parameter.get_2();
+
+            if (parameterValue instanceof Value value) {
+                var expectedType = getParameterType(parameterDefinition.getGovernor());
+
+                try {
+                    // verify that the value is of the expected type
+                    resolveGenericValue(getValueClass(expectedType.getClass()), expectedType, value);
+
+                    parameters.markAsUsed(parameterDefinition);
+
+                    return Optional.of(value);
+                } catch (ValueResolutionException e) {
+                    var formattedType = TypeFormatter.formatType(this, expectedType);
+                    var formattedValue = ValueFormatter.formatValue(value);
+
+                    throw new CompilerException(parameterValue.getPosition(),
+                            "Expected a value of type %s but found: %s", formattedType, formattedValue);
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    protected boolean isValueParameter(ParameterNode definition, SimpleDefinedValue simpleDefinedValue) {
+        var value = simpleDefinedValue.getValue();
+        var paramGovernor = definition.getGovernor();
+        Node type = getParameterType(paramGovernor);
+
+        return paramGovernor != null &&
+                type instanceof Type &&
+                !value.isBlank() &&
+                value.toLowerCase().equals(value) &&
+                definition.getReference().getName().equals(value);
+    }
+
+    private Type getParameterType(ParamGovernorNode paramGovernor) {
+        Node type = null;
+
+        if (paramGovernor instanceof Governor governor) {
+            type = governor.getType();
+        } else if (paramGovernor instanceof DummyGovernor dummyGovernor) {
+
+        }
+
+        if (type instanceof Type) {
+            return (Type) type;
+        }
+
+        return null;
     }
 
     public CompiledType defineType(Type type, String name, Optional<Parameters> maybeParameters) {
@@ -509,6 +576,10 @@ public class CompilerContext {
             typeClass = type.getClass();
         }
 
+        return getValueClass(typeClass);
+    }
+
+    public Class<? extends Value> getValueClass(Class<? extends Type> typeClass) {
         return config.getValueClass(typeClass);
     }
 
@@ -569,8 +640,9 @@ public class CompilerContext {
         constraintCompiler.addConstraint(compiledType, module, definition);
     }
 
-    public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value) {
-        defaultsCompiler.compileDefault(javaClass, field, typeName, type, value);
+    public void compileDefault(JavaClass javaClass, String field, String typeName, Type type, Value value,
+            Optional<Parameters> maybeParameters) {
+        defaultsCompiler.compileDefault(javaClass, field, typeName, type, value, maybeParameters);
     }
 
     public CompiledCollectionType getCompiledCollectionType(CompiledType compiledType) {

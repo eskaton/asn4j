@@ -29,9 +29,12 @@ package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+
+import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
 
@@ -44,11 +47,12 @@ public class DefaultsCompiler {
         this.ctx = ctx;
     }
 
-    public <V extends Value> void compileDefault(JavaClass clazz, String field, String typeName, Type type, V value) {
+    public <V extends Value> void compileDefault(JavaClass clazz, String field, String typeName, Type type, V value,
+            Optional<Parameters> maybeParameters) {
         AbstractDefaultCompiler<V> compiler = ctx.getDefaultCompiler(ctx.resolveBaseType(type).getClass());
 
         try {
-            compiler.compileDefault(ctx, clazz, field, typeName, type, value);
+            compiler.compileDefault(ctx, clazz, field, typeName, type, value, maybeParameters);
         } catch (CompilerException e) {
             throw new CompilerException("Error in default for type %s: %s ", e, formatTypeName(type), e.getMessage());
         }
