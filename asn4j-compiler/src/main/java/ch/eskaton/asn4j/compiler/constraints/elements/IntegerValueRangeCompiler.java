@@ -34,7 +34,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 
 import java.util.Optional;
 
@@ -50,14 +49,13 @@ public class IntegerValueRangeCompiler implements ElementsCompiler<RangeNode> {
 
     @Override
     public Node compile(CompiledType compiledType, RangeNode elements, Optional<Bounds> bounds) {
-        long min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
-        long max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
+        var min = bounds.map(b -> ((IntegerValueBounds) b).getMinValue()).orElse(Long.MIN_VALUE);
+        var max = bounds.map(b -> ((IntegerValueBounds) b).getMaxValue()).orElse(Long.MAX_VALUE);
 
-        IntegerValue lower = elements.getLower().getLowerEndPointValue(min);
-        IntegerValue upper = elements.getUpper().getUpperEndPointValue(max);
+        var lower = elements.getLower().getLowerEndPointValue(ctx, min).getValue().longValue();
+        var upper = elements.getUpper().getUpperEndPointValue(ctx, max).getValue().longValue();
 
-        return new IntegerRangeValueNode(singletonList(new IntegerRange(lower.getValue().longValue(), upper
-                .getValue().longValue())));
+        return new IntegerRangeValueNode(singletonList(new IntegerRange(lower, upper)));
     }
 
 }

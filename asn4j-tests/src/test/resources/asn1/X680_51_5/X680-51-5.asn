@@ -1,6 +1,8 @@
 X680-51-5 DEFINITIONS ::=
 BEGIN
 
+max INTEGER ::= 3
+
 TestBitString1 ::= BIT STRING (SIZE(MIN..MAX))
 TestBitString2 ::= BIT STRING (SIZE(4..MAX))
 TestBitString3 ::= BIT STRING (SIZE(MIN..4))
@@ -14,6 +16,7 @@ TestBitString10 ::= BIT STRING (SIZE (2))
 TestBitStringSize ::= INTEGER (ALL EXCEPT 1)
 TestBitString11 ::= BIT STRING (SIZE (INCLUDES TestBitStringSize))
 TestBitString12 ::= BIT STRING (SIZE (INTEGER EXCEPT 2))
+TestBitString13 ::= BIT STRING (SIZE(0..max))
 
 TestOctetString1 ::= OCTET STRING (SIZE(MIN..MAX))
 TestOctetString2 ::= OCTET STRING (SIZE(4..MAX))

@@ -27,7 +27,9 @@
 
 package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.utils.ToString;
@@ -65,46 +67,49 @@ public class EndpointNode extends AbstractNode {
         return inclusive;
     }
 
-    public IntegerValue getLowerEndPointValue(long bound) {
-        return canonicalizeLowerEndpoint(this, bound);
+    public IntegerValue getLowerEndPointValue(CompilerContext ctx, long bound) {
+        return canonicalizeLowerEndpoint(ctx, this, bound);
     }
 
-    public IntegerValue getUpperEndPointValue(long bound) {
-        return canonicalizeUpperEndpoint(this, bound);
+    public IntegerValue getUpperEndPointValue(CompilerContext ctx, long bound) {
+        return canonicalizeUpperEndpoint(ctx, this, bound);
     }
 
-    static IntegerValue canonicalizeLowerEndpoint(EndpointNode node, long bound) {
-        return canonicalizeEndpoint(node, true, bound);
+    static IntegerValue canonicalizeLowerEndpoint(CompilerContext ctx, EndpointNode node, long bound) {
+        return canonicalizeEndpoint(ctx, node, true, bound);
     }
 
-    static IntegerValue canonicalizeUpperEndpoint(EndpointNode node, long bound) {
-        return canonicalizeEndpoint(node, false, bound);
+    static IntegerValue canonicalizeUpperEndpoint(CompilerContext ctx, EndpointNode node, long bound) {
+        return canonicalizeEndpoint(ctx, node, false, bound);
     }
 
     /**
      * Canonicalizes an {@link EndpointNode}, i.e. resolves MIN and MAX values
      * and converts the value to inclusive.
      *
+     * @param ctx     The compiler context
      * @param node    An {@link EndpointNode}
      * @param isLower true, if it's a lower {@link EndpointNode}
      * @return a canonical {@link EndpointNode}
      */
-    private static IntegerValue canonicalizeEndpoint(EndpointNode node, boolean isLower, long bound) {
-        Value value = node.getValue();
-        boolean inclusive = node.isInclusive();
+    private static IntegerValue canonicalizeEndpoint(CompilerContext ctx, EndpointNode node, boolean isLower, long bound) {
+        var value = node.getValue();
+        var inclusive = node.isInclusive();
 
         if (Value.MAX.equals(value)) {
             return new IntegerValue(inclusive ? bound : bound - 1);
         } else if (Value.MIN.equals(value)) {
             return new IntegerValue(inclusive ? bound : bound + 1);
         } else {
+            var intValue = ctx.resolveGenericValue(IntegerValue.class, new IntegerType(NO_POSITION), value);
+
             if (inclusive) {
-                return (IntegerValue) value;
+                return intValue;
             }
 
             return new IntegerValue(
-                    isLower ? ((IntegerValue) value).getValue().add(BigInteger.ONE)
-                            : ((IntegerValue) value).getValue().subtract(BigInteger.ONE));
+                    isLower ? (intValue).getValue().add(BigInteger.ONE)
+                            : (intValue).getValue().subtract(BigInteger.ONE));
         }
     }
 
