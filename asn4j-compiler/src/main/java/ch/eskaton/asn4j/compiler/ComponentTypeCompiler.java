@@ -94,7 +94,8 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
                 javaClass.addStaticImport(ch.eskaton.commons.utils.Utils.class, "with");
             }
 
-            ctx.compileDefault(javaClass, field.getName(), typeName, type, component.getValue(), maybeParameters);
+            ctx.compileDefault(javaClass, field.getName(), typeName, compiledComponent.getType(), component.getValue(),
+                    maybeParameters);
         }
 
         field.addAnnotation(compAnnotation);
