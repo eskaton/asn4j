@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger4;
 import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger5;
 import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger6;
 import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger7;
+import ch.eskaton.asn4j.test.modules.x680_51_4.TestInteger8;
 import org.junit.jupiter.api.Test;
 
 import static ch.eskaton.asn4j.test.TestHelper.testIntegerFailure;
@@ -81,6 +82,12 @@ class TestX680_51_4 {
     void testInteger7() throws InstantiationException, IllegalAccessException {
         testIntegerSuccess(TestInteger7.class, -4, 0);
         testIntegerFailure(TestInteger7.class, -5, 1);
+    }
+
+    @Test
+    void testInteger8() throws InstantiationException, IllegalAccessException {
+        testIntegerSuccess(TestInteger8.class, 1, Long.MAX_VALUE);
+        testIntegerFailure(TestInteger8.class, -1, 0);
     }
 
 }
