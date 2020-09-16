@@ -336,10 +336,15 @@ public class CompilerContext {
         return defineType(type, name, maybeParameters);
     }
 
-    public Optional<Type> getTypeParameter(Parameters maybeParameters, TypeReference typeReference) {
-        var parameters = maybeParameters;
+    public Optional<Type> getTypeParameter(Parameters parameters, TypeReference typeReference) {
+        var reference = typeReference.getType();
+
+        return getTypeParameter(parameters, reference);
+    }
+
+    private Optional<Type> getTypeParameter(Parameters parameters, String reference) {
         var maybeParameter = parameters.getDefinitionsAndValues().stream().
-                filter(tuple -> isTypeParameter(tuple.get_1(), typeReference))
+                filter(tuple -> isTypeParameter(tuple.get_1(), reference))
                 .findAny();
 
         if (maybeParameter.isPresent()) {
@@ -356,14 +361,13 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    protected boolean isTypeParameter(ParameterNode definition, TypeReference reference) {
-        return definition.getGovernor() == null && definition.getReference().getName().equals(reference.getType());
+    protected boolean isTypeParameter(ParameterNode definition, String reference) {
+        return definition.getGovernor() == null && definition.getReference().getName().equals(reference);
     }
 
-    public Optional<Value> getValueParameter(Parameters maybeParameters, SimpleDefinedValue simpleDefinedValue) {
-        var parameters = maybeParameters;
+    public Optional<Value> getValueParameter(Parameters parameters, SimpleDefinedValue simpleDefinedValue) {
         var maybeParameter = parameters.getDefinitionsAndValues().stream().
-                filter(tuple -> isValueParameter(tuple.get_1(), simpleDefinedValue))
+                filter(tuple -> isValueParameter(parameters, tuple.get_1(), simpleDefinedValue))
                 .findAny();
 
         if (maybeParameter.isPresent()) {
@@ -372,7 +376,7 @@ public class CompilerContext {
             var parameterValue = parameter.get_2();
 
             if (parameterValue instanceof Value value) {
-                var expectedType = getParameterType(parameterDefinition.getGovernor());
+                var expectedType = getParameterType(parameters, parameterDefinition.getGovernor());
 
                 try {
                     // verify that the value is of the expected type
@@ -394,10 +398,11 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    protected boolean isValueParameter(ParameterNode definition, SimpleDefinedValue simpleDefinedValue) {
+    protected boolean isValueParameter(Parameters parameters, ParameterNode definition,
+            SimpleDefinedValue simpleDefinedValue) {
         var value = simpleDefinedValue.getValue();
         var paramGovernor = definition.getGovernor();
-        var type = getParameterType(paramGovernor);
+        var type = getParameterType(parameters, paramGovernor);
 
         return paramGovernor != null &&
                 type instanceof Type &&
@@ -406,7 +411,7 @@ public class CompilerContext {
                 definition.getReference().getName().equals(value);
     }
 
-    private Type getParameterType(ParamGovernorNode paramGovernor) {
+    private Type getParameterType(Parameters parameters, ParamGovernorNode paramGovernor) {
         Node type = null;
 
         if (paramGovernor instanceof Governor governor) {
@@ -417,11 +422,17 @@ public class CompilerContext {
             var firstChar = typeReference.substring(0, 1);
 
             if (firstChar.equals(firstChar.toUpperCase())) {
-                try {
-                    type = resolveTypeReference(typeReference);
-                } catch (CompilerException e) {
-                    throw new CompilerException(dummyGovernor.getPosition(),
-                            "The Governor references the type %s which can't be resolved", typeReference);
+                var resolvedType = getTypeParameter(parameters, typeReference);
+
+                if (resolvedType.isPresent()) {
+                    type = resolvedType.get();
+                } else {
+                    try {
+                        type = resolveTypeReference(typeReference);
+                    } catch (CompilerException e) {
+                        throw new CompilerException(dummyGovernor.getPosition(),
+                                "The Governor references the type %s which can't be resolved", typeReference);
+                    }
                 }
             } else {
                 throw new CompilerException(dummyGovernor.getPosition(),

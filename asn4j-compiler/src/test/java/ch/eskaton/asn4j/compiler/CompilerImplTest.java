@@ -1737,6 +1737,32 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, ".*Expected a value of type INTEGER but found: TRUE.*");
     }
 
+    @Test
+    void testParameterizedTypeAndValueWithSequence() throws IOException, ParserException {
+        var body = """
+                   AbstractSequence {Type, Type:value} ::= SEQUENCE {
+                       field Type DEFAULT value
+                   }
+                   
+                   Sequence ::= AbstractSequence {INTEGER, 23}
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var compiler = new CompilerImpl();
+
+        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Sequence");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var collection = (CompiledCollectionType) compiledType;
+
+        testCollectionField(collection, "field", IntegerType.class);
+    }
+
     private void testChoiceField(CompiledChoiceType choice, String fieldName,
             Class<? extends Type> fieldType) {
         var components = choice.getComponents();
