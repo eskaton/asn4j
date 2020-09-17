@@ -40,7 +40,6 @@ import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
-import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
@@ -66,6 +65,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class CompilerImpl {
 
@@ -75,7 +75,7 @@ public class CompilerImpl {
 
     private CompilerContext compilerContext;
 
-    private Deque<Deque<AssignmentNode>> assignments = new LinkedList<>();
+    private Deque<Tuple2<String, Deque<AssignmentNode>>> assignments = new LinkedList<>();
 
     public static void main(String[] args) throws IOException, ParserException {
         if (args.length != 4) {
@@ -110,7 +110,19 @@ public class CompilerImpl {
 
     void loadAndCompileModule(String moduleName) throws IOException, ParserException {
         loadModules();
-        compileModule(moduleName);
+
+        var maybeMainAssignments = assignments.stream().filter(t -> Objects.equals(t.get_1(), moduleName)).findFirst();
+
+        if (maybeMainAssignments.isPresent()) {
+            var mainAssignments = maybeMainAssignments.get();
+
+            assignments.remove(mainAssignments);
+            assignments.push(mainAssignments);
+        } else {
+            throw new CompilerException("Module %s not found", moduleName);
+        }
+
+        compileModules();
     }
 
     void loadModules() throws IOException, ParserException {
@@ -130,50 +142,53 @@ public class CompilerImpl {
 
             compilerContext.addModule(moduleName, moduleNode);
 
+            var assignmentNodes = moduleNode.getBody().getAssignments();
+            var assignmentsList = assignmentNodes.stream().collect(Collectors.toCollection(LinkedList::new));
+
+            assignments.push(Tuple2.of(moduleName, assignmentsList));
+
             System.out.println("Loaded module " + moduleName);
         } catch (ParserException e) {
             throw new ParserException("Failed to load module from source %s", e, moduleStream.get_1());
         }
     }
 
-    private void compileModule(String moduleName) {
-        compilerContext.executeWithModule(moduleName, () -> {
-            compileModuleAux(moduleName);
+    private void compileModules() {
+        for (var moduleAssignments : assignments) {
+            var moduleName = moduleAssignments.get_1();
 
-            return null;
-        });
+            System.out.println("Compiling module " + moduleName + "...");
+
+            compilerContext.executeWithModule(moduleName, () -> {
+                compileAssignments(moduleAssignments.get_2());
+
+                return null;
+            });
+        }
     }
 
-    private void compileModuleAux(String moduleName) {
-        System.out.println("Compiling module " + moduleName + "...");
+    private void compileAssignments(Deque<AssignmentNode> moduleAssignments) {
+        var assignmentNodes = new LinkedList<>(moduleAssignments);
 
-        var moduleNode = compilerContext.getModule(moduleName);
-
-        compileBody(moduleNode);
-    }
-
-    private void compileBody(ModuleNode module) {
-        var moduleBody = module.getBody();
-
-        if (moduleBody != null) {
-            assignments.push(new LinkedList<>(moduleBody.getAssignments()));
-
-            var assignmentNodes = new LinkedList<>(assignments.peek());
-
-            while (true) {
-                if (assignmentNodes.isEmpty()) {
-                    break;
-                }
-
-                var assignmentNode = assignmentNodes.pop();
-                var result = compileAssignment(assignmentNode);
-
-                if (result != null) {
-                    assignments.peek().remove(assignmentNode);
-                }
+        while (true) {
+            if (assignmentNodes.isEmpty()) {
+                break;
             }
 
-            assignments.pop();
+            var assignmentNode = assignmentNodes.pop();
+
+            // check whether assignment has already been compiled on demand
+            if (!moduleAssignments.contains(assignmentNode)) {
+                moduleAssignments.remove(assignmentNode);
+
+                continue;
+            }
+
+            var result = compileAssignment(assignmentNode);
+
+            if (result != null) {
+                moduleAssignments.remove(assignmentNode);
+            }
         }
     }
 
@@ -288,18 +303,33 @@ public class CompilerImpl {
             Optional<String> maybeModuleName, BiFunction<String,
             Collection<AssignmentNode>, Optional<A>> assignmentSelector, Function<A, T> compiler) {
         return maybeModuleName.map(moduleName -> compilerContext.executeWithModule(moduleName, () -> {
-            var moduleBody = compilerContext.getModule().getBody();
-            var assignments = moduleBody.getAssignments();
-            var maybeTypeAssignment = assignmentSelector.apply(name, assignments);
+            var assignments = getAssignments(moduleName);
 
-            return maybeTypeAssignment.map(compiler::apply);
+            return compile(name, assignmentSelector, compiler, assignments);
         })).or(() -> {
-            var maybeTypeAssignment = assignmentSelector.apply(name, assignments.peek());
+            var moduleName = compilerContext.getModule().getModuleId().getModuleName();
+            var assignments = getAssignments(moduleName);
 
-            maybeTypeAssignment.ifPresent(assignments::remove);
-
-            return Optional.of(maybeTypeAssignment.map(compiler::apply));
+            return Optional.ofNullable(compile(name, assignmentSelector, compiler, assignments));
         }).flatMap(Function.identity());
+    }
+
+    private <T extends CompilationResult, A extends AssignmentNode> Optional<T> compile(String name,
+            BiFunction<String, Collection<AssignmentNode>, Optional<A>> assignmentSelector, Function<A, T> compiler,
+            Deque<AssignmentNode> assignments) {
+        return assignmentSelector.apply(name, assignments).map(assignment -> {
+            assignments.remove(assignment);
+
+            return compiler.apply(assignment);
+        });
+    }
+
+    private Deque<AssignmentNode> getAssignments(String moduleName) {
+        return assignments.stream()
+                .filter(t -> Objects.equals(t.get_1(), moduleName))
+                .findFirst()
+                .map(t -> t.get_2())
+                .orElseThrow(() -> new IllegalCompilerStateException("Module %s unknown", moduleName));
     }
 
     private <A extends AssignmentNode, I extends AssignmentNode> BiFunction<String, Collection<AssignmentNode>, Optional<A>> getAssignmentSelector(
@@ -336,21 +366,29 @@ public class CompilerImpl {
     }
 
     public Optional<CompiledObjectSet> compileObjectSet(String name, Optional<String> maybeModuleName) {
-        Optional<AssignmentNode> maybeAmbiguousAssignment = assignments.peek().stream()
+        Deque<AssignmentNode> moduleAssignments;
+
+        if (maybeModuleName.isPresent()) {
+            moduleAssignments = getAssignments(maybeModuleName.get());
+        } else {
+            moduleAssignments = getAssignments(compilerContext.getModule().getModuleId().getModuleName());
+        }
+
+        var maybeAmbiguousAssignment = moduleAssignments.stream()
                 .filter(obj -> (obj instanceof ObjectSetAssignmentNode ||
                         obj instanceof ValueSetTypeOrObjectSetAssignmentNode) &&
-                        name.equals(obj.getReference()))
+                        Objects.equals(name, obj.getReference()))
                 .findFirst();
 
         if (maybeAmbiguousAssignment.isPresent()) {
             var ambiguousAssignment = maybeAmbiguousAssignment.get();
 
             if (ambiguousAssignment instanceof ObjectSetAssignmentNode assignment) {
-                assignments.peek().remove(assignment);
+                moduleAssignments.remove(assignment);
 
                 return Optional.of(compileObjectSetAssignment(assignment));
             } else if (ambiguousAssignment instanceof ValueSetTypeOrObjectSetAssignmentNode assignment) {
-                assignments.peek().remove(assignment);
+                moduleAssignments.remove(assignment);
 
                 var compilationResult = Optional.of(compileValueSetTypeOrObjectSetAssignmentNode(assignment));
 
