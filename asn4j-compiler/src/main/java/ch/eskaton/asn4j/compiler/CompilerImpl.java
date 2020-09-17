@@ -40,7 +40,6 @@ import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
-import ch.eskaton.asn4j.parser.ast.ModuleBodyNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
@@ -63,7 +62,10 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class CompilerImpl {
 
@@ -151,13 +153,24 @@ public class CompilerImpl {
     }
 
     private void compileBody(ModuleNode module) {
-        ModuleBodyNode moduleBody = module.getBody();
+        var moduleBody = module.getBody();
 
         if (moduleBody != null) {
             assignments.push(new LinkedList<>(moduleBody.getAssignments()));
 
-            while (!assignments.peek().isEmpty()) {
-                compileAssignment(assignments.peek().pop());
+            var assignmentNodes = new LinkedList<>(assignments.peek());
+
+            while (true) {
+                if (assignmentNodes.isEmpty()) {
+                    break;
+                }
+
+                var assignmentNode = assignmentNodes.pop();
+                var result = compileAssignment(assignmentNode);
+
+                if (result != null) {
+                    assignments.peek().remove(assignmentNode);
+                }
             }
 
             assignments.pop();
@@ -167,7 +180,11 @@ public class CompilerImpl {
     private CompilationResult compileAssignment(AssignmentNode unknownAssignment) {
         if (unknownAssignment instanceof TypeAssignmentNode assignment) {
             return compileTypeAssignment(assignment);
-        } else if (unknownAssignment instanceof ValueOrObjectAssignmentNode) {
+        } else if (unknownAssignment instanceof ValueOrObjectAssignmentNode assignment) {
+            if (assignment.getObjectAssignment().isPresent()) {
+                return compileObjectAssignment(assignment.getObjectAssignment().get());
+            }
+
             // ignore values, they are resolved when needed
             return null;
         } else if (unknownAssignment instanceof ObjectSetAssignmentNode assignment) {
@@ -267,67 +284,55 @@ public class CompilerImpl {
                 getCompiler(ParameterizedValueSetTypeAssignmentNode.class).compile(compilerContext, assignment);
     }
 
+    private <T extends CompilationResult, A extends AssignmentNode> Optional<T> compile(String name,
+            Optional<String> maybeModuleName, BiFunction<String,
+            Collection<AssignmentNode>, Optional<A>> assignmentSelector, Function<A, T> compiler) {
+        return maybeModuleName.map(moduleName -> compilerContext.executeWithModule(moduleName, () -> {
+            var moduleBody = compilerContext.getModule().getBody();
+            var assignments = moduleBody.getAssignments();
+            var maybeTypeAssignment = assignmentSelector.apply(name, assignments);
+
+            return maybeTypeAssignment.map(compiler::apply);
+        })).or(() -> {
+            var maybeTypeAssignment = assignmentSelector.apply(name, assignments.peek());
+
+            maybeTypeAssignment.ifPresent(assignments::remove);
+
+            return Optional.of(maybeTypeAssignment.map(compiler::apply));
+        }).flatMap(Function.identity());
+    }
+
+    private <A extends AssignmentNode, I extends AssignmentNode> BiFunction<String, Collection<AssignmentNode>, Optional<A>> getAssignmentSelector(
+            Class<I> intermediateClass, Function<I, Optional<A>> assignmentMapper) {
+        return (name, assignmentNodes) -> assignmentNodes.stream()
+                .filter(obj -> Objects.equals(name, obj.getReference()))
+                .filter(intermediateClass::isInstance)
+                .map(intermediateClass::cast)
+                .findFirst()
+                .map(assignmentMapper::apply)
+                .flatMap(Function.identity());
+    }
+
+    private <A extends AssignmentNode> BiFunction<String, Collection<AssignmentNode>, Optional<A>> getAssignmentSelector(
+            Class<A> assignmentClass) {
+        return getAssignmentSelector(assignmentClass, Optional::ofNullable);
+    }
+
     public Optional<CompiledType> compileType(String name, Optional<String> maybeModuleName) {
-        if (maybeModuleName.isPresent()) {
-            var moduleName = maybeModuleName.get();
-
-            return compilerContext.executeWithModule(moduleName, () -> {
-                var moduleBody = compilerContext.getModule().getBody();
-                var maybeTypeAssignment = getTypeAssignment(name, moduleBody.getAssignments());
-
-                return compileType(maybeTypeAssignment, false);
-            });
-        }
-
-        var maybeTypeAssignment = getTypeAssignment(name, assignments.peek());
-
-        return compileType(maybeTypeAssignment, true);
-    }
-
-    private Optional<CompiledType> compileType(Optional<AssignmentNode> maybeTypeAssignment, boolean remove) {
-        if (maybeTypeAssignment.isPresent()) {
-            var assignment = (TypeAssignmentNode) maybeTypeAssignment.get();
-
-            if (remove) {
-                assignments.peek().remove(assignment);
-            }
-
-            return Optional.of(compileTypeAssignment(assignment));
-        }
-
-        return Optional.empty();
-    }
-
-    private Optional<AssignmentNode> getTypeAssignment(String name, Collection<AssignmentNode> assignmentNodes) {
-        return assignmentNodes.stream()
-                .filter(obj -> obj instanceof TypeAssignmentNode && name.equals(obj.getReference())).findFirst();
+        return compile(name, maybeModuleName, getAssignmentSelector(TypeAssignmentNode.class),
+                this::compileTypeAssignment);
     }
 
     public Optional<CompiledObjectClass> compileObjectClass(String name, Optional<String> maybeModuleName) {
-        Optional<AssignmentNode> maybeObjectClassAssignment = assignments.peek().stream().filter(
-                obj -> obj instanceof ObjectClassAssignmentNode && name.equals(obj.getReference())).findFirst();
-
-        if (maybeObjectClassAssignment.isPresent()) {
-            ObjectClassAssignmentNode assignment = (ObjectClassAssignmentNode) maybeObjectClassAssignment.get();
-
-            assignments.peek().remove(assignment);
-
-            return Optional.of(compileObjectClassAssignment(assignment));
-        }
-
-        return Optional.empty();
+        return compile(name, maybeModuleName, getAssignmentSelector(ObjectClassAssignmentNode.class),
+                this::compileObjectClassAssignment);
     }
 
     public Optional<CompiledObject> compileObject(String name, Optional<String> maybeModuleName) {
-        var assignment = compilerContext.getModule().getBody().getAssignment(name);
+        BiFunction<String, Collection<AssignmentNode>, Optional<ObjectAssignmentNode>> assignmentSelector =
+                getAssignmentSelector(ValueOrObjectAssignmentNode.class, ValueOrObjectAssignmentNode::getObjectAssignment);
 
-        if (assignment instanceof ValueOrObjectAssignmentNode) {
-            var objectAssignment = ((ValueOrObjectAssignmentNode) assignment).getObjectAssignment();
-
-            return objectAssignment.map(this::compileObjectAssignment);
-        }
-
-        return Optional.empty();
+        return compile(name, maybeModuleName, assignmentSelector, this::compileObjectAssignment);
     }
 
     public Optional<CompiledObjectSet> compileObjectSet(String name, Optional<String> maybeModuleName) {
@@ -358,46 +363,26 @@ public class CompilerImpl {
     }
 
     public Optional<CompiledParameterizedType> compileParameterizedType(String name, Optional<String> maybeModuleName) {
-        var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
-
-        if (unknownAssignment instanceof ParameterizedTypeAssignmentNode assignment) {
-            return Optional.of(compileParameterizedTypeAssignment(assignment));
-        }
-
-        return Optional.empty();
+        return compile(name, maybeModuleName, getAssignmentSelector(ParameterizedTypeAssignmentNode.class),
+                this::compileParameterizedTypeAssignment);
     }
 
     public Optional<CompiledParameterizedObjectClass> compiledParameterizedObjectClass(String name,
             Optional<String> maybeModuleName) {
-        var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
-
-        if (unknownAssignment instanceof ParameterizedObjectClassAssignmentNode assignment) {
-            return Optional.of(compileParameterizedObjectClassAssignment(assignment));
-        }
-
-        return Optional.empty();
+        return compile(name, maybeModuleName, getAssignmentSelector(ParameterizedObjectClassAssignmentNode.class),
+                this::compileParameterizedObjectClassAssignment);
     }
 
     public Optional<CompiledParameterizedObjectSet> compiledParameterizedObjectSet(String name,
             Optional<String> maybeModuleName) {
-        var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
-
-        if (unknownAssignment instanceof ParameterizedObjectSetAssignmentNode assignment) {
-            return Optional.of(compileParameterizedObjectSetAssignment(assignment));
-        }
-
-        return Optional.empty();
+        return compile(name, maybeModuleName, getAssignmentSelector(ParameterizedObjectSetAssignmentNode.class),
+                this::compileParameterizedObjectSetAssignment);
     }
 
     public Optional<CompiledParameterizedValueSetType> compiledParameterizedValueSetType(String name,
             Optional<String> maybeModuleName) {
-        var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
-
-        if (unknownAssignment instanceof ParameterizedValueSetTypeAssignmentNode assignment) {
-            return Optional.of(compileParameterizedValueSetTypeAssignment(assignment));
-        }
-
-        return Optional.empty();
+        return compile(name, maybeModuleName, getAssignmentSelector(ParameterizedValueSetTypeAssignmentNode.class),
+                this::compileParameterizedValueSetTypeAssignment);
     }
 
     public CompilerContext getCompilerContext() {
