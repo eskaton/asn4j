@@ -54,6 +54,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
+import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -171,8 +172,10 @@ public abstract class AbstractConstraintCompiler {
                 compileComponentConstraints(compiledType).ifPresent(definitions::addLast);
             }
 
-            if (compiledType.getConstraintDefinition() != null) {
-                definitions.addLast(compiledType.getConstraintDefinition());
+            var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+            if (maybeConstraintDefinition.isPresent()) {
+                definitions.addLast(maybeConstraintDefinition.get());
             }
 
             node = compiledType.getType();
@@ -211,25 +214,24 @@ public abstract class AbstractConstraintCompiler {
 
     protected Optional<ConstraintDefinition> compileComponentConstraints(CompiledType compiledType) {
         return ((HasComponents) compiledType).getComponents().stream()
-                .filter(t -> t.get_2().getConstraintDefinition() != null)
+                .filter(t -> t.get_2().getConstraintDefinition().isPresent())
                 .map(t -> {
                     var name = t.get_1();
                     var compiledComponent = t.get_2();
-                    var componentConstraint = compiledComponent.getConstraintDefinition();
-
-                    var roots = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
-                            componentConstraint.getRoots(), PresenceConstraint.PresenceType.OPTIONAL)));
+                    var constraintDefinition = compiledComponent.getConstraintDefinition().get();
+                    var rootDefinitions = constraintDefinition.getRoots();
+                    var extensionsDefinitions = constraintDefinition.getExtensions();
+                    var roots = createComponentsNode(name, compiledComponent, rootDefinitions);
                     Node extensions = null;
 
-                    if (componentConstraint.getExtensions() != null) {
-                        extensions = new WithComponentsNode(Set.of(new ComponentNode(name, compiledComponent.getType(),
-                                componentConstraint.getRoots(), PresenceConstraint.PresenceType.OPTIONAL)));
+                    if (extensionsDefinitions != null) {
+                        extensions = createComponentsNode(name, compiledComponent, extensionsDefinitions);
                     }
 
-                    return new ConstraintDefinition(roots, extensions, componentConstraint.isExtensible());
+                    return new ConstraintDefinition(roots, extensions, constraintDefinition.isExtensible());
                 }).reduce((op1, op2) -> {
-                    Node roots = new BinOpNode(getComponentCombinationOp(), op1.getRoots(), op2.getRoots());
-                    Node extensions = op1.getExtensions();
+                    var roots = new BinOpNode(getComponentCombinationOp(), op1.getRoots(), op2.getRoots());
+                    var extensions = op1.getExtensions();
 
                     if (extensions == null) {
                         extensions = op2.getExtensions();
@@ -239,10 +241,18 @@ public abstract class AbstractConstraintCompiler {
                         }
                     }
 
-                    boolean extensible = op1.isExtensible() || op2.isExtensible();
+                    var extensible = op1.isExtensible() || op2.isExtensible();
 
                     return new ConstraintDefinition(roots, extensions, extensible);
                 });
+    }
+
+    private WithComponentsNode createComponentsNode(String name, CompiledType compiledComponent,
+            Node constraintDefinition) {
+        var type = compiledComponent.getType();
+        var component = new ComponentNode(name, type, constraintDefinition, PresenceType.OPTIONAL);
+
+        return new WithComponentsNode(Set.of(component));
     }
 
     protected NodeType getComponentCombinationOp() {

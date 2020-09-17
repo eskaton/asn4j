@@ -63,8 +63,10 @@ public class ContainedSubtypeCompiler implements ElementsCompiler<ContainedSubty
                         formatType(ctx, compiledParentType.getType()), formatType(ctx, compiledType.getType()));
             }
 
-            if (compiledParentType.getConstraintDefinition() != null) {
-                constraints.push(compiledParentType.getConstraintDefinition().getRoots());
+            var maybeConstraintDefinition = compiledParentType.getConstraintDefinition();
+
+            if (maybeConstraintDefinition.isPresent()) {
+                constraints.push(maybeConstraintDefinition.get().getRoots());
             }
 
             parent = compiledParentType.getType();
@@ -93,8 +95,9 @@ public class ContainedSubtypeCompiler implements ElementsCompiler<ContainedSubty
     }
 
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {
-        return compiledType.getType().getClass()
-                .isAssignableFrom(ctx.getCompiledBaseType(compiledParentType).getType().getClass());
+        var compiledBaseType = ctx.getCompiledBaseType(compiledParentType);
+
+        return compiledType.getType().getClass().isAssignableFrom(compiledBaseType.getType().getClass());
     }
 
 }
