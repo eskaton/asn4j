@@ -43,6 +43,7 @@ import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
+import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
@@ -490,10 +491,9 @@ public class CompilerContext {
             }
 
             if (field instanceof CompiledFixedTypeValueField) {
-                return defineFixedTypeValueField(type, name, compiledObjectClass, (CompiledFixedTypeValueField) field,
-                        maybeParameters);
+                return defineFixedTypeValueField(type, name, (CompiledFixedTypeValueField) field, maybeParameters);
             } else if (field instanceof CompiledTypeField) {
-                return defineTypeField(type, name, compiledObjectClass, maybeParameters);
+                return defineTypeField(type, name, maybeParameters);
             } else if (field == null) {
                 throw new IllegalCompilerStateException(type.getPosition(), "Failed to resolve field from %s", type);
             } else {
@@ -505,8 +505,7 @@ public class CompilerContext {
         return createCompiledType(type, getTypeName(type, name), true);
     }
 
-    private CompiledType defineTypeField(Type type, String name, CompiledObjectClass compiledObjectClass,
-            Optional<Parameters> maybeParameters) {
+    private CompiledType defineTypeField(Type type, String name, Optional<Parameters> maybeParameters) {
         var additionalConstraints = type.getConstraints();
         var openType = new OpenType();
 
@@ -523,15 +522,11 @@ public class CompilerContext {
             }
         }
 
-        var compiledType = defineType(openType, name, maybeParameters);
-
-        compiledType.setObjectClass(compiledObjectClass);
-
-        return compiledType;
+        return defineType(openType, name, maybeParameters);
     }
 
-    private CompiledType defineFixedTypeValueField(Type type, String name, CompiledObjectClass compiledObjectClass,
-            CompiledFixedTypeValueField field, Optional<Parameters> maybeParameters) {
+    private CompiledType defineFixedTypeValueField(Type type, String name, CompiledFixedTypeValueField field,
+            Optional<Parameters> maybeParameters) {
         var additionalConstraints = type.getConstraints();
         var newType = (Type) Clone.clone(field.getCompiledType().getType());
 
@@ -547,11 +542,7 @@ public class CompilerContext {
             }
         }
 
-        var compiledType = defineType(newType, name, maybeParameters);
-
-        compiledType.setObjectClass(compiledObjectClass);
-
-        return compiledType;
+        return defineType(newType, name, maybeParameters);
     }
 
     private CompiledType defineType(Type type, String name, Optional<Parameters> maybeParameters, boolean newType) {
@@ -559,11 +550,8 @@ public class CompilerContext {
             return compileType(type, getTypeName(type, name), maybeParameters);
         }
 
-        var compiledType = createCompiledType(type, getTypeName(type, name), isBuiltin(type));
+        return createCompiledType(type, getTypeName(type, name), isBuiltin(type));
 
-        compiledType.setTags(CompilerUtils.getTagIds(this, type));
-
-        return compiledType;
     }
 
     private CompiledType compileType(Type type, String typeName, Optional<Parameters> maybeParameters) {
@@ -713,8 +701,10 @@ public class CompilerContext {
             var enumeratedTypeCompiler = (EnumeratedTypeCompiler) this.getCompiler(type.getClass());
 
             return enumeratedTypeCompiler.createCompiledType(this, null, enumeratedType);
+        } else if (isBuiltin(type)) {
+            return new CompiledBuiltinType(type);
         }
-
+        
         return new AnonymousCompiledType(type);
     }
 

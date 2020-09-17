@@ -46,9 +46,7 @@ public class CompiledType implements CompilationResult {
 
     private Optional<List<TagId>> tags = Optional.empty();
 
-    private ConstraintDefinition constraintDefinition;
-
-    private CompiledObjectClass objectClass;
+    private Optional<ConstraintDefinition> constraintDefinition = Optional.empty();
 
     private boolean optional;
 
@@ -81,20 +79,12 @@ public class CompiledType implements CompilationResult {
         this.tags = Optional.ofNullable(tags);
     }
 
-    public ConstraintDefinition getConstraintDefinition() {
+    public Optional<ConstraintDefinition> getConstraintDefinition() {
         return constraintDefinition;
     }
 
     public void setConstraintDefinition(ConstraintDefinition constraintDefinition) {
-        this.constraintDefinition = constraintDefinition;
-    }
-
-    public CompiledObjectClass getObjectClass() {
-        return objectClass;
-    }
-
-    public void setObjectClass(CompiledObjectClass objectClass) {
-        this.objectClass = objectClass;
+        this.constraintDefinition = Optional.ofNullable(constraintDefinition);
     }
 
     public void setOptional(boolean optional) {
@@ -121,13 +111,12 @@ public class CompiledType implements CompilationResult {
                 Objects.equals(type, that.type) &&
                 Objects.equals(name, that.name) &&
                 Objects.equals(tags, that.tags) &&
-                Objects.equals(constraintDefinition, that.constraintDefinition) &&
-                Objects.equals(objectClass, that.objectClass);
+                Objects.equals(constraintDefinition, that.constraintDefinition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, name, tags, constraintDefinition, objectClass, optional);
+        return Objects.hash(type, name, tags, constraintDefinition, optional);
     }
 
     @Override

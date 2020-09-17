@@ -1828,7 +1828,6 @@ class CompilerImplTest {
         exception.ifPresent(e -> assertThat(Utils.rootCause(e).getMessage(), MatchesPattern.matchesPattern(message)));
     }
 
-
     private CompiledObjectClass getCompiledObjectClass(String body, String objectClassName)
             throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
