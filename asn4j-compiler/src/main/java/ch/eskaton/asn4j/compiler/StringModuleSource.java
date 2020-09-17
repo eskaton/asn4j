@@ -27,22 +27,32 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.ModuleNode;
-import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
+import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.Optional;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class ExternalTypeReferenceCompiler extends AbstractTypeReferenceCompiler<ExternalTypeReference> {
+public class StringModuleSource implements ModuleSource {
+
+    private List<Tuple2<String, String>> sources;
+
+    public StringModuleSource(Tuple2<String, String>... sources) {
+        this.sources = Arrays.asList(sources);
+    }
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, ExternalTypeReference node,
-            Optional<Parameters> maybeParameters) {
-        var module = ctx.getModule(node.getModule());
+    public List<Tuple2<String, InputStream>> getModules() {
+        return sources.stream()
+                .map(source -> Tuple2.of(source.get_1(), getInputStream(source)))
+                .collect(Collectors.toList());
+    }
 
-        ctx.ensureSymbolIsExported(module, node.getType());
-
-        return super.compile(ctx, name, node, maybeParameters);
+    private InputStream getInputStream(Tuple2<String, String> source) {
+        return new ByteArrayInputStream(source.get_2().getBytes(Charset.forName("UTF-8")));
     }
 
 }

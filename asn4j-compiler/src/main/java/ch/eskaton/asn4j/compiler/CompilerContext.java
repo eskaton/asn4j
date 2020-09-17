@@ -41,7 +41,6 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
-import ch.eskaton.asn4j.compiler.results.AnonymousCompiledType;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
@@ -121,6 +120,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -267,8 +267,16 @@ public class CompilerContext {
         currentModule.push(module);
     }
 
-    public void pushModule(String moduleName) {
-        pushModule(modules.get(moduleName));
+    public ModuleNode pushModule(String moduleName) {
+        var module = modules.get(moduleName);
+
+        if (module == null) {
+            throw new CompilerException("Tried to access an undefined module: %s", moduleName);
+        }
+
+        pushModule(module);
+
+        return module;
     }
 
     public void popModule() {
@@ -377,7 +385,15 @@ public class CompilerContext {
             var parameterValue = parameter.get_2();
 
             if (parameterValue instanceof Value value) {
-                var expectedType = getParameterType(parameters, parameterDefinition.getGovernor());
+                var governor = parameterDefinition.getGovernor();
+                var expectedType = getParameterType(parameters, governor);
+
+                if (expectedType == null) {
+                    var formattedValue = ValueFormatter.formatValue(value);
+
+                    throw new CompilerException(governor.getPosition(),
+                            "Failed to resolve resolve the type for parameter value: %s", formattedValue);
+                }
 
                 try {
                     // verify that the value is of the expected type
@@ -439,6 +455,9 @@ public class CompilerContext {
                 throw new CompilerException(dummyGovernor.getPosition(),
                         "The Governor '%s' is not a valid typereference", typeReference);
             }
+        } else if (paramGovernor != null) {
+            throw new IllegalCompilerStateException(paramGovernor.getPosition(), "Unexpected governor type %s",
+                    paramGovernor.getClass().getSimpleName());
         }
 
         if (type instanceof Type) {
@@ -697,6 +716,11 @@ public class CompilerContext {
             var typeName = ((TypeReference) type).getType();
 
             return getCompiledType(typeName);
+        } else if (type instanceof ExternalTypeReference externalTypeReference) {
+            var moduleName = externalTypeReference.getModule();
+            var typeName = externalTypeReference.getType();
+
+            return getCompiledType(moduleName, typeName);
         } else if (type instanceof EnumeratedType enumeratedType) {
             var enumeratedTypeCompiler = (EnumeratedTypeCompiler) this.getCompiler(type.getClass());
 
@@ -704,13 +728,19 @@ public class CompilerContext {
         } else if (isBuiltin(type)) {
             return new CompiledBuiltinType(type);
         }
-        
-        return new AnonymousCompiledType(type);
+
+        throw new IllegalCompilerStateException("The type %s is not expected", type.getClass().getSimpleName());
     }
 
     public CompiledType getCompiledType(String reference) {
         return getCompilationResult(reference, "Type", this::getTypesOfCurrentModule,
-                typeReference -> withNewClass(() -> compiler.compileType(typeReference)), this::getTypesOfModule);
+                (ref, mod) -> withNewClass(() -> compiler.compileType(ref, mod)), this::getTypesOfModule);
+    }
+
+    public CompiledType getCompiledType(String moduleName, String reference) {
+        return getCompilationResult(reference, "Type", () -> getTypesOfModule(moduleName),
+                (ref, mod) -> withNewClass(() -> compiler.compileType(ref, Optional.ofNullable(moduleName))),
+                this::getTypesOfModule);
     }
 
     /**
@@ -820,17 +850,17 @@ public class CompilerContext {
 
     private <T extends CompilationResult> T getCompilationResult(String reference, String nodeName,
             Supplier<Map<String, T>> moduleAccessor,
-            Function<String, Optional<T>> compiler,
+            BiFunction<String, Optional<String>, Optional<T>> compiler,
             Function<String, Map<String, T>> importAccessor) {
         var moduleCompilationResult = moduleAccessor.get();
         var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
 
         if (compilationResult.isEmpty()) {
-            compilationResult = compiler.apply(reference);
+            compilationResult = compiler.apply(reference, Optional.empty());
         }
 
         if (compilationResult.isEmpty()) {
-            compilationResult = getImportedCompilationResult(reference, nodeName, importAccessor);
+            compilationResult = getImportedCompilationResult(reference, nodeName, compiler, importAccessor);
         }
 
         return compilationResult.orElseThrow(
@@ -838,7 +868,7 @@ public class CompilerContext {
     }
 
     private <T extends CompilationResult> Optional<T> getImportedCompilationResult(String reference, String nodeName,
-            Function<String, Map<String, T>> resultAccessor) {
+            BiFunction<String, Optional<String>, Optional<T>> compiler, Function<String, Map<String, T>> resultAccessor) {
         var maybeImport = getImport(reference);
 
         if (maybeImport.isPresent()) {
@@ -851,9 +881,13 @@ public class CompilerContext {
                 throw new CompilerException(format, getCurrentModuleName(), reference, nodeName, moduleName);
             }
 
-            var moduleCompilationResult = resultAccessor.apply(moduleName);
+            var maybeResult = (Optional<T>) Optional.ofNullable(resultAccessor.apply(moduleName).get(reference));
 
-            return Optional.ofNullable(moduleCompilationResult.get(reference));
+            if (maybeResult.isEmpty()) {
+                return compiler.apply(reference, Optional.ofNullable(moduleName));
+            }
+
+            return maybeResult;
         }
 
         return Optional.empty();

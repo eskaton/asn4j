@@ -27,22 +27,70 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.ModuleNode;
-import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
+public class CompilerConfig {
 
-import java.util.Optional;
+    private String module;
 
-public class ExternalTypeReferenceCompiler extends AbstractTypeReferenceCompiler<ExternalTypeReference> {
+    private String pkg;
 
-    @Override
-    public CompiledType compile(CompilerContext ctx, String name, ExternalTypeReference node,
-            Optional<Parameters> maybeParameters) {
-        var module = ctx.getModule(node.getModule());
+    private String outputDir;
 
-        ctx.ensureSymbolIsExported(module, node.getType());
+    private boolean generateSource = true;
 
-        return super.compile(ctx, name, node, maybeParameters);
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
+
+    public CompilerConfig module(String module) {
+        setModule(module);
+
+        return this;
+    }
+
+    public String getPkg() {
+        return pkg;
+    }
+
+    public void setPkg(String pkg) {
+        this.pkg = pkg;
+    }
+
+    public CompilerConfig pkg(String pkg) {
+        setPkg(pkg);
+
+        return this;
+    }
+
+    public String getOutputDir() {
+        return outputDir;
+    }
+
+    public void setOutputDir(String outputDir) {
+        this.outputDir = outputDir;
+    }
+
+    public CompilerConfig outputDir(String outputDir) {
+        setOutputDir(outputDir);
+
+        return this;
+    }
+
+    public boolean isGenerateSource() {
+        return generateSource;
+    }
+
+    public void setGenerateSource(boolean generateSource) {
+        this.generateSource = generateSource;
+    }
+
+    public CompilerConfig generateSource(boolean generateSource) {
+        setGenerateSource(generateSource);
+
+        return this;
     }
 
 }
