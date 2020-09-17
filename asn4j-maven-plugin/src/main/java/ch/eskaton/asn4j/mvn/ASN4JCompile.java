@@ -27,7 +27,9 @@
 
 package ch.eskaton.asn4j.mvn;
 
+import ch.eskaton.asn4j.compiler.CompilerConfig;
 import ch.eskaton.asn4j.compiler.CompilerImpl;
+import ch.eskaton.asn4j.compiler.FileModuleSource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
@@ -89,15 +91,14 @@ public class ASN4JCompile extends AbstractMojo {
      * Executes the mojo.
      */
     public void execute() throws MojoExecutionException {
-        StringBuilder paths = new StringBuilder();
+        var paths = new StringBuilder();
 
-        for (String path : includePaths) {
+        for (var path : includePaths) {
             if (paths.length() > 0) {
                 paths.append(File.pathSeparator);
             }
 
-            paths.append(project.getBasedir().getAbsolutePath())
-                    .append(File.separator).append(path);
+            paths.append(project.getBasedir().getAbsolutePath()).append(File.separator).append(path);
         }
 
         getLog().info("Executing ASN.1 Compiler:");
@@ -106,7 +107,8 @@ public class ASN4JCompile extends AbstractMojo {
         getLog().info("- Java package = " + pkg);
         getLog().info("- Output directory = " + outputDirectory);
 
-        CompilerImpl compiler = new CompilerImpl(module, paths.toString(), pkg, outputDirectory);
+        var config = new CompilerConfig().module(module).pkg(pkg).outputDir(outputDirectory);
+        var compiler = new CompilerImpl(config, new FileModuleSource(paths.toString()));
 
         try {
             compiler.run();

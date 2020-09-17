@@ -40,10 +40,8 @@ import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
-import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleBodyNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
-import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
@@ -57,13 +55,11 @@ import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
-import ch.eskaton.commons.io.FileSourceInputStream;
-import ch.eskaton.commons.utils.StringUtils;
+import ch.eskaton.commons.collections.Tuple2;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -71,13 +67,9 @@ import java.util.Optional;
 
 public class CompilerImpl {
 
-    public static final String ASN_1_EXTENSION = ".asn1";
+    private CompilerConfig config;
 
-    public static final String ASN_EXTENSION = ".asn";
-
-    private String module;
-
-    private String[] includePath;
+    private ModuleSource moduleSource;
 
     private CompilerContext compilerContext;
 
@@ -89,58 +81,72 @@ public class CompilerImpl {
             System.exit(1);
         }
 
-        new CompilerImpl(args[0], args[1], args[2], args[3]).run();
+        var config = new CompilerConfig().module(args[1]).pkg(args[2]).outputDir(args[3]);
+
+        new CompilerImpl(config, new FileModuleSource(args[1])).run();
     }
 
-    public CompilerImpl(String module, String path, String pkg, String outputDir) {
-        this.module = module;
-        this.includePath = path.split(File.pathSeparator);
+    public CompilerImpl(CompilerConfig config, ModuleSource moduleSource) {
+        this.config = config;
+        this.moduleSource = moduleSource;
 
-        compilerContext = new CompilerContext(this, pkg, outputDir);
-    }
-
-    public CompilerImpl() {
-        compilerContext = new CompilerContext(this, "", "");
+        compilerContext = new CompilerContext(this, config.getPkg(), config.getOutputDir());
     }
 
     public void run() throws IOException, ParserException {
         long begin = System.currentTimeMillis();
 
-        module = stripExtension(module);
+        loadAndCompileModule(config.getModule());
 
-        loadAndCompileModule(module);
-
-        compilerContext.writeClasses();
+        if (config.isGenerateSource()) {
+            compilerContext.writeClasses();
+        }
 
         System.out.println("Total compilation time " + String.format("%.3f",
                 (System.currentTimeMillis() - begin) / 1000.0) + "s");
     }
 
     void loadAndCompileModule(String moduleName) throws IOException, ParserException {
-        load(moduleName);
+        loadModules();
         compileModule(moduleName);
     }
 
-    public void loadAndCompileModule(String moduleName, InputStream moduleInputStream) throws IOException, ParserException {
-        parseModule(moduleName, moduleInputStream);
-        compileModule(moduleName);
-    }
+    void loadModules() throws IOException, ParserException {
+        var moduleStreams = moduleSource.getModules();
 
-    private void compileModule(String moduleName) throws IOException, ParserException {
-        try {
-            compilerContext.pushModule(compilerContext.getModule(moduleName));
-            compileModuleAux(moduleName);
-        } finally {
-            compilerContext.popModule();
+        for (var moduleStream : moduleStreams) {
+            parseModule(moduleStream);
         }
     }
 
-    private void compileModuleAux(String moduleName) throws IOException, ParserException {
+    void parseModule(Tuple2<String, InputStream> moduleStream) throws IOException, ParserException {
+        var parser = new Parser(moduleStream.get_2());
+
+        try {
+            var moduleNode = parser.parse();
+            var moduleName = moduleNode.getModuleId().getModuleName();
+
+            compilerContext.addModule(moduleName, moduleNode);
+
+            System.out.println("Loaded module " + moduleName);
+        } catch (ParserException e) {
+            throw new ParserException("Failed to load module from source %s", e, moduleStream.get_1());
+        }
+    }
+
+    private void compileModule(String moduleName) {
+        compilerContext.executeWithModule(moduleName, () -> {
+            compileModuleAux(moduleName);
+
+            return null;
+        });
+    }
+
+    private void compileModuleAux(String moduleName) {
         System.out.println("Compiling module " + moduleName + "...");
 
         var moduleNode = compilerContext.getModule(moduleName);
 
-        compileImports(moduleNode);
         compileBody(moduleNode);
     }
 
@@ -261,78 +267,30 @@ public class CompilerImpl {
                 getCompiler(ParameterizedValueSetTypeAssignmentNode.class).compile(compilerContext, assignment);
     }
 
-    private void compileImports(ModuleNode module) throws IOException, ParserException {
-        List<ImportNode> imports = module.getBody().getImports();
+    public Optional<CompiledType> compileType(String name, Optional<String> maybeModuleName) {
+        if (maybeModuleName.isPresent()) {
+            var moduleName = maybeModuleName.get();
 
-        for (ImportNode imp : imports) {
-            ModuleRefNode importedModule = imp.getReference();
-            String importedModuleName = importedModule.getName();
+            return compilerContext.executeWithModule(moduleName, () -> {
+                var moduleBody = compilerContext.getModule().getBody();
+                var maybeTypeAssignment = getTypeAssignment(name, moduleBody.getAssignments());
 
-            if (!compilerContext.isModuleLoaded(importedModuleName)) {
-                loadAndCompileModule(importedModuleName);
-            }
-        }
-    }
-
-    void load(String moduleName) throws IOException, ParserException {
-        System.out.println("Loading module " + moduleName + "...");
-
-        var moduleInputStream = getModuleInputStream(moduleName);
-
-        parseModule(moduleName, moduleInputStream);
-    }
-
-    void parseModule(String moduleName, InputStream moduleInputStream) throws IOException, ParserException {
-        Parser parser = new Parser(moduleInputStream);
-
-        try {
-            var moduleNode = parser.parse();
-
-            compilerContext.addModule(moduleName, moduleNode);
-
-            System.out.println("Loaded module " + moduleName);
-        } catch (ParserException e) {
-            throw new ParserException("Failed to load module " + moduleName, e);
-        }
-    }
-
-    private FileInputStream getModuleInputStream(String moduleName) throws IOException {
-        String moduleFile = null;
-
-        for (String path : includePath) {
-            String file = StringUtils.concat(path, File.separator, moduleName);
-            if (new File(file + ASN_1_EXTENSION).exists()) {
-                moduleFile = file + ASN_1_EXTENSION;
-            } else if (new File(file + ASN_EXTENSION).exists()) {
-                moduleFile = file + ASN_EXTENSION;
-            }
+                return compileType(maybeTypeAssignment, false);
+            });
         }
 
-        if (moduleFile == null) {
-            throw new IOException("Module " + moduleName + " not found in include path");
-        }
+        var maybeTypeAssignment = getTypeAssignment(name, assignments.peek());
 
-        return new FileSourceInputStream(moduleFile);
+        return compileType(maybeTypeAssignment, true);
     }
 
-    private String stripExtension(String module) {
-        if (module.endsWith(ASN_1_EXTENSION)) {
-            module = module.substring(0, module.length() - 5);
-        } else if (module.endsWith(ASN_EXTENSION)) {
-            module = module.substring(0, module.length() - 4);
-        }
-
-        return module;
-    }
-
-    public Optional<CompiledType> compileType(String name) {
-        Optional<AssignmentNode> maybeTypeAssignment = assignments.peek().stream().filter(
-                obj -> obj instanceof TypeAssignmentNode && name.equals(obj.getReference())).findFirst();
-
+    private Optional<CompiledType> compileType(Optional<AssignmentNode> maybeTypeAssignment, boolean remove) {
         if (maybeTypeAssignment.isPresent()) {
-            TypeAssignmentNode assignment = (TypeAssignmentNode) maybeTypeAssignment.get();
+            var assignment = (TypeAssignmentNode) maybeTypeAssignment.get();
 
-            assignments.peek().remove(assignment);
+            if (remove) {
+                assignments.peek().remove(assignment);
+            }
 
             return Optional.of(compileTypeAssignment(assignment));
         }
@@ -340,7 +298,12 @@ public class CompilerImpl {
         return Optional.empty();
     }
 
-    public Optional<CompiledObjectClass> compileObjectClass(String name) {
+    private Optional<AssignmentNode> getTypeAssignment(String name, Collection<AssignmentNode> assignmentNodes) {
+        return assignmentNodes.stream()
+                .filter(obj -> obj instanceof TypeAssignmentNode && name.equals(obj.getReference())).findFirst();
+    }
+
+    public Optional<CompiledObjectClass> compileObjectClass(String name, Optional<String> maybeModuleName) {
         Optional<AssignmentNode> maybeObjectClassAssignment = assignments.peek().stream().filter(
                 obj -> obj instanceof ObjectClassAssignmentNode && name.equals(obj.getReference())).findFirst();
 
@@ -355,7 +318,7 @@ public class CompilerImpl {
         return Optional.empty();
     }
 
-    public Optional<CompiledObject> compileObject(String name) {
+    public Optional<CompiledObject> compileObject(String name, Optional<String> maybeModuleName) {
         var assignment = compilerContext.getModule().getBody().getAssignment(name);
 
         if (assignment instanceof ValueOrObjectAssignmentNode) {
@@ -367,7 +330,7 @@ public class CompilerImpl {
         return Optional.empty();
     }
 
-    public Optional<CompiledObjectSet> compileObjectSet(String name) {
+    public Optional<CompiledObjectSet> compileObjectSet(String name, Optional<String> maybeModuleName) {
         Optional<AssignmentNode> maybeAmbiguousAssignment = assignments.peek().stream()
                 .filter(obj -> (obj instanceof ObjectSetAssignmentNode ||
                         obj instanceof ValueSetTypeOrObjectSetAssignmentNode) &&
@@ -394,7 +357,7 @@ public class CompilerImpl {
         return Optional.empty();
     }
 
-    public Optional<CompiledParameterizedType> compileParameterizedType(String name) {
+    public Optional<CompiledParameterizedType> compileParameterizedType(String name, Optional<String> maybeModuleName) {
         var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
 
         if (unknownAssignment instanceof ParameterizedTypeAssignmentNode assignment) {
@@ -404,7 +367,8 @@ public class CompilerImpl {
         return Optional.empty();
     }
 
-    public Optional<CompiledParameterizedObjectClass> compiledParameterizedObjectClass(String name) {
+    public Optional<CompiledParameterizedObjectClass> compiledParameterizedObjectClass(String name,
+            Optional<String> maybeModuleName) {
         var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
 
         if (unknownAssignment instanceof ParameterizedObjectClassAssignmentNode assignment) {
@@ -414,7 +378,8 @@ public class CompilerImpl {
         return Optional.empty();
     }
 
-    public Optional<CompiledParameterizedObjectSet> compiledParameterizedObjectSet(String name) {
+    public Optional<CompiledParameterizedObjectSet> compiledParameterizedObjectSet(String name,
+            Optional<String> maybeModuleName) {
         var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
 
         if (unknownAssignment instanceof ParameterizedObjectSetAssignmentNode assignment) {
@@ -424,7 +389,8 @@ public class CompilerImpl {
         return Optional.empty();
     }
 
-    public Optional<CompiledParameterizedValueSetType> compiledParameterizedValueSetType(String name) {
+    public Optional<CompiledParameterizedValueSetType> compiledParameterizedValueSetType(String name,
+            Optional<String> maybeModuleName) {
         var unknownAssignment = compilerContext.getModule().getBody().getAssignment(name);
 
         if (unknownAssignment instanceof ParameterizedValueSetTypeAssignmentNode assignment) {

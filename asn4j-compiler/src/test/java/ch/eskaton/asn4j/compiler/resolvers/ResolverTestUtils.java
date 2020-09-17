@@ -27,9 +27,13 @@
 
 package ch.eskaton.asn4j.compiler.resolvers;
 
+import ch.eskaton.asn4j.compiler.CompilerConfig;
 import ch.eskaton.asn4j.compiler.CompilerImpl;
+import ch.eskaton.asn4j.compiler.FileModuleSource;
+import ch.eskaton.asn4j.compiler.StringModuleSource;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -43,10 +47,11 @@ class ResolverTestUtils {
     public static <V extends Value> V resolveValue(String body, Class<V> valueClass, String reference)
             throws IOException, ParserException {
         var module = module(MODULE_NAME, body);
-        var compiler = new CompilerImpl();
+        var config = new CompilerConfig().module(MODULE_NAME).generateSource(false);
+        var compiler = new CompilerImpl(config, new StringModuleSource(Tuple2.of(MODULE_NAME, module)));
         var ctx = compiler.getCompilerContext();
 
-        compiler.loadAndCompileModule(MODULE_NAME, new ByteArrayInputStream(module.getBytes()));
+        compiler.run();
 
         return ctx.resolveValue(valueClass, MODULE_NAME, reference);
     }

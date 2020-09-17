@@ -27,22 +27,13 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.ModuleNode;
-import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
+import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.Optional;
+import java.io.InputStream;
+import java.util.List;
 
-public class ExternalTypeReferenceCompiler extends AbstractTypeReferenceCompiler<ExternalTypeReference> {
+interface ModuleSource {
 
-    @Override
-    public CompiledType compile(CompilerContext ctx, String name, ExternalTypeReference node,
-            Optional<Parameters> maybeParameters) {
-        var module = ctx.getModule(node.getModule());
-
-        ctx.ensureSymbolIsExported(module, node.getType());
-
-        return super.compile(ctx, name, node, maybeParameters);
-    }
+    List<Tuple2<String, InputStream>> getModules();
 
 }
