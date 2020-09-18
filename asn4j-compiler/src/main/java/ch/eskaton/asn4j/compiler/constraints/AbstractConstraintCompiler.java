@@ -53,7 +53,6 @@ import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
-import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
