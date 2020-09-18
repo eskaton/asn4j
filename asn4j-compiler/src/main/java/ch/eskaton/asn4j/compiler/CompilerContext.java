@@ -881,7 +881,7 @@ public class CompilerContext {
                 throw new CompilerException(format, getCurrentModuleName(), reference, nodeName, moduleName);
             }
 
-            var maybeResult = (Optional<T>) Optional.ofNullable(resultAccessor.apply(moduleName).get(reference));
+            var maybeResult = Optional.ofNullable(resultAccessor.apply(moduleName).get(reference));
 
             if (maybeResult.isEmpty()) {
                 return compiler.apply(reference, Optional.ofNullable(moduleName));

@@ -35,6 +35,9 @@ import java.util.stream.Collectors;
 
 public class ParameterUsageVerifier {
 
+    private ParameterUsageVerifier() {
+    }
+
     static void checkUnusedParameters(Optional<Parameters> maybeParameters) {
         if (maybeParameters.isEmpty()) {
             return;

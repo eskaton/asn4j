@@ -31,7 +31,7 @@ import ch.eskaton.commons.collections.Tuple2;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,7 +52,7 @@ public class StringModuleSource implements ModuleSource {
     }
 
     private InputStream getInputStream(Tuple2<String, String> source) {
-        return new ByteArrayInputStream(source.get_2().getBytes(Charset.forName("UTF-8")));
+        return new ByteArrayInputStream(source.get_2().getBytes(StandardCharsets.UTF_8));
     }
 
 }

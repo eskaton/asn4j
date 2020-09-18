@@ -303,14 +303,14 @@ public class CompilerImpl {
             Optional<String> maybeModuleName, BiFunction<String,
             Collection<AssignmentNode>, Optional<A>> assignmentSelector, Function<A, T> compiler) {
         return maybeModuleName.map(moduleName -> compilerContext.executeWithModule(moduleName, () -> {
-            var assignments = getAssignments(moduleName);
+            var moduleAssignments = getAssignments(moduleName);
 
-            return compile(name, assignmentSelector, compiler, assignments);
+            return compile(name, assignmentSelector, compiler, moduleAssignments);
         })).or(() -> {
             var moduleName = compilerContext.getModule().getModuleId().getModuleName();
-            var assignments = getAssignments(moduleName);
+            var moduleAssignments = getAssignments(moduleName);
 
-            return Optional.ofNullable(compile(name, assignmentSelector, compiler, assignments));
+            return Optional.ofNullable(compile(name, assignmentSelector, compiler, moduleAssignments));
         }).flatMap(Function.identity());
     }
 
@@ -328,7 +328,7 @@ public class CompilerImpl {
         return assignments.stream()
                 .filter(t -> Objects.equals(t.get_1(), moduleName))
                 .findFirst()
-                .map(t -> t.get_2())
+                .map(Tuple2::get_2)
                 .orElseThrow(() -> new IllegalCompilerStateException("Module %s unknown", moduleName));
     }
 
