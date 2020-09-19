@@ -1227,8 +1227,7 @@ public class CompilerContext {
             return Optional.empty();
         }
 
-        var componentStream = getTypesOfCurrentModule().entrySet().stream()
-                .map(Map.Entry::getValue);
+        var componentStream = getTypesOfCurrentModule().values().stream();
 
         return findCompiledTypeRecursiveAux(type, componentStream);
     }
@@ -1425,7 +1424,7 @@ public class CompilerContext {
     public ValueAssignmentNode resolveValueReference(String symbolName) {
         Optional<ValueAssignmentNode> assignment = tryResolveValueReference(symbolName);
 
-        if (!assignment.isPresent()) {
+        if (assignment.isEmpty()) {
             throw new ValueResolutionException("Failed to resolve reference " + symbolName);
         }
 
