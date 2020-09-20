@@ -255,7 +255,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 var type = compiledField.getCompiledType().getType();
                 var value = (Value) setting;
 
-                return Tuple2.of(reference, ctx.resolveGenericValue(ctx.getValueType(type), type, value));
+                return Tuple2.of(reference, ctx.getValue(type, value));
             } else if (field instanceof CompiledTypeField) {
                 var type = (Type) setting;
 
@@ -280,10 +280,9 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 var fieldName = field.getName();
                 var fieldValue = (Value) objectFields.get(fieldName);
                 var fieldType = ((CompiledType) objectFields.get(variableTypeValueField.getReference())).getType();
-                var valueType = ctx.getValueType(fieldType);
 
                 try {
-                    ctx.resolveGenericValue(valueType, fieldType, fieldValue);
+                    ctx.getValue(fieldType, fieldValue);
                 } catch (ValueResolutionException e) {
                     throw new CompilerException(objectDefinition.getPosition(),
                             "The value for %s in the object definition for %s must be of the type %s but found the value %s",

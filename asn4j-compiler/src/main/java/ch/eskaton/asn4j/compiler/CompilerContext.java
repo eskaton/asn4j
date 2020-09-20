@@ -400,7 +400,7 @@ public class CompilerContext {
 
                 try {
                     // verify that the value is of the expected type
-                    resolveGenericValue(getValueClass(expectedType.getClass()), expectedType, value);
+                    getValue(expectedType, value);
 
                     parameters.markAsUsed(parameterDefinition);
 
@@ -1459,8 +1459,12 @@ public class CompilerContext {
         return valueResolver.resolveValue(valueClass, moduleName, reference);
     }
 
-    public <V extends Value> V resolveGenericValue(Class<V> valueClass, Type type, Value value) {
-        return (V) new ValueCompiler().compile(this, null, type, value, Optional.empty()).getValue();
+    public <V extends Value> V getValue(Type type, Value value) {
+        return (V) getCompiledValue(type, value).getValue();
+    }
+
+    public <V extends Value> CompiledValue<V> getCompiledValue(Type type, Value value) {
+        return (CompiledValue<V>) new ValueCompiler().compile(this, null, type, value, Optional.empty());
     }
 
 }

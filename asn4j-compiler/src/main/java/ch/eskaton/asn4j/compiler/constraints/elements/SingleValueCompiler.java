@@ -96,7 +96,7 @@ public class SingleValueCompiler<V extends Value, N extends ValueNode>
     }
 
     protected <T> T resolveValue(CompiledType baseType, SingleValueConstraint elements) {
-        return (T) ctx.resolveGenericValue(valueClazz, baseType.getType(), elements.getValue());
+        return (T) ctx.getValue(baseType.getType(), elements.getValue());
     }
 
     private <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... parameterTypes) {

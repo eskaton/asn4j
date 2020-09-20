@@ -53,8 +53,7 @@ public class FixedTypeValueFieldSpecNodeCompiler implements NamedCompiler<FixedT
             }
 
             var value = valueSpecNode.getSpec();
-            var valueClass = ctx.getValueType(type);
-            var defaultValue = ctx.resolveGenericValue(valueClass, type, value);
+            var defaultValue = ctx.getValue(type, value);
 
             compiledField.setDefaultValue(defaultValue);
         } else if (optionalitySpec instanceof OptionalSpecNode) {

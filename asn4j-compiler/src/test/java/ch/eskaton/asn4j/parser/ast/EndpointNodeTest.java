@@ -46,8 +46,8 @@ class EndpointNodeTest {
     void testCanonicalizeEndpoints() {
         var ctx = Mockito.mock(CompilerContext.class);
 
-        when(ctx.resolveGenericValue(any(Class.class), any(Type.class), any(Value.class)))
-                .thenAnswer(i -> i.getArguments()[2]);
+        when(ctx.getValue(any(Type.class), any(Value.class)))
+                .thenAnswer(i -> i.getArguments()[1]);
 
         assertEquals(new IntegerValue(Long.MIN_VALUE),
                 canonicalizeLowerEndpoint(ctx, new EndpointNode(Value.MIN, true), Long.MIN_VALUE));

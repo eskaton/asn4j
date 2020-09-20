@@ -410,11 +410,10 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
 
                 var compiledType = maybeReferencedDefault.get();
                 var type = compiledType.getType();
-                var valueType = ctx.getValueType(type);
                 var defaultValue = maybeDefaultValue.get();
 
                 try {
-                    var resolvedValue = ctx.resolveGenericValue(valueType, type, defaultValue);
+                    var resolvedValue = ctx.getValue(type, defaultValue);
 
                     field.setDefaultValue(resolvedValue);
                 } catch (ValueResolutionException e) {
