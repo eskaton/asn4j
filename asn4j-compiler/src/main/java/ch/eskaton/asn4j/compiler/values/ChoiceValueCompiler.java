@@ -38,7 +38,7 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.utils.TypeFormatter.formatType;
+import static ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter.formatType;
 
 public class ChoiceValueCompiler extends AbstractValueCompiler<ChoiceValue> {
 

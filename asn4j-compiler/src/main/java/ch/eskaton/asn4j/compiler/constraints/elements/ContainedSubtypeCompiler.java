@@ -40,7 +40,7 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import java.util.ArrayDeque;
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.utils.TypeFormatter.formatType;
+import static ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter.formatType;
 
 public class ContainedSubtypeCompiler implements ElementsCompiler<ContainedSubtype> {
 
