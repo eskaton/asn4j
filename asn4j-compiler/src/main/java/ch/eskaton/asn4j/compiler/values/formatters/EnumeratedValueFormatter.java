@@ -25,10 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 
-    String getValue();
+class EnumeratedValueFormatter implements Formatter<EnumeratedValue> {
+
+    @Override
+    public String format(EnumeratedValue value) {
+        var id = value.getId();
+        var intValue = value.getValue();
+
+        if (id != null && intValue != null) {
+            return String.format("%s(%d)", id, intValue);
+        } else if (id != null) {
+            return id;
+        } else {
+            return String.valueOf(value.getValue());
+        }
+    }
 
 }

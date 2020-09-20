@@ -25,10 +25,28 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 
-    String getValue();
+import java.math.BigInteger;
+import java.util.stream.Collectors;
+
+class BitStringValueFormatter implements Formatter<BitStringValue> {
+
+    @Override
+    public String format(BitStringValue value) {
+        var namedValues = value.getNamedValues();
+
+        if (!namedValues.isEmpty()) {
+            return "{%s}".formatted(namedValues.stream().collect(Collectors.joining(", ")));
+        }
+
+        var unusedBits = value.getUnusedBits();
+        var binaryString = new BigInteger(value.getByteValue()).toString(2);
+        var trimmedBinaryString = binaryString.substring(0, binaryString.length() - unusedBits);
+
+        return "'%s'B".formatted(trimmedBinaryString);
+    }
 
 }

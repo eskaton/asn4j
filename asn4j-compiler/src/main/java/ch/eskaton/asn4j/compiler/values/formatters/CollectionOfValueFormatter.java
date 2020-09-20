@@ -25,10 +25,19 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 
-    String getValue();
+import java.util.stream.Collectors;
+
+class CollectionOfValueFormatter implements Formatter<CollectionOfValue> {
+
+    @Override
+    public String format(CollectionOfValue value) {
+        return String.format("{%s}", value.getValues().stream()
+                .map(ValueFormatter::formatValue)
+                .collect(Collectors.joining(", ")));
+    }
 
 }

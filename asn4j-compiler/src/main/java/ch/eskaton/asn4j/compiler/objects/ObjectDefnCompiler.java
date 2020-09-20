@@ -37,7 +37,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
-import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
+import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.parser.Group;
 import ch.eskaton.asn4j.parser.Position;

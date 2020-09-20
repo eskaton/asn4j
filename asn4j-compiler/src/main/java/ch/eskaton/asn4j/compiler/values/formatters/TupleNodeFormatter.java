@@ -25,10 +25,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.Tuple;
 
-    String getValue();
+class TupleNodeFormatter implements Formatter<Tuple> {
+
+    @Override
+    public String format(Tuple value) {
+        return String.format("{%s, %s}", value.getColumn(), value.getRow());
+    }
 
 }

@@ -62,7 +62,7 @@ import ch.eskaton.asn4j.compiler.results.UnNamedCompiledValue;
 import ch.eskaton.asn4j.compiler.types.EnumeratedTypeCompiler;
 import ch.eskaton.asn4j.compiler.types.TypeCompiler;
 import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
-import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
+import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.compiler.values.AbstractValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;

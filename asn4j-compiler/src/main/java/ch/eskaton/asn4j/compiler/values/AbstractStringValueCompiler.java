@@ -33,10 +33,10 @@ import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
-import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
+import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
-import ch.eskaton.asn4j.parser.ast.TupleNode;
+import ch.eskaton.asn4j.parser.ast.Quadruple;
+import ch.eskaton.asn4j.parser.ast.Tuple;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.CharacterStringList;
@@ -119,12 +119,12 @@ public abstract class AbstractStringValueCompiler<V extends HasStringValue & Val
         throw new ValueResolutionException(valuePosition, "Failed to resolve a %s value", typeName);
     }
 
-    protected String resolveTupleValue(TupleNode tuple) {
+    protected String resolveTupleValue(Tuple tuple) {
         throw new ValueResolutionException(tuple.getPosition(), "Tuple values not allowed for type %s: %s", typeName,
                 ValueFormatter.formatValue(tuple));
     }
 
-    protected String resolveQuadrupleValue(QuadrupleNode quadruple) {
+    protected String resolveQuadrupleValue(Quadruple quadruple) {
         throw new ValueResolutionException(quadruple.getPosition(), "Quadruple values not allowed for type %s: %s",
                 typeName, ValueFormatter.formatValue(quadruple));
     }

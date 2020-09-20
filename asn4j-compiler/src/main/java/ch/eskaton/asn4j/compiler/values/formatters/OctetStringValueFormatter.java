@@ -25,10 +25,16 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
+import ch.eskaton.commons.utils.HexDump;
 
-    String getValue();
+class OctetStringValueFormatter implements Formatter<OctetStringValue> {
+
+    @Override
+    public String format(OctetStringValue value) {
+        return "'%s'H".formatted(HexDump.toHexString(value.getByteValue()).toUpperCase());
+    }
 
 }

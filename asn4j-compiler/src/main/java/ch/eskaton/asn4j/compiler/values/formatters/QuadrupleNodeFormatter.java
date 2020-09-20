@@ -25,10 +25,16 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.Quadruple;
 
-    String getValue();
+class QuadrupleNodeFormatter implements Formatter<Quadruple> {
+
+    @Override
+    public String format(Quadruple value) {
+        return String.format("{%s, %s, %s, %s}", value.getGroup(), value.getPlane(), value.getRow(),
+                value.getCell());
+    }
 
 }

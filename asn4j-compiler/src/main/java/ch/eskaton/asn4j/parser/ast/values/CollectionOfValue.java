@@ -29,8 +29,8 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
-import ch.eskaton.asn4j.parser.ast.TupleNode;
+import ch.eskaton.asn4j.parser.ast.Quadruple;
+import ch.eskaton.asn4j.parser.ast.Tuple;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -78,14 +78,14 @@ public class CollectionOfValue extends AbstractValue implements HasSize {
         return isTuple;
     }
 
-    public TupleNode toTuple() {
+    public Tuple toTuple() {
         List<Value> values = getValues();
 
         if (!isTuple()) {
             throw new CompilerException("Invalid tuple: %s", values);
         }
 
-        return new TupleNode(getPosition(), getShort(values, 0), getShort(values, 1));
+        return new Tuple(getPosition(), getShort(values, 0), getShort(values, 1));
     }
 
     public boolean isQuadruple() {
@@ -98,14 +98,14 @@ public class CollectionOfValue extends AbstractValue implements HasSize {
         return isQuadruple;
     }
 
-    public QuadrupleNode toQuadruple() {
+    public Quadruple toQuadruple() {
         List<Value> values = getValues();
 
         if (!isQuadruple()) {
             throw new CompilerException("Invalid quadruple: %s", values);
         }
 
-        return new QuadrupleNode(getPosition(), getShort(values, 0), getShort(values, 1),
+        return new Quadruple(getPosition(), getShort(values, 0), getShort(values, 1),
                 getShort(values, 2), getShort(values, 3));
     }
 

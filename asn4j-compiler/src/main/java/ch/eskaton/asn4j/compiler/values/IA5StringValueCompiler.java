@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.compiler.values;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.TupleNode;
+import ch.eskaton.asn4j.parser.ast.Tuple;
 import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -46,7 +46,7 @@ public class IA5StringValueCompiler extends AbstractStringValueCompiler<IA5Strin
     }
 
     @Override
-    protected String resolveTupleValue(TupleNode tuple) {
+    protected String resolveTupleValue(Tuple tuple) {
         return Character.toString((tuple.getColumn() << 4) | tuple.getRow());
     }
 
