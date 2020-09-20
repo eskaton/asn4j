@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledValue;
+import ch.eskaton.asn4j.compiler.values.ValueCompiler;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
