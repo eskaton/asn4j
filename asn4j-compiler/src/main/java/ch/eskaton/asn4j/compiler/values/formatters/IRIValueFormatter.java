@@ -25,10 +25,17 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 
-    String getValue();
+import java.util.stream.Collectors;
+
+class IRIValueFormatter implements Formatter<IRIValue> {
+
+    @Override
+    public String format(IRIValue value) {
+        return "/" + value.getArcIdentifierTexts().stream().collect(Collectors.joining("/"));
+    }
 
 }

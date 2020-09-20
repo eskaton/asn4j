@@ -1,7 +1,7 @@
 /*
  *  Copyright (c) 2015, Adrian Moser
  *  All rights reserved.
- * 
+ *
  *  Redistribution and use in source and binary forms, with or without
  *  modification, are permitted provided that the following conditions are met:
  *  * Redistributions of source code must retain the above copyright
@@ -12,7 +12,7 @@
  *  * Neither the name of the author nor the
  *  names of its contributors may be used to endorse or promote products
  *  derived from this software without specific prior written permission.
- * 
+ *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
  *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
  *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,53 +25,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
+import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 
-import java.util.Objects;
-
-public class TupleNode extends AbstractValue {
-
-    private short column;
-
-    private short row;
-
-    public TupleNode(Position position, short column, short row) {
-        super(position);
-
-    	this.column = column;
-    	this.row = row;
-    }
-
-    public short getColumn() {
-    	return column;
-    }
-
-    public short getRow() {
-    	return row;
-    }
+class IntegerValueFormatter implements Formatter<IntegerValue> {
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        TupleNode tupleNode = (TupleNode) o;
-
-        return column == tupleNode.column &&
-                row == tupleNode.row;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(column, row);
+    public String format(IntegerValue value) {
+        return value.getValue().toString();
     }
 
 }

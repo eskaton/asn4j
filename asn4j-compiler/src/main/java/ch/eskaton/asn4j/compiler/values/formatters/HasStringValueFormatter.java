@@ -25,10 +25,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
 
-    String getValue();
+class HasStringValueFormatter implements Formatter<HasStringValue> {
+
+    @Override
+    public String format(HasStringValue value) {
+        return value.getValue();
+    }
 
 }

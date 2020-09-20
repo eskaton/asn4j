@@ -25,10 +25,21 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 
-    String getValue();
+import java.util.stream.Collectors;
+
+class ObjectIdentifierValueFormatter implements Formatter<ObjectIdentifierValue> {
+
+    @Override
+    public String format(ObjectIdentifierValue value) {
+        return value.getComponents().stream()
+                .map(OIDComponentNode::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining("."));
+    }
 
 }

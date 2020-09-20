@@ -319,12 +319,12 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.PropertyAndSettingNode;
-import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
+import ch.eskaton.asn4j.parser.ast.Quadruple;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
-import ch.eskaton.asn4j.parser.ast.TupleNode;
+import ch.eskaton.asn4j.parser.ast.Tuple;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeIdentifierObjectClassReferenceNode;
@@ -3606,7 +3606,7 @@ class ParserTest {
         assertTrue(result instanceof CollectionOfValue);
         assertTrue(((CollectionOfValue) result).isQuadruple());
 
-        QuadrupleNode quadrupel = ((CollectionOfValue) result).toQuadruple();
+        Quadruple quadrupel = ((CollectionOfValue) result).toQuadruple();
 
         assertEquals(0, quadrupel.getGroup());
         assertEquals(0, quadrupel.getPlane());
@@ -3713,7 +3713,7 @@ class ParserTest {
         assertTrue(result instanceof CollectionOfValue);
         assertTrue(((CollectionOfValue) result).isTuple());
 
-        TupleNode tuple = ((CollectionOfValue) result).toTuple();
+        Tuple tuple = ((CollectionOfValue) result).toTuple();
 
         assertNotNull(result);
         assertEquals(7, tuple.getColumn());

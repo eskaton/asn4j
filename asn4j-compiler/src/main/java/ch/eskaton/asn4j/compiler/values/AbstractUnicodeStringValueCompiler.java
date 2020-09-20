@@ -27,7 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.values;
 
-import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
+import ch.eskaton.asn4j.parser.ast.Quadruple;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -43,11 +43,11 @@ public abstract class AbstractUnicodeStringValueCompiler<V extends HasStringValu
     }
 
     @Override
-    protected String resolveQuadrupleValue(QuadrupleNode quadruple) {
+    protected String resolveQuadrupleValue(Quadruple quadruple) {
         return new String(Character.toChars(getCodePoint(quadruple)));
     }
 
-    private int getCodePoint(QuadrupleNode quadruple) {
+    private int getCodePoint(Quadruple quadruple) {
         return (((quadruple.getGroup() << 24) |
                 quadruple.getPlane() << 16) |
                 quadruple.getRow() << 8) |

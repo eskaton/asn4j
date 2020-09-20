@@ -25,10 +25,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 
-    String getValue();
+public class SimpleDefinedValueFormatter implements Formatter<SimpleDefinedValue> {
+
+    @Override
+    public String format(SimpleDefinedValue value) {
+        return value.getReference();
+    }
 
 }

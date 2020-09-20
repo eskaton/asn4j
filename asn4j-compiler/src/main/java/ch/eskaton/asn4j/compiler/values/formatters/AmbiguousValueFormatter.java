@@ -25,10 +25,20 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-public interface HasStringValue extends Value {
+import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 
-    String getValue();
+import java.util.stream.Collectors;
+
+class AmbiguousValueFormatter implements Formatter<AmbiguousValue> {
+
+    @Override
+    public String format(AmbiguousValue value) {
+        return value.getValues().stream()
+                .map(ValueFormatter::formatValue)
+                .distinct()
+                .collect(Collectors.joining(", "));
+    }
 
 }
