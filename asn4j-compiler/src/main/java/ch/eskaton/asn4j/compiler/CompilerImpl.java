@@ -215,8 +215,6 @@ public class CompilerImpl {
             return compileObjectClassAssignment(assignment);
         } else if (unknownAssignment instanceof ValueSetTypeOrObjectSetAssignmentNode assignment) {
             return compileValueSetTypeOrObjectSetAssignment(assignment);
-        } else if (unknownAssignment instanceof ObjectSetAssignmentNode assignment) {
-            return compileObjectSetAssignment(assignment);
         } else if (unknownAssignment instanceof ParameterizedTypeAssignmentNode assignment) {
             return compileParameterizedTypeAssignment(assignment);
         } else if (unknownAssignment instanceof ParameterizedValueAssignmentNode) {

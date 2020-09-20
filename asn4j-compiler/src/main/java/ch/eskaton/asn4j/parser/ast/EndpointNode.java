@@ -101,7 +101,7 @@ public class EndpointNode extends AbstractNode {
         } else if (Value.MIN.equals(value)) {
             return new IntegerValue(inclusive ? bound : bound + 1);
         } else {
-            var intValue = ctx.resolveGenericValue(IntegerValue.class, new IntegerType(NO_POSITION), value);
+            var intValue = ctx.<IntegerValue>getValue(new IntegerType(NO_POSITION), value);
 
             if (inclusive) {
                 return intValue;

@@ -65,7 +65,7 @@ public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompile
 
     @Override
     public String getInitializerString(CompilerContext ctx, String typeName, Type type, Value value) {
-        var resolvedValue = ctx.resolveGenericValue(valueClass, type, value);
+        var resolvedValue = ctx.getValue(type, value);
 
         return JavaUtils.getInitializerString(ctx, typeName, resolvedValue);
     }
