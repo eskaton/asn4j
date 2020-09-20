@@ -79,53 +79,54 @@ import static ch.eskaton.commons.utils.Utils.callWith;
 
 public class JavaUtils {
 
+    public static final Dispatcher<Value, Class<? extends Value>, Tuple3<CompilerContext, String, ? extends Value>, String> DISPATCHER =
+            new Dispatcher<Value, Class<? extends Value>, Tuple3<CompilerContext, String, ? extends Value>, String>()
+                    .withComparator((t, u) -> u.isInstance(t))
+                    .withException(t -> new CompilerException("Failed to get initializer string for type %s", t));
+
+    static {
+        addCase(BooleanValue.class, JavaUtils::getBooleanInitializerString);
+        addCase(BitStringValue.class, JavaUtils::getBitStringInitializerString);
+        addCase(BinaryStringValue.class, JavaUtils::getBinaryStringInitializerString);
+        addCase(HexStringValue.class, JavaUtils::getHexStringInitializerString);
+        addCase(EnumeratedValue.class, JavaUtils::getEnumeratedInitializerString);
+        addCase(IntegerValue.class, JavaUtils::getIntegerInitializerString);
+        addCase(RealValue.class, JavaUtils::getRealInitializerString);
+        addCase(IRIValue.class, JavaUtils::getIRIInitializerString);
+        addCase(NullValue.class, JavaUtils::getNullInitializerString);
+        addCase(ObjectIdentifierValue.class, JavaUtils::getObjectIdentifierInitializerString);
+        addCase(OctetStringValue.class, JavaUtils::getOctetStringInitializerString);
+        addCase(RelativeOIDValue.class, JavaUtils::getRelativeOIDInitializerString);
+        addCase(RelativeIRIValue.class, JavaUtils::getRelativeIRIInitializerString);
+        addCase(CollectionOfValue.class, JavaUtils::getCollectionOfInitializerString);
+        addCase(CollectionValue.class, JavaUtils::getCollectionInitializerString);
+        addCase(ChoiceValue.class, JavaUtils::getChoiceInitializerString);
+        addCase(VisibleStringValue.class, JavaUtils::getVisibleStringInitializerString);
+        addCase(UTCTimeValue.class, JavaUtils::getUTCTimeInitializerString);
+        addCase(GeneralizedTimeValue.class, JavaUtils::getGeneralizedTimeInitializerString);
+        addCase(NumericStringValue.class, JavaUtils::getNumericStringInitializerString);
+        addCase(PrintableStringValue.class, JavaUtils::getPrintableStringInitializerString);
+        addCase(IA5StringValue.class, JavaUtils::getIA5StringInitializerString);
+        addCase(GraphicStringValue.class, JavaUtils::getGraphicStringInitializerString);
+        addCase(GeneralStringValue.class, JavaUtils::getGeneralStringInitializerString);
+        addCase(TeletexStringValue.class, JavaUtils::getTeletexStringInitializerString);
+        addCase(VideotexStringValue.class, JavaUtils::getVideotexStringInitializerString);
+        addCase(UniversalStringValue.class, JavaUtils::getUniversalStringInitializerString);
+        addCase(UTF8StringValue.class, JavaUtils::getUTF8StringInitializerString);
+        addCase(BMPStringValue.class, JavaUtils::getBMPStringInitializerString);
+    }
+
     private JavaUtils() {
     }
 
     public static String getInitializerString(CompilerContext ctx, String typeName, Value value) {
-        var dispatcher =
-                new Dispatcher<Value, Class<? extends Value>, Tuple3<CompilerContext, String, ? extends Value>, String>()
-                        .withComparator((t, u) -> u.isInstance(t))
-                        .withException(t -> new CompilerException("Failed to get initializer string for type %s", t));
-
-        addCase(dispatcher, BooleanValue.class, JavaUtils::getBooleanInitializerString);
-        addCase(dispatcher, BitStringValue.class, JavaUtils::getBitStringInitializerString);
-        addCase(dispatcher, BinaryStringValue.class, JavaUtils::getBinaryStringInitializerString);
-        addCase(dispatcher, HexStringValue.class, JavaUtils::getHexStringInitializerString);
-        addCase(dispatcher, EnumeratedValue.class, JavaUtils::getEnumeratedInitializerString);
-        addCase(dispatcher, IntegerValue.class, JavaUtils::getIntegerInitializerString);
-        addCase(dispatcher, RealValue.class, JavaUtils::getRealInitializerString);
-        addCase(dispatcher, IRIValue.class, JavaUtils::getIRIInitializerString);
-        addCase(dispatcher, NullValue.class, JavaUtils::getNullInitializerString);
-        addCase(dispatcher, ObjectIdentifierValue.class, JavaUtils::getObjectIdentifierInitializerString);
-        addCase(dispatcher, OctetStringValue.class, JavaUtils::getOctetStringInitializerString);
-        addCase(dispatcher, RelativeOIDValue.class, JavaUtils::getRelativeOIDInitializerString);
-        addCase(dispatcher, RelativeIRIValue.class, JavaUtils::getRelativeIRIInitializerString);
-        addCase(dispatcher, CollectionOfValue.class, JavaUtils::getCollectionOfInitializerString);
-        addCase(dispatcher, CollectionValue.class, JavaUtils::getCollectionInitializerString);
-        addCase(dispatcher, ChoiceValue.class, JavaUtils::getChoiceInitializerString);
-        addCase(dispatcher, VisibleStringValue.class, JavaUtils::getVisibleStringInitializerString);
-        addCase(dispatcher, UTCTimeValue.class, JavaUtils::getUTCTimeInitializerString);
-        addCase(dispatcher, GeneralizedTimeValue.class, JavaUtils::getGeneralizedTimeInitializerString);
-        addCase(dispatcher, NumericStringValue.class, JavaUtils::getNumericStringInitializerString);
-        addCase(dispatcher, PrintableStringValue.class, JavaUtils::getPrintableStringInitializerString);
-        addCase(dispatcher, IA5StringValue.class, JavaUtils::getIA5StringInitializerString);
-        addCase(dispatcher, GraphicStringValue.class, JavaUtils::getGraphicStringInitializerString);
-        addCase(dispatcher, GeneralStringValue.class, JavaUtils::getGeneralStringInitializerString);
-        addCase(dispatcher, TeletexStringValue.class, JavaUtils::getTeletexStringInitializerString);
-        addCase(dispatcher, VideotexStringValue.class, JavaUtils::getVideotexStringInitializerString);
-        addCase(dispatcher, UniversalStringValue.class, JavaUtils::getUniversalStringInitializerString);
-        addCase(dispatcher, UTF8StringValue.class, JavaUtils::getUTF8StringInitializerString);
-        addCase(dispatcher, BMPStringValue.class, JavaUtils::getBMPStringInitializerString);
-
-        return dispatcher.execute(value, Tuple3.of(ctx, typeName, value));
+        return DISPATCHER.execute(value, Tuple3.of(ctx, typeName, value));
     }
 
     private static <T extends Value> void addCase(
-            Dispatcher<Value, Class<? extends Value>, Tuple3<CompilerContext, String, ? extends Value>, String> dispatcher,
             Class<T> valueClazz,
             TriFunction<CompilerContext, String, T, String> initializer) {
-        dispatcher.withCase(valueClazz,
+        DISPATCHER.withCase(valueClazz,
                 maybeArgs -> callWith(args -> initializer.apply(args.get_1(), args.get_2(),
                         valueClazz.cast(args.get_3())), maybeArgs.get()));
     }
