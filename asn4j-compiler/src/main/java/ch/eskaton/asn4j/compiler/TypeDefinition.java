@@ -30,20 +30,20 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.constraints.AbstractConstraintCompiler;
 import ch.eskaton.asn4j.compiler.defaults.AbstractDefaultCompiler;
 import ch.eskaton.asn4j.compiler.defaults.DefaultCompilerImpl;
-import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.typenamesuppliers.TypeNameSupplier;
+import ch.eskaton.asn4j.compiler.values.AbstractValueCompiler;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueResolver<V>, C extends Compiler<T>,
+public class TypeDefinition<T extends Node, V extends Value, R, S extends AbstractValueCompiler<V>, C extends Compiler<T>,
         D extends AbstractDefaultCompiler<V>, K extends AbstractConstraintCompiler> {
 
     private Class<T> typeClass;
 
     private Class<V> valueClass;
 
-    private S valueResolver;
+    private S valueCompiler;
 
     private Class<R> runtimeTypeClass;
 
@@ -56,18 +56,18 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
     private C compiler;
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
-            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, K constraintCompiler) {
-        this(typeClass, compiler, valueClass, runtimeTypeClass, valueResolver, typeNameSupplier,
+            S valueCompiler, TypeNameSupplier<? extends Type> typeNameSupplier, K constraintCompiler) {
+        this(typeClass, compiler, valueClass, runtimeTypeClass, valueCompiler, typeNameSupplier,
                 (D) new DefaultCompilerImpl<V>(valueClass), constraintCompiler);
     }
 
     public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
-            S valueResolver, TypeNameSupplier<? extends Type> typeNameSupplier, D defaultCompiler, K constraintCompiler) {
+            S valueCompiler, TypeNameSupplier<? extends Type> typeNameSupplier, D defaultCompiler, K constraintCompiler) {
         this.typeClass = typeClass;
         this.compiler = compiler;
         this.valueClass = valueClass;
         this.runtimeTypeClass = runtimeTypeClass;
-        this.valueResolver = valueResolver;
+        this.valueCompiler = valueCompiler;
         this.typeNameSupplier = typeNameSupplier;
         this.defaultCompiler = defaultCompiler;
         this.constraintCompiler = constraintCompiler;
@@ -113,13 +113,13 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends ValueR
         return runtimeTypeClass;
     }
 
-    public S getValueResolver() {
-        if (valueResolver == null) {
+    public S getValueCompiler() {
+        if (valueCompiler == null) {
             throw new IllegalCompilerStateException("Type %s has no associated value resolver",
                     typeClass.getSimpleName());
         }
 
-        return valueResolver;
+        return valueCompiler;
     }
 
     public TypeNameSupplier getTypeNameSupplier() {

@@ -71,7 +71,6 @@ import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -172,15 +171,11 @@ public class JavaUtils {
     }
 
     private static String getIRIInitializerString(CompilerContext ctx, String typeName, IRIValue value) {
-        var iriValue = ctx.resolveValue(IRIValue.class, Optional.empty(), value);
-
-        return getIRIInitializerString(typeName, iriValue.getArcIdentifierTexts());
+        return getIRIInitializerString(typeName, value.getArcIdentifierTexts());
     }
 
     private static String getRelativeIRIInitializerString(CompilerContext ctx, String typeName, RelativeIRIValue value) {
-        var iriValue = ctx.resolveValue(RelativeIRIValue.class, Optional.empty(), value);
-
-        return getIRIInitializerString(typeName, iriValue.getArcIdentifierTexts());
+        return getIRIInitializerString(typeName, value.getArcIdentifierTexts());
     }
 
     private static String getIRIInitializerString(String typeName, List<String> components) {

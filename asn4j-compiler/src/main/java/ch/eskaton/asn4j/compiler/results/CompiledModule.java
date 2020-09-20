@@ -40,6 +40,8 @@ public class CompiledModule implements CompilationResult {
 
     private HashMap<String, CompiledType> types = new HashMap<>();
 
+    private HashMap<String, CompiledValue> values = new HashMap<>();
+
     private HashMap<String, CompiledObject> objects = new HashMap<>();
 
     private HashMap<String, CompiledObjectClass> objectClasses = new HashMap<>();
@@ -68,6 +70,14 @@ public class CompiledModule implements CompilationResult {
 
     public Map<String, CompiledType> getTypes() {
         return Collections.unmodifiableMap(types);
+    }
+
+    public void addValue(String name, CompiledValue compiledValue) {
+        values.put(name, compiledValue);
+    }
+
+    public Map<String, CompiledValue> getValues() {
+        return Collections.unmodifiableMap(values);
     }
 
     public void addObject(String name, CompiledObject compiledObject) {
@@ -145,6 +155,7 @@ public class CompiledModule implements CompilationResult {
 
         return Objects.equals(name, that.name) &&
                 Objects.equals(types, that.types) &&
+                Objects.equals(values, that.values) &&
                 Objects.equals(objects, that.objects) &&
                 Objects.equals(objectClasses, that.objectClasses) &&
                 Objects.equals(objectSets, that.objectSets) &&
@@ -156,7 +167,7 @@ public class CompiledModule implements CompilationResult {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, types, objects, objectClasses, objectSets, parameterizedTypes,
+        return Objects.hash(name, types, values, objects, objectClasses, objectSets, parameterizedTypes,
                 parameterizedObjectClass, parameterizedObjectSet, parameterizedValueSetType);
     }
 

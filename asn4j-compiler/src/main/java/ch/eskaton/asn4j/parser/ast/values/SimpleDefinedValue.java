@@ -39,8 +39,6 @@ import java.util.Optional;
 
 public class SimpleDefinedValue extends DefinedValue implements ParameterizedNode {
 
-    private String value;
-
     private Optional<List<Node>> parameters = Optional.empty();
 
     protected SimpleDefinedValue() {
@@ -48,13 +46,7 @@ public class SimpleDefinedValue extends DefinedValue implements ParameterizedNod
     }
 
     public SimpleDefinedValue(Position position, String value) {
-        super(position);
-
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
+        super(position, value);
     }
 
     public void setParameters(List<Node> parameters) {
@@ -73,7 +65,7 @@ public class SimpleDefinedValue extends DefinedValue implements ParameterizedNod
 
     @Override
     public ObjectNode toObjectValue() {
-        ObjectReference ref = new ObjectReference(getPosition(), value);
+        ObjectReference ref = new ObjectReference(getPosition(), getReference());
 
         if (parameters.isPresent()) {
             ref.setParameters(parameters.get());
@@ -92,16 +84,18 @@ public class SimpleDefinedValue extends DefinedValue implements ParameterizedNod
             return false;
         }
 
+        if (!super.equals(o)) {
+            return false;
+        }
+
         SimpleDefinedValue that = (SimpleDefinedValue) o;
 
-        return Objects.equals(value, that.value) &&
-                Objects.equals(parameters, that.parameters);
+        return Objects.equals(parameters, that.parameters);
     }
 
     @Override
     public int hashCode() {
-
-        return Objects.hash(value, parameters);
+        return Objects.hash(super.hashCode(), parameters);
     }
 
 }

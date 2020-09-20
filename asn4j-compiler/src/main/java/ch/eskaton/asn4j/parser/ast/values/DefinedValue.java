@@ -30,16 +30,50 @@ package ch.eskaton.asn4j.parser.ast.values;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 
+import java.util.Objects;
+
 public abstract class DefinedValue extends AbstractValue {
+
+    protected String reference;
 
     protected DefinedValue() {
         super();
     }
 
-    public DefinedValue(Position position) {
+    public DefinedValue(Position position, String reference) {
         super(position);
+
+        this.reference = reference;
+    }
+
+    public String getReference() {
+        return reference;
     }
 
     public abstract ObjectNode toObjectValue();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        DefinedValue that = (DefinedValue) o;
+
+        return Objects.equals(reference, that.reference);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), reference);
+    }
 
 }

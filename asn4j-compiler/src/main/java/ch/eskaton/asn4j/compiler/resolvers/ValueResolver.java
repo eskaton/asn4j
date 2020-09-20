@@ -28,16 +28,11 @@
 package ch.eskaton.asn4j.compiler.resolvers;
 
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.Optional;
 
 public interface ValueResolver<V> {
-
-    V resolve(DefinedValue ref);
-
-    V resolve(String ref);
 
     V resolve(Optional<Type> type, V value);
 

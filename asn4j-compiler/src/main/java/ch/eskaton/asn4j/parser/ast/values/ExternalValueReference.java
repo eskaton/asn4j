@@ -53,7 +53,7 @@ public class ExternalValueReference extends SimpleDefinedValue {
 
     @Override
     public ObjectNode toObjectValue() {
-        return new ExternalObjectReferenceNode(getPosition(), getValue(), module)
+        return new ExternalObjectReferenceNode(getPosition(), getReference(), module)
                 .parameters(getParameters().orElse(null));
     }
 

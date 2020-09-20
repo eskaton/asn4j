@@ -84,10 +84,10 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
                 });
             } catch (CompilerException e) {
                 if (component.getNamedType() != null) {
-                    throw new CompilerException("Failed to compile component %s in %s %s", e,
+                    throw new CompilerException("Failed to compile component '%s' in %s '%s'", e,
                             component.getNamedType().getName(), typeName, name);
                 } else {
-                    throw new CompilerException("Failed to compile a component in %s %s", e, typeName, name);
+                    throw new CompilerException("Failed to compile a component in %s '%s'", e, typeName, name);
                 }
             }
         }

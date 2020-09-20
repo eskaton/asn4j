@@ -39,11 +39,12 @@ public class RealCompiler extends BuiltinTypeCompiler<Real> {
         var tags = CompilerUtils.getTagIds(ctx, node);
 
         ctx.createClass(name, node, tags);
-        ctx.finishClass();
 
         var compiledType = ctx.createCompiledType(node, name);
 
         compiledType.setTags(tags);
+
+        ctx.finishClass();
 
         return compiledType;
     }

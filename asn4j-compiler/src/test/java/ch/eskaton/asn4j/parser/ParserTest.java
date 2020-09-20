@@ -987,7 +987,7 @@ class ParserTest {
         assertTrue(result instanceof ExternalValueReference);
 
         assertEquals("Module", ((ExternalValueReference) result).getModule());
-        assertEquals("value", result.getValue());
+        assertEquals("value", result.getReference());
     }
 
     /**
@@ -1408,7 +1408,7 @@ class ParserTest {
 
         assertTrue(result instanceof ExternalValueReference);
         assertEquals("Module", ((ExternalValueReference) result).getModule());
-        assertEquals("enum-value", ((ExternalValueReference) result).getValue());
+        assertEquals("enum-value", ((ExternalValueReference) result).getReference());
 
         parser = new Parser(new ByteArrayInputStream("4711".getBytes())).new BuiltinOrReferencedValueParser();
 
@@ -1483,7 +1483,7 @@ class ParserTest {
         result = parser.parse();
 
         assertTrue(result instanceof SimpleDefinedValue);
-        assertEquals("value-reference", ((SimpleDefinedValue) result).getValue());
+        assertEquals("value-reference", ((SimpleDefinedValue) result).getReference());
 
         parser = new Parser(new ByteArrayInputStream(
                 "object-reference {Object}.&value-reference1".getBytes())).new BuiltinOrReferencedValueParser();
@@ -1592,7 +1592,7 @@ class ParserTest {
         assertEquals("Module",
                 ((ExternalValueReference) result.getRef()).getModule());
         assertEquals("ref-number",
-                ((ExternalValueReference) result.getRef()).getValue());
+                ((ExternalValueReference) result.getRef()).getReference());
     }
 
     @Test
@@ -1738,7 +1738,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertEquals("name", result.getName());
-        assertEquals("ref", ((SimpleDefinedValue) result.getRef()).getValue());
+        assertEquals("ref", ((SimpleDefinedValue) result.getRef()).getReference());
     }
 
     /**
@@ -1875,7 +1875,7 @@ class ParserTest {
         assertNotNull(result);
         assertEquals("a-bit", result.getId());
         assertEquals("value-ref",
-                ((SimpleDefinedValue) result.getRef()).getValue());
+                ((SimpleDefinedValue) result.getRef()).getReference());
     }
 
     @Test
@@ -2840,7 +2840,7 @@ class ParserTest {
         assertNotNull(result);
         assertTrue(result.getRef() instanceof SimpleDefinedValue);
         assertEquals("value-ref",
-                ((SimpleDefinedValue) result.getRef()).getValue());
+                ((SimpleDefinedValue) result.getRef()).getReference());
     }
 
     @Test
@@ -2975,7 +2975,7 @@ class ParserTest {
         assertEquals("Module",
                 ((ExternalValueReference) result.getDefinedValue()).getModule());
         assertEquals("oid-component",
-                ((ExternalValueReference) result.getDefinedValue()).getValue());
+                ((ExternalValueReference) result.getDefinedValue()).getReference());
 
         parser = new Parser(new ByteArrayInputStream(
                 "oid-component (Module.value)".getBytes())).new ObjIdComponentsParser();
@@ -2989,7 +2989,7 @@ class ParserTest {
         assertEquals("Module",
                 ((ExternalValueReference) result.getDefinedValue()).getModule());
         assertEquals("value",
-                ((ExternalValueReference) result.getDefinedValue()).getValue());
+                ((ExternalValueReference) result.getDefinedValue()).getReference());
     }
 
     @Test
@@ -3025,7 +3025,7 @@ class ParserTest {
         assertEquals("Module",
                 ((ExternalValueReference) result.getDefinedValue()).getModule());
         assertEquals("oid-component",
-                ((ExternalValueReference) result.getDefinedValue()).getValue());
+                ((ExternalValueReference) result.getDefinedValue()).getReference());
     }
 
     @Test
@@ -3043,7 +3043,7 @@ class ParserTest {
         assertEquals("Module",
                 ((ExternalValueReference) result.getDefinedValue()).getModule());
         assertEquals("value",
-                ((ExternalValueReference) result.getDefinedValue()).getValue());
+                ((ExternalValueReference) result.getDefinedValue()).getReference());
 
         parser = new Parser(new ByteArrayInputStream(
                 "oid-component (4711)".getBytes())).new NameAndNumberFormParser();
@@ -6872,7 +6872,7 @@ class ParserTest {
         assertTrue(result instanceof ExternalValueReference);
 
         assertEquals("Module", ((ExternalValueReference) result).getModule());
-        assertEquals("value", result.getValue());
+        assertEquals("value", result.getReference());
         assertTrue(result.getParameters().isPresent());
         assertEquals(1, result.getParameters().get().size());
     }
@@ -6889,7 +6889,7 @@ class ParserTest {
         assertTrue(result instanceof ExternalValueReference);
 
         assertEquals("Module", ((ExternalValueReference) result).getModule());
-        assertEquals("value", result.getValue());
+        assertEquals("value", result.getReference());
 
         parser = new Parser(new ByteArrayInputStream("valueref".getBytes())).new SimpleDefinedValueParser();
 
@@ -6897,7 +6897,7 @@ class ParserTest {
 
         assertNotNull(result);
 
-        assertEquals("valueref", result.getValue());
+        assertEquals("valueref", result.getReference());
     }
 
     @Test

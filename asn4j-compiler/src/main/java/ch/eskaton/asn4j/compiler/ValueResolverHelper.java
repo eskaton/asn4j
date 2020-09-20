@@ -27,12 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
-import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-
-import java.util.Optional;
 
 public class ValueResolverHelper {
 
@@ -42,36 +37,14 @@ public class ValueResolverHelper {
         this.ctx = ctx;
     }
 
-    public <V extends Value> V resolveValue(Class<V> valueClass, Optional<Type> type, V value) {
-        return ctx.getValueResolver(valueClass).resolve(type, value);
-    }
-
-    public <V extends Value> V resolveValue(Class<V> valueClass, DefinedValue ref) {
-        return ctx.getValueResolver(valueClass).resolve(ref);
-    }
-
-    public <V extends Value> V resolveValue(Class<V> valueClass, String ref) {
-        return ctx.getValueResolver(valueClass).resolve(ref);
-    }
-
     public <V extends Value> V resolveValue(Class<V> valueClass, String moduleName, String reference) {
         var module = ctx.getModule(moduleName);
 
         if (module != null) {
-            return ctx.executeWithModule(moduleName, () -> ctx.getValueResolver(valueClass).resolve(reference));
+            return ctx.executeWithModule(moduleName, () -> ctx.resolveValue(valueClass, reference));
         }
 
         return null;
-    }
-
-    public <V extends Value> V resolveGenericValue(Class<V> valueClass, Type type, Value value) {
-        var resolvedValue = ctx.getValueResolver(valueClass).resolveGeneric(type, value);
-
-        if (resolvedValue instanceof AbstractValue) {
-            ((AbstractValue) resolvedValue).setType(type);
-        }
-
-        return resolvedValue;
     }
 
 }
