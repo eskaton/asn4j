@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.compiler.values.formatters;
 
 import ch.eskaton.asn4j.parser.ast.Tuple;
 
-class TupleNodeFormatter implements Formatter<Tuple> {
+class TupleFormatter implements Formatter<Tuple> {
 
     @Override
     public String format(Tuple value) {
