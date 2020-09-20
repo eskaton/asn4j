@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.compiler.values.formatters;
 
 import ch.eskaton.asn4j.parser.ast.Quadruple;
 
-class QuadrupleNodeFormatter implements Formatter<Quadruple> {
+class QuadrupleFormatter implements Formatter<Quadruple> {
 
     @Override
     public String format(Quadruple value) {

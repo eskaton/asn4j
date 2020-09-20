@@ -27,7 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.values.formatters;
 
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.Quadruple;
 import ch.eskaton.asn4j.parser.ast.Tuple;
@@ -48,54 +48,58 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
+import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.commons.ImmutableReference;
+import ch.eskaton.commons.Reference;
+import ch.eskaton.commons.utils.Dispatcher;
+
+import java.util.function.Function;
+
+import static ch.eskaton.commons.utils.Utils.callWith;
 
 public class ValueFormatter {
+
+    public static final Dispatcher<Value, Class<? extends Value>, Reference<? extends Value>, String> DISPATCHER =
+            new Dispatcher<Value, Class<? extends Value>, Reference<? extends Value>, String>()
+                    .withComparator((t, u) -> u.isInstance(t))
+                    .withException(t -> new CompilerException("Formatter for value of type %s not defined", t));
+
+    static {
+        addCase(AmbiguousValue.class, new AmbiguousValueFormatter()::format);
+        addCase(BitStringValue.class, new BitStringValueFormatter()::format);
+        addCase(BooleanValue.class, new BooleanValueFormatter()::format);
+        addCase(CollectionOfValue.class, new CollectionOfValueFormatter()::format);
+        addCase(CollectionValue.class, new CollectionValueFormatter()::format);
+        addCase(EnumeratedValue.class, new EnumeratedValueFormatter()::format);
+        addCase(ExternalValueReference.class, new ExternalValueReferenceFormatter()::format);
+        addCase(HasStringValue.class, new HasStringValueFormatter()::format);
+        addCase(IntegerValue.class, new IntegerValueFormatter()::format);
+        addCase(IRIValue.class, new IRIValueFormatter()::format);
+        addCase(NullValue.class, new NullValueFormatter()::format);
+        addCase(ObjectIdentifierValue.class, new ObjectIdentifierValueFormatter()::format);
+        addCase(OctetStringValue.class, new OctetStringValueFormatter()::format);
+        addCase(Quadruple.class, new QuadrupleFormatter()::format);
+        addCase(RelativeIRIValue.class, new RelativeIRIValueFormatter()::format);
+        addCase(RelativeOIDValue.class, new RelativeOIDValueFormatter()::format);
+        addCase(SimpleDefinedValue.class, new SimpleDefinedValueFormatter()::format);
+        addCase(StringValue.class, new StringValueFormatter()::format);
+        addCase(Tuple.class, new TupleFormatter()::format);
+    }
 
     private ValueFormatter() {
     }
 
     public static String formatValue(Node node) {
-        if (node instanceof SimpleDefinedValue value) {
-            return new SimpleDefinedValueFormatter().format(value);
-        } else if (node instanceof ExternalValueReference value) {
-            return new ExternalValueReferenceFormatter().format(value);
-        } else if (node instanceof StringValue value) {
-            return new StringValueFormatter().format(value);
-        } else if (node instanceof NullValue value) {
-            return new NullValueFormatter().format(value);
-        } else if (node instanceof ObjectIdentifierValue value) {
-            return new ObjectIdentifierValueFormatter().format(value);
-        } else if (node instanceof RelativeOIDValue value) {
-            return new RelativeOIDValueFormatter().format(value);
-        } else if (node instanceof RelativeIRIValue value) {
-            return new RelativeIRIValueFormatter().format(value);
-        } else if (node instanceof IRIValue value) {
-            return new IRIValueFormatter().format(value);
-        } else if (node instanceof EnumeratedValue value) {
-            return new EnumeratedValueFormatter().format(value);
-        } else if (node instanceof OctetStringValue value) {
-            return new OctetStringValueFormatter().format(value);
-        } else if (node instanceof BitStringValue value) {
-            return new BitStringValueFormatter().format(value);
-        } else if (node instanceof IntegerValue value) {
-            return new IntegerValueFormatter().format(value);
-        } else if (node instanceof BooleanValue value) {
-            return new BooleanValueFormatter().format(value);
-        } else if (node instanceof CollectionOfValue value) {
-            return new CollectionOfValueFormatter().format(value);
-        } else if (node instanceof CollectionValue value) {
-            return new CollectionValueFormatter().format(value);
-        } else if (node instanceof AmbiguousValue value) {
-            return new AmbiguousValueFormatter().format(value);
-        } else if (node instanceof Tuple value) {
-            return new TupleNodeFormatter().format(value);
-        } else if (node instanceof Quadruple value) {
-            return new QuadrupleNodeFormatter().format(value);
-        } else if (node instanceof HasStringValue value) {
-            return new HasStringValueFormatter().format(value);
+        if ((node instanceof Value value)) {
+            return DISPATCHER.execute(value, new ImmutableReference<>(value));
         }
 
-        throw new IllegalCompilerStateException("Formatter for value of type %s not defined", node.getClass());
+        throw new CompilerException(node.getPosition(), "Invalid value: %s", node);
+    }
+
+    private static <V extends Value> void addCase(Class<V> valueClazz, Function<V, String> formatter) {
+        DISPATCHER.withCase(valueClazz,
+                maybeArgs -> callWith(args -> formatter.apply((V) args.get()), maybeArgs.get()));
     }
 
 }
