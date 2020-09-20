@@ -97,7 +97,7 @@ public class CompilerUtils {
         return sb.toString();
     }
 
-    static String formatConstant(String name) {
+    public static String formatConstant(String name) {
         StringBuilder sb = new StringBuilder();
 
         for (char c : name.toCharArray()) {

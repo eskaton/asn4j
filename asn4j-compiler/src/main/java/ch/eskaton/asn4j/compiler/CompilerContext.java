@@ -59,9 +59,13 @@ import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.results.HasChildComponents;
 import ch.eskaton.asn4j.compiler.results.UnNamedCompiledValue;
+import ch.eskaton.asn4j.compiler.types.EnumeratedTypeCompiler;
+import ch.eskaton.asn4j.compiler.types.TypeCompiler;
 import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
 import ch.eskaton.asn4j.compiler.values.AbstractValueCompiler;
+import ch.eskaton.asn4j.compiler.values.ValueCompiler;
+import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.parser.DummyGovernor;
 import ch.eskaton.asn4j.parser.Governor;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -337,7 +341,7 @@ public class CompilerContext {
         return config.getTypeNameSupplier(type.getClass()).getName(type, name);
     }
 
-    protected CompiledType defineType(NamedType namedType, Optional<Parameters> maybeParameters) {
+    public CompiledType defineType(NamedType namedType, Optional<Parameters> maybeParameters) {
         var name = namedType.getName();
         var type = namedType.getType();
 

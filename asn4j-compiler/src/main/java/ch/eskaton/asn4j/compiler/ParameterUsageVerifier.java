@@ -38,7 +38,7 @@ public class ParameterUsageVerifier {
     private ParameterUsageVerifier() {
     }
 
-    static void checkUnusedParameters(Optional<Parameters> maybeParameters) {
+    public static void checkUnusedParameters(Optional<Parameters> maybeParameters) {
         if (maybeParameters.isEmpty()) {
             return;
         }
