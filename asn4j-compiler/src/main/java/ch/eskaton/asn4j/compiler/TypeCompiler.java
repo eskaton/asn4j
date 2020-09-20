@@ -34,9 +34,10 @@ import java.util.Optional;
 
 public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
 
+    @Override
     public CompiledType compile(CompilerContext ctx, String name, Type type, Optional<Parameters> maybeParameters) {
         return ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass())
-                .compile(ctx, name, type ,maybeParameters);
+                .compile(ctx, name, type, maybeParameters);
     }
 
 }

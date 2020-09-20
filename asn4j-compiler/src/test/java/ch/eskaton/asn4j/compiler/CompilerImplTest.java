@@ -76,14 +76,13 @@ import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
-import ch.eskaton.commons.utils.Utils;
-import org.hamcrest.text.MatchesPattern;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -94,6 +93,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static ch.eskaton.asn4j.compiler.CompilerTestUtils.compilerConfig;
+import static ch.eskaton.asn4j.compiler.CompilerTestUtils.getCompiledValue;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BMP_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
@@ -124,9 +125,7 @@ import static ch.eskaton.asn4j.runtime.types.TypeName.UTC_TIME;
 import static ch.eskaton.asn4j.runtime.types.TypeName.UTF8_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.VIDEOTEX_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.VISIBLE_STRING;
-import static ch.eskaton.asn4j.test.TestUtils.assertThrows;
 import static ch.eskaton.asn4j.test.TestUtils.module;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -138,23 +137,95 @@ class CompilerImplTest {
     public static final String MODULE_NAME = "TEST-MODULE";
 
     @Test
+    void testValueReference() throws IOException, ParserException {
+        var body = """
+                null NULL ::= NULL
+                nullRef NULL ::= null
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var value = ctx.getCompiledModule("TEST-MODULE").getValues().get("nullRef");
+
+        assertNotNull(value);
+        assertTrue(value.getValue() instanceof NullValue);
+    }
+
+    @Test
+    void testNullValueImportedReferences() throws IOException, ParserException {
+        var body1 = """
+                IMPORTS null FROM OTHER-MODULE;
+                                
+                nullRef NULL ::= null    
+                """;
+        var body2 = """
+                EXPORTS null;
+                                
+                null NULL ::= NULL     
+                """;
+
+        var module1 = module(MODULE_NAME, body1);
+        var module2 = module("OTHER-MODULE", body2);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledValue = ctx.getCompiledModule(MODULE_NAME).getValues().get("nullRef");
+
+        assertNotNull(compiledValue);
+        assertTrue(compiledValue.getValue() instanceof NullValue);
+    }
+
+    @Test
+    void testExternalValueReferences() throws IOException, ParserException {
+        var body1 = """            
+                nullRef NULL ::= OTHER-MODULE.null    
+                """;
+        var body2 = """
+                EXPORTS null;
+                                
+                null NULL ::= NULL     
+                """;
+
+        var module1 = module(MODULE_NAME, body1);
+        var module2 = module("OTHER-MODULE", body2);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledValue = ctx.getCompiledModule(MODULE_NAME).getValues().get("nullRef");
+
+        assertNotNull(compiledValue);
+        assertTrue(compiledValue.getValue() instanceof NullValue);
+    }
+
+    @Test
     void testExternalTypeReference() throws IOException, ParserException {
         var body1 = """
                 IMPORTS Integer FROM OTHER-MODULE;
-                
+                                
                 MyInt1 ::= OTHER-MODULE.Integer     
                 MyInt2 ::= [0] EXPLICIT OTHER-MODULE.Integer     
                 """;
         var body2 = """
                 EXPORTS Integer;
-                
+                                
                 Integer ::= INTEGER     
                 """;
 
         var module1 = module("TEST-MODULE", body1);
         var module2 = module("OTHER-MODULE", body2);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -165,7 +236,7 @@ class CompilerImplTest {
         assertTrue(value1.getType() instanceof ExternalTypeReference);
         assertTrue(value1.getTags().isPresent());
         assertEquals(1, value1.getTags().get().size());
-        
+
         var value2 = ctx.getCompiledModule("TEST-MODULE").getTypes().get("MyInt2");
 
         assertNotNull(value2);
@@ -177,6 +248,43 @@ class CompilerImplTest {
 
         assertNotNull(value3);
         assertTrue(value3.getType() instanceof IntegerType);
+    }
+
+
+    @Test
+    void testValueOfSelectedType() throws IOException, ParserException {
+        var body = """
+                TestChoice ::= CHOICE {a BOOLEAN, b INTEGER}
+                selected b < TestChoice ::= 12
+                """;
+
+        var compiledValue = getCompiledValue(body, IntegerValue.class, "selected");
+        var value = (IntegerValue) compiledValue.getValue();
+
+        assertEquals(12, value.getValue().intValue());
+    }
+
+    @Test
+    void testSequenceWithChoiceWithDefault() throws IOException, ParserException {
+        var body = """
+                Seq ::= SEQUENCE {
+                    choice CHOICE {
+                        a INTEGER,
+                        b BOOLEAN
+                    } DEFAULT a: 25
+                }
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq");
+
+        assertNotNull(compiledType);
     }
 
     @SuppressWarnings("unused")
@@ -207,7 +315,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -253,7 +361,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body, implicit);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -419,7 +527,7 @@ class CompilerImplTest {
                 }
                 """;
 
-        testModule(body, CompilerException.class, ".*Failed to resolve an INTEGER value.*");
+        testModule(body, CompilerException.class, ".*Invalid INTEGER value.*");
     }
 
     @Test
@@ -436,7 +544,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -478,7 +586,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -507,7 +615,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -567,7 +675,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -846,7 +954,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -872,7 +980,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -912,7 +1020,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1426,7 +1534,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1457,7 +1565,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1487,7 +1595,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1551,7 +1659,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1598,7 +1706,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1649,7 +1757,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1685,7 +1793,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1712,7 +1820,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1741,7 +1849,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1809,7 +1917,7 @@ class CompilerImplTest {
 
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1857,7 +1965,7 @@ class CompilerImplTest {
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1871,7 +1979,7 @@ class CompilerImplTest {
     private void testCompiledChoice(String body) throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1883,21 +1991,17 @@ class CompilerImplTest {
     }
 
     private void testModule(String body, Class<? extends Exception> expected, String message) {
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var exception = assertThrows(
-                () -> new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource).run(), expected);
-
-        exception.ifPresent(e -> assertThat(Utils.rootCause(e).getMessage(), MatchesPattern.matchesPattern(message)));
+        CompilerTestUtils.testModule("TEST-MODULE", body, expected, message);
     }
 
     private CompiledObjectClass getCompiledObjectClass(String body, String objectClassName)
             throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
-        compiler.run();;
+        compiler.run();
+        ;
 
         var ctx = compiler.getCompilerContext();
 
@@ -1956,7 +2060,7 @@ class CompilerImplTest {
             throws IOException, ParserException {
         var module = module("TEST-MODULE", body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(getCompilerConfig(MODULE_NAME), moduleSource);
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
@@ -1966,10 +2070,6 @@ class CompilerImplTest {
         assertTrue(objectClass.getSyntax().isPresent());
 
         return ctx.getCompiledModule("TEST-MODULE").getObjectSets().get(setName);
-    }
-
-    private CompilerConfig getCompilerConfig(String moduleName) {
-        return new CompilerConfig().module(moduleName).generateSource(false);
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {

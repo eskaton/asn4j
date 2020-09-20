@@ -39,7 +39,6 @@ import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
-import ch.eskaton.asn4j.compiler.resolvers.ValueResolver;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
@@ -57,18 +56,19 @@ import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedValueSetType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
+import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.results.HasChildComponents;
+import ch.eskaton.asn4j.compiler.results.UnNamedCompiledValue;
 import ch.eskaton.asn4j.compiler.utils.TypeFormatter;
 import ch.eskaton.asn4j.compiler.utils.ValueFormatter;
+import ch.eskaton.asn4j.compiler.values.AbstractValueCompiler;
 import ch.eskaton.asn4j.parser.DummyGovernor;
 import ch.eskaton.asn4j.parser.Governor;
 import ch.eskaton.asn4j.parser.ParserException;
-import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
-import ch.eskaton.asn4j.parser.ast.ModuleRefNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
@@ -80,8 +80,6 @@ import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
@@ -95,6 +93,7 @@ import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
+import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
@@ -126,7 +125,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
-import static ch.eskaton.asn4j.compiler.CompilerUtils.resolveAmbiguousValue;
+import static ch.eskaton.commons.utils.ReflectionUtils.getInstance;
 
 public class CompilerContext {
 
@@ -174,6 +173,10 @@ public class CompilerContext {
         getCurrentCompiledModule().addType(name, compiledType);
     }
 
+    private void addValue(String name, CompiledValue compiledValue) {
+        getCurrentCompiledModule().addValue(name, compiledValue);
+    }
+
     private void addObjectClass(String name, CompiledObjectClass compiledObjectClass) {
         getCurrentCompiledModule().addObjectClass(name, compiledObjectClass);
     }
@@ -216,6 +219,10 @@ public class CompilerContext {
 
     public <T extends Type, C extends AbstractConstraintCompiler> C getConstraintCompiler(Class<T> clazz) {
         return config.getConstraintCompiler(clazz);
+    }
+
+    public <T extends Type, V extends Value, C extends AbstractValueCompiler<V>> C getValueCompiler(Class<T> clazz) {
+        return config.getValueCompiler(clazz);
     }
 
     public ModuleNode getModule() {
@@ -285,10 +292,6 @@ public class CompilerContext {
 
     public void duplicateModule() {
         currentModule.push(getModule());
-    }
-
-    public boolean isModuleLoaded(String moduleName) {
-        return modules.containsKey(moduleName);
     }
 
     public void addModule(String moduleName, ModuleNode module) {
@@ -417,7 +420,7 @@ public class CompilerContext {
 
     protected boolean isValueParameter(Parameters parameters, ParameterNode definition,
             SimpleDefinedValue simpleDefinedValue) {
-        var value = simpleDefinedValue.getValue();
+        var value = simpleDefinedValue.getReference();
         var paramGovernor = definition.getGovernor();
         var type = getParameterType(parameters, paramGovernor);
 
@@ -619,13 +622,18 @@ public class CompilerContext {
         return config.isBuiltin(type.getClass());
     }
 
+    private boolean isBuiltin(Class<? extends Type> typeClass) {
+        return config.isBuiltin(typeClass);
+    }
+
     public boolean isRuntimeType(String typeName) {
         return config.isRuntimeType(typeName);
     }
 
     public void ensureSymbolIsExported(ModuleNode module, String symbolName) {
         if (!isSymbolExported(module, symbolName)) {
-            String format = "Module %s uses the symbol %s from module %s which the latter doesn't export";
+            var format = "Module '%s' uses the symbol '%s' from module' %s' which the latter doesn't export";
+
             throw new CompilerException(format, getCurrentModuleName(), symbolName,
                     module.getModuleId().getModuleName());
         }
@@ -703,6 +711,17 @@ public class CompilerContext {
         }
     }
 
+    public CompiledBuiltinType getCompiledBuiltinType(Class<? extends Type> typeClass) {
+        if (isBuiltin(typeClass)) {
+            var type = getInstance(typeClass,
+                    e -> new CompilerException("Failed to create type class: %s", e, typeClass.getSimpleName()));
+
+            return new CompiledBuiltinType(type);
+        }
+
+        throw new IllegalCompilerStateException("%s is not a builtin type", typeClass.getSimpleName());
+    }
+
     /**
      * Looks up the compiled type for the given type. Type may be compiled if it isn't already.
      * If no compiled type can be found, it is assumed that type is a builtin type which is
@@ -727,6 +746,10 @@ public class CompilerContext {
             return enumeratedTypeCompiler.createCompiledType(this, null, enumeratedType);
         } else if (isBuiltin(type)) {
             return new CompiledBuiltinType(type);
+        } else if (type instanceof SelectionType) {
+            var resolvedType = resolveSelectedType(type);
+
+            return getCompiledType(resolvedType);
         }
 
         throw new IllegalCompilerStateException("The type %s is not expected", type.getClass().getSimpleName());
@@ -741,6 +764,30 @@ public class CompilerContext {
         return getCompilationResult(reference, "Type", () -> getTypesOfModule(moduleName),
                 (ref, mod) -> withNewClass(() -> compiler.compileType(ref, Optional.ofNullable(moduleName))),
                 this::getTypesOfModule);
+    }
+
+    public CompiledValue getCompiledValue(DefinedValue definedValue) {
+        var reference = definedValue.getReference();
+
+        if (definedValue instanceof ExternalValueReference externalValueReference) {
+            return getCompiledValue(externalValueReference.getModule(), reference);
+        } else if (definedValue instanceof SimpleDefinedValue) {
+            return getCompiledValue(reference);
+        } else {
+            throw new IllegalCompilerStateException(definedValue.getPosition(), "Unsupported type: %s",
+                    definedValue.getClass().getSimpleName());
+        }
+    }
+
+    public CompiledValue getCompiledValue(String reference) {
+        return getCompilationResult(reference, "Value", this::getValuesOfCurrentModule,
+                (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, mod)), this::getValuesOfModule);
+    }
+
+    public CompiledValue getCompiledValue(String moduleName, String reference) {
+        return getCompilationResult(reference, "Value", () -> getValuesOfModule(moduleName),
+                (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, Optional.ofNullable(moduleName))),
+                this::getValuesOfModule);
     }
 
     /**
@@ -878,7 +925,7 @@ public class CompilerContext {
             if (!isSymbolExported(module, reference)) {
                 var format = "Module '%s' uses the %s '%s' from module '%s' which the latter doesn't export";
 
-                throw new CompilerException(format, getCurrentModuleName(), reference, nodeName, moduleName);
+                throw new CompilerException(format, getCurrentModuleName(), nodeName, reference, moduleName);
             }
 
             var maybeResult = Optional.ofNullable(resultAccessor.apply(moduleName).get(reference));
@@ -964,6 +1011,16 @@ public class CompilerContext {
     private Map<String, CompiledType> getTypesOfModule(String moduleName) {
         return Optional.ofNullable(definedModules.get(moduleName))
                 .map(CompiledModule::getTypes)
+                .orElseGet(Map::of);
+    }
+
+    private Map<String, CompiledValue> getValuesOfCurrentModule() {
+        return getValuesOfModule(getCurrentModuleName());
+    }
+
+    private Map<String, CompiledValue> getValuesOfModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getValues)
                 .orElseGet(Map::of);
     }
 
@@ -1153,6 +1210,18 @@ public class CompilerContext {
         return currentClass.size() == 1;
     }
 
+    public CompiledValue createCompiledValue(CompiledType type, Value value) {
+        return new UnNamedCompiledValue(type, value);
+    }
+
+    public CompiledValue createCompiledValue(String name, CompiledType type, Value value) {
+        var compiledValue = new CompiledValue<>(name, type, value);
+
+        addValue(name, compiledValue);
+
+        return compiledValue;
+    }
+
     public CompiledObjectClass createCompiledObjectClass(String name) {
         var compiledObjectClass = new CompiledObjectClass(name);
 
@@ -1318,141 +1387,80 @@ public class CompilerContext {
 
     /*******************************************************************************************************************
      * V A L U E  R E S O L V E R S
-     ******************************************************************************************************************/
+     *******************************************************************************************************************/
 
-    public ValueAssignmentNode resolveDefinedValue(DefinedValue ref) {
-        ValueOrObjectAssignmentNode assigment;
+    public CompiledValue resolveDefinedValue(DefinedValue definedValue) {
+        var reference = definedValue.getReference();
 
-        if (ref instanceof ExternalValueReference) {
-            assigment = resolveExternalReference(((ExternalValueReference) ref));
+        if (definedValue instanceof ExternalValueReference externalValueReference) {
+            var moduleName = externalValueReference.getModule();
+
+            return getCompiledValue(moduleName, reference);
         } else {
-            return resolveValueReference(((SimpleDefinedValue) ref));
+            return getCompiledValue(definedValue.getReference());
         }
-
-        if (assigment.getValueAssignment().isPresent()) {
-            return assigment.getValueAssignment().get();
-        }
-
-        throw new CompilerException(ref.getPosition(), "%s doesn't refer to a value");
     }
 
-    private ValueOrObjectAssignmentNode resolveExternalReference(ExternalValueReference reference) {
-        String moduleName = reference.getModule();
-        String symbolName = reference.getValue();
-        ModuleNode module;
+    private CompiledValue resolveExternalReference(ExternalValueReference reference) {
+        var moduleName = reference.getModule();
+        var symbolName = reference.getReference();
 
-        try {
-            module = getModule(moduleName);
-        } catch (CompilerException e) {
-            throw new CompilerException("Failed to resolve external reference %s.%s", moduleName, symbolName, e);
-        }
-
-        ensureSymbolIsExported(module, symbolName);
-
-        AssignmentNode assignment = modules.get(moduleName).getBody().getAssignment(symbolName);
-
-        if (!(assignment instanceof ValueOrObjectAssignmentNode)) {
-            throw new CompilerException("Failed to resolve reference " + reference);
-        }
-
-        return (ValueOrObjectAssignmentNode) assignment;
+        return getCompiledValue(moduleName, symbolName);
     }
 
-    public Optional<ValueAssignmentNode> tryResolveAllValueReferences(SimpleDefinedValue reference) {
-        Optional<ValueAssignmentNode> assignment = tryResolveValueReference(reference);
-        Optional<ValueAssignmentNode> tmpAssignment = assignment;
-
-        while (tmpAssignment.isPresent()) {
-            assignment = tmpAssignment;
-
-            reference = resolveAmbiguousValue(tmpAssignment.get().getValue(), SimpleDefinedValue.class);
-
-            if (reference == null) {
-                break;
-            }
-
-            tmpAssignment = tryResolveValueReference(reference);
-
-            if (tmpAssignment.equals(assignment)) {
-                break;
-            }
-        }
-
-        return assignment;
+    public CompiledValue tryResolveAllValueReferences(SimpleDefinedValue reference) {
+        return tryResolveValueReference(reference);
     }
 
-    public Optional<ValueAssignmentNode> tryResolveValueReference(SimpleDefinedValue reference) {
-        Optional<ValueOrObjectAssignmentNode> maybeAssignment;
+    public CompiledValue tryResolveValueReference(SimpleDefinedValue reference) {
+        CompiledValue compiledValue;
 
         if (reference instanceof ExternalValueReference) {
-            maybeAssignment = Optional.of(resolveExternalReference(((ExternalValueReference) reference)));
-
-            return maybeAssignment.get().getValueAssignment();
+            compiledValue = resolveExternalReference((ExternalValueReference) reference);
         } else {
-            return tryResolveValueReference(reference.getValue());
-        }
-    }
-
-    public Optional<ValueAssignmentNode> tryResolveValueReference(String symbolName) {
-        AssignmentNode assignment = getModule().getBody().getAssignment(symbolName);
-
-        if (assignment == null) {
-            Optional<ImportNode> imp = getImport(symbolName);
-
-            if (imp.isPresent()) {
-                ModuleRefNode moduleRef = imp.get().getReference();
-                String moduleName = moduleRef.getName();
-                ModuleNode module = getModule(moduleName);
-
-                ensureSymbolIsExported(module, symbolName);
-
-                assignment = modules.get(moduleName).getBody().getAssignment(symbolName);
-            }
+            compiledValue = getCompiledValue(reference.getReference());
         }
 
-        if (assignment instanceof ValueOrObjectAssignmentNode) {
-            return ((ValueOrObjectAssignmentNode) assignment).getValueAssignment();
+        return compiledValue;
+    }
+
+    public <V extends Value> V resolveValue(Class<V> valueClass, DefinedValue definedValue) {
+        var compiledValue = resolveDefinedValue(definedValue);
+        var value = compiledValue.getValue();
+
+        if (value.getClass().isAssignableFrom(valueClass)) {
+            return (V) value;
         }
 
-        return Optional.empty();
+        throw new ValueResolutionException(definedValue.getPosition(), "Failed to resolve reference " + definedValue);
     }
 
-    public ValueAssignmentNode resolveValueReference(SimpleDefinedValue reference) {
-        return resolveValueReference(reference.getValue());
-    }
+    public <V extends Value> V resolveValue(Class<V> valueClass, String reference) {
+        CompiledValue result;
 
-    public ValueAssignmentNode resolveValueReference(String symbolName) {
-        Optional<ValueAssignmentNode> assignment = tryResolveValueReference(symbolName);
-
-        if (assignment.isEmpty()) {
-            throw new ValueResolutionException("Failed to resolve reference " + symbolName);
+        try {
+            result = getCompiledValue(reference);
+        } catch (CompilerException e) {
+            throw new ValueResolutionException("Failed to resolve reference " + reference);
         }
 
-        return assignment.get();
+        var compiledValue = result;
+        var value = compiledValue.getValue();
+
+        if (value.getClass().isAssignableFrom(valueClass)) {
+            return (V) value;
+        }
+
+        throw new ValueResolutionException("Failed to resolve reference " + reference);
     }
 
-    public <V extends Value> V resolveValue(Class<V> valueClass, Optional<Type> type, V value) {
-        return valueResolver.resolveValue(valueClass, type, value);
-    }
-
-    public <V extends Value> V resolveValue(Class<V> valueClass, DefinedValue ref) {
-        return getValueResolver(valueClass).resolve(ref);
-    }
-
-    public <V extends Value> V resolveValue(Class<V> valueClass, String ref) {
-        return getValueResolver(valueClass).resolve(ref);
-    }
-
+    // TODO: Used only for testing -> remove if possible
     public <V extends Value> V resolveValue(Class<V> valueClass, String moduleName, String reference) {
         return valueResolver.resolveValue(valueClass, moduleName, reference);
     }
 
     public <V extends Value> V resolveGenericValue(Class<V> valueClass, Type type, Value value) {
-        return valueResolver.resolveGenericValue(valueClass, type, value);
-    }
-
-    <V extends Value> ValueResolver<V> getValueResolver(Class<V> valueClass) {
-        return config.getValueResolver(valueClass);
+        return (V) new ValueCompiler().compile(this, null, type, value, Optional.empty()).getValue();
     }
 
 }

@@ -33,13 +33,16 @@ import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.QuadrupleNode;
 import ch.eskaton.asn4j.parser.ast.TupleNode;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
 import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
@@ -48,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.commons.utils.HexDump;
 
+import java.math.BigInteger;
 import java.util.stream.Collectors;
 
 public class ValueFormatter {
@@ -57,9 +61,13 @@ public class ValueFormatter {
 
     public static String formatValue(Node node) {
         if (node instanceof SimpleDefinedValue value) {
-            return value.getValue();
+            return value.getReference();
+        } else if (node instanceof ExternalValueReference value) {
+            return "%s.%s".formatted(value.getModule(), value.getReference());
         } else if (node instanceof StringValue value) {
             return value.getCString();
+        } else if (node instanceof NullValue) {
+            return "NULL";
         } else if (node instanceof ObjectIdentifierValue value) {
             return value.getComponents().stream()
                     .map(OIDComponentNode::getId)
@@ -87,6 +95,18 @@ public class ValueFormatter {
             }
         } else if (node instanceof OctetStringValue value) {
             return "'%s'H".formatted(HexDump.toHexString(value.getByteValue()).toUpperCase());
+        } else if (node instanceof BitStringValue value) {
+            var namedValues = value.getNamedValues();
+
+            if (!namedValues.isEmpty()) {
+                return "{%s}".formatted(namedValues.stream().collect(Collectors.joining(", ")));
+            }
+
+            var unusedBits = value.getUnusedBits();
+            var binaryString = new BigInteger(value.getByteValue()).toString(2);
+            var trimmedBinaryString = binaryString.substring(0, binaryString.length() - unusedBits);
+
+            return "'%s'B".formatted(trimmedBinaryString);
         } else if (node instanceof IntegerValue value) {
             return value.getValue().toString();
         } else if (node instanceof BooleanValue value) {
@@ -100,7 +120,10 @@ public class ValueFormatter {
                     .map(namedValue -> "%s: %s".formatted(namedValue.getName(), formatValue(namedValue.getValue())))
                     .collect(Collectors.joining(", ")));
         } else if (node instanceof AmbiguousValue value) {
-            return value.getValues().stream().map(ValueFormatter::formatValue).collect(Collectors.joining(", "));
+            return value.getValues().stream()
+                    .map(ValueFormatter::formatValue)
+                    .distinct()
+                    .collect(Collectors.joining(", "));
         } else if (node instanceof TupleNode value) {
             return String.format("{%s, %s}", value.getColumn(), value.getRow());
         } else if (node instanceof QuadrupleNode value) {

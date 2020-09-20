@@ -58,12 +58,12 @@ public class EnumeratedTypeSingleValueCompiler extends SingleValueCompiler<Enume
             EnumerationItems allItems = compiledEnumeratedType.getRoots().copy()
                     .addAll(compiledEnumeratedType.getAdditions().getItems());
             Optional<Tuple2<String, Integer>> enumItem = allItems.getItems().stream()
-                    .filter(t -> t.get_1().equals(definedValue.getValue())).findAny();
+                    .filter(t -> t.get_1().equals(definedValue.getReference())).findAny();
 
             if (enumItem.isPresent()) {
                 return enumItem.get().get_2();
             } else {
-                throw new CompilerException("Failed to resolve enum value: %s", definedValue.getValue());
+                throw new CompilerException("Failed to resolve enum value: %s", definedValue.getReference());
             }
         } else {
             throw new CompilerException("Failed to resolve value: %s", value.getClass().getSimpleName());

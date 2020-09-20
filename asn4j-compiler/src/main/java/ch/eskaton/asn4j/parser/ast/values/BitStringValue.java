@@ -76,6 +76,12 @@ public class BitStringValue extends ByteStringValue {
         return value;
     }
 
+    public void setByteValue(byte[] byteValue, int unusedBits) {
+        setByteValue(byteValue);
+
+        this.unusedBits = unusedBits;
+    }
+
     public List<String> getNamedValues() {
         return namedValues;
     }

@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedValueSetType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
@@ -50,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
@@ -201,6 +203,10 @@ public class CompilerImpl {
                 return compileObjectAssignment(assignment.getObjectAssignment().get());
             }
 
+            if (assignment.getValueAssignment().isPresent()) {
+                return compileValueAssignment(assignment.getValueAssignment().get());
+            }
+
             // ignore values, they are resolved when needed
             return null;
         } else if (unknownAssignment instanceof ObjectSetAssignmentNode assignment) {
@@ -265,6 +271,11 @@ public class CompilerImpl {
         var typeAssignment = new TypeAssignmentNode(assignment.getPosition(), assignment.getReference(), type);
 
         return compileTypeAssignment(typeAssignment);
+    }
+
+    private CompiledValue compileValueAssignment(ValueAssignmentNode assignment) {
+        return compilerContext.<ValueAssignmentNode, ValueAssignmentCompiler>
+                getCompiler(ValueAssignmentNode.class).compile(compilerContext, assignment);
     }
 
     private CompiledObjectClass compileObjectClassAssignment(ObjectClassAssignmentNode assignment) {
@@ -357,6 +368,13 @@ public class CompilerImpl {
     public Optional<CompiledType> compileType(String name, Optional<String> maybeModuleName) {
         return compile(name, maybeModuleName, getAssignmentSelector(TypeAssignmentNode.class),
                 this::compileTypeAssignment);
+    }
+
+    public Optional<CompiledValue> compileValue(String name, Optional<String> maybeModuleName) {
+        var assignmentSelector = getAssignmentSelector(ValueOrObjectAssignmentNode.class,
+                ValueOrObjectAssignmentNode::getValueAssignment);
+
+        return compile(name, maybeModuleName, assignmentSelector, this::compileValueAssignment);
     }
 
     public Optional<CompiledType> compileValueSetType(String name, Optional<String> maybeModuleName) {
