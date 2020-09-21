@@ -36,6 +36,11 @@ class BooleanFormatter implements Formatter<BooleanType> {
 
     @Override
     public String format(CompilerContext ctx, BooleanType type) {
+        return getTypeName();
+    }
+
+    @Override
+    public String getTypeName() {
         return BOOLEAN.getName();
     }
 

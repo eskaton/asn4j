@@ -37,7 +37,12 @@ class SequenceOfFormatter implements Formatter<SequenceOfType> {
 
     @Override
     public String format(CompilerContext ctx, SequenceOfType type) {
-        return SEQUENCE_OF + "(" + formatType(ctx, type.getType()) + ")";
+        return getTypeName() + "(" + formatType(ctx, type.getType()) + ")";
+    }
+
+    @Override
+    public String getTypeName() {
+        return SEQUENCE_OF.getName();
     }
 
 }

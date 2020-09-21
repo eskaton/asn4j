@@ -36,6 +36,11 @@ class OctetStringFormatter implements Formatter<OctetString> {
 
     @Override
     public String format(CompilerContext ctx, OctetString type) {
+        return getTypeName();
+    }
+
+    @Override
+    public String getTypeName() {
         return OCTET_STRING.getName();
     }
 

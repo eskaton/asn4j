@@ -65,6 +65,7 @@ import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BMP_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.GENERAL_STRING;
@@ -86,6 +87,11 @@ public class TypeFormatter {
 
     public static final Dispatcher<Type, Class<? extends Type>, Tuple2<CompilerContext, ? extends Type>, String> DISPATCHER =
             new Dispatcher<Type, Class<? extends Type>, Tuple2<CompilerContext, ? extends Type>, String>()
+                    .withComparator((t, u) -> u.isInstance(t))
+                    .withException(t -> new CompilerException("Formatter for type %s not defined", t));
+
+    public static final Dispatcher<Type, Class<? extends Type>, Void, String> NAME_DISPATCHER =
+            new Dispatcher<Type, Class<? extends Type>, Void, String>()
                     .withComparator((t, u) -> u.isInstance(t))
                     .withException(t -> new CompilerException("Formatter for type %s not defined", t));
 
@@ -121,6 +127,38 @@ public class TypeFormatter {
         addCase(TypeReference.class, new TypeReferenceFormatter()::format);
     }
 
+    static {
+        addNameCase(BooleanType.class, new BooleanFormatter()::getTypeName);
+        addNameCase(IntegerType.class, new IntegerFormatter()::getTypeName);
+        addNameCase(EnumeratedType.class, new EnumeratedFormatter()::getTypeName);
+        addNameCase(BitString.class, new BitStringFormatter()::getTypeName);
+        addNameCase(OctetString.class, new OctetStringFormatter()::getTypeName);
+        addNameCase(Null.class, new DefaultTypeFormatter<Null>(NULL)::getTypeName);
+        addNameCase(ObjectIdentifier.class, new ObjectIdentifierFormatter()::getTypeName);
+        addNameCase(RelativeOID.class, new RelativeOIDFormatter()::getTypeName);
+        addNameCase(IRI.class, new IRIFormatter()::getTypeName);
+        addNameCase(RelativeIRI.class, new RelativeIRIFormatter()::getTypeName);
+        addNameCase(SequenceType.class, new SequenceFormatter()::getTypeName);
+        addNameCase(SetType.class, new SetFormatter()::getTypeName);
+        addNameCase(SequenceOfType.class, new SequenceOfFormatter()::getTypeName);
+        addNameCase(SetOfType.class, new SetOfFormatter()::getTypeName);
+        addNameCase(Choice.class, new ChoiceFormatter()::getTypeName);
+        addNameCase(VisibleString.class, new DefaultTypeFormatter<VisibleString>(VISIBLE_STRING)::getTypeName);
+        addNameCase(ISO646String.class, new DefaultTypeFormatter<ISO646String>(ISO646_STRING)::getTypeName);
+        addNameCase(NumericString.class, new DefaultTypeFormatter<NumericString>(NUMERIC_STRING)::getTypeName);
+        addNameCase(PrintableString.class, new DefaultTypeFormatter<PrintableString>(PRINTABLE_STRING)::getTypeName);
+        addNameCase(IA5String.class, new DefaultTypeFormatter<IA5String>(IA5_STRING)::getTypeName);
+        addNameCase(GraphicString.class, new DefaultTypeFormatter<GraphicString>(GRAPHIC_STRING)::getTypeName);
+        addNameCase(GeneralString.class, new DefaultTypeFormatter<GeneralString>(GENERAL_STRING)::getTypeName);
+        addNameCase(TeletexString.class, new DefaultTypeFormatter<TeletexString>(TELETEX_STRING)::getTypeName);
+        addNameCase(T61String.class, new DefaultTypeFormatter<T61String>(T61_STRING)::getTypeName);
+        addNameCase(VideotexString.class, new DefaultTypeFormatter<VideotexString>(VIDEOTEX_STRING)::getTypeName);
+        addNameCase(UTF8String.class, new DefaultTypeFormatter<UTF8String>(UTF8_STRING)::getTypeName);
+        addNameCase(UniversalString.class, new DefaultTypeFormatter<UniversalString>(UNIVERSAL_STRING)::getTypeName);
+        addNameCase(BMPString.class, new DefaultTypeFormatter<BMPString>(BMP_STRING)::getTypeName);
+        addNameCase(TypeReference.class, new TypeReferenceFormatter()::getTypeName);
+    }
+
     private TypeFormatter() {
     }
 
@@ -132,9 +170,21 @@ public class TypeFormatter {
         throw new IllegalCompilerStateException("Invalid type: %s", node.getClass().getSimpleName());
     }
 
+    public static String getTypeName(Node node) {
+        if (node instanceof Type type) {
+            return NAME_DISPATCHER.execute(type);
+        }
+
+        throw new IllegalCompilerStateException("Invalid type: %s", node.getClass().getSimpleName());
+    }
+
     private static <T extends Type> void addCase(Class<T> typeClass, BiFunction<CompilerContext, T, String> formatter) {
         DISPATCHER.withCase(typeClass,
                 maybeArgs -> callWith(args -> formatter.apply(args.get_1(), (T) args.get_2()), maybeArgs.get()));
+    }
+
+    private static <T extends Type> void addNameCase(Class<T> typeClass, Supplier<String> nameSupplier) {
+        NAME_DISPATCHER.withCase(typeClass, maybeArgs -> callWith(args -> nameSupplier.get(), null));
     }
 
 }
