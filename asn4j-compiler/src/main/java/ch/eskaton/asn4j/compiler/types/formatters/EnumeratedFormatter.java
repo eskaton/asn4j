@@ -41,7 +41,12 @@ class EnumeratedFormatter implements Formatter<EnumeratedType> {
 
     @Override
     public String format(CompilerContext ctx, EnumeratedType type) {
-        return ENUMERATED.getName() + "(" + formatItems(type) + ")";
+        return getTypeName() + "(" + formatItems(type) + ")";
+    }
+
+    @Override
+    public String getTypeName() {
+        return ENUMERATED.getName();
     }
 
     private String formatItems(EnumeratedType type) {

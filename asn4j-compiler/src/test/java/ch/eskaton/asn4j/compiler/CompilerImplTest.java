@@ -449,6 +449,84 @@ class CompilerImplTest {
     }
 
     @Test
+    void testSequenceWithComponentsOfReference() throws IOException, ParserException {
+        var body = """
+                Seq1 ::= SEQUENCE {a INTEGER, b BOOLEAN}
+                Seq2 ::= SEQUENCE { 
+                    COMPONENTS OF Seq1 
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq2");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledCollectionType = (CompiledCollectionType) compiledType;
+        var components = compiledCollectionType.getComponents();
+
+        var field1 = components.stream().filter(t -> t.get_1().equals("a")).findFirst();
+
+        assertTrue(field1.isPresent());
+        assertTrue(field1.get().get_2().getType() instanceof IntegerType);
+
+        var field2 = components.stream().filter(t -> t.get_1().equals("b")).findFirst();
+
+        assertTrue(field2.isPresent());
+        assertTrue(field2.get().get_2().getType() instanceof BooleanType);
+    }
+
+    @Test
+    void testSequenceWithComponentsOf() throws IOException, ParserException {
+        var body = """
+                Seq ::= SEQUENCE { 
+                    COMPONENTS OF SEQUENCE {a INTEGER, b BOOLEAN} 
+                }
+                """;
+
+        var module = module("TEST-MODULE", body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledCollectionType = (CompiledCollectionType) compiledType;
+        var components = compiledCollectionType.getComponents();
+
+        var field1 = components.stream().filter(t -> t.get_1().equals("a")).findFirst();
+
+        assertTrue(field1.isPresent());
+        assertTrue(field1.get().get_2().getType() instanceof IntegerType);
+
+        var field2 = components.stream().filter(t -> t.get_1().equals("b")).findFirst();
+
+        assertTrue(field2.isPresent());
+        assertTrue(field2.get().get_2().getType() instanceof BooleanType);
+    }
+
+    @Test
+    void testSequenceWithComponentsOfInvalidType() {
+        var body = """
+                Seq ::= SEQUENCE { 
+                    COMPONENTS OF SET {a INTEGER, b BOOLEAN} 
+                }
+                """;
+
+        testModule(body, CompilerException.class, ".*Invalid type 'SET' in COMPONENTS OF 'Seq'.*");
+    }
+
+    @Test
     void testRedefinitionOfType() {
         var body = """
                 Integer ::= INTEGER

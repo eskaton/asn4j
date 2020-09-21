@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
@@ -118,9 +119,14 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
     private List<Tuple2<String, CompiledType>> compileComponentType(CompilerContext ctx,
             CompiledCollectionType compiledType, Type type, Optional<Parameters> maybeParameters) {
-        Type referencedType;
+        var collectionType = compiledType.getType();
+        Type resolvedType;
 
-        if (type instanceof TypeReference typeReference) {
+        if (collectionType.getClass().isAssignableFrom(type.getClass())) {
+            resolvedType = type;
+
+            ctx.duplicateModule();
+        } else if (type instanceof TypeReference typeReference) {
             var refTypeName = typeReference.getType();
 
             if (maybeParameters.isPresent()) {
@@ -137,7 +143,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
                 throw new CompilerException("Type %s referenced but not defined", refTypeName);
             }
 
-            referencedType = compiledComponentType.getType();
+            resolvedType = compiledComponentType.getType();
 
             ctx.duplicateModule();
         } else if (type instanceof ExternalTypeReference typeReference) {
@@ -151,22 +157,25 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
                         refTypeName, refModuleName);
             }
 
-            referencedType = compiledComponentType.getType();
+            resolvedType = compiledComponentType.getType();
 
             ctx.pushModule(refModuleName);
         } else {
-            throw new CompilerException(type.getPosition(), "Unimplemented type %s", type);
+            var formattedType = TypeFormatter.getTypeName(type);
+
+            throw new CompilerException(type.getPosition(), "Invalid type '%s' in COMPONENTS OF '%s'",
+                    formattedType, compiledType.getName());
         }
 
         List<ComponentType> componentTypes;
 
-        if (referencedType instanceof SetType) {
-            componentTypes = ((SetType) referencedType).getAllRootComponents();
-        } else if (referencedType instanceof SequenceType) {
-            componentTypes = ((SequenceType) referencedType).getAllRootComponents();
+        if (resolvedType instanceof SetType) {
+            componentTypes = ((SetType) resolvedType).getAllRootComponents();
+        } else if (resolvedType instanceof SequenceType) {
+            componentTypes = ((SequenceType) resolvedType).getAllRootComponents();
         } else {
-            throw new CompilerException(referencedType.getPosition(), "Components of type %s not supported",
-                    referencedType);
+            throw new CompilerException(resolvedType.getPosition(), "Components of type %s not supported",
+                    resolvedType);
         }
 
         var components = new ArrayList<Tuple2<String, CompiledType>>();

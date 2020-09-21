@@ -36,6 +36,11 @@ class IntegerFormatter implements Formatter<IntegerType> {
 
     @Override
     public String format(CompilerContext ctx, IntegerType type) {
+        return getTypeName();
+    }
+
+    @Override
+    public String getTypeName() {
         return INTEGER.getName();
     }
 

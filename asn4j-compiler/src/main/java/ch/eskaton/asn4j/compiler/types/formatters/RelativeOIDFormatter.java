@@ -36,6 +36,11 @@ class RelativeOIDFormatter implements Formatter<RelativeOID> {
 
     @Override
     public String format(CompilerContext ctx, RelativeOID type) {
+        return getTypeName();
+    }
+
+    @Override
+    public String getTypeName() {
         return RELATIVE_OID.getName();
     }
 

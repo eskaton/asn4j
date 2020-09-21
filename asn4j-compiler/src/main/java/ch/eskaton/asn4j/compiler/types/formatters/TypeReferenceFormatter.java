@@ -39,4 +39,9 @@ public class TypeReferenceFormatter implements Formatter<TypeReference> {
         return formatType(ctx, ctx.resolveTypeReference(type));
     }
 
+    @Override
+    public String getTypeName() {
+        return "typereference";
+    }
+
 }
