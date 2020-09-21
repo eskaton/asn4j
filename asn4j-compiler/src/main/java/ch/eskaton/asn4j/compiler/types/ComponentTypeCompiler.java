@@ -37,7 +37,6 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
@@ -119,7 +118,6 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
     private List<Tuple2<String, CompiledType>> compileComponentType(CompilerContext ctx,
             CompiledCollectionType compiledType, Type type, Optional<Parameters> maybeParameters) {
-        Optional<TypeAssignmentNode> assignment;
         Type referencedType;
 
         if (type instanceof TypeReference typeReference) {
@@ -133,30 +131,27 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
                         .orElse(refTypeName);
             }
 
-            assignment = ctx.getTypeAssignment(refTypeName);
+            var compiledComponentType = ctx.getCompiledType(refTypeName);
 
-            if (assignment.isEmpty()) {
+            if (compiledComponentType == null) {
                 throw new CompilerException("Type %s referenced but not defined", refTypeName);
             }
 
-            referencedType = assignment.get().getType();
+            referencedType = compiledComponentType.getType();
 
             ctx.duplicateModule();
         } else if (type instanceof ExternalTypeReference typeReference) {
             var refTypeName = typeReference.getType();
             var refModuleName = typeReference.getModule();
+            var compiledComponentType = ctx.getCompiledType(refModuleName, refTypeName);
 
-            assignment = ctx.getTypeAssignment(refModuleName, refTypeName);
-
-            ctx.resolveBaseType(refModuleName, refTypeName);
-
-            if (assignment.isEmpty()) {
+            if (compiledComponentType == null) {
                 throw new CompilerException(typeReference.getPosition(),
                         "Type %s from Module %s referenced but not defined or not exported",
                         refTypeName, refModuleName);
             }
 
-            referencedType = assignment.get().getType();
+            referencedType = compiledComponentType.getType();
 
             ctx.pushModule(refModuleName);
         } else {
@@ -176,9 +171,12 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
         var components = new ArrayList<Tuple2<String, CompiledType>>();
 
-        for (ComponentType referencedComponent : componentTypes) {
-            components.addAll(ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class)
-                    .compile(ctx, compiledType, referencedComponent, Optional.empty()));
+        for (var referencedComponent : componentTypes) {
+            var componentTypeCompiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
+            var compiledComponents = componentTypeCompiler.compile(ctx, compiledType, referencedComponent,
+                    Optional.empty());
+
+            components.addAll(compiledComponents);
         }
 
         ctx.popModule();

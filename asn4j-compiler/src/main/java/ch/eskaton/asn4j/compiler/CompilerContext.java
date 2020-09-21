@@ -35,7 +35,6 @@ import ch.eskaton.asn4j.compiler.defaults.AbstractDefaultCompiler;
 import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
-import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
@@ -1133,9 +1132,10 @@ public class CompilerContext {
 
     public String getRuntimeTypeName(String typeName) {
         try {
-            Type type = resolveBaseType(typeName);
+            var compiledType = getCompiledType(typeName);
+            var baseType = getCompiledBaseType(compiledType).getType();
 
-            return getRuntimeTypeName(type.getClass());
+            return getRuntimeTypeName(baseType.getClass());
         } catch (CompilerException e) {
             return typeName;
         }
@@ -1376,22 +1376,6 @@ public class CompilerContext {
 
     public Type resolveTypeReference(Type type) {
         return typeResolver.resolveTypeReference(type);
-    }
-
-    private Type resolveBaseType(ModuleNode module, String typeName) {
-        return typeResolver.resolveBaseType(module, typeName);
-    }
-
-    public Type resolveBaseType(String moduleName, String typeName) {
-        return resolveBaseType(getModule(moduleName), typeName);
-    }
-
-    public Type resolveBaseType(String typeName) {
-        return resolveBaseType(currentModule.peek(), typeName);
-    }
-
-    public Type resolveBaseType(Type type) {
-        return typeResolver.resolveBaseType(type);
     }
 
     public Type resolveSelectedType(Type type) {
