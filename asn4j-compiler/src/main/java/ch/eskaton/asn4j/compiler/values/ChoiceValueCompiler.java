@@ -74,8 +74,7 @@ public class ChoiceValueCompiler extends AbstractValueCompiler<ChoiceValue> {
         }
 
         var namedType = maybeNamedType.get();
-        var compiledValue = new ValueCompiler().compile(ctx, null, namedType.getType(), choiceValue.getValue(),
-                maybeParameters);
+        var compiledValue = ctx.getCompiledValue(namedType.getType(), choiceValue.getValue(), maybeParameters);
 
         choiceValue.setValue(compiledValue.getValue());
 

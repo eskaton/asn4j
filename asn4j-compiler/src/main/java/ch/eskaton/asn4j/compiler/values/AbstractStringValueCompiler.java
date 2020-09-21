@@ -171,7 +171,7 @@ public abstract class AbstractStringValueCompiler<V extends HasStringValue & Val
                     "%s '%s' resolved to '%s' but a value of type '%s' was expected",
                     nodeName, formattedValue, stringValue, formattedType);
         } else if (value instanceof CollectionOfValue) {
-            var compiledValue = new ValueCompiler().compile(ctx, null, type, value, Optional.empty());
+            var compiledValue = ctx.getCompiledValue(type, value);
 
             return ((HasStringValue) compiledValue.getValue()).getValue();
         } else {

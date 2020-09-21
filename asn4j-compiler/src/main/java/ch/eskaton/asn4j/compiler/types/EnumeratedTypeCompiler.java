@@ -198,7 +198,8 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         Integer number;
 
         if (item.getRef() != null) {
-            BigInteger bigValue = ctx.resolveValue(IntegerValue.class, item.getRef()).getValue();
+            var compiledValue = ctx.<IntegerValue>getCompiledValue(IntegerValue.class, item.getRef());
+            var bigValue = compiledValue.getValue().getValue();
 
             if (bigValue.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
                 throw new CompilerException(item.getPosition(), "Value %s too large in type %s", bigValue, name);

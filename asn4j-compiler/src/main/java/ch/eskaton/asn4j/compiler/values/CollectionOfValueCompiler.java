@@ -31,6 +31,8 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
+import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
@@ -42,9 +44,6 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatValue;
 
 public class CollectionOfValueCompiler extends AbstractValueCompiler<CollectionOfValue> {
 
@@ -86,23 +85,21 @@ public class CollectionOfValueCompiler extends AbstractValueCompiler<CollectionO
 
     private Value resolveElement(CompilerContext ctx, Type elementType, Class<? extends Value> valueClass,
             Value value) {
-        try {
-            if (value instanceof AmbiguousValue) {
-                var resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
+        if (value instanceof AmbiguousValue) {
+            var resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
 
-                if (resolvedValue != null) {
-                    value = resolvedValue;
-                } else {
-                    throw new ValueResolutionException("Failed to resolve a value in a %s to type %s: %s",
-                            getTypeName().getName(), formatTypeName(elementType), formatValue(value));
-                }
+            if (resolvedValue != null) {
+                value = resolvedValue;
+            } else {
+                var formattedValue = ValueFormatter.formatValue(value);
+                var formattedType = TypeFormatter.formatType(ctx, elementType);
+
+                throw new ValueResolutionException("Failed to resolve a value in a %s to type %s: %s",
+                        getTypeName().getName(), formattedType, formattedValue);
             }
-
-            return new ValueCompiler().compile(ctx, null, elementType, value, Optional.empty()).getValue();
-        } catch (ClassCastException e) {
-            throw new ValueResolutionException("Failed to resolve a value in a %s to type %s: %s",
-                    getTypeName().getName(), formatTypeName(elementType), formatValue(value));
         }
+
+        return ctx.getCompiledValue(elementType, value).getValue();
     }
 
 }

@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
@@ -39,7 +40,6 @@ import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public class TypeResolverHelper {
@@ -154,22 +154,10 @@ public class TypeResolverHelper {
         }
     }
 
-    public Type resolveTypeReference(String moduleName, String reference) {
-        return resolveTypeReference(ctx.getModule(moduleName), reference);
-    }
-
     private Type resolveTypeReference(ModuleNode module, String reference) {
         return Optional.ofNullable(((TypeAssignmentNode) module.getBody().getAssignment(reference)))
                 .map(TypeOrObjectClassAssignmentNode::getType)
                 .orElseThrow(() -> new CompilerException("Failed to resolve reference to %s", reference));
-    }
-
-    public <T extends Type> T resolveTypeReference(Class<T> typeClass, String reference) {
-        return resolveTypeReference(typeClass, ctx.getModule(), reference);
-    }
-
-    public <T extends Type> T resolveTypeReference(Class<T> typeClass, String moduleName, String reference) {
-        return resolveTypeReference(typeClass, ctx.getModule(moduleName), reference);
     }
 
     public <T extends Type> T resolveTypeReference(Class<T> typeClass, ModuleNode module, String reference) {
@@ -177,7 +165,7 @@ public class TypeResolverHelper {
 
         if (!type.getClass().equals(typeClass)) {
             throw new CompilerException("Failed to resolve reference %s to type %s. Found type: %s",
-                    reference, typeClass.getSimpleName(), formatTypeName(type));
+                    reference, typeClass.getSimpleName(), TypeFormatter.formatType(ctx, type));
         }
 
         return (T) type;

@@ -36,7 +36,6 @@ import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 
-import java.math.BigInteger;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
@@ -56,11 +55,12 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
         if (namedBits != null && !namedBits.isEmpty()) {
             for (NamedBitNode namedBit : namedBits) {
-                String fieldName = CompilerUtils.formatConstant(namedBit.getId());
+                var fieldName = CompilerUtils.formatConstant(namedBit.getId());
                 long value;
 
                 if (namedBit.getRef() != null) {
-                    BigInteger bigValue = ctx.resolveValue(IntegerValue.class, namedBit.getRef()).getValue();
+                    var compiledValue = ctx.<IntegerValue>getCompiledValue(IntegerValue.class, namedBit.getRef());
+                    var bigValue = compiledValue.getValue().getValue();
 
                     if (bigValue.bitLength() > 63) {
                         throw new CompilerException("Named bit '%s' too long: %s", fieldName, bigValue.toString());

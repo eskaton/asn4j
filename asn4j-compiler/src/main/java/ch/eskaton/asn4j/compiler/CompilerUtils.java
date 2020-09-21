@@ -40,7 +40,6 @@ import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -51,7 +50,6 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.commons.MutableReference;
 import ch.eskaton.commons.collections.Tuple2;
-import ch.eskaton.commons.utils.StreamsUtils;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -319,18 +317,6 @@ public class CompilerUtils {
         return null;
     }
 
-    public static String getTypeName(Type type) {
-        if (type instanceof TypeReference) {
-            return ((TypeReference) type).getType();
-        }
-
-        return type.getClass().getSimpleName();
-    }
-
-    public static String formatTypeName(Type type) {
-        return (type instanceof NamedType ? ((NamedType) type).getName() : getTypeName(type));
-    }
-
     public static String getTypeParameterString(Optional<List<String>> typeNames) {
         return typeNames.map(CompilerUtils::getTypeParameterString).orElse("");
     }
@@ -343,21 +329,9 @@ public class CompilerUtils {
         return reversedTypeNames.stream().reduce("", (s1, s2) -> s1.isEmpty() ? s2 : s2 + "<" + s1 + ">");
     }
 
-    public static String formatValue(Value value) {
-        if (value instanceof AmbiguousValue) {
-            return "Multiple possible value interpretations found: \n" +
-                    StreamsUtils.zipWithIndex(1, ((AmbiguousValue) value).getValues().stream().map(Object::toString))
-                            .map(tuple -> tuple.get_1() + ". " + tuple.get_2()).collect(Collectors.joining("\n"));
-
-        } else {
-            return value.toString();
-        }
-    }
-
     public static List<Integer> getComponentIds(List<OIDComponentNode> components) {
         return components.stream().map(OIDComponentNode::getId).collect(Collectors.toList());
     }
-
 
     public static boolean compileComponentConstraints(CompilerContext ctx, HasComponents compiledType) {
         var hasComponentConstraint = new MutableReference<>(false);

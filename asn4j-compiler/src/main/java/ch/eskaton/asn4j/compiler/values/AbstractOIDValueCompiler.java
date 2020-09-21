@@ -82,16 +82,25 @@ public abstract class AbstractOIDValueCompiler<V extends AbstractOIDValue>
             OIDComponentNode component, int componentPos);
 
     protected List<OIDComponentNode> resolveOIDReference(CompilerContext ctx, OIDComponentNode component) {
-        V referencedOidValue;
         var valueClass = getValueClass();
+        var compiledValue = resolveComponent(ctx, component);
 
-        try {
-            referencedOidValue = ctx.resolveValue(valueClass, component.getName());
-        } catch (ValueResolutionException e2) {
-            referencedOidValue = ctx.resolveValue(valueClass, component.getDefinedValue());
+        if (compiledValue != null && valueClass.isInstance(compiledValue.getValue())) {
+            return resolveComponents(ctx, (V) compiledValue.getValue());
         }
 
-        return resolveComponents(ctx, referencedOidValue);
+        throw new ValueResolutionException(component.getPosition(), "Failed to resolve component of %s value: %s",
+                getTypeName(), component);
+    }
+
+    private CompiledValue resolveComponent(CompilerContext ctx, OIDComponentNode component) {
+        var hasName = component.getName() != null;
+
+        if (hasName) {
+            return ctx.getCompiledValue(component.getName());
+        } else {
+            return ctx.getCompiledValue(component.getDefinedValue());
+        }
     }
 
     protected OIDComponentNode resolveComponentId(CompilerContext ctx, OIDComponentNode component) {

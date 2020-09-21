@@ -69,7 +69,9 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
                 long value;
 
                 if (namedNumber.getRef() != null) {
-                    bigValue = ctx.resolveValue(IntegerValue.class, namedNumber.getRef()).getValue();
+                    var compiledValue = ctx.<IntegerValue>getCompiledValue(IntegerValue.class, namedNumber.getRef());
+
+                    bigValue = compiledValue.getValue().getValue();
                 } else {
                     bigValue = namedNumber.getValue().getNumber();
                 }

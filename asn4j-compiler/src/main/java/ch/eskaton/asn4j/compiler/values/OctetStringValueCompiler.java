@@ -56,8 +56,13 @@ public class OctetStringValueCompiler extends AbstractValueCompiler<OctetStringV
             return (OctetStringValue) value;
         }
 
-        if (value instanceof SimpleDefinedValue) {
-            return (OctetStringValue) ctx.tryResolveAllValueReferences((SimpleDefinedValue) value).getValue();
+        if (value instanceof SimpleDefinedValue simpleDefinedValue) {
+            var compiledValue = ctx.getCompiledValue(simpleDefinedValue);
+            var resolvedValue = compiledValue.getValue();
+
+            if (resolvedValue instanceof OctetStringValue) {
+                return (OctetStringValue) resolvedValue;
+            }
         } else if (value instanceof AbstractBaseXStringValue) {
             return ((AbstractBaseXStringValue) value).toOctetString();
         }

@@ -31,6 +31,8 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
+import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -48,9 +50,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatValue;
 
 public class CollectionValueCompiler extends AbstractValueCompiler<CollectionValue> {
 
@@ -129,26 +128,27 @@ public class CollectionValueCompiler extends AbstractValueCompiler<CollectionVal
                 if (resolvedValue != null) {
                     value = resolvedValue;
                 } else {
-                    return resolveError(typeName, elementType, namedValue, value, Optional.empty());
+                    return resolveError(ctx, typeName, elementType, namedValue, value, Optional.empty());
                 }
             }
 
-            return new ValueCompiler().compile(ctx, null, elementType, value, Optional.empty()).getValue();
+            return ctx.getCompiledValue(elementType, value).getValue();
         } catch (ClassCastException | ValueResolutionException e) {
-            return resolveError(typeName, elementType, namedValue, value, Optional.of(e));
+            return resolveError(ctx, typeName, elementType, namedValue, value, Optional.of(e));
         }
     }
 
-    private Value resolveError(String typeName, Type elementType, NamedValue namedValue, Value value,
-            Optional<Exception> e) {
-        final var message = "Failed to resolve value for component '%s' in a %s to type %s: %s";
+    private Value resolveError(CompilerContext ctx, String typeName, Type elementType, NamedValue namedValue,
+            Value value, Optional<Exception> e) {
+        var message = "Failed to resolve value for component '%s' in a %s to type %s: %s";
+        var formattedType = TypeFormatter.formatType(ctx, elementType);
+        var formattedValue = ValueFormatter.formatValue(value);
 
         if (e.isPresent()) {
-            throw new ValueResolutionException(message, e.get(), namedValue.getName(), typeName,
-                    formatTypeName(elementType), formatValue(value));
+            throw new ValueResolutionException(message, e.get(), namedValue.getName(), typeName, formattedType,
+                    formattedValue);
         } else {
-            throw new ValueResolutionException(message, namedValue.getName(), typeName, formatTypeName(elementType),
-                    formatValue(value));
+            throw new ValueResolutionException(message, namedValue.getName(), typeName, formattedType, formattedValue);
         }
     }
 
