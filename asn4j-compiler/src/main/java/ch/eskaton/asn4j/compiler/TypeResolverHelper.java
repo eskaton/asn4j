@@ -108,14 +108,6 @@ public class TypeResolverHelper {
         }
     }
 
-    public Type resolveBaseType(Type type) {
-        if (type instanceof TypeReference) {
-            return resolveBaseType(ctx.getModule(), ((TypeReference) type).getType());
-        }
-
-        return type;
-    }
-
     Type resolveTypeReference(Type typeReference) {
         while (typeReference instanceof TypeReference) {
             if (isUsefulType(typeReference)) {
