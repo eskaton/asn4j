@@ -4547,7 +4547,7 @@ public class Parser {
     // Literal ::= word | ","
     protected class LiteralParser implements RuleParser<LiteralNode> {
 
-        Set<String> invalidWords = new HashSet<>(Arrays.asList(
+        private Set<String> invalidWords = new HashSet<>(Arrays.asList(
                 Lexer.BIT_LIT, Lexer.BOOLEAN_LIT, Lexer.CHARACTER_LIT,
                 Lexer.CHOICE_LIT, Lexer.DATE_LIT, Lexer.DATE_TIME_LIT,
                 Lexer.DURATION_LIT, Lexer.EMBEDDED_LIT, Lexer.END_LIT,

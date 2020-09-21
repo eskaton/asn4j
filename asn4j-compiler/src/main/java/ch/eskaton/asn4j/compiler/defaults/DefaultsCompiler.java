@@ -31,12 +31,12 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
+import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.Optional;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatTypeName;
 
 public class DefaultsCompiler {
 
@@ -49,12 +49,17 @@ public class DefaultsCompiler {
 
     public <V extends Value> void compileDefault(JavaClass clazz, String field, String typeName, Type type, V value,
             Optional<Parameters> maybeParameters) {
-        AbstractDefaultCompiler<V> compiler = ctx.getDefaultCompiler(ctx.resolveBaseType(type).getClass());
+        var compiledBaseType = ctx.getCompiledBaseType(type);
+        var compiler = ctx.getDefaultCompiler(compiledBaseType.getType().getClass());
 
         try {
             compiler.compileDefault(ctx, clazz, field, typeName, type, value, maybeParameters);
         } catch (CompilerException e) {
-            throw new CompilerException("Error in default for type %s: %s ", e, formatTypeName(type), e.getMessage());
+            var formattedType = TypeFormatter.formatType(ctx, type);
+            var formattedValue = ValueFormatter.formatValue(value);
+
+            throw new CompilerException(value.getPosition(), "Failed to compile default value '%s' for type %s: %s",
+                    e, formattedValue, formattedType, e.getMessage());
         }
     }
 
