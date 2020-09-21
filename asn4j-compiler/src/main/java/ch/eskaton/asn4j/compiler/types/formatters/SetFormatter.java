@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.SET;
 
-class SetTypeFormatter extends CollectionFormatter<SetType> {
+class SetFormatter extends CollectionFormatter<SetType> {
 
     @Override
     public String format(CompilerContext ctx, SetType type) {
