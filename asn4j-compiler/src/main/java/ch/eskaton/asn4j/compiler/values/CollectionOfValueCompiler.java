@@ -60,7 +60,6 @@ public class CollectionOfValueCompiler extends AbstractValueCompiler<CollectionO
         if (value instanceof EmptyValue) {
             return new CollectionOfValue(value.getPosition(), Collections.emptyList());
         } else if (value instanceof AmbiguousValue) {
-            // TODO does this ever occur?
             collectionOfValue = CompilerUtils.resolveAmbiguousValue(value, CollectionOfValue.class);
         } else if (value instanceof CollectionOfValue) {
             collectionOfValue = (CollectionOfValue) value;

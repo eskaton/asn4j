@@ -69,6 +69,19 @@ public class CollectionOfValueCompilerTest {
     }
 
     @Test
+    void testCollectionOfValueAmbiguous() throws IOException, ParserException {
+        var body = """
+                SeqOf ::= SEQUENCE OF INTEGER
+                seqOf SeqOf ::= {1}
+                """;
+
+        var compiledValue = getCompiledValue(body, CollectionOfValue.class, "seqOf");
+        var value = (CollectionOfValue) compiledValue.getValue();
+
+        assertEquals(1, value.getValues().size());
+    }
+
+    @Test
     void testCollectionOfValueWithTypeReference() throws IOException, ParserException {
         var body = """
                 SeqOf1 ::= SEQUENCE OF INTEGER
