@@ -735,13 +735,13 @@ public class CompilerContext {
     }
 
     public CompiledType getCompiledType(String reference) {
-        return getCompilationResult(reference, "Type", this::getTypesOfCurrentModule,
+        return getCompilationResult(reference, Optional.empty(), "Type", this::getTypesOfCurrentModule,
                 (ref, mod) -> withNewClass(() -> compiler.compileType(ref, mod)), this::getTypesOfModule);
     }
 
     public CompiledType getCompiledType(String moduleName, String reference) {
-        return getCompilationResult(reference, "Type", () -> getTypesOfModule(moduleName),
-                (ref, mod) -> withNewClass(() -> compiler.compileType(ref, Optional.ofNullable(moduleName))),
+        return getCompilationResult(reference, Optional.of(moduleName), "Type", () -> getTypesOfModule(moduleName),
+                (ref, mod) -> withNewClass(() -> compiler.compileType(ref, mod)),
                 this::getTypesOfModule);
     }
 
@@ -759,13 +759,13 @@ public class CompilerContext {
     }
 
     public CompiledValue getCompiledValue(String reference) {
-        return getCompilationResult(reference, "Value", this::getValuesOfCurrentModule,
+        return getCompilationResult(reference, Optional.empty(), "Value", this::getValuesOfCurrentModule,
                 (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, mod)), this::getValuesOfModule);
     }
 
     public CompiledValue getCompiledValue(String moduleName, String reference) {
-        return getCompilationResult(reference, "Value", () -> getValuesOfModule(moduleName),
-                (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, Optional.ofNullable(moduleName))),
+        return getCompilationResult(reference, Optional.ofNullable(moduleName), "Value", () -> getValuesOfModule(moduleName),
+                (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, mod)),
                 this::getValuesOfModule);
     }
 
@@ -807,7 +807,7 @@ public class CompilerContext {
     }
 
     private CompiledObject getCompiledObject(String reference) {
-        return getCompilationResult(reference, "Object", this::getObjectsOfCurrentModule,
+        return getCompilationResult(reference, Optional.empty(), "Object", this::getObjectsOfCurrentModule,
                 compiler::compileObject, this::getObjectsOfModule);
     }
 
@@ -825,8 +825,14 @@ public class CompilerContext {
     }
 
     public CompiledObjectClass getCompiledObjectClass(String reference) {
-        return getCompilationResult(reference, "ObjectClass", this::getObjectClassesOfCurrentModule,
+        return getCompilationResult(reference, Optional.empty(), "ObjectClass", this::getObjectClassesOfCurrentModule,
                 compiler::compileObjectClass, this::getObjectClassesOfModule);
+    }
+
+    public CompiledObjectClass getCompiledObjectClass(String moduleName, String reference) {
+        return getCompilationResult(reference, Optional.of(moduleName), "ObjectClass",
+                () -> getObjectClassesOfModule(moduleName), compiler::compileObjectClass,
+                this::getObjectClassesOfModule);
     }
 
     /**
@@ -843,20 +849,39 @@ public class CompilerContext {
     }
 
     public CompiledObjectSet getCompiledObjectSet(String reference) {
-        return getCompilationResult(reference, "ParameterizedObjectSet", this::getObjectSetsOfCurrentModule,
-                compiler::compileObjectSet, this::getObjectSetsOfModule);
+        return getCompilationResult(reference, Optional.empty(), "ObjectSet",
+                this::getObjectSetsOfCurrentModule, compiler::compileObjectSet, this::getObjectSetsOfModule);
+    }
+
+    public CompiledObjectSet getCompiledObjectSet(String moduleName, String reference) {
+        return getCompilationResult(reference, Optional.of(moduleName), "ObjectSet",
+                () -> getObjectSetsOfModule(moduleName), compiler::compileObjectSet, this::getObjectSetsOfModule);
     }
 
     /**
-     * Looks up the compiled parameterized type for the given parameterized type reference reference. The compiled
+     * Looks up the compiled parameterized type for the given parameterized type reference. The compiled
      * parameterized type may be compiled if it isn't already.
      *
      * @param reference a parameterized type reference
      * @return a compiled parameterized type
      */
     public CompiledParameterizedType getCompiledParameterizedType(String reference) {
-        return getCompilationResult(reference, "ParameterizedType",
+        return getCompilationResult(reference, Optional.empty(), "ParameterizedType",
                 this::getParameterizedTypesOfCurrentModule, compiler::compileParameterizedType,
+                this::getParameterizedTypesOfModule);
+    }
+
+    /**
+     * Looks up the compiled parameterized type for the given module name and parameterized type reference. The compiled
+     * parameterized type may be compiled if it isn't already.
+     *
+     * @param moduleName a module name
+     * @param reference  a parameterized type reference
+     * @return a compiled parameterized type
+     */
+    public CompiledParameterizedType getCompiledParameterizedType(String moduleName, String reference) {
+        return getCompilationResult(reference, Optional.of(moduleName), "ParameterizedType",
+                () -> getParameterizedTypesOfModule(moduleName), compiler::compileParameterizedType,
                 this::getParameterizedTypesOfModule);
     }
 
@@ -868,8 +893,22 @@ public class CompilerContext {
      * @return a compiled parameterized object class reference type
      */
     public CompiledParameterizedObjectClass getCompiledParameterizedObjectClass(String reference) {
-        return getCompilationResult(reference, "ParameterizedObjectClass",
+        return getCompilationResult(reference, Optional.empty(), "ParameterizedObjectClass",
                 this::getParameterizedObjectClassesOfCurrentModule, compiler::compiledParameterizedObjectClass,
+                this::getParameterizedObjectClassesOfModule);
+    }
+
+    /**
+     * Looks up the compiled parameterized object class for the given module name and parameterized object class
+     * reference. The compiled parameterized object class may be compiled if it isn't already.
+     *
+     * @param moduleName a module name
+     * @param reference  an parameterized object class reference
+     * @return a compiled parameterized object class reference type
+     */
+    public CompiledParameterizedObjectClass getCompiledParameterizedObjectClass(String moduleName, String reference) {
+        return getCompilationResult(reference, Optional.of(moduleName), "ParameterizedObjectClass",
+                () -> getParameterizedObjectClassesOfModule(moduleName), compiler::compiledParameterizedObjectClass,
                 this::getParameterizedObjectClassesOfModule);
     }
 
@@ -881,8 +920,22 @@ public class CompilerContext {
      * @return a compiled parameterized object set
      */
     public CompiledParameterizedObjectSet getCompiledParameterizedObjectSet(String reference) {
-        return getCompilationResult(reference, "ParameterizedObjectSet",
+        return getCompilationResult(reference, Optional.empty(), "ParameterizedObjectSet",
                 this::getParameterizedObjectSetsOfCurrentModule, compiler::compiledParameterizedObjectSet,
+                this::getParameterizedObjectSetsOfModule);
+    }
+
+    /**
+     * Looks up the compiled parameterized object set for the given module name and parameterized object set reference.
+     * The compiled parameterized object set may be compiled if it isn't already.
+     *
+     * @param moduleName a module name
+     * @param reference  a parameterized object set reference
+     * @return a compiled parameterized object set
+     */
+    public CompiledParameterizedObjectSet getCompiledParameterizedObjectSet(String moduleName, String reference) {
+        return getCompilationResult(reference, Optional.of(moduleName), "ParameterizedObjectSet",
+                () -> getParameterizedObjectSetsOfModule(moduleName), compiler::compiledParameterizedObjectSet,
                 this::getParameterizedObjectSetsOfModule);
     }
 
@@ -894,20 +947,34 @@ public class CompilerContext {
      * @return a compiled parameterized value set type
      */
     public CompiledParameterizedValueSetType getCompiledParameterizedValueSetType(String reference) {
-        return getCompilationResult(reference, "ParameterizedValueSetType",
+        return getCompilationResult(reference, Optional.empty(), "ParameterizedValueSetType",
                 this::getParameterizedValueSetTypesOfCurrentModule, compiler::compiledParameterizedValueSetType,
                 this::getParameterizedValueSetTypesOfModule);
     }
 
-    private <T extends CompilationResult> T getCompilationResult(String reference, String nodeName,
-            Supplier<Map<String, T>> moduleAccessor,
+    /**
+     * Looks up the compiled parameterized value set type for the given module name and parameterized value set type
+     * reference. The compiled parameterized value set type may be compiled if it isn't already.
+     *
+     * @param moduleName a module name
+     * @param reference  a parameterized value set type reference
+     * @return a compiled parameterized value set type
+     */
+    public CompiledParameterizedValueSetType getCompiledParameterizedValueSetType(String moduleName, String reference) {
+        return getCompilationResult(reference, Optional.of(moduleName), "ParameterizedValueSetType",
+                () -> getParameterizedValueSetTypesOfModule(moduleName), compiler::compiledParameterizedValueSetType,
+                this::getParameterizedValueSetTypesOfModule);
+    }
+
+    private <T extends CompilationResult> T getCompilationResult(String reference, Optional<String> maybeModuleName,
+            String nodeName, Supplier<Map<String, T>> moduleAccessor,
             BiFunction<String, Optional<String>, Optional<T>> compiler,
             Function<String, Map<String, T>> importAccessor) {
         var moduleCompilationResult = moduleAccessor.get();
         var compilationResult = Optional.ofNullable(moduleCompilationResult.get(reference));
 
         if (compilationResult.isEmpty()) {
-            compilationResult = compiler.apply(reference, Optional.empty());
+            compilationResult = compiler.apply(reference, maybeModuleName);
         }
 
         if (compilationResult.isEmpty()) {
