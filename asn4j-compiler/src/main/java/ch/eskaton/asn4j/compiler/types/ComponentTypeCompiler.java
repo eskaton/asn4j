@@ -50,7 +50,6 @@ import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
-import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,20 +81,21 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             boolean isRoot, Optional<Parameters> maybeParameters) {
         var javaClass = ctx.getCurrentClass();
         var type = ctx.resolveSelectedType(namedType.getType());
-        var compAnnotation = new JavaAnnotation(ASN1Component.class);
         var hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
         var isOptional = component.getCompType() == CompType.NAMED_TYPE_OPT;
         var compiledComponent = ctx.defineType(namedType, maybeParameters);
         var typeName = compiledComponent.getName();
         var field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
+        var compAnnotation = new JavaAnnotation(ASN1Component.class);
 
         compiledComponent.setParent(compiledType);
-        var compiledCollectionComponent = new CompiledCollectionComponent(namedType.getName(), compiledComponent, isRoot);
+
+        var compiledCollectionComponent = new CompiledCollectionComponent(namedType.getName(), compiledComponent,
+                isOptional, isRoot);
 
         compiledType.getComponents().add(compiledCollectionComponent);
 
         if (isOptional) {
-            compiledComponent.setOptional(true);
             compAnnotation.addParameter("optional", "true");
         } else if (hasDefault) {
             compAnnotation.addParameter("hasDefault", "true");

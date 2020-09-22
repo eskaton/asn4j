@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.types;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
@@ -40,23 +41,28 @@ public class SequenceCompiler extends AbstractCollectionCompiler<SequenceType> {
         super(TypeName.SEQUENCE, OpenTypeVerifier::new);
     }
 
-    private static class OpenTypeVerifier implements ComponentVerifier {
+    private static class OpenTypeVerifier implements ComponentVerifier<CompiledCollectionComponent> {
 
         private final TypeName typeName;
 
-        private Tuple2<String, CompiledType> optionalOpenTypeComponent;
+        private CompiledCollectionComponent optionalOpenTypeComponent;
 
         public OpenTypeVerifier(TypeName typeName) {
             this.typeName = typeName;
         }
 
-        public void verify(String name, CompiledType component) {
-            if (component.getType() instanceof OpenType && component.isOptional()) {
-                optionalOpenTypeComponent = Tuple2.of(name, component);
+        public void verify(CompiledCollectionComponent component) {
+            var compiledType = component.getCompiledType();
+
+            if (compiledType.getType() instanceof OpenType && component.isOptional()) {
+                optionalOpenTypeComponent = component;
             } else if (optionalOpenTypeComponent != null) {
+                var collectionTypeName = this.typeName.getName();
+                var parentTypeName = optionalOpenTypeComponent.getCompiledType().getParent().getName();
+                var openTypeName = optionalOpenTypeComponent.getName();
+
                 throw new CompilerException("%s '%s' contains the optional open type '%s' which is ambiguous",
-                        typeName.getName(), optionalOpenTypeComponent.get_2().getParent().getName(),
-                        optionalOpenTypeComponent.get_1());
+                        collectionTypeName, parentTypeName, openTypeName);
             }
         }
 

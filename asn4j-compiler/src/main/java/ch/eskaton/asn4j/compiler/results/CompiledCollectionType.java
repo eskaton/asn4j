@@ -40,9 +40,6 @@ public class CompiledCollectionType extends CompiledType implements HasComponent
 
     private List<CompiledCollectionComponent> components = new ArrayList<>();
 
-    public CompiledCollectionType() {
-    }
-
     public CompiledCollectionType(Type type, String name) {
         super(type, name);
     }

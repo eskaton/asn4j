@@ -116,8 +116,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
                 var compiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
                 var compiledComponents = compiler.compile(ctx, compiledType, component, isRoot, maybeParameters);
 
-                compiledComponents.forEach(
-                        c -> componentVerifiers.forEach(v -> v.verify(c.getName(), c.getCompiledType())));
+                compiledComponents.forEach(c -> componentVerifiers.forEach(v -> v.verify(c)));
             } catch (CompilerException e) {
                 if (component.getNamedType() != null) {
                     throw new CompilerException("Failed to compile component '%s' in %s '%s'", e,

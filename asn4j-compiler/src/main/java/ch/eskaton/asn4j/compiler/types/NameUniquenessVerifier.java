@@ -28,13 +28,14 @@
 package ch.eskaton.asn4j.compiler.types;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.HashSet;
 import java.util.Set;
 
-class NameUniquenessVerifier implements ComponentVerifier {
+class NameUniquenessVerifier implements ComponentVerifier<CompiledComponent> {
 
     private final TypeName typeName;
 
@@ -44,13 +45,15 @@ class NameUniquenessVerifier implements ComponentVerifier {
         this.typeName = typeName;
     }
 
-    public void verify(String name, CompiledType component) {
-        if (seenNames.contains(name)) {
+    public void verify(CompiledComponent component) {
+        var componentName = component.getName();
+
+        if (seenNames.contains(componentName)) {
             throw new CompilerException("Duplicate component name in %s '%s': %s", typeName.getName(),
-                    component.getParent().getName(), name);
+                    component.getCompiledType().getParent().getName(), componentName);
         }
 
-        seenNames.add(name);
+        seenNames.add(componentName);
     }
 
 }

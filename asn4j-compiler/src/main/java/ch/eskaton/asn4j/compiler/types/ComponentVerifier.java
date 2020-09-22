@@ -27,11 +27,11 @@
 
 package ch.eskaton.asn4j.compiler.types;
 
-import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 
 @FunctionalInterface
-interface ComponentVerifier {
+interface ComponentVerifier<C extends CompiledComponent> {
 
-    void verify(String name, CompiledType component);
+    void verify(C component);
 
 }
