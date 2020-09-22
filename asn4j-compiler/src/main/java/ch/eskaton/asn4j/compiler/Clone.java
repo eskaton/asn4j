@@ -34,6 +34,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Clone {
@@ -54,6 +55,8 @@ public class Clone {
             return object;
         } else if (object instanceof Enum) {
             return object;
+        } else if (object instanceof Optional optional) {
+            return optional.map(Clone::clone);
         }
 
         var clazz = object.getClass();
