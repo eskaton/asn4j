@@ -315,8 +315,8 @@ public class CompilerImpl {
     }
 
     private <T extends CompilationResult, A extends AssignmentNode> Optional<T> compile(String name,
-            Optional<String> maybeModuleName, BiFunction<String,
-            Collection<AssignmentNode>, Optional<A>> assignmentSelector, Function<A, T> compiler) {
+            Optional<String> maybeModuleName,
+            BiFunction<String, Collection<AssignmentNode>, Optional<A>> assignmentSelector, Function<A, T> compiler) {
         return maybeModuleName.map(moduleName -> compilerContext.executeWithModule(moduleName, () -> {
             var moduleAssignments = getAssignments(moduleName);
 
