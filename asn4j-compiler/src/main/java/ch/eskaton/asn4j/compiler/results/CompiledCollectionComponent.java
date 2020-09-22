@@ -31,12 +31,19 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 public class CompiledCollectionComponent extends CompiledComponent {
 
+    private boolean optional;
+
     private boolean root;
 
-    public CompiledCollectionComponent(String name, CompiledType compiledType, boolean root) {
+    public CompiledCollectionComponent(String name, CompiledType compiledType, boolean optional, boolean root) {
         super(name, compiledType);
 
+        this.optional = optional;
         this.root = root;
+    }
+
+    public boolean isOptional() {
+        return optional;
     }
 
     public boolean isRoot() {

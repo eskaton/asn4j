@@ -29,36 +29,40 @@ package ch.eskaton.asn4j.compiler.types;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.HashMap;
 
-class TagUniquenessVerifier implements ComponentVerifier {
+class TagUniquenessVerifier implements ComponentVerifier<CompiledComponent> {
 
     private final TypeName typeName;
 
-    private final HashMap<TagId, Tuple2<String, CompiledType>> seenTags = new HashMap<>();
+    private final HashMap<TagId, CompiledComponent> seenTags = new HashMap<>();
 
     public TagUniquenessVerifier(TypeName typeName) {
         this.typeName = typeName;
     }
 
-    public void verify(String componentName, CompiledType component) {
-        var tagIds = CompilerUtils.getLeadingTagId(component);
+    public void verify(CompiledComponent component) {
+        var componentName = component.getName();
+        var compiledType = component.getCompiledType();
+        var tagIds = CompilerUtils.getLeadingTagId(compiledType);
 
         tagIds.forEach(tagId -> {
             var seenComponent = seenTags.get(tagId);
 
             if (seenComponent != null) {
-                throw new CompilerException("Duplicate tags in %s '%s': %s and %s", typeName.getName(),
-                        seenComponent.get_2().getParent().getName(), seenComponent.get_1(), componentName);
+                var parentTypeName = seenComponent.getCompiledType().getParent().getName();
+                var collectionTypeName = typeName.getName();
+
+                throw new CompilerException("Duplicate tags in %s '%s': %s and %s", collectionTypeName,
+                        parentTypeName, seenComponent.getName(), componentName);
             }
         });
 
-        tagIds.forEach(tagId -> seenTags.put(tagId, Tuple2.of(componentName, component)));
+        tagIds.forEach(tagId -> seenTags.put(tagId, component));
     }
 
 }

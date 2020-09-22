@@ -28,32 +28,33 @@
 package ch.eskaton.asn4j.compiler.types;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
-class UntaggedOpenTypeVerifier implements ComponentVerifier {
+class UntaggedOpenTypeVerifier implements ComponentVerifier<CompiledComponent> {
 
     private final TypeName typeName;
 
     private int componentCount = 0;
 
-    private Tuple2<String, CompiledType> untaggedOpenType;
+    private CompiledComponent untaggedOpenType;
 
     public UntaggedOpenTypeVerifier(TypeName typeName) {
         this.typeName = typeName;
     }
 
-    public void verify(String name, CompiledType component) {
-        if (untaggedOpenType == null && component.getType() instanceof OpenType openType &&
+    public void verify(CompiledComponent component) {
+        var compiledType = component.getCompiledType();
+
+        if (untaggedOpenType == null && compiledType.getType() instanceof OpenType openType &&
                 openType.getTags().isEmpty()) {
-            untaggedOpenType = Tuple2.of(name, component);
+            untaggedOpenType = component;
         }
 
         if (componentCount >= 1 && untaggedOpenType != null) {
             throw new CompilerException("%s '%s' contains the open type '%s' which is ambiguous", typeName.getName(),
-                    untaggedOpenType.get_2().getParent().getName(), untaggedOpenType.get_1());
+                    untaggedOpenType.getCompiledType().getParent().getName(), untaggedOpenType.getName());
         }
 
         componentCount++;

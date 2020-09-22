@@ -45,7 +45,6 @@ import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,7 +93,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
             component.setParent(compiledType);
 
-            componentVerifiers.forEach(v -> v.verify(fieldName, component));
+            componentVerifiers.forEach(v -> v.verify(compiledComponent));
 
             components.add(compiledComponent);
             fieldNames.add(fieldName);
