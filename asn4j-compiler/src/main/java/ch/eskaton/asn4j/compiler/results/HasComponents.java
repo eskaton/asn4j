@@ -27,12 +27,10 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.commons.collections.Tuple2;
-
 import java.util.List;
 
-public interface HasComponents {
+public interface HasComponents<V extends CompiledComponent> {
 
-    List<Tuple2<String, CompiledType>> getComponents();
+    List<V> getComponents();
 
 }

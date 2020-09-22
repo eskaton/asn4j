@@ -61,7 +61,7 @@ public class CollectionValueExpressionBuilder
     @Override
     protected BooleanExpression buildExpression(CompiledType compiledType, CollectionValue collectionValue) {
         var compiledBaseType = (CompiledCollectionType) ctx.getCompiledBaseType(compiledType);
-        var typeStream = compiledBaseType.getComponents().stream().map(c -> c.get_2().getName());
+        var typeStream = compiledBaseType.getComponents().stream().map(c -> c.getCompiledType().getName());
         var valueStream = collectionValue.getValues().stream();
         var associations = new HashSet<Tuple2<Expression, Expression>>();
 

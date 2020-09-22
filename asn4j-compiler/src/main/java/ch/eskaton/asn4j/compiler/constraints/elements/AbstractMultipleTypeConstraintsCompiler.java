@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
@@ -60,17 +61,17 @@ public abstract class AbstractMultipleTypeConstraintsCompiler implements Element
 
     @Override
     public Node compile(CompiledType compiledType, MultipleTypeConstraints elements, Optional<Bounds> bounds) {
-        var components = ((HasComponents) compiledType).getComponents();
+        var components = ((HasComponents<CompiledComponent>) compiledType).getComponents();
         var componentNodes = new HashSet<ComponentNode>();
         var verifier = verifierSupplier.get();
 
         for (var constraint : elements.getConstraints()) {
             var name = constraint.getName();
-            var index = StreamsUtils.indexOf(components, c -> Objects.equals(name, c.get_1()));
+            var index = StreamsUtils.indexOf(components, c -> Objects.equals(name, c.getName()));
 
             verifier.verify(index, compiledType.getName(), name);
 
-            componentNodes.add(compileComponentConstraint(components.get(index).get_2(), constraint));
+            componentNodes.add(compileComponentConstraint(components.get(index).getCompiledType(), constraint));
         }
 
         return new WithComponentsNode(componentNodes);

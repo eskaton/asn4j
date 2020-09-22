@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.UnNamedCompiler;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
@@ -59,26 +60,26 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
-    public List<Tuple2<String, CompiledType>> compile(CompilerContext ctx, CompiledCollectionType compiledType,
-            ComponentType node, Optional<Parameters> maybeParameters) {
+    public List<CompiledCollectionComponent> compile(CompilerContext ctx, CompiledCollectionType compiledType,
+            ComponentType node, boolean isRoot, Optional<Parameters> maybeParameters) {
         switch (node.getCompType()) {
             case NAMED_TYPE_OPT:
                 // fall through
             case NAMED_TYPE_DEF:
                 // fall through
             case NAMED_TYPE:
-                return compileComponentNamedType(ctx, compiledType, node, node.getNamedType(), maybeParameters);
+                return compileComponentNamedType(ctx, compiledType, node, node.getNamedType(), isRoot, maybeParameters);
             case TYPE:
-                return compileComponentType(ctx, compiledType, node.getType(), maybeParameters);
+                return compileComponentType(ctx, compiledType, node.getType(), isRoot, maybeParameters);
             default:
                 throw new IllegalCompilerStateException(node.getPosition(), "Unsupported component type: %s",
                         node.getCompType());
         }
     }
 
-    private List<Tuple2<String, CompiledType>> compileComponentNamedType(CompilerContext ctx,
+    private List<CompiledCollectionComponent> compileComponentNamedType(CompilerContext ctx,
             CompiledCollectionType compiledType, ComponentType component, NamedType namedType,
-            Optional<Parameters> maybeParameters) {
+            boolean isRoot, Optional<Parameters> maybeParameters) {
         var javaClass = ctx.getCurrentClass();
         var type = ctx.resolveSelectedType(namedType.getType());
         var compAnnotation = new JavaAnnotation(ASN1Component.class);
@@ -89,7 +90,9 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         var field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
 
         compiledComponent.setParent(compiledType);
-        compiledType.getComponents().add(Tuple2.of(namedType.getName(), compiledComponent));
+        var compiledCollectionComponent = new CompiledCollectionComponent(namedType.getName(), compiledComponent, isRoot);
+
+        compiledType.getComponents().add(compiledCollectionComponent);
 
         if (isOptional) {
             compiledComponent.setOptional(true);
@@ -115,18 +118,18 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
         javaClass.addField(field);
 
-        return List.of(Tuple2.of(namedType.getName(), compiledComponent));
+        return List.of(compiledCollectionComponent);
     }
 
-    private List<Tuple2<String, CompiledType>> compileComponentType(CompilerContext ctx,
-            CompiledCollectionType compiledType, Type type, Optional<Parameters> maybeParameters) {
+    private List<CompiledCollectionComponent> compileComponentType(CompilerContext ctx,
+            CompiledCollectionType compiledType, Type type, boolean isRoot, Optional<Parameters> maybeParameters) {
         var resolvedType = resolveType(ctx, compiledType, type, maybeParameters);
         var componentTypes = getComponentTypes(resolvedType);
-        var components = new ArrayList<Tuple2<String, CompiledType>>();
+        var components = new ArrayList<CompiledCollectionComponent>();
 
         for (var componentType : componentTypes) {
             var componentTypeCompiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
-            var compiledComponents = componentTypeCompiler.compile(ctx, compiledType, componentType,
+            var compiledComponents = componentTypeCompiler.compile(ctx, compiledType, componentType, isRoot,
                     Optional.empty());
 
             components.addAll(compiledComponents);

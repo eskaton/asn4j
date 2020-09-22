@@ -37,6 +37,7 @@ import java.util.Optional;
 
 public class ObjectClassNodeCompiler implements NamedCompiler<ObjectClassNode, CompiledObjectClass> {
 
+    @Override
     public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassNode node,
             Optional<Parameters> maybeParameters) {
         return ctx.<ObjectClassNode, NamedCompiler<ObjectClassNode, CompiledObjectClass>>getCompiler((Class<ObjectClassNode>) node.getClass())

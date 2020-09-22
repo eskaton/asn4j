@@ -46,6 +46,7 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
@@ -224,11 +225,11 @@ public class WithComponentExpressionBuilder extends InnerTypeExpressionBuilder {
         return singletonList(new Parameter(new ILParameterizedType(ILBuiltinType.LIST, typeParameter), VAR_VALUES));
     }
 
-    private List<Expression> getCollectionParameters(HasComponents compiledContentType) {
+    private List<Expression> getCollectionParameters(HasComponents<? extends CompiledComponent> compiledContentType) {
         var associations = new HashSet<Tuple2<Expression, Expression>>();
 
         compiledContentType.getComponents().stream()
-                .map(Tuple2::get_1)
+                .map(CompiledComponent::getName)
                 .map(n -> new Tuple2<Expression, Expression>(ILValue.of(n),
                         new FunctionCall(of("get" + initCap(n)), of(Variable.of(VAR_VALUE)))))
                 .forEach(associations::add);

@@ -328,7 +328,7 @@ class CompilerImplTest {
 
         assertEquals(1, compiledSequence.getComponents().size());
 
-        var compiledComponent = compiledSequence.getComponents().get(0).get_2();
+        var compiledComponent = compiledSequence.getComponents().get(0).getCompiledType();
 
         assertTrue(compiledComponent.getType().getClass().isAssignableFrom(type));
         assertTrue(compiledComponent.getTags().isPresent());
@@ -374,7 +374,7 @@ class CompilerImplTest {
 
         assertEquals(1, compiledSequence.getComponents().size());
 
-        var compiledComponent = compiledSequence.getComponents().get(0).get_2();
+        var compiledComponent = compiledSequence.getComponents().get(0).getCompiledType();
 
         assertTrue(compiledComponent.getTags().isPresent());
         assertEquals(tags.size(), compiledComponent.getTags().get().size());
@@ -470,15 +470,15 @@ class CompilerImplTest {
         var compiledCollectionType = (CompiledCollectionType) compiledType;
         var components = compiledCollectionType.getComponents();
 
-        var field1 = components.stream().filter(t -> t.get_1().equals("a")).findFirst();
+        var field1 = components.stream().filter(t -> t.getName().equals("a")).findFirst();
 
         assertTrue(field1.isPresent());
-        assertTrue(field1.get().get_2().getType() instanceof IntegerType);
+        assertTrue(field1.get().getCompiledType().getType() instanceof IntegerType);
 
-        var field2 = components.stream().filter(t -> t.get_1().equals("b")).findFirst();
+        var field2 = components.stream().filter(t -> t.getName().equals("b")).findFirst();
 
         assertTrue(field2.isPresent());
-        assertTrue(field2.get().get_2().getType() instanceof BooleanType);
+        assertTrue(field2.get().getCompiledType().getType() instanceof BooleanType);
     }
 
     @Test
@@ -503,15 +503,15 @@ class CompilerImplTest {
         var compiledCollectionType = (CompiledCollectionType) compiledType;
         var components = compiledCollectionType.getComponents();
 
-        var field1 = components.stream().filter(t -> t.get_1().equals("a")).findFirst();
+        var field1 = components.stream().filter(t -> t.getName().equals("a")).findFirst();
 
         assertTrue(field1.isPresent());
-        assertTrue(field1.get().get_2().getType() instanceof IntegerType);
+        assertTrue(field1.get().getCompiledType().getType() instanceof IntegerType);
 
-        var field2 = components.stream().filter(t -> t.get_1().equals("b")).findFirst();
+        var field2 = components.stream().filter(t -> t.getName().equals("b")).findFirst();
 
         assertTrue(field2.isPresent());
-        assertTrue(field2.get().get_2().getType() instanceof BooleanType);
+        assertTrue(field2.get().getCompiledType().getType() instanceof BooleanType);
     }
 
     @Test
@@ -706,7 +706,7 @@ class CompilerImplTest {
 
         assertEquals(1, compiledSequence.getComponents().size());
 
-        var compiledComponent = compiledSequence.getComponents().get(0).get_2();
+        var compiledComponent = compiledSequence.getComponents().get(0).getCompiledType();
 
         assertTrue(compiledComponent.getType() instanceof BooleanType);
     }
@@ -766,7 +766,7 @@ class CompilerImplTest {
 
         assertEquals(1, compiledSequence.getComponents().size());
 
-        var compiledComponent = compiledSequence.getComponents().get(0).get_2();
+        var compiledComponent = compiledSequence.getComponents().get(0).getCompiledType();
 
         assertTrue(compiledComponent.getType() instanceof OpenType);
     }
@@ -2081,30 +2081,30 @@ class CompilerImplTest {
             Class<? extends Type> fieldType) {
         var components = choice.getComponents();
         var maybeField = components.stream()
-                .filter(tuple -> tuple.get_1().equals(fieldName))
+                .filter(tuple -> tuple.getName().equals(fieldName))
                 .findAny();
 
         assertTrue(maybeField.isPresent());
 
         var field = maybeField.get();
 
-        assertTrue(fieldType.isAssignableFrom(field.get_2().getType().getClass()));
+        assertTrue(fieldType.isAssignableFrom(field.getCompiledType().getType().getClass()));
     }
 
     private CompiledType testCollectionField(CompiledCollectionType collection, String fieldName,
             Class<? extends Type> fieldType) {
         var components = collection.getComponents();
         var maybeField = components.stream()
-                .filter(tuple -> tuple.get_1().equals(fieldName))
+                .filter(tuple -> tuple.getName().equals(fieldName))
                 .findAny();
 
         assertTrue(maybeField.isPresent());
 
         var field = maybeField.get();
 
-        assertTrue(fieldType.isAssignableFrom(field.get_2().getType().getClass()));
+        assertTrue(fieldType.isAssignableFrom(field.getCompiledType().getType().getClass()));
 
-        return field.get_2();
+        return field.getCompiledType();
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {

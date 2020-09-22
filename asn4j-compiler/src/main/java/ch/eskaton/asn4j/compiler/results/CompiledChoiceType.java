@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.results;
 
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.utils.ToString;
-import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,26 +36,26 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class CompiledChoiceType extends CompiledType implements HasComponents, HasChildComponents {
+public class CompiledChoiceType extends CompiledType implements HasComponents<CompiledComponent>, HasChildComponents {
 
-    private List<Tuple2<String, CompiledType>> components = new ArrayList<>();
+    private List<CompiledComponent> components = new ArrayList<>();
 
     public CompiledChoiceType(Type type, String name) {
         super(type, name);
     }
 
     @Override
-    public List<Tuple2<String, CompiledType>> getComponents() {
+    public List<CompiledComponent> getComponents() {
         return components;
     }
 
-    public Optional<Tuple2<String, CompiledType>> getComponent(String componentName) {
-        return components.stream().filter(c -> c.get_1().equals(componentName)).findFirst();
+    public Optional<CompiledComponent> getComponent(String componentName) {
+        return components.stream().filter(c -> c.getName().equals(componentName)).findFirst();
     }
 
     @Override
     public List<? extends CompiledType> getChildComponents() {
-        return components.stream().map(Tuple2::get_2).collect(Collectors.toList());
+        return components.stream().map(CompiledComponent::getCompiledType).collect(Collectors.toList());
     }
 
     @Override

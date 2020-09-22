@@ -35,6 +35,7 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public abstract class Collection extends AbstractType {
 
@@ -112,6 +113,17 @@ public abstract class Collection extends AbstractType {
 
     public List<ComponentType> getExtensionRootComponents() {
         return extensionRootComponents;
+    }
+
+    public List<ComponentType> getExtensionAdditionComponents() {
+        if (extensionAdditions != null) {
+            return extensionAdditions.stream()
+                    .map(ExtensionAdditionGroup::getComponents)
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
+        }
+
+        return List.of();
     }
 
     public Object getExtensionAndException() {

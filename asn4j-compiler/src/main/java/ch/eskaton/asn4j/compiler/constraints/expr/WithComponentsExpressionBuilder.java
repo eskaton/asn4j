@@ -47,6 +47,7 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
@@ -199,12 +200,12 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
     public Optional<BooleanExpression> build(Module module, CompiledType compiledType, WithComponentsNode node) {
         var compiledComponentTypes = getTypeWithComponents(compiledType).getComponents()
                 .stream()
-                .collect(Collectors.toMap(Tuple2::get_1, Tuple2::get_2));
+                .collect(Collectors.toMap(CompiledComponent::getName, CompiledComponent::getCompiledType));
 
         return getExpression(module, compiledType, node, compiledComponentTypes);
     }
 
-    protected HasComponents getTypeWithComponents(CompiledType compiledType) {
+    protected HasComponents<? extends CompiledComponent> getTypeWithComponents(CompiledType compiledType) {
         return ctx.getCompiledCollectionType(compiledType);
     }
 

@@ -50,6 +50,7 @@ import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
@@ -133,7 +134,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
         Set<Tuple2<Expression, Expression>> associations = new HashSet<>();
 
         compiledType.getComponents().stream()
-                .map(Tuple2::get_1)
+                .map(CompiledComponent::getName)
                 .map(n -> new Tuple2(ILValue.of(n), new FunctionCall(of("get" + initCap(n)))))
                 .forEach(associations::add);
 
