@@ -250,7 +250,6 @@ class CompilerImplTest {
         assertTrue(value3.getType() instanceof IntegerType);
     }
 
-
     @Test
     void testValueOfSelectedType() throws IOException, ParserException {
         var body = """
@@ -1750,6 +1749,74 @@ class CompilerImplTest {
         testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
         testCollectionField((CompiledCollectionType) compiledType, "field2", IntegerType.class);
         testCollectionField((CompiledCollectionType) compiledType, "field3", VisibleString.class);
+    }
+
+    @Test
+    void testParameterizedTypeWithSetComponentsOfExternalTypeReference() throws IOException, ParserException {
+        var body1 = """              
+                Set1 ::= SET {
+                    COMPONENTS OF OTHER-MODULE.Set2
+                }
+                """;
+        var body2 = """
+                EXPORTS Set2;
+                                
+                Set2 ::= SET {
+                    field1 INTEGER,
+                    field2 BOOLEAN
+                }     
+                """;
+
+        var module1 = module("TEST-MODULE", body1);
+        var module2 = module("OTHER-MODULE", body2);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Set1");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        testCollectionField((CompiledCollectionType) compiledType, "field1", IntegerType.class);
+        testCollectionField((CompiledCollectionType) compiledType, "field2", BooleanType.class);
+    }
+
+    @Test
+    void testParameterizedTypeWithSetComponentsOfImportedType() throws IOException, ParserException {
+        var body1 = """
+                IMPORTS Set2 FROM OTHER-MODULE;
+                                
+                Set1 ::= SET {
+                    COMPONENTS OF Set2
+                }
+                """;
+        var body2 = """
+                EXPORTS Set2;
+                                
+                Set2 ::= SET {
+                    field1 INTEGER,
+                    field2 BOOLEAN
+                }    
+                """;
+
+        var module1 = module("TEST-MODULE", body1);
+        var module2 = module("OTHER-MODULE", body2);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Set1");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        testCollectionField((CompiledCollectionType) compiledType, "field1", IntegerType.class);
+        testCollectionField((CompiledCollectionType) compiledType, "field2", BooleanType.class);
     }
 
     @Test

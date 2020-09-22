@@ -273,30 +273,6 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    public void pushModule(ModuleNode module) {
-        currentModule.push(module);
-    }
-
-    public ModuleNode pushModule(String moduleName) {
-        var module = modules.get(moduleName);
-
-        if (module == null) {
-            throw new CompilerException("Tried to access an undefined module: %s", moduleName);
-        }
-
-        pushModule(module);
-
-        return module;
-    }
-
-    public void popModule() {
-        currentModule.pop();
-    }
-
-    public void duplicateModule() {
-        currentModule.push(getModule());
-    }
-
     public void addModule(String moduleName, ModuleNode module) {
         modules.put(moduleName, module);
     }
