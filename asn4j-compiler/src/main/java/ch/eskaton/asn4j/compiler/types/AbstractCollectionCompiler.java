@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
 import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
@@ -67,38 +68,16 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         var componentVerifiers = componentVerifierSuppliers.stream()
                 .map(s -> s.apply(typeName))
                 .collect(Collectors.toList());
-        var ctor = new JavaConstructor(JavaVisibility.PUBLIC, name);
-        var ctorBody = new StringBuilder();
         var compiledType = ctx.createCompiledType(CompiledCollectionType.class, node, name);
 
         compiledType.setTags(tags);
 
-        for (ComponentType component : node.getAllComponents()) {
-            try {
-                var compiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
-                var compiledComponents = compiler.compile(ctx, compiledType, component, maybeParameters);
+        compileComponents(ctx, name, maybeParameters, componentVerifiers, compiledType,
+                node.getAllRootComponents(), true);
+        compileComponents(ctx, name, maybeParameters, componentVerifiers, compiledType,
+                node.getExtensionAdditionComponents(), false);
 
-                compiledComponents.forEach(c -> {
-                    var argType = c.get_2().getName();
-                    var argName = CompilerUtils.formatName(c.get_1());
-
-                    componentVerifiers.forEach(v -> v.verify(c.get_1(), c.get_2()));
-
-                    ctor.getParameters().add(new JavaParameter(argType, argName));
-                    ctorBody.append("\t\tthis." + argName + " = " + argName + ";\n");
-                });
-            } catch (CompilerException e) {
-                if (component.getNamedType() != null) {
-                    throw new CompilerException("Failed to compile component '%s' in %s '%s'", e,
-                            component.getNamedType().getName(), typeName, name);
-                } else {
-                    throw new CompilerException("Failed to compile a component in %s '%s'", e, typeName, name);
-                }
-            }
-        }
-
-        ctor.setBody(Optional.of(ctorBody.toString()));
-        javaClass.addMethod(ctor);
+        createJavaConstructors(name, compiledType, javaClass);
 
         var hasComponentConstraint = CompilerUtils.compileComponentConstraints(ctx, compiledType);
 
@@ -111,6 +90,43 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         ctx.finishClass();
 
         return compiledType;
+    }
+
+    private void createJavaConstructors(String name, CompiledCollectionType compiledType, JavaClass javaClass) {
+        var ctor = new JavaConstructor(JavaVisibility.PUBLIC, name);
+        var ctorBody = new StringBuilder();
+
+        compiledType.getComponents().forEach(component -> {
+            var argType = component.getCompiledType().getName();
+            var argName = CompilerUtils.formatName(component.getName());
+
+            ctor.getParameters().add(new JavaParameter(argType, argName));
+            ctorBody.append("\t\tthis.%s = %s;\n".formatted(argName, argName));
+        });
+
+        ctor.setBody(Optional.of(ctorBody.toString()));
+        javaClass.addMethod(ctor);
+    }
+
+    private void compileComponents(CompilerContext ctx, String name, Optional<Parameters> maybeParameters,
+            List<ComponentVerifier> componentVerifiers, CompiledCollectionType compiledType,
+            List<ComponentType> components, boolean isRoot) {
+        for (ComponentType component : components) {
+            try {
+                var compiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
+                var compiledComponents = compiler.compile(ctx, compiledType, component, isRoot, maybeParameters);
+
+                compiledComponents.forEach(
+                        c -> componentVerifiers.forEach(v -> v.verify(c.getName(), c.getCompiledType())));
+            } catch (CompilerException e) {
+                if (component.getNamedType() != null) {
+                    throw new CompilerException("Failed to compile component '%s' in %s '%s'", e,
+                            component.getNamedType().getName(), typeName, name);
+                } else {
+                    throw new CompilerException("Failed to compile a component in %s '%s'", e, typeName, name);
+                }
+            }
+        }
     }
 
 }

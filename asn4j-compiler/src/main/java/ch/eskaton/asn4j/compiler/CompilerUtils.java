@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
@@ -49,7 +50,6 @@ import ch.eskaton.asn4j.runtime.TaggingMode;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.commons.MutableReference;
-import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -234,7 +234,7 @@ public class CompilerUtils {
                             "Selection type doesn't refer to known component: %s", type);
                 }
 
-                var maybeCompiledTags = maybeComponent.get().get_2().getTags();
+                var maybeCompiledTags = maybeComponent.get().getCompiledType().getTags();
 
                 addTags(tags, maybeCompiledTags, explicit);
             } else {
@@ -288,7 +288,7 @@ public class CompilerUtils {
     public static Set<TagId> getLeadingTagId(CompiledType compiledType) {
         if (compiledType instanceof CompiledChoiceType compiledChoiceType) {
             return compiledChoiceType.getComponents().stream()
-                    .map(Tuple2::get_2)
+                    .map(CompiledComponent::getCompiledType)
                     .map(CompiledType::getTags)
                     .map(tags -> tags.map(t -> t.stream().findFirst())).
                             flatMap(Optional::stream)
@@ -333,12 +333,13 @@ public class CompilerUtils {
         return components.stream().map(OIDComponentNode::getId).collect(Collectors.toList());
     }
 
-    public static boolean compileComponentConstraints(CompilerContext ctx, HasComponents compiledType) {
+    public static boolean compileComponentConstraints(CompilerContext ctx,
+            HasComponents<? extends CompiledComponent> compiledType) {
         var hasComponentConstraint = new MutableReference<>(false);
 
         compiledType.getComponents().stream().forEach(component -> {
-            var componentName = component.get_1();
-            var compiledComponent = component.get_2();
+            var componentName = component.getName();
+            var compiledComponent = component.getCompiledType();
             var componentType = compiledComponent.getType();
 
             if (componentType.getConstraints() != null) {

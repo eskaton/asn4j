@@ -49,6 +49,7 @@ import ch.eskaton.asn4j.compiler.il.ILVisibility;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.MultipleTypeConstraints;
@@ -123,7 +124,7 @@ public class ChoiceConstraintCompiler extends AbstractConstraintCompiler {
         Set<Tuple2<Expression, Expression>> associations = new HashSet<>();
 
         compiledType.getComponents().stream()
-                .map(Tuple2::get_1)
+                .map(CompiledComponent::getName)
                 .map(n -> new Tuple2(ILValue.of(n), new FunctionCall(of("get" + initCap(n)))))
                 .forEach(associations::add);
 

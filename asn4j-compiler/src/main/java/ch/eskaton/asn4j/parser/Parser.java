@@ -3143,7 +3143,7 @@ public class Parser {
         public Type parse() throws ParserException {
             return new ChoiceParser<>(usefulTypeParser,
                     typeFromObjectsParser /* incl. ValueSetFromObjects */,
-                    externalTypeReferenceParser, parameterizedTypeParser
+                    parameterizedTypeParser, externalTypeReferenceParser
                     /* incl. ParameterizedValueSetType */, typeReferenceParser,
                     selectionTypeParser).parse();
         }

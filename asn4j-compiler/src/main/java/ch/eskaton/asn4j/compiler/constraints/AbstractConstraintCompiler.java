@@ -47,6 +47,7 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.NegationExpression;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
@@ -212,11 +213,11 @@ public abstract class AbstractConstraintCompiler {
     }
 
     protected Optional<ConstraintDefinition> compileComponentConstraints(CompiledType compiledType) {
-        return ((HasComponents) compiledType).getComponents().stream()
-                .filter(t -> t.get_2().getConstraintDefinition().isPresent())
+        return ((HasComponents<? extends CompiledComponent>) compiledType).getComponents().stream()
+                .filter(t -> t.getCompiledType().getConstraintDefinition().isPresent())
                 .map(t -> {
-                    var name = t.get_1();
-                    var compiledComponent = t.get_2();
+                    var name = t.getName();
+                    var compiledComponent = t.getCompiledType();
                     var constraintDefinition = compiledComponent.getConstraintDefinition().get();
                     var rootDefinitions = constraintDefinition.getRoots();
                     var extensionsDefinitions = constraintDefinition.getExtensions();

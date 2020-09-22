@@ -229,8 +229,8 @@ public class JavaUtils {
 
         return maybeCompiledType.map(compiledType -> {
             var initString = compiledType.getComponents().stream()
-                    .map(c -> values.containsKey(c.get_1()) ?
-                            getInitializerString(ctx, ctx.getTypeName(c.get_2().getType()), values.get(c.get_1())) :
+                    .map(c -> values.containsKey(c.getName()) ?
+                            getInitializerString(ctx, ctx.getTypeName(c.getCompiledType().getType()), values.get(c.getName())) :
                             "null")
                     .collect(Collectors.joining(", "));
 
@@ -245,8 +245,8 @@ public class JavaUtils {
 
         return maybeCompiledType.map(compiledType -> {
             var componentType = compiledType.getComponents().stream()
-                    .filter(c -> c.get_1().equals(value.getId()))
-                    .map(c -> c.get_2().getType())
+                    .filter(c -> c.getName().equals(value.getId()))
+                    .map(c -> c.getCompiledType().getType())
                     .findFirst();
             var name = StringUtils.initCap(CompilerUtils.formatName(value.getId()));
 

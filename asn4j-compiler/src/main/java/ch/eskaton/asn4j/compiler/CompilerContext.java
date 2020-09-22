@@ -102,6 +102,7 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
+import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
@@ -327,8 +328,8 @@ public class CompilerContext {
         return defineType(type, name, maybeParameters);
     }
 
-    public Optional<Type> getTypeParameter(Parameters parameters, TypeReference typeReference) {
-        var reference = typeReference.getType();
+    public Optional<Type> getTypeParameter(Parameters parameters, SimpleDefinedType definedType) {
+        var reference = definedType.getType();
 
         return getTypeParameter(parameters, reference);
     }

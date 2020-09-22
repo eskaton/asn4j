@@ -47,6 +47,7 @@ import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParame
 public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         implements NamedCompiler<T, CompiledType> {
 
+    @Override
     public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
         if (node.getParameters().isEmpty()) {
             // ensure the type is resolvable

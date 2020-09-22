@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaEnum;
 import ch.eskaton.asn4j.compiler.java.objs.JavaGetter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaTypedSetter;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -82,20 +83,20 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         compiledType.setTags(tags);
 
-        var components = new ArrayList<Tuple2<String, CompiledType>>();
+        var components = new ArrayList<CompiledComponent>();
 
         for (NamedType namedType : node.getRootAlternatives()) {
             var typeConstant = CompilerUtils.formatConstant(namedType.getName());
-            var nameAndComponent = compileChoiceNamedType(ctx, javaClass, namedType,
+            var compiledComponent = compileChoiceNamedType(ctx, javaClass, namedType,
                     maybeParameters, typeConstant, clearFields);
-            var fieldName = nameAndComponent.get_1();
-            var component = nameAndComponent.get_2();
+            var fieldName = compiledComponent.getName();
+            var component = compiledComponent.getCompiledType();
 
             component.setParent(compiledType);
 
             componentVerifiers.forEach(v -> v.verify(fieldName, component));
 
-            components.add(nameAndComponent);
+            components.add(compiledComponent);
             fieldNames.add(fieldName);
             typeEnum.addEnumConstant(typeConstant);
             bodyBuilder.append("\tcase " + typeConstant + ":").append("\t\treturn " + fieldName + ";");
@@ -125,7 +126,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         return compiledType;
     }
 
-    private Tuple2<String, CompiledType> compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass,
+    private CompiledComponent compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass,
             NamedType namedType, Optional<Parameters> maybeParameters, String typeConstant, String beforeCode) {
         var name = CompilerUtils.formatName(namedType.getName());
         var compiledType = ctx.defineType(namedType, maybeParameters);
@@ -144,7 +145,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
                 beforeCode));
         javaClass.addMethod(new JavaGetter(typeName, name, field.hasDefault()));
 
-        return Tuple2.of(name, compiledType);
+        return new CompiledComponent(name, compiledType);
     }
 
     private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {

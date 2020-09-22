@@ -27,62 +27,20 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
+public class CompiledCollectionComponent extends CompiledComponent {
 
-public class CompiledCollectionType extends CompiledType implements HasComponents<CompiledCollectionComponent>,
-        HasChildComponents {
+    private boolean root;
 
-    private List<CompiledCollectionComponent> components = new ArrayList<>();
+    public CompiledCollectionComponent(String name, CompiledType compiledType, boolean root) {
+        super(name, compiledType);
 
-    public CompiledCollectionType() {
+        this.root = root;
     }
 
-    public CompiledCollectionType(Type type, String name) {
-        super(type, name);
-    }
-
-    @Override
-    public List<CompiledCollectionComponent> getComponents() {
-        return components;
-    }
-
-    public void setComponents(List<CompiledCollectionComponent> components) {
-        this.components = components;
-    }
-
-    @Override
-    public List<? extends CompiledType> getChildComponents() {
-        return components.stream().map(CompiledComponent::getCompiledType).collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(obj)) {
-            return false;
-        }
-
-        CompiledCollectionType that = (CompiledCollectionType) obj;
-
-        return Objects.equals(components, that.components);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), components);
+    public boolean isRoot() {
+        return root;
     }
 
     @Override

@@ -64,9 +64,9 @@ public class ChoiceValueExpressionBuilder
         var associations = new HashSet<Tuple2<Expression, Expression>>();
 
         compiledBaseType.getComponents().stream().forEach(c -> {
-            var value = c.get_1().equals(choiceValue.getId()) ? choiceValue.getValue() : null;
+            var value = c.getName().equals(choiceValue.getId()) ? choiceValue.getValue() : null;
 
-            associations.add(Tuple2.of(ILValue.of(c.get_1()), ILValue.of(c.get_2().getName(), value)));
+            associations.add(Tuple2.of(ILValue.of(c.getName()), ILValue.of(c.getCompiledType().getName(), value)));
         });
 
         return new BooleanFunctionCall.MapEquals(Variable.of(VAR_VALUES), new ILMapValue(ILType.of(ILBuiltinType.STRING),
