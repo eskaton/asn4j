@@ -111,9 +111,12 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
         compiledType.setTags(tags);
 
         if (node.hasConstraint()) {
-            var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
-            compiledType.setConstraintDefinition(constraintDef);
+            compiledType.setConstraintDefinition(constraintDef.get_1());
+
+            javaClass.addModule(ctx, constraintDef.get_2());
+            javaClass.addImport(ConstraintViolatedException.class);
         }
 
         ctx.finishClass();

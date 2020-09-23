@@ -37,6 +37,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -58,9 +59,12 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
         compiledType.setTags(tags);
 
         if (node.hasAnyConstraint()) {
-            var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
-            compiledType.setConstraintDefinition(constraintDef);
+            compiledType.setConstraintDefinition(constraintDef.get_1());
+
+            javaClass.addModule(ctx, constraintDef.get_2());
+            javaClass.addImport(ConstraintViolatedException.class);
         }
 
         ctx.finishClass();

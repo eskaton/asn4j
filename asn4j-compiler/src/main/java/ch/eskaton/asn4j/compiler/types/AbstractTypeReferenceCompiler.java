@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -72,9 +73,12 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         compiledType.setTags(tags);
 
         if (node.hasConstraint()) {
-            var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
-            compiledType.setConstraintDefinition(constraintDef);
+            compiledType.setConstraintDefinition(constraintDef.get_1());
+
+            javaClass.addModule(ctx, constraintDef.get_2());
+            javaClass.addImport(ConstraintViolatedException.class);
         }
 
         ctx.finishClass();
