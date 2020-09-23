@@ -637,15 +637,16 @@ public class CompilerContext {
         return constraintCompiler.buildExpression(module, compiledType, node);
     }
 
-    public Tuple2<ConstraintDefinition, Module> compileConstraintAndModule(String name, CompiledType compiledType) {
+    public Optional<Tuple2<ConstraintDefinition, Module>> compileConstraintAndModule(String name,
+            CompiledType compiledType) {
         return constraintCompiler.compileConstraintAndModule(name, compiledType);
     }
 
-    public ConstraintDefinition compileConstraint(String name, CompiledType compiledType) {
+    public Optional<ConstraintDefinition> compileConstraint(String name, CompiledType compiledType) {
         return constraintCompiler.compileConstraint(name, compiledType);
     }
 
-    public ConstraintDefinition compileConstraint(CompiledType compiledType) {
+    public Optional<ConstraintDefinition> compileConstraint(CompiledType compiledType) {
         return constraintCompiler.compileConstraint(compiledType);
     }
 

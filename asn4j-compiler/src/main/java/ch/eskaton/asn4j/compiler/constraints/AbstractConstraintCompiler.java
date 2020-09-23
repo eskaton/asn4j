@@ -155,7 +155,7 @@ public abstract class AbstractConstraintCompiler {
         return new ConstraintDefinition(root, extension).extensible(setSpec.hasExtensionMarker());
     }
 
-    ConstraintDefinition compileComponentConstraints(Type node, CompiledType baseType) {
+    Optional<ConstraintDefinition> compileComponentConstraints(Type node, CompiledType baseType) {
         LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
         Optional<List<Constraint>> constraint = Optional.ofNullable(node.getConstraints());
         ConstraintDefinition definition = null;
@@ -209,7 +209,7 @@ public abstract class AbstractConstraintCompiler {
             definition.optimize(this::optimize);
         }
 
-        return definition;
+        return Optional.ofNullable(definition);
     }
 
     protected Optional<ConstraintDefinition> compileComponentConstraints(CompiledType compiledType) {

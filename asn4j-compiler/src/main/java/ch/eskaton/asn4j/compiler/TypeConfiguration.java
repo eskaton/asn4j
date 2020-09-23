@@ -364,10 +364,10 @@ public class TypeConfiguration {
                 new SubtypeTypeNameSupplier<>(this), new OpenTypeConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(GeneralizedTime.class, new GeneralizedTimeCompiler(), GeneralizedTimeValue.class,
                 ASN1GeneralizedTime.class, new GeneralizedTimeValueCompiler(), new DefaultTypeNameSupplier(this),
-                null));
+                new VisibleStringConstraintCompiler(ctx)));
         types.add(new TypeDefinition<>(UTCTime.class, new UTCTimeCompiler(), UTCTimeValue.class,
                 ASN1UTCTime.class, new UTCTimeValueCompiler(), new DefaultTypeNameSupplier(this),
-                null));
+                new VisibleStringConstraintCompiler(ctx)));
         // special types
         types.add(new TypeDefinition<>(ComponentType.class, new ComponentTypeCompiler()));
         types.add(new TypeDefinition<>(SelectionType.class, new SelectionTypeCompiler(),

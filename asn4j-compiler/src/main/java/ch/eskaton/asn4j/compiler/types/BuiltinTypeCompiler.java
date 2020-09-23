@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.Optional;
 
@@ -47,12 +48,12 @@ public abstract class BuiltinTypeCompiler<T extends Type> implements NamedCompil
 
         compiledType.setTags(tags);
 
-        if (node.hasConstraint()) {
-            var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
+        var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
-            compiledType.setConstraintDefinition(constraintDef.get_1());
+        compiledType.setConstraintDefinition(constraintDef.map(Tuple2::get_1).orElse(null));
 
-            javaClass.addModule(ctx, constraintDef.get_2());
+        if (constraintDef.isPresent()) {
+            javaClass.addModule(ctx, constraintDef.get().get_2());
             javaClass.addImport(ConstraintViolatedException.class);
         }
 

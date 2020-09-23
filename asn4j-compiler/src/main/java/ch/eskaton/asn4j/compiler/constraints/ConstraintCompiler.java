@@ -50,21 +50,22 @@ public class ConstraintCompiler {
         this.ctx = ctx;
     }
 
-    public Tuple2<ConstraintDefinition, Module> compileConstraintAndModule(String name, CompiledType compiledType) {
+    public Optional<Tuple2<ConstraintDefinition, Module>> compileConstraintAndModule(String name,
+            CompiledType compiledType) {
         var definition = compileConstraint(name, compiledType);
 
-        if (definition != null) {
+        if (definition.isPresent()) {
             var module = new Module();
 
-            addConstraint(compiledType, module, definition);
+            addConstraint(compiledType, module, definition.get());
 
-            return Tuple2.of(definition, module);
+            return Optional.of(Tuple2.of(definition.get(), module));
         }
 
-        return null;
+        return Optional.empty();
     }
 
-    public ConstraintDefinition compileConstraint(String name, CompiledType compiledType) {
+    public Optional<ConstraintDefinition> compileConstraint(String name, CompiledType compiledType) {
         try {
             return compileConstraintAux(compiledType);
         } catch (CompilerException e) {
@@ -76,7 +77,7 @@ public class ConstraintCompiler {
         return ctx.getConstraintCompiler(compiledType.getType().getClass());
     }
 
-    public ConstraintDefinition compileConstraint(CompiledType compiledType) {
+    public Optional<ConstraintDefinition> compileConstraint(CompiledType compiledType) {
         try {
             return compileConstraintAux(compiledType);
         } catch (CompilerException e) {
@@ -91,7 +92,7 @@ public class ConstraintCompiler {
         return Tuple2.of(compiler, compiledBaseType);
     }
 
-    private ConstraintDefinition compileConstraintAux(CompiledType compiledType) {
+    private Optional<ConstraintDefinition> compileConstraintAux(CompiledType compiledType) {
         var compilerAndType = getCompilerAndType(compiledType);
 
         return compilerAndType.get_1().compileComponentConstraints(compiledType.getType(), compilerAndType.get_2());

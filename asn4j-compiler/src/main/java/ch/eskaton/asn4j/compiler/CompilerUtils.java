@@ -345,7 +345,7 @@ public class CompilerUtils {
             if (componentType.getConstraints() != null) {
                 var constraintDef = ctx.compileConstraint(componentName, compiledComponent);
 
-                compiledComponent.setConstraintDefinition(constraintDef);
+                compiledComponent.setConstraintDefinition(constraintDef.orElse(null));
 
                 hasComponentConstraint.set(true);
             }

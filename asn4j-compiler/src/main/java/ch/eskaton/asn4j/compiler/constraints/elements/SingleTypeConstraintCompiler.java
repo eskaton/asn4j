@@ -34,7 +34,6 @@ import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleTypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Optional;
 
@@ -48,12 +47,12 @@ public class SingleTypeConstraintCompiler implements ElementsCompiler<SingleType
 
     @Override
     public Node compile(CompiledType baseType, SingleTypeConstraint elements, Optional<Bounds> bounds) {
-        Type componentType = ((CollectionOfType) baseType.getType()).getType();
+        var componentType = ((CollectionOfType) baseType.getType()).getType();
+        var maybeDefinition = ctx.compileConstraint(ctx.getCompiledType(componentType));
+        ConstraintDefinition definition;
 
-        ConstraintDefinition definition = ctx.compileConstraint(ctx.getCompiledType(componentType));
-
-        if (definition != null) {
-            definition = definition.serialApplication(
+        if (maybeDefinition.isPresent()) {
+            definition = maybeDefinition.get().serialApplication(
                     ctx.compileConstraint(componentType, elements.getConstraint()));
         } else {
             definition = ctx.compileConstraint(componentType, elements.getConstraint());

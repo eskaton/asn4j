@@ -77,12 +77,12 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         generateJavaClass(javaClass, name, compiledType);
 
-        if (node.hasConstraint()) {
-            var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
+        var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
-            compiledType.setConstraintDefinition(constraintDef.get_1());
+        compiledType.setConstraintDefinition(constraintDef.map(Tuple2::get_1).orElse(null));
 
-            javaClass.addModule(ctx, constraintDef.get_2());
+        if (constraintDef.isPresent()) {
+            javaClass.addModule(ctx, constraintDef.get().get_2());
             javaClass.addImport(ConstraintViolatedException.class);
         }
 
