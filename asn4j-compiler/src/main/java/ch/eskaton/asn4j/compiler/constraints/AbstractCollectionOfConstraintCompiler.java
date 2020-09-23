@@ -101,32 +101,36 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    ConstraintDefinition compileComponentConstraints(Type node, CompiledType baseType) {
-        ConstraintDefinition constraintDefinition = super.compileComponentConstraints(node, baseType);
-        CollectionOfType collectionOfType = (CollectionOfType) baseType.getType();
+    Optional<ConstraintDefinition> compileComponentConstraints(Type node, CompiledType compiledBaseType) {
+        var maybeConstraintDefinition = super.compileComponentConstraints(node, compiledBaseType);
+        var collectionOfType = (CollectionOfType) compiledBaseType.getType();
 
         if (collectionOfType.hasElementConstraint()) {
-            if (constraintDefinition == null) {
-                constraintDefinition = new ConstraintDefinition();
+            var constraintDefinition = maybeConstraintDefinition.orElse(new ConstraintDefinition());
+            var contentType = collectionOfType.getType();
+            var compiledType = ctx.getCompiledType(contentType);
+            var maybeComponentDefinition = ctx.compileConstraint(compiledType);
+
+            if (maybeComponentDefinition.isPresent()) {
+                var componentDefinition = maybeComponentDefinition.get();
+
+                if (componentDefinition.getRoots() != null) {
+                    var roots = new WithComponentNode(contentType, componentDefinition.getRoots());
+
+                    componentDefinition.setRoots(roots);
+                }
+
+                if (componentDefinition.getExtensions() != null) {
+                    var extensions = new WithComponentNode(contentType, componentDefinition.getExtensions());
+
+                    componentDefinition.setExtensions(extensions);
+                }
+
+                return Optional.ofNullable(constraintDefinition.serialApplication(componentDefinition));
             }
-
-            ConstraintDefinition componentDefinition = ctx
-                    .compileConstraint(ctx.getCompiledType(((CollectionOfType) baseType.getType()).getType()));
-
-            if (componentDefinition.getRoots() != null) {
-                componentDefinition
-                        .setRoots(new WithComponentNode(collectionOfType.getType(), componentDefinition.getRoots()));
-            }
-
-            if (componentDefinition.getExtensions() != null) {
-                componentDefinition.setExtensions(
-                        new WithComponentNode(collectionOfType.getType(), componentDefinition.getRoots()));
-            }
-
-            constraintDefinition = constraintDefinition.serialApplication(componentDefinition);
         }
 
-        return constraintDefinition;
+        return maybeConstraintDefinition;
     }
 
     @Override

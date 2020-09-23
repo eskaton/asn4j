@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
+import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
@@ -84,14 +85,15 @@ public abstract class AbstractMultipleTypeConstraintsCompiler implements Element
                 .map(PresenceConstraint::getType).orElse(null);
         var maybeValueConstraint = Optional.ofNullable(constraint.getValue())
                 .map(ValueConstraint::getConstraint);
-        var definition = ctx.compileConstraint(compiledType);
+        var maybeDefinition = ctx.compileConstraint(compiledType);
         Node roots = null;
 
         if (maybeValueConstraint.isPresent()) {
             var valueConstraint = maybeValueConstraint.get();
+            ConstraintDefinition definition;
 
-            if (definition != null) {
-                definition = definition.serialApplication(ctx.compileConstraint(compiledType, valueConstraint));
+            if (maybeDefinition.isPresent()) {
+                definition = maybeDefinition.get().serialApplication(ctx.compileConstraint(compiledType, valueConstraint));
             } else {
                 definition = ctx.compileConstraint(compiledType, valueConstraint);
             }

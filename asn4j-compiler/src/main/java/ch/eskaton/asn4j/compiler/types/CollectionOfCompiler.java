@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -58,12 +59,12 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
         compiledType.setContentType(contentType);
         compiledType.setTags(tags);
 
-        if (node.hasAnyConstraint()) {
-            var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
+        var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
-            compiledType.setConstraintDefinition(constraintDef.get_1());
+        compiledType.setConstraintDefinition(constraintDef.map(Tuple2::get_1).orElse(null));
 
-            javaClass.addModule(ctx, constraintDef.get_2());
+        if (constraintDef.isPresent()) {
+            javaClass.addModule(ctx, constraintDef.get().get_2());
             javaClass.addImport(ConstraintViolatedException.class);
         }
 

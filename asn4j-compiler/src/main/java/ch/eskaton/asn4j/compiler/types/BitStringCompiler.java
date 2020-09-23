@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.Optional;
 
@@ -87,12 +88,12 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
         compiledType.setTags(tags);
 
-        if (node.hasConstraint()) {
-            var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
+        var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
-            compiledType.setConstraintDefinition(constraintDef.get_1());
+        compiledType.setConstraintDefinition(constraintDef.map(Tuple2::get_1).orElse(null));
 
-            javaClass.addModule(ctx, constraintDef.get_2());
+        if (constraintDef.isPresent()) {
+            javaClass.addModule(ctx, constraintDef.get().get_2());
             javaClass.addImport(ConstraintViolatedException.class);
         }
 

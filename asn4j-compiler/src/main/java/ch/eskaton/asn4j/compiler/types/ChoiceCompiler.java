@@ -46,6 +46,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,13 +115,12 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
         compiledType.getComponents().addAll(components);
 
         var hasComponentConstraint = CompilerUtils.compileComponentConstraints(ctx, compiledType);
+        var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
-        if (node.hasConstraint() || hasComponentConstraint) {
-            var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
+        compiledType.setConstraintDefinition(constraintDef.map(Tuple2::get_1).orElse(null));
 
-            compiledType.setConstraintDefinition(constraintDef.get_1());
-
-            javaClass.addModule(ctx, constraintDef.get_2());
+        if (constraintDef.isPresent()) {
+            javaClass.addModule(ctx, constraintDef.get().get_2());
             javaClass.addImport(ConstraintViolatedException.class);
         }
 
