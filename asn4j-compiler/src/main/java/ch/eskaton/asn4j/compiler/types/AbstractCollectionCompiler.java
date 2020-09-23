@@ -40,6 +40,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.ArrayList;
@@ -82,9 +83,12 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         var hasComponentConstraint = CompilerUtils.compileComponentConstraints(ctx, compiledType);
 
         if (node.hasConstraint() || hasComponentConstraint) {
-            var constraintDef = ctx.compileConstraint(javaClass, name, compiledType);
+            var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
-            compiledType.setConstraintDefinition(constraintDef);
+            compiledType.setConstraintDefinition(constraintDef.get_1());
+
+            javaClass.addModule(ctx, constraintDef.get_2());
+            javaClass.addImport(ConstraintViolatedException.class);
         }
 
         ctx.finishClass();

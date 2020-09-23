@@ -32,11 +32,9 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.Optional;
@@ -52,19 +50,18 @@ public class ConstraintCompiler {
         this.ctx = ctx;
     }
 
-    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, CompiledType compiledType) {
+    public Tuple2<ConstraintDefinition, Module> compileConstraintAndModule(String name, CompiledType compiledType) {
         var definition = compileConstraint(name, compiledType);
 
         if (definition != null) {
-            Module module = new Module();
+            var module = new Module();
 
             addConstraint(compiledType, module, definition);
 
-            javaClass.addModule(ctx, module);
-            javaClass.addImport(ConstraintViolatedException.class);
+            return Tuple2.of(definition, module);
         }
 
-        return definition;
+        return null;
     }
 
     public ConstraintDefinition compileConstraint(String name, CompiledType compiledType) {

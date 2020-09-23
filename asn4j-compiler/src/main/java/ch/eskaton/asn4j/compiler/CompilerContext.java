@@ -112,6 +112,7 @@ import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
+import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.io.File;
@@ -636,8 +637,8 @@ public class CompilerContext {
         return constraintCompiler.buildExpression(module, compiledType, node);
     }
 
-    public ConstraintDefinition compileConstraint(JavaClass javaClass, String name, CompiledType compiledType) {
-        return constraintCompiler.compileConstraint(javaClass, name, compiledType);
+    public Tuple2<ConstraintDefinition, Module> compileConstraintAndModule(String name, CompiledType compiledType) {
+        return constraintCompiler.compileConstraintAndModule(name, compiledType);
     }
 
     public ConstraintDefinition compileConstraint(String name, CompiledType compiledType) {
