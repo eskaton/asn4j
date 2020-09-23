@@ -37,7 +37,7 @@ import java.io.IOException;
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.getCompiledValue;
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.testModule;
 
-public class EnumeratedValueCompilerTest {
+class EnumeratedValueCompilerTest {
 
     private static final String MODULE_NAME = "TEST-MODULE";
 

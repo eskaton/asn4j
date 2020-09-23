@@ -39,7 +39,7 @@ import static ch.eskaton.asn4j.compiler.CompilerTestUtils.testModule;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BitStringValueCompilerTest {
+class BitStringValueCompilerTest {
 
     private static final String MODULE_NAME = "TEST-MODULE";
 

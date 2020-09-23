@@ -767,7 +767,8 @@ public class CompilerContext {
     }
 
     public CompiledValue getCompiledValue(String moduleName, String reference) {
-        return getCompilationResult(reference, Optional.ofNullable(moduleName), "Value", () -> getValuesOfModule(moduleName),
+        return getCompilationResult(reference, Optional.ofNullable(moduleName), "Value",
+                () -> getValuesOfModule(moduleName),
                 (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, mod)),
                 this::getValuesOfModule);
     }
@@ -778,7 +779,7 @@ public class CompilerContext {
 
     public <V extends Value> CompiledValue<V> getCompiledValue(Type type, Value value,
             Optional<Parameters> maybeParameters) {
-        return (CompiledValue<V>) new ValueCompiler().compile(this, null, type, value, maybeParameters);
+        return new ValueCompiler().compile(this, null, type, value, maybeParameters);
     }
 
     public <V extends Value> V getValue(Type type, Value value) {
@@ -791,7 +792,7 @@ public class CompilerContext {
         var value = compiledValue.getValue();
 
         if (value.getClass().isAssignableFrom(valueClass)) {
-            return (CompiledValue<V>) compiledValue;
+            return compiledValue;
         }
 
         throw new ValueResolutionException(definedValue.getPosition(), "Failed to resolve reference %s.", definedValue);

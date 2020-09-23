@@ -40,7 +40,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.MatchesPattern.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class BMPStringValueCompilerTest {
+class BMPStringValueCompilerTest {
 
     @Test
     void testResolveCStringValue() throws IOException, ParserException {
