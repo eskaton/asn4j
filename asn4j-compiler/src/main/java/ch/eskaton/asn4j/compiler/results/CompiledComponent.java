@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.compiler.results;
 
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public class CompiledComponent {
+public class CompiledComponent implements CompilationResult {
 
     private String name;
 
