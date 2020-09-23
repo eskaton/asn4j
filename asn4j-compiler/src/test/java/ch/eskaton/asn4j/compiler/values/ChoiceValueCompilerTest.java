@@ -41,7 +41,7 @@ import static ch.eskaton.asn4j.compiler.CompilerTestUtils.testModule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class ChoiceValueCompilerTest {
+class ChoiceValueCompilerTest {
 
     private static final String MODULE_NAME = "TEST-MODULE";
 

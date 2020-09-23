@@ -42,6 +42,7 @@ public abstract class AbstractOIDOrIRIValueCompiler<V extends Value> extends Abs
         super(typeName, valueClass);
     }
 
+    @Override
     public V doCompile(CompilerContext ctx, CompiledType compiledType, Value value,
             Optional<Parameters> maybeParameters) {
         var valueClass = getValueClass();

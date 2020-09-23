@@ -40,7 +40,7 @@ import static ch.eskaton.asn4j.compiler.CompilerTestUtils.testModule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class CollectionOfValueCompilerTest {
+class CollectionOfValueCompilerTest {
 
     @Test
     void testCollectionOfValue() throws IOException, ParserException {

@@ -29,11 +29,9 @@ package ch.eskaton.asn4j.compiler.types;
 
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
 public class SequenceCompiler extends AbstractCollectionCompiler<SequenceType> {
 

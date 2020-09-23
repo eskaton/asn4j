@@ -38,7 +38,7 @@ import static ch.eskaton.asn4j.compiler.CompilerTestUtils.getCompiledValue;
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.testModule;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BooleanValueCompilerTest {
+class BooleanValueCompilerTest {
 
     private static final String MODULE_NAME = "TEST-MODULE";
 
