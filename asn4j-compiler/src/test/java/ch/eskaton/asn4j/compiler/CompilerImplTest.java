@@ -317,7 +317,7 @@ class CompilerImplTest {
                 """;
         testModule(body, CompilerException.class, ".*Invalid BOOLEAN value: 25.*");
     }
-    
+
     @Test
     void testSequenceWithDefaultInvalidReference() {
         var body = """

@@ -48,7 +48,6 @@ public class CompiledType implements CompilationResult {
 
     private Optional<ConstraintDefinition> constraintDefinition = Optional.empty();
 
-
     CompiledType(Type type, String name) {
         this.type = type;
         this.name = name;

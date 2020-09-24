@@ -664,9 +664,13 @@ public class CompilerContext {
         constraintCompiler.addConstraint(compiledType, module, definition);
     }
 
-    public CompiledValue<Value> compileDefault(JavaClass javaClass, String field, String typeName, Type type,
-            Value value, Optional<Parameters> maybeParameters) {
-        return defaultsCompiler.compileDefault(javaClass, field, typeName, type, value, maybeParameters);
+    public CompiledValue<Value> compileDefault(Type type, Value value, Optional<Parameters> maybeParameters) {
+        return defaultsCompiler.compileDefault(type, value, maybeParameters);
+    }
+
+    public void addDefaultField(CompilerContext ctx, JavaClass javaClass, String field, String typeName,
+            CompiledValue compiledValue) {
+        defaultsCompiler.addDefaultField(ctx, javaClass, field, typeName, compiledValue);
     }
 
     public CompiledCollectionType getCompiledCollectionType(CompiledType compiledType) {

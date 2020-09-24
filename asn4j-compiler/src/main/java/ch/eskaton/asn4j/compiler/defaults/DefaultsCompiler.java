@@ -48,13 +48,12 @@ public class DefaultsCompiler {
         this.ctx = ctx;
     }
 
-    public <V extends Value> CompiledValue<Value> compileDefault(JavaClass clazz, String field, String typeName,
-            Type type, V value, Optional<Parameters> maybeParameters) {
-        var compiledBaseType = ctx.getCompiledBaseType(type);
-        var compiler = ctx.getDefaultCompiler(compiledBaseType.getType().getClass());
+    public <V extends Value> CompiledValue<Value> compileDefault(Type type, V value,
+            Optional<Parameters> maybeParameters) {
+        var compiler = getDefaultCompiler(type);
 
         try {
-            return compiler.compileDefault(ctx, clazz, field, typeName, type, value, maybeParameters);
+            return compiler.compileDefault(ctx, type, value, maybeParameters);
         } catch (CompilerException e) {
             var formattedType = TypeFormatter.formatType(ctx, type);
             var formattedValue = ValueFormatter.formatValue(value);
@@ -62,6 +61,19 @@ public class DefaultsCompiler {
             throw new CompilerException(value.getPosition(), "Failed to compile default value '%s' for type %s: %s",
                     e, formattedValue, formattedType, e.getMessage());
         }
+    }
+
+    private AbstractDefaultCompiler<Value> getDefaultCompiler(Type type) {
+        var compiledBaseType = ctx.getCompiledBaseType(type);
+
+        return ctx.getDefaultCompiler(compiledBaseType.getType().getClass());
+    }
+
+    public void addDefaultField(CompilerContext ctx, JavaClass javaClass, String field, String typeName,
+            CompiledValue compiledValue) {
+        var compiler = getDefaultCompiler(compiledValue.getCompiledType().getType());
+
+        compiler.addDefaultField(ctx, javaClass, field, typeName, compiledValue);
     }
 
 }
