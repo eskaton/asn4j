@@ -148,6 +148,8 @@ public class CompilerContext {
 
     private Deque<JavaClass> currentClass = new LinkedList<>();
 
+    private Deque<Type> currentType = new LinkedList<>();
+
     private Map<String, JavaStructure> structs = new HashMap<>();
 
     private Map<String, ModuleNode> modules = new HashMap<>();
@@ -693,6 +695,18 @@ public class CompilerContext {
         }
     }
 
+    public <T> T withNewType(Supplier<T> supplier) {
+        Deque<Type> oldType = currentType;
+
+        try {
+            currentType = new LinkedList<>();
+
+            return supplier.get();
+        } finally {
+            currentType = oldType;
+        }
+    }
+
     public CompiledBuiltinType getCompiledBuiltinType(Class<? extends Type> typeClass) {
         if (isBuiltin(typeClass)) {
             var type = getInstance(typeClass,
@@ -774,7 +788,7 @@ public class CompilerContext {
     }
 
     public <V extends Value> CompiledValue<V> getCompiledValue(Type type, Value value) {
-        return (CompiledValue<V>) getCompiledValue(type, value, Optional.empty());
+        return getCompiledValue(type, value, Optional.empty());
     }
 
     public <V extends Value> CompiledValue<V> getCompiledValue(Type type, Value value,
@@ -1273,17 +1287,33 @@ public class CompilerContext {
             throw new IllegalCompilerStateException("Constructor %s threw an exception", e, compiledTypeClass);
         }
 
+        compiledType.setTags(CompilerUtils.getTagIds(this, type));
+
         if (!isSubType && isTopLevelType()) {
             addType(name, compiledType);
         }
 
-        compiledType.setTags(CompilerUtils.getTagIds(this, type));
-
         return compiledType;
     }
 
+    public void startType(Type type) {
+        currentType.push(type);
+    }
+
+    public void finishType(Type type) {
+        if (!currentType.isEmpty()) {
+            var typeToFinish = currentType.pop();
+
+            if (typeToFinish.equals(type)) {
+                return;
+            }
+        }
+
+        throw new IllegalCompilerStateException(type.getPosition(), "Tried to finish an unexpected type: %s", type);
+    }
+
     private boolean isTopLevelType() {
-        return currentClass.size() == 1;
+        return currentType.size() == 1;
     }
 
     public CompiledValue createCompiledValue(CompiledType type, Value value) {
