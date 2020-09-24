@@ -48,8 +48,8 @@ public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompile
     }
 
     @Override
-    public CompiledValue<V> compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
-            V value, Optional<Parameters> maybeParameters) {
+    public CompiledValue<V> compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName,
+            Type type, V value, Optional<Parameters> maybeParameters) {
         var valueToResolve = (Value) value;
 
         if (value instanceof SimpleDefinedValue simpleDefinedValue && maybeParameters.isPresent()) {
@@ -57,7 +57,8 @@ public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompile
         }
 
         var compiledValue = ctx.<V>getCompiledValue(type, valueToResolve);
-        var initializerString = getInitializerString(ctx, typeName, compiledValue.getCompiledType().getType(), compiledValue.getValue());
+        var initializerString = getInitializerString(ctx, typeName, compiledValue.getCompiledType().getType(),
+                compiledValue.getValue());
         var defaultField = addDefaultField(clazz, typeName, field);
 
         clazz.addInitializer(new JavaInitializer(String.format("\t\t%s = %s;", defaultField, initializerString)));
