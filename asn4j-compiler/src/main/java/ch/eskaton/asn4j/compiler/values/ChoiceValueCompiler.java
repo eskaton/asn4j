@@ -62,7 +62,7 @@ public class ChoiceValueCompiler extends AbstractValueCompiler<ChoiceValue> {
         if (valueType != null) {
             // if the type is null, the value is defined in the context of the currently compiled CHOICE,
             // otherwise it must match the type of the latter
-            checkTypes(ctx, resolvedType, ctx.resolveSelectedType(valueType));
+            checkTypes(ctx, resolvedType, ctx.getCompiledType(valueType).getType());
         }
 
         var maybeNamedType = choiceType.getAllAlternatives().stream()

@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaInitializer;
+import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -47,7 +48,7 @@ public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompile
     }
 
     @Override
-    public void compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
+    public CompiledValue<V> compileDefault(CompilerContext ctx, JavaClass clazz, String field, String typeName, Type type,
             V value, Optional<Parameters> maybeParameters) {
         var valueToResolve = (Value) value;
 
@@ -55,12 +56,15 @@ public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompile
             valueToResolve = ctx.getValueParameter(maybeParameters.get(), simpleDefinedValue).orElse(value);
         }
 
-        var initializerString = getInitializerString(ctx, typeName, type, valueToResolve);
+        var compiledValue = ctx.<V>getCompiledValue(type, valueToResolve);
+        var initializerString = getInitializerString(ctx, typeName, compiledValue.getCompiledType().getType(), compiledValue.getValue());
         var defaultField = addDefaultField(clazz, typeName, field);
 
         clazz.addInitializer(new JavaInitializer(String.format("\t\t%s = %s;", defaultField, initializerString)));
 
         addImports(clazz);
+
+        return compiledValue;
     }
 
     @Override

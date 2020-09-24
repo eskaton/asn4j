@@ -46,9 +46,7 @@ public abstract class ByteStringDefaultCompiler<V extends ByteStringValue> exten
             return getEmptyValueInitializer(typeName);
         }
 
-        V resolvedValue = (V) ctx.getValue(type, value);
-
-        return JavaUtils.getInitializerString(ctx, typeName, resolvedValue);
+        return JavaUtils.getInitializerString(ctx, typeName, value);
     }
 
     protected abstract String getEmptyValueInitializer(String typeName);
