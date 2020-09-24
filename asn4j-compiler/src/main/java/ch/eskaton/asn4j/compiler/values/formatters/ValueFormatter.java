@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.parser.ast.Tuple;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
@@ -70,6 +71,7 @@ public class ValueFormatter {
         addCase(BooleanValue.class, new BooleanValueFormatter()::format);
         addCase(CollectionOfValue.class, new CollectionOfValueFormatter()::format);
         addCase(CollectionValue.class, new CollectionValueFormatter()::format);
+        addCase(ChoiceValue.class, new ChoiceValueFormatter()::format);
         addCase(EnumeratedValue.class, new EnumeratedValueFormatter()::format);
         addCase(ExternalValueReference.class, new ExternalValueReferenceFormatter()::format);
         addCase(HasStringValue.class, new HasStringValueFormatter()::format);
