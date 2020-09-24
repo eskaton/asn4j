@@ -27,7 +27,10 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.utils.ToString;
+
+import java.util.Optional;
 
 public class CompiledCollectionComponent extends CompiledComponent {
 
@@ -35,7 +38,10 @@ public class CompiledCollectionComponent extends CompiledComponent {
 
     private boolean root;
 
-    public CompiledCollectionComponent(String name, CompiledType compiledType, boolean optional, boolean root) {
+    private Optional<CompiledValue<Value>> defaultValue = Optional.empty();
+
+    public CompiledCollectionComponent(String name, CompiledType compiledType, boolean optional,
+            boolean root) {
         super(name, compiledType);
 
         this.optional = optional;
@@ -48,6 +54,14 @@ public class CompiledCollectionComponent extends CompiledComponent {
 
     public boolean isRoot() {
         return root;
+    }
+
+    public void setDefault(Optional<CompiledValue<Value>> defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public Optional<CompiledValue<Value>> getDefaultValue() {
+        return defaultValue;
     }
 
     @Override

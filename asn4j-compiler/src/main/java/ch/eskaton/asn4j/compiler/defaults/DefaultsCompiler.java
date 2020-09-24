@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -47,13 +48,13 @@ public class DefaultsCompiler {
         this.ctx = ctx;
     }
 
-    public <V extends Value> void compileDefault(JavaClass clazz, String field, String typeName, Type type, V value,
-            Optional<Parameters> maybeParameters) {
+    public <V extends Value> CompiledValue<Value> compileDefault(JavaClass clazz, String field, String typeName,
+            Type type, V value, Optional<Parameters> maybeParameters) {
         var compiledBaseType = ctx.getCompiledBaseType(type);
         var compiler = ctx.getDefaultCompiler(compiledBaseType.getType().getClass());
 
         try {
-            compiler.compileDefault(ctx, clazz, field, typeName, type, value, maybeParameters);
+            return compiler.compileDefault(ctx, clazz, field, typeName, type, value, maybeParameters);
         } catch (CompilerException e) {
             var formattedType = TypeFormatter.formatType(ctx, type);
             var formattedValue = ValueFormatter.formatValue(value);

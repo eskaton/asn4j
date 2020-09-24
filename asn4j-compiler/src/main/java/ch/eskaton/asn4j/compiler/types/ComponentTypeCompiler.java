@@ -34,10 +34,12 @@ import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.UnNamedCompiler;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
@@ -49,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 
 import java.util.ArrayList;
@@ -86,7 +89,6 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         var compiledComponent = ctx.defineType(namedType, maybeParameters);
         var typeName = compiledComponent.getName();
         var field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
-        var compAnnotation = new JavaAnnotation(ASN1Component.class);
 
         compiledComponent.setParent(compiledType);
 
@@ -94,6 +96,13 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
                 isOptional, isRoot);
 
         compiledType.getComponents().add(compiledCollectionComponent);
+
+        var maybeDefaultValue = getDefaultValue(ctx, component, maybeParameters, javaClass, compiledComponent,
+                typeName, field);
+
+        compiledCollectionComponent.setDefault(maybeDefaultValue);
+
+        var compAnnotation = new JavaAnnotation(ASN1Component.class);
 
         if (isOptional) {
             compAnnotation.addParameter("optional", "true");
@@ -103,9 +112,6 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             if (type instanceof Choice) {
                 javaClass.addStaticImport(ch.eskaton.commons.utils.Utils.class, "with");
             }
-
-            ctx.compileDefault(javaClass, field.getName(), typeName, compiledComponent.getType(), component.getValue(),
-                    maybeParameters);
         }
 
         field.addAnnotation(compAnnotation);
@@ -119,6 +125,21 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         javaClass.addField(field);
 
         return List.of(compiledCollectionComponent);
+    }
+
+    private Optional<CompiledValue<Value>> getDefaultValue(CompilerContext ctx, ComponentType component,
+            Optional<Parameters> maybeParameters, JavaClass javaClass, CompiledType compiledComponent, String typeName,
+            JavaDefinedField field) {
+        var hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
+
+        if (hasDefault) {
+            var defaultValue = ctx.compileDefault(javaClass, field.getName(), typeName, compiledComponent.getType(),
+                    component.getValue(), maybeParameters);
+
+            return Optional.of(defaultValue);
+        }
+
+        return Optional.empty();
     }
 
     private List<CompiledCollectionComponent> compileComponentType(CompilerContext ctx,
