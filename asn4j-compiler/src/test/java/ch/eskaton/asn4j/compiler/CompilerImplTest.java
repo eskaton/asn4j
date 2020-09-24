@@ -74,6 +74,7 @@ import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
+import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
@@ -284,6 +285,27 @@ class CompilerImplTest {
         var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq");
 
         assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledCollectionType = (CompiledCollectionType) compiledType;
+        var field = compiledCollectionType.getComponents().stream()
+                .filter(c -> c.getName().equals("choice"))
+                .findFirst();
+
+        assertTrue(field.isPresent());
+
+        var defaultValue = field.get().getDefaultValue();
+
+        assertTrue(defaultValue.isPresent());
+
+        var value = defaultValue.get().getValue();
+
+        assertTrue(value instanceof ChoiceValue);
+
+        var choiceValue = (ChoiceValue) value;
+
+        assertEquals("a", choiceValue.getId());
+        assertTrue(choiceValue.getValue() instanceof IntegerValue);
     }
 
     @SuppressWarnings("unused")
