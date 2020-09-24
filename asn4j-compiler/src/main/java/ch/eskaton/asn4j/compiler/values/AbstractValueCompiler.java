@@ -98,13 +98,13 @@ public abstract class AbstractValueCompiler<V extends Value> implements Compiler
         var resolvedType = ctx.getCompiledBaseType(resolvedValue.getCompiledType()).getType();
 
         if (!resolvedType.getClass().isAssignableFrom(expectedType.getClass())) {
-            // TODO format definedValue
             var formattedExpectedType = TypeFormatter.formatType(ctx, expectedType);
             var formattedResolvedType = TypeFormatter.formatType(ctx, resolvedType);
+            var formattedDefinedValue = ValueFormatter.formatValue(definedValue);
 
             throw new ValueResolutionException(definedValue.getPosition(),
                     "Expected a value of type %s but '%s' refers to a value of type %s",
-                    formattedExpectedType, definedValue, formattedResolvedType);
+                    formattedExpectedType, formattedDefinedValue, formattedResolvedType);
         }
 
         return (V) resolvedValue.getValue();
