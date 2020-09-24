@@ -40,7 +40,13 @@ class BitStringFormatter implements Formatter<BitString> {
 
     @Override
     public String format(CompilerContext ctx, BitString type) {
-        return getTypeName() + "(" + formatItems(type) + ")";
+        var formatItems = formatItems(type);
+
+        if (formatItems.isEmpty()) {
+            return getTypeName();
+        }
+
+        return getTypeName() + "(" + formatItems + ")";
     }
 
     @Override
