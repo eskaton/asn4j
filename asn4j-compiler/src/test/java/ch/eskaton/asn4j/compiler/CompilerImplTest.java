@@ -308,6 +308,29 @@ class CompilerImplTest {
         assertTrue(choiceValue.getValue() instanceof IntegerValue);
     }
 
+    @Test
+    void testSequenceWithDefaultInvalidValue() {
+        var body = """
+                Seq ::= SEQUENCE {
+                    field BOOLEAN DEFAULT 25
+                }
+                """;
+        testModule(body, CompilerException.class, ".*Invalid BOOLEAN value: 25.*");
+    }
+    
+    @Test
+    void testSequenceWithDefaultInvalidReference() {
+        var body = """
+                int INTEGER ::= 25
+                                
+                Seq ::= SEQUENCE {
+                    field BOOLEAN DEFAULT int
+                }
+                """;
+        testModule(body, CompilerException.class,
+                ".*Expected a value of type BOOLEAN but 'int' refers to a value of type INTEGER.*");
+    }
+
     @SuppressWarnings("unused")
     @ParameterizedTest(name = "[{index}] {3}")
     @MethodSource("provideInvalidTypesInConstraintsArguments")
