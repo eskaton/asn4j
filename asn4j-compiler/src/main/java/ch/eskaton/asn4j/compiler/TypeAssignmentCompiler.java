@@ -37,13 +37,13 @@ import java.util.Optional;
 public class TypeAssignmentCompiler implements Compiler<TypeAssignmentNode> {
 
     public CompiledType compile(CompilerContext ctx, TypeAssignmentNode node) {
-        String typeName = node.getReference();
+        var typeName = node.getReference();
 
         System.out.println("Compiling type " + typeName);
 
-        TypeCompiler compiler = ctx.getCompiler(Type.class);
+        var compiler = ctx.<Type, TypeCompiler>getCompiler(Type.class);
 
-        return compiler.compile(ctx, typeName, node.getType(), Optional.empty());
+        return ctx.withNewType(() -> compiler.compile(ctx, typeName, node.getType(), Optional.empty()));
     }
 
 }

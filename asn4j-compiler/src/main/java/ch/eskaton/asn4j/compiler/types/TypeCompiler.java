@@ -39,8 +39,15 @@ public class TypeCompiler implements NamedCompiler<Type, CompiledType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, Type type, Optional<Parameters> maybeParameters) {
-        return ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass())
-                .compile(ctx, name, type, maybeParameters);
+        var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
+
+        try {
+            ctx.startType(type);
+
+            return compiler.compile(ctx, name, type, maybeParameters);
+        } finally {
+            ctx.finishType(type);
+        }
     }
 
 }

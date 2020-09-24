@@ -59,11 +59,13 @@ public class SelectionTypeCompiler implements NamedCompiler<SelectionType, Compi
                 Type collectionType = ((TypeAssignmentNode) assignment).getType();
 
                 if (collectionType instanceof Choice) {
-                    NamedType foundType = ((Choice) collectionType).getRootAlternatives().stream()
+                    var foundType = ((Choice) collectionType).getRootAlternatives().stream()
                             .filter(t -> t.getName().equals(selectedId))
                             .findFirst()
                             .orElseThrow(() -> new CompilerException("Selected type not found"));
-                    return ctx.<Type, TypeCompiler>getCompiler(Type.class).compile(ctx, name, foundType.getType(), Optional.empty());
+                    var compiler = ctx.<Type, TypeCompiler>getCompiler(Type.class);
+
+                    return ctx.withNewType(() -> compiler.compile(ctx, name, foundType.getType(), Optional.empty()));
                 }
             } else {
                 throw new CompilerException(selectedType.getPosition(), "Selected type not found");
