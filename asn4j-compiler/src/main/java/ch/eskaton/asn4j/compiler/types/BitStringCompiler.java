@@ -31,13 +31,16 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.results.CompiledBitStringType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.commons.collections.Tuple2;
+import ch.eskaton.asn4j.runtime.types.ASN1NamedBitString;
 
+import java.util.HashMap;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
@@ -51,41 +54,21 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
         var javaClass = ctx.createClass(name, node, tags);
         var namedBits = node.getNamedBits();
         var uniquenessChecker = new IdentifierUniquenessChecker<>(name);
-        long msb = 0;
-
-        javaClass.setParent(ch.eskaton.asn4j.runtime.types.ASN1NamedBitString.class.getSimpleName());
+        var compiledNamedBits = new HashMap<String, Long>();
 
         if (namedBits != null && !namedBits.isEmpty()) {
-            for (NamedBitNode namedBit : namedBits) {
-                var fieldName = CompilerUtils.formatConstant(namedBit.getId());
-                long value;
-
-                if (namedBit.getRef() != null) {
-                    var compiledValue = ctx.<IntegerValue>getCompiledValue(IntegerValue.class, namedBit.getRef());
-                    var bigValue = compiledValue.getValue().getValue();
-
-                    if (bigValue.bitLength() > 63) {
-                        throw new CompilerException("Named bit '%s' too long: %s", fieldName, bigValue.toString());
-                    }
-
-                    value = bigValue.longValue();
-                } else {
-                    value = namedBit.getNum();
-                }
+            for (var namedBit : namedBits) {
+                long value = getValue(ctx, namedBit);
 
                 uniquenessChecker.add(namedBit.getId(), value);
 
-                msb = value > msb ? value : msb;
-
-                javaClass.field().modifier(PUBLIC).asStatic().asFinal().type(int.class).name(fieldName)
-                        .initializer(String.valueOf(value)).build();
+                compiledNamedBits.put(namedBit.getId(), value);
             }
         }
 
-        javaClass.method().modifier(PUBLIC).name(name).build();
+        var compiledType = ctx.createCompiledType(CompiledBitStringType.class, node, name);
 
-        var compiledType = ctx.createCompiledType(node, name);
-
+        compiledType.setNamedBits(compiledNamedBits);
         compiledType.setTags(tags);
 
         ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
@@ -93,14 +76,60 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
             compiledType.setModule(constraintAndModule.get_2());
         });
 
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
+        generateJavaClass(ctx, javaClass, compiledType);
 
         ctx.finishClass(false);
 
         return compiledType;
+    }
+
+    private void generateJavaClass(CompilerContext ctx, JavaClass javaClass, CompiledBitStringType compiledType) {
+        var name = compiledType.getName();
+        var namedBits = compiledType.getNamedBits();
+
+        javaClass.setParent(ASN1NamedBitString.class.getSimpleName());
+
+        if (namedBits.isPresent()) {
+            for (var namedBit : namedBits.get().entrySet()) {
+                var value = namedBit.getValue();
+                var fieldName = CompilerUtils.formatConstant(namedBit.getKey());
+
+                javaClass.field()
+                        .modifier(PUBLIC)
+                        .asStatic()
+                        .asFinal()
+                        .type(int.class)
+                        .name(fieldName)
+                        .initializer(String.valueOf(value))
+                        .build();
+            }
+        }
+
+        javaClass.method().modifier(PUBLIC).name(name).build();
+
+        if (compiledType.getModule().isPresent()) {
+            javaClass.addModule(ctx, compiledType.getModule().get());
+            javaClass.addImport(ConstraintViolatedException.class);
+        }
+    }
+
+    private long getValue(CompilerContext ctx, NamedBitNode namedBit) {
+        long value;
+
+        if (namedBit.getRef() != null) {
+            var compiledValue = ctx.<IntegerValue>getCompiledValue(IntegerValue.class, namedBit.getRef());
+            var bigValue = compiledValue.getValue().getValue();
+
+            if (bigValue.bitLength() > 63) {
+                throw new CompilerException("Named bit '%s' too long: %s", namedBit.getId(), bigValue.toString());
+            }
+
+            value = bigValue.longValue();
+        } else {
+            value = namedBit.getNum();
+        }
+
+        return value;
     }
 
 }
