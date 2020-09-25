@@ -29,25 +29,25 @@ package ch.eskaton.asn4j.compiler.results;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 public class CompiledIntegerType extends CompiledType {
 
-    private Optional<HashMap<String, Long>> namedNumbers;
+    private Optional<Map<String, Long>> namedNumbers;
 
     CompiledIntegerType(Type type, String name) {
         super(type, name);
     }
 
-    public void setNamedNumbers(HashMap<String, Long> namedNumbers) {
+    public void setNamedNumbers(Map<String, Long> namedNumbers) {
         this.namedNumbers = namedNumbers == null || namedNumbers.isEmpty() ?
                 Optional.empty() :
                 Optional.of(namedNumbers);
     }
 
-    public Optional<HashMap<String, Long>> getNamedNumbers() {
+    public Optional<Map<String, Long>> getNamedNumbers() {
         return namedNumbers;
     }
 

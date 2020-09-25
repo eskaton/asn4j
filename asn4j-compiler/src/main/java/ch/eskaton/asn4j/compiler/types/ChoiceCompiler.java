@@ -141,9 +141,8 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
             Optional<Parameters> maybeParameters) {
         var name = namedType.getName();
         var compiledType = ctx.defineType(namedType, maybeParameters);
-        var compiledComponent = new CompiledComponent(name, compiledType);
 
-        return compiledComponent;
+        return new CompiledComponent(name, compiledType);
     }
 
     private void addJavaField(JavaClass javaClass, String typeConstant, String beforeCode,
