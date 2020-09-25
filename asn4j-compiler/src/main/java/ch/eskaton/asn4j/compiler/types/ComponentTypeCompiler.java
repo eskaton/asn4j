@@ -44,7 +44,6 @@ import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
-import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
@@ -84,7 +83,6 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         var isOptional = component.getCompType() == CompType.NAMED_TYPE_OPT;
         var namedType = component.getNamedType();
         var compiledComponent = ctx.defineType(namedType, maybeParameters);
-        var typeName = compiledComponent.getName();
 
         compiledComponent.setParent(compiledType);
 
@@ -97,23 +95,26 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
         compiledCollectionComponent.setDefault(maybeDefaultValue);
 
-        addField(ctx, namedType, component, compiledComponent, typeName, maybeDefaultValue);
+        addField(ctx, compiledCollectionComponent);
 
         return List.of(compiledCollectionComponent);
     }
 
-    private void addField(CompilerContext ctx, NamedType namedType, ComponentType component,
-            CompiledType compiledComponent, String typeName, Optional<CompiledValue<Value>> maybeDefaultValue) {
-        var type = ctx.resolveSelectedType(namedType.getType());
-        var hasDefault = component.getCompType() == CompType.NAMED_TYPE_DEF;
-        var isOptional = component.getCompType() == CompType.NAMED_TYPE_OPT;
+    private void addField(CompilerContext ctx, CompiledCollectionComponent compiledCollectionComponent) {
+        var compiledType = compiledCollectionComponent.getCompiledType();
+        var maybeDefaultValue = compiledCollectionComponent.getDefaultValue();
+        var hasDefault = maybeDefaultValue.isPresent();
+        var isOptional = compiledCollectionComponent.isOptional();
+        var type = compiledType.getType();
         var javaClass = ctx.getCurrentClass();
-        var field = new JavaDefinedField(typeName, formatName(namedType.getName()), hasDefault);
+        var javaTypeName = compiledType.getName();
+        var javaFieldName = formatName(compiledCollectionComponent.getName());
+        var field = new JavaDefinedField(javaTypeName, javaFieldName, hasDefault);
         var compAnnotation = new JavaAnnotation(ASN1Component.class);
 
         if (isOptional) {
             compAnnotation.addParameter("optional", "true");
-        } else if (maybeDefaultValue.isPresent()) {
+        } else if (hasDefault) {
             compAnnotation.addParameter("hasDefault", "true");
 
             if (type instanceof Choice) {
@@ -122,12 +123,12 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
             var defaultValue = maybeDefaultValue.get();
 
-            ctx.addDefaultField(ctx, javaClass, field.getName(), typeName, defaultValue);
+            ctx.addDefaultField(ctx, javaClass, field.getName(), javaTypeName, defaultValue);
         }
 
         field.addAnnotation(compAnnotation);
 
-        var tags = compiledComponent.getTags();
+        var tags = compiledType.getTags();
 
         if (tags.isPresent() && !tags.get().isEmpty()) {
             field.addAnnotation(CompilerUtils.getTagsAnnotation(tags.get()));
