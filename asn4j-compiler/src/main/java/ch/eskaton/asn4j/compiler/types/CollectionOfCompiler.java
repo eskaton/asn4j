@@ -38,7 +38,6 @@ import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.LinkedList;
 import java.util.Optional;

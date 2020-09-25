@@ -29,25 +29,25 @@ package ch.eskaton.asn4j.compiler.results;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 public class CompiledBitStringType extends CompiledType {
 
-    private Optional<HashMap<String, Long>> namedBits;
+    private Optional<Map<String, Long>> namedBits;
 
     CompiledBitStringType(Type type, String name) {
         super(type, name);
     }
 
-    public void setNamedBits(HashMap<String, Long> namedBits) {
+    public void setNamedBits(Map<String, Long> namedBits) {
         this.namedBits = namedBits == null || namedBits.isEmpty() ?
                 Optional.empty() :
                 Optional.of(namedBits);
     }
 
-    public Optional<HashMap<String, Long>> getNamedBits() {
+    public Optional<Map<String, Long>> getNamedBits() {
         return namedBits;
     }
 

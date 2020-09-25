@@ -39,7 +39,6 @@ import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -68,7 +67,6 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         }
 
         var tags = CompilerUtils.getTagIds(ctx, node);
-        var javaClass = ctx.createClass(name, node, tags);
         var compiledType = ctx.createCompiledType(node, name);
 
         compiledType.setTags(tags);
@@ -77,6 +75,8 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });
+
+        var javaClass = ctx.createClass(name, node, tags);
 
         if (compiledType.getModule().isPresent()) {
             javaClass.addModule(ctx, compiledType.getModule().get());
