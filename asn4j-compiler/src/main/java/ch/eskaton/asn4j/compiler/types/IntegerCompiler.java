@@ -63,7 +63,7 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
         if (namedNumbers != null && !namedNumbers.isEmpty()) {
             for (var namedNumber : namedNumbers) {
-                var value = getBigIntegerValue(ctx, namedNumber);
+                var value = getValue(ctx, namedNumber);
                 var id = namedNumber.getId();
 
                 uniquenessChecker.add(id, value);
@@ -140,7 +140,7 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
         javaClass.addMethod(javaConstructor);
     }
 
-    private long getBigIntegerValue(CompilerContext ctx, NamedNumber namedNumber) {
+    private long getValue(CompilerContext ctx, NamedNumber namedNumber) {
         BigInteger bigValue;
 
         if (namedNumber.getRef() != null) {
