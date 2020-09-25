@@ -138,6 +138,117 @@ class CompilerImplTest {
     public static final String MODULE_NAME = "TEST-MODULE";
 
     @Test
+    void testConstraintAndModuleAbsent() throws IOException, ParserException {
+        var body = """
+                Integer ::= INTEGER
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Integer");
+
+        assertTrue(compiledType.getType() instanceof IntegerType);
+        assertTrue(compiledType.getConstraintDefinition().isEmpty());
+        assertTrue(compiledType.getModule().isEmpty());
+    }
+
+    @Test
+    void testConstraintAndModulePresent() throws IOException, ParserException {
+        var body = """
+                Integer ::= INTEGER (1..9)
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Integer");
+
+        assertTrue(compiledType.getType() instanceof IntegerType);
+        assertTrue(compiledType.getConstraintDefinition().isPresent());
+        assertTrue(compiledType.getModule().isPresent());
+    }
+
+    @Test
+    void testCollectionConstraintAndModuleAbsent() throws IOException, ParserException {
+        var body = """
+                Seq ::= SEQUENCE {
+                    a INTEGER
+                }
+                """;
+
+        var compiledType = getCompiledCollectionType(body, MODULE_NAME, "Seq");
+        var field = compiledType.getComponents().stream().filter(c -> c.getName().equals("a")).findFirst();
+
+        assertTrue(field.isPresent());
+
+        assertTrue(compiledType.getConstraintDefinition().isEmpty());
+        assertTrue(compiledType.getModule().isEmpty());
+    }
+
+    @Test
+    void testCollectionConstraintAndModulePresent() throws IOException, ParserException {
+        var body = """
+                Seq ::= SEQUENCE {
+                    a INTEGER (1..9)
+                }
+                """;
+
+        var compiledType = getCompiledCollectionType(body, MODULE_NAME, "Seq");
+        var field = compiledType.getComponents().stream().filter(c -> c.getName().equals("a")).findFirst();
+
+        assertTrue(compiledType.getConstraintDefinition().isPresent());
+        assertTrue(compiledType.getModule().isPresent());
+    }
+
+    @Test
+    void testCollectionOfConstraintAndModuleAbsent() throws IOException, ParserException {
+        var body = """
+                SeqOf ::= SEQUENCE OF INTEGER
+                """;
+
+        var compiledType = getCompiledCollectionOfType(body, MODULE_NAME, "SeqOf");
+
+        assertTrue(compiledType.getConstraintDefinition().isEmpty());
+        assertTrue(compiledType.getModule().isEmpty());
+    }
+
+    @Test
+    void testCollectionOfConstraintAndModulePresent() throws IOException, ParserException {
+        var body = """
+                SeqOf ::= SEQUENCE OF INTEGER (1..9)
+                """;
+
+        var compiledType = getCompiledCollectionOfType(body, MODULE_NAME, "SeqOf");
+
+        assertTrue(compiledType.getConstraintDefinition().isPresent());
+        assertTrue(compiledType.getModule().isPresent());
+    }
+
+    @Test
+    void testChoiceConstraintAndModuleAbsent() throws IOException, ParserException {
+        var body = """
+                Choice ::= CHOICE {
+                    a INTEGER
+                }
+                """;
+
+        var compiledType = getCompiledChoiceType(body, MODULE_NAME, "Choice");
+        var field = compiledType.getComponent("a");
+
+        assertTrue(compiledType.getConstraintDefinition().isEmpty());
+        assertTrue(compiledType.getModule().isEmpty());
+    }
+
+    @Test
+    void testChoiceConstraintAndModulePresent() throws IOException, ParserException {
+        var body = """
+                Choice ::= CHOICE {
+                    a INTEGER (1..9)
+                }
+                """;
+
+        var compiledType = getCompiledChoiceType(body, MODULE_NAME, "Choice");
+
+        assertTrue(compiledType.getConstraintDefinition().isPresent());
+        assertTrue(compiledType.getModule().isPresent());
+    }
+
+    @Test
     void testValueReference() throws IOException, ParserException {
         var body = """
                 null NULL ::= NULL
@@ -151,7 +262,7 @@ class CompilerImplTest {
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var value = ctx.getCompiledModule("TEST-MODULE").getValues().get("nullRef");
+        var value = ctx.getCompiledModule(MODULE_NAME).getValues().get("nullRef");
 
         assertNotNull(value);
         assertTrue(value.getValue() instanceof NullValue);
@@ -223,7 +334,7 @@ class CompilerImplTest {
                 Integer ::= INTEGER     
                 """;
 
-        var module1 = module("TEST-MODULE", body1);
+        var module1 = module(MODULE_NAME, body1);
         var module2 = module("OTHER-MODULE", body2);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
@@ -231,14 +342,14 @@ class CompilerImplTest {
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var value1 = ctx.getCompiledModule("TEST-MODULE").getTypes().get("MyInt1");
+        var value1 = ctx.getCompiledModule(MODULE_NAME).getTypes().get("MyInt1");
 
         assertNotNull(value1);
         assertTrue(value1.getType() instanceof ExternalTypeReference);
         assertTrue(value1.getTags().isPresent());
         assertEquals(1, value1.getTags().get().size());
 
-        var value2 = ctx.getCompiledModule("TEST-MODULE").getTypes().get("MyInt2");
+        var value2 = ctx.getCompiledModule(MODULE_NAME).getTypes().get("MyInt2");
 
         assertNotNull(value2);
         assertTrue(value2.getType() instanceof ExternalTypeReference);
@@ -275,16 +386,8 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         var compiledCollectionType = (CompiledCollectionType) compiledType;
@@ -357,16 +460,8 @@ class CompilerImplTest {
                 }
                 """.formatted(typeName);
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         var compiledSequence = (CompiledCollectionType) compiledType;
@@ -403,14 +498,14 @@ class CompilerImplTest {
                 }
                 """.formatted(prefixedType);
 
-        var module = module("TEST-MODULE", body, implicit);
+        var module = module(MODULE_NAME, body, implicit);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
+        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq");
 
         assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
@@ -501,14 +596,14 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
+        var module = module(MODULE_NAME, body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq2");
+        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq2");
 
         assertTrue(compiledType instanceof CompiledCollectionType);
 
@@ -534,14 +629,14 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
+        var module = module(MODULE_NAME, body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
+        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq");
 
         assertTrue(compiledType instanceof CompiledCollectionType);
 
@@ -664,14 +759,14 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
+        var module = module(MODULE_NAME, body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
+        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
 
         assertNotNull(objectSet);
         assertEquals(1, objectSet.getValues().size());
@@ -706,14 +801,14 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
+        var module = module(MODULE_NAME, body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
+        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
 
         assertNotNull(objectSet);
         assertEquals(2, objectSet.getValues().size());
@@ -735,16 +830,8 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "TestSequence");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("TestSequence");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         var compiledSequence = (CompiledCollectionType) compiledType;
@@ -795,16 +882,8 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "TestSequence");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("TestSequence");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         var compiledSequence = (CompiledCollectionType) compiledType;
@@ -1074,14 +1153,14 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
+        var module = module(MODULE_NAME, body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
+        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
 
         assertNotNull(objectSet);
         assertEquals(2, objectSet.getValues().size());
@@ -1100,14 +1179,14 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
+        var module = module(MODULE_NAME, body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
+        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
 
         assertNotNull(objectSet);
         assertEquals(1, objectSet.getValues().size());
@@ -1140,14 +1219,14 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module("TEST-MODULE", body);
+        var module = module(MODULE_NAME, body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule("TEST-MODULE").getObjectSets().get("TestSet");
+        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
 
         assertNotNull(objectSet);
         assertEquals(1, objectSet.getValues().size());
@@ -1654,16 +1733,8 @@ class CompilerImplTest {
                    Seq ::= AbstractSeq {BOOLEAN}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         testCollectionField((CompiledCollectionType) compiledType, "field", BooleanType.class);
@@ -1685,16 +1756,8 @@ class CompilerImplTest {
                    Seq ::= AbstractSeq {BOOLEAN, TestSequence}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
@@ -1715,16 +1778,8 @@ class CompilerImplTest {
                    Seq ::= AbstractSeq {BOOLEAN, INTEGER}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Seq");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         var collection = (CompiledCollectionType) compiledType;
@@ -1779,16 +1834,8 @@ class CompilerImplTest {
                    Set ::= AbstractSet {BOOLEAN, TestSet}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Set");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Set");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
@@ -1812,7 +1859,7 @@ class CompilerImplTest {
                 }     
                 """;
 
-        var module1 = module("TEST-MODULE", body1);
+        var module1 = module(MODULE_NAME, body1);
         var module2 = module("OTHER-MODULE", body2);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
@@ -1820,7 +1867,7 @@ class CompilerImplTest {
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Set1");
+        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Set1");
 
         assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
@@ -1847,7 +1894,7 @@ class CompilerImplTest {
                 }    
                 """;
 
-        var module1 = module("TEST-MODULE", body1);
+        var module1 = module(MODULE_NAME, body1);
         var module2 = module("OTHER-MODULE", body2);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
@@ -1855,7 +1902,7 @@ class CompilerImplTest {
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Set1");
+        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Set1");
 
         assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
@@ -1894,16 +1941,8 @@ class CompilerImplTest {
                    Choice ::= AbstractChoice {BOOLEAN}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Choice");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Choice");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledChoiceType);
 
         testChoiceField((CompiledChoiceType) compiledType, "field1", BooleanType.class);
@@ -1945,16 +1984,8 @@ class CompilerImplTest {
                    SequenceOf ::= AbstractSequenceOf {BOOLEAN}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "SequenceOf");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("SequenceOf");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionOfType);
 
         var collectionOf = (CompiledCollectionOfType) compiledType;
@@ -1981,16 +2012,8 @@ class CompilerImplTest {
                    SetOf ::= AbstractSetOf {BOOLEAN}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "SetOf");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("SetOf");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionOfType);
 
         var collectionOf = (CompiledCollectionOfType) compiledType;
@@ -2008,16 +2031,8 @@ class CompilerImplTest {
                    Sequence ::= AbstractSequence {23}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Sequence");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         var collection = (CompiledCollectionType) compiledType;
@@ -2037,16 +2052,8 @@ class CompilerImplTest {
                    Sequence ::= AbstractSequence {23}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Sequence");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         var collection = (CompiledCollectionType) compiledType;
@@ -2105,16 +2112,8 @@ class CompilerImplTest {
                    Sequence ::= AbstractSequence {INTEGER, 23}
                 """;
 
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("Sequence");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
 
         var collection = (CompiledCollectionType) compiledType;
@@ -2153,49 +2152,75 @@ class CompilerImplTest {
     }
 
     private void testCompiledCollection(String body, String collectionName) throws IOException, ParserException {
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, collectionName);
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get(collectionName);
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledCollectionType);
     }
 
     private void testCompiledChoice(String body) throws IOException, ParserException {
-        var module = module("TEST-MODULE", body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        var compiledType = getCompiledType(body, MODULE_NAME, "TestChoice");
 
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule("TEST-MODULE").getTypes().get("TestChoice");
-
-        assertNotNull(compiledType);
         assertTrue(compiledType instanceof CompiledChoiceType);
     }
 
     private void testModule(String body, Class<? extends Exception> expected, String message) {
-        CompilerTestUtils.testModule("TEST-MODULE", body, expected, message);
+        CompilerTestUtils.testModule(MODULE_NAME, body, expected, message);
     }
 
-    private CompiledObjectClass getCompiledObjectClass(String body, String objectClassName)
+    private CompiledType getCompiledType(String body, String moduleName, String typeName)
             throws IOException, ParserException {
-        var module = module("TEST-MODULE", body);
+        var module = module(moduleName, body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
-        ;
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule(moduleName).getTypes().get(typeName);
+
+        assertNotNull(compiledType);
+
+        return compiledType;
+    }
+
+    private CompiledCollectionType getCompiledCollectionType(String body, String moduleName, String typeName)
+            throws IOException, ParserException {
+        var compiledType = getCompiledType(body, moduleName, typeName);
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        return (CompiledCollectionType) compiledType;
+    }
+
+    private CompiledCollectionOfType getCompiledCollectionOfType(String body, String moduleName, String typeName)
+            throws IOException, ParserException {
+        var compiledType = getCompiledType(body, moduleName, typeName);
+
+        assertTrue(compiledType instanceof CompiledCollectionOfType);
+
+        return (CompiledCollectionOfType) compiledType;
+    }
+
+    private CompiledChoiceType getCompiledChoiceType(String body, String moduleName, String typeName)
+            throws IOException, ParserException {
+        var compiledType = getCompiledType(body, moduleName, typeName);
+
+        assertTrue(compiledType instanceof CompiledChoiceType);
+
+        return (CompiledChoiceType) compiledType;
+    }
+
+    private CompiledObjectClass getCompiledObjectClass(String body, String objectClassName)
+            throws IOException, ParserException {
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
 
         var ctx = compiler.getCompilerContext();
 
-        return ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get(objectClassName);
+        return ctx.getCompiledModule(MODULE_NAME).getObjectClasses().get(objectClassName);
     }
 
     private CompiledVariableTypeValueField getCompiledVariableTypeValueField(String body, String objectClassName,
@@ -2248,18 +2273,18 @@ class CompilerImplTest {
 
     private CompiledObjectSet getCompiledObjectSet(String body, String objectClassName, String setName)
             throws IOException, ParserException {
-        var module = module("TEST-MODULE", body);
+        var module = module(MODULE_NAME, body);
         var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
         var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
         compiler.run();
 
         var ctx = compiler.getCompilerContext();
-        var objectClass = ctx.getCompiledModule("TEST-MODULE").getObjectClasses().get(objectClassName);
+        var objectClass = ctx.getCompiledModule(MODULE_NAME).getObjectClasses().get(objectClassName);
 
         assertTrue(objectClass.getSyntax().isPresent());
 
-        return ctx.getCompiledModule("TEST-MODULE").getObjectSets().get(setName);
+        return ctx.getCompiledModule(MODULE_NAME).getObjectSets().get(setName);
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {
