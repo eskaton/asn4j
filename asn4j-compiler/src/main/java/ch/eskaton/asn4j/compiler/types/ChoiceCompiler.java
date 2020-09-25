@@ -114,8 +114,9 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         compiledType.getComponents().addAll(components);
 
-        var hasComponentConstraint = CompilerUtils.compileComponentConstraints(ctx, compiledType);
-        var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
+         CompilerUtils.compileComponentConstraints(ctx, compiledType);
+
+         var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
 
         compiledType.setConstraintDefinition(constraintDef.map(Tuple2::get_1).orElse(null));
 

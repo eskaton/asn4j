@@ -35,7 +35,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
-import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
