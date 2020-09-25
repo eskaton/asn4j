@@ -75,17 +75,12 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         compiledType.setTags(tags);
 
-        generateJavaClass(javaClass, name, compiledType);
-
         ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });
 
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
+        generateJavaClass(ctx, javaClass, compiledType);
 
         ctx.finishClass(false);
 
@@ -103,18 +98,26 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         return compiledType;
     }
 
-    private JavaClass generateJavaClass(JavaClass javaClass, String name, CompiledEnumeratedType compiledType) {
+    private JavaClass generateJavaClass(CompilerContext ctx, JavaClass javaClass, CompiledEnumeratedType compiledType) {
+        var name = compiledType.getName();
         var allItems = compiledType.getRoots().copy().addAll(compiledType.getAdditions().getItems());
         var cases = new HashMap<Integer, String>();
 
         allItems.getItems().forEach(item -> {
-            String fieldName = CompilerUtils.formatConstant(item.get_1());
-            int value = item.get_2();
+            var fieldName = CompilerUtils.formatConstant(item.get_1());
+            var value = item.get_2();
+            var initializer = "new %s(%s)".formatted(name, value);
 
             cases.put(value, fieldName);
 
-            javaClass.field().modifier(PUBLIC).asStatic().asFinal().type(name).name(fieldName)
-                    .initializer("new " + name + "(" + value + ")").build();
+            javaClass.field()
+                    .modifier(PUBLIC)
+                    .asStatic()
+                    .asFinal()
+                    .type(name)
+                    .name(fieldName)
+                    .initializer(initializer)
+                    .build();
         });
 
         javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, name));
@@ -123,23 +126,32 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, name,
                 asList(new JavaParameter(name, VALUE_PARAMETER)), Optional.of("\t\tsuper.setValue(value.getValue());")));
 
-        var builder = javaClass.method().asStatic().returnType(name).name("valueOf")
-                .parameter(INT, VALUE_PARAMETER).exception(ASN1RuntimeException.class).body();
+        var bodyBuilder = javaClass.method()
+                .asStatic()
+                .returnType(name).name("valueOf")
+                .parameter(INT, VALUE_PARAMETER)
+                .exception(ASN1RuntimeException.class)
+                .body();
 
-        builder.append("switch(value) {");
+        bodyBuilder.append("switch(value) {");
 
-        for (Entry<Integer, String> entry : cases.entrySet()) {
-            builder.append("\tcase " + entry.getKey() + ":");
-            builder.append("\t\treturn " + entry.getValue() + ";");
+        for (var entry : cases.entrySet()) {
+            bodyBuilder.append("\tcase " + entry.getKey() + ":");
+            bodyBuilder.append("\t\treturn " + entry.getValue() + ";");
         }
 
-        builder.append("\tdefault:")
+        bodyBuilder.append("\tdefault:")
                 .append("\t\tthrow new " + ASN1RuntimeException.class.getSimpleName() +
                         "(\"Undefined value: \" + value);").append("}");
 
-        builder.finish().build();
+        bodyBuilder.finish().build();
 
         javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
+
+        if (compiledType.getModule().isPresent()) {
+            javaClass.addModule(ctx, compiledType.getModule().get());
+            javaClass.addImport(ConstraintViolatedException.class);
+        }
 
         return javaClass;
     }
@@ -163,14 +175,14 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
     public EnumerationItems getAdditionalItems(CompilerContext ctx, String typeName, EnumerationItems rootItems,
             List<EnumerationItemNode> nodes) {
-        EnumerationItems additionalItems = getEnumerationItems(ctx, typeName, nodes);
-        EnumerationItems allItems = rootItems.copy();
+        var additionalItems = getEnumerationItems(ctx, typeName, nodes);
+        var allItems = rootItems.copy();
 
         allItems.addAll(additionalItems.getItems());
 
         if (nodes != null) {
-            int i = rootItems.getItems().size();
-            MutableInteger n = MutableInteger.of(0);
+            var i = rootItems.getItems().size();
+            var n = MutableInteger.of(0);
 
             for (; i < allItems.getItems().size(); i++) {
                 if (allItems.getNumber(i) == null) {
