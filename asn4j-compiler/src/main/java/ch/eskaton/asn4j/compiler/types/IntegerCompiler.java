@@ -31,18 +31,20 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
 import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStaticInitializer;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
+import ch.eskaton.asn4j.compiler.results.CompiledIntegerType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
@@ -57,37 +59,58 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
         var javaClass = ctx.createClass(name, node, tags);
         var namedNumbers = node.getNamedNumbers();
         var uniquenessChecker = new IdentifierUniquenessChecker<>(name);
+        var compiledNamedNumbers = new HashMap<String, Long>();
 
         if (namedNumbers != null && !namedNumbers.isEmpty()) {
+            for (var namedNumber : namedNumbers) {
+                var value = getBigIntegerValue(ctx, namedNumber);
+                var id = namedNumber.getId();
+
+                uniquenessChecker.add(id, value);
+
+                compiledNamedNumbers.put(id, value);
+            }
+        }
+
+        var compiledType = ctx.createCompiledType(CompiledIntegerType.class, node, name);
+
+        compiledType.setNamedNumbers(compiledNamedNumbers);
+        compiledType.setTags(tags);
+
+        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
+            compiledType.setConstraintDefinition(constraintAndModule.get_1());
+            compiledType.setModule(constraintAndModule.get_2());
+        });
+
+        generateJavaClass(ctx, javaClass, compiledType);
+
+        ctx.finishClass();
+
+        return compiledType;
+    }
+
+    private void generateJavaClass(CompilerContext ctx, JavaClass javaClass, CompiledIntegerType compiledType) {
+        var name = compiledType.getName();
+        var namedNumbers = compiledType.getNamedNumbers();
+
+        if (namedNumbers.isPresent()) {
             var staticBody = new StringBuilder();
 
             staticBody.append("\t\ttry {\n");
 
-            for (NamedNumber namedNumber : namedNumbers) {
-                var fieldName = CompilerUtils.formatConstant(namedNumber.getId());
-                BigInteger bigValue;
-                long value;
+            for (var namedNumber : namedNumbers.get().entrySet()) {
+                var value = namedNumber.getValue();
+                var fieldName = CompilerUtils.formatConstant(namedNumber.getKey());
+                var initializer = "new %s(%s);\n".formatted(name, value);
 
-                if (namedNumber.getRef() != null) {
-                    var compiledValue = ctx.<IntegerValue>getCompiledValue(IntegerValue.class, namedNumber.getRef());
-
-                    bigValue = compiledValue.getValue().getValue();
-                } else {
-                    bigValue = namedNumber.getValue().getNumber();
-                }
-
-                if (bigValue.bitLength() > 63) {
-                    throw new CompilerException("Named number '%s' too long: %s", fieldName, bigValue);
-                }
-
-                uniquenessChecker.add(namedNumber.getId(), bigValue);
-
-                value = bigValue.longValue();
-
-                javaClass.field().modifier(PUBLIC).asStatic().asFinal().type(name).name(fieldName).build();
-
-                staticBody.append(StringUtils.concat("\t\t\t", fieldName,
-                        " = ", "new ", name, "(", value, ");\n"));
+                javaClass.field()
+                        .modifier(PUBLIC)
+                        .asStatic()
+                        .asFinal()
+                        .type(name)
+                        .name(fieldName)
+                        .initializer(initializer)
+                        .build();
             }
 
             staticBody.append("\t\t} catch (")
@@ -101,28 +124,38 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
         javaClass.addImport(BigInteger.class, ConstraintViolatedException.class);
 
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.PROTECTED, name,
-                singletonList(new JavaParameter("long", "value")),
-                Optional.of("\t\tsuper.setValue(BigInteger.valueOf(value));"),
-                singletonList(ConstraintViolatedException.class.getName())));
-
-        var compiledType = ctx.createCompiledType(node, name);
-
-        compiledType.setTags(tags);
-
-        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
-            compiledType.setConstraintDefinition(constraintAndModule.get_1());
-            compiledType.setModule(constraintAndModule.get_2());
-        });
+        addJavaConstructor(javaClass, name);
 
         if (compiledType.getModule().isPresent()) {
             javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
+        }
+    }
+
+    private void addJavaConstructor(JavaClass javaClass, String name) {
+        var parameters = singletonList(new JavaParameter("long", "value"));
+        var exceptions = singletonList(ConstraintViolatedException.class.getName());
+        var body = Optional.of("\t\tsuper.setValue(BigInteger.valueOf(value));");
+        var javaConstructor = new JavaConstructor(JavaVisibility.PROTECTED, name, parameters, body, exceptions);
+
+        javaClass.addMethod(javaConstructor);
+    }
+
+    private long getBigIntegerValue(CompilerContext ctx, NamedNumber namedNumber) {
+        BigInteger bigValue;
+
+        if (namedNumber.getRef() != null) {
+            var compiledValue = ctx.<IntegerValue>getCompiledValue(IntegerValue.class, namedNumber.getRef());
+
+            bigValue = compiledValue.getValue().getValue();
+        } else {
+            bigValue = namedNumber.getValue().getNumber();
         }
 
-        ctx.finishClass();
+        if (bigValue.bitLength() > 63) {
+            throw new CompilerException("Named number '%s' too long: %s", namedNumber.getId(), bigValue);
+        }
 
-        return compiledType;
+        return bigValue.longValue();
     }
 
 }
