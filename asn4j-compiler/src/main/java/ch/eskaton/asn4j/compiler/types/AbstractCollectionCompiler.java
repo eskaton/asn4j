@@ -47,7 +47,6 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,15 +85,15 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         compileComponents(ctx, name, maybeParameters, componentVerifiers, compiledType,
                 node.getExtensionAdditionComponents(), false);
 
-
         CompilerUtils.compileComponentConstraints(ctx, compiledType);
 
-        var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
+        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
+            compiledType.setConstraintDefinition(constraintAndModule.get_1());
+            compiledType.setModule(constraintAndModule.get_2());
+        });
 
-        compiledType.setConstraintDefinition(constraintDef.map(Tuple2::get_1).orElse(null));
-
-        if (compiledType.getConstraintDefinition().isPresent()) {
-            javaClass.addModule(ctx, constraintDef.get().get_2());
+        if (compiledType.getModule().isPresent()) {
+            javaClass.addModule(ctx, compiledType.getModule().get());
             javaClass.addImport(ConstraintViolatedException.class);
         }
 

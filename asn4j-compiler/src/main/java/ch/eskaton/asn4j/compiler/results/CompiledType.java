@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.results;
 
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
+import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.utils.ToString;
@@ -47,6 +48,8 @@ public class CompiledType implements CompilationResult {
     private Optional<List<TagId>> tags = Optional.empty();
 
     private Optional<ConstraintDefinition> constraintDefinition = Optional.empty();
+
+    private Optional<Module> module = Optional.empty();
 
     CompiledType(Type type, String name) {
         this.type = type;
@@ -83,6 +86,14 @@ public class CompiledType implements CompilationResult {
 
     public void setConstraintDefinition(ConstraintDefinition constraintDefinition) {
         this.constraintDefinition = Optional.ofNullable(constraintDefinition);
+    }
+
+    public Optional<Module> getModule() {
+        return module;
+    }
+
+    public void setModule(Module module) {
+        this.module = Optional.ofNullable(module);
     }
 
     @Override

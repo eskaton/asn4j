@@ -40,7 +40,6 @@ import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
 import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.StringUtils;
 
 import java.math.BigInteger;
@@ -111,12 +110,13 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
         compiledType.setTags(tags);
 
-        var constraintDef = ctx.compileConstraintAndModule(name, compiledType);
+        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
+            compiledType.setConstraintDefinition(constraintAndModule.get_1());
+            compiledType.setModule(constraintAndModule.get_2());
+        });
 
-        compiledType.setConstraintDefinition(constraintDef.map(Tuple2::get_1).orElse(null));
-
-        if (constraintDef.isPresent()) {
-            javaClass.addModule(ctx, constraintDef.get().get_2());
+        if (compiledType.getModule().isPresent()) {
+            javaClass.addModule(ctx, compiledType.getModule().get());
             javaClass.addImport(ConstraintViolatedException.class);
         }
 
