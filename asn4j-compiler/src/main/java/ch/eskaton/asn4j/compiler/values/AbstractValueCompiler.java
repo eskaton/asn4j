@@ -50,10 +50,6 @@ public abstract class AbstractValueCompiler<V extends Value> implements Compiler
 
     private Class<V> valueClass;
 
-    public AbstractValueCompiler() {
-        // TODO: remove after refactoring
-    }
-
     public AbstractValueCompiler(TypeName typeName, Class<V> valueClass) {
         this.typeName = typeName;
         this.valueClass = valueClass;

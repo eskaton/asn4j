@@ -95,7 +95,7 @@ public class CollectionValueCompiler extends AbstractValueCompiler<CollectionVal
             return collectionValue;
         }
 
-        throw invalidValueError(collectionValue != null ? collectionValue : value);
+        throw invalidValueError(value);
     }
 
     private Value getValue(CompilerContext ctx, String typeName, Map<String, Type> elementTypes, NamedValue value) {
