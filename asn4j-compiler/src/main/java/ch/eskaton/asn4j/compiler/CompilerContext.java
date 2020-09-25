@@ -180,7 +180,7 @@ public class CompilerContext {
         getCurrentCompiledModule().addType(name, compiledType);
     }
 
-    private void addValue(String name, CompiledValue compiledValue) {
+    private <V extends Value> void addValue(String name, CompiledValue<V> compiledValue) {
         getCurrentCompiledModule().addValue(name, compiledValue);
     }
 
@@ -669,7 +669,7 @@ public class CompilerContext {
     }
 
     public void addDefaultField(CompilerContext ctx, JavaClass javaClass, String field, String typeName,
-            CompiledValue compiledValue) {
+            CompiledValue<Value> compiledValue) {
         defaultsCompiler.addDefaultField(ctx, javaClass, field, typeName, compiledValue);
     }
 
@@ -766,7 +766,7 @@ public class CompilerContext {
                 this::getTypesOfModule);
     }
 
-    public CompiledValue getCompiledValue(DefinedValue definedValue) {
+    public CompiledValue<? extends Value> getCompiledValue(DefinedValue definedValue) {
         var reference = definedValue.getReference();
 
         if (definedValue instanceof ExternalValueReference externalValueReference) {
@@ -779,12 +779,12 @@ public class CompilerContext {
         }
     }
 
-    public CompiledValue getCompiledValue(String reference) {
+    public CompiledValue<? extends Value> getCompiledValue(String reference) {
         return getCompilationResult(reference, Optional.empty(), "Value", this::getValuesOfCurrentModule,
                 (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, mod)), this::getValuesOfModule);
     }
 
-    public CompiledValue getCompiledValue(String moduleName, String reference) {
+    public CompiledValue<? extends Value> getCompiledValue(String moduleName, String reference) {
         return getCompilationResult(reference, Optional.ofNullable(moduleName), "Value",
                 () -> getValuesOfModule(moduleName),
                 (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, mod)),
@@ -810,7 +810,7 @@ public class CompilerContext {
         var value = compiledValue.getValue();
 
         if (value.getClass().isAssignableFrom(valueClass)) {
-            return compiledValue;
+            return (CompiledValue<V>) compiledValue;
         }
 
         throw new ValueResolutionException(definedValue.getPosition(), "Failed to resolve reference %s.", definedValue);
@@ -1107,11 +1107,11 @@ public class CompilerContext {
                 .orElseGet(Map::of);
     }
 
-    private Map<String, CompiledValue> getValuesOfCurrentModule() {
+    private Map<String, CompiledValue<? extends Value>> getValuesOfCurrentModule() {
         return getValuesOfModule(getCurrentModuleName());
     }
 
-    private Map<String, CompiledValue> getValuesOfModule(String moduleName) {
+    private Map<String, CompiledValue<? extends Value>> getValuesOfModule(String moduleName) {
         return Optional.ofNullable(definedModules.get(moduleName))
                 .map(CompiledModule::getValues)
                 .orElseGet(Map::of);
@@ -1320,11 +1320,11 @@ public class CompilerContext {
         return currentType.size() == 1;
     }
 
-    public CompiledValue createCompiledValue(CompiledType type, Value value) {
+    public <V extends Value> CompiledValue<V> createCompiledValue(CompiledType type, Value value) {
         return new UnNamedCompiledValue(type, value);
     }
 
-    public CompiledValue createCompiledValue(String name, CompiledType type, Value value) {
+    public <V extends Value> CompiledValue<V> createCompiledValue(String name, CompiledType type, V value) {
         var compiledValue = new CompiledValue<>(name, type, value);
 
         addValue(name, compiledValue);

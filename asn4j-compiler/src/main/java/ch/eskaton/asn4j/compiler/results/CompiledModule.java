@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.results;
 
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Collections;
@@ -40,7 +41,7 @@ public class CompiledModule implements CompilationResult {
 
     private HashMap<String, CompiledType> types = new HashMap<>();
 
-    private HashMap<String, CompiledValue> values = new HashMap<>();
+    private HashMap<String, CompiledValue<? extends Value>> values = new HashMap<>();
 
     private HashMap<String, CompiledObject> objects = new HashMap<>();
 
@@ -72,11 +73,11 @@ public class CompiledModule implements CompilationResult {
         return Collections.unmodifiableMap(types);
     }
 
-    public void addValue(String name, CompiledValue compiledValue) {
+    public <V extends Value> void addValue(String name, CompiledValue<V> compiledValue) {
         values.put(name, compiledValue);
     }
 
-    public Map<String, CompiledValue> getValues() {
+    public Map<String, CompiledValue<? extends Value>> getValues() {
         return Collections.unmodifiableMap(values);
     }
 

@@ -56,6 +56,7 @@ import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.io.IOException;
@@ -368,7 +369,7 @@ public class CompilerImpl {
                 this::compileTypeAssignment);
     }
 
-    public Optional<CompiledValue> compileValue(String name, Optional<String> maybeModuleName) {
+    public Optional<CompiledValue<? extends Value>> compileValue(String name, Optional<String> maybeModuleName) {
         var assignmentSelector = getAssignmentSelector(ValueOrObjectAssignmentNode.class,
                 ValueOrObjectAssignmentNode::getValueAssignment);
 
