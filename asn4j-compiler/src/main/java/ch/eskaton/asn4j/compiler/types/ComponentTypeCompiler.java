@@ -29,18 +29,14 @@ package ch.eskaton.asn4j.compiler.types;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.UnNamedCompiler;
-import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
-import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
-import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
@@ -50,13 +46,10 @@ import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
@@ -95,46 +88,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
         compiledCollectionComponent.setDefault(maybeDefaultValue);
 
-        addField(ctx, compiledCollectionComponent);
-
         return List.of(compiledCollectionComponent);
-    }
-
-    private void addField(CompilerContext ctx, CompiledCollectionComponent compiledCollectionComponent) {
-        var compiledType = compiledCollectionComponent.getCompiledType();
-        var maybeDefaultValue = compiledCollectionComponent.getDefaultValue();
-        var hasDefault = maybeDefaultValue.isPresent();
-        var isOptional = compiledCollectionComponent.isOptional();
-        var type = compiledType.getType();
-        var javaClass = ctx.getCurrentClass();
-        var javaTypeName = compiledType.getName();
-        var javaFieldName = formatName(compiledCollectionComponent.getName());
-        var field = new JavaDefinedField(javaTypeName, javaFieldName, hasDefault);
-        var compAnnotation = new JavaAnnotation(ASN1Component.class);
-
-        if (isOptional) {
-            compAnnotation.addParameter("optional", "true");
-        } else if (hasDefault) {
-            compAnnotation.addParameter("hasDefault", "true");
-
-            if (type instanceof Choice) {
-                javaClass.addStaticImport(ch.eskaton.commons.utils.Utils.class, "with");
-            }
-
-            var defaultValue = maybeDefaultValue.get();
-
-            ctx.addDefaultField(ctx, javaClass, field.getName(), javaTypeName, defaultValue);
-        }
-
-        field.addAnnotation(compAnnotation);
-
-        var tags = compiledType.getTags();
-
-        if (tags.isPresent() && !tags.get().isEmpty()) {
-            field.addAnnotation(CompilerUtils.getTagsAnnotation(tags.get()));
-        }
-
-        javaClass.addField(field);
     }
 
     private Optional<CompiledValue<Value>> getDefaultValue(CompilerContext ctx, ComponentType component,
