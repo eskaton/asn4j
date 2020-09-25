@@ -67,39 +67,59 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
     public CompiledType compile(CompilerContext ctx, String name, Choice node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
         var javaClass = ctx.createClass(name, node, tags);
-        var fieldNames = new ArrayList<String>();
-        var typeEnum = new JavaEnum(CHOICE_ENUM);
         var componentVerifiers = List.of(
                 new NameUniquenessVerifier(TypeName.CHOICE),
                 new TagUniquenessVerifier(TypeName.CHOICE),
                 new UntaggedOpenTypeVerifier(TypeName.CHOICE));
+        var compiledType = ctx.createCompiledType(CompiledChoiceType.class, node, name);
+        var components = new ArrayList<CompiledComponent>();
+
+        compiledType.setTags(tags);
+
+        for (var namedType : node.getRootAlternatives()) {
+            var compiledComponent = compileChoiceNamedType(ctx, namedType, maybeParameters);
+            var component = compiledComponent.getCompiledType();
+
+            component.setParent(compiledType);
+            componentVerifiers.forEach(v -> v.verify(compiledComponent));
+            components.add(compiledComponent);
+        }
+
+        compiledType.getComponents().addAll(components);
+
+        CompilerUtils.compileComponentConstraints(ctx, compiledType);
+
+        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
+            compiledType.setConstraintDefinition(constraintAndModule.get_1());
+            compiledType.setModule(constraintAndModule.get_2());
+        });
+
+        updateJavaClass(ctx, javaClass, compiledType);
+
+        ctx.finishClass();
+
+        return compiledType;
+    }
+
+    private void updateJavaClass(CompilerContext ctx, JavaClass javaClass, CompiledChoiceType compiledType) {
+        var fieldNames = new ArrayList<String>();
+        var typeEnum = new JavaEnum(CHOICE_ENUM);
+
         var bodyBuilder = javaClass.method().modifier(PUBLIC).annotation("@Override")
                 .returnType(ASN1Type.class.getSimpleName()).name("getValue").body();
         var clearFields = "\t\t" + CLEAR_FIELDS + "();\n";
 
         bodyBuilder.append("switch(" + CHOICE_FIELD + ") {");
 
-        var compiledType = ctx.createCompiledType(CompiledChoiceType.class, node, name);
+        for (var component : compiledType.getComponents()) {
+            var fieldName = CompilerUtils.formatName(component.getName());
+            var typeConstant = CompilerUtils.formatConstant(component.getName());
 
-        compiledType.setTags(tags);
-
-        var components = new ArrayList<CompiledComponent>();
-
-        for (NamedType namedType : node.getRootAlternatives()) {
-            var typeConstant = CompilerUtils.formatConstant(namedType.getName());
-            var compiledComponent = compileChoiceNamedType(ctx, javaClass, namedType,
-                    maybeParameters, typeConstant, clearFields);
-            var fieldName = compiledComponent.getName();
-            var component = compiledComponent.getCompiledType();
-
-            component.setParent(compiledType);
-
-            componentVerifiers.forEach(v -> v.verify(compiledComponent));
-
-            components.add(compiledComponent);
             fieldNames.add(fieldName);
             typeEnum.addEnumConstant(typeConstant);
             bodyBuilder.append("\tcase " + typeConstant + ":").append("\t\treturn " + fieldName + ";");
+
+            addJavaField(javaClass, typeConstant, clearFields, component);
         }
 
         bodyBuilder.append("}").append("").append("return null;");
@@ -111,50 +131,54 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         addClearFieldsMethod(javaClass, fieldNames);
 
-        compiledType.getComponents().addAll(components);
-
-        CompilerUtils.compileComponentConstraints(ctx, compiledType);
-
-        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
-            compiledType.setConstraintDefinition(constraintAndModule.get_1());
-            compiledType.setModule(constraintAndModule.get_2());
-        });
-
         if (compiledType.getModule().isPresent()) {
             javaClass.addModule(ctx, compiledType.getModule().get());
             javaClass.addImport(ConstraintViolatedException.class);
         }
-
-        ctx.finishClass();
-
-        return compiledType;
     }
 
-    private CompiledComponent compileChoiceNamedType(CompilerContext ctx, JavaClass javaClass,
-            NamedType namedType, Optional<Parameters> maybeParameters, String typeConstant, String beforeCode) {
-        var name = CompilerUtils.formatName(namedType.getName());
+    private CompiledComponent compileChoiceNamedType(CompilerContext ctx, NamedType namedType,
+            Optional<Parameters> maybeParameters) {
+        var name = namedType.getName();
         var compiledType = ctx.defineType(namedType, maybeParameters);
-        var typeName = compiledType.getName();
-        var field = new JavaDefinedField(typeName, name);
-        var tags = compiledType.getTags();
+        var compiledComponent = new CompiledComponent(name, compiledType);
 
-        field.addAnnotation(new JavaAnnotation(ASN1Alternative.class).addParameter("name", '"' + typeConstant + '"'));
+        return compiledComponent;
+    }
+
+    private void addJavaField(JavaClass javaClass, String typeConstant, String beforeCode,
+            CompiledComponent compiledComponent) {
+        var compiledType = compiledComponent.getCompiledType();
+        var tags = compiledType.getTags();
+        var javaTypeName = compiledType.getName();
+        var javaFieldName = compiledComponent.getName();
+        var qualifiedConstant = CHOICE_ENUM + "." + typeConstant;
+        var field = new JavaDefinedField(javaTypeName, javaFieldName);
+        var javaSetter = new JavaTypedSetter(javaTypeName, javaFieldName, CHOICE_FIELD, qualifiedConstant, beforeCode);
+        var javaGetter = new JavaGetter(javaTypeName, javaFieldName, field.hasDefault());
+        var annotation = new JavaAnnotation(ASN1Alternative.class).
+                addParameter("name", '"' + typeConstant + '"');
+
+        field.addAnnotation(annotation);
 
         if (tags.isPresent() && !tags.get().isEmpty()) {
             field.addAnnotation(CompilerUtils.getTagsAnnotation(tags.get()));
         }
 
         javaClass.addField(field, false, false);
-        javaClass.addMethod(new JavaTypedSetter(typeName, name, CHOICE_FIELD, CHOICE_ENUM + "." + typeConstant,
-                beforeCode));
-        javaClass.addMethod(new JavaGetter(typeName, name, field.hasDefault()));
-
-        return new CompiledComponent(name, compiledType);
+        javaClass.addMethod(javaSetter);
+        javaClass.addMethod(javaGetter);
     }
 
     private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
-        javaClass.method().modifier(PRIVATE).name(CLEAR_FIELDS).body()
-                .append(fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList())).finish().build();
+        var body = fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList());
+
+        javaClass.method()
+                .modifier(PRIVATE)
+                .name(CLEAR_FIELDS)
+                .body().append(body)
+                .finish()
+                .build();
     }
 
 }

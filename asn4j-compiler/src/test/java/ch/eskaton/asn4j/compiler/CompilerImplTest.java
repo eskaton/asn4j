@@ -228,7 +228,6 @@ class CompilerImplTest {
                 """;
 
         var compiledType = getCompiledChoiceType(body, MODULE_NAME, "Choice");
-        var field = compiledType.getComponent("a");
 
         assertTrue(compiledType.getConstraintDefinition().isEmpty());
         assertTrue(compiledType.getModule().isEmpty());
