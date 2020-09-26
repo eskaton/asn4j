@@ -51,16 +51,16 @@ public class CompilerConfig {
         return this;
     }
 
-    public String getPkg() {
+    public String getPackage() {
         return pkg;
     }
 
-    public void setPkg(String pkg) {
+    public void setPackage(String pkg) {
         this.pkg = pkg;
     }
 
     public CompilerConfig pkg(String pkg) {
-        setPkg(pkg);
+        setPackage(pkg);
 
         return this;
     }
