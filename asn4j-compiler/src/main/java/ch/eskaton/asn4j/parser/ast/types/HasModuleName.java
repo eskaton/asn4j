@@ -27,31 +27,7 @@
 
 package ch.eskaton.asn4j.parser.ast.types;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.ComponentTypeListsNode;
-import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
+public interface HasModuleName {
 
-public class SetType extends Collection {
-
-    protected SetType() {
-        super();
-    }
-
-    public SetType(Position position, String moduleName) {
-        super(position, moduleName);
-    }
-
-    public SetType(Position position, String moduleName, ComponentTypeListsNode compTypes) {
-        super(position, moduleName, compTypes);
-    }
-
-    public SetType(Position position, String moduleName, ExtensionAndExceptionNode extAndEx, Boolean optExtMarker) {
-        super(position, moduleName, extAndEx, optExtMarker);
-    }
-
-    @Override
-    protected String getType() {
-        return "Set";
-    }
-
+    String getModuleName();
 }

@@ -36,7 +36,7 @@ public class ExternalTypeReference extends SimpleDefinedType {
     private String module;
 
     public ExternalTypeReference(Position position, String module, String type) {
-        super(position, type);
+        super(position, module, type);
 
         this.module = module;
     }

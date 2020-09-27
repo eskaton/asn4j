@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.parser.Position;
 public class UsefulType extends TypeReference {
 
     public UsefulType(Position position, String type) {
-        super(position, type);
+        super(position, null, type);
     }
 
 }

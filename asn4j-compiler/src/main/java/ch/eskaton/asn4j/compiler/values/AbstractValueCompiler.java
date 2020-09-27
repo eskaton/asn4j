@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
+import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -65,7 +66,7 @@ public abstract class AbstractValueCompiler<V extends Value> implements Compiler
 
     public final V compile(CompilerContext ctx, CompiledType compiledType, Value value,
             Optional<Parameters> maybeParameters) {
-        var resolvedCompiledType = ctx.getCompiledType(ctx.resolveTypeReference(compiledType.getType()));
+        var resolvedCompiledType = ctx.getCompiledBaseType(compiledType);
 
         if (value instanceof DefinedValue definedValue) {
             return compileDefinedValue(ctx, resolvedCompiledType, definedValue);

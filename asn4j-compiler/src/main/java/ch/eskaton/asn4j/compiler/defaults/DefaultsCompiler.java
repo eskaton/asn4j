@@ -51,7 +51,6 @@ public class DefaultsCompiler {
     public <V extends Value> CompiledValue<Value> compileDefault(Type type, V value,
             Optional<Parameters> maybeParameters) {
         var compiler = getDefaultCompiler(type);
-
         try {
             return compiler.compileDefault(ctx, type, value, maybeParameters);
         } catch (CompilerException e) {
@@ -71,7 +70,8 @@ public class DefaultsCompiler {
 
     public void addDefaultField(CompilerContext ctx, JavaClass javaClass, String field, String typeName,
             CompiledValue compiledValue) {
-        var compiler = getDefaultCompiler(compiledValue.getCompiledType().getType());
+        var compiledBaseType = ctx.findCompiledBaseType(compiledValue.getCompiledType());
+        var compiler = ctx.getDefaultCompiler(compiledBaseType.getType().getClass());
 
         compiler.addDefaultField(ctx, javaClass, field, typeName, compiledValue);
     }

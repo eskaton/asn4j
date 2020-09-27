@@ -248,6 +248,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -274,6 +275,8 @@ public class Parser {
     private int lastErrorOffset = 0;
 
     private ParserException lastException;
+
+    private String moduleName;
 
     // Parsers
     private ActualParameterListParser actualParameterListParser = new ActualParameterListParser();
@@ -1043,8 +1046,15 @@ public class Parser {
     protected class ModuleIdentifierParser extends ListRuleParser<ModuleIdentifierNode> {
 
         public ModuleIdentifierNode parse() throws ParserException {
-            return super.parse(new SequenceParser(new boolean[] { true, false }, TokenType.TYPE_REFERENCE,
-                    definitiveIdentificationParser), a -> new ModuleIdentifierNode(a.P0(), a.s0(), a.n1()));
+            ModuleIdentifierNode node = super.parse(new SequenceParser(new boolean[] { true, false },
+                    TokenType.TYPE_REFERENCE,definitiveIdentificationParser),
+                    a -> new ModuleIdentifierNode(a.P0(), a.s0(), a.n1()));
+
+            if (node != null) {
+                moduleName = node.getModuleName();
+            }
+
+            return node;
         }
 
     }
@@ -1758,7 +1768,7 @@ public class Parser {
                             alternativeTypeListsParser, TokenType.R_BRACE).parse();
 
                     if (choiceRule != null) {
-                        type = new Choice(position, (AlternativeTypeLists) choiceRule.get(1));
+                        type = new Choice(position, moduleName, (AlternativeTypeLists) choiceRule.get(1));
                     }
                     break;
 
@@ -1794,8 +1804,9 @@ public class Parser {
                         Type rule = typeOrNamedTypeParser.parse();
 
                         if (rule != null) {
-                            type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceOfType(position, rule) :
-                                    new SetOfType(position, rule);
+                            type = token.getType() == TokenType.SEQUENCE_KW ?
+                                    new SequenceOfType(position, moduleName, rule) :
+                                    new SetOfType(position, moduleName, rule);
                         }
                     } else {
                         List<Object> rule = new SequenceParser(new boolean[] { true, false, true }, TokenType.L_BRACE,
@@ -1806,19 +1817,20 @@ public class Parser {
 
                         if (rule != null) {
                             if (rule.get(1) == null) {
-                                type = token.getType() == TokenType.SEQUENCE_KW ? new SequenceType(position)
-                                        : new SetType(position);
+                                type = token.getType() == TokenType.SEQUENCE_KW ?
+                                        new SequenceType(position, moduleName) :
+                                        new SetType(position, moduleName);
                             } else {
                                 List<Object> ruleList = (List<Object>) rule.get(1);
 
                                 if (ruleList.size() == 1) {
                                     type = token.getType() == TokenType.SEQUENCE_KW ?
-                                            new SequenceType(position, (ComponentTypeListsNode) ruleList.get(0)) :
-                                            new SetType(position, (ComponentTypeListsNode) ruleList.get(0));
+                                            new SequenceType(position, moduleName, (ComponentTypeListsNode) ruleList.get(0)) :
+                                            new SetType(position, moduleName, (ComponentTypeListsNode) ruleList.get(0));
                                 } else {
                                     type = token.getType() == TokenType.SEQUENCE_KW ?
-                                            new SequenceType(position, (ExtensionAndExceptionNode) ruleList.get(0), (Boolean) ruleList.get(1)):
-                                            new SetType(position, (ExtensionAndExceptionNode) ruleList.get(0), (Boolean) ruleList.get(1));
+                                            new SequenceType(position, moduleName, (ExtensionAndExceptionNode) ruleList.get(0), (Boolean) ruleList.get(1)):
+                                            new SetType(position, moduleName, (ExtensionAndExceptionNode) ruleList.get(0), (Boolean) ruleList.get(1));
                                 }
                             }
                         }
@@ -3157,7 +3169,7 @@ public class Parser {
             Token token = expect(TokenType.TYPE_REFERENCE);
 
             if (token != null) {
-                return new TypeReference(token.getPosition(), token.getText());
+                return new TypeReference(token.getPosition(), moduleName, token.getText());
             }
 
             return null;
@@ -3231,10 +3243,10 @@ public class Parser {
 
                 switch (a.l().$0()) {
                     case SET_KW:
-                        type = new SetOfType(a.l().P0(), (Type) a.l().n3());
+                        type = new SetOfType(a.l().P0(), moduleName, (Type) a.l().n3());
                         break;
                     case SEQUENCE_KW:
-                        type = new SequenceOfType(a.l().P0(), (Type) a.l().n3());
+                        type = new SequenceOfType(a.l().P0(), moduleName, (Type) a.l().n3());
                         break;
                     default:
                         throw new ParserException("Implementation error");

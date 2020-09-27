@@ -31,19 +31,14 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Parameters;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.results.CompiledBitStringType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.NamedBitNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
-import ch.eskaton.asn4j.runtime.types.ASN1NamedBitString;
 
 import java.util.HashMap;
 import java.util.Optional;
-
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 
 public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
 
@@ -51,7 +46,6 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
     public CompiledType compile(CompilerContext ctx, String name, BitString node,
             Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
-        var javaClass = ctx.createClass(name, node, tags);
         var namedBits = node.getNamedBits();
         var uniquenessChecker = new IdentifierUniquenessChecker<>(name);
         var compiledNamedBits = new HashMap<String, Long>();
@@ -76,41 +70,7 @@ public class BitStringCompiler extends BuiltinTypeCompiler<BitString> {
             compiledType.setModule(constraintAndModule.get_2());
         });
 
-        generateJavaClass(ctx, javaClass, compiledType);
-
-        ctx.finishClass(false);
-
         return compiledType;
-    }
-
-    private void generateJavaClass(CompilerContext ctx, JavaClass javaClass, CompiledBitStringType compiledType) {
-        var name = compiledType.getName();
-        var namedBits = compiledType.getNamedBits();
-
-        javaClass.setParent(ASN1NamedBitString.class.getSimpleName());
-
-        if (namedBits.isPresent()) {
-            for (var namedBit : namedBits.get().entrySet()) {
-                var value = namedBit.getValue();
-                var fieldName = CompilerUtils.formatConstant(namedBit.getKey());
-
-                javaClass.field()
-                        .modifier(PUBLIC)
-                        .asStatic()
-                        .asFinal()
-                        .type(int.class)
-                        .name(fieldName)
-                        .initializer(String.valueOf(value))
-                        .build();
-            }
-        }
-
-        javaClass.method().modifier(PUBLIC).name(name).build();
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
     }
 
     private long getValue(CompilerContext ctx, NamedBitNode namedBit) {

@@ -32,20 +32,10 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
-import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
-import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
-import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
-import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
-import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
-import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.ArrayList;
@@ -54,8 +44,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
 public abstract class AbstractCollectionCompiler<T extends Collection> implements NamedCompiler<T, CompiledType> {
 
@@ -72,7 +60,6 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
 
     public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
-        var javaClass = ctx.createClass(name, node, tags);
         var componentVerifiers = componentVerifierSuppliers.stream()
                 .map(s -> s.apply(typeName))
                 .collect(Collectors.toList());
@@ -92,20 +79,8 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
             compiledType.setModule(constraintAndModule.get_2());
         });
 
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
-
-        createJavaConstructors(name, compiledType, javaClass);
-
-        compiledType.getComponents().forEach(component -> addJavaField(ctx, component));
-
-        ctx.finishClass();
-
         return compiledType;
     }
-
 
     private void compileComponents(CompilerContext ctx, String name, Optional<Parameters> maybeParameters,
             List<ComponentVerifier> componentVerifiers, CompiledCollectionType compiledType,
@@ -127,57 +102,4 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         }
     }
 
-    private void addJavaField(CompilerContext ctx, CompiledCollectionComponent compiledCollectionComponent) {
-        var compiledType = compiledCollectionComponent.getCompiledType();
-        var maybeDefaultValue = compiledCollectionComponent.getDefaultValue();
-        var hasDefault = maybeDefaultValue.isPresent();
-        var isOptional = compiledCollectionComponent.isOptional();
-        var type = compiledType.getType();
-        var javaClass = ctx.getCurrentClass();
-        var javaTypeName = compiledType.getName();
-        var javaFieldName = formatName(compiledCollectionComponent.getName());
-        var field = new JavaDefinedField(javaTypeName, javaFieldName, hasDefault);
-        var compAnnotation = new JavaAnnotation(ASN1Component.class);
-
-        if (isOptional) {
-            compAnnotation.addParameter("optional", "true");
-        } else if (hasDefault) {
-            compAnnotation.addParameter("hasDefault", "true");
-
-            if (type instanceof Choice) {
-                javaClass.addStaticImport(ch.eskaton.commons.utils.Utils.class, "with");
-            }
-
-            var defaultValue = maybeDefaultValue.get();
-
-            ctx.addDefaultField(ctx, javaClass, field.getName(), javaTypeName, defaultValue);
-        }
-
-        field.addAnnotation(compAnnotation);
-
-        var tags = compiledType.getTags();
-
-        if (tags.isPresent() && !tags.get().isEmpty()) {
-            field.addAnnotation(CompilerUtils.getTagsAnnotation(tags.get()));
-        }
-
-        javaClass.addField(field);
-    }
-
-
-    private void createJavaConstructors(String name, CompiledCollectionType compiledType, JavaClass javaClass) {
-        var ctor = new JavaConstructor(JavaVisibility.PUBLIC, name);
-        var ctorBody = new StringBuilder();
-
-        compiledType.getComponents().forEach(component -> {
-            var argType = component.getCompiledType().getName();
-            var argName = CompilerUtils.formatName(component.getName());
-
-            ctor.getParameters().add(new JavaParameter(argType, argName));
-            ctorBody.append("\t\tthis.%s = %s;\n".formatted(argName, argName));
-        });
-
-        ctor.setBody(Optional.of(ctorBody.toString()));
-        javaClass.addMethod(ctor);
-    }
 }

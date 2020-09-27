@@ -31,24 +31,15 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Parameters;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
-import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
-import ch.eskaton.asn4j.compiler.java.objs.JavaStaticInitializer;
-import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.results.CompiledIntegerType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NamedNumber;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Optional;
-
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
-import static java.util.Collections.singletonList;
 
 public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
 
@@ -56,7 +47,6 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
     public CompiledType compile(CompilerContext ctx, String name, IntegerType node,
             Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
-        var javaClass = ctx.createClass(name, node, tags);
         var namedNumbers = node.getNamedNumbers();
         var uniquenessChecker = new IdentifierUniquenessChecker<>(name);
         var compiledNamedNumbers = new HashMap<String, Long>();
@@ -82,62 +72,7 @@ public class IntegerCompiler extends BuiltinTypeCompiler<IntegerType> {
             compiledType.setModule(constraintAndModule.get_2());
         });
 
-        generateJavaClass(ctx, javaClass, compiledType);
-
-        ctx.finishClass();
-
         return compiledType;
-    }
-
-    private void generateJavaClass(CompilerContext ctx, JavaClass javaClass, CompiledIntegerType compiledType) {
-        var name = compiledType.getName();
-        var namedNumbers = compiledType.getNamedNumbers();
-
-        if (namedNumbers.isPresent()) {
-            var staticBody = new StringBuilder();
-
-            staticBody.append("\t\ttry {\n");
-
-            for (var namedNumber : namedNumbers.get().entrySet()) {
-                var value = namedNumber.getValue();
-                var fieldName = CompilerUtils.formatConstant(namedNumber.getKey());
-                var initializer = "new %s(%s);\n".formatted(name, value);
-
-                javaClass.field()
-                        .modifier(PUBLIC)
-                        .asStatic()
-                        .asFinal()
-                        .type(name)
-                        .name(fieldName)
-                        .initializer(initializer)
-                        .build();
-            }
-
-            staticBody.append("\t\t} catch (")
-                    .append(ConstraintViolatedException.class.getSimpleName())
-                    .append(" e){\n");
-            staticBody.append("\t\t\tthrow new RuntimeException(e);\n");
-            staticBody.append("\t\t}");
-
-            javaClass.addStaticInitializer(new JavaStaticInitializer(staticBody.toString()));
-        }
-
-        javaClass.addImport(BigInteger.class, ConstraintViolatedException.class);
-
-        addJavaConstructor(javaClass, name);
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-        }
-    }
-
-    private void addJavaConstructor(JavaClass javaClass, String name) {
-        var parameters = singletonList(new JavaParameter("long", "value"));
-        var exceptions = singletonList(ConstraintViolatedException.class.getName());
-        var body = Optional.of("\t\tsuper.setValue(BigInteger.valueOf(value));");
-        var javaConstructor = new JavaConstructor(JavaVisibility.PROTECTED, name, parameters, body, exceptions);
-
-        javaClass.addMethod(javaConstructor);
     }
 
     private long getValue(CompilerContext ctx, NamedNumber namedNumber) {

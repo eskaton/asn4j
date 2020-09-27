@@ -32,35 +32,21 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaConstructor;
-import ch.eskaton.asn4j.compiler.java.objs.JavaParameter;
-import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.commons.MutableInteger;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.java.objs.JavaType.INT;
-import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
-import static java.util.Arrays.asList;
-
 public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, CompiledType> {
-
-    public static final String VALUE_PARAMETER = "value";
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, EnumeratedType node,
@@ -70,7 +56,6 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         }
 
         var tags = CompilerUtils.getTagIds(ctx, node);
-        var javaClass = ctx.createClass(name, node, tags);
         var compiledType = createCompiledType(ctx, name, node);
 
         compiledType.setTags(tags);
@@ -79,10 +64,6 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });
-
-        generateJavaClass(ctx, javaClass, compiledType);
-
-        ctx.finishClass(false);
 
         return compiledType;
     }
@@ -96,64 +77,6 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
         compiledType.setAdditions(additionalItems);
 
         return compiledType;
-    }
-
-    private JavaClass generateJavaClass(CompilerContext ctx, JavaClass javaClass, CompiledEnumeratedType compiledType) {
-        var name = compiledType.getName();
-        var allItems = compiledType.getRoots().copy().addAll(compiledType.getAdditions().getItems());
-        var cases = new HashMap<Integer, String>();
-
-        allItems.getItems().forEach(item -> {
-            var fieldName = CompilerUtils.formatConstant(item.get_1());
-            var value = item.get_2();
-            var initializer = "new %s(%s)".formatted(name, value);
-
-            cases.put(value, fieldName);
-
-            javaClass.field()
-                    .modifier(PUBLIC)
-                    .asStatic()
-                    .asFinal()
-                    .type(name)
-                    .name(fieldName)
-                    .initializer(initializer)
-                    .build();
-        });
-
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, name));
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.PROTECTED, name,
-                asList(new JavaParameter("int", VALUE_PARAMETER)), Optional.of("\t\tsuper.setValue(value);")));
-        javaClass.addMethod(new JavaConstructor(JavaVisibility.PUBLIC, name,
-                asList(new JavaParameter(name, VALUE_PARAMETER)), Optional.of("\t\tsuper.setValue(value.getValue());")));
-
-        var bodyBuilder = javaClass.method()
-                .asStatic()
-                .returnType(name).name("valueOf")
-                .parameter(INT, VALUE_PARAMETER)
-                .exception(ASN1RuntimeException.class)
-                .body();
-
-        bodyBuilder.append("switch(value) {");
-
-        for (var entry : cases.entrySet()) {
-            bodyBuilder.append("\tcase " + entry.getKey() + ":");
-            bodyBuilder.append("\t\treturn " + entry.getValue() + ";");
-        }
-
-        bodyBuilder.append("\tdefault:")
-                .append("\t\tthrow new " + ASN1RuntimeException.class.getSimpleName() +
-                        "(\"Undefined value: \" + value);").append("}");
-
-        bodyBuilder.finish().build();
-
-        javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
-
-        return javaClass;
     }
 
     public EnumerationItems getRootItems(CompilerContext ctx, String typeName, List<EnumerationItemNode> nodes) {
