@@ -40,14 +40,9 @@ public class RealCompiler extends BuiltinTypeCompiler<Real> {
     @Override
     public CompiledType compile(CompilerContext ctx, String name, Real node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
-
-        ctx.createClass(name, node, tags);
-
         var compiledType = ctx.createCompiledType(node, name);
 
         compiledType.setTags(tags);
-
-        ctx.finishClass();
 
         return compiledType;
     }

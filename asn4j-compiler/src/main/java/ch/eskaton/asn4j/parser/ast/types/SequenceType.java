@@ -37,16 +37,16 @@ public class SequenceType extends Collection {
         super();
     }
 
-    public SequenceType(Position position) {
-        super(position);
+    public SequenceType(Position position, String moduleName) {
+        super(position, moduleName);
     }
 
-    public SequenceType(Position position, ComponentTypeListsNode compTypes) {
-        super(position, compTypes);
+    public SequenceType(Position position, String moduleName, ComponentTypeListsNode compTypes) {
+        super(position, moduleName, compTypes);
     }
 
-    public SequenceType(Position position, ExtensionAndExceptionNode extAndEx, Boolean optExtMarker) {
-        super(position, extAndEx, optExtMarker);
+    public SequenceType(Position position, String moduleName,  ExtensionAndExceptionNode extAndEx, Boolean optExtMarker) {
+        super(position, moduleName, extAndEx, optExtMarker);
     }
 
     @Override

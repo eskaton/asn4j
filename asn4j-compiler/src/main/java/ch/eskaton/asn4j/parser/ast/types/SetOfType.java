@@ -34,8 +34,8 @@ public class SetOfType extends CollectionOfType {
     protected SetOfType() {
     }
 
-    public SetOfType(Position position, Type type) {
-        super(position, type);
+    public SetOfType(Position position, String moduleName, Type type) {
+        super(position, moduleName, type);
     }
 
 }

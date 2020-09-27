@@ -34,17 +34,25 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class CollectionOfType extends AbstractType {
+public class CollectionOfType extends AbstractType implements HasModuleName {
+
+    private String moduleName;
 
     protected Type type;
 
     protected CollectionOfType() {
     }
 
-    public CollectionOfType(Position position, Type type) {
+    public CollectionOfType(Position position, String moduleName, Type type) {
         super(position);
 
+        this.moduleName = moduleName;
         this.type = type;
+    }
+
+    @Override
+    public String getModuleName() {
+        return null;
     }
 
     public Type getType() {

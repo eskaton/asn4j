@@ -27,6 +27,9 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.java.JavaCompiler;
+import ch.eskaton.asn4j.compiler.java.JavaWriter;
+import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
@@ -58,11 +61,14 @@ import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Tuple2;
+import ch.eskaton.commons.utils.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -96,20 +102,38 @@ public class CompilerImpl {
         this.config = config;
         this.moduleSource = moduleSource;
 
-        compilerContext = new CompilerContext(this, config.getPkg(), config.getOutputDir());
+        compilerContext = new CompilerContext(this, config.getPackage(), config.getOutputDir());
     }
 
     public void run() throws IOException, ParserException {
         long begin = System.currentTimeMillis();
 
         loadAndCompileModule(config.getModule());
-
-        if (config.isGenerateSource()) {
-            compilerContext.writeClasses();
-        }
+        generateJavaClasses();
 
         System.out.println("Total compilation time " + String.format("%.3f",
                 (System.currentTimeMillis() - begin) / 1000.0) + "s");
+    }
+
+    private void generateJavaClasses() {
+        var modules = compilerContext.getCompiledModules();
+        var structs = new HashMap<String, JavaStructure>();
+        var javaCompiler = new JavaCompiler();
+
+        for (var module : modules.values()) {
+            structs.putAll(javaCompiler.compile(compilerContext, module.getTypes(), config.getPackage()));
+        }
+
+        if (config.isGenerateSource()) {
+            var pkgDir = config.getPackage().replace('.', File.separatorChar);
+            var pkgFile = new File(StringUtils.concat(config.getOutputDir(), File.separator, pkgDir));
+
+            if (pkgFile.exists() || pkgFile.mkdirs()) {
+                new JavaWriter().write(structs, config.getOutputDir());
+            } else {
+                throw new CompilerException("Failed to create directory " + pkgFile);
+            }
+        }
     }
 
     void loadAndCompileModule(String moduleName) throws IOException, ParserException {

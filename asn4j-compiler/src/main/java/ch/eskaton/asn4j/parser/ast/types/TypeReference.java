@@ -31,8 +31,8 @@ import ch.eskaton.asn4j.parser.Position;
 
 public class TypeReference extends SimpleDefinedType {
 
-    public TypeReference(Position position, String type) {
-    	super(position, type);
+    public TypeReference(Position position, String moduleName, String type) {
+    	super(position, moduleName, type);
     }
 
 }

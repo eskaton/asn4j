@@ -35,16 +35,24 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class SimpleDefinedType extends AbstractType implements ParameterizedNode {
+public class SimpleDefinedType extends AbstractType implements ParameterizedNode, HasModuleName {
+
+    private String moduleName;
 
     private String type;
 
     private Optional<List<Node>> parameters = Optional.empty();
 
-    public SimpleDefinedType(Position position, String type) {
+    public SimpleDefinedType(Position position, String moduleName, String type) {
         super(position);
 
+        this.moduleName = moduleName;
         this.type = type;
+    }
+
+    @Override
+    public String getModuleName() {
+        return moduleName;
     }
 
     public String getType() {
@@ -89,5 +97,4 @@ public class SimpleDefinedType extends AbstractType implements ParameterizedNode
     public int hashCode() {
         return Objects.hash(super.hashCode(), type, parameters);
     }
-
 }

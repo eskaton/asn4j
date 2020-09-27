@@ -41,6 +41,8 @@ public class CompiledType implements CompilationResult {
 
     private CompiledType parent;
 
+    private String moduleName;
+
     private Type type;
 
     private String name;
@@ -50,6 +52,8 @@ public class CompiledType implements CompilationResult {
     private Optional<ConstraintDefinition> constraintDefinition = Optional.empty();
 
     private Optional<Module> module = Optional.empty();
+
+    private boolean subtype;
 
     CompiledType(Type type, String name) {
         this.type = type;
@@ -62,6 +66,14 @@ public class CompiledType implements CompilationResult {
 
     public void setParent(CompiledType parent) {
         this.parent = parent;
+    }
+
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
     }
 
     public Type getType() {
@@ -96,6 +108,14 @@ public class CompiledType implements CompilationResult {
         this.module = Optional.ofNullable(module);
     }
 
+    public boolean isSubtype() {
+        return subtype;
+    }
+
+    public void setSubtype(boolean subtype) {
+        this.subtype = subtype;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -123,5 +143,4 @@ public class CompiledType implements CompilationResult {
     public String toString() {
         return ToString.getExcept(this, "parent");
     }
-
 }

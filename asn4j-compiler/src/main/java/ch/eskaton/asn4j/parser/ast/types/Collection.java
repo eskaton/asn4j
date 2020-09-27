@@ -37,7 +37,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class Collection extends AbstractType {
+public abstract class Collection extends AbstractType implements HasModuleName {
+
+
+    private String moduleName;
 
     private List<ComponentType> rootComponents;
 
@@ -53,13 +56,16 @@ public abstract class Collection extends AbstractType {
         super();
     }
 
-    public Collection(Position position) {
+    public Collection(Position position, String moduleName) {
         super(position);
+
+        this.moduleName = moduleName;
     }
 
-    public Collection(Position position, ComponentTypeListsNode compTypes) {
+    public Collection(Position position, String moduleName, ComponentTypeListsNode compTypes) {
         super(position);
 
+        this.moduleName = moduleName;
         this.rootComponents = compTypes.getRootComponents();
         this.extensionAndException = compTypes.getExtensionAndException();
         this.extensionAdditions = compTypes.getExtensionAdditions();
@@ -67,12 +73,18 @@ public abstract class Collection extends AbstractType {
         this.extensionRootComponents = compTypes.getExtensionRootComponents();
     }
 
-    public Collection(Position position, ExtensionAndExceptionNode extensionAndException,
+    public Collection(Position position, String moduleName, ExtensionAndExceptionNode extensionAndException,
             Boolean optionalExtensionMarker) {
         super(position);
 
+        this.moduleName = moduleName;
         this.extensionAndException = extensionAndException;
         this.optionalExtensionMarker = optionalExtensionMarker;
+    }
+
+    @Override
+    public String getModuleName() {
+        return moduleName;
     }
 
     public List<ComponentType> getAllRootComponents() {

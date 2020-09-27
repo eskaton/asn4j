@@ -36,7 +36,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Choice extends AbstractType {
+public class Choice extends AbstractType implements HasModuleName {
+
+    private String moduleName;
 
     private List<NamedType> rootAlternatives;
 
@@ -52,14 +54,20 @@ public class Choice extends AbstractType {
         super();
     }
 
-    public Choice(Position position, AlternativeTypeLists alternatives) {
+    public Choice(Position position, String moduleName, AlternativeTypeLists alternatives) {
         super(position);
 
+        this.moduleName = moduleName;
         this.rootAlternatives = alternatives.getRootAlternatives();
         this.extensible = alternatives.getExtensionAndException() != null;
         this.exceptionId = this.extensible ? alternatives.getExtensionAndException().getExceptionId() : null;
         this.extensionAdditionAlternatives = alternatives.getExtensionAdditionAlternatives();
         this.optionalExtensionMarker = alternatives.hasExtensionMarker();
+    }
+
+    @Override
+    public String getModuleName() {
+        return moduleName;
     }
 
     public List<NamedType> getRootAlternatives() {

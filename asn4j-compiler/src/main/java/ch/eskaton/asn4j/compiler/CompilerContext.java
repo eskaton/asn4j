@@ -35,7 +35,6 @@ import ch.eskaton.asn4j.compiler.defaults.AbstractDefaultCompiler;
 import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
-import ch.eskaton.asn4j.compiler.java.JavaWriter;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
@@ -90,6 +89,7 @@ import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
+import ch.eskaton.asn4j.parser.ast.types.HasModuleName;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -113,9 +113,7 @@ import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.commons.collections.Tuple2;
-import ch.eskaton.commons.utils.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -174,6 +172,10 @@ public class CompilerContext {
 
     public CompiledModule getCompiledModule(String moduleName) {
         return definedModules.computeIfAbsent(moduleName, CompiledModule::new);
+    }
+
+    public HashMap<String, CompiledModule> getCompiledModules() {
+        return definedModules;
     }
 
     private void addType(String name, CompiledType compiledType) {
@@ -552,7 +554,11 @@ public class CompilerContext {
 
     private CompiledType defineType(Type type, String name, Optional<Parameters> maybeParameters, boolean newType) {
         if (newType && name != null) {
-            return compileType(type, getTypeName(type, name), maybeParameters);
+            var compiledType = compileType(type, getTypeName(type, name), maybeParameters);
+
+            compiledType.setSubtype(true);
+
+            return compiledType;
         }
 
         return createCompiledType(type, getTypeName(type, name), isBuiltin(type));
@@ -619,18 +625,6 @@ public class CompilerContext {
 
             throw new CompilerException(format, getCurrentModuleName(), symbolName,
                     module.getModuleId().getModuleName());
-        }
-    }
-
-    public void writeClasses() {
-        String pkgDir = pkg.replace('.', File.separatorChar);
-
-        File pkgFile = new File(StringUtils.concat(outputDir, File.separator, pkgDir));
-
-        if (pkgFile.exists() || pkgFile.mkdirs()) {
-            new JavaWriter().write(structs, outputDir);
-        } else {
-            throw new CompilerException("Failed to create directory " + pkgFile);
         }
     }
 
@@ -1093,6 +1087,22 @@ public class CompilerContext {
         return compiledType;
     }
 
+    public CompiledType findCompiledBaseType(CompiledType compiledType) {
+        var type = compiledType.getType();
+
+        if (type instanceof SimpleDefinedType simpleDefinedType && !(type instanceof UsefulType)) {
+            return findCompiledBaseType(compiledType.getModuleName(), simpleDefinedType);
+        }
+
+        return compiledType;
+    }
+
+    public CompiledType findCompiledBaseType(String moduleName, SimpleDefinedType type) {
+        var compiledType = getTypesOfModule(moduleName).get(type.getType());
+
+        return findCompiledBaseType(compiledType);
+    }
+
     private boolean isResolvableReference(Type type) {
         return type instanceof TypeReference && !(type instanceof UsefulType);
     }
@@ -1293,7 +1303,13 @@ public class CompilerContext {
 
         compiledType.setTags(CompilerUtils.getTagIds(this, type));
 
-        if (!isSubType && isTopLevelType()) {
+        var module = currentModule.peek();
+
+        if (module != null) {
+            compiledType.setModuleName(module.getModuleId().getModuleName());
+        }
+
+        if (!isSubType && isTopLevelType() && name != null) {
             addType(name, compiledType);
         }
 
@@ -1395,9 +1411,14 @@ public class CompilerContext {
     }
 
     public <T extends CompiledType & HasChildComponents> Optional<T> findCompiledTypeRecursive(Type type) {
-        if (type instanceof TypeReference) {
-            // type references are not nested, but may not yet be compiled, so we force the compilation here
-            var compiledType = getCompiledType(type);
+        if (!(type instanceof HasModuleName)) {
+            throw new IllegalCompilerStateException(type.getPosition(), "Type has no module name: ", type);
+        }
+
+        var moduleName = ((HasModuleName) type).getModuleName();
+
+        if (type instanceof TypeReference typeReference) {
+            var compiledType = getTypesOfModule(moduleName).get(typeReference.getType());
 
             if (compiledType instanceof HasChildComponents) {
                 return Optional.of((T) compiledType);
@@ -1406,7 +1427,7 @@ public class CompilerContext {
             return Optional.empty();
         }
 
-        var componentStream = getTypesOfCurrentModule().values().stream();
+        var componentStream = getTypesOfModule(moduleName).values().stream();
 
         return findCompiledTypeRecursiveAux(type, componentStream);
     }

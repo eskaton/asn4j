@@ -37,7 +37,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.LinkedList;
 import java.util.Optional;
@@ -47,9 +46,6 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
     @Override
     public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
-        var javaClass = ctx.createClass(name, node, tags);
-
-        javaClass.typeParameter(ctx.getTypeParameter(node, Optional.of(name)));
 
         var contentType = compileContentType(ctx, node, name, maybeParameters);
         var compiledType = ctx.createCompiledType(CompiledCollectionOfType.class, node, name);
@@ -62,13 +58,6 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
-
-        ctx.finishClass();
 
         return compiledType;
     }
