@@ -40,16 +40,6 @@ import java.util.Optional;
 public class JavaCollectionOfCompiler extends AbstractJavaTypeCompiler<CompiledCollectionOfType> {
 
     @Override
-    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
-            Map<String, JavaStructure> compiledClasses, String pkg, CompiledCollectionOfType compiledType) {
-        var javaClass = createClass(ctx, classStack, pkg, compiledType);
-
-        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
-
-        finishClass(classStack, compiledClasses, true);
-    }
-
-    @Override
     protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, CompiledCollectionOfType compiledType, JavaClass javaClass) {
         var name = compiledType.getName();

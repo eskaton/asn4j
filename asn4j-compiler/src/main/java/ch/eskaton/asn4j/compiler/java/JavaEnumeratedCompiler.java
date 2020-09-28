@@ -49,13 +49,8 @@ import static java.util.Arrays.asList;
 public class JavaEnumeratedCompiler extends AbstractJavaTypeCompiler<CompiledEnumeratedType> {
 
     @Override
-    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
-            Map<String, JavaStructure> compiledClasses, String pkg, CompiledEnumeratedType compiledType) {
-        var javaClass = createClass(ctx, classStack, pkg, compiledType);
-
-        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
-
-        finishClass(classStack, compiledClasses, false);
+    protected boolean createEqualsAndHashCode() {
+        return false;
     }
 
     @Override
