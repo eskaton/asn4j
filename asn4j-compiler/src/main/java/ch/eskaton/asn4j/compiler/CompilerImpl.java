@@ -120,11 +120,12 @@ public class CompilerImpl {
         var structs = new HashMap<String, JavaStructure>();
         var javaCompiler = new JavaCompiler();
 
-        for (var module : modules.values()) {
-            structs.putAll(javaCompiler.compile(compilerContext, module.getTypes(), config.getPackage()));
-        }
 
         if (config.isGenerateSource()) {
+            for (var module : modules.values()) {
+                structs.putAll(javaCompiler.compile(compilerContext, module.getTypes(), config.getPackage()));
+            }
+
             var pkgDir = config.getPackage().replace('.', File.separatorChar);
             var pkgFile = new File(StringUtils.concat(config.getOutputDir(), File.separator, pkgDir));
 
