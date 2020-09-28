@@ -39,7 +39,6 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaTypedSetter;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Alternative;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1Type;
 
 import java.util.ArrayList;
@@ -48,11 +47,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PRIVATE;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 
-public class JavaChoiceCompiler implements JavaTypeCompiler<CompiledChoiceType> {
+public class JavaChoiceCompiler extends AbstractJavaTypeCompiler<CompiledChoiceType> {
 
     public static final String CLEAR_FIELDS = "clearFields";
 
@@ -61,28 +59,18 @@ public class JavaChoiceCompiler implements JavaTypeCompiler<CompiledChoiceType> 
     private static final String CHOICE_FIELD = "choice";
 
     @Override
-    public void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, String pkg, CompiledChoiceType compiledType) {
-        var name = compiledType.getName();
-        var className = formatName(name);
-        var tags = compiledType.getTags().orElse(List.of());
-        var type = compiledType.getType();
-        var javaClass = createClass(ctx, classStack, pkg, className, type, tags);
+        var javaClass = createClass(ctx, classStack, pkg, compiledType);
 
-        generateChoiceJavaClass(ctx, javaClass, compiledType);
-
-        compiledType.getComponents().forEach(component -> {
-            var compiledComponent = component.getCompiledType();
-
-            if (compiledComponent.isSubtype()) {
-                compiler.compileType(ctx, classStack, compiledClasses, pkg, compiledComponent);
-            }
-        });
+        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
 
         finishClass(classStack, compiledClasses, true);
     }
 
-    private void generateChoiceJavaClass(CompilerContext ctx, JavaClass javaClass, CompiledChoiceType compiledType) {
+    @Override
+    protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+            Map<String, JavaStructure> compiledClasses, CompiledChoiceType compiledType, JavaClass javaClass) {
         var fieldNames = new ArrayList<String>();
         var typeEnum = new JavaEnum(CHOICE_ENUM);
 
@@ -112,10 +100,13 @@ public class JavaChoiceCompiler implements JavaTypeCompiler<CompiledChoiceType> 
 
         addClearFieldsMethod(javaClass, fieldNames);
 
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
+        compiledType.getComponents().forEach(component -> {
+            var compiledComponent = component.getCompiledType();
+
+            if (compiledComponent.isSubtype()) {
+                compiler.compileType(ctx, classStack, compiledClasses, javaClass.getPkg(), compiledComponent);
+            }
+        });
     }
 
     private void addJavaField(JavaClass javaClass, String typeConstant, String beforeCode,

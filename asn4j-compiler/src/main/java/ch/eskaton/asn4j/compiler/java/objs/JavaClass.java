@@ -100,6 +100,10 @@ public class JavaClass implements JavaStructure {
         this.parent = parent;
     }
 
+    public String getPkg() {
+        return pkg;
+    }
+
     public String getName() {
         return name;
     }

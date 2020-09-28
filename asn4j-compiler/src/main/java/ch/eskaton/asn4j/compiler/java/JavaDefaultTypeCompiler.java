@@ -31,30 +31,16 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Deque;
-import java.util.List;
 import java.util.Map;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
-
-public class JavaDefaultTypeCompiler implements JavaTypeCompiler<CompiledType> {
+public class JavaDefaultTypeCompiler extends AbstractJavaTypeCompiler<CompiledType> {
 
     @Override
     public void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, String pkg, CompiledType compiledType) {
-        var name = compiledType.getName();
-        var className = formatName(name);
-        var tags = compiledType.getTags().orElse(List.of());
-        var type = compiledType.getType();
-        var javaClass = createClass(ctx, classStack, pkg, className, type, tags);
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
-
+        createClass(ctx, classStack, pkg, compiledType);
         finishClass(classStack, compiledClasses, true);
     }
 

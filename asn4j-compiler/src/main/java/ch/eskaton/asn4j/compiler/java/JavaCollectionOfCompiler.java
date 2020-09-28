@@ -32,25 +32,28 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.results.AnonymousCompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Deque;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
-
-public class JavaCollectionOfCompiler implements JavaTypeCompiler<CompiledCollectionOfType>{
+public class JavaCollectionOfCompiler extends AbstractJavaTypeCompiler<CompiledCollectionOfType> {
 
     @Override
-    public void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, String pkg, CompiledCollectionOfType compiledType) {
+        var javaClass = createClass(ctx, classStack, pkg, compiledType);
+
+        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
+
+        finishClass(classStack, compiledClasses, true);
+    }
+
+    @Override
+    protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+            Map<String, JavaStructure> compiledClasses, CompiledCollectionOfType compiledType, JavaClass javaClass) {
         var name = compiledType.getName();
-        var className = formatName(name);
-        var tags = compiledType.getTags().orElse(List.of());
         var type = compiledType.getType();
-        var javaClass = createClass(ctx, classStack, pkg, className, type, tags);
 
         javaClass.typeParameter(ctx.getTypeParameter(type, Optional.of(name)));
 
@@ -61,15 +64,8 @@ public class JavaCollectionOfCompiler implements JavaTypeCompiler<CompiledCollec
         }
 
         if (contentType.isSubtype()) {
-            compiler.compileType(ctx, classStack, compiledClasses, pkg, contentType);
+            compiler.compileType(ctx, classStack, compiledClasses, javaClass.getPkg(), contentType);
         }
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
-
-        finishClass(classStack, compiledClasses, true);
     }
 
 }
