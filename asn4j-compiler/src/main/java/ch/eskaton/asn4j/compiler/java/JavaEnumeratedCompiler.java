@@ -36,37 +36,31 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.java.objs.JavaVisibility;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaType.INT;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 import static java.util.Arrays.asList;
 
-public class JavaEnumeratedCompiler implements JavaTypeCompiler<CompiledEnumeratedType> {
+public class JavaEnumeratedCompiler extends AbstractJavaTypeCompiler<CompiledEnumeratedType> {
 
     @Override
-    public void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, String pkg, CompiledEnumeratedType compiledType) {
-        var name = compiledType.getName();
-        var className = formatName(name);
-        var tags = compiledType.getTags().orElse(List.of());
-        var type = compiledType.getType();
-        var javaClass = createClass(ctx, classStack, pkg, className, type, tags);
+        var javaClass = createClass(ctx, classStack, pkg, compiledType);
 
-        generateEnumeratedJavaClass(ctx, javaClass, compiledType);
+        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
 
         finishClass(classStack, compiledClasses, false);
     }
 
-    private JavaClass generateEnumeratedJavaClass(CompilerContext ctx, JavaClass javaClass,
-            CompiledEnumeratedType compiledType) {
+    @Override
+    protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+            Map<String, JavaStructure> compiledClasses, CompiledEnumeratedType compiledType, JavaClass javaClass) {
         final String VALUE_PARAMETER = "value";
 
         var name = compiledType.getName();
@@ -117,13 +111,6 @@ public class JavaEnumeratedCompiler implements JavaTypeCompiler<CompiledEnumerat
         bodyBuilder.finish().build();
 
         javaClass.addImport(ASN1RuntimeException.class.getCanonicalName());
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
-
-        return javaClass;
     }
 
 }

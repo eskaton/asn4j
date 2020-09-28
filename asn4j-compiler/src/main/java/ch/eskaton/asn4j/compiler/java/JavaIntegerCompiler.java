@@ -40,32 +40,27 @@ import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.math.BigInteger;
 import java.util.Deque;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 import static java.util.Collections.singletonList;
 
-public class JavaIntegerCompiler implements JavaTypeCompiler<CompiledIntegerType> {
-
+public class JavaIntegerCompiler extends AbstractJavaTypeCompiler<CompiledIntegerType> {
 
     @Override
-    public void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, String pkg, CompiledIntegerType compiledType) {
-        var name = compiledType.getName();
-        var className = formatName(name);
-        var tags = compiledType.getTags().orElse(List.of());
-        var type = compiledType.getType();
-        var javaClass = createClass(ctx, classStack, pkg, className, type, tags);
+        var javaClass = createClass(ctx, classStack, pkg, compiledType);
 
-        generateIntegerJavaClass(ctx, javaClass, compiledType);
+        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
 
         finishClass(classStack, compiledClasses, true);
     }
 
-    private void generateIntegerJavaClass(CompilerContext ctx, JavaClass javaClass, CompiledIntegerType compiledType) {
+    @Override
+    protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+            Map<String, JavaStructure> compiledClasses, CompiledIntegerType compiledType, JavaClass javaClass) {
         var name = compiledType.getName();
         var namedNumbers = compiledType.getNamedNumbers();
 
@@ -101,10 +96,6 @@ public class JavaIntegerCompiler implements JavaTypeCompiler<CompiledIntegerType
         javaClass.addImport(BigInteger.class, ConstraintViolatedException.class);
 
         addJavaConstructor(javaClass, name);
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-        }
     }
 
     private void addJavaConstructor(JavaClass javaClass, String name) {
@@ -115,6 +106,5 @@ public class JavaIntegerCompiler implements JavaTypeCompiler<CompiledIntegerType
 
         javaClass.addMethod(javaConstructor);
     }
-
 
 }

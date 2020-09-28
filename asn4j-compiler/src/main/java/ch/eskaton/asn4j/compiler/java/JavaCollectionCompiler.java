@@ -40,30 +40,28 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Component;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Deque;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
-public class JavaCollectionCompiler implements JavaTypeCompiler<CompiledCollectionType> {
+public class JavaCollectionCompiler extends AbstractJavaTypeCompiler<CompiledCollectionType> {
 
     @Override
-    public void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, String pkg, CompiledCollectionType compiledType) {
-        var name = compiledType.getName();
-        var className = formatName(name);
-        var tags = compiledType.getTags().orElse(List.of());
-        var type = compiledType.getType();
-        var javaClass = createClass(ctx, classStack, pkg, className, type, tags);
+        var javaClass = createClass(ctx, classStack, pkg, compiledType);
+        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
 
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
+        finishClass(classStack, compiledClasses, true);
+    }
+
+    @Override
+    protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+            Map<String, JavaStructure> compiledClasses, CompiledCollectionType compiledType, JavaClass javaClass) {
+        var name = compiledType.getName();
 
         createJavaConstructors(name, compiledType, javaClass);
 
@@ -73,13 +71,10 @@ public class JavaCollectionCompiler implements JavaTypeCompiler<CompiledCollecti
             var compiledComponent = component.getCompiledType();
 
             if (compiledComponent.isSubtype()) {
-                compiler.compileType(ctx, classStack, compiledClasses, pkg, compiledComponent);
+                compiler.compileType(ctx, classStack, compiledClasses, javaClass.getPkg(), compiledComponent);
             }
         });
-
-        finishClass(classStack, compiledClasses, true);
     }
-
 
     private void createJavaConstructors(String name, CompiledCollectionType compiledType, JavaClass javaClass) {
         var ctor = new JavaConstructor(JavaVisibility.PUBLIC, name);

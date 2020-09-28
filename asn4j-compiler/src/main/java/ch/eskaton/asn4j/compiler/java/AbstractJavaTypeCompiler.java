@@ -32,8 +32,7 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.runtime.TagId;
+import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Deque;
 import java.util.List;
@@ -41,21 +40,30 @@ import java.util.Map;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
-public interface JavaTypeCompiler<T extends CompiledType> {
+public abstract class AbstractJavaTypeCompiler<T extends CompiledType> {
 
-    void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+    protected abstract void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, String pkg, T compiledType);
 
-    default JavaClass createClass(CompilerContext ctx, Deque<JavaClass> classes, String pkg, String name, Type type,
-            List<TagId> tags) {
-        var javaClass = new JavaClass(pkg, formatName(name), tags, ctx.getTypeName(type));
+    protected JavaClass createClass(CompilerContext ctx, Deque<JavaClass> classes, String pkg,
+            CompiledType compiledType) {
+        var name = compiledType.getName();
+        var className = formatName(name);
+        var tags = compiledType.getTags().orElse(List.of());
+        var type = compiledType.getType();
+        var javaClass = new JavaClass(pkg, className, tags, ctx.getTypeName(type));
+
+        if (compiledType.getModule().isPresent()) {
+            javaClass.addModule(ctx, compiledType.getModule().get());
+            javaClass.addImport(ConstraintViolatedException.class);
+        }
 
         classes.push(javaClass);
 
         return javaClass;
     }
 
-    default void finishClass(Deque<JavaClass> classes, Map<String, JavaStructure> compiledClasses,
+    protected void finishClass(Deque<JavaClass> classes, Map<String, JavaStructure> compiledClasses,
             boolean createEqualsAndHashCode) {
         var javaClass = classes.pop();
 
@@ -69,6 +77,10 @@ public interface JavaTypeCompiler<T extends CompiledType> {
             classes.peek().addInnerClass(javaClass);
             javaClass.addModifier(JavaModifier.STATIC);
         }
+    }
+
+    protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+            Map<String, JavaStructure> compiledClasses, T compiledType, JavaClass javaClass) {
     }
 
 }

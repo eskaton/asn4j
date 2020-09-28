@@ -32,35 +32,28 @@ import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.results.CompiledBitStringType;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 import ch.eskaton.asn4j.runtime.types.ASN1NamedBitString;
 
 import java.util.Deque;
-import java.util.List;
 import java.util.Map;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 import static ch.eskaton.asn4j.compiler.java.objs.JavaVisibility.PUBLIC;
 
-public class JavaBitStringCompiler implements JavaTypeCompiler<CompiledBitStringType> {
-
+public class JavaBitStringCompiler extends AbstractJavaTypeCompiler<CompiledBitStringType> {
 
     @Override
-    public void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, String pkg, CompiledBitStringType compiledType) {
-        var name = compiledType.getName();
-        var className = formatName(name);
-        var tags = compiledType.getTags().orElse(List.of());
-        var type = compiledType.getType();
-        var javaClass = createClass(ctx, classStack, pkg, className, type, tags);
+        var javaClass = createClass(ctx, classStack, pkg, compiledType);
 
-        generateBitStringJavaClass(ctx, javaClass, compiledType);
+        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
 
         finishClass(classStack, compiledClasses, false);
     }
 
-    private void generateBitStringJavaClass(CompilerContext ctx, JavaClass javaClass,
-            CompiledBitStringType compiledType) {
+    @Override
+    protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+            Map<String, JavaStructure> compiledClasses, CompiledBitStringType compiledType, JavaClass javaClass) {
         var name = compiledType.getName();
         var namedBits = compiledType.getNamedBits();
 
@@ -83,11 +76,6 @@ public class JavaBitStringCompiler implements JavaTypeCompiler<CompiledBitString
         }
 
         javaClass.method().modifier(PUBLIC).name(name).build();
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
     }
 
 }
