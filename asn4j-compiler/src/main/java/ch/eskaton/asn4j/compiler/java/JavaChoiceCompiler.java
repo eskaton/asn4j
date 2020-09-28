@@ -59,16 +59,6 @@ public class JavaChoiceCompiler extends AbstractJavaTypeCompiler<CompiledChoiceT
     private static final String CHOICE_FIELD = "choice";
 
     @Override
-    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
-            Map<String, JavaStructure> compiledClasses, String pkg, CompiledChoiceType compiledType) {
-        var javaClass = createClass(ctx, classStack, pkg, compiledType);
-
-        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
-
-        finishClass(classStack, compiledClasses, true);
-    }
-
-    @Override
     protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, CompiledChoiceType compiledType, JavaClass javaClass) {
         var fieldNames = new ArrayList<String>();

@@ -27,21 +27,8 @@
 
 package ch.eskaton.asn4j.compiler.java;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 
-import java.util.Deque;
-import java.util.Map;
-
 public class JavaDefaultTypeCompiler extends AbstractJavaTypeCompiler<CompiledType> {
-
-    @Override
-    public void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
-            Map<String, JavaStructure> compiledClasses, String pkg, CompiledType compiledType) {
-        createClass(ctx, classStack, pkg, compiledType);
-        finishClass(classStack, compiledClasses, true);
-    }
 
 }

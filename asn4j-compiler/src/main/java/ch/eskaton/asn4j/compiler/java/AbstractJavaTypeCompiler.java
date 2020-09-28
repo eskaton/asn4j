@@ -42,8 +42,18 @@ import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 
 public abstract class AbstractJavaTypeCompiler<T extends CompiledType> {
 
-    protected abstract void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
-            Map<String, JavaStructure> compiledClasses, String pkg, T compiledType);
+    protected void compile(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
+            Map<String, JavaStructure> compiledClasses, String pkg, T compiledType) {
+        var javaClass = createClass(ctx, classStack, pkg, compiledType);
+
+        configureJavaClass(compiler, ctx, classStack, compiledClasses, compiledType, javaClass);
+
+        finishClass(classStack, compiledClasses, createEqualsAndHashCode());
+    }
+
+    protected boolean createEqualsAndHashCode() {
+        return true;
+    }
 
     protected JavaClass createClass(CompilerContext ctx, Deque<JavaClass> classes, String pkg,
             CompiledType compiledType) {
