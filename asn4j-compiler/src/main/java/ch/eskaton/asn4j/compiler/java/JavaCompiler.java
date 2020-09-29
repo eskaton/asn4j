@@ -72,7 +72,7 @@ public class JavaCompiler {
                 maybeArgs -> callWithConsumer(args -> compiler.accept(args.get_1(), args.get_2(), args.get_3(), args.get_4(), args.get_5(), (T) args.get_6()), maybeArgs.get(), true));
     }
 
-    public HashMap<String, JavaStructure> compile(CompilerContext ctx, Map<String, CompiledType> compiledTypes,
+    public Map<String, JavaStructure> compile(CompilerContext ctx, Map<String, CompiledType> compiledTypes,
             String pkg) {
         var compiledClasses = new HashMap<String, JavaStructure>();
 

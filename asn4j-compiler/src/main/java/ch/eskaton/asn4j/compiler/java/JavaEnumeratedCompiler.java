@@ -56,7 +56,7 @@ public class JavaEnumeratedCompiler extends AbstractJavaTypeCompiler<CompiledEnu
     @Override
     protected void configureJavaClass(JavaCompiler compiler, CompilerContext ctx, Deque<JavaClass> classStack,
             Map<String, JavaStructure> compiledClasses, CompiledEnumeratedType compiledType, JavaClass javaClass) {
-        final String VALUE_PARAMETER = "value";
+        final var VALUE_PARAMETER = "value";
 
         var name = compiledType.getName();
         var allItems = compiledType.getRoots().copy().addAll(compiledType.getAdditions().getItems());
@@ -95,13 +95,14 @@ public class JavaEnumeratedCompiler extends AbstractJavaTypeCompiler<CompiledEnu
         bodyBuilder.append("switch(value) {");
 
         for (var entry : cases.entrySet()) {
-            bodyBuilder.append("\tcase " + entry.getKey() + ":");
-            bodyBuilder.append("\t\treturn " + entry.getValue() + ";");
+            bodyBuilder.append("\tcase %s:".formatted(entry.getKey()));
+            bodyBuilder.append("\t\treturn %s;".formatted(entry.getValue()));
         }
 
-        bodyBuilder.append("\tdefault:")
-                .append("\t\tthrow new " + ASN1RuntimeException.class.getSimpleName() +
-                        "(\"Undefined value: \" + value);").append("}");
+        var exception = "\t\tthrow new %s(\"Undefined value: \" + value);"
+                .formatted(ASN1RuntimeException.class.getSimpleName());
+
+        bodyBuilder.append("\tdefault:").append(exception).append("}");
 
         bodyBuilder.finish().build();
 

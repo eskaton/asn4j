@@ -66,9 +66,9 @@ public class JavaChoiceCompiler extends AbstractJavaTypeCompiler<CompiledChoiceT
 
         var bodyBuilder = javaClass.method().modifier(PUBLIC).annotation("@Override")
                 .returnType(ASN1Type.class.getSimpleName()).name("getValue").body();
-        var clearFields = "\t\t" + CLEAR_FIELDS + "();\n";
+        var clearFields = "\t\t%s();\n".formatted(CLEAR_FIELDS);
 
-        bodyBuilder.append("switch(" + CHOICE_FIELD + ") {");
+        bodyBuilder.append("switch(%s) {".formatted(CHOICE_FIELD));
 
         for (var component : compiledType.getComponents()) {
             var fieldName = CompilerUtils.formatName(component.getName());
@@ -76,7 +76,9 @@ public class JavaChoiceCompiler extends AbstractJavaTypeCompiler<CompiledChoiceT
 
             fieldNames.add(fieldName);
             typeEnum.addEnumConstant(typeConstant);
-            bodyBuilder.append("\tcase " + typeConstant + ":").append("\t\treturn " + fieldName + ";");
+
+            bodyBuilder.append("\tcase %s:".formatted(typeConstant))
+                    .append("\t\treturn %s;".formatted(fieldName));
 
             addJavaField(javaClass, typeConstant, clearFields, component);
         }
@@ -110,7 +112,7 @@ public class JavaChoiceCompiler extends AbstractJavaTypeCompiler<CompiledChoiceT
         var javaSetter = new JavaTypedSetter(javaTypeName, javaFieldName, CHOICE_FIELD, qualifiedConstant, beforeCode);
         var javaGetter = new JavaGetter(javaTypeName, javaFieldName, field.hasDefault());
         var annotation = new JavaAnnotation(ASN1Alternative.class).
-                addParameter("name", '"' + typeConstant + '"');
+                addParameter("name", "\"%s\"".formatted(typeConstant));
 
         field.addAnnotation(annotation);
 
@@ -124,7 +126,7 @@ public class JavaChoiceCompiler extends AbstractJavaTypeCompiler<CompiledChoiceT
     }
 
     private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
-        var body = fieldNames.stream().map(f -> f + " = null;").collect(Collectors.toList());
+        var body = fieldNames.stream().map(f -> "%s = null;".formatted(f)).collect(Collectors.toList());
 
         javaClass.method()
                 .modifier(PRIVATE)

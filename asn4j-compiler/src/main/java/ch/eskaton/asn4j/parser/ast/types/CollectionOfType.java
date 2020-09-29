@@ -52,7 +52,7 @@ public class CollectionOfType extends AbstractType implements HasModuleName {
 
     @Override
     public String getModuleName() {
-        return null;
+        return moduleName;
     }
 
     public Type getType() {

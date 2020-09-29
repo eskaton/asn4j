@@ -36,7 +36,7 @@ import java.util.Optional;
 
 public class ValueAssignmentCompiler implements Compiler<ValueAssignmentNode> {
 
-    public CompiledValue compile(CompilerContext ctx, ValueAssignmentNode node) {
+    public CompiledValue<Value> compile(CompilerContext ctx, ValueAssignmentNode node) {
         var valueName = node.getReference();
 
         System.out.println("Compiling value " + valueName);

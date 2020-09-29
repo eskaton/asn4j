@@ -449,15 +449,6 @@ public class TypeConfiguration {
                 new IllegalCompilerStateException("Unexpected type: %s", typeClass.getSimpleName()));
     }
 
-    private <V extends Value, R> R getConfigByValue(String functionName, Class<V> valueClass,
-            Function<TypeDefinition, R> accessor) {
-        return memoizer.get(functionName, List.of(valueClass), type -> types.stream()
-                .filter(td -> td.matchesValue(valueClass))
-                .map(accessor)
-                .findFirst()).orElseThrow(() ->
-                new IllegalCompilerStateException("Unexpected value: %s", valueClass.getSimpleName()));
-    }
-
     private static class Memoizer {
 
         private Map<Tuple2<String, List<Object>>, Object> cache = new HashMap<>();

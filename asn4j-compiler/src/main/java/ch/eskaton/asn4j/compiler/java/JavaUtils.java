@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
@@ -123,27 +124,27 @@ public class JavaUtils {
         return DISPATCHER.execute(value, Tuple3.of(ctx, typeName, value));
     }
 
-    private static <T extends Value> void addCase(
-            Class<T> valueClazz,
+    private static <T extends Value> void addCase(Class<T> valueClazz,
             TriFunction<CompilerContext, String, T, String> initializer) {
         DISPATCHER.withCase(valueClazz,
-                maybeArgs -> callWith(args -> initializer.apply(args.get_1(), args.get_2(),
-                        valueClazz.cast(args.get_3())), maybeArgs.get()));
+                maybeArgs -> callWith(args ->
+                        initializer.apply(args.get_1(), args.get_2(), valueClazz.cast(args.get_3())), maybeArgs.get()));
     }
 
     private static String getBooleanInitializerString(CompilerContext ctx, String typeName, BooleanValue value) {
-        return "new " + typeName + "(" + value.getValue() + ")";
+        return "new %s(%s)".formatted(typeName, value.getValue());
     }
 
     private static String getBitStringInitializerString(CompilerContext ctx, String typeName, BitStringValue value) {
-        byte[] bytes = value.getByteValue();
-        String bytesStr = IntStream.range(0, bytes.length).boxed().map(
-                i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
+        var bytes = value.getByteValue();
+        var bytesStr = IntStream.range(0, bytes.length).boxed()
+                .map(i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
 
-        return "new " + typeName + "(new byte[] { " + bytesStr + " }, " + value.getUnusedBits() + ")";
+        return "new %s(new byte[] { %s }, %s)".formatted(typeName, bytesStr, value.getUnusedBits());
     }
 
-    private static String getBinaryStringInitializerString(CompilerContext ctx, String typeName, BinaryStringValue value) {
+    private static String getBinaryStringInitializerString(CompilerContext ctx, String typeName,
+            BinaryStringValue value) {
         return getBitStringInitializerString(ctx, typeName, value.toBitString());
     }
 
@@ -156,7 +157,7 @@ public class JavaUtils {
     }
 
     private static String getIntegerInitializerString(CompilerContext ctx, String typeName, IntegerValue value) {
-        return "new " + typeName + "(" + value.getValue().longValue() + "L)";
+        return "new %s(%sL)".formatted(typeName, value.getValue().longValue());
     }
 
     private static String getRealInitializerString(CompilerContext ctx, String typeName, RealValue value) {
@@ -175,18 +176,19 @@ public class JavaUtils {
         return getIRIInitializerString(typeName, value.getArcIdentifierTexts());
     }
 
-    private static String getRelativeIRIInitializerString(CompilerContext ctx, String typeName, RelativeIRIValue value) {
+    private static String getRelativeIRIInitializerString(CompilerContext ctx, String typeName,
+            RelativeIRIValue value) {
         return getIRIInitializerString(typeName, value.getArcIdentifierTexts());
     }
 
     private static String getIRIInitializerString(String typeName, List<String> components) {
-        String idsString = components.stream().map(str -> StringUtils.wrap(str, "\"")).collect(Collectors.joining(", "));
+        var idsString = components.stream().map(str -> StringUtils.wrap(str, "\"")).collect(Collectors.joining(", "));
 
-        return "new " + typeName + "(" + idsString + ")";
+        return "new %s(%s)".formatted(typeName, idsString);
     }
 
     private static String getNullInitializerString(CompilerContext ctx, String typeName, NullValue value) {
-        return "new " + typeName + "()";
+        return "new %s()".formatted(typeName);
     }
 
     private static String getObjectIdentifierInitializerString(CompilerContext ctx, String typeName,
@@ -194,30 +196,33 @@ public class JavaUtils {
         return getOIDInitializerString(typeName, getComponentIds(value.getComponents()));
     }
 
-    private static String getRelativeOIDInitializerString(CompilerContext ctx, String typeName, RelativeOIDValue value) {
+    private static String getRelativeOIDInitializerString(CompilerContext ctx, String typeName,
+            RelativeOIDValue value) {
         return getOIDInitializerString(typeName, getComponentIds(value.getComponents()));
     }
 
     private static String getOIDInitializerString(String typeName, List<Integer> ids) {
-        String idsString = ids.stream().map(Object::toString).collect(Collectors.joining(", "));
+        var idsString = ids.stream().map(Object::toString).collect(Collectors.joining(", "));
 
-        return "new " + typeName + "(new int[] { " + idsString + " })";
+        return "new %s(new int[] {%s})".formatted(typeName, idsString);
     }
 
-    private static String getOctetStringInitializerString(CompilerContext ctx, String typeName, OctetStringValue value) {
-        byte[] bytes = value.getByteValue();
-        String bytesStr = IntStream.range(0, bytes.length).boxed().map(
+    private static String getOctetStringInitializerString(CompilerContext ctx, String typeName,
+            OctetStringValue value) {
+        var bytes = value.getByteValue();
+        var bytesStr = IntStream.range(0, bytes.length).boxed().map(
                 i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
 
-        return "new " + typeName + "(new byte[] { " + bytesStr + " })";
+        return "new %s(new byte[] { %s })".formatted(typeName, bytesStr);
     }
 
-    private static String getCollectionOfInitializerString(CompilerContext ctx, String typeName, CollectionOfValue value) {
+    private static String getCollectionOfInitializerString(CompilerContext ctx, String typeName,
+            CollectionOfValue value) {
         var initString = value.getValues().stream()
                 .map(v -> getInitializerString(ctx, ctx.getTypeName(((AbstractValue) v).getType()), v))
                 .collect(Collectors.joining(", "));
 
-        return "new " + typeName + "(" + initString + ")";
+        return "new %s(%s)".formatted(typeName, initString);
     }
 
     private static String getCollectionInitializerString(CompilerContext ctx, String typeName, CollectionValue value) {
@@ -229,12 +234,17 @@ public class JavaUtils {
 
         return maybeCompiledType.map(compiledType -> {
             var initString = compiledType.getComponents().stream()
-                    .map(c -> values.containsKey(c.getName()) ?
-                            getInitializerString(ctx, ctx.getTypeName(c.getCompiledType().getType()), values.get(c.getName())) :
-                            "null")
+                    .map(c -> {
+                        var componentTypeName = ctx.getTypeName(c.getCompiledType().getType());
+                        var componentValue = values.get(c.getName());
+
+                        return values.containsKey(c.getName()) ?
+                                getInitializerString(ctx, componentTypeName, componentValue) :
+                                "null";
+                    })
                     .collect(Collectors.joining(", "));
 
-            return "new " + typeName + "(" + initString + ")";
+            return "new %s(%s)".formatted(typeName, initString);
         }).orElseThrow(() -> new CompilerException("Failed to resolve type %s", typeName));
     }
 

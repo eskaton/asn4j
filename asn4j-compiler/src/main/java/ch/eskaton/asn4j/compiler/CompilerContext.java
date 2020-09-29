@@ -36,7 +36,6 @@ import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaModifier;
 import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
@@ -111,7 +110,6 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.commons.collections.Tuple2;
 
 import java.io.IOException;
@@ -129,7 +127,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.formatName;
 import static ch.eskaton.commons.utils.ReflectionUtils.getInstance;
 
 public class CompilerContext {
@@ -156,14 +153,8 @@ public class CompilerContext {
 
     private CompilerImpl compiler;
 
-    private String pkg;
-
-    private String outputDir;
-
-    public CompilerContext(CompilerImpl compiler, String pkg, String outputDir) {
+    public CompilerContext(CompilerImpl compiler) {
         this.compiler = compiler;
-        this.pkg = pkg;
-        this.outputDir = outputDir;
     }
 
     private CompiledModule getCurrentCompiledModule() {
@@ -174,7 +165,7 @@ public class CompilerContext {
         return definedModules.computeIfAbsent(moduleName, CompiledModule::new);
     }
 
-    public HashMap<String, CompiledModule> getCompiledModules() {
+    public Map<String, CompiledModule> getCompiledModules() {
         return definedModules;
     }
 
@@ -236,47 +227,6 @@ public class CompilerContext {
 
     public ModuleNode getModule() {
         return currentModule.peek();
-    }
-
-    public void finishClass() {
-        finishClass(true);
-    }
-
-    public void finishClass(boolean createEqualsAndHashCode) {
-        JavaClass javaClass = currentClass.pop();
-
-        if (createEqualsAndHashCode) {
-            javaClass.createEqualsAndHashCode();
-        }
-
-        if (currentClass.isEmpty()) {
-            structs.put(javaClass.getName(), javaClass);
-        } else {
-            currentClass.peek().addInnerClass(javaClass);
-            javaClass.addModifier(JavaModifier.STATIC);
-        }
-    }
-
-    public JavaClass createClass(String name, Type type, List<TagId> tags) {
-        var javaClass = new JavaClass(pkg, formatName(name), tags, getTypeName(type));
-
-        currentClass.push(javaClass);
-
-        return javaClass;
-    }
-
-    public JavaClass getCurrentClass() {
-        return currentClass.peek();
-    }
-
-    public Optional<JavaClass> getClass(String className) {
-        JavaStructure struct = structs.get(className);
-
-        if (struct instanceof JavaClass) {
-            return Optional.of((JavaClass) struct);
-        }
-
-        return Optional.empty();
     }
 
     public void addModule(String moduleName, ModuleNode module) {
