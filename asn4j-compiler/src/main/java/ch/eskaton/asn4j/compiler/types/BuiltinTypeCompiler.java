@@ -33,7 +33,6 @@ import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.runtime.exceptions.ConstraintViolatedException;
 
 import java.util.Optional;
 
@@ -42,7 +41,6 @@ public abstract class BuiltinTypeCompiler<T extends Type> implements NamedCompil
     @Override
     public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
-        var javaClass = ctx.createClass(name, node, tags);
         var compiledType = ctx.createCompiledType(node, name);
 
         compiledType.setTags(tags);
@@ -51,13 +49,6 @@ public abstract class BuiltinTypeCompiler<T extends Type> implements NamedCompil
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });
-
-        if (compiledType.getModule().isPresent()) {
-            javaClass.addModule(ctx, compiledType.getModule().get());
-            javaClass.addImport(ConstraintViolatedException.class);
-        }
-
-        ctx.finishClass();
 
         return compiledType;
     }

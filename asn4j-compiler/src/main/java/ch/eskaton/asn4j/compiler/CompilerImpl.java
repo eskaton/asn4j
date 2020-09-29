@@ -102,7 +102,7 @@ public class CompilerImpl {
         this.config = config;
         this.moduleSource = moduleSource;
 
-        compilerContext = new CompilerContext(this, config.getPackage(), config.getOutputDir());
+        compilerContext = new CompilerContext(this);
     }
 
     public void run() throws IOException, ParserException {
@@ -297,7 +297,7 @@ public class CompilerImpl {
         return compileTypeAssignment(typeAssignment);
     }
 
-    private CompiledValue compileValueAssignment(ValueAssignmentNode assignment) {
+    private CompiledValue<Value> compileValueAssignment(ValueAssignmentNode assignment) {
         return compilerContext.<ValueAssignmentNode, ValueAssignmentCompiler>
                 getCompiler(ValueAssignmentNode.class).compile(compilerContext, assignment);
     }

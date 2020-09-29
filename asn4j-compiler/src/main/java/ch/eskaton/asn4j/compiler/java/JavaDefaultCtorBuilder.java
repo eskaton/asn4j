@@ -63,17 +63,18 @@ import static java.lang.Thread.currentThread;
 public class JavaDefaultCtorBuilder {
 
     public void build(Map<String, JavaStructure> structs) {
-        ClassHierarchy hierarchy = buildClassHierarchy(structs);
+        var hierarchy = buildClassHierarchy(structs);
 
         createDefaultConstructors(null, hierarchy.getJavaClass(), hierarchy.getSubclasses());
     }
 
-    private void createDefaultConstructors(JavaClass parentJavaClass, JavaClass javaClass, Set<ClassHierarchy> subclasses) {
+    private void createDefaultConstructors(JavaClass parentJavaClass, JavaClass javaClass,
+            Set<ClassHierarchy> subclasses) {
         if (javaClass != null) {
             createDefaultConstructors(parentJavaClass, javaClass);
         }
 
-        for (ClassHierarchy subclass : subclasses) {
+        for (var subclass : subclasses) {
             createDefaultConstructors(javaClass, subclass.getJavaClass(), subclass.getSubclasses());
         }
     }
@@ -88,7 +89,7 @@ public class JavaDefaultCtorBuilder {
 
     public <T> void generateParentConstructors(JavaClass javaClass) {
         try {
-            Class<? super T> parentClazz = (Class<? super T>) currentThread()
+            var parentClazz = (Class<? super T>) currentThread()
                     .getContextClassLoader().loadClass("ch.eskaton.asn4j.runtime.types." + javaClass.getParent());
 
             Arrays.stream(parentClazz.getConstructors())
@@ -106,7 +107,7 @@ public class JavaDefaultCtorBuilder {
 
     private static void collectClasses(Set<Class<?>> classes, Type type) {
         if (type instanceof Class) {
-            Class<?> clazz = (Class<?>) type;
+            var clazz = (Class<?>) type;
 
             if (!type.equals(Object.class) && !clazz.isPrimitive()) {
                 if (clazz.isArray()) {
@@ -122,32 +123,31 @@ public class JavaDefaultCtorBuilder {
         } else if (type instanceof ParameterizedType) {
             collectClasses(classes, ((ParameterizedType) type).getRawType());
 
-            for (Type actualType : ((ParameterizedType) type).getActualTypeArguments()) {
+            for (var actualType : ((ParameterizedType) type).getActualTypeArguments()) {
                 collectClasses(classes, actualType);
             }
         } else if (type instanceof GenericArrayType) {
             collectClasses(classes, ((GenericArrayType) type).getGenericComponentType());
         } else if (type instanceof WildcardType) {
-            for (Type lowerBound : ((WildcardType) type).getLowerBounds()) {
+            for (var lowerBound : ((WildcardType) type).getLowerBounds()) {
                 collectClasses(classes, lowerBound);
             }
 
-            for (Type upperBound : ((WildcardType) type).getUpperBounds()) {
+            for (var upperBound : ((WildcardType) type).getUpperBounds()) {
                 collectClasses(classes, upperBound);
             }
         }
     }
 
     private void generateParentConstructor(JavaClass javaClass, Constructor<?> ctor) {
-        JavaConstructor javaCtor = new JavaConstructor(getVisibility(ctor), javaClass.getName());
-
-        Set<Class<?>> classes = new HashSet<>();
+        var javaCtor = new JavaConstructor(getVisibility(ctor), javaClass.getName());
+        var classes = new HashSet<Class<?>>();
 
         Arrays.stream(ctor.getGenericParameterTypes()).forEach(type -> collectClasses(classes, type));
 
         classes.stream().forEach(javaClass::addImport);
 
-        List<JavaParameter> parameters = getParameters(ctor, javaClass.getTypeParameter());
+        var parameters = getParameters(ctor, javaClass.getTypeParameter());
 
         javaCtor.getParameters().addAll(parameters);
 
@@ -158,17 +158,17 @@ public class JavaDefaultCtorBuilder {
     }
 
     private List<JavaParameter> getParameters(Constructor<?> ctor, Optional<List<String>> typeParameter) {
-        MutableInteger n = new MutableInteger(0);
-        Class<?>[] parameterClasses = ctor.getParameterTypes();
-        Type[] parameterTypes = ctor.getGenericParameterTypes();
-        int parameterCount = parameterTypes.length;
-        List<JavaParameter> parameters = new ArrayList<>(parameterCount);
+        var parameterClasses = ctor.getParameterTypes();
+        var parameterTypes = ctor.getGenericParameterTypes();
+        var parameterCount = parameterTypes.length;
+        var parameters = new ArrayList<JavaParameter>(parameterCount);
+        var n = new MutableInteger(0);
 
-        for (int i = 0; i < parameterCount; i++) {
-            boolean isVarArgs = i == parameterCount - 1 && ctor.isVarArgs();
-            Class<?> clazz = parameterClasses[i];
-            Type type = parameterTypes[i];
-            String typeName = getTypeName(type, typeParameter, isVarArgs);
+        for (var i = 0; i < parameterCount; i++) {
+            var isVarArgs = i == parameterCount - 1 && ctor.isVarArgs();
+            var clazz = parameterClasses[i];
+            var type = parameterTypes[i];
+            var typeName = getTypeName(type, typeParameter, isVarArgs);
 
             parameters.add(new JavaParameter(typeName, "arg" + n.increment().getValue(), clazz));
         }
@@ -182,8 +182,8 @@ public class JavaDefaultCtorBuilder {
 
     private String getTypeNameAux(Type type, String typeParameter, boolean isVarArgs, int level) {
         if (type instanceof GenericArrayType) {
-            Type componentType = ((GenericArrayType) type).getGenericComponentType();
-            String typeName = getTypeNameAux(componentType, typeParameter, isVarArgs, level + 1);
+            var componentType = ((GenericArrayType) type).getGenericComponentType();
+            var typeName = getTypeNameAux(componentType, typeParameter, isVarArgs, level + 1);
 
             return getArrayTypeName(isVarArgs, level, typeName);
         } else if (type instanceof TypeVariable) {
@@ -193,12 +193,12 @@ public class JavaDefaultCtorBuilder {
 
             return ((TypeVariable) type).getName();
         } else if (type instanceof ParameterizedType) {
-            String typeParameters = Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
+            var typeParameters = Arrays.stream(((ParameterizedType) type).getActualTypeArguments())
                     .map(t -> getTypeNameAux(t, typeParameter, isVarArgs, level + 1)).collect(Collectors.joining(", "));
 
             return ((ParameterizedType) type).getRawType().getTypeName() + "<" + typeParameters + ">";
         } else if (type instanceof Class && ((Class) type).isArray()) {
-            String typeName = getTypeNameAux(((Class) type).getComponentType(), typeParameter, isVarArgs, level + 1);
+            var typeName = getTypeNameAux(((Class) type).getComponentType(), typeParameter, isVarArgs, level + 1);
 
             return getArrayTypeName(isVarArgs, level, typeName);
         }
@@ -229,7 +229,7 @@ public class JavaDefaultCtorBuilder {
     }
 
     private JavaVisibility getVisibility(Executable executable) {
-        JavaVisibility visibility = JavaVisibility.PACKAGE_PRIVATE;
+        var visibility = JavaVisibility.PACKAGE_PRIVATE;
 
         if (Modifier.isPublic(executable.getModifiers())) {
             visibility = JavaVisibility.PUBLIC;
@@ -241,18 +241,17 @@ public class JavaDefaultCtorBuilder {
     }
 
     private void createDefaultConstructor(JavaClass parentJavaClass, JavaClass javaClass) {
-        List<JavaConstructor> parentCtors = parentJavaClass.getConstructors().stream()
+        var parentCtors = parentJavaClass.getConstructors().stream()
                 .filter(ctor -> !ctor.getVisibility().equals(JavaVisibility.PRIVATE))
                 .collect(Collectors.toList());
+        var childCtors = javaClass.getConstructors();
 
-        List<JavaConstructor> childCtors = javaClass.getConstructors();
-
-        for (JavaConstructor parentCtor : parentCtors) {
-            JavaConstructor ctor = new JavaConstructor(parentCtor.getVisibility(), javaClass.getName(),
+        for (var parentCtor : parentCtors) {
+            var ctor = new JavaConstructor(parentCtor.getVisibility(), javaClass.getName(),
                     parentCtor.getParameters());
 
             if (!constructorDefined(childCtors, ctor)) {
-                StringBuilder body = new StringBuilder("\t\tsuper(");
+                var body = new StringBuilder("\t\tsuper(");
 
                 body.append(getParametersString(ctor.getParameters()));
 
@@ -271,23 +270,22 @@ public class JavaDefaultCtorBuilder {
     }
 
     private ClassHierarchy buildClassHierarchy(Map<String, JavaStructure> structs) {
-        ClassHierarchy root = new ClassHierarchy(null);
+        var root = new ClassHierarchy(null);
 
-        for (JavaStructure struct : structs.values()) {
+        for (var struct : structs.values()) {
             if (!(struct instanceof JavaClass)) {
                 throw new IllegalCompilerStateException("Support for %s not implemented.", struct);
             }
 
-            JavaClass javaClass = (JavaClass) struct;
-
-            Deque<JavaClass> clazzHierarchy = new LinkedList<>();
+            var javaClass = (JavaClass) struct;
+            var clazzHierarchy = new LinkedList<JavaClass>();
 
             clazzHierarchy.push(javaClass);
 
-            String parent = javaClass.getParent();
+            var parent = javaClass.getParent();
 
             while (parent != null && !parent.startsWith("ASN1")) {
-                JavaStructure parentStruct = structs.get(parent);
+                var parentStruct = structs.get(parent);
 
                 if (parentStruct instanceof JavaClass) {
                     javaClass = (JavaClass) parentStruct;
@@ -316,14 +314,15 @@ public class JavaDefaultCtorBuilder {
         while (!clazzHierarchy.isEmpty()) {
             javaClass = clazzHierarchy.pop();
 
-            for (ClassHierarchy subclass : subclasses) {
+            for (var subclass : subclasses) {
                 if (subclass.getJavaClass().equals(javaClass)) {
                     addClassToHierarchy(clazzHierarchy, subclass.getSubclasses());
+
                     continue subclasses;
                 }
             }
 
-            ClassHierarchy subclass = new ClassHierarchy(javaClass);
+            var subclass = new ClassHierarchy(javaClass);
 
             subclasses.add(subclass);
 
