@@ -595,29 +595,12 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq2");
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq2");
 
         assertTrue(compiledType instanceof CompiledCollectionType);
 
-        var compiledCollectionType = (CompiledCollectionType) compiledType;
-        var components = compiledCollectionType.getComponents();
-
-        var field1 = components.stream().filter(t -> t.getName().equals("a")).findFirst();
-
-        assertTrue(field1.isPresent());
-        assertTrue(field1.get().getCompiledType().getType() instanceof IntegerType);
-
-        var field2 = components.stream().filter(t -> t.getName().equals("b")).findFirst();
-
-        assertTrue(field2.isPresent());
-        assertTrue(field2.get().getCompiledType().getType() instanceof BooleanType);
+        testCollectionField((CompiledCollectionType) compiledType, "a", IntegerType.class);
+        testCollectionField((CompiledCollectionType) compiledType, "b", BooleanType.class);
     }
 
     @Test
@@ -628,29 +611,12 @@ class CompilerImplTest {
                 }
                 """;
 
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq");
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
 
         assertTrue(compiledType instanceof CompiledCollectionType);
 
-        var compiledCollectionType = (CompiledCollectionType) compiledType;
-        var components = compiledCollectionType.getComponents();
-
-        var field1 = components.stream().filter(t -> t.getName().equals("a")).findFirst();
-
-        assertTrue(field1.isPresent());
-        assertTrue(field1.get().getCompiledType().getType() instanceof IntegerType);
-
-        var field2 = components.stream().filter(t -> t.getName().equals("b")).findFirst();
-
-        assertTrue(field2.isPresent());
-        assertTrue(field2.get().getCompiledType().getType() instanceof BooleanType);
+        testCollectionField((CompiledCollectionType) compiledType, "a", IntegerType.class);
+        testCollectionField((CompiledCollectionType) compiledType, "b", BooleanType.class);
     }
 
     @Test
@@ -1762,6 +1728,24 @@ class CompilerImplTest {
         testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
         testCollectionField((CompiledCollectionType) compiledType, "field2", IntegerType.class);
         testCollectionField((CompiledCollectionType) compiledType, "field3", VisibleString.class);
+    }
+
+    @Test
+    void testParameterizedTypeWithSequenceComponentsOfInline() throws IOException, ParserException {
+        var body = """
+                AbstractSeq {Type} ::= SEQUENCE { 
+                    COMPONENTS OF SEQUENCE {field1 INTEGER, field2 Type} 
+                }
+                
+                Seq ::= AbstractSeq {BOOLEAN}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        testCollectionField((CompiledCollectionType) compiledType, "field1", IntegerType.class);
+        testCollectionField((CompiledCollectionType) compiledType, "field2", BooleanType.class);
     }
 
     @Test
