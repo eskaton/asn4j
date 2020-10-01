@@ -31,6 +31,6 @@ import java.util.List;
 
 public interface HasChildComponents {
 
-    List<? extends CompiledType> getChildComponents();
+    List<CompiledType> getChildComponents();
 
 }

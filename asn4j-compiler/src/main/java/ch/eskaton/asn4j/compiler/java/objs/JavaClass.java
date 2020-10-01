@@ -331,11 +331,11 @@ public class JavaClass implements JavaStructure {
             writer.write(StringUtils.concat(IMPORT + " " + STATIC + " ", imp, ";\n"));
         }
 
-        String pkg = Clazz.class.getPackage().getName();
+        var runtimePackageName = Clazz.class.getPackage().getName();
 
-        writer.write(IMPORT + " " + pkg + ".Clazz;\n");
-        writer.write(IMPORT + " " + pkg + ".types.*;\n");
-        writer.write(IMPORT + " " + pkg + ".annotations.*;\n");
+        writer.write(IMPORT + " " + runtimePackageName + ".Clazz;\n");
+        writer.write(IMPORT + " " + runtimePackageName + ".types.*;\n");
+        writer.write(IMPORT + " " + runtimePackageName + ".annotations.*;\n");
         writer.write(IMPORT + " java.util.Objects;\n");
         writer.newLine();
     }

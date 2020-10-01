@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser;
 
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.TokenOrGroup;
 
 public class RequiredToken extends TokenOrGroup {
 

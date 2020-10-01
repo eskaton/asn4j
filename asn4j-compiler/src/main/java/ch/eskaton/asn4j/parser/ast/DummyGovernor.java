@@ -25,32 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser;
+package ch.eskaton.asn4j.parser.ast;
 
-import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
+import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 
-import java.util.List;
+public class DummyGovernor extends ParamGovernorNode {
 
-public class ObjectClassDefn extends ObjectClassNode {
+    private ReferenceNode reference;
 
-    private List<AbstractFieldSpecNode> fieldSpec;
-
-    private List<Object> syntaxSpec;
-
-    public ObjectClassDefn(Position position, List<AbstractFieldSpecNode> fieldSpec, List<Object> syntaxSpec) {
+    public DummyGovernor(Position position, ReferenceNode reference) {
         super(position);
 
-        this.fieldSpec = fieldSpec;
-        this.syntaxSpec = syntaxSpec;
+        this.reference = reference;
     }
 
-    public List<AbstractFieldSpecNode> getFieldSpec() {
-        return fieldSpec;
-    }
-
-    public List<Object> getSyntaxSpec() {
-        return syntaxSpec;
+    public ReferenceNode getReference() {
+        return reference;
     }
 
 }

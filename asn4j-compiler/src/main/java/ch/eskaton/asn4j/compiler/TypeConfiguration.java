@@ -145,7 +145,7 @@ import ch.eskaton.asn4j.compiler.values.UniversalStringValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueCompiler;
 import ch.eskaton.asn4j.compiler.values.VideotexStringValueCompiler;
 import ch.eskaton.asn4j.compiler.values.VisibleStringValueCompiler;
-import ch.eskaton.asn4j.parser.ObjectClassDefn;
+import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.Node;

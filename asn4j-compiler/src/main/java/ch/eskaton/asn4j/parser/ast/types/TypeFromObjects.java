@@ -42,63 +42,72 @@ import java.util.Optional;
 
 public class TypeFromObjects extends InformationFromObjects implements Type {
 
+
+    private LinkedList<Tag> tags = new LinkedList<>();
+
+    private LinkedList<Optional<TaggingMode>> taggingModes = new LinkedList<>();
+
+    private List<Constraint> constraints;
+
+    private EncodingPrefixNode encodingPrefix;
+
     public TypeFromObjects(Position position, ReferencedObjectsNode reference, FieldNameNode field) {
         super(position, reference, field);
     }
 
     @Override
     public LinkedList<Tag> getTags() {
-        return null;
+        return tags;
     }
 
     @Override
     public void setTags(LinkedList<Tag> tags) {
-
+        this.tags = tags;
     }
 
     @Override
     public void addTag(Tag tag) {
-
+        this.tags.addFirst(tag);
     }
 
     @Override
     public LinkedList<Optional<TaggingMode>> getTaggingModes() {
-        return null;
+        return taggingModes;
     }
 
     @Override
     public void setTaggingModes(LinkedList<Optional<TaggingMode>> taggingModes) {
-
+        this.taggingModes = taggingModes;
     }
 
     @Override
-    public void addTaggingMode(Optional<TaggingMode> mode) {
-
+    public void addTaggingMode(Optional<TaggingMode> taggingMode) {
+        this.taggingModes.addFirst(taggingMode);
     }
 
     @Override
-    public void setConstraints(List<Constraint> constraints) {
-
+    public void setConstraints(List<Constraint> constraint) {
+        this.constraints = constraint;
     }
 
     @Override
     public List<Constraint> getConstraints() {
-        return null;
+        return constraints;
     }
 
     @Override
     public boolean hasConstraint() {
-        return false;
+        return constraints != null && !constraints.isEmpty();
     }
 
     @Override
     public void setEncodingPrefix(EncodingPrefixNode encodingPrefix) {
-
+        this.encodingPrefix = encodingPrefix;
     }
 
     @Override
     public EncodingPrefixNode getEncodingPrefix() {
-        return null;
+        return encodingPrefix;
     }
 
     @Override

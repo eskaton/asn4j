@@ -25,9 +25,9 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser;
+package ch.eskaton.asn4j.parser.ast;
 
-import ch.eskaton.asn4j.parser.ast.AbstractNode;
+import ch.eskaton.asn4j.parser.Position;
 
 public abstract class TokenOrGroup extends AbstractNode {
 

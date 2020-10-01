@@ -46,13 +46,13 @@ public abstract class ListRuleParser<T> implements RuleParser<T> {
     }
 
     protected T parse(Parser.SequenceParser parser, ParserFunction<SequenceListAccessor, T> consumer, T dflt) throws ParserException {
-        SequenceListAccessor A = new SequenceListAccessor(parser.parse());
+        var accessor = new SequenceListAccessor(parser.parse());
 
-        if (!A.matched()) {
+        if (!accessor.matched()) {
             return dflt;
         }
 
-        return consumer.apply(A);
+        return consumer.apply(accessor);
     }
 
     protected <T, U> T parse(Parser.RepetitionParser<U> parser, ParserFunction<RepetitionListAccessor, T> consumer) throws ParserException {
@@ -60,23 +60,23 @@ public abstract class ListRuleParser<T> implements RuleParser<T> {
     }
 
     protected <T, U> T parse(Parser.RepetitionParser<U> parser, ParserFunction<RepetitionListAccessor, T> consumer, T dflt) throws ParserException {
-        RepetitionListAccessor A = new RepetitionListAccessor<>(parser.parse());
+        var accessor = new RepetitionListAccessor<>(parser.parse());
 
-        if (!A.matched()) {
+        if (!accessor.matched()) {
             return dflt;
         }
 
-        return consumer.apply(A);
+        return consumer.apply(accessor);
     }
 
     protected T parse(Parser.CommaSeparatedRuleParser parser, ParserFunction<SequenceListAccessor, T> consumer) throws ParserException {
-        SequenceListAccessor A = new SequenceListAccessor(parser.parse());
+        var accessor = new SequenceListAccessor(parser.parse());
 
-        if (!A.matched()) {
+        if (!accessor.matched()) {
             return null;
         }
 
-        return consumer.apply(A);
+        return consumer.apply(accessor);
     }
 
     protected boolean matched() {
