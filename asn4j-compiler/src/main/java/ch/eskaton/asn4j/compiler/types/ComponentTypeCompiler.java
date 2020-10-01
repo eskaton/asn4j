@@ -40,16 +40,14 @@ import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
-import ch.eskaton.asn4j.parser.ast.types.SequenceType;
-import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
@@ -108,51 +106,45 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             CompiledCollectionType compiledType, ComponentType componentType, boolean isRoot,
             Optional<Parameters> maybeParameters) {
         var type = componentType.getType();
-        var resolvedType = resolveType(ctx, compiledType, type, maybeParameters);
-        var resolvedComponentTypes = getComponentTypes(resolvedType);
-        var components = new ArrayList<CompiledCollectionComponent>();
+        var compiledCollectionType = resolveCompiledCollectionType(ctx, compiledType, type, maybeParameters);
+        var compiledCollectionComponents = getComponentTypes(compiledCollectionType);
 
-        for (var resolvedComponentType : resolvedComponentTypes) {
-            var componentTypeCompiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
-            var compiledComponents = componentTypeCompiler.compile(ctx, compiledType, resolvedComponentType, isRoot,
-                    Optional.empty());
+        compiledType.getComponents().addAll(compiledCollectionComponents);
 
-            components.addAll(compiledComponents);
-        }
-
-        return components;
+        return compiledCollectionComponents;
     }
 
-    private Type resolveType(CompilerContext ctx, CompiledCollectionType compiledType, Type type,
-            Optional<Parameters> maybeParameters) {
+    private CompiledCollectionType resolveCompiledCollectionType(CompilerContext ctx,
+            CompiledCollectionType compiledType, Type type, Optional<Parameters> maybeParameters) {
         var collectionType = compiledType.getType();
+        CompiledType compiledCollectionType = null;
 
         if (collectionType.getClass().isAssignableFrom(type.getClass())) {
-            return type;
+            compiledCollectionType = ctx.<Type, TypeCompiler>getCompiler(Type.class).compile(ctx, null, type,
+                    maybeParameters);
         } else if (type instanceof TypeReference typeReference) {
-            return resolveTypeReference(ctx, typeReference, maybeParameters);
+            compiledCollectionType = resolveTypeReference(ctx, typeReference, maybeParameters);
         } else if (type instanceof ExternalTypeReference typeReference) {
-            return resolveExternalTypeReference(ctx, typeReference);
-        } else {
+            compiledCollectionType = resolveExternalTypeReference(ctx, typeReference);
+        }
+
+        if (!(compiledCollectionType instanceof CompiledCollectionType)) {
             var formattedType = TypeFormatter.getTypeName(type);
 
             throw new CompilerException(type.getPosition(), "Invalid type '%s' in COMPONENTS OF '%s'",
                     formattedType, compiledType.getName());
         }
+
+        return (CompiledCollectionType) compiledCollectionType;
     }
 
-    private List<ComponentType> getComponentTypes(Type resolvedType) {
-        if (resolvedType instanceof SetType) {
-            return ((SetType) resolvedType).getAllRootComponents();
-        } else if (resolvedType instanceof SequenceType) {
-            return ((SequenceType) resolvedType).getAllRootComponents();
-        } else {
-            throw new CompilerException(resolvedType.getPosition(), "Components of type %s not supported",
-                    resolvedType);
-        }
+    private List<CompiledCollectionComponent> getComponentTypes(CompiledCollectionType compiledCollectionType) {
+        return compiledCollectionType.getComponents().stream()
+                .filter(CompiledCollectionComponent::isRoot)
+                .collect(Collectors.toList());
     }
 
-    private Type resolveTypeReference(CompilerContext ctx, TypeReference typeReference,
+    private CompiledType resolveTypeReference(CompilerContext ctx, TypeReference typeReference,
             Optional<Parameters> maybeParameters) {
         var referencedTypeName = typeReference.getType();
         var compiledComponentType = compileTypeReference(ctx, typeReference, maybeParameters);
@@ -161,7 +153,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             throw new CompilerException("Type %s referenced but not defined", referencedTypeName);
         }
 
-        return compiledComponentType.getType();
+        return compiledComponentType;
     }
 
     private CompiledType compileTypeReference(CompilerContext ctx, TypeReference typeReference,
@@ -179,7 +171,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         }
     }
 
-    private Type resolveExternalTypeReference(CompilerContext ctx, ExternalTypeReference typeReference) {
+    private CompiledType resolveExternalTypeReference(CompilerContext ctx, ExternalTypeReference typeReference) {
         var refTypeName = typeReference.getType();
         var refModuleName = typeReference.getModule();
         var compiledComponentType = ctx.getCompiledType(refModuleName, refTypeName);
@@ -190,7 +182,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
                     refTypeName, refModuleName);
         }
 
-        return compiledComponentType.getType();
+        return compiledComponentType;
     }
 
 }
