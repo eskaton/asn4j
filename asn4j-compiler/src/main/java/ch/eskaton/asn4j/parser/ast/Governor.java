@@ -25,23 +25,24 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser;
+package ch.eskaton.asn4j.parser.ast;
 
+import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
-import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 
-public class DummyGovernor extends ParamGovernorNode {
+public class Governor extends ParamGovernorNode {
 
-    private ReferenceNode reference;
+    private Node type;
 
-    public DummyGovernor(Position position, ReferenceNode reference) {
+    public Governor(Position position, Node type) {
         super(position);
 
-        this.reference = reference;
+        this.type = type;
     }
 
-    public ReferenceNode getReference() {
-        return reference;
+    public Node getType() {
+        return type;
     }
 
 }

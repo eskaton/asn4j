@@ -51,7 +51,7 @@ public class CompiledCollectionOfType extends CompiledType implements HasChildCo
     }
 
     @Override
-    public List<? extends CompiledType> getChildComponents() {
+    public List<CompiledType> getChildComponents() {
         return contentType != null ? List.of(contentType) : Collections.emptyList();
     }
 

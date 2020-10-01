@@ -79,13 +79,13 @@ public class CollectionOfValue extends AbstractValue implements HasSize {
     }
 
     public Tuple toTuple() {
-        List<Value> values = getValues();
+        var maybeTuple = getValues();
 
         if (!isTuple()) {
-            throw new CompilerException("Invalid tuple: %s", values);
+            throw new CompilerException("Invalid tuple: %s", maybeTuple);
         }
 
-        return new Tuple(getPosition(), getShort(values, 0), getShort(values, 1));
+        return new Tuple(getPosition(), getShort(maybeTuple, 0), getShort(maybeTuple, 1));
     }
 
     public boolean isQuadruple() {
@@ -99,14 +99,14 @@ public class CollectionOfValue extends AbstractValue implements HasSize {
     }
 
     public Quadruple toQuadruple() {
-        List<Value> values = getValues();
+        var maybeQuadruple = getValues();
 
         if (!isQuadruple()) {
-            throw new CompilerException("Invalid quadruple: %s", values);
+            throw new CompilerException("Invalid quadruple: %s", maybeQuadruple);
         }
 
-        return new Quadruple(getPosition(), getShort(values, 0), getShort(values, 1),
-                getShort(values, 2), getShort(values, 3));
+        return new Quadruple(getPosition(), getShort(maybeQuadruple, 0), getShort(maybeQuadruple, 1),
+                getShort(maybeQuadruple, 2), getShort(maybeQuadruple, 3));
     }
 
     private short getShort(List<Value> values, int pos) {
@@ -114,13 +114,13 @@ public class CollectionOfValue extends AbstractValue implements HasSize {
     }
 
     private boolean checkValues(List<Value> values, BigInteger[] maxValues) {
-        int pos = 0;
+        var pos = 0;
 
         if (values.size() != maxValues.length) {
             return false;
         }
 
-        for (Value value : values) {
+        for (var value : values) {
             if (!(value instanceof IntegerValue)
                     || ((IntegerValue) value).getValue().compareTo(BigInteger.ZERO) < 0
                     || ((IntegerValue) value).getValue().compareTo(maxValues[pos++]) > 0) {

@@ -103,11 +103,11 @@ public class ConstraintDefinition {
     }
 
     public ConstraintDefinition serialApplication(ConstraintDefinition other) {
-        Node roots = new BinOpNode(INTERSECTION, getRoots(), other.getRoots());
-        Node extensions = other.getExtensions();
-        boolean extensible = other.isExtensible();
+        var newRoots = new BinOpNode(INTERSECTION, getRoots(), other.getRoots());
+        var newExtensions = other.getExtensions();
+        var newExtensible = other.isExtensible();
 
-        return new ConstraintDefinition(roots, extensions, extensible);
+        return new ConstraintDefinition(newRoots, newExtensions, newExtensible);
     }
 
     public void optimize(UnaryOperator<Node> optimizer) {

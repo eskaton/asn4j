@@ -54,7 +54,7 @@ public class CompiledCollectionType extends CompiledType implements HasComponent
     }
 
     @Override
-    public List<? extends CompiledType> getChildComponents() {
+    public List<CompiledType> getChildComponents() {
         return components.stream().map(CompiledComponent::getCompiledType).collect(Collectors.toList());
     }
 
