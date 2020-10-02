@@ -64,11 +64,11 @@ import ch.eskaton.asn4j.compiler.values.AbstractValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
-import ch.eskaton.asn4j.parser.ast.DummyGovernor;
-import ch.eskaton.asn4j.parser.ast.Governor;
 import ch.eskaton.asn4j.parser.ParserException;
+import ch.eskaton.asn4j.parser.ast.DummyGovernor;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
+import ch.eskaton.asn4j.parser.ast.Governor;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
@@ -699,13 +699,35 @@ public class CompilerContext {
         throw new IllegalCompilerStateException("The type %s is not expected", type.getClass().getSimpleName());
     }
 
+    public CompiledType getCompiledType(SimpleDefinedType simpleDefinedType) {
+        if (CompilerUtils.isUsefulType(simpleDefinedType)) {
+            throw new IllegalArgumentException("A UsefulType is not allowed here: " + simpleDefinedType);
+        }
+
+        var reference = simpleDefinedType.getType();
+        var maybeModuleName = CompilerUtils.toExternalTypeReference(simpleDefinedType)
+                .map(ExternalTypeReference::getModule);
+
+        if (maybeModuleName.isEmpty()) {
+            return getCompiledType(reference);
+        }
+
+        return getCompiledType(maybeModuleName.get(), reference);
+    }
+
     public CompiledType getCompiledType(String reference) {
+        Objects.requireNonNull(reference);
+
         return getCompilationResult(reference, Optional.empty(), "Type", this::getTypesOfCurrentModule,
                 (ref, mod) -> withNewClass(() -> compiler.compileType(ref, mod)), this::getTypesOfModule);
     }
 
     public CompiledType getCompiledType(String moduleName, String reference) {
-        return getCompilationResult(reference, Optional.of(moduleName), "Type", () -> getTypesOfModule(moduleName),
+        Objects.requireNonNull(moduleName);
+        Objects.requireNonNull(reference);
+
+        return getCompilationResult(reference, Optional.ofNullable(moduleName), "Type",
+                () -> getTypesOfModule(moduleName),
                 (ref, mod) -> withNewClass(() -> compiler.compileType(ref, mod)),
                 this::getTypesOfModule);
     }
