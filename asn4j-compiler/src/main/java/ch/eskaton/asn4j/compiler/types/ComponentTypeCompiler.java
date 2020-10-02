@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.types;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.UnNamedCompiler;
@@ -40,9 +41,9 @@ import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
-import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.List;
@@ -73,8 +74,15 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             Optional<Parameters> maybeParameters) {
         var isOptional = component.getCompType() == CompType.NAMED_TYPE_OPT;
         var namedType = component.getNamedType();
-        var compiledComponent = ctx.defineType(namedType, maybeParameters);
 
+        // TODO: handle parameterized type
+        CompiledType compiledComponent;
+
+        if (namedType.getType() instanceof TypeReference typeReference && !(namedType.getType() instanceof UsefulType)) {
+            compiledComponent = CompilerUtils.compileTypeReference(ctx, typeReference, maybeParameters);
+        } else {
+            compiledComponent = ctx.defineType(namedType, maybeParameters);
+        }
         compiledComponent.setParent(compiledType);
 
         var compiledCollectionComponent = new CompiledCollectionComponent(namedType.getName(), compiledComponent,
@@ -147,28 +155,13 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
     private CompiledType resolveTypeReference(CompilerContext ctx, TypeReference typeReference,
             Optional<Parameters> maybeParameters) {
         var referencedTypeName = typeReference.getType();
-        var compiledComponentType = compileTypeReference(ctx, typeReference, maybeParameters);
+        var compiledComponentType = CompilerUtils.compileTypeReference(ctx, typeReference, maybeParameters);
 
         if (compiledComponentType == null) {
             throw new CompilerException("Type %s referenced but not defined", referencedTypeName);
         }
 
         return compiledComponentType;
-    }
-
-    private CompiledType compileTypeReference(CompilerContext ctx, TypeReference typeReference,
-            Optional<Parameters> maybeParameters) {
-        var referencedTypeName = typeReference.getType();
-
-        if (maybeParameters.isPresent()) {
-            return ctx.getTypeParameter(maybeParameters.get(), typeReference)
-                    .filter(SimpleDefinedType.class::isInstance)
-                    .map(SimpleDefinedType.class::cast)
-                    .map(ctx::getCompiledType)
-                    .orElseGet(() -> ctx.getCompiledType(referencedTypeName));
-        } else {
-            return ctx.getCompiledType(referencedTypeName);
-        }
     }
 
     private CompiledType resolveExternalTypeReference(CompilerContext ctx, ExternalTypeReference typeReference) {

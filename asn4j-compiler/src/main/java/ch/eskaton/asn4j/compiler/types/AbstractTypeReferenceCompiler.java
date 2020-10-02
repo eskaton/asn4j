@@ -55,7 +55,7 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         } else {
             var typeName = node.getType();
             var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
-            var parameters = createParameters(node, name, compiledParameterizedType);
+            var parameters = CompilerUtils.createParameters(node, name, compiledParameterizedType);
             var type = compiledParameterizedType.getType();
             var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
             var compiledType = compiler.compile(ctx, name, type, parameters);
@@ -76,26 +76,6 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         });
 
         return compiledType;
-    }
-
-    private Optional<Parameters> createParameters(T node, String typeName,
-            CompiledParameterizedType compiledParameterizedType) {
-        var parameterizedTypeName = compiledParameterizedType.getName();
-        var parameterValues = node.getParameters().get();
-        var parameterValueCount = parameterValues.size();
-        var parameterDefinitions = compiledParameterizedType.getParameters();
-
-        if (parameterValueCount != parameterDefinitions.size()) {
-            var parameterNames = parameterDefinitions.stream()
-                    .map(ParameterNode::getReference)
-                    .map(ReferenceNode::getName)
-                    .collect(Collectors.joining(", "));
-
-            throw new CompilerException(node.getPosition(), "'%s' passes %d parameters but '%s' expects: %s",
-                    typeName, parameterValueCount, parameterizedTypeName, parameterNames);
-        }
-
-        return Optional.of(new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues));
     }
 
 }

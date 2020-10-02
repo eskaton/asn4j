@@ -60,9 +60,9 @@ class TagUniquenessVerifier implements ComponentVerifier<CompiledComponent> {
                 throw new CompilerException("Duplicate tags in %s '%s': %s and %s", collectionTypeName,
                         parentTypeName, seenComponent.getName(), componentName);
             }
-        });
 
-        tagIds.forEach(tagId -> seenTags.put(tagId, component));
+            seenTags.put(tagId, component);
+        });
     }
 
 }

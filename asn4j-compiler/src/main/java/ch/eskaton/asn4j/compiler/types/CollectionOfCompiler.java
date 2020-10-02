@@ -78,13 +78,21 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
 
         var compiledType = ctx.isSubtypeNeeded(type) ?
                 ctx.defineType(type, name + "Content", maybeParameters) :
-                ctx.getCompiledType(type);
+                getCompiledType(ctx, type, maybeParameters);
 
         while (!types.isEmpty()) {
             compiledType = new AnonymousCompiledCollectionOfType(types.pop(), compiledType);
         }
 
         return compiledType;
+    }
+
+    private CompiledType getCompiledType(CompilerContext ctx, Type type, Optional<Parameters> maybeParameters) {
+        if (type instanceof TypeReference typeReference) {
+            return CompilerUtils.compileTypeReference(ctx, typeReference, maybeParameters);
+        }
+
+        return ctx.getCompiledType(type);
     }
 
 }

@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
@@ -189,7 +190,6 @@ class CompilerImplTest {
                 """;
 
         var compiledType = getCompiledCollectionType(body, MODULE_NAME, "Seq");
-        var field = compiledType.getComponents().stream().filter(c -> c.getName().equals("a")).findFirst();
 
         assertTrue(compiledType.getConstraintDefinition().isPresent());
         assertTrue(compiledType.getModule().isPresent());
@@ -2102,6 +2102,84 @@ class CompilerImplTest {
         var collection = (CompiledCollectionType) compiledType;
 
         testCollectionField(collection, "field", IntegerType.class);
+    }
+
+    @Test
+    void testParameterizedTypeWithInheritedParameter() throws IOException, ParserException {
+        var body = """
+                    Set ::= AbstractSet2 {BOOLEAN}
+                
+                    AbstractSet1 {Type1} ::= SET {
+                        field Type1
+                    }
+                
+                    AbstractSet2 {Type2} ::= SET {
+                        COMPONENTS OF AbstractSet1 {Type2}
+                    }
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Set");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var collection = (CompiledCollectionType) compiledType;
+
+        testCollectionField(collection, "field", BooleanType.class);
+    }
+
+    @Test
+    void testParameterizedTypeWithInheritedParameterInSet() throws IOException, ParserException {
+        var body = """
+                    Set ::= AbstractSet2 {BOOLEAN}
+                
+                    AbstractSet1 {Type1} ::= SET {
+                        field2 Type1
+                    }
+                
+                    AbstractSet2 {Type2} ::= SET {
+                        field1 AbstractSet1 {Type2}
+                    }
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Set");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var set = (CompiledCollectionType) compiledType;
+
+        assertEquals(1, set.getComponents().size());
+        assertTrue(set.getComponents().get(0) instanceof CompiledCollectionComponent);
+
+        var field1 = set.getComponents().get(0).getCompiledType();
+
+        assertEquals(1, ((CompiledCollectionType) field1).getComponents().size());
+
+        var field2 = ((CompiledCollectionType) field1).getComponents().get(0);
+
+        assertTrue(field2.getCompiledType().getType() instanceof BooleanType);
+    }
+
+    @Test
+    void testParameterizedTypeWithInheritedParameterInSetOf() throws IOException, ParserException {
+        var body = """
+                    SetOf ::= AbstractSetOf2 {BOOLEAN}
+                
+                    AbstractSetOf1 {Type1} ::= SET OF Type1
+                
+                    AbstractSetOf2 {Type2} ::= SET OF AbstractSetOf1 {Type2}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "SetOf");
+
+        assertTrue(compiledType instanceof CompiledCollectionOfType);
+
+        var collection = (CompiledCollectionOfType) compiledType;
+
+        assertTrue(collection.getContentType() instanceof CompiledCollectionOfType);
+
+        var contentType = (CompiledCollectionOfType) collection.getContentType();
+
+        assertTrue(contentType.getContentType().getType() instanceof BooleanType);
     }
 
     private void testChoiceField(CompiledChoiceType choice, String fieldName,
