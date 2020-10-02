@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Parameters {
 
@@ -77,6 +76,10 @@ public class Parameters {
         return values;
     }
 
+    public Parameters values(List<Node> values) {
+        return new Parameters(parameterizedName, definitions, values);
+    }
+
     public List<Tuple2<ParameterNode, Node>> getDefinitionsAndValues() {
         var definitionsStream = getDefinitions().stream();
         var valuesStream = getValues().stream();
@@ -84,19 +87,25 @@ public class Parameters {
         return StreamsUtils.zip(definitionsStream, valuesStream).collect(Collectors.toList());
     }
 
-    public Optional<Tuple2<Integer, ParameterNode>> getParameterDefinition(String parameterName) {
-        var indexStream = IntStream.rangeClosed(0, definitions.size()).boxed();
-        var definitionsStream = definitions.stream();
+    public Optional<Tuple2<ParameterNode, Node>> getDefinitionAndValue(String parameterName) {
+        var definitionsStream = getDefinitions().stream();
+        var valuesStream = getValues().stream();
 
-        return StreamsUtils.zip(indexStream, definitionsStream)
-                .filter(t -> t.get_2().getReference().getName().equals(parameterName))
+        return StreamsUtils.zip(definitionsStream, valuesStream)
+                .filter(t -> t.get_1().getReference().getName().equals(parameterName))
                 .findFirst();
     }
 
-    public Optional<Node> getParameterValue(String parameterName) {
-        var maybeDefinition = getParameterDefinition(parameterName);
+    public Optional<ParameterNode> getDefinition(String parameterName) {
+        var maybeDefinition = getDefinitionAndValue(parameterName);
 
-        return maybeDefinition.map(definition -> values.get(definition.get_1()));
+        return maybeDefinition.map(Tuple2::get_1);
+    }
+
+    public Optional<Node> getValue(String parameterName) {
+        var maybeDefinition = getDefinitionAndValue(parameterName);
+
+        return maybeDefinition.map(Tuple2::get_2);
     }
 
     public void markAsUsed(ParameterNode parameter) {
