@@ -36,7 +36,6 @@ import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.java.objs.JavaStructure;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
@@ -141,11 +140,7 @@ public class CompilerContext {
 
     private TypeResolverHelper typeResolver = new TypeResolverHelper(this);
 
-    private Deque<JavaClass> currentClass = new LinkedList<>();
-
     private Deque<Type> currentType = new LinkedList<>();
-
-    private Map<String, JavaStructure> structs = new HashMap<>();
 
     private Map<String, ModuleNode> modules = new HashMap<>();
 
@@ -631,18 +626,6 @@ public class CompilerContext {
                 .orElseThrow(() -> new CompilerException("Failed to resolve the type of %s", compiledType));
     }
 
-    public <T> T withNewClass(Supplier<T> supplier) {
-        Deque<JavaClass> oldClass = currentClass;
-
-        try {
-            currentClass = new LinkedList<>();
-
-            return supplier.get();
-        } finally {
-            currentClass = oldClass;
-        }
-    }
-
     public <T> T withNewType(Supplier<T> supplier) {
         Deque<Type> oldType = currentType;
 
@@ -719,7 +702,7 @@ public class CompilerContext {
         Objects.requireNonNull(reference);
 
         return getCompilationResult(reference, Optional.empty(), "Type", this::getTypesOfCurrentModule,
-                (ref, mod) -> withNewClass(() -> compiler.compileType(ref, mod)), this::getTypesOfModule);
+                (ref, mod) -> compiler.compileType(ref, mod), this::getTypesOfModule);
     }
 
     public CompiledType getCompiledType(String moduleName, String reference) {
@@ -727,8 +710,7 @@ public class CompilerContext {
         Objects.requireNonNull(reference);
 
         return getCompilationResult(reference, Optional.ofNullable(moduleName), "Type",
-                () -> getTypesOfModule(moduleName),
-                (ref, mod) -> withNewClass(() -> compiler.compileType(ref, mod)),
+                () -> getTypesOfModule(moduleName), (ref, mod) -> compiler.compileType(ref, mod),
                 this::getTypesOfModule);
     }
 
@@ -747,13 +729,12 @@ public class CompilerContext {
 
     public CompiledValue<? extends Value> getCompiledValue(String reference) {
         return getCompilationResult(reference, Optional.empty(), "Value", this::getValuesOfCurrentModule,
-                (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, mod)), this::getValuesOfModule);
+                (ref, mod) -> compiler.compileValue(ref, mod), this::getValuesOfModule);
     }
 
     public CompiledValue<? extends Value> getCompiledValue(String moduleName, String reference) {
         return getCompilationResult(reference, Optional.ofNullable(moduleName), "Value",
-                () -> getValuesOfModule(moduleName),
-                (ref, mod) -> withNewClass(() -> compiler.compileValue(ref, mod)),
+                () -> getValuesOfModule(moduleName), (ref, mod) -> compiler.compileValue(ref, mod),
                 this::getValuesOfModule);
     }
 
