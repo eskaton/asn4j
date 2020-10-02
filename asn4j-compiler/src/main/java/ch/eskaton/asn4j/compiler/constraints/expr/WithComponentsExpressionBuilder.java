@@ -46,16 +46,16 @@ import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.il.Parameter;
 import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
-import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.types.ASN1BMPString;
 import ch.eskaton.asn4j.runtime.types.ASN1BitString;
 import ch.eskaton.asn4j.runtime.types.ASN1Boolean;
@@ -214,7 +214,7 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
         var expressionCalls = node.getComponents().stream().map(componentNode -> {
             var compiledComponent = compiledComponentTypes.get(componentNode.getName());
             var maybeValueExpression = getValueExpression(module, componentNode, compiledComponent);
-            var maybePresenceExpression = getPresenceExpression(compiledType.getType(), componentNode);
+            var maybePresenceExpression = getPresenceExpression(compiledType, componentNode);
             var expression = OptionalUtils.combine(maybeValueExpression, maybePresenceExpression,
                     (l, r) -> new BinaryBooleanExpression(getOperator(), l, r));
 
@@ -245,24 +245,26 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
         return BinaryOperator.AND;
     }
 
-    protected Optional<BooleanExpression> getPresenceExpression(Type type, ComponentNode componentNode) {
+    protected Optional<BooleanExpression> getPresenceExpression(CompiledType compiledType, ComponentNode componentNode) {
         return Optional.ofNullable(componentNode.getPresenceType())
                 .map(presenceType -> {
-                    Optional<ComponentType> componentType = getComponentType((SequenceType) type, componentNode);
+                    var componentType = getComponentType((CompiledCollectionType) compiledType, componentNode);
 
                     return componentType.map(c ->
-                            buildPresenceExpression(c.getNamedType().getName(), isComponentOptional(c), presenceType))
+                            buildPresenceExpression(c.getName(), isComponentOptional(c), presenceType))
                             .orElse(null);
                 });
     }
 
-    private Optional<ComponentType> getComponentType(SequenceType type, ComponentNode componentNode) {
-        return type.getAllComponents().stream()
-                .filter(c -> c.getNamedType().getName().equals(componentNode.getName()))
+    private Optional<CompiledCollectionComponent> getComponentType(CompiledCollectionType compiledCollectionType,
+            ComponentNode componentNode) {
+        return compiledCollectionType.getComponents().stream()
+                .filter(c -> c.getName().equals(componentNode.getName()))
                 .findFirst();
     }
 
-    protected Optional<BooleanExpression> getValueExpression(Module module, ComponentNode componentNode, CompiledType compiledComponent) {
+    protected Optional<BooleanExpression> getValueExpression(Module module, ComponentNode componentNode,
+            CompiledType compiledComponent) {
         return Optional.ofNullable(componentNode.getConstraint())
                 .map(constraint -> ctx.buildExpression(module, compiledComponent, constraint)
                         .orElseThrow(() -> new IllegalCompilerStateException("Expected maybeValueExpression")));
@@ -278,7 +280,7 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
     }
 
     protected BooleanExpression getAbsentExpression(boolean componentOptional, String componentName) {
-        if (componentOptional) {
+        if (!componentOptional) {
             throw new CompilerException("Component '%s' isn't optional and therefore can't have a presence constraint of ABSENT",
                     componentName);
         }
@@ -286,8 +288,8 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
         return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE), new ILValue(null));
     }
 
-    private boolean isComponentOptional(ComponentType componentType) {
-        return componentType.getCompType() != ComponentType.CompType.NAMED_TYPE_OPT;
+    private boolean isComponentOptional(CompiledCollectionComponent compiledCollectionComponent) {
+        return compiledCollectionComponent.isOptional();
     }
 
     protected List<Expression> getParameters(ComponentNode component, CompiledType compiledType, String runtimeType) {
