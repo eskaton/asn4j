@@ -30,11 +30,14 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledComponent;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.ParameterNode;
+import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -58,12 +61,14 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
 import static ch.eskaton.asn4j.runtime.TaggingMode.EXPLICIT;
 import static ch.eskaton.asn4j.runtime.TaggingMode.IMPLICIT;
 
@@ -377,6 +382,92 @@ public class CompilerUtils {
         return simpleDefinedType instanceof ExternalTypeReference externalTypeReference ?
                 Optional.of(externalTypeReference) :
                 Optional.empty();
+    }
+
+    public static CompiledType compileTypeReference(CompilerContext ctx, TypeReference typeReference,
+            Optional<Parameters> maybeParameters) {
+        var referencedTypeName = typeReference.getType();
+
+        if (maybeParameters.isPresent()) {
+            var maybeTypeRefParams = typeReference.getParameters();
+            var usedParameters = new HashSet<ParameterNode>();
+
+            if (maybeTypeRefParams.isPresent()) {
+                var typeName = typeReference.getType();
+                var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
+                var parameters = createParameters(typeReference, typeName, compiledParameterizedType);
+
+                var parameterValues = parameters.map(p -> p.getDefinitionsAndValues().stream().map(t -> {
+                    var parameterValue = t.get_2();
+
+                    if (parameterValue instanceof TypeReference paramReference) {
+                        var maybeValue = maybeParameters.get().getParameterValue(paramReference.getType());
+
+                        if (maybeValue.isPresent()) {
+                            t.set_2(maybeValue.get());
+                            usedParameters.add(maybeParameters.get().getParameterDefinition(paramReference.getType()).get().get_2());
+                        }
+                    }
+
+                    return t.get_2();
+                }).collect(Collectors.toList()));
+
+                Optional<Parameters> updatedParameters;
+
+                if (parameters.isPresent() && parameterValues.isPresent()) {
+                    updatedParameters = Optional.of(new Parameters(parameters.get().getParameterizedName(),
+                            parameters.get().getDefinitions(), parameterValues.get()));
+                } else {
+                    updatedParameters = parameters;
+                }
+
+                usedParameters.stream().forEach(usedParameter -> maybeParameters.get().markAsUsed(usedParameter));
+
+                var type = compiledParameterizedType.getType();
+                var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
+                var compiledType = compiler.compile(ctx, null, type, updatedParameters);
+
+                checkUnusedParameters(updatedParameters);
+
+                return compiledType;
+            }
+
+            var maybeResolvedType = ctx.getTypeParameter(maybeParameters.get(), typeReference);
+
+            if (maybeResolvedType.isPresent()) {
+                var resolvedType = maybeResolvedType.get();
+
+                if (isAnyTypeReference(resolvedType)) {
+                    return ctx.getCompiledType((SimpleDefinedType) resolvedType);
+                }
+
+                var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) resolvedType.getClass());
+
+                return compiler.compile(ctx, null, resolvedType, maybeParameters);
+            }
+        }
+
+        return ctx.getCompiledType(referencedTypeName);
+    }
+
+    public static Optional<Parameters> createParameters(SimpleDefinedType node, String typeName,
+            CompiledParameterizedType compiledParameterizedType) {
+        var parameterizedTypeName = compiledParameterizedType.getName();
+        var parameterValues = node.getParameters().get();
+        var parameterValueCount = parameterValues.size();
+        var parameterDefinitions = compiledParameterizedType.getParameters();
+
+        if (parameterValueCount != parameterDefinitions.size()) {
+            var parameterNames = parameterDefinitions.stream()
+                    .map(ParameterNode::getReference)
+                    .map(ReferenceNode::getName)
+                    .collect(Collectors.joining(", "));
+
+            throw new CompilerException(node.getPosition(), "'%s' passes %d parameters but '%s' expects: %s",
+                    typeName, parameterValueCount, parameterizedTypeName, parameterNames);
+        }
+
+        return Optional.of(new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues));
     }
 
 }
