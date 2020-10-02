@@ -28,8 +28,6 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
-import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 
 public class DummyGovernor extends ParamGovernorNode {
 

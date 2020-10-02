@@ -34,7 +34,7 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 import java.util.HashSet;
 import java.util.Set;
 
-class NameUniquenessVerifier implements ComponentVerifier<CompiledComponent> {
+class NameUniquenessVerifier<C extends CompiledComponent> implements ComponentVerifier<C> {
 
     private final TypeName typeName;
 

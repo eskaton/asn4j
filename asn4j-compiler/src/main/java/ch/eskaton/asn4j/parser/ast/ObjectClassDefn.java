@@ -28,8 +28,6 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 
 import java.util.List;
 

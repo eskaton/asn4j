@@ -1289,8 +1289,8 @@ public class CompilerContext {
         return currentType.size() == 1;
     }
 
-    public <V extends Value> CompiledValue<V> createCompiledValue(CompiledType type, Value value) {
-        return new UnNamedCompiledValue(type, value);
+    public <V extends Value> CompiledValue<V> createCompiledValue(CompiledType type, V value) {
+        return new UnNamedCompiledValue<V>(type, value);
     }
 
     public <V extends Value> CompiledValue<V> createCompiledValue(String name, CompiledType type, V value) {

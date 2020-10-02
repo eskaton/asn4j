@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-class UntaggedOpenTypeVerifier implements ComponentVerifier<CompiledComponent> {
+class UntaggedOpenTypeVerifier<C extends CompiledComponent> implements ComponentVerifier<C> {
 
     private final TypeName typeName;
 
