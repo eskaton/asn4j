@@ -52,7 +52,7 @@ public class IntegerValueCompiler extends AbstractValueCompiler<IntegerValue> {
             if (namedValue != null) {
                 var value = new IntegerValue(namedNumber.getPosition(), namedNumber.getValue().getNumber());
 
-                return new UnNamedCompiledValue(compiledType, value);
+                return new UnNamedCompiledValue<>(compiledType, value);
             } else {
                 return ctx.getCompiledValue(namedNumber.getRef());
             }

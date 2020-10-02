@@ -35,7 +35,7 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.HashMap;
 
-class TagUniquenessVerifier implements ComponentVerifier<CompiledComponent> {
+class TagUniquenessVerifier <C extends CompiledComponent> implements ComponentVerifier<C> {
 
     private final TypeName typeName;
 

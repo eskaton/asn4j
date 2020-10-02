@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
@@ -49,10 +50,10 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
 
     private final TypeName typeName;
 
-    private final List<Function<TypeName, ComponentVerifier>> componentVerifierSuppliers;
+    private final List<Function<TypeName, ComponentVerifier<CompiledCollectionComponent>>> componentVerifierSuppliers;
 
     public AbstractCollectionCompiler(TypeName typeName,
-            Function<TypeName, ComponentVerifier>... componentVerifierSupplier) {
+            Function<TypeName, ComponentVerifier<CompiledCollectionComponent>>... componentVerifierSupplier) {
         this.typeName = typeName;
         this.componentVerifierSuppliers = new ArrayList<>(Arrays.asList(componentVerifierSupplier));
         this.componentVerifierSuppliers.add(NameUniquenessVerifier::new);
@@ -83,8 +84,8 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
     }
 
     private void compileComponents(CompilerContext ctx, String name, Optional<Parameters> maybeParameters,
-            List<ComponentVerifier> componentVerifiers, CompiledCollectionType compiledType,
-            List<ComponentType> components, boolean isRoot) {
+            List<ComponentVerifier<CompiledCollectionComponent>> componentVerifiers,
+            CompiledCollectionType compiledType, List<ComponentType> components, boolean isRoot) {
         for (ComponentType component : components) {
             try {
                 var compiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);

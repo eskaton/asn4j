@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.compiler.results;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class UnNamedCompiledValue<V extends Value> extends CompiledValue {
+public class UnNamedCompiledValue<V extends Value> extends CompiledValue<V> {
 
     public UnNamedCompiledValue(CompiledType type, V value) {
         super(null, type, value);
