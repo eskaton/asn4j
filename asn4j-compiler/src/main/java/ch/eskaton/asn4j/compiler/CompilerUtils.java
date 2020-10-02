@@ -61,7 +61,6 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -390,39 +389,12 @@ public class CompilerUtils {
 
         if (maybeParameters.isPresent()) {
             var maybeTypeRefParams = typeReference.getParameters();
-            var usedParameters = new HashSet<ParameterNode>();
 
             if (maybeTypeRefParams.isPresent()) {
                 var typeName = typeReference.getType();
                 var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
                 var parameters = createParameters(typeReference, typeName, compiledParameterizedType);
-
-                var parameterValues = parameters.map(p -> p.getDefinitionsAndValues().stream().map(t -> {
-                    var parameterValue = t.get_2();
-
-                    if (parameterValue instanceof TypeReference paramReference) {
-                        var maybeValue = maybeParameters.get().getParameterValue(paramReference.getType());
-
-                        if (maybeValue.isPresent()) {
-                            t.set_2(maybeValue.get());
-                            usedParameters.add(maybeParameters.get().getParameterDefinition(paramReference.getType()).get().get_2());
-                        }
-                    }
-
-                    return t.get_2();
-                }).collect(Collectors.toList()));
-
-                Optional<Parameters> updatedParameters;
-
-                if (parameters.isPresent() && parameterValues.isPresent()) {
-                    updatedParameters = Optional.of(new Parameters(parameters.get().getParameterizedName(),
-                            parameters.get().getDefinitions(), parameterValues.get()));
-                } else {
-                    updatedParameters = parameters;
-                }
-
-                usedParameters.stream().forEach(usedParameter -> maybeParameters.get().markAsUsed(usedParameter));
-
+                var updatedParameters = Optional.of(updateParameters(maybeParameters.get(), parameters));
                 var type = compiledParameterizedType.getType();
                 var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
                 var compiledType = compiler.compile(ctx, null, type, updatedParameters);
@@ -450,24 +422,82 @@ public class CompilerUtils {
         return ctx.getCompiledType(referencedTypeName);
     }
 
-    public static Optional<Parameters> createParameters(SimpleDefinedType node, String typeName,
+    /**
+     * Substitutes references in the output parameters with the values of matching input parameters.
+     * <p/>
+     * In the following example Type1 of AbstractSet1 is the output parameter and its associated value is the reference
+     * Type2. The input parameter is Type2 of AbstractSet2 with the value BOOLEAN. The method substitutes the reference
+     * Type2 in the output with the Value BOOLEAN from the input, because the reference matches the input parameters
+     * name.
+     *
+     * <pre>
+     *  Set ::= AbstractSet2 {BOOLEAN}
+     *
+     *  AbstractSet1 {Type1} ::= SET {
+     *      field Type1
+     *  }
+     *
+     *  AbstractSet2 {Type2} ::= SET {
+     *      COMPONENTS OF AbstractSet1 {Type2}
+     *  }
+     * </pre>
+     *
+     * @param inputParameters  Input parameters
+     * @param outputParameters Output parameters
+     * @return Updated parameters
+     */
+    private static Parameters updateParameters(Parameters inputParameters, Parameters outputParameters) {
+        var parameterValues = outputParameters.getDefinitionsAndValues().stream().map(definitionAndValue -> {
+            var parameterValue = definitionAndValue.get_2();
+
+            if (parameterValue instanceof TypeReference paramReference) {
+                var paramReferenceName = paramReference.getType();
+                var maybeParameter = inputParameters.getDefinitionAndValue(paramReferenceName);
+
+                if (maybeParameter.isPresent()) {
+                    var parameter = maybeParameter.get();
+
+                    definitionAndValue.set_2(parameter.get_2());
+                    inputParameters.markAsUsed(parameter.get_1());
+                }
+            }
+
+            return definitionAndValue.get_2();
+        }).collect(Collectors.toList());
+
+        return outputParameters.values(parameterValues);
+    }
+
+    /**
+     * Matches the parameter definitions to the actual parameters of the typereference and wraps them in a
+     * parameters object.
+     *
+     * @param simpleDefinedType         A type reference
+     * @param typeName                  Name of the type that is being compiled
+     * @param compiledParameterizedType The compiled parameterized type
+     * @return A parameters object
+     */
+    public static Parameters createParameters(SimpleDefinedType simpleDefinedType, String typeName,
             CompiledParameterizedType compiledParameterizedType) {
         var parameterizedTypeName = compiledParameterizedType.getName();
-        var parameterValues = node.getParameters().get();
-        var parameterValueCount = parameterValues.size();
+        var maybeParameterValues = simpleDefinedType.getParameters();
+        var parameterValues = maybeParameterValues.orElse(List.of());
+        var parameterValuesCount = parameterValues.size();
         var parameterDefinitions = compiledParameterizedType.getParameters();
+        var parameterDefinitionsCount = parameterDefinitions.size();
 
-        if (parameterValueCount != parameterDefinitions.size()) {
+        if (parameterValuesCount != parameterDefinitionsCount) {
             var parameterNames = parameterDefinitions.stream()
                     .map(ParameterNode::getReference)
                     .map(ReferenceNode::getName)
                     .collect(Collectors.joining(", "));
 
-            throw new CompilerException(node.getPosition(), "'%s' passes %d parameters but '%s' expects: %s",
-                    typeName, parameterValueCount, parameterizedTypeName, parameterNames);
+            throw new CompilerException(simpleDefinedType.getPosition(),
+                    "'%s' passes %d parameters but '%s' expects: %s",
+                    typeName, parameterValuesCount, parameterizedTypeName, parameterNames);
         }
 
-        return Optional.of(new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues));
+        return new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues);
     }
 
 }
