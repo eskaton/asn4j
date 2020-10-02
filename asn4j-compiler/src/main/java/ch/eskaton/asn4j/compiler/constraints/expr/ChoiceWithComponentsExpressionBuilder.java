@@ -34,11 +34,10 @@ import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
+import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
-import ch.eskaton.asn4j.parser.ast.types.Choice;
-import ch.eskaton.asn4j.parser.ast.types.NamedType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Optional;
 
@@ -61,10 +60,10 @@ public class ChoiceWithComponentsExpressionBuilder extends WithComponentsExpress
     }
 
     @Override
-    protected Optional<BooleanExpression> getPresenceExpression(Type type, ComponentNode componentNode) {
+    protected Optional<BooleanExpression> getPresenceExpression(CompiledType compiledType, ComponentNode componentNode) {
         return Optional.ofNullable(componentNode.getPresenceType())
                 .map(presenceType -> {
-                    Optional<NamedType> componentType = getComponentType((Choice) type, componentNode);
+                    var componentType = getComponentType((CompiledChoiceType) compiledType, componentNode);
 
                     return componentType.map(c -> buildPresenceExpression(null, true, presenceType)).orElse(null);
                 });
@@ -75,8 +74,9 @@ public class ChoiceWithComponentsExpressionBuilder extends WithComponentsExpress
         return new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE), new ILValue(null));
     }
 
-    private Optional<NamedType> getComponentType(Choice type, ComponentNode componentNode) {
-        return type.getAllAlternatives().stream()
+    private Optional<CompiledComponent> getComponentType(CompiledChoiceType compiledChoiceType,
+            ComponentNode componentNode) {
+        return compiledChoiceType.getComponents().stream()
                 .filter(c -> c.getName().equals(componentNode.getName()))
                 .findFirst();
     }
