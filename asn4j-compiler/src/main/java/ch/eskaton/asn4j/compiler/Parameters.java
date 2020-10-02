@@ -38,8 +38,10 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Parameters {
 
@@ -52,6 +54,12 @@ public class Parameters {
     private final Set<ParameterNode> usedParameters = new HashSet<>();
 
     public Parameters(String parameterizedName, List<ParameterNode> definitions, List<Node> values) {
+        if (definitions.size() != values.size()) {
+            throw new IllegalCompilerStateException(
+                    "Size of parameter definitions (%d) and parameter values (%d) don't match",
+                    definitions.size(), values.size());
+        }
+
         this.parameterizedName = parameterizedName;
         this.definitions = definitions;
         this.values = values;
@@ -76,7 +84,26 @@ public class Parameters {
         return StreamsUtils.zip(definitionsStream, valuesStream).collect(Collectors.toList());
     }
 
+    public Optional<Tuple2<Integer, ParameterNode>> getParameterDefinition(String parameterName) {
+        var indexStream = IntStream.rangeClosed(0, definitions.size()).boxed();
+        var definitionsStream = definitions.stream();
+
+        return StreamsUtils.zip(indexStream, definitionsStream)
+                .filter(t -> t.get_2().getReference().getName().equals(parameterName))
+                .findFirst();
+    }
+
+    public Optional<Node> getParameterValue(String parameterName) {
+        var maybeDefinition = getParameterDefinition(parameterName);
+
+        return maybeDefinition.map(definition -> values.get(definition.get_1()));
+    }
+
     public void markAsUsed(ParameterNode parameter) {
+        if (!definitions.contains(parameter)) {
+            throw new IllegalCompilerStateException("Parameter doesn't exist: %s", parameter);
+        }
+
         usedParameters.add(parameter);
     }
 

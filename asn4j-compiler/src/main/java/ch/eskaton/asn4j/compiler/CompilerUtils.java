@@ -36,11 +36,14 @@ import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
+import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -352,6 +355,28 @@ public class CompilerUtils {
         });
 
         return hasComponentConstraint.get();
+    }
+
+    public static boolean isUsefulType(Type type) {
+        return type instanceof UsefulType;
+    }
+
+    public static boolean isTypeReference(Type type) {
+        return type instanceof TypeReference;
+    }
+
+    public static boolean isExternalTypeReference(Type type) {
+        return type instanceof ExternalTypeReference;
+    }
+
+    public static boolean isAnyTypeReference(Type type) {
+        return isTypeReference(type) || isExternalTypeReference(type);
+    }
+
+    public static Optional<ExternalTypeReference> toExternalTypeReference(SimpleDefinedType simpleDefinedType) {
+        return simpleDefinedType instanceof ExternalTypeReference externalTypeReference ?
+                Optional.of(externalTypeReference) :
+                Optional.empty();
     }
 
 }
