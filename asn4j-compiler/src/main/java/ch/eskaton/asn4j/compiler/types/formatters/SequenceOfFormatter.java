@@ -37,11 +37,11 @@ class SequenceOfFormatter implements Formatter<SequenceOfType> {
 
     @Override
     public String format(CompilerContext ctx, SequenceOfType type) {
-        return getTypeName() + "(" + formatType(ctx, type.getType()) + ")";
+        return "%s %s".formatted(getTypeName(null), formatType(ctx, type.getType()));
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(SequenceOfType type) {
         return SEQUENCE_OF.getName();
     }
 

@@ -41,11 +41,11 @@ class DefaultTypeFormatter<T extends Type> implements Formatter<T> {
 
     @Override
     public String format(CompilerContext ctx, T type) {
-        return getTypeName();
+        return getTypeName(null);
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(T type) {
         return typeName.getName();
     }
 

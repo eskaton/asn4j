@@ -34,6 +34,6 @@ interface Formatter<T extends Type> {
 
     String format(CompilerContext ctx, T type);
 
-    String getTypeName();
+    String getTypeName(T type);
 
 }

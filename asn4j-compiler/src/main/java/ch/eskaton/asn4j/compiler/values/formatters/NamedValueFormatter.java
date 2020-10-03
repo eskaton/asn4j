@@ -25,47 +25,15 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.types.formatters;
+package ch.eskaton.asn4j.compiler.values.formatters;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
-import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.values.NamedValue;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static ch.eskaton.asn4j.runtime.types.TypeName.ENUMERATED;
-
-class EnumeratedFormatter implements Formatter<EnumeratedType> {
+class NamedValueFormatter implements Formatter<NamedValue> {
 
     @Override
-    public String format(CompilerContext ctx, EnumeratedType type) {
-        return getTypeName(null) + "(" + formatItems(type) + ")";
-    }
-
-    @Override
-    public String getTypeName(EnumeratedType type) {
-        return ENUMERATED.getName();
-    }
-
-    private String formatItems(EnumeratedType type) {
-        var rootItems = type.getRootEnum();
-        var additionalItems = type.getAdditionalEnum();
-
-        if (additionalItems != null && !additionalItems.isEmpty()) {
-            return formatItems(rootItems) + ", " + formatItems(additionalItems);
-        }
-
-        return formatItems(rootItems);
-    }
-
-    private String formatItems(List<EnumerationItemNode> enumerationItems) {
-        return Optional.ofNullable(enumerationItems)
-                .map(items -> items.stream()
-                        .map(EnumerationItemNode::getName).
-                                collect(Collectors.joining(", ")))
-                .orElse("");
+    public String format(NamedValue value) {
+        return String.format("%s %s", value.getName(), ValueFormatter.formatValue(value.getValue()));
     }
 
 }

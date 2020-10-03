@@ -38,13 +38,13 @@ class SequenceFormatter extends CollectionFormatter<SequenceType> {
 
     @Override
     public String format(CompilerContext ctx, SequenceType type) {
-        return getTypeName() + "[" + type.getAllComponents().stream()
+        return getTypeName(null) + "[" + type.getAllComponents().stream()
                 .map(t -> formatComponentType(ctx, t))
                 .collect(Collectors.joining(", ")) + "]";
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(SequenceType type) {
         return SEQUENCE.getName();
     }
 
