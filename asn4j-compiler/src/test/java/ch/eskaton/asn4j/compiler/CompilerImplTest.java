@@ -212,6 +212,34 @@ class CompilerImplTest {
     }
 
     @Test
+    void testCollectionOfNamedTypeInvalidComponentInValue() {
+        var body = """
+                SeqOf ::= SEQUENCE OF a INTEGER
+                
+                Seq ::= SEQUENCE {
+                    b SeqOf DEFAULT {c 1, c 2}
+                }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*The value 'c 1' references a named component in 'SEQUENCE OF a INTEGER' that doesn't exist.*");
+    }
+
+    @Test
+    void testCollectionOfTypeInvalidComponentInValue() {
+        var body = """
+                SeqOf ::= SEQUENCE OF INTEGER
+                
+                Seq ::= SEQUENCE {
+                    b SeqOf DEFAULT {c 1, c 2}
+                }
+                """;
+
+        testModule(body, CompilerException.class,
+                ".*The value 'c 1' references a named component in 'SEQUENCE OF INTEGER' that doesn't exist.*");
+    }
+
+    @Test
     void testCollectionOfConstraintAndModuleAbsent() throws IOException, ParserException {
         var body = """
                 SeqOf ::= SEQUENCE OF INTEGER
