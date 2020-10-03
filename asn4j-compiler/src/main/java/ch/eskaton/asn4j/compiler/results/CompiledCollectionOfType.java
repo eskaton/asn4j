@@ -33,8 +33,11 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class CompiledCollectionOfType extends CompiledType implements HasChildComponents {
+
+    private Optional<String> contentTypeName = Optional.empty();
 
     private CompiledType contentType;
 
@@ -48,6 +51,14 @@ public class CompiledCollectionOfType extends CompiledType implements HasChildCo
 
     public void setContentType(CompiledType contentType) {
         this.contentType = contentType;
+    }
+
+    public Optional<String> getContentTypeName() {
+        return contentTypeName;
+    }
+
+    public void setContentTypeName(String contentTypeName) {
+        this.contentTypeName = Optional.ofNullable(contentTypeName);
     }
 
     @Override
