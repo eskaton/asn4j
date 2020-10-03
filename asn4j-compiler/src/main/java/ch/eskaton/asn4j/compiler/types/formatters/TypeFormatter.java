@@ -42,6 +42,7 @@ import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.ISO646String;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
@@ -61,11 +62,13 @@ import ch.eskaton.asn4j.parser.ast.types.UTF8String;
 import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.commons.ImmutableReference;
+import ch.eskaton.commons.Reference;
 import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.function.BiFunction;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import static ch.eskaton.asn4j.runtime.types.TypeName.BMP_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.GENERAL_STRING;
@@ -90,8 +93,8 @@ public class TypeFormatter {
                     .withComparator((t, u) -> u.isInstance(t))
                     .withException(t -> new CompilerException("Formatter for type %s not defined", t));
 
-    public static final Dispatcher<Type, Class<? extends Type>, Void, String> NAME_DISPATCHER =
-            new Dispatcher<Type, Class<? extends Type>, Void, String>()
+    public static final Dispatcher<Type, Class<? extends Type>, Reference<? extends Type>, String> NAME_DISPATCHER =
+            new Dispatcher<Type, Class<? extends Type>, Reference<? extends Type>, String>()
                     .withComparator((t, u) -> u.isInstance(t))
                     .withException(t -> new CompilerException("Formatter for type %s not defined", t));
 
@@ -125,6 +128,7 @@ public class TypeFormatter {
         addCase(UniversalString.class, new DefaultTypeFormatter<UniversalString>(UNIVERSAL_STRING)::format);
         addCase(BMPString.class, new DefaultTypeFormatter<BMPString>(BMP_STRING)::format);
         addCase(TypeReference.class, new TypeReferenceFormatter()::format);
+        addCase(NamedType.class, new NamedTypeFormatter()::format);
     }
 
     static {
@@ -157,6 +161,7 @@ public class TypeFormatter {
         addNameCase(UniversalString.class, new DefaultTypeFormatter<UniversalString>(UNIVERSAL_STRING)::getTypeName);
         addNameCase(BMPString.class, new DefaultTypeFormatter<BMPString>(BMP_STRING)::getTypeName);
         addNameCase(TypeReference.class, new TypeReferenceFormatter()::getTypeName);
+        addNameCase(NamedType.class, new NamedTypeFormatter()::getTypeName);
     }
 
     private TypeFormatter() {
@@ -172,7 +177,7 @@ public class TypeFormatter {
 
     public static String getTypeName(Node node) {
         if (node instanceof Type type) {
-            return NAME_DISPATCHER.execute(type);
+            return NAME_DISPATCHER.execute(type, ImmutableReference.of(type));
         }
 
         throw new IllegalCompilerStateException("Invalid type: %s", node.getClass().getSimpleName());
@@ -183,8 +188,9 @@ public class TypeFormatter {
                 maybeArgs -> callWith(args -> formatter.apply(args.get_1(), (T) args.get_2()), maybeArgs.get()));
     }
 
-    private static <T extends Type> void addNameCase(Class<T> typeClass, Supplier<String> nameSupplier) {
-        NAME_DISPATCHER.withCase(typeClass, maybeArgs -> callWith(args -> nameSupplier.get(), null));
+    private static <T extends Type> void addNameCase(Class<T> typeClass, Function<T, String> nameSupplier) {
+        NAME_DISPATCHER.withCase(typeClass,
+                maybeArgs -> callWith(args -> nameSupplier.apply((T) args.get()), maybeArgs.get()));
     }
 
 }

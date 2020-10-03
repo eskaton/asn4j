@@ -38,13 +38,13 @@ class SetFormatter extends CollectionFormatter<SetType> {
 
     @Override
     public String format(CompilerContext ctx, SetType type) {
-        return getTypeName() + "[" + type.getAllComponents().stream()
+        return getTypeName(null) + "[" + type.getAllComponents().stream()
                 .map(t -> formatComponentType(ctx, t))
                 .collect(Collectors.joining(", ")) + "]";
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(SetType type) {
         return SET.getName();
     }
 

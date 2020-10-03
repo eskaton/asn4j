@@ -40,7 +40,7 @@ public class TypeReferenceFormatter implements Formatter<TypeReference> {
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(TypeReference type) {
         return "typereference";
     }
 

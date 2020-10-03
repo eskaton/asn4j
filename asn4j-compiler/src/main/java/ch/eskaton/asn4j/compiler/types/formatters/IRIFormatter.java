@@ -36,11 +36,11 @@ class IRIFormatter implements Formatter<IRI> {
 
     @Override
     public String format(CompilerContext ctx, IRI type) {
-        return getTypeName();
+        return getTypeName(null);
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(IRI type) {
         return OID_IRI.getName();
     }
 

@@ -28,44 +28,20 @@
 package ch.eskaton.asn4j.compiler.types.formatters;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
-import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import static ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter.formatType;
 
-import static ch.eskaton.asn4j.runtime.types.TypeName.ENUMERATED;
-
-class EnumeratedFormatter implements Formatter<EnumeratedType> {
+public class NamedTypeFormatter implements Formatter<NamedType> {
 
     @Override
-    public String format(CompilerContext ctx, EnumeratedType type) {
-        return getTypeName(null) + "(" + formatItems(type) + ")";
+    public String format(CompilerContext ctx, NamedType type) {
+        return "%s %s".formatted(type.getName(), formatType(ctx, type.getType()));
     }
 
     @Override
-    public String getTypeName(EnumeratedType type) {
-        return ENUMERATED.getName();
-    }
-
-    private String formatItems(EnumeratedType type) {
-        var rootItems = type.getRootEnum();
-        var additionalItems = type.getAdditionalEnum();
-
-        if (additionalItems != null && !additionalItems.isEmpty()) {
-            return formatItems(rootItems) + ", " + formatItems(additionalItems);
-        }
-
-        return formatItems(rootItems);
-    }
-
-    private String formatItems(List<EnumerationItemNode> enumerationItems) {
-        return Optional.ofNullable(enumerationItems)
-                .map(items -> items.stream()
-                        .map(EnumerationItemNode::getName).
-                                collect(Collectors.joining(", ")))
-                .orElse("");
+    public String getTypeName(NamedType type) {
+        return TypeFormatter.getTypeName(type.getType());
     }
 
 }

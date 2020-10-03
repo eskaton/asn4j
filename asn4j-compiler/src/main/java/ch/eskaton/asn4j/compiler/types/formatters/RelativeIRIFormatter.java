@@ -36,11 +36,11 @@ class RelativeIRIFormatter implements Formatter<RelativeIRI> {
 
     @Override
     public String format(CompilerContext ctx, RelativeIRI type) {
-        return getTypeName();
+        return getTypeName(null);
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(RelativeIRI type) {
         return RELATIVE_OID_IRI.getName();
     }
 

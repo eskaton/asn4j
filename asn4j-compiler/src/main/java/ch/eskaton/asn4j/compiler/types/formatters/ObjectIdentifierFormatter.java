@@ -36,11 +36,11 @@ class ObjectIdentifierFormatter implements Formatter<ObjectIdentifier> {
 
     @Override
     public String format(CompilerContext ctx, ObjectIdentifier type) {
-        return getTypeName();
+        return getTypeName(null);
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(ObjectIdentifier type) {
         return OID.getName();
     }
 

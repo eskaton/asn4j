@@ -37,11 +37,11 @@ class SetOfFormatter implements Formatter<SetOfType> {
 
     @Override
     public String format(CompilerContext ctx, SetOfType type) {
-        return getTypeName() + "(" + formatType(ctx, type.getType()) + ")";
+        return getTypeName(null) + "(" + formatType(ctx, type.getType()) + ")";
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(SetOfType type) {
         return SET_OF.getName();
     }
 

@@ -40,13 +40,13 @@ public class ChoiceFormatter implements Formatter<Choice> {
 
     @Override
     public String format(CompilerContext ctx, Choice type) {
-        return getTypeName() + "[" + type.getAllAlternatives().stream()
+        return getTypeName(null) + "[" + type.getAllAlternatives().stream()
                 .map(a -> formatNamedType(ctx, a))
                 .collect(Collectors.joining(", ")) + "]";
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(Choice type) {
         return CHOICE.getName();
     }
 

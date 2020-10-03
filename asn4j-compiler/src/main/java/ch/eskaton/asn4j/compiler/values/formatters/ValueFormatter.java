@@ -42,6 +42,7 @@ import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NamedValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
 import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
@@ -86,6 +87,7 @@ public class ValueFormatter {
         addCase(SimpleDefinedValue.class, new SimpleDefinedValueFormatter()::format);
         addCase(StringValue.class, new StringValueFormatter()::format);
         addCase(Tuple.class, new TupleFormatter()::format);
+        addCase(NamedValue.class, new NamedValueFormatter()::format);
     }
 
     private ValueFormatter() {

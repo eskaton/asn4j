@@ -43,14 +43,14 @@ class BitStringFormatter implements Formatter<BitString> {
         var formatItems = formatItems(type);
 
         if (formatItems.isEmpty()) {
-            return getTypeName();
+            return getTypeName(null);
         }
 
-        return getTypeName() + "(" + formatItems + ")";
+        return getTypeName(null) + "(" + formatItems + ")";
     }
 
     @Override
-    public String getTypeName() {
+    public String getTypeName(BitString type) {
         return BIT_STRING.getName();
     }
 
