@@ -34,9 +34,11 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
 import ch.eskaton.asn4j.parser.ast.values.EmptyValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -55,6 +57,7 @@ public class CollectionOfValueCompiler extends AbstractValueCompiler<CollectionO
     public CollectionOfValue doCompile(CompilerContext ctx, CompiledType compiledType, Value value,
             Optional<Parameters> maybeParameters) {
         var baseType = ctx.getCompiledBaseType(compiledType.getType()).getType();
+        var elementType = ((CollectionOfType) baseType).getType();
         CollectionOfValue collectionOfValue = null;
 
         if (value instanceof EmptyValue) {
@@ -63,10 +66,30 @@ public class CollectionOfValueCompiler extends AbstractValueCompiler<CollectionO
             collectionOfValue = CompilerUtils.resolveAmbiguousValue(value, CollectionOfValue.class);
         } else if (value instanceof CollectionOfValue) {
             collectionOfValue = (CollectionOfValue) value;
+        } else if (value instanceof CollectionValue collectionValue) {
+            var maybeElementName = elementType instanceof NamedType namedType ?
+                    Optional.of(namedType.getName()) :
+                    Optional.empty();
+            var values = collectionValue.getValues().stream().map(namedValue -> {
+                var name = namedValue.getName();
+
+                if (maybeElementName.isEmpty() ||
+                        maybeElementName.isPresent() && !maybeElementName.get().equals(name)) {
+                    var formattedValue = ValueFormatter.formatValue(namedValue);
+                    var formattedType = TypeFormatter.formatType(ctx, baseType);
+
+                    throw new ValueResolutionException(namedValue.getPosition(),
+                            "The value '%s' references a named component in '%s' that doesn't exist",
+                            formattedValue, formattedType);
+                }
+
+                return namedValue.getValue();
+            }).collect(Collectors.toList());
+
+            collectionOfValue = new CollectionOfValue(collectionValue.getPosition(), values);
         }
 
         if (collectionOfValue != null) {
-            var elementType = ((CollectionOfType) baseType).getType();
             var valueClass = ctx.getValueType(elementType);
 
             var values = collectionOfValue.getValues().stream()
@@ -93,7 +116,8 @@ public class CollectionOfValueCompiler extends AbstractValueCompiler<CollectionO
                 var formattedValue = ValueFormatter.formatValue(value);
                 var formattedType = TypeFormatter.formatType(ctx, elementType);
 
-                throw new ValueResolutionException("Failed to resolve a value in a %s to type %s: %s",
+                throw new ValueResolutionException(value.getPosition(),
+                        "Failed to resolve a value in a %s to type %s: %s",
                         getTypeName().getName(), formattedType, formattedValue);
             }
         }
