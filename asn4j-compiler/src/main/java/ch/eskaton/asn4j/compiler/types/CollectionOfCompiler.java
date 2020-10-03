@@ -35,6 +35,7 @@ import ch.eskaton.asn4j.compiler.results.AnonymousCompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
@@ -46,13 +47,10 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
     @Override
     public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
-
-        var contentType = compileContentType(ctx, node, name, maybeParameters);
         var compiledType = ctx.createCompiledType(CompiledCollectionOfType.class, node, name);
 
-        contentType.setParent(compiledType);
-        compiledType.setContentType(contentType);
         compiledType.setTags(tags);
+        compileContentType(ctx, compiledType, node, name, maybeParameters);
 
         ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
@@ -62,8 +60,8 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
         return compiledType;
     }
 
-    private CompiledType compileContentType(CompilerContext ctx, T node, String name,
-            Optional<Parameters> maybeParameters) {
+    private void compileContentType(CompilerContext ctx, CompiledCollectionOfType compiledCollectionOfType,
+            T node, String name, Optional<Parameters> maybeParameters) {
         var type = node.getType();
         var types = new LinkedList<Type>();
 
@@ -72,19 +70,28 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
             type = ((CollectionOfType) type).getType();
         }
 
+        var contentTypeName = name + "Content";
+
+        if (type instanceof NamedType namedType) {
+            contentTypeName = namedType.getName();
+            compiledCollectionOfType.setContentTypeName(contentTypeName);
+            type = namedType.getType();
+        }
+
         if (maybeParameters.isPresent() && type instanceof TypeReference typeReference) {
             type = ctx.getTypeParameter(maybeParameters.get(), typeReference).orElse(type);
         }
 
         var compiledType = ctx.isSubtypeNeeded(type) ?
-                ctx.defineType(type, name + "Content", maybeParameters) :
+                ctx.defineType(type, contentTypeName, maybeParameters) :
                 getCompiledType(ctx, type, maybeParameters);
 
         while (!types.isEmpty()) {
             compiledType = new AnonymousCompiledCollectionOfType(types.pop(), compiledType);
         }
 
-        return compiledType;
+        compiledType.setParent(compiledCollectionOfType);
+        compiledCollectionOfType.setContentType(compiledType);
     }
 
     private CompiledType getCompiledType(CompilerContext ctx, Type type, Optional<Parameters> maybeParameters) {

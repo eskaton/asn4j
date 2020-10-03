@@ -196,6 +196,22 @@ class CompilerImplTest {
     }
 
     @Test
+    void testCollectionOfNamedType() throws IOException, ParserException {
+        var body = """
+                SeqOf ::= SEQUENCE OF a INTEGER
+                """;
+
+        var compiledType = getCompiledCollectionOfType(body, MODULE_NAME, "SeqOf");
+
+        assertTrue(compiledType instanceof CompiledCollectionOfType);
+
+        var compiledCollectionOfType = (CompiledCollectionOfType) compiledType;
+
+        assertEquals(Optional.of("a"), compiledCollectionOfType.getContentTypeName());
+        assertTrue(compiledCollectionOfType.getContentType().getType() instanceof IntegerType);
+    }
+
+    @Test
     void testCollectionOfConstraintAndModuleAbsent() throws IOException, ParserException {
         var body = """
                 SeqOf ::= SEQUENCE OF INTEGER
@@ -1736,7 +1752,7 @@ class CompilerImplTest {
                 AbstractSeq {Type} ::= SEQUENCE { 
                     COMPONENTS OF SEQUENCE {field1 INTEGER, field2 Type} 
                 }
-                
+                                
                 Seq ::= AbstractSeq {BOOLEAN}
                 """;
 
@@ -2108,11 +2124,11 @@ class CompilerImplTest {
     void testParameterizedTypeWithInheritedParameter() throws IOException, ParserException {
         var body = """
                     Set ::= AbstractSet2 {BOOLEAN}
-                
+                                
                     AbstractSet1 {Type1} ::= SET {
                         field Type1
                     }
-                
+                                
                     AbstractSet2 {Type2} ::= SET {
                         COMPONENTS OF AbstractSet1 {Type2}
                     }
@@ -2131,11 +2147,11 @@ class CompilerImplTest {
     void testParameterizedTypeWithInheritedParameterInSet() throws IOException, ParserException {
         var body = """
                     Set ::= AbstractSet2 {BOOLEAN}
-                
+                                
                     AbstractSet1 {Type1} ::= SET {
                         field2 Type1
                     }
-                
+                                
                     AbstractSet2 {Type2} ::= SET {
                         field1 AbstractSet1 {Type2}
                     }
@@ -2163,9 +2179,9 @@ class CompilerImplTest {
     void testParameterizedTypeWithInheritedParameterInSetOf() throws IOException, ParserException {
         var body = """
                     SetOf ::= AbstractSetOf2 {BOOLEAN}
-                
+                                
                     AbstractSetOf1 {Type1} ::= SET OF Type1
-                
+                                
                     AbstractSetOf2 {Type2} ::= SET OF AbstractSetOf1 {Type2}
                 """;
 

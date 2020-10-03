@@ -78,11 +78,13 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         // TODO: handle parameterized type
         CompiledType compiledComponent;
 
-        if (namedType.getType() instanceof TypeReference typeReference && !(namedType.getType() instanceof UsefulType)) {
-            compiledComponent = CompilerUtils.compileTypeReference(ctx, typeReference, maybeParameters);
+        if (CompilerUtils.isTypeReference(namedType.getType()) && !(CompilerUtils.isUsefulType(namedType.getType()))) {
+            compiledComponent = CompilerUtils.compileTypeReference(ctx, (TypeReference) namedType.getType(),
+                    maybeParameters);
         } else {
             compiledComponent = ctx.defineType(namedType, maybeParameters);
         }
+
         compiledComponent.setParent(compiledType);
 
         var compiledCollectionComponent = new CompiledCollectionComponent(namedType.getName(), compiledComponent,
