@@ -1290,7 +1290,7 @@ public class CompilerContext {
     }
 
     public <V extends Value> CompiledValue<V> createCompiledValue(CompiledType type, V value) {
-        return new UnNamedCompiledValue<V>(type, value);
+        return new UnNamedCompiledValue<>(type, value);
     }
 
     public <V extends Value> CompiledValue<V> createCompiledValue(String name, CompiledType type, V value) {
