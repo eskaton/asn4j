@@ -378,7 +378,7 @@ public class CompilerContext {
                     type = resolvedType.get();
                 } else {
                     try {
-                        type = resolveTypeReference(typeReference);
+                        type = getCompiledType(typeReference).getType();
                     } catch (CompilerException e) {
                         throw new CompilerException(dummyGovernor.getPosition(),
                                 "The Governor references the type %s which can't be resolved", typeReference);
@@ -1424,10 +1424,6 @@ public class CompilerContext {
     /*******************************************************************************************************************
      * T Y P E  R E S O L V E R S
      ******************************************************************************************************************/
-
-    public Type resolveTypeReference(String reference) {
-        return typeResolver.resolveTypeReference(reference);
-    }
 
     public Type resolveTypeReference(Type type) {
         return typeResolver.resolveTypeReference(type);
