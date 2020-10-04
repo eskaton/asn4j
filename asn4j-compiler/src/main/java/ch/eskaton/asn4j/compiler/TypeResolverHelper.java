@@ -27,10 +27,8 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
@@ -134,33 +132,6 @@ public class TypeResolverHelper {
         }
 
         return typeReference;
-    }
-
-    public Type resolveTypeReference(String reference) {
-        try {
-            return resolveTypeReference(ctx.getModule(), reference);
-        } catch (CompilerException e) {
-            return ctx.findImport(reference)
-                    .map(moduleName -> resolveTypeReference(ctx.getModule(moduleName), reference))
-                    .orElseThrow(() -> new CompilerException("Failed to resolve reference to %s", reference));
-        }
-    }
-
-    private Type resolveTypeReference(ModuleNode module, String reference) {
-        return Optional.ofNullable(((TypeAssignmentNode) module.getBody().getAssignment(reference)))
-                .map(TypeOrObjectClassAssignmentNode::getType)
-                .orElseThrow(() -> new CompilerException("Failed to resolve reference to %s", reference));
-    }
-
-    public <T extends Type> T resolveTypeReference(Class<T> typeClass, ModuleNode module, String reference) {
-        Type type = resolveBaseType(module, reference);
-
-        if (!type.getClass().equals(typeClass)) {
-            throw new CompilerException("Failed to resolve reference %s to type %s. Found type: %s",
-                    reference, typeClass.getSimpleName(), TypeFormatter.formatType(ctx, type));
-        }
-
-        return (T) type;
     }
 
     public Type resolveSelectedType(Type type) {

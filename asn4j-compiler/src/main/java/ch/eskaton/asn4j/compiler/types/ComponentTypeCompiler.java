@@ -156,10 +156,11 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
     private CompiledType resolveTypeReference(CompilerContext ctx, TypeReference typeReference,
             Optional<Parameters> maybeParameters) {
-        var referencedTypeName = typeReference.getType();
         var compiledComponentType = CompilerUtils.compileTypeReference(ctx, typeReference, maybeParameters);
 
         if (compiledComponentType == null) {
+            var referencedTypeName = typeReference.getType();
+
             throw new CompilerException("Type %s referenced but not defined", referencedTypeName);
         }
 
