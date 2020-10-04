@@ -33,7 +33,6 @@ import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.AbstractValue;
 import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BinaryStringValue;
@@ -85,6 +84,8 @@ public class JavaUtils {
                     .withComparator((t, u) -> u.isInstance(t))
                     .withException(t -> new CompilerException("Failed to get initializer string for type %s", t));
 
+    public static final String DFLT_INIT_FMT = "new %s(%s)";
+
     static {
         addCase(BooleanValue.class, JavaUtils::getBooleanInitializerString);
         addCase(BitStringValue.class, JavaUtils::getBitStringInitializerString);
@@ -132,7 +133,7 @@ public class JavaUtils {
     }
 
     private static String getBooleanInitializerString(CompilerContext ctx, String typeName, BooleanValue value) {
-        return "new %s(%s)".formatted(typeName, value.getValue());
+        return DFLT_INIT_FMT.formatted(typeName, value.getValue());
     }
 
     private static String getBitStringInitializerString(CompilerContext ctx, String typeName, BitStringValue value) {
@@ -153,7 +154,7 @@ public class JavaUtils {
     }
 
     private static String getEnumeratedInitializerString(CompilerContext ctx, String typeName, EnumeratedValue value) {
-        return typeName + "." + value.getId().toUpperCase();
+        return "%s.%s".formatted(typeName, value.getId().toUpperCase());
     }
 
     private static String getIntegerInitializerString(CompilerContext ctx, String typeName, IntegerValue value) {
@@ -184,7 +185,7 @@ public class JavaUtils {
     private static String getIRIInitializerString(String typeName, List<String> components) {
         var idsString = components.stream().map(str -> StringUtils.wrap(str, "\"")).collect(Collectors.joining(", "));
 
-        return "new %s(%s)".formatted(typeName, idsString);
+        return DFLT_INIT_FMT.formatted(typeName, idsString);
     }
 
     private static String getNullInitializerString(CompilerContext ctx, String typeName, NullValue value) {
@@ -210,8 +211,9 @@ public class JavaUtils {
     private static String getOctetStringInitializerString(CompilerContext ctx, String typeName,
             OctetStringValue value) {
         var bytes = value.getByteValue();
-        var bytesStr = IntStream.range(0, bytes.length).boxed().map(
-                i -> String.format("(byte) 0x%02x", bytes[i])).collect(Collectors.joining(", "));
+        var bytesStr = IntStream.range(0, bytes.length).boxed()
+                .map(i -> String.format("(byte) 0x%02x", bytes[i]))
+                .collect(Collectors.joining(", "));
 
         return "new %s(new byte[] { %s })".formatted(typeName, bytesStr);
     }
@@ -222,7 +224,7 @@ public class JavaUtils {
                 .map(v -> getInitializerString(ctx, ctx.getTypeName(((AbstractValue) v).getType()), v))
                 .collect(Collectors.joining(", "));
 
-        return "new %s(%s)".formatted(typeName, initString);
+        return DFLT_INIT_FMT.formatted(typeName, initString);
     }
 
     private static String getCollectionInitializerString(CompilerContext ctx, String typeName, CollectionValue value) {
@@ -244,7 +246,7 @@ public class JavaUtils {
                     })
                     .collect(Collectors.joining(", "));
 
-            return "new %s(%s)".formatted(typeName, initString);
+            return DFLT_INIT_FMT.formatted(typeName, initString);
         }).orElseThrow(() -> new CompilerException("Failed to resolve type %s", typeName));
     }
 
@@ -312,18 +314,15 @@ public class JavaUtils {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 
-    private static String getUTF8StringInitializerString(CompilerContext ctx, String typeName,
-            UTF8StringValue value) {
+    private static String getUTF8StringInitializerString(CompilerContext ctx, String typeName, UTF8StringValue value) {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 
-    private static String getBMPStringInitializerString(CompilerContext ctx, String typeName,
-            BMPStringValue value) {
+    private static String getBMPStringInitializerString(CompilerContext ctx, String typeName, BMPStringValue value) {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 
-    private static String getUTCTimeInitializerString(CompilerContext ctx, String typeName,
-            UTCTimeValue value) {
+    private static String getUTCTimeInitializerString(CompilerContext ctx, String typeName, UTCTimeValue value) {
         return getGenericStringInitializerString(ctx, typeName, value.getValue());
     }
 
@@ -333,11 +332,10 @@ public class JavaUtils {
     }
 
     @SuppressWarnings("unused")
-    private static String getGenericStringInitializerString(CompilerContext ctx, String typeName,
-            String value) {
+    private static String getGenericStringInitializerString(CompilerContext ctx, String typeName, String value) {
         var escaped = value.chars().boxed().map(JavaUtils::escapeCharacter).collect(Collectors.joining());
 
-        return String.format("new %s(\"%s\")", typeName, escaped);
+        return "new %s(\"%s\")".formatted(typeName, escaped);
     }
 
     private static String escapeCharacter(Integer chr) {
