@@ -31,13 +31,13 @@ import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.ast.values.AbstractStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.List;
 
-public class StringSingleValueCompiler<V extends HasStringValue & Value>
+public class StringSingleValueCompiler<V extends AbstractStringValue & Value>
         extends SingleValueCompiler<V, StringValueNode> {
 
     public StringSingleValueCompiler(CompilerContext ctx, Class<V> valueClass, TypeName typeName) {

@@ -49,7 +49,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
 import ch.eskaton.asn4j.parser.ast.constraints.PermittedAlphabetConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
-import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.ast.values.AbstractStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
@@ -58,7 +58,7 @@ import java.util.Optional;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING;
 
-public abstract class AbstractStringConstraintCompiler<V extends HasStringValue & Value>
+public abstract class AbstractStringConstraintCompiler<V extends AbstractStringValue & Value>
         extends AbstractConstraintCompiler {
 
     public AbstractStringConstraintCompiler(CompilerContext ctx, Class<V> valueClass) {

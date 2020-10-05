@@ -1006,8 +1006,9 @@ public class CompilerContext {
      * @return a compiled type
      */
     public CompiledType getCompiledBaseType(CompiledType compiledType) {
-        if (compiledType.getType() instanceof TypeReference ||
-                compiledType.getType() instanceof ExternalTypeReference) {
+        var type = compiledType.getType();
+
+        if (CompilerUtils.isAnyTypeReference(type)) {
             return getCompiledBaseType(compiledType.getType());
         }
 

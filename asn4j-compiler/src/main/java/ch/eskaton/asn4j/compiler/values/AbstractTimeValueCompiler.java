@@ -30,12 +30,12 @@ package ch.eskaton.asn4j.compiler.values;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.ast.values.AbstractStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 
-public abstract class AbstractTimeValueCompiler<V extends HasStringValue & Value>
+public abstract class AbstractTimeValueCompiler<V extends AbstractStringValue & Value>
         extends AbstractStringValueCompiler<V> {
 
     public AbstractTimeValueCompiler(TypeName typeName, Class<? extends Type> typeClass,

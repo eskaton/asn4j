@@ -29,12 +29,12 @@ package ch.eskaton.asn4j.compiler.values;
 
 import ch.eskaton.asn4j.parser.ast.Quadruple;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.ast.values.AbstractStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 
-public abstract class AbstractUnicodeStringValueCompiler<V extends HasStringValue & Value>
+public abstract class AbstractUnicodeStringValueCompiler<V extends AbstractStringValue & Value>
         extends AbstractStringValueCompiler<V> {
 
     public AbstractUnicodeStringValueCompiler(TypeName typeName, Class<? extends Type> typeClass, Class<V> valueClass,

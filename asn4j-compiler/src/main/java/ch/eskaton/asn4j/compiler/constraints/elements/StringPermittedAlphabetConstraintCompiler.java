@@ -29,11 +29,11 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
-import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.ast.values.AbstractStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
-public class StringPermittedAlphabetConstraintCompiler<V extends HasStringValue & Value> extends PermittedAlphabetConstraintCompiler {
+public class StringPermittedAlphabetConstraintCompiler<V extends AbstractStringValue & Value> extends PermittedAlphabetConstraintCompiler {
 
     public StringPermittedAlphabetConstraintCompiler(CompilerContext ctx, Class<V> valueClass, TypeName typeName) {
         super(ctx, typeName);
