@@ -215,9 +215,10 @@ public class WithComponentExpressionBuilder extends InnerTypeExpressionBuilder {
 
     private List<Parameter> getCollectionOfParameter(CompiledType compiledType) {
         var compiledBaseType = (CompiledCollectionOfType) ctx.getCompiledBaseType(compiledType);
-        var contentType = compiledBaseType.getContentType().getType();
+        var compiledContentType = compiledBaseType.getContentType();
+        var resolvedContentType = ctx.getCompiledBaseType(compiledContentType).getType();
 
-        List<String> typeParameter = ctx.getParameterizedType(ctx.resolveTypeReference(contentType))
+        List<String> typeParameter = ctx.getParameterizedType(resolvedContentType)
                 .stream()
                 .skip(1)
                 .collect(Collectors.toList());

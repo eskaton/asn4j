@@ -49,7 +49,7 @@ public class ScalarValueExpressionBuilder extends AbstractValueExpressionBuilder
     @Override
     public Optional<BooleanExpression> build(CompiledType compiledType, ValueNode node) {
         return Optional.of(new BinaryBooleanExpression(BinaryOperator.EQ, new Variable(VAR_VALUE),
-                new ILValue(getTypeName(compiledType.getType()), node.getValue())));
+                new ILValue(getTypeName(compiledType), node.getValue())));
     }
 
 }

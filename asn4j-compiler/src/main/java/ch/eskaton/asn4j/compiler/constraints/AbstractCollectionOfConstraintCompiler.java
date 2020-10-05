@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
@@ -57,6 +58,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
+import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -137,15 +139,20 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {
         generateDoCheckConstraint(module);
 
-        CollectionOfType referencedType = (CollectionOfType) ctx.resolveTypeReference(compiledType.getType());
-        List<String> typeParameter = ctx.getTypeParameter(referencedType);
+        var type = compiledType.getType();
 
-        FunctionBuilder builder = generateCheckConstraintValue(module,
+        if (CompilerUtils.isAnyTypeReference(type)) {
+            type = ctx.getCompiledType((SimpleDefinedType) type).getType();
+        }
+
+        var collectionOfType = (CollectionOfType) type;
+        var typeParameter = ctx.getTypeParameter(collectionOfType);
+        var functionBuilder = generateCheckConstraintValue(module,
                 new Parameter(ILParameterizedType.of(collectionType, typeParameter), VAR_VALUE));
 
-        addConstraintCondition(compiledType, typeParameter, definition, builder, module);
+        addConstraintCondition(compiledType, typeParameter, definition, functionBuilder, module);
 
-        builder.build();
+        functionBuilder.build();
     }
 
     protected void addConstraintCondition(CompiledType compiledType, List<String> typeParameter, ConstraintDefinition definition,

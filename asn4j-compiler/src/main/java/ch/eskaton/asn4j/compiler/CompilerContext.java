@@ -138,8 +138,6 @@ public class CompilerContext {
 
     private DefaultsCompiler defaultsCompiler = new DefaultsCompiler(this);
 
-    private TypeResolverHelper typeResolver = new TypeResolverHelper(this);
-
     private Deque<Type> currentType = new LinkedList<>();
 
     private Map<String, ModuleNode> modules = new HashMap<>();
@@ -518,16 +516,6 @@ public class CompilerContext {
         return getTypeAssignment(currentModule.peek(), typeName);
     }
 
-    public Optional<TypeAssignmentNode> getTypeAssignment(String moduleName, String typeName) {
-        var module = Optional.ofNullable(modules.get(moduleName));
-
-        if (module.isPresent()) {
-            return getTypeAssignment(module.get(), typeName);
-        }
-
-        return Optional.empty();
-    }
-
     Optional<TypeAssignmentNode> getTypeAssignment(ModuleNode module, String typeName) {
         return module.getBody().getAssignments().stream()
                 .filter(TypeAssignmentNode.class::isInstance)
@@ -537,15 +525,19 @@ public class CompilerContext {
     }
 
     public Class<? extends Value> getValueType(Type type) {
-        Class<? extends Type> typeClass;
-
-        if (type instanceof TypeReference) {
-            typeClass = resolveTypeReference(type).getClass();
-        } else {
-            typeClass = type.getClass();
-        }
+        var typeClass = getTypeClass(type);
 
         return getValueClass(typeClass);
+    }
+
+    private Class<? extends Type> getTypeClass(Type type) {
+        if (CompilerUtils.isAnyTypeReference(type)) {
+            var compiledType = getCompiledType(type);
+
+            return compiledType.getType().getClass();
+        } else {
+            return type.getClass();
+        }
     }
 
     public Class<? extends Value> getValueClass(Class<? extends Type> typeClass) {
@@ -1035,7 +1027,7 @@ public class CompilerContext {
             compiledType = getCompiledType(type);
 
             type = compiledType.getType();
-        } while (isResolvableReference(type));
+        } while (isResolvableReference(type) && !(type instanceof CompiledBuiltinType));
 
         return compiledType;
     }
@@ -1170,7 +1162,9 @@ public class CompilerContext {
     }
 
     public String getRuntimeTypeName(Type type) {
-        return getRuntimeTypeName(resolveTypeReference(type).getClass());
+        var typeClass = getTypeClass(type);
+
+        return getRuntimeTypeName(typeClass);
     }
 
     public List<String> getTypeParameter(Type type) {
@@ -1421,16 +1415,28 @@ public class CompilerContext {
         return null;
     }
 
-    /*******************************************************************************************************************
-     * T Y P E  R E S O L V E R S
-     ******************************************************************************************************************/
-
-    public Type resolveTypeReference(Type type) {
-        return typeResolver.resolveTypeReference(type);
-    }
-
     public Type resolveSelectedType(Type type) {
-        return typeResolver.resolveSelectedType(type);
+        if (type instanceof SelectionType) {
+            var selectedId = ((SelectionType) type).getId();
+            var selectedType = ((SelectionType) type).getType();
+
+            if (selectedType instanceof TypeReference) {
+                var compiledType = getCompiledType(selectedType);
+                var collectionType = compiledType.getType();
+
+                if (collectionType instanceof Choice) {
+                    return ((Choice) collectionType).getRootAlternatives().stream()
+                            .filter(t -> t.getName().equals(selectedId))
+                            .findFirst()
+                            .orElseThrow(() -> new CompilerException("Selected type not found")).getType();
+                }
+
+            }
+
+            throw new CompilerException("Selected type not found");
+        }
+
+        return type;
     }
 
 }

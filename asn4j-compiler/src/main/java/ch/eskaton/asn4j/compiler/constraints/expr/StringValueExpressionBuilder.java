@@ -64,7 +64,7 @@ public class StringValueExpressionBuilder extends AbstractValueExpressionBuilder
     private BooleanExpression buildExpression(CompiledType compiledType, StringValueOrRange value) {
         if (value instanceof StringSingleValue) {
             return new BooleanFunctionCall.StringEquals(new Variable(VAR_VALUE),
-                    new ILValue(getTypeName(compiledType.getType()), ((StringSingleValue) value).getValue()));
+                    new ILValue(getTypeName(compiledType), ((StringSingleValue) value).getValue()));
         }
 
         throw new IllegalCompilerStateException("Unsupported value node: %s", value);

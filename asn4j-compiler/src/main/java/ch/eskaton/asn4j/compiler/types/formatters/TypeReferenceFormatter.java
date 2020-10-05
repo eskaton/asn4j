@@ -36,7 +36,7 @@ public class TypeReferenceFormatter implements Formatter<TypeReference> {
 
     @Override
     public String format(CompilerContext ctx, TypeReference type) {
-        return formatType(ctx, ctx.resolveTypeReference(type));
+        return formatType(ctx, ctx.getCompiledBaseType(type).getType());
     }
 
     @Override

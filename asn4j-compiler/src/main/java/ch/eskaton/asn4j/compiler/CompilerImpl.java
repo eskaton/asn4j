@@ -286,7 +286,7 @@ public class CompilerImpl {
         var type = assignment.getType();
 
         // check whether node is a valid type
-        compilerContext.resolveTypeReference(type);
+        compilerContext.getCompiledType(type);
 
         var valueSet = assignment.getValueSet();
 

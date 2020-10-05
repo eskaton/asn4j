@@ -31,9 +31,9 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public abstract class AbstractValueExpressionBuilder<V extends ValueNode> {
@@ -44,13 +44,13 @@ public abstract class AbstractValueExpressionBuilder<V extends ValueNode> {
         this.ctx = ctx;
     }
 
-    protected String getTypeName(Type type) {
-        if (type == null) {
-            return "";
-        } else if (type instanceof TypeReference) {
-            return ((TypeReference) type).getType();
+    protected String getTypeName(CompiledType compiledType) {
+        Objects.requireNonNull(compiledType);
+
+        if (compiledType.getType() instanceof TypeReference typeReference) {
+            return typeReference.getType();
         } else {
-            return ctx.getRuntimeTypeName(type.getClass());
+            return ctx.getRuntimeTypeName(compiledType.getType().getClass());
         }
     }
 

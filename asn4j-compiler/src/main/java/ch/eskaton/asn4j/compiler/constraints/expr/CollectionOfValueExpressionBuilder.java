@@ -28,14 +28,16 @@
 package ch.eskaton.asn4j.compiler.constraints.expr;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BooleanFunctionCall;
 import ch.eskaton.asn4j.compiler.il.ILListValue;
 import ch.eskaton.asn4j.compiler.il.ILValue;
 import ch.eskaton.asn4j.compiler.il.Variable;
+import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
+import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
@@ -54,27 +56,31 @@ public class CollectionOfValueExpressionBuilder
     @Override
     protected BooleanExpression buildExpression(CompiledType compiledType, CollectionOfValue collectionOfValue) {
         var values = collectionOfValue.getValues().stream()
-                .map(value -> new ILValue(getTypeName(compiledType.getType()), value))
+                .map(value -> new ILValue(getTypeName(compiledType), value))
                 .collect(Collectors.toList());
 
         return new BooleanFunctionCall.SetEquals(new Variable(VAR_VALUE), new ILListValue(values));
     }
 
     @Override
-    protected String getTypeName(Type type) {
+    protected String getTypeName(CompiledType compiledType) {
+        var type = compiledType.getType();
+
         if (type instanceof TypeReference) {
-            type = ctx.resolveTypeReference(type);
+            compiledType = ctx.getCompiledBaseType(compiledType);
         }
 
-        Type elementType;
+        if (compiledType instanceof CompiledCollectionOfType compiledCollectionOfType) {
+            var compiledContentType = compiledCollectionOfType.getContentType();
 
-        if (type instanceof CollectionOfType) {
-            elementType = ((CollectionOfType) type).getType();
-        } else {
-            elementType = type;
+            if (!(compiledContentType instanceof CompiledBuiltinType)) {
+                return compiledContentType.getName();
+            }
+
+            return super.getTypeName(compiledContentType);
         }
 
-        return super.getTypeName(elementType);
+       throw new CompilerException(type.getPosition(), "Unexpected type: %s", type);
     }
 
 }
