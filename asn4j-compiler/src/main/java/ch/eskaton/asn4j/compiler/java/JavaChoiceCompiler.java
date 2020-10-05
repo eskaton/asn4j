@@ -126,7 +126,7 @@ public class JavaChoiceCompiler extends AbstractJavaTypeCompiler<CompiledChoiceT
     }
 
     private void addClearFieldsMethod(JavaClass javaClass, List<String> fieldNames) {
-        var body = fieldNames.stream().map(f -> "%s = null;".formatted(f)).collect(Collectors.toList());
+        var body = fieldNames.stream().map("%s = null;"::formatted).collect(Collectors.toList());
 
         javaClass.method()
                 .modifier(PRIVATE)

@@ -2848,13 +2848,13 @@ public class Parser {
     }
 
     private List<IRIToken> parseArcIdSequence(String iriValue, boolean relative) throws ParserException {
-        IRILexer lexer = new IRILexer(iriValue);
+        IRILexer iriLexer = new IRILexer(iriValue);
         List<IRIToken> iriTokens = new ArrayList<>();
         IRIToken iriToken;
         boolean idExpected = relative;
 
         do {
-            iriToken = lexer.nextToken();
+            iriToken = iriLexer.nextToken();
 
             if (iriToken == null) {
                 break;

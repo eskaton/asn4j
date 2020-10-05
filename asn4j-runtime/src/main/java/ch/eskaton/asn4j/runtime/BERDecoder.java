@@ -577,13 +577,13 @@ public class BERDecoder implements Decoder {
 
         public TagNode accept(TLV tlv) {
             for (TagNode child : childs) {
-                ASN1Tag tag = child.getTag();
+                ASN1Tag childTag = child.getTag();
 
                 if (LOGGER.isTraceEnabled()) {
-                    LOGGER.trace("Trying: tag={}, class={}", tag.tag(), tag.clazz());
+                    LOGGER.trace("Trying: tag={}, class={}", childTag.tag(), childTag.clazz());
                 }
 
-                if (tlv.getTagId().equalsASN1Tag(tag)) {
+                if (tlv.getTagId().equalsASN1Tag(childTag)) {
                     return child;
                 }
             }

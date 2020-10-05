@@ -58,7 +58,8 @@ import java.util.Optional;
 import static ch.eskaton.asn4j.compiler.constraints.Constants.VAR_VALUE;
 import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING;
 
-public class AbstractStringConstraintCompiler<V extends HasStringValue & Value> extends AbstractConstraintCompiler {
+public abstract class AbstractStringConstraintCompiler<V extends HasStringValue & Value>
+        extends AbstractConstraintCompiler {
 
     public AbstractStringConstraintCompiler(CompilerContext ctx, Class<V> valueClass) {
         super(ctx);

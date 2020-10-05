@@ -43,7 +43,6 @@ import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
-import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.List;

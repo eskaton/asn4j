@@ -29,7 +29,6 @@ package ch.eskaton.asn4j.compiler.typenamesuppliers;
 
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.TypeConfiguration;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
@@ -38,10 +37,7 @@ import ch.eskaton.asn4j.runtime.types.ASN1UTCTime;
 
 public class TypeReferenceTypeNameSupplier implements TypeNameSupplier<Type> {
 
-    private final TypeConfiguration config;
-
-    public TypeReferenceTypeNameSupplier(TypeConfiguration config) {
-        this.config = config;
+    public TypeReferenceTypeNameSupplier() {
     }
 
     @Override
