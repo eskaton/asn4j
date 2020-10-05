@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.Collection;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Map;
 import java.util.Objects;
@@ -52,7 +53,14 @@ public class CollectionContainedSubtypeCompiler extends ContainedSubtypeCompiler
     private Map<String, Class<? extends Node>> getElementTypes(CompiledType compiledType) {
         return ((Collection) compiledType.getType()).getAllRootComponents().stream()
                 .map(ComponentType::getNamedType)
-                .collect(Collectors.toMap(NamedType::getName, nt -> ctx.resolveTypeReference(nt.getType()).getClass()));
+                .collect(Collectors.toMap(NamedType::getName, this::getTypeClass));
+    }
+
+    private Class<? extends Type> getTypeClass(NamedType namedType) {
+        var type = namedType.getType();
+        var compiledType = ctx.getCompiledType(type);
+
+        return compiledType.getType().getClass();
     }
 
 }

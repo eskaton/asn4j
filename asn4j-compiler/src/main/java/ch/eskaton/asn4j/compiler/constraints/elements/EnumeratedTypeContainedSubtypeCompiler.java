@@ -29,12 +29,12 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.compiler.results.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class EnumeratedTypeContainedSubtypeCompiler extends ContainedSubtypeCompiler {
 
@@ -48,20 +48,18 @@ public class EnumeratedTypeContainedSubtypeCompiler extends ContainedSubtypeComp
                 Objects.equals(getItems(compiledType), getItems(compiledParentType));
     }
 
-    private Object getItems(CompiledType compiledType) {
-        if (compiledType instanceof CompiledEnumeratedType) {
-            return getItemsAux(compiledType);
+    private Tuple2<Boolean, Set<List<Tuple2<String, Integer>>>> getItems(CompiledType compiledType) {
+        if (!(compiledType instanceof CompiledEnumeratedType)) {
+            compiledType = ctx.getCompiledBaseType(compiledType.getType());
         }
 
-        return getItemsAux(ctx.getCompiledBaseType(compiledType.getType()));
-    }
+        var compiledEnumeratedType = (CompiledEnumeratedType) compiledType;
+        var roots = compiledEnumeratedType.getRoots();
+        var additions = compiledEnumeratedType.getAdditions();
+        var enumeratedType = (EnumeratedType) compiledEnumeratedType.getType();
+        var allItems = roots.copy().addAll(additions.getItems()).getItems();
 
-    private Object getItemsAux(CompiledType compiledType) {
-        EnumerationItems roots = ((CompiledEnumeratedType) compiledType).getRoots();
-        EnumerationItems additions = ((CompiledEnumeratedType) compiledType).getAdditions();
-
-        return new Tuple2<>(((EnumeratedType) compiledType.getType()).isExtensible(),
-                new HashSet<>(roots.copy().addAll(additions.getItems()).getItems()));
+        return Tuple2.of(enumeratedType.isExtensible(), Set.of(allItems));
     }
 
 }

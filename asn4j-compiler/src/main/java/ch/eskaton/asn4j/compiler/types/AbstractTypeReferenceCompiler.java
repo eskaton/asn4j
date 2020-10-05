@@ -44,10 +44,7 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
-        if (node.getParameters().isEmpty()) {
-            // ensure the type is resolvable
-            ctx.resolveTypeReference(node);
-        } else {
+        if (node.getParameters().isPresent()) {
             var typeName = node.getType();
             var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
             var parameters = Optional.of(CompilerUtils.createParameters(node, name, compiledParameterizedType));

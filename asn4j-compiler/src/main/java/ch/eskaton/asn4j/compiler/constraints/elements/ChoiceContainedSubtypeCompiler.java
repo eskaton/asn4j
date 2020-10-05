@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Map;
 import java.util.Objects;
@@ -50,7 +51,14 @@ public class ChoiceContainedSubtypeCompiler extends ContainedSubtypeCompiler {
 
     private Map<String, Class<? extends Node>> getElementTypes(CompiledType compiledType) {
         return ((Choice) compiledType.getType()).getRootAlternatives().stream()
-                .collect(Collectors.toMap(NamedType::getName, nt -> ctx.resolveTypeReference(nt.getType()).getClass()));
+                .collect(Collectors.toMap(NamedType::getName, this::getTypeClass));
+    }
+
+    private Class<? extends Type> getTypeClass(NamedType namedType) {
+        var type = namedType.getType();
+        var compiledType = ctx.getCompiledType(type);
+
+        return compiledType.getType().getClass();
     }
 
 }

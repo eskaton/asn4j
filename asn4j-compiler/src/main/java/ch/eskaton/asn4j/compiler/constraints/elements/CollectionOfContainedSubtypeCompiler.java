@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -52,7 +53,13 @@ public class CollectionOfContainedSubtypeCompiler extends ContainedSubtypeCompil
             return Optional.empty();
         }
 
-        return Optional.of(ctx.resolveTypeReference(((CollectionOfType) type).getType()).getClass());
+        return Optional.of(getTypeClass((CollectionOfType) type));
+    }
+
+    private Class<? extends Type> getTypeClass(CollectionOfType type) {
+        var contentType = type.getType();
+
+        return ctx.getCompiledType(contentType).getType().getClass();
     }
 
 }
