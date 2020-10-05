@@ -374,7 +374,7 @@ public class TypeConfiguration {
                 new SelectionTypeTypeNameSupplier(ctx, this)));
         types.add(new TypeDefinition<>(Type.class, new TypeCompiler()));
         types.add(new TypeDefinition<>(TypeReference.class, new TypeReferenceCompiler(),
-                new TypeReferenceTypeNameSupplier(this)));
+                new TypeReferenceTypeNameSupplier()));
         types.add(new TypeDefinition<>(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),
                 new ExternalTypeReferenceTypeNameSupplier()));
         types.add(new TypeDefinition<>(Value.class, new ValueCompiler()));

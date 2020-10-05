@@ -35,16 +35,13 @@ import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 
 public interface Value extends Node {
 
-    Value MIN = new Bound("MIN");
+    Value MIN = new Bound();
 
-    Value MAX = new Bound("MAX");
+    Value MAX = new Bound();
 
     class Bound implements Value {
 
-        private String name;
-
-        private Bound(String name) {
-            this.name = name;
+        private Bound() {
         }
 
         @Override

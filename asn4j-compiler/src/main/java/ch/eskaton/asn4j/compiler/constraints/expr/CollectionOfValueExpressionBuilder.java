@@ -38,7 +38,6 @@ import ch.eskaton.asn4j.compiler.il.Variable;
 import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 
@@ -80,7 +79,7 @@ public class CollectionOfValueExpressionBuilder
             return super.getTypeName(compiledContentType);
         }
 
-       throw new CompilerException(type.getPosition(), "Unexpected type: %s", type);
+        throw new CompilerException(type.getPosition(), "Unexpected type: %s", type);
     }
 
 }
