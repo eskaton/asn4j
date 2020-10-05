@@ -60,64 +60,60 @@ public class CollectionValueCompiler extends AbstractValueCompiler<CollectionVal
     @Override
     public CollectionValue doCompile(CompilerContext ctx, CompiledType compiledType, Value value,
             Optional<Parameters> maybeParameters) {
-        CollectionValue collectionValue = null;
         var typeName = getTypeName().getName();
-        var type = compiledType.getType();
+        var maybeCollectionValue = getCollectionValue(value);
 
-        if (value instanceof EmptyValue) {
-            return new CollectionValue(value.getPosition(), Collections.emptyList());
-        } else if (value instanceof AmbiguousValue) {
-            collectionValue = CompilerUtils.resolveAmbiguousValue(value, CollectionValue.class);
-        } else if (value instanceof CollectionValue) {
-            collectionValue = (CollectionValue) value;
-        }
-
-        if (type instanceof TypeReference) {
-            type = ctx.resolveTypeReference(type);
-        }
-
-        if (collectionValue != null) {
-            var elementTypes = ((Collection) type).getAllComponents().stream()
-                    .map(ComponentType::getNamedType)
-                    .collect(Collectors.toMap(NamedType::getName, NamedType::getType));
-
-            var values = collectionValue.getValues().stream()
-                    .map(v -> {
-                        var resolvedValue = (AbstractValue) getValue(ctx, typeName, elementTypes, v);
-
-                        return new NamedValue(v.getPosition(), v.getName(), resolvedValue, resolvedValue.getType());
-                    })
-                    .collect(Collectors.toList());
-
-            collectionValue.getValues().clear();
-            collectionValue.getValues().addAll(values);
-
-            return collectionValue;
+        if (maybeCollectionValue.isPresent()) {
+            return resolveCollectionValue(ctx, typeName, compiledType, maybeCollectionValue.get());
         }
 
         throw invalidValueError(value);
     }
 
-    private Value getValue(CompilerContext ctx, String typeName, Map<String, Type> elementTypes, NamedValue value) {
-        var elementType = getElementType(elementTypes, value);
-        var valueType = ctx.getValueType(elementType);
-
-        return resolveElement(ctx, typeName, elementType, valueType, value);
-    }
-
-    private Type getElementType(Map<String, Type> elementTypes, NamedValue value) {
-        Type elementType = elementTypes.get(value.getName());
-
-        if (elementType == null) {
-            throw new ValueResolutionException(value.getPosition(),
-                    "SEQUENCE value contains a component '%s' which isn't defined. Must be one of [%s]",
-                    value.getName(), elementTypes.keySet().stream().collect(Collectors.joining(", ")));
+    private Optional<CollectionValue> getCollectionValue(Value value) {
+        if (value instanceof EmptyValue) {
+            return Optional.of(new CollectionValue(value.getPosition(), Collections.emptyList()));
+        } else if (value instanceof AmbiguousValue) {
+            return Optional.ofNullable(CompilerUtils.resolveAmbiguousValue(value, CollectionValue.class));
+        } else if (value instanceof CollectionValue) {
+            return Optional.of((CollectionValue) value);
         }
 
-        return elementType;
+        return Optional.empty();
     }
 
-    private Value resolveElement(CompilerContext ctx, String typeName, Type elementType,
+    private CollectionValue resolveCollectionValue(CompilerContext ctx, String typeName, CompiledType compiledType,
+            CollectionValue collectionValue) {
+        var collection = getCollectionType(ctx, compiledType.getType());
+        var componentTypes = collection.getAllComponents().stream()
+                .map(ComponentType::getNamedType)
+                .collect(Collectors.toMap(NamedType::getName, NamedType::getType));
+        var values = collectionValue.getValues().stream()
+                .map(v -> getNamedValue(ctx, typeName, componentTypes, v))
+                .collect(Collectors.toList());
+
+        collectionValue.getValues().clear();
+        collectionValue.getValues().addAll(values);
+
+        return collectionValue;
+    }
+
+    private NamedValue getNamedValue(CompilerContext ctx, String typeName, Map<String, Type> componentTypes,
+            NamedValue namedValue) {
+        var resolvedValue = (AbstractValue) getValue(ctx, typeName, componentTypes, namedValue);
+
+        return new NamedValue(namedValue.getPosition(), namedValue.getName(), resolvedValue, resolvedValue.getType());
+    }
+
+    private Value getValue(CompilerContext ctx, String typeName, Map<String, Type> componentTypes,
+            NamedValue value) {
+        var componentType = getComponentType(componentTypes, value);
+        var valueType = ctx.getValueType(componentType);
+
+        return resolveComponent(ctx, typeName, componentType, valueType, value);
+    }
+
+    private Value resolveComponent(CompilerContext ctx, String typeName, Type componentType,
             Class<? extends Value> valueClass, NamedValue namedValue) {
         var value = namedValue.getValue();
 
@@ -128,20 +124,53 @@ public class CollectionValueCompiler extends AbstractValueCompiler<CollectionVal
                 if (resolvedValue != null) {
                     value = resolvedValue;
                 } else {
-                    return resolveError(ctx, typeName, elementType, namedValue, value, Optional.empty());
+                    return resolveError(ctx, typeName, componentType, namedValue, value, Optional.empty());
                 }
             }
 
-            return ctx.getCompiledValue(elementType, value).getValue();
+            return ctx.getCompiledValue(componentType, value).getValue();
         } catch (ClassCastException | ValueResolutionException e) {
-            return resolveError(ctx, typeName, elementType, namedValue, value, Optional.of(e));
+            return resolveError(ctx, typeName, componentType, namedValue, value, Optional.of(e));
         }
     }
 
-    private Value resolveError(CompilerContext ctx, String typeName, Type elementType, NamedValue namedValue,
+    private Collection getCollectionType(CompilerContext ctx, Type type) {
+        if (type instanceof TypeReference) {
+            type = ctx.getCompiledType(type).getType();
+        }
+
+        if (type instanceof Collection collection) {
+            return collection;
+        }
+
+        var typeName = getTypeName().getName();
+        var formattedType = TypeFormatter.formatType(ctx, type);
+
+        throw new ValueResolutionException(type.getPosition(),
+                "Failed to resolve a %s value where a value of type %s is expected",
+                typeName, formattedType);
+    }
+
+    private Type getComponentType(Map<String, Type> componentTypes, NamedValue value) {
+        var componentName = value.getName();
+        var componentType = componentTypes.get(componentName);
+
+        if (componentType == null) {
+            var typeName = getTypeName().getName();
+            var componentNames = componentTypes.keySet().stream().collect(Collectors.joining(", "));
+
+            throw new ValueResolutionException(value.getPosition(),
+                    "%s value contains a component '%s' which isn't defined. Must be one of [%s]",
+                    typeName, componentName, componentNames);
+        }
+
+        return componentType;
+    }
+
+    private Value resolveError(CompilerContext ctx, String typeName, Type componentType, NamedValue namedValue,
             Value value, Optional<Exception> e) {
         var message = "Failed to resolve value for component '%s' in a %s to type %s: %s";
-        var formattedType = TypeFormatter.formatType(ctx, elementType);
+        var formattedType = TypeFormatter.formatType(ctx, componentType);
         var formattedValue = ValueFormatter.formatValue(value);
 
         if (e.isPresent()) {
