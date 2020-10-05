@@ -30,35 +30,19 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.IA5StringVerifier;
 
 @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 22))
-public class ASN1IA5String extends AbstractASN1String {
+public class ASN1IA5String extends AbstractVerifiedASN1String {
 
     private static final IA5StringVerifier VERIFIER = new IA5StringVerifier();
 
     public ASN1IA5String() {
-        super();
+        super(VERIFIER);
     }
 
     public ASN1IA5String(String value) {
-        super(value);
-
-        verifyString(value);
-    }
-
-    @Override
-    public void setValue(String value) {
-        verifyString(value);
-
-        super.setValue(value);
-    }
-
-    private void verifyString(String value) {
-        VERIFIER.verify(value).ifPresent(v -> {
-            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
-        });
+        super(VERIFIER, value);
     }
 
 }
