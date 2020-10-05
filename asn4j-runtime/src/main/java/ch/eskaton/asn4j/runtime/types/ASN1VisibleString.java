@@ -30,35 +30,19 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tag;
 import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
-import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.ISO646Verifier;
 
 @ASN1Tags(tags = @ASN1Tag(clazz = Clazz.UNIVERSAL, tag = 26))
-public class ASN1VisibleString extends AbstractASN1String {
+public class ASN1VisibleString extends AbstractVerifiedASN1String {
 
     private static final ISO646Verifier VERIFIER = new ISO646Verifier();
 
     public ASN1VisibleString() {
-        super();
+        super(VERIFIER);
     }
 
     public ASN1VisibleString(String value) {
-        super(value);
-
-        verifyString(value);
-    }
-
-    @Override
-    public void setValue(String value) {
-        verifyString(value);
-
-        super.setValue(value);
-    }
-
-    private void verifyString(String value) {
-        VERIFIER.verify(value).ifPresent(v -> {
-            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
-        });
+        super(VERIFIER, value);
     }
 
 }

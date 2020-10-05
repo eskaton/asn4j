@@ -25,14 +25,38 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.values;
+package ch.eskaton.asn4j.runtime.types;
 
-import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
+import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 
-public class UTCTimeValue extends AbstractStringValue {
+public class AbstractVerifiedASN1String extends AbstractASN1String {
 
-    public UTCTimeValue(Position position, String value) {
-        super(position, value);
+    private final StringVerifier verifier;
+
+    public AbstractVerifiedASN1String(StringVerifier verifier) {
+        this.verifier = verifier;
+    }
+
+    public AbstractVerifiedASN1String(StringVerifier verifier, String value) {
+        super(value);
+
+        this.verifier = verifier;
+
+        verifyString(value);
+    }
+
+    @Override
+    public void setValue(String value) {
+        verifyString(value);
+
+        super.setValue(value);
+    }
+
+    private void verifyString(String value) {
+        verifier.verify(value).ifPresent(v -> {
+            throw new ASN1RuntimeException("String contains invalid characters: %s", v);
+        });
     }
 
 }
