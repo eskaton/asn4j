@@ -34,12 +34,12 @@ import ch.eskaton.asn4j.compiler.constraints.expr.UnicodeStringSizeExpressionBui
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.ast.values.AbstractStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.Optional;
 
-public abstract class AbstractUnicodeStringConstraintCompiler<V extends HasStringValue & Value>
+public abstract class AbstractUnicodeStringConstraintCompiler<V extends AbstractStringValue & Value>
         extends AbstractStringConstraintCompiler<V> {
 
     public AbstractUnicodeStringConstraintCompiler(CompilerContext ctx, Class<V> valueClass) {

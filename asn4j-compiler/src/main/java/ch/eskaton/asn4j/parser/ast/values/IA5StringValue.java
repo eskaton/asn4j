@@ -29,45 +29,10 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 
-import java.util.Objects;
-
-public class IA5StringValue extends AbstractValue implements HasStringValue {
-
-    private String value;
+public class IA5StringValue extends AbstractStringValue {
 
     public IA5StringValue(Position position, String value) {
-        super(position);
-
-        this.value = value;
-    }
-
-    @Override
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        if (!super.equals(o)) {
-            return false;
-        }
-
-        IA5StringValue that = (IA5StringValue) o;
-
-        return Objects.equals(value, that.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), value);
+        super(position, value);
     }
 
 }

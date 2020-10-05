@@ -38,11 +38,11 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.Quadruple;
 import ch.eskaton.asn4j.parser.ast.Tuple;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.AbstractStringValue;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
 import ch.eskaton.asn4j.parser.ast.values.CharacterStringList;
 import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
-import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -51,7 +51,7 @@ import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public abstract class AbstractStringValueCompiler<V extends HasStringValue & Value> extends AbstractValueCompiler<V> {
+public abstract class AbstractStringValueCompiler<V extends AbstractStringValue & Value> extends AbstractValueCompiler<V> {
 
     private final TypeName typeName;
 
@@ -160,7 +160,7 @@ public abstract class AbstractStringValueCompiler<V extends HasStringValue & Val
             var stringValue = ctx.getCompiledValue(((DefinedValue) value)).getValue();
 
             if (stringValue.getClass().isAssignableFrom(valueClass)) {
-                return ((HasStringValue) stringValue).getValue();
+                return ((AbstractStringValue) stringValue).getValue();
             }
 
             var nodeName = value.getClass().getSimpleName();
@@ -173,7 +173,7 @@ public abstract class AbstractStringValueCompiler<V extends HasStringValue & Val
         } else if (value instanceof CollectionOfValue) {
             var compiledValue = ctx.getCompiledValue(type, value);
 
-            return ((HasStringValue) compiledValue.getValue()).getValue();
+            return ((AbstractStringValue) compiledValue.getValue()).getValue();
         } else {
             throw new IllegalCompilerStateException("Unsupported value for %s: %s", typeName, value);
         }

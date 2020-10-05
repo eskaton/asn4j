@@ -25,15 +25,48 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.values.formatters;
+package ch.eskaton.asn4j.parser.ast.values;
 
-import ch.eskaton.asn4j.parser.ast.values.HasStringValue;
+import ch.eskaton.asn4j.parser.Position;
 
-class HasStringValueFormatter implements Formatter<HasStringValue> {
+import java.util.Objects;
+
+public class AbstractStringValue extends AbstractValue {
+
+    private String value;
+
+    public AbstractStringValue(Position position, String value) {
+        super(position);
+
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
 
     @Override
-    public String format(HasStringValue value) {
-        return value.getValue();
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        AbstractStringValue that = (AbstractStringValue) o;
+
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
     }
 
 }
