@@ -36,28 +36,23 @@ import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
-import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
-import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledModule;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedValueSetType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.results.HasChildComponents;
 import ch.eskaton.asn4j.compiler.results.UnNamedCompiledValue;
 import ch.eskaton.asn4j.compiler.types.EnumeratedTypeCompiler;
-import ch.eskaton.asn4j.compiler.types.TypeCompiler;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.AbstractValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueCompiler;
@@ -71,7 +66,6 @@ import ch.eskaton.asn4j.parser.ast.Governor;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
-import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
@@ -88,17 +82,10 @@ import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.HasModuleName;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
-import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
-import ch.eskaton.asn4j.parser.ast.types.OpenType;
-import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
-import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
-import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
-import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -261,19 +248,8 @@ public class CompilerContext {
         return getTypeName(type, name);
     }
 
-    private String getTypeName(Type type, String name) {
+    public String getTypeName(Type type, String name) {
         return config.getTypeNameSupplier(type.getClass()).getName(type, name);
-    }
-
-    public CompiledType defineType(NamedType namedType, Optional<Parameters> maybeParameters) {
-        var name = namedType.getName();
-        var type = namedType.getType();
-
-        if (type instanceof TypeReference typeReference && maybeParameters.isPresent()) {
-            type = getTypeParameter(maybeParameters.get(), typeReference).orElse(type);
-        }
-
-        return defineType(type, name, maybeParameters);
     }
 
     public Optional<Type> getTypeParameter(Parameters parameters, SimpleDefinedType definedType) {
@@ -398,119 +374,6 @@ public class CompilerContext {
         return null;
     }
 
-    public CompiledType defineType(Type type, String name, Optional<Parameters> maybeParameters) {
-        if (type instanceof EnumeratedType) {
-            return defineType(type, name, maybeParameters, isSubtypeNeeded(type));
-        } else if (type instanceof IntegerType) {
-            return defineType(type, name, maybeParameters, isSubtypeNeeded(type));
-        } else if (type instanceof BitString) {
-            return defineType(type, name, maybeParameters, isSubtypeNeeded(type));
-        } else if (type instanceof SequenceType
-                || type instanceof SequenceOfType
-                || type instanceof SetType
-                || type instanceof SetOfType
-                || type instanceof Choice) {
-            return defineType(type, name, maybeParameters, true);
-        } else if (type instanceof ObjectIdentifier
-                || type instanceof RelativeOID
-                || type instanceof IRI
-                || type instanceof RelativeIRI) {
-            return defineType(type, name, maybeParameters, false);
-        } else if (type instanceof ObjectClassFieldTypeNode objectClassFieldType) {
-            var objectClassReference = objectClassFieldType.getObjectClassReference();
-            var compiledObjectClass = getCompiledObjectClass(objectClassReference.getReference());
-            var fieldNames = objectClassFieldType.getFieldName().getPrimitiveFieldNames();
-            AbstractCompiledField<?> field = null;
-
-            for (var i = 0; i < fieldNames.size(); i++) {
-                var fieldName = fieldNames.get(i);
-                var objectClassName = compiledObjectClass.getName();
-
-                field = compiledObjectClass.getField(fieldName.getReference())
-                        .orElseThrow(() -> new CompilerException("Unknown field '%s' in object class %s",
-                                fieldName.getReference(), objectClassName));
-
-                if (i < fieldNames.size() - 1) {
-                    if (field instanceof CompiledObjectField compiledObjectField) {
-                        compiledObjectClass = compiledObjectField.getObjectClass();
-                    } else {
-                        throw new CompilerException(fieldName.getPosition(), "&%s doesn't refer to an object class",
-                                field.getName());
-                    }
-                }
-            }
-
-            if (field instanceof CompiledFixedTypeValueField) {
-                return defineFixedTypeValueField(type, name, (CompiledFixedTypeValueField) field, maybeParameters);
-            } else if (field instanceof CompiledTypeField) {
-                return defineTypeField(type, name, maybeParameters);
-            } else if (field == null) {
-                throw new IllegalCompilerStateException(type.getPosition(), "Failed to resolve field from %s", type);
-            } else {
-                throw new IllegalCompilerStateException(type.getPosition(), "Unexpected field type: %s",
-                        field.getClass().getSimpleName());
-            }
-        }
-
-        return createCompiledType(type, getTypeName(type, name), true);
-    }
-
-    private CompiledType defineTypeField(Type type, String name, Optional<Parameters> maybeParameters) {
-        var additionalConstraints = type.getConstraints();
-        var openType = new OpenType();
-
-        openType.setTags(type.getTags());
-        openType.setTaggingModes(type.getTaggingModes());
-
-        if (additionalConstraints != null) {
-            var constraints = openType.getConstraints();
-
-            if (constraints == null) {
-                openType.setConstraints(additionalConstraints);
-            } else {
-                constraints.addAll(additionalConstraints);
-            }
-        }
-
-        return defineType(openType, name, maybeParameters);
-    }
-
-    private CompiledType defineFixedTypeValueField(Type type, String name, CompiledFixedTypeValueField field,
-            Optional<Parameters> maybeParameters) {
-        var additionalConstraints = type.getConstraints();
-        var newType = (Type) Clone.clone(field.getCompiledType().getType());
-
-        newType.setTags(type.getTags());
-
-        if (additionalConstraints != null) {
-            var constraints = newType.getConstraints();
-
-            if (constraints == null) {
-                newType.setConstraints(additionalConstraints);
-            } else {
-                constraints.addAll(additionalConstraints);
-            }
-        }
-
-        return defineType(newType, name, maybeParameters);
-    }
-
-    private CompiledType defineType(Type type, String name, Optional<Parameters> maybeParameters, boolean newType) {
-        if (newType && name != null) {
-            var compiledType = compileType(type, getTypeName(type, name), maybeParameters);
-
-            compiledType.setSubtype(true);
-
-            return compiledType;
-        }
-
-        return createCompiledType(type, getTypeName(type, name), isBuiltin(type));
-
-    }
-
-    private CompiledType compileType(Type type, String typeName, Optional<Parameters> maybeParameters) {
-        return this.<Type, TypeCompiler>getCompiler(Type.class).compile(this, typeName, type, maybeParameters);
-    }
 
     public Optional<TypeAssignmentNode> getTypeAssignment(String typeName) {
         return getTypeAssignment(currentModule.peek(), typeName);

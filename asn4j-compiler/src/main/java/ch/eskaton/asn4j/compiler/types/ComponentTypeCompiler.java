@@ -41,6 +41,7 @@ import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType;
 import ch.eskaton.asn4j.parser.ast.types.ComponentType.CompType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -53,19 +54,12 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
 
     public List<CompiledCollectionComponent> compile(CompilerContext ctx, CompiledCollectionType compiledType,
             ComponentType node, boolean isRoot, Optional<Parameters> maybeParameters) {
-        switch (node.getCompType()) {
-            case NAMED_TYPE_OPT:
-                // fall through
-            case NAMED_TYPE_DEF:
-                // fall through
-            case NAMED_TYPE:
-                return compileComponentNamedType(ctx, compiledType, node, isRoot, maybeParameters);
-            case TYPE:
-                return compileComponentType(ctx, compiledType, node, maybeParameters);
-            default:
-                throw new IllegalCompilerStateException(node.getPosition(), "Unsupported component type: %s",
-                        node.getCompType());
-        }
+        return switch (node.getCompType()) {
+            case NAMED_TYPE_OPT, NAMED_TYPE_DEF, NAMED_TYPE -> compileComponentNamedType(ctx, compiledType, node, isRoot, maybeParameters);
+            case TYPE -> compileComponentType(ctx, compiledType, node, maybeParameters);
+            default -> throw new IllegalCompilerStateException(node.getPosition(), "Unsupported component type: %s",
+                    node.getCompType());
+        };
     }
 
     private List<CompiledCollectionComponent> compileComponentNamedType(CompilerContext ctx,
@@ -80,7 +74,9 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             compiledComponent = CompilerUtils.compileTypeReference(ctx, (TypeReference) namedType.getType(),
                     maybeParameters);
         } else {
-            compiledComponent = ctx.defineType(namedType, maybeParameters);
+            var compiler = ctx.<NamedType, NamedTypeCompiler>getCompiler((Class<NamedType>) namedType.getClass());
+
+            compiledComponent = compiler.compile(ctx, namedType, maybeParameters);
         }
 
         compiledComponent.setParent(compiledType);
