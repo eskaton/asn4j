@@ -92,6 +92,7 @@ import ch.eskaton.asn4j.compiler.types.IA5StringCompiler;
 import ch.eskaton.asn4j.compiler.types.IRICompiler;
 import ch.eskaton.asn4j.compiler.types.ISO646StringCompiler;
 import ch.eskaton.asn4j.compiler.types.IntegerCompiler;
+import ch.eskaton.asn4j.compiler.types.NamedTypeCompiler;
 import ch.eskaton.asn4j.compiler.types.NullCompiler;
 import ch.eskaton.asn4j.compiler.types.NumericStringCompiler;
 import ch.eskaton.asn4j.compiler.types.OctetStringCompiler;
@@ -145,12 +146,12 @@ import ch.eskaton.asn4j.compiler.values.UniversalStringValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueCompiler;
 import ch.eskaton.asn4j.compiler.values.VideotexStringValueCompiler;
 import ch.eskaton.asn4j.compiler.values.VisibleStringValueCompiler;
-import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
@@ -176,6 +177,7 @@ import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.ISO646String;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
+import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.NumericString;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
@@ -373,6 +375,7 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(SelectionType.class, new SelectionTypeCompiler(),
                 new SelectionTypeTypeNameSupplier(ctx, this)));
         types.add(new TypeDefinition<>(Type.class, new TypeCompiler()));
+        types.add(new TypeDefinition<>(NamedType.class, new NamedTypeCompiler()));
         types.add(new TypeDefinition<>(TypeReference.class, new TypeReferenceCompiler(),
                 new TypeReferenceTypeNameSupplier()));
         types.add(new TypeDefinition<>(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),
