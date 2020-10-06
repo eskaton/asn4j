@@ -44,13 +44,14 @@ import java.util.Optional;
 
 public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
+    public static final List<ComponentVerifier> COMPONENT_VERIFIERS = List.of(
+            new NameUniquenessVerifier(TypeName.CHOICE),
+            new TagUniquenessVerifier(TypeName.CHOICE),
+            new UntaggedOpenTypeVerifier(TypeName.CHOICE));
+
     @Override
     public CompiledType compile(CompilerContext ctx, String name, Choice node, Optional<Parameters> maybeParameters) {
         var tags = CompilerUtils.getTagIds(ctx, node);
-        var componentVerifiers = List.of(
-                new NameUniquenessVerifier(TypeName.CHOICE),
-                new TagUniquenessVerifier(TypeName.CHOICE),
-                new UntaggedOpenTypeVerifier(TypeName.CHOICE));
         var compiledType = ctx.createCompiledType(CompiledChoiceType.class, node, name);
         var components = new ArrayList<CompiledComponent>();
 
@@ -61,7 +62,7 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
             var component = compiledComponent.getCompiledType();
 
             component.setParent(compiledType);
-            componentVerifiers.forEach(v -> v.verify(compiledComponent));
+            COMPONENT_VERIFIERS.forEach(v -> v.verify(compiledComponent));
             components.add(compiledComponent);
         }
 

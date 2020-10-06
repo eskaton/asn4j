@@ -61,7 +61,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
             case NAMED_TYPE:
                 return compileComponentNamedType(ctx, compiledType, node, isRoot, maybeParameters);
             case TYPE:
-                return compileComponentType(ctx, compiledType, node, isRoot, maybeParameters);
+                return compileComponentType(ctx, compiledType, node, maybeParameters);
             default:
                 throw new IllegalCompilerStateException(node.getPosition(), "Unsupported component type: %s",
                         node.getCompType());
@@ -74,7 +74,6 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         var isOptional = component.getCompType() == CompType.NAMED_TYPE_OPT;
         var namedType = component.getNamedType();
 
-        // TODO: handle parameterized type
         CompiledType compiledComponent;
 
         if (CompilerUtils.isTypeReference(namedType.getType()) && !(CompilerUtils.isUsefulType(namedType.getType()))) {
@@ -112,8 +111,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
     }
 
     private List<CompiledCollectionComponent> compileComponentType(CompilerContext ctx,
-            CompiledCollectionType compiledType, ComponentType componentType, boolean isRoot,
-            Optional<Parameters> maybeParameters) {
+            CompiledCollectionType compiledType, ComponentType componentType, Optional<Parameters> maybeParameters) {
         var type = componentType.getType();
         var compiledCollectionType = resolveCompiledCollectionType(ctx, compiledType, type, maybeParameters);
         var compiledCollectionComponents = getComponentTypes(compiledCollectionType);
@@ -129,8 +127,7 @@ public class ComponentTypeCompiler implements UnNamedCompiler<ComponentType> {
         CompiledType compiledCollectionType = null;
 
         if (collectionType.getClass().isAssignableFrom(type.getClass())) {
-            compiledCollectionType = ctx.<Type, TypeCompiler>getCompiler(Type.class).compile(ctx, null, type,
-                    maybeParameters);
+            compiledCollectionType = ctx.<Type, TypeCompiler>getCompiler(Type.class).compile(ctx, null, type, maybeParameters);
         } else if (type instanceof TypeReference typeReference) {
             compiledCollectionType = resolveTypeReference(ctx, typeReference, maybeParameters);
         } else if (type instanceof ExternalTypeReference typeReference) {
