@@ -80,7 +80,7 @@ import ch.eskaton.asn4j.parser.ast.OIDNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
-import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
+import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
@@ -4807,11 +4807,11 @@ public class Parser {
     }
 
     // ObjectClassFieldType ::= DefinedObjectClass "." FieldName
-    protected class ObjectClassFieldTypeParser extends ListRuleParser<ObjectClassFieldTypeNode> {
+    protected class ObjectClassFieldTypeParser extends ListRuleParser<ObjectClassFieldType> {
 
-        public ObjectClassFieldTypeNode parse() throws ParserException {
+        public ObjectClassFieldType parse() throws ParserException {
             return super.parse(new SequenceParser(definedObjectClassParser, TokenType.DOT, fieldNameParser),
-                    a -> new ObjectClassFieldTypeNode(a.P(), a.n0(), a.n2()));
+                    a -> new ObjectClassFieldType(a.P(), a.n0(), a.n2()));
         }
 
     }

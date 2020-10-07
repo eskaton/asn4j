@@ -25,20 +25,21 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.types.AbstractType;
+import ch.eskaton.asn4j.parser.ast.FieldNameNode;
+import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 
 import java.util.Objects;
 
-public class ObjectClassFieldTypeNode extends AbstractType {
+public class ObjectClassFieldType extends AbstractType {
 
     private ObjectClassReference objectClassReference;
 
     private FieldNameNode fieldName;
 
-    public ObjectClassFieldTypeNode(Position position, ObjectClassReference objectClassReference,
+    public ObjectClassFieldType(Position position, ObjectClassReference objectClassReference,
             FieldNameNode fieldName) {
         super(position);
 
@@ -68,7 +69,7 @@ public class ObjectClassFieldTypeNode extends AbstractType {
             return false;
         }
 
-        ObjectClassFieldTypeNode that = (ObjectClassFieldTypeNode) o;
+        ObjectClassFieldType that = (ObjectClassFieldType) o;
 
         return Objects.equals(objectClassReference, that.objectClassReference) &&
                 Objects.equals(fieldName, that.fieldName);

@@ -27,26 +27,18 @@
 
 package ch.eskaton.asn4j.compiler.types;
 
-import ch.eskaton.asn4j.compiler.Clone;
 import ch.eskaton.asn4j.compiler.Compiler;
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.Parameters;
-import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
-import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
-import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
-import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
 import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
 import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
@@ -89,40 +81,10 @@ public class NamedTypeCompiler implements Compiler<NamedType> {
                 || type instanceof IRI
                 || type instanceof RelativeIRI) {
             return compile(ctx, type, name, maybeParameters, false);
-        } else if (type instanceof ObjectClassFieldTypeNode objectClassFieldType) {
-            var objectClassReference = objectClassFieldType.getObjectClassReference();
-            var compiledObjectClass = ctx.getCompiledObjectClass(objectClassReference.getReference());
-            var fieldNames = objectClassFieldType.getFieldName().getPrimitiveFieldNames();
-            AbstractCompiledField<?> field = null;
+        } else if (type instanceof ObjectClassFieldType objectClassFieldType) {
+            var compiler = ctx.<ObjectClassFieldType, ObjectClassFieldTypeCompiler>getCompiler(ObjectClassFieldType.class);
 
-            for (var i = 0; i < fieldNames.size(); i++) {
-                var fieldName = fieldNames.get(i);
-                var objectClassName = compiledObjectClass.getName();
-
-                field = compiledObjectClass.getField(fieldName.getReference())
-                        .orElseThrow(() -> new CompilerException("Unknown field '%s' in object class %s",
-                                fieldName.getReference(), objectClassName));
-
-                if (i < fieldNames.size() - 1) {
-                    if (field instanceof CompiledObjectField compiledObjectField) {
-                        compiledObjectClass = compiledObjectField.getObjectClass();
-                    } else {
-                        throw new CompilerException(fieldName.getPosition(), "&%s doesn't refer to an object class",
-                                field.getName());
-                    }
-                }
-            }
-
-            if (field instanceof CompiledFixedTypeValueField) {
-                return defineFixedTypeValueField(ctx, type, name, (CompiledFixedTypeValueField) field, maybeParameters);
-            } else if (field instanceof CompiledTypeField) {
-                return defineTypeField(ctx, type, name, maybeParameters);
-            } else if (field == null) {
-                throw new IllegalCompilerStateException(type.getPosition(), "Failed to resolve field from %s", type);
-            } else {
-                throw new IllegalCompilerStateException(type.getPosition(), "Unexpected field type: %s",
-                        field.getClass().getSimpleName());
-            }
+            return compiler.compile(ctx, name, objectClassFieldType, maybeParameters);
         }
 
         return ctx.createCompiledType(type, ctx.getTypeName(type, name), true);
@@ -141,46 +103,6 @@ public class NamedTypeCompiler implements Compiler<NamedType> {
         return ctx.createCompiledType(type, ctx.getTypeName(type, name), ctx.isBuiltin(type));
     }
 
-    private CompiledType defineTypeField(CompilerContext ctx, Type type, String name,
-            Optional<Parameters> maybeParameters) {
-        var additionalConstraints = type.getConstraints();
-        var openType = new OpenType();
-
-        openType.setTags(type.getTags());
-        openType.setTaggingModes(type.getTaggingModes());
-
-        if (additionalConstraints != null) {
-            var constraints = openType.getConstraints();
-
-            if (constraints == null) {
-                openType.setConstraints(additionalConstraints);
-            } else {
-                constraints.addAll(additionalConstraints);
-            }
-        }
-
-        return compile(ctx, openType, name, maybeParameters);
-    }
-
-    private CompiledType defineFixedTypeValueField(CompilerContext ctx, Type type, String name,
-            CompiledFixedTypeValueField field, Optional<Parameters> maybeParameters) {
-        var additionalConstraints = type.getConstraints();
-        var newType = (Type) Clone.clone(field.getCompiledType().getType());
-
-        newType.setTags(type.getTags());
-
-        if (additionalConstraints != null) {
-            var constraints = newType.getConstraints();
-
-            if (constraints == null) {
-                newType.setConstraints(additionalConstraints);
-            } else {
-                constraints.addAll(additionalConstraints);
-            }
-        }
-
-        return compile(ctx, newType, name, maybeParameters);
-    }
 
     private CompiledType compileType(CompilerContext ctx, Type type, String typeName,
             Optional<Parameters> maybeParameters) {
