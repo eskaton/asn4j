@@ -295,7 +295,7 @@ import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.OIDNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
-import ch.eskaton.asn4j.parser.ast.ObjectClassFieldTypeNode;
+import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
@@ -1191,7 +1191,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectClassFieldTypeNode);
+        assertTrue(result instanceof ObjectClassFieldType);
 
         parser = new Parser(new ByteArrayInputStream("OBJECT IDENTIFIER".getBytes())).new BuiltinTypeParser();
 
@@ -6083,7 +6083,7 @@ class ParserTest {
                 new ByteArrayInputStream(
                         "OBJECT-CLASS.&ObjectSet-Reference".getBytes())).new ObjectClassFieldTypeParser();
 
-        ObjectClassFieldTypeNode result = parser.parse();
+        ObjectClassFieldType result = parser.parse();
 
         assertNotNull(result);
         assertEquals("OBJECT-CLASS", result.getObjectClassReference().getReference());
@@ -6998,8 +6998,8 @@ class ParserTest {
         assertNotNull(((TypeReference) result).getParameters());
         assertTrue(((TypeReference) result).getParameters().isPresent());
         assertEquals(1, ((TypeReference) result).getParameters().get().size());
-        assertTrue(((TypeReference) result).getParameters().get().get(0) instanceof ObjectClassFieldTypeNode);
-        assertTrue(((ObjectClassFieldTypeNode) ((TypeReference) result)
+        assertTrue(((TypeReference) result).getParameters().get().get(0) instanceof ObjectClassFieldType);
+        assertTrue(((ObjectClassFieldType) ((TypeReference) result)
                 .getParameters().get().get(0)).hasConstraint());
     }
 

@@ -74,7 +74,6 @@ import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
-import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
@@ -117,19 +116,19 @@ import static ch.eskaton.commons.utils.ReflectionUtils.getInstance;
 
 public class CompilerContext {
 
-    private HashMap<String, CompiledModule> definedModules = new HashMap<>();
+    private final HashMap<String, CompiledModule> definedModules = new HashMap<>();
 
-    private TypeConfiguration config = new TypeConfiguration(this);
+    private final TypeConfiguration config = new TypeConfiguration(this);
 
-    private ConstraintCompiler constraintCompiler = new ConstraintCompiler(this);
+    private final ConstraintCompiler constraintCompiler = new ConstraintCompiler(this);
 
-    private DefaultsCompiler defaultsCompiler = new DefaultsCompiler(this);
+    private final DefaultsCompiler defaultsCompiler = new DefaultsCompiler(this);
+
+    private final Map<String, ModuleNode> modules = new HashMap<>();
+
+    private final Deque<ModuleNode> currentModule = new LinkedList<>();
 
     private Deque<Type> currentType = new LinkedList<>();
-
-    private Map<String, ModuleNode> modules = new HashMap<>();
-
-    private Deque<ModuleNode> currentModule = new LinkedList<>();
 
     private CompilerImpl compiler;
 
@@ -188,7 +187,6 @@ public class CompilerContext {
         getCurrentCompiledModule().addParameterizedValueSetType(name, compiledParameterizedValueSetType);
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> clazz) {
         return config.getCompiler(clazz);
     }
@@ -227,14 +225,6 @@ public class CompilerContext {
         }
 
         return module;
-    }
-
-    Optional<String> findImport(String typeName) {
-        return currentModule.peek().getBody().getImports().stream()
-                .filter(importNode -> importNode.getSymbols().stream()
-                        .anyMatch(sym -> sym.getName().equals(typeName))
-                ).map(importNode -> importNode.getReference().getName())
-                .findAny();
     }
 
     public String getTypeName(Type type) {
@@ -329,7 +319,7 @@ public class CompilerContext {
         var type = getParameterType(parameters, paramGovernor);
 
         return paramGovernor != null &&
-                type instanceof Type &&
+                type != null &&
                 !value.isBlank() &&
                 value.toLowerCase().equals(value) &&
                 definition.getReference().getName().equals(value);
@@ -372,19 +362,6 @@ public class CompilerContext {
         }
 
         return null;
-    }
-
-
-    public Optional<TypeAssignmentNode> getTypeAssignment(String typeName) {
-        return getTypeAssignment(currentModule.peek(), typeName);
-    }
-
-    Optional<TypeAssignmentNode> getTypeAssignment(ModuleNode module, String typeName) {
-        return module.getBody().getAssignments().stream()
-                .filter(TypeAssignmentNode.class::isInstance)
-                .map(TypeAssignmentNode.class::cast)
-                .filter(a -> typeName.equals(a.getReference()))
-                .findFirst();
     }
 
     public Class<? extends Value> getValueType(Type type) {

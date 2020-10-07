@@ -95,6 +95,7 @@ import ch.eskaton.asn4j.compiler.types.IntegerCompiler;
 import ch.eskaton.asn4j.compiler.types.NamedTypeCompiler;
 import ch.eskaton.asn4j.compiler.types.NullCompiler;
 import ch.eskaton.asn4j.compiler.types.NumericStringCompiler;
+import ch.eskaton.asn4j.compiler.types.ObjectClassFieldTypeCompiler;
 import ch.eskaton.asn4j.compiler.types.OctetStringCompiler;
 import ch.eskaton.asn4j.compiler.types.OpenTypeCompiler;
 import ch.eskaton.asn4j.compiler.types.PrintableStringCompiler;
@@ -180,6 +181,7 @@ import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.NumericString;
+import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
 import ch.eskaton.asn4j.parser.ast.types.OpenType;
@@ -380,6 +382,7 @@ public class TypeConfiguration {
                 new TypeReferenceTypeNameSupplier()));
         types.add(new TypeDefinition<>(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),
                 new ExternalTypeReferenceTypeNameSupplier()));
+        types.add(new TypeDefinition<>(ObjectClassFieldType.class, new ObjectClassFieldTypeCompiler()));
         types.add(new TypeDefinition<>(Value.class, new ValueCompiler()));
         types.add(new TypeDefinition<>(ObjectClassNode.class, new ObjectClassNodeCompiler()));
         types.add(new TypeDefinition<>(ObjectClassDefn.class, new ObjectClassDefnCompiler()));
