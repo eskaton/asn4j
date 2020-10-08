@@ -38,7 +38,7 @@ public abstract class InformationFromObjects extends AbstractNode {
 
     private FieldNameNode field;
 
-    public InformationFromObjects(Position position, ReferencedObjectsNode reference, FieldNameNode field) {
+    protected InformationFromObjects(Position position, ReferencedObjectsNode reference, FieldNameNode field) {
         super(position);
 
         this.reference = reference;

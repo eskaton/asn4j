@@ -53,7 +53,7 @@ import static java.util.Optional.of;
 public abstract class AbstractIRIConstraintCompiler<N extends AbstractIRIValueNode>
         extends AbstractConstraintCompiler {
 
-    public AbstractIRIConstraintCompiler(CompilerContext ctx) {
+    protected AbstractIRIConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);

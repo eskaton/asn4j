@@ -38,8 +38,8 @@ import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 public abstract class AbstractTimeValueCompiler<V extends AbstractStringValue & Value>
         extends AbstractStringValueCompiler<V> {
 
-    public AbstractTimeValueCompiler(TypeName typeName, Class<? extends Type> typeClass,
-            Class<V> valueClass, StringVerifier verifier) {
+    protected AbstractTimeValueCompiler(TypeName typeName, Class<? extends Type> typeClass, Class<V> valueClass,
+            StringVerifier verifier) {
         super(typeName, typeClass, valueClass, verifier);
     }
 

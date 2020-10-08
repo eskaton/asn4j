@@ -42,7 +42,7 @@ import java.util.Optional;
 public abstract class AbstractUnicodeStringConstraintCompiler<V extends AbstractStringValue & Value>
         extends AbstractStringConstraintCompiler<V> {
 
-    public AbstractUnicodeStringConstraintCompiler(CompilerContext ctx, Class<V> valueClass) {
+    protected AbstractUnicodeStringConstraintCompiler(CompilerContext ctx, Class<V> valueClass) {
         super(ctx, valueClass);
     }
 

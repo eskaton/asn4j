@@ -40,7 +40,7 @@ public abstract class DefinedValue extends AbstractValue {
         super();
     }
 
-    public DefinedValue(Position position, String reference) {
+    protected DefinedValue(Position position, String reference) {
         super(position);
 
         this.reference = reference;

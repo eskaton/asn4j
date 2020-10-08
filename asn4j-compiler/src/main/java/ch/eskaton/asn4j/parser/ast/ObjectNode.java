@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.parser.Position;
 
 public abstract class ObjectNode extends AbstractNode {
 
-    public ObjectNode(Position position) {
+    protected ObjectNode(Position position) {
         super(position);
     }
 

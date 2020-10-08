@@ -51,7 +51,7 @@ public abstract class AbstractType implements Type {
 
     private EncodingPrefixNode encodingPrefix;
 
-    public AbstractType(Position position) {
+    protected AbstractType(Position position) {
         this.position = position;
     }
 

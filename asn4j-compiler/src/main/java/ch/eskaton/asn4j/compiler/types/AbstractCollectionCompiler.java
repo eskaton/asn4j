@@ -52,7 +52,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
 
     private final List<Function<TypeName, ComponentVerifier<CompiledCollectionComponent>>> componentVerifierSuppliers;
 
-    public AbstractCollectionCompiler(TypeName typeName,
+    protected AbstractCollectionCompiler(TypeName typeName,
             Function<TypeName, ComponentVerifier<CompiledCollectionComponent>>... componentVerifierSupplier) {
         this.typeName = typeName;
         this.componentVerifierSuppliers = new ArrayList<>(Arrays.asList(componentVerifierSupplier));

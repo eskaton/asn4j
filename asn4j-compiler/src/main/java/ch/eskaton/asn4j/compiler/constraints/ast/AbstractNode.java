@@ -33,7 +33,7 @@ public abstract class AbstractNode implements Node {
 
     private NodeType type;
 
-    public AbstractNode(NodeType type) {
+    protected AbstractNode(NodeType type) {
         this.type = type;
     }
 

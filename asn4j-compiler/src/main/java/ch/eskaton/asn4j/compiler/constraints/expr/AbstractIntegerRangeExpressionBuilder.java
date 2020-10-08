@@ -51,7 +51,7 @@ public abstract class AbstractIntegerRangeExpressionBuilder {
 
     protected final Function<List<Expression>, BooleanExpression> checkEq;
 
-    public AbstractIntegerRangeExpressionBuilder(Function<List<Expression>, BooleanExpression> checkMin,
+    protected AbstractIntegerRangeExpressionBuilder(Function<List<Expression>, BooleanExpression> checkMin,
             Function<List<Expression>, BooleanExpression> checkMax,
             Function<List<Expression>, BooleanExpression> checkEq) {
         this.checkMin = checkMin;

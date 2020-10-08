@@ -40,7 +40,7 @@ public abstract class AbstractValueExpressionBuilder<V extends ValueNode> {
 
     protected CompilerContext ctx;
 
-    public AbstractValueExpressionBuilder(CompilerContext ctx) {
+    protected AbstractValueExpressionBuilder(CompilerContext ctx) {
         this.ctx = ctx;
     }
 

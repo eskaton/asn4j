@@ -52,7 +52,7 @@ import static java.util.Optional.of;
 public abstract class AbstractOIDConstraintCompiler<N extends AbstractOIDValueNode>
         extends AbstractConstraintCompiler {
 
-    public AbstractOIDConstraintCompiler(CompilerContext ctx) {
+    protected AbstractOIDConstraintCompiler(CompilerContext ctx) {
         super(ctx);
 
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);

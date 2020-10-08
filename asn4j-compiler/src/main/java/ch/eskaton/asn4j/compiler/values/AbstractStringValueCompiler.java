@@ -61,7 +61,7 @@ public abstract class AbstractStringValueCompiler<V extends AbstractStringValue 
 
     private final StringVerifier verifier;
 
-    public AbstractStringValueCompiler(TypeName typeName, Class<? extends Type> typeClass,
+    protected AbstractStringValueCompiler(TypeName typeName, Class<? extends Type> typeClass,
             Class<V> valueClass, StringVerifier verifier) {
         super(typeName, valueClass);
 

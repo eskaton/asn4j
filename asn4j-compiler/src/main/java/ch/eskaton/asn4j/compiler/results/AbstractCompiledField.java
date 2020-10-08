@@ -39,7 +39,7 @@ public abstract class AbstractCompiledField<D> implements CompilationResult {
 
     private boolean optional;
 
-    public AbstractCompiledField(String name) {
+    protected AbstractCompiledField(String name) {
         this.name = name;
     }
 

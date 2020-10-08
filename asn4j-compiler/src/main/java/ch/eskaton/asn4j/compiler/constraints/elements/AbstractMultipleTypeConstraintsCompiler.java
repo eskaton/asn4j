@@ -54,7 +54,7 @@ public abstract class AbstractMultipleTypeConstraintsCompiler implements Element
 
     private final Supplier<? extends ComponentVerifier> verifierSupplier;
 
-    public AbstractMultipleTypeConstraintsCompiler(CompilerContext ctx,
+    protected AbstractMultipleTypeConstraintsCompiler(CompilerContext ctx,
             Supplier<? extends ComponentVerifier> verifierSupplier) {
         this.ctx = ctx;
         this.verifierSupplier = verifierSupplier;

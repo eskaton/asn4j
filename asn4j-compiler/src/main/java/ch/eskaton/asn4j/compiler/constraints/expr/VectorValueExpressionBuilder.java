@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public abstract class VectorValueExpressionBuilder<V, N extends ValueNode<? extends Collection<V>>>
         extends AbstractValueExpressionBuilder<N> {
 
-    public VectorValueExpressionBuilder(CompilerContext ctx) {
+    protected VectorValueExpressionBuilder(CompilerContext ctx) {
         super(ctx);
     }
 

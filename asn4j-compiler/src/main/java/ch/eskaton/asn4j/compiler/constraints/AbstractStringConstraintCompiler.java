@@ -61,7 +61,7 @@ import static ch.eskaton.asn4j.compiler.il.ILBuiltinType.STRING;
 public abstract class AbstractStringConstraintCompiler<V extends AbstractStringValue & Value>
         extends AbstractConstraintCompiler {
 
-    public AbstractStringConstraintCompiler(CompilerContext ctx, Class<V> valueClass) {
+    protected AbstractStringConstraintCompiler(CompilerContext ctx, Class<V> valueClass) {
         super(ctx);
 
         addConstraintHandler(ContainedSubtype.class, new ContainedSubtypeCompiler(ctx)::compile);

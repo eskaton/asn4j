@@ -32,7 +32,7 @@ import java.util.Set;
 
 public abstract class AbstractIRIValueNode extends ValueNode<Set<List<String>>> {
 
-    public AbstractIRIValueNode(Set<List<String>> value) {
+    protected AbstractIRIValueNode(Set<List<String>> value) {
         super(value);
     }
 

@@ -85,7 +85,7 @@ public abstract class AbstractCollectionConstraintCompiler extends AbstractConst
 
     private final TypeName typeName;
 
-    public AbstractCollectionConstraintCompiler(CompilerContext ctx, TypeName typeName) {
+    protected AbstractCollectionConstraintCompiler(CompilerContext ctx, TypeName typeName) {
         super(ctx);
 
         this.typeName = typeName;
