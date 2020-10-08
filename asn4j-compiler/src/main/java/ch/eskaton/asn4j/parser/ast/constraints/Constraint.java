@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.runtime.utils.ToString;
 
 public abstract class Constraint extends Elements {
 
-    public Constraint(Position position) {
+    protected Constraint(Position position) {
         super(position);
     }
 

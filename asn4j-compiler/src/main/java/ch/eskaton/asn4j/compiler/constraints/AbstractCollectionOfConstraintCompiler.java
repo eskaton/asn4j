@@ -82,7 +82,7 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
 
     private final ILBuiltinType collectionType;
 
-    public AbstractCollectionOfConstraintCompiler(CompilerContext ctx, TypeName typeName, ILBuiltinType collectionType) {
+    protected AbstractCollectionOfConstraintCompiler(CompilerContext ctx, TypeName typeName, ILBuiltinType collectionType) {
         super(ctx);
 
         this.typeName = typeName;

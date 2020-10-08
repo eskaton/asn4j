@@ -36,7 +36,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public abstract class ByteStringDefaultCompiler<V extends ByteStringValue> extends DefaultCompilerImpl {
 
-    public ByteStringDefaultCompiler(Class<V> valueClass) {
+    protected ByteStringDefaultCompiler(Class<V> valueClass) {
         super(valueClass);
     }
 

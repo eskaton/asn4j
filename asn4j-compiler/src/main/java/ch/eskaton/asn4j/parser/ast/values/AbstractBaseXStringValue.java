@@ -7,13 +7,13 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class AbstractBaseXStringValue extends AbstractValue {
+public abstract class AbstractBaseXStringValue extends AbstractValue {
 
     private int base;
 
     protected String value;
 
-    public AbstractBaseXStringValue(Position position, String value, int base) {
+    protected AbstractBaseXStringValue(Position position, String value, int base) {
         super(position);
 
         this.value = value;

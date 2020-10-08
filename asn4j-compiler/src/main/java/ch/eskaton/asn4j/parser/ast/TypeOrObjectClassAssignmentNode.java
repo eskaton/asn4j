@@ -33,7 +33,7 @@ public abstract class TypeOrObjectClassAssignmentNode<T extends Node> extends As
 
     private T type;
 
-    public TypeOrObjectClassAssignmentNode(Position position, String reference, T type) {
+    protected TypeOrObjectClassAssignmentNode(Position position, String reference, T type) {
         super(position, reference);
 
         this.type = type;

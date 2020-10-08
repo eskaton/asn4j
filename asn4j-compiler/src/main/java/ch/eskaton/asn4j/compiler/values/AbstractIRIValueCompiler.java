@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 public abstract class AbstractIRIValueCompiler<V extends AbstractIRIValue>
         extends AbstractOIDOrIRIValueCompiler<V> {
 
-    public AbstractIRIValueCompiler(TypeName typeName, Class<V> valueClass) {
+    protected AbstractIRIValueCompiler(TypeName typeName, Class<V> valueClass) {
         super(typeName, valueClass);
     }
 

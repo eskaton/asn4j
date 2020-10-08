@@ -35,7 +35,7 @@ public abstract class AbstractTimeStringVerifier implements StringVerifier {
 
     private final AbstractDateTimeParser parser;
 
-    public AbstractTimeStringVerifier(AbstractDateTimeParser parser) {
+    protected AbstractTimeStringVerifier(AbstractDateTimeParser parser) {
         this.parser = parser;
     }
 

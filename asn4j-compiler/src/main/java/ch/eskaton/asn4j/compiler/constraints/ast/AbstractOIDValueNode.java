@@ -32,7 +32,7 @@ import java.util.Set;
 
 public abstract class AbstractOIDValueNode extends ValueNode<Set<List<Integer>>> {
 
-    public AbstractOIDValueNode(Set<List<Integer>> value) {
+    protected AbstractOIDValueNode(Set<List<Integer>> value) {
         super(value);
     }
 

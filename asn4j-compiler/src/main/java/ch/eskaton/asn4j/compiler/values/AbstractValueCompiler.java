@@ -50,7 +50,7 @@ public abstract class AbstractValueCompiler<V extends Value> implements Compiler
 
     private Class<V> valueClass;
 
-    public AbstractValueCompiler(TypeName typeName, Class<V> valueClass) {
+    protected AbstractValueCompiler(TypeName typeName, Class<V> valueClass) {
         this.typeName = typeName;
         this.valueClass = valueClass;
     }
@@ -77,7 +77,7 @@ public abstract class AbstractValueCompiler<V extends Value> implements Compiler
     protected V compileDefinedValue(CompilerContext ctx, CompiledType compiledType,
             DefinedValue definedValue) {
         var reference = definedValue.getReference();
-        CompiledValue resolvedValue;
+        CompiledValue<?> resolvedValue;
 
         if (definedValue instanceof ExternalValueReference externalValueReference) {
             var moduleName = externalValueReference.getModule();
@@ -112,6 +112,7 @@ public abstract class AbstractValueCompiler<V extends Value> implements Compiler
         return ctx.getCompiledValue(reference);
     }
 
+    @SuppressWarnings("unused")
     public V doCompile(CompilerContext ctx, CompiledType compiledType, Value value,
             Optional<Parameters> maybeParameters) {
         if (value.getClass().isAssignableFrom(valueClass)) {

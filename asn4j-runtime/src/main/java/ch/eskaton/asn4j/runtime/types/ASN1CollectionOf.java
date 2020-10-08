@@ -41,7 +41,7 @@ public abstract class ASN1CollectionOf<C extends Collection<T>, T extends ASN1Ty
 
     protected C values;
 
-    public ASN1CollectionOf(C values) {
+    protected ASN1CollectionOf(C values) {
         this.values = values;
     }
 

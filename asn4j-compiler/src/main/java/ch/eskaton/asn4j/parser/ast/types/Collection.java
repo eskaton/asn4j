@@ -56,13 +56,13 @@ public abstract class Collection extends AbstractType implements HasModuleName {
         super();
     }
 
-    public Collection(Position position, String moduleName) {
+    protected Collection(Position position, String moduleName) {
         super(position);
 
         this.moduleName = moduleName;
     }
 
-    public Collection(Position position, String moduleName, ComponentTypeListsNode compTypes) {
+    protected Collection(Position position, String moduleName, ComponentTypeListsNode compTypes) {
         super(position);
 
         this.moduleName = moduleName;
@@ -73,7 +73,7 @@ public abstract class Collection extends AbstractType implements HasModuleName {
         this.extensionRootComponents = compTypes.getExtensionRootComponents();
     }
 
-    public Collection(Position position, String moduleName, ExtensionAndExceptionNode extensionAndException,
+    protected Collection(Position position, String moduleName, ExtensionAndExceptionNode extensionAndException,
             Boolean optionalExtensionMarker) {
         super(position);
 

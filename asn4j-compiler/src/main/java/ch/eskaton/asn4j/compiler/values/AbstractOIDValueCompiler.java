@@ -46,7 +46,7 @@ import java.util.Optional;
 public abstract class AbstractOIDValueCompiler<V extends AbstractOIDValue>
         extends AbstractOIDOrIRIValueCompiler<V> {
 
-    public AbstractOIDValueCompiler(TypeName typeName, Class<V> valueClass) {
+    protected AbstractOIDValueCompiler(TypeName typeName, Class<V> valueClass) {
         super(typeName, valueClass);
     }
 

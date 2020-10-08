@@ -47,7 +47,7 @@ public abstract class AbstractValueSizeTransformer<V extends HasSize, C extends 
 
     private Function<C, N> createNode;
 
-    public AbstractValueSizeTransformer(Function<C, N> createNode) {
+    protected AbstractValueSizeTransformer(Function<C, N> createNode) {
         this.createNode = createNode;
     }
 

@@ -39,7 +39,7 @@ import java.util.Set;
 public abstract class AbstractIRISingleValueCompiler<V extends AbstractIRIValue,
         N extends AbstractIRIValueNode> extends SingleValueCompiler<V, N> {
 
-    public AbstractIRISingleValueCompiler(CompilerContext ctx, Class<V> valueClazz, Class<N> valueNodeClazz,
+    protected AbstractIRISingleValueCompiler(CompilerContext ctx, Class<V> valueClazz, Class<N> valueNodeClazz,
             TypeName typeName) {
         super(ctx, valueClazz, valueNodeClazz, typeName, Set.class);
     }

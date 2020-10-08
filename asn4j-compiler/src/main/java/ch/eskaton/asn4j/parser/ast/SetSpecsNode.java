@@ -38,19 +38,19 @@ public abstract class SetSpecsNode extends AbstractNode {
 
     private boolean extensionMarker;
 
-    public SetSpecsNode(Position position, boolean extensionMarker) {
+    protected SetSpecsNode(Position position, boolean extensionMarker) {
         this(position, null, extensionMarker, null);
     }
 
-    public SetSpecsNode(ElementSet rootElements) {
+    protected SetSpecsNode(ElementSet rootElements) {
         this(rootElements.getPosition(), rootElements, false, null);
     }
 
-    public SetSpecsNode(ElementSet rootElements, boolean extensionMarker) {
+    protected SetSpecsNode(ElementSet rootElements, boolean extensionMarker) {
         this(rootElements.getPosition(), rootElements, extensionMarker, null);
     }
 
-    public SetSpecsNode(Position position, ElementSet rootElements, boolean extensionMarker,
+    protected SetSpecsNode(Position position, ElementSet rootElements, boolean extensionMarker,
             ElementSet extensionElements) {
         super(position);
 

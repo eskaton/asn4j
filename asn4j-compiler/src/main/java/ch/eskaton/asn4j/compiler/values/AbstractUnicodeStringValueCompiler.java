@@ -37,8 +37,8 @@ import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 public abstract class AbstractUnicodeStringValueCompiler<V extends AbstractStringValue & Value>
         extends AbstractStringValueCompiler<V> {
 
-    public AbstractUnicodeStringValueCompiler(TypeName typeName, Class<? extends Type> typeClass, Class<V> valueClass,
-            StringVerifier verifier) {
+    protected AbstractUnicodeStringValueCompiler(TypeName typeName, Class<? extends Type> typeClass,
+            Class<V> valueClass, StringVerifier verifier) {
         super(typeName, typeClass, valueClass, verifier);
     }
 

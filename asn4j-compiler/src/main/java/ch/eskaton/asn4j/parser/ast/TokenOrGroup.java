@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.parser.Position;
 
 public abstract class TokenOrGroup extends AbstractNode {
 
-    public TokenOrGroup(Position position) {
+    protected TokenOrGroup(Position position) {
         super(position);
     }
 

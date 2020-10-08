@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.runtime.types;
 
 public abstract class ASN1NamedInteger extends ASN1Integer {
 
-    public ASN1NamedInteger(long value) {
+    protected ASN1NamedInteger(long value) {
         super(value);
     }
 

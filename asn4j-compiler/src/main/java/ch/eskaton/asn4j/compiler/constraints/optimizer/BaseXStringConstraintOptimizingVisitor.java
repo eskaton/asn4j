@@ -36,10 +36,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class BaseXStringConstraintOptimizingVisitor<V extends AbstractValue & HasSize, C extends List<V>, N extends ValueNode<C>>
-        extends AbstractConstraintOptimizingVisitor<V, C, N> {
+public abstract class BaseXStringConstraintOptimizingVisitor<V extends AbstractValue & HasSize,
+        C extends List<V>, N extends ValueNode<C>> extends AbstractConstraintOptimizingVisitor<V, C, N> {
 
-    public <T extends Comparator<V>> BaseXStringConstraintOptimizingVisitor(T comparator, Function<C, N> createNode) {
+    protected <T extends Comparator<V>> BaseXStringConstraintOptimizingVisitor(T comparator,
+            Function<C, N> createNode) {
         super.configureTransformation(BinOpType.VALUE_VALUE,
                 new ValueValueTransformer<>(new OrderedSetOperationsStrategy<>(comparator), createNode));
         super.configureTransformation(BinOpType.VALUE_NEGATION,

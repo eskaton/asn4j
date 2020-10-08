@@ -295,6 +295,10 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
     }
 
     private FunctionCall getMapValueAccessor(Optional<Tuple2<ComponentNode, CompiledType>> args, String accessor) {
+        if (args.isEmpty()) {
+            throw new IllegalCompilerStateException("Empty arguments not allowed");
+        }
+
         return getMapValueAccessor(args.get().get_1(), args.get().get_2(), accessor);
     }
 

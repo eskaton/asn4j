@@ -35,11 +35,11 @@ public abstract class ByteStringValue extends AbstractValue implements HasSize {
 
     protected byte[] byteValue;
 
-    public ByteStringValue(Position position) {
+    protected ByteStringValue(Position position) {
         super(position);
     }
 
-    public ByteStringValue(Position position, byte[] byteValue) {
+    protected ByteStringValue(Position position, byte[] byteValue) {
         super(position);
 
         this.byteValue = byteValue;
