@@ -1445,6 +1445,54 @@ class CompilerImplTest {
     }
 
     @Test
+    void testObjectClassAbstractSyntax() throws IOException, ParserException {
+        var body = """
+                   TEST ::= ABSTRACT-SYNTAX
+                """;
+
+        var objectClass = getCompiledObjectClass(body, "TEST");
+
+        assertEquals(3, objectClass.getFields().size());
+
+        var maybeField1 = objectClass.getField("id");
+
+        assertTrue(maybeField1.isPresent());
+
+        var field1 = maybeField1.get();
+
+        assertTrue(field1 instanceof CompiledFixedTypeValueField);
+
+        var compiledFixedTypeValueField1 = (CompiledFixedTypeValueField) field1;
+
+        assertTrue(compiledFixedTypeValueField1.isUnique());
+        assertTrue(compiledFixedTypeValueField1.getCompiledType().getType() instanceof ObjectIdentifier);
+
+        var maybeField2 = objectClass.getField("Type");
+
+        assertTrue(maybeField2.isPresent());
+
+        var field2 = maybeField2.get();
+
+        assertTrue(field2 instanceof CompiledTypeField);
+
+        var maybeField3 = objectClass.getField("property");
+
+        assertTrue(maybeField3.isPresent());
+
+        var field3 = maybeField3.get();
+
+        assertTrue(field3 instanceof CompiledFixedTypeValueField);
+
+        var compiledFixedTypeValueField3 = (CompiledFixedTypeValueField) field3;
+
+        assertFalse(compiledFixedTypeValueField3.isUnique());
+        assertTrue(compiledFixedTypeValueField3.getCompiledType().getType() instanceof BitString);
+        assertNotNull(compiledFixedTypeValueField3.getDefaultValue());
+
+        assertTrue(objectClass.getSyntax().isPresent());
+    }
+
+    @Test
     void testObjectClassWithSyntax() throws IOException, ParserException {
         var body = """
                    TEST ::= CLASS {

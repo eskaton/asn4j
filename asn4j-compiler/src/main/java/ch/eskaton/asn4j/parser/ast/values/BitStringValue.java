@@ -126,11 +126,12 @@ public class BitStringValue extends ByteStringValue {
 
     @Override
     public String toString() {
-        String namedValuesStr = namedValues != null ? StringUtils.join(namedValues, ", ") :
-                String.valueOf(this.value);
-        String valueStr = byteValue != null ? "0x" + HexDump.toHexString(byteValue) : namedValuesStr;
+        var namedValuesStr = namedValues != null ? StringUtils.join(namedValues, ", ") : String.valueOf(this.value);
+        var valueStr = byteValue != null && byteValue.length > 0 ?
+                "0x" + HexDump.toHexString(byteValue) :
+                namedValuesStr;
 
-        return StringUtils.concat(getClass().getSimpleName() + "[", valueStr, "]");
+        return "%s[%s]".formatted(getClass().getSimpleName(), valueStr);
     }
 
 }
