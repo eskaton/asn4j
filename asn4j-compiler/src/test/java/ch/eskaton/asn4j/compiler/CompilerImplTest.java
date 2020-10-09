@@ -32,12 +32,14 @@ import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
+import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueSetField;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -215,7 +217,7 @@ class CompilerImplTest {
     void testCollectionOfNamedTypeInvalidComponentInValue() {
         var body = """
                 SeqOf ::= SEQUENCE OF a INTEGER
-                
+                                
                 Seq ::= SEQUENCE {
                     b SeqOf DEFAULT {c 1, c 2}
                 }
@@ -229,7 +231,7 @@ class CompilerImplTest {
     void testCollectionOfTypeInvalidComponentInValue() {
         var body = """
                 SeqOf ::= SEQUENCE OF INTEGER
-                
+                                
                 Seq ::= SEQUENCE {
                     b SeqOf DEFAULT {c 1, c 2}
                 }
@@ -1409,6 +1411,40 @@ class CompilerImplTest {
     }
 
     @Test
+    void testObjectClassTypeIdentifier() throws IOException, ParserException {
+        var body = """
+                   TEST ::= TYPE-IDENTIFIER
+                """;
+
+        var objectClass = getCompiledObjectClass(body, "TEST");
+
+        assertEquals(2, objectClass.getFields().size());
+
+        var maybeField1 = objectClass.getField("id");
+
+        assertTrue(maybeField1.isPresent());
+
+        var field1 = maybeField1.get();
+
+        assertTrue(field1 instanceof CompiledFixedTypeValueField);
+
+        var compiledFixedTypeValueField = (CompiledFixedTypeValueField) field1;
+
+        assertTrue(compiledFixedTypeValueField.isUnique());
+        assertTrue(compiledFixedTypeValueField.getCompiledType().getType() instanceof ObjectIdentifier);
+
+        var maybeField2 = objectClass.getField("Type");
+
+        assertTrue(maybeField2.isPresent());
+
+        var field2 = maybeField2.get();
+
+        assertTrue(field2 instanceof CompiledTypeField);
+
+        assertTrue(objectClass.getSyntax().isPresent());
+    }
+
+    @Test
     void testObjectClassWithSyntax() throws IOException, ParserException {
         var body = """
                    TEST ::= CLASS {
@@ -1586,7 +1622,7 @@ class CompilerImplTest {
                    TestSet TEST ::= { testObject }
                 """;
 
-        CompiledObjectSet objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+        var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
 
         assertEquals(1, objectSet.getValues().size());
 
@@ -2329,8 +2365,7 @@ class CompilerImplTest {
     }
 
     private CompiledVariableTypeValueField getCompiledVariableTypeValueField(String body, String objectClassName,
-            String fieldName) throws IOException,
-            ParserException {
+            String fieldName) throws IOException, ParserException {
         var field = getCompiledField(body, objectClassName, fieldName);
 
         assertTrue(field.get() instanceof CompiledVariableTypeValueField);

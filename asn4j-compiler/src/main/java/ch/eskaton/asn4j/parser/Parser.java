@@ -4084,7 +4084,7 @@ public class Parser {
 
     // ObjectClass ::= DefinedObjectClass | ObjectClassDefn |
     // ParameterizedObjectClass
-    protected class ObjectClassParser implements RuleParser<ObjectClassNode> {
+    public class ObjectClassParser implements RuleParser<ObjectClassNode> {
 
         @SuppressWarnings("unchecked")
         public ObjectClassNode parse() throws ParserException {
