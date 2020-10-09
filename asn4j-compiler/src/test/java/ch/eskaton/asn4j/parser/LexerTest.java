@@ -66,23 +66,14 @@ class LexerTest {
         assertTrue(lexer.isEOF());
     }
 
-    @Test
-    void testTypeReference() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("T Type Test-Type Test--Type".getBytes()));
-
-        assertEquals(Token.TokenType.TYPE_REFERENCE, lexer.nextToken(Context.NORMAL).getType());
-
-        assertEquals(Token.TokenType.TYPE_REFERENCE, lexer.nextToken(Context.NORMAL).getType());
-
-        assertEquals(Token.TokenType.TYPE_REFERENCE, lexer.nextToken(Context.NORMAL).getType());
-
+    @ParameterizedTest
+    @MethodSource("provideTypeReference")
+    void testTypeReference(String body, String typeReference) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(body.getBytes()));
         var token = lexer.nextToken(Context.NORMAL);
 
         assertEquals(Token.TokenType.TYPE_REFERENCE, token.getType());
-        assertEquals("Test", token.getText());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(typeReference, token.getText());
     }
 
     @Test
@@ -92,150 +83,87 @@ class LexerTest {
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.NORMAL));
     }
 
-    @Test
-    void testTypeIdentifier() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("t type test-type test-TYPE test--type".getBytes()));
-
-        assertEquals(Token.TokenType.IDENTIFIER, lexer.nextToken(Context.NORMAL).getType());
-
-        assertEquals(Token.TokenType.IDENTIFIER, lexer.nextToken(Context.NORMAL).getType());
-
-        assertEquals(Token.TokenType.IDENTIFIER, lexer.nextToken(Context.NORMAL).getType());
-
-        assertEquals(Token.TokenType.IDENTIFIER, lexer.nextToken(Context.NORMAL).getType());
-
+    @ParameterizedTest
+    @MethodSource("provideIdentifier")
+    void testIdentifier(String body, String identifier) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(body.getBytes()));
         var token = lexer.nextToken(Context.NORMAL);
 
         assertEquals(Token.TokenType.IDENTIFIER, token.getType());
-        assertEquals("test", token.getText());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(identifier, token.getText());
     }
 
     @Test
     void testInvalidIdentifier() throws IOException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("type-".getBytes()));
+        var lexer = new Lexer(new ByteArrayInputStream("type-".getBytes()));
 
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.NORMAL));
     }
 
-    @Test
-    void testObjectClassReference() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("T OBJECT-CLASS".getBytes()));
+    @ParameterizedTest
+    @ValueSource(strings = { "T", "OBJECT-CLASS" })
+    void testObjectClassReference(String objectClassReference) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(objectClassReference.getBytes()));
+        var token = lexer.nextToken(Context.OBJECT_CLASS);
 
-        assertEquals(Token.TokenType.OBJECT_CLASS_REFERENCE, lexer.nextToken(Context.OBJECT_CLASS).getType());
-
-        assertEquals(Token.TokenType.OBJECT_CLASS_REFERENCE, lexer.nextToken(Context.OBJECT_CLASS).getType());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.OBJECT_CLASS_REFERENCE, token.getType());
+        assertEquals(objectClassReference, token.getText());
     }
 
     @Test
     void testInvalidObjectClassReference() throws IOException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("Invalid".getBytes()));
+        var lexer = new Lexer(new ByteArrayInputStream("Invalid".getBytes()));
 
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.OBJECT_CLASS).getType());
     }
 
-    @Test
-    void testTypeFieldReference() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("&T &Type-Field".getBytes()));
+    @ParameterizedTest
+    @ValueSource(strings = { "&T", "&Type-Field" })
+    void testTypeFieldReference(String typeFieldReference) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(typeFieldReference.getBytes()));
+        var token = lexer.nextToken(Context.TYPE_FIELD);
 
-        assertEquals(Token.TokenType.TYPE_FIELD_REFERENCE, lexer.nextToken(Context.TYPE_FIELD).getType());
-
-        assertEquals(Token.TokenType.TYPE_FIELD_REFERENCE, lexer.nextToken(Context.TYPE_FIELD).getType());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.TYPE_FIELD_REFERENCE, token.getType());
+        assertEquals(typeFieldReference, token.getText());
     }
 
     @Test
     void testValueFieldReference() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("&value-field".getBytes()));
+        var lexer = new Lexer(new ByteArrayInputStream("&value-field".getBytes()));
+        var token = lexer.nextToken(Context.VALUE_FIELD);
 
-        assertEquals(Token.TokenType.VALUE_FIELD_REFERENCE, lexer.nextToken(Context.VALUE_FIELD).getType());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.VALUE_FIELD_REFERENCE, token.getType());
+        assertEquals("&value-field", token.getText());
     }
 
     @Test
     void testWord() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("A-WORD".getBytes()));
+        var lexer = new Lexer(new ByteArrayInputStream("A-WORD".getBytes()));
+        var token = lexer.nextToken(Context.SYNTAX);
 
-        assertEquals(Token.TokenType.WORD, lexer.nextToken(Context.SYNTAX).getType());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.WORD, token.getType());
+        assertEquals("A-WORD", token.getText());
     }
 
-    @Test
-    void testNumber() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("0 1 42 4711".getBytes()));
-        Token token;
+    @ParameterizedTest
+    @ValueSource(strings = { "0", "1", "42", "4711" })
+    void testNumber(String number) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(number.getBytes()));
+        var token = lexer.nextToken(Context.NORMAL);
 
-        assertEquals(Token.TokenType.NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("0", token.getText());
-
-        assertEquals(Token.TokenType.NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("1", token.getText());
-
-        assertEquals(Token.TokenType.NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("42", token.getText());
-
-        assertEquals(Token.TokenType.NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("4711", token.getText());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.NUMBER, token.getType());
+        assertEquals(number, token.getText());
     }
 
-    @Test
-    void testRealNumber() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream(
-                "01 2. 3.41 3e0 3e12 3e-12 42.e-0 42.e5 42.e-5 77.35E0 77.35e+6 77.35e-6".getBytes()));
-        Token token;
+    @ParameterizedTest
+    @ValueSource(strings = { "01", "2.", "3.41", "3e0", "3e12", "3e-12", "42.e-0", "42.e5", "42.e-5", "77.35E0",
+            "77.35e+6", "77.35e-6" })
+    void testRealNumber(String realNumber) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(realNumber.getBytes()));
+        var token = lexer.nextToken(Context.NORMAL);
 
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("01", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("2.", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("3.41", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("3e0", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("3e12", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("3e-12", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("42.e-0", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("42.e5", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("42.e-5", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("77.35E0", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("77.35e+6", token.getText());
-
-        assertEquals(Token.TokenType.REAL_NUMBER, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("77.35e-6", token.getText());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.REAL_NUMBER, token.getType());
+        assertEquals(realNumber, token.getText());
     }
 
     @ParameterizedTest
@@ -246,111 +174,55 @@ class LexerTest {
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.NORMAL));
     }
 
-    @Test
-    void testBString() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("''B '0'B '1'B '0101'B '1 01 1'B".getBytes()));
-        Token token;
+    @ParameterizedTest
+    @MethodSource("provideBString")
+    void testBString(String body, String bString) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(body.getBytes()));
+        var token = lexer.nextToken(Context.NORMAL);
 
-        assertEquals(Token.TokenType.B_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("", token.getText());
-
-        assertEquals(Token.TokenType.B_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("0", token.getText());
-
-        assertEquals(Token.TokenType.B_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("1", token.getText());
-
-        assertEquals(Token.TokenType.B_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("0101", token.getText());
-
-        assertEquals(Token.TokenType.B_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("1011", token.getText());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.B_STRING, token.getType());
+        assertEquals(bString, token.getText());
     }
 
-    @Test
-    void testHString() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("''H '0'H '0B0F'H 'F AD 5'H".getBytes()));
-        Token token;
+    @ParameterizedTest
+    @MethodSource("provideHString")
+    void testHString(String body, String hString) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(body.getBytes()));
+        var token = lexer.nextToken(Context.NORMAL);
 
-        assertEquals(Token.TokenType.H_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("", token.getText());
-
-        assertEquals(Token.TokenType.H_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("0", token.getText());
-
-        assertEquals(Token.TokenType.H_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("0B0F", token.getText());
-
-        assertEquals(Token.TokenType.H_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("FAD5", token.getText());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.H_STRING, token.getType());
+        assertEquals(hString, token.getText());
     }
 
-    @Test
-    void testCString() throws IOException, ParserException {
-        Lexer lexer = new Lexer(
-                new ByteArrayInputStream(
-                        "\"\" \"\"\"\" \" \" \"a\"\"b\" \"abc def\" \"abc   \t\r\n   def\nghi\" \"\n\nabc\""
-                                .getBytes()));
-        Token token;
+    @ParameterizedTest
+    @MethodSource("provideCString")
+    void testCString(String body, String cString) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(body.getBytes()));
+        var token = lexer.nextToken(Context.NORMAL);
 
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("", getCString(token));
-
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("\"", getCString(token));
-
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals(" ", getCString(token));
-
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("a\"b", getCString(token));
-
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("abc def", getCString(token));
-
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("abcdefghi", getCString(token));
-
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("abc", getCString(token));
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.C_STRING, token.getType());
+        assertEquals(cString, getCString(token));
     }
 
     private static String getCString(Token token) {
         return new StringValue(NO_POSITION, token.getText(), ((StringToken) token).getFlags()).getCString();
     }
 
-    @Test
-    void testSimpleString() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("\"a\" \"abc def\" \"abc\n\ndef\"".getBytes()));
-        Token token;
+    @ParameterizedTest
+    @MethodSource("provideSimpleString")
+    void testSimpleString(String body, String simpleString) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(body.getBytes()));
+        var token = lexer.nextToken(Context.NORMAL);
 
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("a", getSimpleString(token));
-
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("abc def", getSimpleString(token));
-
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals("abc  def", getSimpleString(token));
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.C_STRING, token.getType());
+        assertEquals(simpleString.replace("\"", ""), getSimpleString(token));
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "\"\"", "\"\"\"\"", "\"ü\"" })
     void testInvalidSimpleString(String input) throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream(input.getBytes()));
-        Token token = lexer.nextToken(Context.NORMAL);
+        var lexer = new Lexer(new ByteArrayInputStream(input.getBytes()));
+        var token = lexer.nextToken(Context.NORMAL);
 
         assertEquals(Token.TokenType.C_STRING, token.getType());
         assertThrows(ParserException.class, () -> getSimpleString(token));
@@ -360,19 +232,15 @@ class LexerTest {
         return new StringValue(NO_POSITION, token.getText(), ((StringToken) token).getFlags()).getSimpleString();
     }
 
-    @Test
-    void testTString() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("\".\" \"0123456789+-:.,/CDHMRPSTWYZ\"".getBytes()));
-        Token token;
+    @ParameterizedTest
+    @ValueSource(strings = { "\".\"", "\"0123456789+-:.,/CDHMRPSTWYZ\"" })
+    void testTString(String tString) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(tString.getBytes()));
+        var token = lexer.nextToken(Context.NORMAL);
 
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals(new TimeValue(NO_POSITION, "."), getTimeValue(token));
+        assertEquals(Token.TokenType.C_STRING, token.getType());
+        assertEquals(new TimeValue(NO_POSITION, tString.replace("\"", "")), getTimeValue(token));
 
-        assertEquals(Token.TokenType.C_STRING, (token = lexer.nextToken(Context.NORMAL)).getType());
-        assertEquals(new TimeValue(NO_POSITION, "0123456789+-:.,/CDHMRPSTWYZ"), getTimeValue(token));
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
     }
 
     @ParameterizedTest
@@ -389,147 +257,30 @@ class LexerTest {
         return new StringValue(NO_POSITION, token.getText(), ((StringToken) token).getFlags()).getTimeValue();
     }
 
-    @Test
-    void testTokens() throws IOException, ParserException {
-        testToken("::=", Token.TokenType.ASSIGN);
-        testToken("..", Token.TokenType.RANGE);
-        testToken("...", Token.TokenType.ELLIPSIS);
-        testToken("[[", Token.TokenType.L_VERSION_BRACKETS);
-        testToken("]]", Token.TokenType.R_VERSION_BRACKETS);
-        testToken("{", Token.TokenType.L_BRACE);
-        testToken("}", Token.TokenType.R_BRACE);
-        testToken("<", Token.TokenType.LT);
-        testToken(">", Token.TokenType.GT);
-        testToken(",", Token.TokenType.COMMA);
-        testToken(".", Token.TokenType.DOT);
-        testToken("/", Token.TokenType.SOLIDUS);
-        testToken("(", Token.TokenType.L_PAREN);
-        testToken(")", Token.TokenType.R_PAREN);
-        testToken("[", Token.TokenType.L_BRACKET);
-        testToken("]", Token.TokenType.R_BRACKET);
-        testToken("-", Token.TokenType.MINUS);
-        testToken(":", Token.TokenType.COLON);
-        testToken("=", Token.TokenType.EQUALS);
-        testToken("\"", Token.TokenType.QUOTATION);
-        testToken("'", Token.TokenType.APOSTROPHE);
-        testToken(";", Token.TokenType.SEMICOLON);
-        testToken("@", Token.TokenType.AT);
-        testToken("|", Token.TokenType.PIPE);
-        testToken("!", Token.TokenType.EXCLAMATION);
-        testToken("^", Token.TokenType.CIRCUMFLEX);
+    @ParameterizedTest
+    @MethodSource("provideTokens")
+    void testTokens(String token, Token.TokenType type) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(token.getBytes()));
+
+        assertEquals(type, lexer.nextToken(Context.NORMAL).getType());
     }
 
-    @Test
-    void testKeywords() throws IOException, ParserException {
-        testToken("ABSENT", Token.TokenType.ABSENT_KW);
-        testToken("ABSTRACT-SYNTAX", Token.TokenType.ABSTRACT_SYNTAX_KW);
-        testToken("ALL", Token.TokenType.ALL_KW);
-        testToken("APPLICATION", Token.TokenType.APPLICATION_KW);
-        testToken("AUTOMATIC", Token.TokenType.AUTOMATIC_KW);
-        testToken("BEGIN", Token.TokenType.BEGIN_KW);
-        testToken("BIT", Token.TokenType.BIT_KW);
-        testToken("BMPString", Token.TokenType.BMP_STRING_KW);
-        testToken("BOOLEAN", Token.TokenType.BOOLEAN_KW);
-        testToken("BY", Token.TokenType.BY_KW);
-        testToken("CHARACTER", Token.TokenType.CHARACTER_KW);
-        testToken("CHOICE", Token.TokenType.CHOICE_KW);
-        testToken("CLASS", Token.TokenType.CLASS_KW);
-        testToken("COMPONENT", Token.TokenType.COMPONENT_KW);
-        testToken("COMPONENTS", Token.TokenType.COMPONENTS_KW);
-        testToken("CONSTRAINED", Token.TokenType.CONSTRAINED_KW);
-        testToken("CONTAINING", Token.TokenType.CONTAINING_KW);
-        testToken("DATE", Token.TokenType.DATE_KW);
-        testToken("DATE-TIME", Token.TokenType.DATE_TIME_KW);
-        testToken("DEFAULT", Token.TokenType.DEFAULT_KW);
-        testToken("DEFINITIONS", Token.TokenType.DEFINITIONS_KW);
-        testToken("DURATION", Token.TokenType.DURATION_KW);
-        testToken("EMBEDDED", Token.TokenType.EMBEDDED_KW);
-        testToken("ENCODED", Token.TokenType.ENCODED_KW);
-        testToken("ENCODING-CONTROL", Token.TokenType.ENCODING_CONTROL_KW);
-        testToken("END", Token.TokenType.END_KW);
-        testToken("ENUMERATED", Token.TokenType.ENUMERATED_KW);
-        testToken("EXCEPT", Token.TokenType.EXCEPT_KW);
-        testToken("EXPLICIT", Token.TokenType.EXPLICIT_KW);
-        testToken("EXPORTS", Token.TokenType.EXPORTS_KW);
-        testToken("EXTENSIBILITY", Token.TokenType.EXTENSIBILITY_KW);
-        testToken("EXTERNAL", Token.TokenType.EXTERNAL_KW);
-        testToken("FALSE", Token.TokenType.FALSE_KW);
-        testToken("FROM", Token.TokenType.FROM_KW);
-        testToken("GeneralizedTime", Token.TokenType.GENERALIZED_TIME_KW);
-        testToken("GeneralString", Token.TokenType.GENERAL_STRING_KW);
-        testToken("GraphicString", Token.TokenType.GRAPHIC_STRING_KW);
-        testToken("IA5String", Token.TokenType.IA5_STRING_KW);
-        testToken("IDENTIFIER", Token.TokenType.IDENTIFIER_KW);
-        testToken("IMPLICIT", Token.TokenType.IMPLICIT_KW);
-        testToken("IMPLIED", Token.TokenType.IMPLIED_KW);
-        testToken("IMPORTS", Token.TokenType.IMPORTS_KW);
-        testToken("INCLUDES", Token.TokenType.INCLUDES_KW);
-        testToken("INSTANCE", Token.TokenType.INSTANCE_KW);
-        testToken("INSTRUCTIONS", Token.TokenType.INSTRUCTIONS_KW);
-        testToken("INTEGER", Token.TokenType.INTEGER_KW);
-        testToken("INTERSECTION", Token.TokenType.INTERSECTION_KW);
-        testToken("ISO646String", Token.TokenType.ISO646_STRING_KW);
-        testToken("MAX", Token.TokenType.MAX_KW);
-        testToken("MIN", Token.TokenType.MIN_KW);
-        testToken("MINUS-INFINITY", Token.TokenType.MINUS_INFINITY_KW);
-        testToken("NOT-A-NUMBER", Token.TokenType.NOT_A_NUMBER_KW);
-        testToken("NULL", Token.TokenType.NULL_KW);
-        testToken("NumericString", Token.TokenType.NUMERIC_STRING_KW);
-        testToken("OBJECT", Token.TokenType.OBJECT_KW);
-        testToken("ObjectDescriptor", Token.TokenType.OBJECT_DESCRIPTOR_KW);
-        testToken("OCTET", Token.TokenType.OCTET_KW);
-        testToken("OF", Token.TokenType.OF_KW);
-        testToken("OID-IRI", Token.TokenType.OID_IRI_KW);
-        testToken("OPTIONAL", Token.TokenType.OPTIONAL_KW);
-        testToken("PATTERN", Token.TokenType.PATTERN_KW);
-        testToken("PDV", Token.TokenType.PDV_KW);
-        testToken("PLUS-INFINITY", Token.TokenType.PLUS_INFINITY_KW);
-        testToken("PRESENT", Token.TokenType.PRESENT_KW);
-        testToken("PrintableString", Token.TokenType.PRINTABLE_STRING_KW);
-        testToken("PRIVATE", Token.TokenType.PRIVATE_KW);
-        testToken("REAL", Token.TokenType.REAL_KW);
-        testToken("RELATIVE-OID", Token.TokenType.RELATIVE_OID_KW);
-        testToken("RELATIVE-OID-IRI", Token.TokenType.RELATIVE_OID_IRI_KW);
-        testToken("SEQUENCE", Token.TokenType.SEQUENCE_KW);
-        testToken("SET", Token.TokenType.SET_KW);
-        testToken("SETTINGS", Token.TokenType.SETTINGS_KW);
-        testToken("SIZE", Token.TokenType.SIZE_KW);
-        testToken("STRING", Token.TokenType.STRING_KW);
-        testToken("SYNTAX", Token.TokenType.SYNTAX_KW);
-        testToken("T61String", Token.TokenType.T61_STRING_KW);
-        testToken("TAGS", Token.TokenType.TAGS_KW);
-        testToken("TeletexString", Token.TokenType.TELETEX_STRING_KW);
-        testToken("TIME", Token.TokenType.TIME_KW);
-        testToken("TIME-OF-DAY", Token.TokenType.TIME_OF_DAY_KW);
-        testToken("TRUE", Token.TokenType.TRUE_KW);
-        testToken("TYPE-IDENTIFIER", Token.TokenType.TYPE_IDENTIFIER_KW);
-        testToken("UNION", Token.TokenType.UNION_KW);
-        testToken("UNIQUE", Token.TokenType.UNIQUE_KW);
-        testToken("UNIVERSAL", Token.TokenType.UNIVERSAL_KW);
-        testToken("UniversalString", Token.TokenType.UNIVERSAL_STRING_KW);
-        testToken("UTCTime", Token.TokenType.UTC_TIME_KW);
-        testToken("UTF8String", Token.TokenType.UTF8_STRING_KW);
-        testToken("VideotexString", Token.TokenType.VIDEOTEX_STRING_KW);
-        testToken("VisibleString", Token.TokenType.VISIBLE_STRING_KW);
-        testToken("WITH", Token.TokenType.WITH_KW);
+    @ParameterizedTest
+    @MethodSource("provideKeywords")
+    void testKeywords(String token, Token.TokenType type) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(token.getBytes()));
+
+        assertEquals(type, lexer.nextToken(Context.NORMAL).getType());
     }
 
-    @Test
-    void testEncodingReference() throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream("TAG XER PER".getBytes()));
-        Token token;
+    @ParameterizedTest
+    @ValueSource(strings = { "TAG", "XER", "PER" })
+    void testEncodingReference(String encodingReference) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(encodingReference.getBytes()));
+        var token = lexer.nextToken(Context.ENCODING);
 
-        assertEquals(Token.TokenType.ENCODING_REFERENCE, (token = lexer.nextToken(Context.ENCODING)).getType());
-        assertEquals("TAG", token.getText());
-
-        assertEquals(Token.TokenType.ENCODING_REFERENCE, (token = lexer.nextToken(Context.ENCODING)).getType());
-        assertEquals("XER", token.getText());
-
-        assertEquals(Token.TokenType.ENCODING_REFERENCE, (token = lexer.nextToken(Context.ENCODING)).getType());
-        assertEquals("PER", token.getText());
-
-        assertNull(lexer.nextToken(Context.NORMAL));
-        assertTrue(lexer.isEOF());
+        assertEquals(Token.TokenType.ENCODING_REFERENCE, token.getType());
+        assertEquals(encodingReference, token.getText());
     }
 
     @ParameterizedTest
@@ -540,10 +291,189 @@ class LexerTest {
         assertThrows(ParserException.class, () -> lexer.nextToken(Context.ENCODING));
     }
 
-    private void testToken(String token, Token.TokenType type) throws IOException, ParserException {
-        Lexer lexer = new Lexer(new ByteArrayInputStream(token.getBytes()));
+    private static Stream<Arguments> provideBString() {
+        return Stream.of(
+                Arguments.of("''B", ""),
+                Arguments.of("'0'B", "0"),
+                Arguments.of("'1'B", "1"),
+                Arguments.of("'0101'B", "0101"),
+                Arguments.of("'1 01 1'B", "1011")
+        );
+    }
 
-        assertEquals(type, lexer.nextToken(Context.NORMAL).getType());
+    private static Stream<Arguments> provideHString() {
+        return Stream.of(
+                Arguments.of("''H", ""),
+                Arguments.of("'0'H", "0"),
+                Arguments.of("'0B0F'H", "0B0F"),
+                Arguments.of("'F AD 5'H", "FAD5")
+        );
+    }
+
+    private static Stream<Arguments> provideCString() {
+        return Stream.of(
+                Arguments.of("\"\"", ""),
+                Arguments.of("\"\"\"\"", "\""),
+                Arguments.of("\" \"", " "),
+                Arguments.of("\"a\"\"b\"", "a\"b"),
+                Arguments.of("\"abc def\"", "abc def"),
+                Arguments.of("\"abc   \t\r\n   def\nghi\"", "abcdefghi"),
+                Arguments.of("\"\n\nabc\"", "abc")
+        );
+    }
+
+    private static Stream<Arguments> provideSimpleString() {
+        return Stream.of(
+                Arguments.of("\"a\"", "a"),
+                Arguments.of("\"abc def\"", "abc def"),
+                Arguments.of("\"abc\n\ndef\"", "abc  def")
+        );
+    }
+
+    private static Stream<Arguments> provideTypeReference() {
+        return Stream.of(
+                Arguments.of("T", "T"),
+                Arguments.of("Type", "Type"),
+                Arguments.of("Test-Type", "Test-Type"),
+                Arguments.of("Test--Type", "Test")
+        );
+    }
+
+    private static Stream<Arguments> provideIdentifier() {
+        return Stream.of(
+                Arguments.of("t", "t"),
+                Arguments.of("type", "type"),
+                Arguments.of("test-type", "test-type"),
+                Arguments.of("test-TYPE", "test-TYPE"),
+                Arguments.of("test--type", "test")
+        );
+    }
+
+    private static Stream<Arguments> provideTokens() {
+        return Stream.of(
+                Arguments.of("::=", Token.TokenType.ASSIGN),
+                Arguments.of("..", Token.TokenType.RANGE),
+                Arguments.of("...", Token.TokenType.ELLIPSIS),
+                Arguments.of("[[", Token.TokenType.L_VERSION_BRACKETS),
+                Arguments.of("]]", Token.TokenType.R_VERSION_BRACKETS),
+                Arguments.of("{", Token.TokenType.L_BRACE),
+                Arguments.of("}", Token.TokenType.R_BRACE),
+                Arguments.of("<", Token.TokenType.LT),
+                Arguments.of(">", Token.TokenType.GT),
+                Arguments.of(",", Token.TokenType.COMMA),
+                Arguments.of(".", Token.TokenType.DOT),
+                Arguments.of("/", Token.TokenType.SOLIDUS),
+                Arguments.of("(", Token.TokenType.L_PAREN),
+                Arguments.of(")", Token.TokenType.R_PAREN),
+                Arguments.of("[", Token.TokenType.L_BRACKET),
+                Arguments.of("]", Token.TokenType.R_BRACKET),
+                Arguments.of("-", Token.TokenType.MINUS),
+                Arguments.of(":", Token.TokenType.COLON),
+                Arguments.of("=", Token.TokenType.EQUALS),
+                Arguments.of("\"", Token.TokenType.QUOTATION),
+                Arguments.of("'", Token.TokenType.APOSTROPHE),
+                Arguments.of(";", Token.TokenType.SEMICOLON),
+                Arguments.of("@", Token.TokenType.AT),
+                Arguments.of("|", Token.TokenType.PIPE),
+                Arguments.of("!", Token.TokenType.EXCLAMATION),
+                Arguments.of("^", Token.TokenType.CIRCUMFLEX)
+        );
+    }
+
+    private static Stream<Arguments> provideKeywords() {
+        return Stream.of(
+                Arguments.of("ABSENT", Token.TokenType.ABSENT_KW),
+                Arguments.of("ABSTRACT-SYNTAX", Token.TokenType.ABSTRACT_SYNTAX_KW),
+                Arguments.of("ALL", Token.TokenType.ALL_KW),
+                Arguments.of("APPLICATION", Token.TokenType.APPLICATION_KW),
+                Arguments.of("AUTOMATIC", Token.TokenType.AUTOMATIC_KW),
+                Arguments.of("BEGIN", Token.TokenType.BEGIN_KW),
+                Arguments.of("BIT", Token.TokenType.BIT_KW),
+                Arguments.of("BMPString", Token.TokenType.BMP_STRING_KW),
+                Arguments.of("BOOLEAN", Token.TokenType.BOOLEAN_KW),
+                Arguments.of("BY", Token.TokenType.BY_KW),
+                Arguments.of("CHARACTER", Token.TokenType.CHARACTER_KW),
+                Arguments.of("CHOICE", Token.TokenType.CHOICE_KW),
+                Arguments.of("CLASS", Token.TokenType.CLASS_KW),
+                Arguments.of("COMPONENT", Token.TokenType.COMPONENT_KW),
+                Arguments.of("COMPONENTS", Token.TokenType.COMPONENTS_KW),
+                Arguments.of("CONSTRAINED", Token.TokenType.CONSTRAINED_KW),
+                Arguments.of("CONTAINING", Token.TokenType.CONTAINING_KW),
+                Arguments.of("DATE", Token.TokenType.DATE_KW),
+                Arguments.of("DATE-TIME", Token.TokenType.DATE_TIME_KW),
+                Arguments.of("DEFAULT", Token.TokenType.DEFAULT_KW),
+                Arguments.of("DEFINITIONS", Token.TokenType.DEFINITIONS_KW),
+                Arguments.of("DURATION", Token.TokenType.DURATION_KW),
+                Arguments.of("EMBEDDED", Token.TokenType.EMBEDDED_KW),
+                Arguments.of("ENCODED", Token.TokenType.ENCODED_KW),
+                Arguments.of("ENCODING-CONTROL", Token.TokenType.ENCODING_CONTROL_KW),
+                Arguments.of("END", Token.TokenType.END_KW),
+                Arguments.of("ENUMERATED", Token.TokenType.ENUMERATED_KW),
+                Arguments.of("EXCEPT", Token.TokenType.EXCEPT_KW),
+                Arguments.of("EXPLICIT", Token.TokenType.EXPLICIT_KW),
+                Arguments.of("EXPORTS", Token.TokenType.EXPORTS_KW),
+                Arguments.of("EXTENSIBILITY", Token.TokenType.EXTENSIBILITY_KW),
+                Arguments.of("EXTERNAL", Token.TokenType.EXTERNAL_KW),
+                Arguments.of("FALSE", Token.TokenType.FALSE_KW),
+                Arguments.of("FROM", Token.TokenType.FROM_KW),
+                Arguments.of("GeneralizedTime", Token.TokenType.GENERALIZED_TIME_KW),
+                Arguments.of("GeneralString", Token.TokenType.GENERAL_STRING_KW),
+                Arguments.of("GraphicString", Token.TokenType.GRAPHIC_STRING_KW),
+                Arguments.of("IA5String", Token.TokenType.IA5_STRING_KW),
+                Arguments.of("IDENTIFIER", Token.TokenType.IDENTIFIER_KW),
+                Arguments.of("IMPLICIT", Token.TokenType.IMPLICIT_KW),
+                Arguments.of("IMPLIED", Token.TokenType.IMPLIED_KW),
+                Arguments.of("IMPORTS", Token.TokenType.IMPORTS_KW),
+                Arguments.of("INCLUDES", Token.TokenType.INCLUDES_KW),
+                Arguments.of("INSTANCE", Token.TokenType.INSTANCE_KW),
+                Arguments.of("INSTRUCTIONS", Token.TokenType.INSTRUCTIONS_KW),
+                Arguments.of("INTEGER", Token.TokenType.INTEGER_KW),
+                Arguments.of("INTERSECTION", Token.TokenType.INTERSECTION_KW),
+                Arguments.of("ISO646String", Token.TokenType.ISO646_STRING_KW),
+                Arguments.of("MAX", Token.TokenType.MAX_KW),
+                Arguments.of("MIN", Token.TokenType.MIN_KW),
+                Arguments.of("MINUS-INFINITY", Token.TokenType.MINUS_INFINITY_KW),
+                Arguments.of("NOT-A-NUMBER", Token.TokenType.NOT_A_NUMBER_KW),
+                Arguments.of("NULL", Token.TokenType.NULL_KW),
+                Arguments.of("NumericString", Token.TokenType.NUMERIC_STRING_KW),
+                Arguments.of("OBJECT", Token.TokenType.OBJECT_KW),
+                Arguments.of("ObjectDescriptor", Token.TokenType.OBJECT_DESCRIPTOR_KW),
+                Arguments.of("OCTET", Token.TokenType.OCTET_KW),
+                Arguments.of("OF", Token.TokenType.OF_KW),
+                Arguments.of("OID-IRI", Token.TokenType.OID_IRI_KW),
+                Arguments.of("OPTIONAL", Token.TokenType.OPTIONAL_KW),
+                Arguments.of("PATTERN", Token.TokenType.PATTERN_KW),
+                Arguments.of("PDV", Token.TokenType.PDV_KW),
+                Arguments.of("PLUS-INFINITY", Token.TokenType.PLUS_INFINITY_KW),
+                Arguments.of("PRESENT", Token.TokenType.PRESENT_KW),
+                Arguments.of("PrintableString", Token.TokenType.PRINTABLE_STRING_KW),
+                Arguments.of("PRIVATE", Token.TokenType.PRIVATE_KW),
+                Arguments.of("REAL", Token.TokenType.REAL_KW),
+                Arguments.of("RELATIVE-OID", Token.TokenType.RELATIVE_OID_KW),
+                Arguments.of("RELATIVE-OID-IRI", Token.TokenType.RELATIVE_OID_IRI_KW),
+                Arguments.of("SEQUENCE", Token.TokenType.SEQUENCE_KW),
+                Arguments.of("SET", Token.TokenType.SET_KW),
+                Arguments.of("SETTINGS", Token.TokenType.SETTINGS_KW),
+                Arguments.of("SIZE", Token.TokenType.SIZE_KW),
+                Arguments.of("STRING", Token.TokenType.STRING_KW),
+                Arguments.of("SYNTAX", Token.TokenType.SYNTAX_KW),
+                Arguments.of("T61String", Token.TokenType.T61_STRING_KW),
+                Arguments.of("TAGS", Token.TokenType.TAGS_KW),
+                Arguments.of("TeletexString", Token.TokenType.TELETEX_STRING_KW),
+                Arguments.of("TIME", Token.TokenType.TIME_KW),
+                Arguments.of("TIME-OF-DAY", Token.TokenType.TIME_OF_DAY_KW),
+                Arguments.of("TRUE", Token.TokenType.TRUE_KW),
+                Arguments.of("TYPE-IDENTIFIER", Token.TokenType.TYPE_IDENTIFIER_KW),
+                Arguments.of("UNION", Token.TokenType.UNION_KW),
+                Arguments.of("UNIQUE", Token.TokenType.UNIQUE_KW),
+                Arguments.of("UNIVERSAL", Token.TokenType.UNIVERSAL_KW),
+                Arguments.of("UniversalString", Token.TokenType.UNIVERSAL_STRING_KW),
+                Arguments.of("UTCTime", Token.TokenType.UTC_TIME_KW),
+                Arguments.of("UTF8String", Token.TokenType.UTF8_STRING_KW),
+                Arguments.of("VideotexString", Token.TokenType.VIDEOTEX_STRING_KW),
+                Arguments.of("VisibleString", Token.TokenType.VISIBLE_STRING_KW),
+                Arguments.of("WITH", Token.TokenType.WITH_KW)
+        );
     }
 
     private static Stream<Arguments> provideComments() {
@@ -570,7 +500,5 @@ class LexerTest {
                 Arguments.of("/* This is a /* nested */ comment */")
         );
     }
-
-
 
 }
