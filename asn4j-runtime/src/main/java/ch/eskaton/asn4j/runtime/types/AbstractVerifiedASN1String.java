@@ -30,15 +30,15 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 
-public class AbstractVerifiedASN1String extends AbstractASN1String {
+public abstract class AbstractVerifiedASN1String extends AbstractASN1String {
 
     private final StringVerifier verifier;
 
-    public AbstractVerifiedASN1String(StringVerifier verifier) {
+    protected AbstractVerifiedASN1String(StringVerifier verifier) {
         this.verifier = verifier;
     }
 
-    public AbstractVerifiedASN1String(StringVerifier verifier, String value) {
+    protected AbstractVerifiedASN1String(StringVerifier verifier, String value) {
         super(value);
 
         this.verifier = verifier;
