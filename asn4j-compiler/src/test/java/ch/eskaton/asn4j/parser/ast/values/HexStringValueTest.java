@@ -32,33 +32,18 @@ import org.junit.jupiter.api.Test;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class AbstractBaseXStringValueTest {
-
-    @Test
-    void testToBitString() {
-        assertEquals(new BitStringValue(new byte[] {}, 0),
-                new AbstractBaseXStringValue(NO_POSITION, "", 2).toBitString());
-
-        assertEquals(new BitStringValue(new byte[] { (byte) 5 }, 4),
-                new AbstractBaseXStringValue(NO_POSITION, "0101", 2).toBitString());
-
-        assertEquals(new BitStringValue(new byte[] { (byte) 0xff }, 0),
-                new AbstractBaseXStringValue(NO_POSITION, "11111111", 2).toBitString());
-
-        assertEquals(new BitStringValue(new byte[] { 0x01, (byte) 0xff }, 7),
-                new AbstractBaseXStringValue(NO_POSITION, "111111111", 2).toBitString());
-    }
+class HexStringValueTest {
 
     @Test
     void testToOctetString() {
         assertEquals(new OctetStringValue(new byte[] {}),
-                new AbstractBaseXStringValue(NO_POSITION, "", 16).toOctetString());
+                new HexStringValue(NO_POSITION, "").toOctetString());
 
         assertEquals(new OctetStringValue(new byte[] { (byte) 0xf0 }),
-                new AbstractBaseXStringValue(NO_POSITION, "F", 16).toOctetString());
+                new HexStringValue(NO_POSITION, "F").toOctetString());
 
         assertEquals(new OctetStringValue(new byte[] { 0x74, 0x65, 0x73, 0x74 }),
-                new AbstractBaseXStringValue(NO_POSITION, "74657374", 16).toOctetString());
+                new HexStringValue(NO_POSITION, "74657374").toOctetString());
     }
 
 }
