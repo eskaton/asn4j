@@ -951,8 +951,7 @@ public class Lexer {
                     }
                     break;
                 default:
-                    unexpectedTokenError(c);
-                    return;
+                    // fall through
             }
         }
     }
@@ -1010,10 +1009,6 @@ public class Lexer {
 
     private Position position(int line, int pos) {
         return new Position(moduleFile, line, pos);
-    }
-
-    private void unexpectedTokenError(int c) {
-        throw new IllegalStateException("Unexpected token" + c);
     }
 
 }

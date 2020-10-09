@@ -32,10 +32,13 @@ import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.TimeValue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,6 +47,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LexerTest {
+
+    @ParameterizedTest
+    @MethodSource("provideComments")
+    void testComment(String body) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(body.getBytes()));
+
+        assertNull(lexer.nextToken(Context.NORMAL));
+        assertTrue(lexer.isEOF());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideMultilineComments")
+    void testMultilineComment(String body) throws IOException, ParserException {
+        var lexer = new Lexer(new ByteArrayInputStream(body.getBytes()));
+
+        assertNull(lexer.nextToken(Context.NORMAL));
+        assertTrue(lexer.isEOF());
+    }
 
     @Test
     void testTypeReference() throws IOException, ParserException {
@@ -524,5 +545,32 @@ class LexerTest {
 
         assertEquals(type, lexer.nextToken(Context.NORMAL).getType());
     }
+
+    private static Stream<Arguments> provideComments() {
+        return Stream.of(
+                Arguments.of("--"),
+                Arguments.of("-- This is a comment"),
+                Arguments.of("-- This is a comment\r"),
+                Arguments.of("-- This is a comment\r\n"),
+                Arguments.of("-- This is a comment\n"),
+                Arguments.of("-- This is a -comment"),
+                Arguments.of("-- This is a -comment--")
+        );
+    }
+
+    private static Stream<Arguments> provideMultilineComments() {
+        return Stream.of(
+                Arguments.of("/**/"),
+                Arguments.of("/* This is a comment */"),
+                Arguments.of("/* This is \ra comment */"),
+                Arguments.of("/* This is \na comment */"),
+                Arguments.of("/* This is \r\na comment */"),
+                Arguments.of("/* This is / a comment */"),
+                Arguments.of("/* This is * a comment */"),
+                Arguments.of("/* This is a /* nested */ comment */")
+        );
+    }
+
+
 
 }
