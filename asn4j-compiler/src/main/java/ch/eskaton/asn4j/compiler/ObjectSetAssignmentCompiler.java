@@ -95,14 +95,18 @@ public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignment
     }
 
     private Set<Map<String, Object>> compile(CompiledObjectClass objectClass, ElementSet elementSet) {
-        List<Elements> operands = elementSet.getOperands();
+        if (elementSet == null) {
+            return Set.of();
+        }
+
+        var operands = elementSet.getOperands();
 
         switch (elementSet.getOperation()) {
             case ALL:
                 return new HashSet<>();
             case EXCLUDE:
                 if (operands.size() == 1) {
-                    return new HashSet<>();
+                    return Set.of();
                 } else {
                     return exclusion(objectClass, operands);
                 }

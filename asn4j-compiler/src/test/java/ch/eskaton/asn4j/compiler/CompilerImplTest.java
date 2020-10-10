@@ -1863,6 +1863,19 @@ class CompilerImplTest {
     }
 
     @Test
+    void testObjectSetEmpty() throws IOException, ParserException {
+        var body = """
+                TEST ::= TYPE-IDENTIFIER
+                                
+                TestSet TEST ::= {...}
+                """;
+
+        var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+
+        assertEquals(0, objectSet.getValues().size());
+    }
+
+    @Test
     void testParameterizedTypeWithSequence() throws IOException, ParserException {
         var body = """
                    AbstractSeq {Type} ::= SEQUENCE {
