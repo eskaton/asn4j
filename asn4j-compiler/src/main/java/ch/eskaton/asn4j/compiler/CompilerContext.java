@@ -829,10 +829,12 @@ public class CompilerContext {
     }
 
     private boolean isSymbolExported(ModuleNode module, String symbol) {
-        ExportsNode exports = module.getBody().getExports();
+        var exports = module.getBody().getExports();
 
         if (exports.getMode() == ExportsNode.Mode.SPECIFIC) {
             return exports.getSymbols().stream().anyMatch(s -> s.getName().equals(symbol));
+        } else if (exports.getMode() == ExportsNode.Mode.ALL) {
+            return true;
         }
 
         return false;
