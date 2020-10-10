@@ -408,6 +408,31 @@ class CompilerImplTest {
     }
 
     @Test
+    void testExternalTypeReferenceWithExportAll() throws IOException, ParserException {
+        var body1 = """
+                MyInt ::= OTHER-MODULE.Integer
+                """;
+        var body2 = """
+                Integer ::= INTEGER
+                """;
+
+        var module1 = module(MODULE_NAME, body1);
+        var module2 = module("OTHER-MODULE", body2);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var value = ctx.getCompiledModule(MODULE_NAME).getTypes().get("MyInt");
+
+        assertNotNull(value);
+        assertTrue(value.getType() instanceof ExternalTypeReference);
+        assertTrue(value.getTags().isPresent());
+        assertEquals(1, value.getTags().get().size());
+    }
+
+    @Test
     void testValueOfSelectedType() throws IOException, ParserException {
         var body = """
                 TestChoice ::= CHOICE {a BOOLEAN, b INTEGER}
