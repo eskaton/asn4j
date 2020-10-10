@@ -1493,6 +1493,52 @@ class CompilerImplTest {
     }
 
     @Test
+    void testInstanceOfType() throws IOException, ParserException {
+        var body = """
+                   TEST ::= TYPE-IDENTIFIER
+                   Test ::= INSTANCE OF TEST
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Test");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledCollectionType = (CompiledCollectionType) compiledType;
+        var components = compiledCollectionType.getComponents();
+
+        assertEquals(2, components.size());
+
+        var maybeTypeId = components.stream().filter(component -> component.getName().equals("type-id")).findFirst();
+
+        assertTrue(maybeTypeId.isPresent());
+
+        var typeId = maybeTypeId.get();
+
+        assertTrue(typeId.getCompiledType().getType() instanceof ObjectIdentifier);
+
+        var maybeValue = components.stream().filter(component -> component.getName().equals("value")).findFirst();
+
+        assertTrue(maybeValue.isPresent());
+
+        var value = maybeValue.get();
+
+        assertTrue(value.getCompiledType().getType() instanceof OpenType);
+
+        var maybeTags = compiledCollectionType.getTags();
+
+        assertTrue(maybeTags.isPresent());
+
+        var tags = maybeTags.get();
+
+        assertEquals(1, tags.size());
+
+        var tag = tags.get(0);
+
+        assertEquals(Clazz.UNIVERSAL, tag.getClazz());
+        assertEquals(8, tag.getTag());
+    }
+
+    @Test
     void testObjectClassWithSyntax() throws IOException, ParserException {
         var body = """
                    TEST ::= CLASS {
