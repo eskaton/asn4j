@@ -1656,7 +1656,7 @@ public class Parser {
     // SET "{" "}"
     // | SET "{" ExtensionAndException OptionalExtensionMarker "}"
     // | SET "{" ComponentTypeLists "}"
-    protected class BuiltinTypeParserAux implements RuleParser<Type> {
+    public class BuiltinTypeParserAux implements RuleParser<Type> {
 
         @SuppressWarnings("unchecked")
         public Type parse() throws ParserException {

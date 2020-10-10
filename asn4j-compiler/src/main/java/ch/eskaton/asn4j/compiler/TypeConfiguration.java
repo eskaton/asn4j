@@ -93,6 +93,7 @@ import ch.eskaton.asn4j.compiler.types.GraphicStringCompiler;
 import ch.eskaton.asn4j.compiler.types.IA5StringCompiler;
 import ch.eskaton.asn4j.compiler.types.IRICompiler;
 import ch.eskaton.asn4j.compiler.types.ISO646StringCompiler;
+import ch.eskaton.asn4j.compiler.types.InstanceOfTypeCompiler;
 import ch.eskaton.asn4j.compiler.types.IntegerCompiler;
 import ch.eskaton.asn4j.compiler.types.NamedTypeCompiler;
 import ch.eskaton.asn4j.compiler.types.NullCompiler;
@@ -181,6 +182,7 @@ import ch.eskaton.asn4j.parser.ast.types.GraphicString;
 import ch.eskaton.asn4j.parser.ast.types.IA5String;
 import ch.eskaton.asn4j.parser.ast.types.IRI;
 import ch.eskaton.asn4j.parser.ast.types.ISO646String;
+import ch.eskaton.asn4j.parser.ast.types.InstanceOfType;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
@@ -382,6 +384,7 @@ public class TypeConfiguration {
                 new SelectionTypeTypeNameSupplier(ctx, this)));
         types.add(new TypeDefinition<>(Type.class, new TypeCompiler()));
         types.add(new TypeDefinition<>(NamedType.class, new NamedTypeCompiler()));
+        types.add(new TypeDefinition<>(InstanceOfType.class, new InstanceOfTypeCompiler()));
         types.add(new TypeDefinition<>(TypeReference.class, new TypeReferenceCompiler(),
                 new TypeReferenceTypeNameSupplier()));
         types.add(new TypeDefinition<>(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),

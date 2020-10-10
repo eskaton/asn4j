@@ -42,6 +42,10 @@ public class InstanceOfType extends AbstractType {
         this.objectClass = objectClass;
     }
 
+    public ObjectClassReference getObjectClass() {
+        return objectClass;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
