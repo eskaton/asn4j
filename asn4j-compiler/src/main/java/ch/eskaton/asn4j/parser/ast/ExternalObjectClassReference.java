@@ -29,11 +29,11 @@ package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
 
-public class ExternalObjectClassReferenceNode extends ObjectClassReference {
+public class ExternalObjectClassReference extends ObjectClassReference {
 
     private String module;
 
-    public ExternalObjectClassReferenceNode(Position position, String module, String reference) {
+    public ExternalObjectClassReference(Position position, String module, String reference) {
         super(position, reference);
 
         this.module = module;

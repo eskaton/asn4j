@@ -1421,6 +1421,43 @@ class CompilerImplTest {
     }
 
     @Test
+    void testObjectClassExternalReference() throws IOException, ParserException {
+        var body1 = """
+                TEST2 ::= OTHER-MODULE.TEST
+                """;
+        var body2 = """
+                TEST ::= CLASS {
+                    &fixedTypeValueField INTEGER
+                }
+                """;
+
+        var module1 = module(MODULE_NAME, body1);
+        var module2 = module("OTHER-MODULE", body2);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledObjectClass = ctx.getCompiledModule(MODULE_NAME).getObjectClasses().get("TEST2");
+
+        assertNotNull(compiledObjectClass);
+        assertEquals(1, compiledObjectClass.getFields().size());
+
+        var maybeField = compiledObjectClass.getField("fixedTypeValueField");
+
+        assertTrue(maybeField.isPresent());
+
+        var field = maybeField.get();
+
+        assertTrue(field instanceof CompiledFixedTypeValueField);
+
+        var fixedTypeValueField = (CompiledFixedTypeValueField) field;
+
+        assertTrue(fixedTypeValueField.getCompiledType().getType() instanceof IntegerType);
+    }
+
+    @Test
     void testObjectSetField() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
