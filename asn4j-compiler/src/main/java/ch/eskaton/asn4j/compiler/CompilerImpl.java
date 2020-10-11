@@ -54,6 +54,7 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeAssignmentNode;
@@ -222,8 +223,8 @@ public class CompilerImpl {
     }
 
     private CompilationResult compileAssignment(AssignmentNode unknownAssignment) {
-        if (unknownAssignment instanceof TypeAssignmentNode assignment) {
-            return compileTypeAssignment(assignment);
+        if (unknownAssignment instanceof TypeOrObjectClassAssignmentNode assignment) {
+            return compileTypeOrObjectClassAssignment(assignment);
         } else if (unknownAssignment instanceof ValueOrObjectAssignmentNode assignment) {
             if (assignment.getObjectAssignment().isPresent()) {
                 return compileObjectAssignment(assignment.getObjectAssignment().get());
@@ -261,6 +262,22 @@ public class CompilerImpl {
                 unknownAssignment.getClass().getSimpleName());
     }
 
+    private CompilationResult compileTypeOrObjectClassAssignment(TypeOrObjectClassAssignmentNode assignment) {
+        if (assignment.getObjectClassAssignment().isPresent()) {
+            try {
+                return compileObjectClassAssignment(assignment.getObjectClassAssignment().get());
+            } catch (ResolutionException e) {
+                // ignore
+            }
+        }
+
+        if (assignment.getTypeAssignment().isPresent()) {
+            return compileTypeAssignment(assignment.getTypeAssignment().get());
+        }
+
+        throw new IllegalCompilerStateException(assignment.getPosition(), "Unhandled assignment: %s", assignment);
+    }
+
     private CompiledType compileTypeAssignment(TypeAssignmentNode assignment) {
         return compilerContext.<TypeAssignmentNode, TypeAssignmentCompiler>getCompiler(TypeAssignmentNode.class)
                 .compile(compilerContext, assignment);
@@ -270,7 +287,7 @@ public class CompilerImpl {
         if (assignment.getValueSetTypeAssignment().isPresent()) {
             try {
                 return compileValueSetTypeAssignment(assignment.getValueSetTypeAssignment().get());
-            } catch (CompilerException e) {
+            } catch (ResolutionException e) {
                 // ignore
             }
         }
@@ -390,8 +407,8 @@ public class CompilerImpl {
     }
 
     public Optional<CompiledType> compileType(String name, Optional<String> maybeModuleName) {
-        return compile(name, maybeModuleName, getAssignmentSelector(TypeAssignmentNode.class),
-                this::compileTypeAssignment);
+        return compile(name, maybeModuleName, getAssignmentSelector(TypeOrObjectClassAssignmentNode.class,
+                TypeOrObjectClassAssignmentNode::getTypeAssignment), this::compileTypeAssignment);
     }
 
     public Optional<CompiledValue<? extends Value>> compileValue(String name, Optional<String> maybeModuleName) {
@@ -409,7 +426,8 @@ public class CompilerImpl {
     }
 
     public Optional<CompiledObjectClass> compileObjectClass(String name, Optional<String> maybeModuleName) {
-        var assignmentSelector = getAssignmentSelector(ObjectClassAssignmentNode.class);
+        var assignmentSelector = getAssignmentSelector(TypeOrObjectClassAssignmentNode.class,
+                TypeOrObjectClassAssignmentNode::getObjectClassAssignment);
 
         return compile(name, maybeModuleName, assignmentSelector, this::compileObjectClassAssignment);
     }

@@ -1511,21 +1511,42 @@ public class Parser {
 
     // TypeAssignment ::= typereference "::=" Type
     // ObjectClassAssignment ::= objectclassreference "::=" ObjectClass
-    protected class TypeAssignmentParser extends ListRuleParser<TypeOrObjectClassAssignmentNode<?>> {
+    protected class TypeAssignmentParser extends ListRuleParser<TypeOrObjectClassAssignmentNode> {
 
-        @SuppressWarnings("unchecked")
-        public TypeOrObjectClassAssignmentNode<?> parse() throws ParserException {
-            return super.parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.ASSIGN,
-                            new ChoiceParser<>(typeParser, objectClassParser)),
-                    a -> {
-                        if (a.n2() instanceof Type) {
-                            return new TypeAssignmentNode(a.P0(), a.s0(), a.n2());
-                        } else if (a.n2() instanceof ObjectClassNode) {
-                            return new ObjectClassAssignmentNode(a.P0(), a.s0(), a.n2());
-                        }
+        public TypeOrObjectClassAssignmentNode parse() throws ParserException {
+            Set<List<Object>> rules = new AmbiguousChoiceParser<>(
+                    new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.ASSIGN, typeParser),
+                    new SequenceParser(new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.OBJECT_CLASS),
+                            TokenType.ASSIGN, objectClassParser)).parse();
 
-                        return null;
-                    });
+            Optional<List<Object>> first = rules.stream().findFirst();
+
+            if (first.isPresent()) {
+                Token token = (Token) first.get().get(0);
+                TypeOrObjectClassAssignmentNode rule =
+                        new TypeOrObjectClassAssignmentNode(token.getPosition(), token.getText());
+
+                rules.stream().forEach(r -> {
+                    TokenType tokenType = ((Token) r.get(0)).getType();
+
+                    switch (tokenType) {
+                        case TYPE_REFERENCE:
+                            rule.setTypeAssignment(new TypeAssignmentNode(rule.getPosition(),
+                                    rule.getReference(), (Type) r.get(2)));
+                            break;
+                        case OBJECT_CLASS_REFERENCE:
+                            rule.setObjectClassAssignment(new ObjectClassAssignmentNode(rule.getPosition(),
+                                    rule.getReference(), (ObjectClassNode) r.get(2)));
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected token type: " + tokenType.toString());
+                    }
+                });
+
+                return rule;
+            }
+
+            return null;
         }
 
     }

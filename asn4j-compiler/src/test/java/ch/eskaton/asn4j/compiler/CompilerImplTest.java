@@ -1393,12 +1393,40 @@ class CompilerImplTest {
     }
 
     @Test
+    void testObjectClassReference() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &fixedTypeValueField INTEGER
+                }
+
+                TEST2 ::= TEST
+                """;
+
+        var compiledObjectClass = getCompiledObjectClass(body, "TEST2");
+
+        assertNotNull(compiledObjectClass);
+        assertEquals(1, compiledObjectClass.getFields().size());
+
+        var maybeField = compiledObjectClass.getField("fixedTypeValueField");
+
+        assertTrue(maybeField.isPresent());
+
+        var field = maybeField.get();
+
+        assertTrue(field instanceof CompiledFixedTypeValueField);
+
+        var fixedTypeValueField = (CompiledFixedTypeValueField) field;
+
+        assertTrue(fixedTypeValueField.getCompiledType().getType() instanceof IntegerType);
+    }
+
+    @Test
     void testObjectSetField() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
                     &ObjectSetField TEST2
                 }
-                                
+
                 TEST2 ::= CLASS {
                     &fixedTypeValueField INTEGER
                 }

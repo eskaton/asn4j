@@ -25,52 +25,28 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.types;
+package ch.eskaton.asn4j.compiler.objects;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
-import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.Choice;
-import ch.eskaton.asn4j.parser.ast.types.SelectionType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 
 import java.util.Optional;
 
-public class SelectionTypeCompiler implements NamedCompiler<SelectionType, CompiledType> {
+public class ObjectClassReferenceCompiler implements NamedCompiler<ObjectClassReference, CompiledObjectClass> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, SelectionType node,
+    public CompiledObjectClass compile(CompilerContext ctx, String name, ObjectClassReference node,
             Optional<Parameters> maybeParameters) {
-        var selectedId = node.getId();
-        var selectedType = node.getType();
+        var referencedObjectClass = ctx.getCompiledObjectClass(node.getReference());
+        var objectClass = ctx.createCompiledObjectClass(name);
 
-        if (selectedType instanceof TypeReference) {
-            var compiledType = ctx.getCompiledType(selectedType);
+        referencedObjectClass.getFields().forEach(objectClass::addField);
+        objectClass.setSyntax(referencedObjectClass.getSyntax().orElse(null));
 
-            if (compiledType instanceof CompiledChoiceType compiledChoiceType) {
-                var choiceType = (Choice) compiledChoiceType.getType();
-
-                var foundType = choiceType.getRootAlternatives().stream()
-                        .filter(t -> t.getName().equals(selectedId))
-                        .findFirst()
-                        .orElseThrow(() -> getNotFoundException(selectedType));
-                var compiler = ctx.<Type, TypeCompiler>getCompiler(Type.class);
-
-                return ctx.withNewType(() -> compiler.compile(ctx, name, foundType.getType(), Optional.empty()));
-            } else {
-                throw getNotFoundException(selectedType);
-            }
-        }
-
-        return ctx.createCompiledType(node, name);
-    }
-
-    private CompilerException getNotFoundException(Type selectedType) {
-        return new CompilerException(selectedType.getPosition(), "Selected type not found");
+        return objectClass;
     }
 
 }
