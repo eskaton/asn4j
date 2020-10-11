@@ -482,6 +482,50 @@ class CompilerImplTest {
     }
 
     @Test
+    void testSequenceWithParameterizedComponent() throws IOException, ParserException {
+        var body = """
+                Seq2{Type} ::= SEQUENCE {
+                    field2 Type
+                }
+
+                Seq1 ::= SEQUENCE {
+                    field1 Seq2{BOOLEAN}
+                }
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq1");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledCollectionType1 = (CompiledCollectionType) compiledType;
+        var maybeField1 = compiledCollectionType1.getComponents().stream()
+                .filter(c -> c.getName().equals("field1"))
+                .findFirst();
+
+        assertTrue(maybeField1.isPresent());
+
+        var field1 = maybeField1.get();
+
+        assertTrue(field1 instanceof CompiledCollectionComponent);
+
+        var compiledCollectionComponent = (CompiledCollectionComponent) field1;
+
+        assertTrue(compiledCollectionComponent.getCompiledType() instanceof CompiledCollectionType);
+
+        var compiledCollectionType2 = (CompiledCollectionType) compiledCollectionComponent.getCompiledType();
+
+        var maybeField2 = compiledCollectionType2.getComponents().stream()
+                .filter(c -> c.getName().equals("field2"))
+                .findFirst();
+
+        assertTrue(maybeField2.isPresent());
+
+        var field2 = maybeField2.get();
+
+        assertTrue(field2.getCompiledType().getType() instanceof BooleanType);
+    }
+
+    @Test
     void testSequenceWithDefaultInvalidValue() {
         var body = """
                 Seq ::= SEQUENCE {
