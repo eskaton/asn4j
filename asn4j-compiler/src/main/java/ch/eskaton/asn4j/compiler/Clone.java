@@ -42,7 +42,7 @@ public class Clone {
     private Clone() {
     }
 
-    public static Object clone(Object object) {
+    public static <T> T clone(T object) {
         if (object == null) {
             return null;
         } else if (object instanceof String) {
@@ -56,7 +56,7 @@ public class Clone {
         } else if (object instanceof Enum) {
             return object;
         } else if (object instanceof Optional optional) {
-            return optional.map(Clone::clone);
+            return (T) optional.map(Clone::clone);
         }
 
         var clazz = object.getClass();
@@ -97,7 +97,7 @@ public class Clone {
             throw new CloneException("Failed to clone object of type " + clazz.getSimpleName(), e);
         }
 
-        return copy;
+        return (T) copy;
     }
 
     public static class CloneException extends RuntimeException {
