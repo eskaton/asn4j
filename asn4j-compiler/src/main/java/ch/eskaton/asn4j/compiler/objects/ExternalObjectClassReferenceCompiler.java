@@ -29,13 +29,14 @@ package ch.eskaton.asn4j.compiler.objects;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
-import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectClassReference;
 
-public class ObjectClassReferenceCompiler extends AbstractObjectReferenceCompiler<ObjectClassReference> {
+public class ExternalObjectClassReferenceCompiler
+        extends AbstractObjectReferenceCompiler<ExternalObjectClassReference> {
 
     @Override
-    protected CompiledObjectClass getReferencedObjectClass(CompilerContext ctx, ObjectClassReference node) {
-        return ctx.getCompiledObjectClass(node.getReference());
+    protected CompiledObjectClass getReferencedObjectClass(CompilerContext ctx, ExternalObjectClassReference node) {
+        return ctx.getCompiledObjectClass(node.getModule(), node.getReference());
     }
 
 }

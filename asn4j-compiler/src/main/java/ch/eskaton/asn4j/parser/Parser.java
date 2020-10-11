@@ -54,7 +54,7 @@ import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
-import ch.eskaton.asn4j.parser.ast.ExternalObjectClassReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReferenceNode;
 import ch.eskaton.asn4j.parser.ast.FieldNameNode;
@@ -4075,12 +4075,12 @@ public class Parser {
     }
 
     // ExternalObjectClassReference ::= modulereference "." objectclassreference
-    protected class ExternalObjectClassReferenceParser extends ListRuleParser<ExternalObjectClassReferenceNode> {
+    protected class ExternalObjectClassReferenceParser extends ListRuleParser<ExternalObjectClassReference> {
 
-        public ExternalObjectClassReferenceNode parse() throws ParserException {
+        public ExternalObjectClassReference parse() throws ParserException {
             return super.parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.DOT,
                     new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.OBJECT_CLASS)),
-                    a -> new ExternalObjectClassReferenceNode(a.P0(), a.s0(),a.s2()));
+                    a -> new ExternalObjectClassReference(a.P0(), a.s0(),a.s2()));
         }
 
     }
@@ -5193,7 +5193,7 @@ public class Parser {
                         ExternalTypeReference typeReference = (ExternalTypeReference) typeNode;
 
                         return new ParameterizedObjectAssignmentNode(position, tokenText, parameterNodeList,
-                                new ExternalObjectClassReferenceNode(typeReference.getPosition(),
+                                new ExternalObjectClassReference(typeReference.getPosition(),
                                         typeReference.getModule(), typeReference.getType()), (ObjectNode) valueNode);
                     }
                     // TODO: error

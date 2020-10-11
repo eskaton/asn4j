@@ -28,14 +28,27 @@
 package ch.eskaton.asn4j.compiler.objects;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.NamedCompiler;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 
-public class ObjectClassReferenceCompiler extends AbstractObjectReferenceCompiler<ObjectClassReference> {
+import java.util.Optional;
+
+public abstract class AbstractObjectReferenceCompiler<T extends ObjectClassReference>
+        implements NamedCompiler<T, CompiledObjectClass> {
 
     @Override
-    protected CompiledObjectClass getReferencedObjectClass(CompilerContext ctx, ObjectClassReference node) {
-        return ctx.getCompiledObjectClass(node.getReference());
+    public CompiledObjectClass compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
+        var referencedObjectClass = getReferencedObjectClass(ctx, node);
+        var objectClass = ctx.createCompiledObjectClass(name);
+
+        referencedObjectClass.getFields().forEach(objectClass::addField);
+        objectClass.setSyntax(referencedObjectClass.getSyntax().orElse(null));
+
+        return objectClass;
     }
+
+    protected abstract CompiledObjectClass getReferencedObjectClass(CompilerContext ctx, T node);
 
 }
