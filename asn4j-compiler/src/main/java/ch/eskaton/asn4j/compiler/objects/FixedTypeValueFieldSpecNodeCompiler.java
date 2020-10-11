@@ -33,9 +33,13 @@ import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.types.ObjectClassFieldTypeCompiler;
 import ch.eskaton.asn4j.parser.ast.DefaultValueSpecNode;
 import ch.eskaton.asn4j.parser.ast.FixedTypeValueFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
+import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Optional;
 
@@ -46,7 +50,7 @@ public class FixedTypeValueFieldSpecNodeCompiler implements NamedCompiler<FixedT
     public CompiledFixedTypeValueField compile(CompilerContext ctx, String name, FixedTypeValueFieldSpecNode node,
             Optional<Parameters> maybeParameters) {
         var type = node.getType();
-        var compiledType = ctx.getCompiledType(type);
+        var compiledType = getCompiledType(ctx, node.getReference(), type, maybeParameters);
         var optionalitySpec = node.getOptionalitySpec();
         var compiledField = new CompiledFixedTypeValueField(node.getReference(), compiledType, node.isUnique());
 
@@ -68,6 +72,17 @@ public class FixedTypeValueFieldSpecNodeCompiler implements NamedCompiler<FixedT
         }
 
         return compiledField;
+    }
+
+    private CompiledType getCompiledType(CompilerContext ctx, String name, Type type,
+            Optional<Parameters> maybeParameters) {
+        if (type instanceof ObjectClassFieldType objectClassFieldType) {
+            var compiler = ctx.<ObjectClassFieldType, ObjectClassFieldTypeCompiler>getCompiler(ObjectClassFieldType.class);
+
+            return compiler.compile(ctx, name, objectClassFieldType, maybeParameters);
+        }
+
+        return ctx.getCompiledType(type);
     }
 
 }
