@@ -226,16 +226,7 @@ public class CompilerImpl {
         if (unknownAssignment instanceof TypeOrObjectClassAssignmentNode assignment) {
             return compileTypeOrObjectClassAssignment(assignment);
         } else if (unknownAssignment instanceof ValueOrObjectAssignmentNode assignment) {
-            if (assignment.getObjectAssignment().isPresent()) {
-                return compileObjectAssignment(assignment.getObjectAssignment().get());
-            }
-
-            if (assignment.getValueAssignment().isPresent()) {
-                return compileValueAssignment(assignment.getValueAssignment().get());
-            }
-
-            // ignore values, they are resolved when needed
-            return null;
+            return compileValueOrObjectAssignmentNode(assignment);
         } else if (unknownAssignment instanceof ObjectSetAssignmentNode assignment) {
             return compileObjectSetAssignment(assignment);
         } else if (unknownAssignment instanceof ObjectClassAssignmentNode assignment) {
@@ -273,6 +264,18 @@ public class CompilerImpl {
 
         if (assignment.getTypeAssignment().isPresent()) {
             return compileTypeAssignment(assignment.getTypeAssignment().get());
+        }
+
+        throw new IllegalCompilerStateException(assignment.getPosition(), "Unhandled assignment: %s", assignment);
+    }
+
+    private CompilationResult compileValueOrObjectAssignmentNode(ValueOrObjectAssignmentNode assignment) {
+        if (assignment.getObjectAssignment().isPresent()) {
+            return compileObjectAssignment(assignment.getObjectAssignment().get());
+        }
+
+        if (assignment.getValueAssignment().isPresent()) {
+            return compileValueAssignment(assignment.getValueAssignment().get());
         }
 
         throw new IllegalCompilerStateException(assignment.getPosition(), "Unhandled assignment: %s", assignment);
