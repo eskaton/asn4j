@@ -65,6 +65,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
@@ -386,22 +387,13 @@ public class CompilerUtils {
     public static CompiledType compileTypeReference(CompilerContext ctx, TypeReference typeReference,
             Optional<Parameters> maybeParameters) {
         var referencedTypeName = typeReference.getType();
+        var maybeTypeRefParams = typeReference.getParameters();
+
 
         if (maybeParameters.isPresent()) {
-            var maybeTypeRefParams = typeReference.getParameters();
-
             if (maybeTypeRefParams.isPresent()) {
-                var typeName = typeReference.getType();
-                var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
-                var parameters = createParameters(typeReference, typeName, compiledParameterizedType);
-                var updatedParameters = Optional.of(updateParameters(maybeParameters.get(), parameters));
-                var type = compiledParameterizedType.getType();
-                var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
-                var compiledType = compiler.compile(ctx, null, type, updatedParameters);
-
-                checkUnusedParameters(updatedParameters);
-
-                return compiledType;
+                return getCompiledParameterizedType(ctx, typeReference,
+                        (parameters -> updateParameters(maybeParameters.get(), parameters)));
             }
 
             var maybeResolvedType = ctx.getTypeParameter(maybeParameters.get(), typeReference);
@@ -417,9 +409,27 @@ public class CompilerUtils {
 
                 return compiler.compile(ctx, null, resolvedType, maybeParameters);
             }
+        } else if (maybeTypeRefParams.isPresent()) {
+            return getCompiledParameterizedType(ctx, typeReference, Function.identity());
         }
 
         return ctx.getCompiledType(referencedTypeName);
+    }
+
+    private static CompiledType getCompiledParameterizedType(CompilerContext ctx, TypeReference typeReference,
+            Function<Parameters, Parameters> parametersProvider) {
+        var typeName = typeReference.getType();
+        var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
+        var parameters = createParameters(typeReference, typeName, compiledParameterizedType);
+        var updatedParameters = parametersProvider.apply(parameters);
+        var maybeUpdatedParameters = Optional.of(updatedParameters);
+        var type = compiledParameterizedType.getType();
+        var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
+        var compiledType = compiler.compile(ctx, null, type, maybeUpdatedParameters);
+
+        checkUnusedParameters(maybeUpdatedParameters);
+
+        return compiledType;
     }
 
     /**
