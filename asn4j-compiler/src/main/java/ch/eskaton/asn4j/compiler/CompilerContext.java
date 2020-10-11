@@ -783,7 +783,7 @@ public class CompilerContext {
         }
 
         return compilationResult.orElseThrow(
-                () -> new CompilerException("Failed to resolve %s '%s'", nodeName, reference));
+                () -> new ResolutionException("Failed to resolve %s '%s'", nodeName, reference));
     }
 
     private <T extends CompilationResult> Optional<T> getImportedCompilationResult(String reference, String nodeName,

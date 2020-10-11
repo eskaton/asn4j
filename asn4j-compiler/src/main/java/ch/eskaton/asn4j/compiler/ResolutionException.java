@@ -27,23 +27,11 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.objects.ObjectClassNodeCompiler;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
-import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+@SuppressWarnings("serial")
+public class ResolutionException extends CompilerException {
 
-import java.util.Optional;
-
-public class ObjectClassAssignmentCompiler implements Compiler<ObjectClassAssignmentNode> {
-
-    public CompiledObjectClass compile(CompilerContext ctx, ObjectClassAssignmentNode node) {
-        String objectClassName = node.getReference();
-
-        System.out.println("Compiling object class " + objectClassName);
-
-        ObjectClassNodeCompiler compiler = ctx.getCompiler(ObjectClassNode.class);
-
-        return compiler.compile(ctx, objectClassName, node.getObjectClass(), Optional.empty());
+    public ResolutionException(String format, Object... args) {
+        super(String.format(format, args));
     }
 
 }

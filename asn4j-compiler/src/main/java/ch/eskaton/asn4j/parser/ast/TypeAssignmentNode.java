@@ -30,10 +30,18 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
-public class TypeAssignmentNode extends TypeOrObjectClassAssignmentNode<Type> {
+public class TypeAssignmentNode extends AssignmentNode {
+
+    private Type type;
 
     public TypeAssignmentNode(Position position, String reference, Type type) {
-        super(position, reference, type);
+        super(position, reference);
+
+        this.type = type;
+    }
+
+    public Type getType() {
+        return type;
     }
 
 }

@@ -330,7 +330,6 @@ import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.TokenOrGroup;
 import ch.eskaton.asn4j.parser.ast.Tuple;
-import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeIdentifierObjectClassReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
@@ -871,7 +870,7 @@ class ParserTest {
         List<AssignmentNode> result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result.get(0) instanceof TypeAssignmentNode);
+        assertTrue(result.get(0) instanceof TypeOrObjectClassAssignmentNode);
         assertTrue(result.get(1) instanceof ValueOrObjectAssignmentNode);
     }
 
@@ -883,7 +882,8 @@ class ParserTest {
         AssignmentNode result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof TypeAssignmentNode);
+        assertTrue(result instanceof TypeOrObjectClassAssignmentNode);
+        assertTrue(((TypeOrObjectClassAssignmentNode) result).getTypeAssignment().isPresent());
 
         parser = new Parser(new ByteArrayInputStream(
                 "value-reference VisibleString ::= \"string\"".getBytes())).new AssignmentParser();
@@ -910,6 +910,7 @@ class ParserTest {
 
         assertNotNull(result);
         assertTrue(result instanceof TypeOrObjectClassAssignmentNode);
+        assertTrue(((TypeOrObjectClassAssignmentNode) result).getObjectClassAssignment().isPresent());
 
         parser = new Parser(
                 new ByteArrayInputStream(
@@ -1007,11 +1008,12 @@ class ParserTest {
                 "Type-Reference ::= [TAG: APPLICATION 23] INTEGER ((0..MAX))"
                         .getBytes())).new TypeAssignmentParser();
 
-        TypeOrObjectClassAssignmentNode<?> result = parser.parse();
+        TypeOrObjectClassAssignmentNode result = parser.parse();
 
         assertNotNull(result);
         assertEquals("Type-Reference", result.getReference());
-        assertTrue(result.getType() instanceof IntegerType);
+        assertTrue(result.getTypeAssignment().isPresent());
+        assertTrue(result.getTypeAssignment().get().getType() instanceof IntegerType);
     }
 
     @Test
@@ -4968,19 +4970,18 @@ class ParserTest {
      */
 
     @Test
-    void testObjectClassAssignmentParser() throws IOException,
-            ParserException {
+    void testObjectClassAssignmentParser() throws IOException, ParserException {
         TypeAssignmentParser parser = new Parser(
                 new ByteArrayInputStream(
                         "OBJECT-CLASS ::= CLASS { &Type-Reference OPTIONAL } WITH SYNTAX { [ARGUMENT &ArgumentType] }"
                                 .getBytes())).new TypeAssignmentParser();
 
-        TypeOrObjectClassAssignmentNode<?> result = parser.parse();
+        TypeOrObjectClassAssignmentNode result = parser.parse();
 
         assertNotNull(result);
         assertEquals("OBJECT-CLASS", result.getReference());
-        assertTrue(result.getType() instanceof ObjectClassDefn);
-
+        assertTrue(result.getObjectClassAssignment().isPresent());
+        assertTrue(result.getObjectClassAssignment().get().getObjectClass() instanceof ObjectClassDefn);
     }
 
     @Test
