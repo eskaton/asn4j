@@ -65,7 +65,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
@@ -410,14 +410,14 @@ public class CompilerUtils {
                 return compiler.compile(ctx, null, resolvedType, maybeParameters);
             }
         } else if (maybeTypeRefParams.isPresent()) {
-            return getCompiledParameterizedType(ctx, typeReference, Function.identity());
+            return getCompiledParameterizedType(ctx, typeReference, UnaryOperator.identity());
         }
 
         return ctx.getCompiledType(referencedTypeName);
     }
 
     private static CompiledType getCompiledParameterizedType(CompilerContext ctx, TypeReference typeReference,
-            Function<Parameters, Parameters> parametersProvider) {
+            UnaryOperator<Parameters> parametersProvider) {
         var typeName = typeReference.getType();
         var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
         var parameters = createParameters(typeReference, typeName, compiledParameterizedType);

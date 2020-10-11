@@ -30,6 +30,8 @@ package ch.eskaton.asn4j.runtime.types;
 import ch.eskaton.asn4j.runtime.exceptions.ASN1RuntimeException;
 import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 
+import java.util.Objects;
+
 public abstract class AbstractVerifiedASN1String extends AbstractASN1String {
 
     private final StringVerifier verifier;
@@ -59,4 +61,28 @@ public abstract class AbstractVerifiedASN1String extends AbstractASN1String {
         });
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        AbstractVerifiedASN1String that = (AbstractVerifiedASN1String) o;
+
+        return Objects.equals(verifier, that.verifier);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), verifier);
+    }
+    
 }

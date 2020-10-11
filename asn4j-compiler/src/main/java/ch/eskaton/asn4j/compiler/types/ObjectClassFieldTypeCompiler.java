@@ -109,7 +109,7 @@ public class ObjectClassFieldTypeCompiler implements NamedCompiler<ObjectClassFi
     private CompiledType defineFixedTypeValueField(CompilerContext ctx, Type type, String name,
             CompiledFixedTypeValueField field, Optional<Parameters> maybeParameters) {
         var additionalConstraints = type.getConstraints();
-        var newType = (Type) Clone.clone(field.getCompiledType().getType());
+        var newType = Clone.clone(field.getCompiledType().getType());
 
         newType.setTags(type.getTags());
 
