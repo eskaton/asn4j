@@ -221,10 +221,10 @@ public class ObjectClassDefnCompiler implements NamedCompiler<ObjectClassDefn, C
             FixedTypeValueOrObjectFieldSpecNode fieldSpec) {
         if (fieldSpec.getFixedTypeValueFieldSpec().isPresent()) {
             var fixedTypeValueFieldSpec = fieldSpec.getFixedTypeValueFieldSpec().get();
-            var compiledField = ctx.<FixedTypeValueFieldSpecNode,
-                    NamedCompiler<FixedTypeValueFieldSpecNode, AbstractCompiledField<?>>>getCompiler(
-                    (Class<FixedTypeValueFieldSpecNode>) fixedTypeValueFieldSpec.getClass())
-                    .compile(ctx, name, fixedTypeValueFieldSpec, Optional.empty());
+            var nodeClass = (Class<FixedTypeValueFieldSpecNode>) fixedTypeValueFieldSpec.getClass();
+            var compiler = ctx.<FixedTypeValueFieldSpecNode,
+                    NamedCompiler<FixedTypeValueFieldSpecNode, AbstractCompiledField<?>>>getCompiler(nodeClass);
+            var compiledField = compiler.compile(ctx, name, fixedTypeValueFieldSpec, Optional.empty());
 
             compiledObjectClass.addField(compiledField);
         }
