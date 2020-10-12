@@ -2376,7 +2376,7 @@ class CompilerImplTest {
     }
 
     @Test
-    void testParameterizedValueInConstraint() throws IOException, ParserException {
+    void testParameterizedValueInIntegerRangeConstraint() throws IOException, ParserException {
         var body = """
                    AbstractSequence {INTEGER:max} ::= SEQUENCE {
                        field INTEGER (0..max)
@@ -2409,6 +2409,42 @@ class CompilerImplTest {
 
         assertEquals(0, integerRange.getLower());
         assertEquals(4, integerRange.getUpper());
+    }
+
+    @Test
+    void testParameterizedValueInIntegerConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractSequence {INTEGER:value} ::= SEQUENCE {
+                       field INTEGER (value)
+                   }
+
+                   Sequence ::= AbstractSequence {7}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var collection = (CompiledCollectionType) compiledType;
+        var compiledFieldType = testCollectionField(collection, "field", IntegerType.class);
+        var maybeConstraintDefinition = compiledFieldType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof IntegerRangeValueNode);
+
+        var integerRangeValueNode = (IntegerRangeValueNode) roots;
+        var integerRanges = integerRangeValueNode.getValue();
+
+        assertEquals(1, integerRanges.size());
+
+        var integerRange = integerRanges.get(0);
+
+        assertEquals(7, integerRange.getLower());
+        assertEquals(7, integerRange.getUpper());
     }
 
     @Test
