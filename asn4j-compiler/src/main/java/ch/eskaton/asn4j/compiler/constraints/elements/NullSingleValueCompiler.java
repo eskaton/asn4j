@@ -28,11 +28,11 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
@@ -43,8 +43,9 @@ public class NullSingleValueCompiler extends SingleValueCompiler<NullValue, Valu
     }
 
     @Override
-    protected ASN1Null.Value resolveValue(CompiledType baseType, SingleValueConstraint elements) {
-        Value value = elements.getValue();
+    protected ASN1Null.Value resolveValue(CompiledType baseType, SingleValueConstraint elements,
+            Parameters parameters) {
+        var value = elements.getValue();
 
         if (value instanceof NullValue) {
             return ASN1Null.Value.NULL;

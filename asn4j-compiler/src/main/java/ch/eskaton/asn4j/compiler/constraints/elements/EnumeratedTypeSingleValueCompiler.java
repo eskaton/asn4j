@@ -29,17 +29,15 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.compiler.results.EnumerationItems;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple2;
 
-import java.util.Optional;
 import java.util.Set;
 
 public class EnumeratedTypeSingleValueCompiler extends SingleValueCompiler<EnumeratedValue, EnumeratedValueNode> {
@@ -49,15 +47,15 @@ public class EnumeratedTypeSingleValueCompiler extends SingleValueCompiler<Enume
     }
 
     @Override
-    protected Integer resolveValue(CompiledType baseType, SingleValueConstraint elements) {
+    protected Integer resolveValue(CompiledType baseType, SingleValueConstraint elements, Parameters parameters) {
         var compiledEnumeratedType = (CompiledEnumeratedType) baseType;
         var value = elements.getValue();
         var definedValue = CompilerUtils.resolveAmbiguousValue(value, SimpleDefinedValue.class);
 
         if (definedValue != null) {
-            EnumerationItems allItems = compiledEnumeratedType.getRoots().copy()
+            var allItems = compiledEnumeratedType.getRoots().copy()
                     .addAll(compiledEnumeratedType.getAdditions().getItems());
-            Optional<Tuple2<String, Integer>> enumItem = allItems.getItems().stream()
+            var enumItem = allItems.getItems().stream()
                     .filter(t -> t.get_1().equals(definedValue.getReference())).findAny();
 
             if (enumItem.isPresent()) {

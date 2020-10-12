@@ -27,6 +27,7 @@
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -43,8 +44,8 @@ public class IntegerSingleValueCompiler extends SingleValueCompiler<IntegerValue
     }
 
     @Override
-    protected IntegerRange resolveValue(CompiledType baseType, SingleValueConstraint elements) {
-        var longValue = super.<IntegerValue>resolveValue(baseType, elements).getValue().longValue();
+    protected IntegerRange resolveValue(CompiledType baseType, SingleValueConstraint elements, Parameters parameters) {
+        var longValue = super.<IntegerValue>resolveValue(baseType, elements, parameters).getValue().longValue();
 
         return new IntegerRange(longValue, longValue);
     }

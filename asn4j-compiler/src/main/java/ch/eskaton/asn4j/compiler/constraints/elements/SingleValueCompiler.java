@@ -76,7 +76,7 @@ public class SingleValueCompiler<V extends Value, N extends ValueNode>
     @Override
     public Node compile(CompiledType baseType, SingleValueConstraint elements, Optional<Bounds> bounds,
             Optional<Parameters> maybeParameters) {
-        var value = resolveValue(baseType, elements);
+        var value = resolveValue(baseType, elements, maybeParameters.orElse(null));
 
         try {
             var ctor = collectionType.map(ct -> getConstructor(valueNodeClazz, ct))
@@ -97,8 +97,10 @@ public class SingleValueCompiler<V extends Value, N extends ValueNode>
         }
     }
 
-    protected <T> T resolveValue(CompiledType baseType, SingleValueConstraint elements) {
-        return ctx.getValue(baseType.getType(), elements.getValue());
+    protected <T> T resolveValue(CompiledType baseType, SingleValueConstraint elements, Parameters parameters) {
+        var maybeParameters = Optional.ofNullable(parameters);
+
+        return (T) ctx.getCompiledValue(baseType.getType(), elements.getValue(), maybeParameters).getValue();
     }
 
     private <T> Constructor<T> getConstructor(Class<T> clazz, Class<?>... parameterTypes) {
