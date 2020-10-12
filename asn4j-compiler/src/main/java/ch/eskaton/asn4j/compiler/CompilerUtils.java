@@ -33,9 +33,11 @@ import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
@@ -381,6 +383,12 @@ public class CompilerUtils {
     public static Optional<ExternalTypeReference> toExternalTypeReference(SimpleDefinedType simpleDefinedType) {
         return simpleDefinedType instanceof ExternalTypeReference externalTypeReference ?
                 Optional.of(externalTypeReference) :
+                Optional.empty();
+    }
+
+    public static Optional<ExternalObjectSetReference> toExternalObjectSetReference(ObjectSetReference objectSetReference) {
+        return objectSetReference instanceof ExternalObjectSetReference externalObjectSetReference ?
+                Optional.of(externalObjectSetReference) :
                 Optional.empty();
     }
 
