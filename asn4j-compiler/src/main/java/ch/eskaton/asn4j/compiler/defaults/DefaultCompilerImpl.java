@@ -36,7 +36,6 @@ import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;
 import ch.eskaton.asn4j.compiler.java.objs.JavaInitializer;
 import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.Optional;
@@ -52,13 +51,7 @@ public class DefaultCompilerImpl<V extends Value> extends AbstractDefaultCompile
     @Override
     public CompiledValue<V> compileDefault(CompilerContext ctx, Type type, V value,
             Optional<Parameters> maybeParameters) {
-        var valueToResolve = (Value) value;
-
-        if (value instanceof SimpleDefinedValue simpleDefinedValue && maybeParameters.isPresent()) {
-            valueToResolve = ctx.getValueParameter(maybeParameters.get(), simpleDefinedValue).orElse(value);
-        }
-
-        return ctx.getCompiledValue(type, valueToResolve);
+        return ctx.getCompiledValue(type, value, maybeParameters);
     }
 
     @Override
