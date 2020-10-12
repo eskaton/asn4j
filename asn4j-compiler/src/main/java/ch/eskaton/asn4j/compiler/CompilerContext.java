@@ -62,6 +62,7 @@ import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.DummyGovernor;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.Governor;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
@@ -645,8 +646,14 @@ public class CompilerContext {
      */
     public CompiledObjectSet getCompiledObjectSet(ObjectSetReference objectSetReference) {
         var reference = objectSetReference.getReference();
+        var maybeModuleName = CompilerUtils.toExternalObjectSetReference(objectSetReference)
+                .map(ExternalObjectSetReference::getModule);
 
-        return getCompiledObjectSet(reference);
+        if (maybeModuleName.isEmpty()) {
+            return getCompiledObjectSet(reference);
+        }
+
+        return getCompiledObjectSet(maybeModuleName.get(), reference);
     }
 
     public CompiledObjectSet getCompiledObjectSet(String reference) {
