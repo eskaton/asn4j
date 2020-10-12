@@ -27,6 +27,7 @@
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractIRIValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
@@ -45,8 +46,8 @@ public abstract class AbstractIRISingleValueCompiler<V extends AbstractIRIValue,
     }
 
     @Override
-    protected List<String> resolveValue(CompiledType baseType, SingleValueConstraint elements) {
-        return super.<V>resolveValue(baseType, elements).getArcIdentifierTexts();
+    protected List<String> resolveValue(CompiledType baseType, SingleValueConstraint elements, Parameters parameters) {
+        return super.<V>resolveValue(baseType, elements, parameters).getArcIdentifierTexts();
     }
 
 }

@@ -27,6 +27,7 @@
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
@@ -40,8 +41,8 @@ public class BooleanSingleValueCompiler extends SingleValueCompiler<BooleanValue
     }
 
     @Override
-    protected Object resolveValue(CompiledType baseType, SingleValueConstraint elements) {
-        return super.<BooleanValue>resolveValue(baseType, elements).getValue();
+    protected Boolean resolveValue(CompiledType baseType, SingleValueConstraint elements, Parameters parameters) {
+        return super.<BooleanValue>resolveValue(baseType, elements, parameters).getValue();
     }
 
 }

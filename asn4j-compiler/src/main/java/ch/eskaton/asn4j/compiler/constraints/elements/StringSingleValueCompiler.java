@@ -27,6 +27,7 @@
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -45,8 +46,9 @@ public class StringSingleValueCompiler<V extends AbstractStringValue & Value>
     }
 
     @Override
-    protected StringSingleValue resolveValue(CompiledType baseType, SingleValueConstraint elements) {
-        var stringValue = super.<V>resolveValue(baseType, elements).getValue();
+    protected StringSingleValue resolveValue(CompiledType baseType, SingleValueConstraint elements,
+            Parameters parameters) {
+        var stringValue = super.<V>resolveValue(baseType, elements, parameters).getValue();
 
         return new StringSingleValue(stringValue);
     }
