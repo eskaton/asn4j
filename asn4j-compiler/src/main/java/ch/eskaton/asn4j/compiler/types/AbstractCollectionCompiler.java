@@ -73,9 +73,9 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
         compileComponents(ctx, name, maybeParameters, componentVerifiers, compiledType,
                 node.getExtensionAdditionComponents(), false);
 
-        CompilerUtils.compileComponentConstraints(ctx, compiledType);
+        CompilerUtils.compileComponentConstraints(ctx, compiledType, maybeParameters);
 
-        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
+        ctx.compileConstraintAndModule(name, compiledType, maybeParameters).ifPresent(constraintAndModule -> {
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });
@@ -86,7 +86,7 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
     private void compileComponents(CompilerContext ctx, String name, Optional<Parameters> maybeParameters,
             List<ComponentVerifier<CompiledCollectionComponent>> componentVerifiers,
             CompiledCollectionType compiledType, List<ComponentType> components, boolean isRoot) {
-        for (ComponentType component : components) {
+        for (var component : components) {
             try {
                 var compiler = ctx.<ComponentType, ComponentTypeCompiler>getCompiler(ComponentType.class);
                 var compiledComponents = compiler.compile(ctx, compiledType, component, isRoot, maybeParameters);
@@ -94,10 +94,12 @@ public abstract class AbstractCollectionCompiler<T extends Collection> implement
                 compiledComponents.forEach(c -> componentVerifiers.forEach(v -> v.verify(c)));
             } catch (CompilerException e) {
                 if (component.getNamedType() != null) {
-                    throw new CompilerException("Failed to compile component '%s' in %s '%s'", e,
-                            component.getNamedType().getName(), typeName, name);
+                    throw new CompilerException(component.getPosition(),
+                            "Failed to compile component '%s' in %s '%s'",
+                            e, component.getNamedType().getName(), typeName, name);
                 } else {
-                    throw new CompilerException("Failed to compile a component in %s '%s'", e, typeName, name);
+                    throw new CompilerException(component.getPosition(),
+                            "Failed to compile a component in %s '%s'", e, typeName, name);
                 }
             }
         }

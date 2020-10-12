@@ -28,6 +28,7 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
@@ -51,7 +52,8 @@ public class ContainedSubtypeCompiler implements ElementsCompiler<ContainedSubty
     }
 
     @Override
-    public Node compile(CompiledType compiledType, ContainedSubtype elements, Optional<Bounds> bounds) {
+    public Node compile(CompiledType compiledType, ContainedSubtype elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
         var parent = elements.getType();
         var constraints = new ArrayDeque<Node>();
 

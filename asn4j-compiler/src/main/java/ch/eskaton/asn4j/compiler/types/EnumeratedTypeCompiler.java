@@ -60,7 +60,7 @@ public class EnumeratedTypeCompiler implements NamedCompiler<EnumeratedType, Com
 
         compiledType.setTags(tags);
 
-        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
+        ctx.compileConstraintAndModule(name, compiledType, maybeParameters).ifPresent(constraintAndModule -> {
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });

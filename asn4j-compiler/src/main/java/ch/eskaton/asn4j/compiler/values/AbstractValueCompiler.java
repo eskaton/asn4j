@@ -68,23 +68,33 @@ public abstract class AbstractValueCompiler<V extends Value> implements Compiler
         var resolvedCompiledType = ctx.getCompiledBaseType(compiledType);
 
         if (value instanceof DefinedValue definedValue) {
-            return compileDefinedValue(ctx, resolvedCompiledType, definedValue);
+            return compileDefinedValue(ctx, resolvedCompiledType, definedValue, maybeParameters);
         }
 
         return doCompile(ctx, resolvedCompiledType, value, maybeParameters);
     }
 
-    protected V compileDefinedValue(CompilerContext ctx, CompiledType compiledType,
-            DefinedValue definedValue) {
+    protected V compileDefinedValue(CompilerContext ctx, CompiledType compiledType, DefinedValue definedValue,
+            Optional<Parameters> maybeParameters) {
         var reference = definedValue.getReference();
-        CompiledValue<?> resolvedValue;
+        CompiledValue<?> resolvedValue = null;
 
         if (definedValue instanceof ExternalValueReference externalValueReference) {
             var moduleName = externalValueReference.getModule();
 
             resolvedValue = ctx.getCompiledValue(moduleName, reference);
-        } else if (definedValue instanceof SimpleDefinedValue) {
-            resolvedValue = compileSimpleDefinedValue(ctx, compiledType, reference);
+        } else if (definedValue instanceof SimpleDefinedValue simpleDefinedValue) {
+            if (maybeParameters.isPresent()) {
+                var maybeValue = ctx.getValueParameter(maybeParameters.get(), simpleDefinedValue);
+
+                if (maybeValue.isPresent()) {
+                    resolvedValue = ctx.getCompiledValue(compiledType.getType(), maybeValue.get());
+                }
+            }
+
+            if (resolvedValue == null) {
+                resolvedValue = compileSimpleDefinedValue(ctx, compiledType, reference);
+            }
         } else {
             throw new IllegalCompilerStateException(definedValue.getPosition(), "Unsupported value reference: %s",
                     definedValue);

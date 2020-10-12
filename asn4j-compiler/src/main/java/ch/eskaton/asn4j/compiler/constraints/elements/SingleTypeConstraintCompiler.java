@@ -27,6 +27,7 @@
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
@@ -46,16 +47,18 @@ public class SingleTypeConstraintCompiler implements ElementsCompiler<SingleType
     }
 
     @Override
-    public Node compile(CompiledType baseType, SingleTypeConstraint elements, Optional<Bounds> bounds) {
+    public Node compile(CompiledType baseType, SingleTypeConstraint elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
         var componentType = ((CollectionOfType) baseType.getType()).getType();
-        var maybeDefinition = ctx.compileConstraint(ctx.getCompiledType(componentType));
+        var maybeDefinition = ctx.compileConstraint(ctx.getCompiledType(componentType), maybeParameters);
         ConstraintDefinition definition;
 
         if (maybeDefinition.isPresent()) {
-            definition = maybeDefinition.get().serialApplication(
-                    ctx.compileConstraint(componentType, elements.getConstraint()));
+            var newDefinition = ctx.compileConstraint(componentType, elements.getConstraint(), maybeParameters);
+
+            definition = maybeDefinition.get().serialApplication(newDefinition);
         } else {
-            definition = ctx.compileConstraint(componentType, elements.getConstraint());
+            definition = ctx.compileConstraint(componentType, elements.getConstraint(), maybeParameters);
         }
 
         return new WithComponentNode(componentType, definition.getRoots());

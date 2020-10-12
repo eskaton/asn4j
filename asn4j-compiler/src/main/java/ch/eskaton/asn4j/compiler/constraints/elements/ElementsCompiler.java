@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
@@ -36,7 +37,7 @@ import java.util.Optional;
 
 public interface ElementsCompiler<C extends Elements> {
 
-    Node compile(CompiledType baseType, C elements, Optional<Bounds> bounds);
+    Node compile(CompiledType baseType, C elements, Optional<Bounds> bounds, Optional<Parameters> maybeParameters);
 
 }
 

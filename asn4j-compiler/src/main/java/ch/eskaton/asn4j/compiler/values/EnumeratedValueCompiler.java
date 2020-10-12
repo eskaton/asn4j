@@ -28,12 +28,15 @@
 package ch.eskaton.asn4j.compiler.values;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+
+import java.util.Optional;
 
 public class EnumeratedValueCompiler extends AbstractValueCompiler<EnumeratedValue> {
 
@@ -43,7 +46,7 @@ public class EnumeratedValueCompiler extends AbstractValueCompiler<EnumeratedVal
 
     @Override
     protected EnumeratedValue compileDefinedValue(CompilerContext ctx, CompiledType compiledType,
-            DefinedValue definedValue) {
+            DefinedValue definedValue, Optional<Parameters> maybeParameters) {
         var compiledEnumeratedType = (CompiledEnumeratedType) compiledType;
         var position = definedValue.getPosition();
 
@@ -56,7 +59,7 @@ public class EnumeratedValueCompiler extends AbstractValueCompiler<EnumeratedVal
             }
         }
 
-        return super.compileDefinedValue(ctx, compiledType, definedValue);
+        return super.compileDefinedValue(ctx, compiledType, definedValue, maybeParameters);
     }
 
 }

@@ -344,7 +344,7 @@ public class CompilerUtils {
     }
 
     public static boolean compileComponentConstraints(CompilerContext ctx,
-            HasComponents<? extends CompiledComponent> compiledType) {
+            HasComponents<? extends CompiledComponent> compiledType, Optional<Parameters> maybeParameters) {
         var hasComponentConstraint = new MutableReference<>(false);
 
         compiledType.getComponents().stream().forEach(component -> {
@@ -353,7 +353,7 @@ public class CompilerUtils {
             var componentType = compiledComponent.getType();
 
             if (componentType.getConstraints() != null) {
-                var constraintDef = ctx.compileConstraint(componentName, compiledComponent);
+                var constraintDef = ctx.compileConstraint(componentName, compiledComponent, maybeParameters);
 
                 compiledComponent.setConstraintDefinition(constraintDef.orElse(null));
 
@@ -396,7 +396,6 @@ public class CompilerUtils {
             Optional<Parameters> maybeParameters) {
         var referencedTypeName = typeReference.getType();
         var maybeTypeRefParams = typeReference.getParameters();
-
 
         if (maybeParameters.isPresent()) {
             if (maybeTypeRefParams.isPresent()) {

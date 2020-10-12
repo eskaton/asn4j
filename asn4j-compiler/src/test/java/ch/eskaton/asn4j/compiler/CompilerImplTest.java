@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
@@ -2372,6 +2373,42 @@ class CompilerImplTest {
         var collection = (CompiledCollectionType) compiledType;
 
         testCollectionField(collection, "field", IntegerType.class);
+    }
+
+    @Test
+    void testParameterizedValueInConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractSequence {INTEGER:max} ::= SEQUENCE {
+                       field INTEGER (0..max)
+                   }
+
+                   Sequence ::= AbstractSequence {4}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var collection = (CompiledCollectionType) compiledType;
+        var compiledFieldType = testCollectionField(collection, "field", IntegerType.class);
+        var maybeConstraintDefinition = compiledFieldType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof IntegerRangeValueNode);
+
+        var integerRangeValueNode = (IntegerRangeValueNode) roots;
+        var integerRanges = integerRangeValueNode.getValue();
+
+        assertEquals(1, integerRanges.size());
+
+        var integerRange = integerRanges.get(0);
+
+        assertEquals(0, integerRange.getLower());
+        assertEquals(4, integerRange.getUpper());
     }
 
     @Test

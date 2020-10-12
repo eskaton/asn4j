@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
@@ -40,23 +41,23 @@ import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.PermittedAlphabetConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple3;
-import ch.eskaton.commons.functional.TriFunction;
+import ch.eskaton.commons.collections.Tuple4;
+import ch.eskaton.commons.functional.QuadFunction;
 import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.Optional;
 
 public class PermittedAlphabetConstraintCompiler implements ElementsCompiler<PermittedAlphabetConstraint> {
 
-    private Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
-            ? extends Elements, Optional<Bounds>>, Node> dispatcher;
+    private Dispatcher<Elements, Class<? extends Elements>,
+            Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node> dispatcher;
 
     private final TypeName typeName;
 
     public PermittedAlphabetConstraintCompiler(CompilerContext ctx, TypeName typeName) {
         this.typeName = typeName;
-        this.dispatcher = new Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
-                ? extends Elements, Optional<Bounds>>, Node>()
+        this.dispatcher = new Dispatcher<Elements, Class<? extends Elements>,
+                Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node>()
                 .withComparator((t, c) -> c.isInstance(t))
                 .withException(e -> new CompilerException("Invalid constraint %s for %s type",
                         e.getClass().getSimpleName(), typeName));
@@ -66,16 +67,16 @@ public class PermittedAlphabetConstraintCompiler implements ElementsCompiler<Per
     }
 
     protected <T extends Elements> Node dispatchToCompiler(Class<T> clazz,
-            TriFunction<CompiledType, T, Optional<Bounds>, Node> function,
-            Optional<Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>> maybeArgs) {
+            QuadFunction<CompiledType, T, Optional<Bounds>, Optional<Parameters>, Node> function,
+            Optional<Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>> maybeArgs) {
         var args = maybeArgs.orElseThrow(
                 () -> new IllegalCompilerStateException("Arguments in dispatchToCompiler may not be null"));
 
-        return function.apply(args.get_1(), clazz.cast(args.get_2()), args.get_3());
+        return function.apply(args.get_1(), clazz.cast(args.get_2()), args.get_3(), args.get_4());
     }
 
     protected <T extends Elements> void addConstraintHandler(Class<T> clazz,
-            TriFunction<CompiledType, T, Optional<Bounds>, Node> function) {
+            QuadFunction<CompiledType, T, Optional<Bounds>, Optional<Parameters>, Node> function) {
         dispatcher.withCase(clazz, a -> dispatchToCompiler(clazz, function, a));
     }
 
@@ -84,7 +85,8 @@ public class PermittedAlphabetConstraintCompiler implements ElementsCompiler<Per
     }
 
     @Override
-    public Node compile(CompiledType baseType, PermittedAlphabetConstraint elements, Optional<Bounds> bounds) {
+    public Node compile(CompiledType baseType, PermittedAlphabetConstraint elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
         var constraint = elements.getConstraint();
 
         if (!(constraint instanceof SubtypeConstraint)) {
@@ -94,7 +96,7 @@ public class PermittedAlphabetConstraintCompiler implements ElementsCompiler<Per
 
         var setSpecs = ((SubtypeConstraint) constraint).getElementSetSpecs();
         var rootElements = setSpecs.getRootElements();
-        var root = dispatcher.execute(rootElements, Tuple3.of(baseType, rootElements, bounds));
+        var root = dispatcher.execute(rootElements, Tuple4.of(baseType, rootElements, bounds, maybeParameters));
         var visitor = new PermittedAlphabetVisitor();
 
         return new PermittedAlphabetNode(visitor.visit(root));

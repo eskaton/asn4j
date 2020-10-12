@@ -45,7 +45,7 @@ public abstract class BuiltinTypeCompiler<T extends Type> implements NamedCompil
 
         compiledType.setTags(tags);
 
-        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
+        ctx.compileConstraintAndModule(name, compiledType, maybeParameters).ifPresent(constraintAndModule -> {
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });

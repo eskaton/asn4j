@@ -412,24 +412,28 @@ public class CompilerContext {
     }
 
     public Optional<Tuple2<ConstraintDefinition, Module>> compileConstraintAndModule(String name,
-            CompiledType compiledType) {
-        return constraintCompiler.compileConstraintAndModule(name, compiledType);
+            CompiledType compiledType, Optional<Parameters> maybeParameters) {
+        return constraintCompiler.compileConstraintAndModule(name, compiledType, maybeParameters);
     }
 
-    public Optional<ConstraintDefinition> compileConstraint(String name, CompiledType compiledType) {
-        return constraintCompiler.compileConstraint(name, compiledType);
+    public Optional<ConstraintDefinition> compileConstraint(String name, CompiledType compiledType,
+            Optional<Parameters> maybeParameters) {
+        return constraintCompiler.compileConstraint(name, compiledType, maybeParameters);
     }
 
-    public Optional<ConstraintDefinition> compileConstraint(CompiledType compiledType) {
-        return constraintCompiler.compileConstraint(compiledType);
+    public Optional<ConstraintDefinition> compileConstraint(CompiledType compiledType,
+            Optional<Parameters> maybeParameters) {
+        return constraintCompiler.compileConstraint(compiledType, maybeParameters);
     }
 
-    public ConstraintDefinition compileConstraint(Type type, Constraint constraint) {
-        return constraintCompiler.compileConstraint(type, constraint);
+    public ConstraintDefinition compileConstraint(Type type, Constraint constraint,
+            Optional<Parameters> maybeParameters) {
+        return constraintCompiler.compileConstraint(type, constraint, maybeParameters);
     }
 
-    public ConstraintDefinition compileConstraint(CompiledType compiledType, Constraint constraint) {
-        return constraintCompiler.compileConstraint(compiledType, constraint);
+    public ConstraintDefinition compileConstraint(CompiledType compiledType, Constraint constraint,
+            Optional<Parameters> maybeParameters) {
+        return constraintCompiler.compileConstraint(compiledType, constraint, maybeParameters);
     }
 
     public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {

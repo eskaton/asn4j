@@ -52,7 +52,7 @@ public abstract class CollectionOfCompiler<T extends CollectionOfType> implement
         compiledType.setTags(tags);
         compileContentType(ctx, compiledType, node, name, maybeParameters);
 
-        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
+        ctx.compileConstraintAndModule(name, compiledType, maybeParameters).ifPresent(constraintAndModule -> {
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });

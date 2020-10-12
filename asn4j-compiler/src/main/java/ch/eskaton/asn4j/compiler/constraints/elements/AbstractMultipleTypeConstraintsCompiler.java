@@ -28,6 +28,7 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ConstraintDefinition;
 import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
@@ -61,7 +62,8 @@ public abstract class AbstractMultipleTypeConstraintsCompiler implements Element
     }
 
     @Override
-    public Node compile(CompiledType compiledType, MultipleTypeConstraints elements, Optional<Bounds> bounds) {
+    public Node compile(CompiledType compiledType, MultipleTypeConstraints elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
         var components = ((HasComponents<CompiledComponent>) compiledType).getComponents();
         var componentNodes = new HashSet<ComponentNode>();
         var verifier = verifierSupplier.get();
@@ -72,20 +74,22 @@ public abstract class AbstractMultipleTypeConstraintsCompiler implements Element
 
             verifier.verify(index, compiledType.getName(), name);
 
-            componentNodes.add(compileComponentConstraint(components.get(index).getCompiledType(), constraint));
+            componentNodes.add(compileComponentConstraint(components.get(index).getCompiledType(), constraint,
+                    maybeParameters));
         }
 
         return new WithComponentsNode(componentNodes);
     }
 
-    protected ComponentNode compileComponentConstraint(CompiledType compiledType, NamedConstraint namedConstraint) {
+    protected ComponentNode compileComponentConstraint(CompiledType compiledType, NamedConstraint namedConstraint,
+            Optional<Parameters> maybeParameters) {
         var name = namedConstraint.getName();
         var constraint = namedConstraint.getConstraint();
         var presence = Optional.ofNullable(constraint.getPresence())
                 .map(PresenceConstraint::getType).orElse(null);
         var maybeValueConstraint = Optional.ofNullable(constraint.getValue())
                 .map(ValueConstraint::getConstraint);
-        var maybeDefinition = ctx.compileConstraint(compiledType);
+        var maybeDefinition = ctx.compileConstraint(compiledType, maybeParameters);
         Node roots = null;
 
         if (maybeValueConstraint.isPresent()) {
@@ -93,9 +97,11 @@ public abstract class AbstractMultipleTypeConstraintsCompiler implements Element
             ConstraintDefinition definition;
 
             if (maybeDefinition.isPresent()) {
-                definition = maybeDefinition.get().serialApplication(ctx.compileConstraint(compiledType, valueConstraint));
+                var newDefinition = ctx.compileConstraint(compiledType, valueConstraint, maybeParameters);
+
+                definition = maybeDefinition.get().serialApplication(newDefinition);
             } else {
-                definition = ctx.compileConstraint(compiledType, valueConstraint);
+                definition = ctx.compileConstraint(compiledType, valueConstraint, maybeParameters);
             }
 
             roots = definition.getRoots();
