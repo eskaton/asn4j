@@ -27,6 +27,7 @@
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
@@ -35,7 +36,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
-import ch.eskaton.commons.collections.Tuple3;
+import ch.eskaton.commons.collections.Tuple4;
 import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.List;
@@ -48,52 +49,59 @@ import static ch.eskaton.asn4j.compiler.constraints.ast.NodeType.UNION;
 
 public class ElementSetCompiler implements ElementsCompiler<ElementSet> {
 
-    private final Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
-            ? extends Elements, Optional<Bounds>>, Node> dispatcher;
+    private final Dispatcher<Elements, Class<? extends Elements>,
+            Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node> dispatcher;
 
-    public ElementSetCompiler(Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
-            ? extends Elements, Optional<Bounds>>, Node> dispatcher) {
+    public ElementSetCompiler(Dispatcher<Elements, Class<? extends Elements>,
+            Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node> dispatcher) {
         this.dispatcher = dispatcher;
     }
 
     @Override
-    public Node compile(CompiledType baseType, ElementSet set, Optional<Bounds> bounds) {
-        List<Elements> operands = set.getOperands();
+    public Node compile(CompiledType baseType, ElementSet set, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
+        var operands = set.getOperands();
 
         switch (set.getOperation()) {
             case ALL:
-                return calculateInversion(compile(baseType, (ElementSet) operands.get(0), bounds));
+                return calculateInversion(compile(baseType, (ElementSet) operands.get(0), bounds, maybeParameters));
 
             case EXCLUDE:
+                var set1 = calculateElements(baseType, operands.get(0), bounds, maybeParameters);
+
                 if (operands.size() == 1) {
                     // ALL EXCEPT
-                    return calculateElements(baseType, operands.get(0), bounds);
+                    return set1;
                 } else {
-                    return calculateExclude(calculateElements(baseType, operands.get(0), bounds),
-                            calculateElements(baseType, operands.get(1), bounds));
+                    var set2 = calculateElements(baseType, operands.get(1), bounds, maybeParameters);
+
+                    return calculateExclude(set1, set2);
                 }
 
             case INTERSECTION:
-                return calculateIntersection(baseType, operands, bounds);
+                return calculateIntersection(baseType, operands, bounds, maybeParameters);
 
             case UNION:
-                return calculateUnion(baseType, operands, bounds);
+                return calculateUnion(baseType, operands, bounds, maybeParameters);
 
             default:
                 throw new IllegalCompilerStateException("Unimplemented node type: %s", set.getOperation());
         }
     }
 
-    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds) {
-        return dispatcher.execute(elements, new Tuple3<>(baseType, elements, bounds));
+    protected Node calculateElements(CompiledType baseType, Elements elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
+        return dispatcher.execute(elements, Tuple4.of(baseType, elements, bounds, maybeParameters));
     }
 
-    protected Node calculateIntersection(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds) {
-        return calculateBinOp(baseType, elements, bounds, INTERSECTION);
+    protected Node calculateIntersection(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
+        return calculateBinOp(baseType, elements, bounds, maybeParameters, INTERSECTION);
     }
 
-    protected Node calculateUnion(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds) {
-        return calculateBinOp(baseType, elements, bounds, UNION);
+    protected Node calculateUnion(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
+        return calculateBinOp(baseType, elements, bounds, maybeParameters, UNION);
     }
 
     protected Node calculateInversion(Node node) {
@@ -105,11 +113,11 @@ public class ElementSetCompiler implements ElementsCompiler<ElementSet> {
     }
 
     protected Node calculateBinOp(CompiledType baseType, List<Elements> elements, Optional<Bounds> bounds,
-            NodeType type) {
+            Optional<Parameters> maybeParameters, NodeType type) {
         Node node = null;
 
-        for (Elements element : elements) {
-            Node tmpNode = calculateElements(baseType, element, bounds);
+        for (var element : elements) {
+            var tmpNode = calculateElements(baseType, element, bounds, maybeParameters);
 
             if (node == null) {
                 node = tmpNode;

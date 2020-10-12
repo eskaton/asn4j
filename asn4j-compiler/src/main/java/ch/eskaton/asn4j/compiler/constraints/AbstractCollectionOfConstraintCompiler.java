@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
@@ -103,15 +104,16 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    Optional<ConstraintDefinition> compileComponentConstraints(Type node, CompiledType compiledBaseType) {
-        var maybeConstraintDefinition = super.compileComponentConstraints(node, compiledBaseType);
+    Optional<ConstraintDefinition> compileComponentConstraints(Type node, CompiledType compiledBaseType,
+            Optional<Parameters> maybeParameters) {
+        var maybeConstraintDefinition = super.compileComponentConstraints(node, compiledBaseType, maybeParameters);
         var collectionOfType = (CollectionOfType) compiledBaseType.getType();
 
         if (collectionOfType.hasElementConstraint()) {
             var constraintDefinition = maybeConstraintDefinition.orElse(new ConstraintDefinition());
             var contentType = collectionOfType.getType();
             var compiledType = ctx.getCompiledType(contentType);
-            var maybeComponentDefinition = ctx.compileConstraint(compiledType);
+            var maybeComponentDefinition = ctx.compileConstraint(compiledType, maybeParameters);
 
             if (maybeComponentDefinition.isPresent()) {
                 var componentDefinition = maybeComponentDefinition.get();

@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
@@ -73,7 +74,8 @@ public class SingleValueCompiler<V extends Value, N extends ValueNode>
     }
 
     @Override
-    public Node compile(CompiledType baseType, SingleValueConstraint elements, Optional<Bounds> bounds) {
+    public Node compile(CompiledType baseType, SingleValueConstraint elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
         var value = resolveValue(baseType, elements);
 
         try {

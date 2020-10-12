@@ -28,6 +28,7 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.IntegerValueBounds;
 import ch.eskaton.asn4j.compiler.constraints.SizeBounds;
@@ -38,7 +39,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
-import ch.eskaton.commons.collections.Tuple3;
+import ch.eskaton.commons.collections.Tuple4;
 import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.Optional;
@@ -49,18 +50,19 @@ public class SizeCompiler implements ElementsCompiler<SizeConstraint> {
 
     protected final CompilerContext ctx;
 
-    protected final Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
-            ? extends Elements, Optional<Bounds>>, Node> dispatcher;
+    protected final Dispatcher<Elements, Class<? extends Elements>,
+            Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node> dispatcher;
 
 
-    public SizeCompiler(CompilerContext ctx, Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
-            ? extends Elements, Optional<Bounds>>, Node> dispatcher) {
+    public SizeCompiler(CompilerContext ctx, Dispatcher<Elements, Class<? extends Elements>,
+            Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node> dispatcher) {
         this.ctx = ctx;
         this.dispatcher = dispatcher;
     }
 
     @Override
-    public Node compile(CompiledType compiledType, SizeConstraint sizeConstraint, Optional<Bounds> bounds) {
+    public Node compile(CompiledType compiledType, SizeConstraint sizeConstraint, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
         var constraint = sizeConstraint.getConstraint();
 
         if (constraint instanceof SubtypeConstraint) {
@@ -72,8 +74,8 @@ public class SizeCompiler implements ElementsCompiler<SizeConstraint> {
                     ((SizeBounds) b).getMaxSize()))
                     .orElse(new IntegerValueBounds(0L, Long.MAX_VALUE));
 
-            var node = dispatcher.execute(rootElements, Tuple3.of(compiledBaseType, rootElements,
-                    Optional.of(adjustedBounds)));
+            var node = dispatcher.execute(rootElements, Tuple4.of(compiledBaseType, rootElements,
+                    Optional.of(adjustedBounds), maybeParameters));
 
             var maybeSizes = new SizeVisitor().visit(node);
 

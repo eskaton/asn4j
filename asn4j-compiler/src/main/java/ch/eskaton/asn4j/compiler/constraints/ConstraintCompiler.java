@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
@@ -51,8 +52,8 @@ public class ConstraintCompiler {
     }
 
     public Optional<Tuple2<ConstraintDefinition, Module>> compileConstraintAndModule(String name,
-            CompiledType compiledType) {
-        var definition = compileConstraint(name, compiledType);
+            CompiledType compiledType, Optional<Parameters> maybeParameters) {
+        var definition = compileConstraint(name, compiledType, maybeParameters);
 
         if (definition.isPresent()) {
             var module = new Module();
@@ -65,11 +66,12 @@ public class ConstraintCompiler {
         return Optional.empty();
     }
 
-    public Optional<ConstraintDefinition> compileConstraint(String name, CompiledType compiledType) {
+    public Optional<ConstraintDefinition> compileConstraint(String name, CompiledType compiledType,
+            Optional<Parameters> maybeParameters) {
         try {
-            return compileConstraintAux(compiledType);
+            return compileConstraintAux(compiledType, maybeParameters);
         } catch (CompilerException e) {
-            throw new CompilerException("Error in constraints for type %s: %s", e, name, e.getMessage());
+            throw new CompilerException("Error in constraints for type '%s': %s", e, name, e.getMessage());
         }
     }
 
@@ -77,9 +79,10 @@ public class ConstraintCompiler {
         return ctx.getConstraintCompiler(compiledType.getType().getClass());
     }
 
-    public Optional<ConstraintDefinition> compileConstraint(CompiledType compiledType) {
+    public Optional<ConstraintDefinition> compileConstraint(CompiledType compiledType,
+            Optional<Parameters> maybeParameters) {
         try {
-            return compileConstraintAux(compiledType);
+            return compileConstraintAux(compiledType, maybeParameters);
         } catch (CompilerException e) {
             throw new CompilerException("Error in constraint: %s", e, e.getMessage());
         }
@@ -92,28 +95,32 @@ public class ConstraintCompiler {
         return Tuple2.of(compiler, compiledBaseType);
     }
 
-    private Optional<ConstraintDefinition> compileConstraintAux(CompiledType compiledType) {
+    private Optional<ConstraintDefinition> compileConstraintAux(CompiledType compiledType,
+            Optional<Parameters> maybeParameters) {
         var compilerAndType = getCompilerAndType(compiledType);
 
-        return compilerAndType.get_1().compileComponentConstraints(compiledType.getType(), compilerAndType.get_2());
+        return compilerAndType.get_1().compileComponentConstraints(compiledType.getType(), compilerAndType.get_2(),
+                maybeParameters);
     }
 
     public void addConstraint(CompiledType compiledType, Module module, ConstraintDefinition definition) {
         getCompilerAndType(compiledType).get_1().addConstraint(compiledType, module, definition);
     }
 
-    public ConstraintDefinition compileConstraint(Type type, Constraint constraint) {
+    public ConstraintDefinition compileConstraint(Type type, Constraint constraint,
+            Optional<Parameters> maybeParameters) {
         var compilerAndType = getCompilerAndType(ctx.getCompiledBaseType(type));
 
         return compilerAndType.get_1().compileComponentConstraints(compilerAndType.get_2(), singletonList(constraint),
-                Optional.empty());
+                Optional.empty(), maybeParameters);
     }
 
-    public ConstraintDefinition compileConstraint(CompiledType compiledType, Constraint constraint) {
+    public ConstraintDefinition compileConstraint(CompiledType compiledType, Constraint constraint,
+            Optional<Parameters> maybeParameters) {
         var compilerAndType = getCompilerAndType(compiledType);
 
         return compilerAndType.get_1().compileComponentConstraints(compilerAndType.get_2(), singletonList(constraint),
-                Optional.empty());
+                Optional.empty(), maybeParameters);
     }
 
     public Optional<BooleanExpression> buildExpression(Module module, CompiledType compiledType, Node node) {

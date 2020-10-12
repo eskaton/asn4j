@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
@@ -59,8 +60,8 @@ import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.runtime.types.TypeName;
-import ch.eskaton.commons.collections.Tuple3;
-import ch.eskaton.commons.functional.TriFunction;
+import ch.eskaton.commons.collections.Tuple4;
+import ch.eskaton.commons.functional.QuadFunction;
 import ch.eskaton.commons.utils.Dispatcher;
 import ch.eskaton.commons.utils.OptionalUtils;
 
@@ -80,15 +81,15 @@ import static java.util.Optional.of;
 
 public abstract class AbstractConstraintCompiler {
 
-    private Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
-            ? extends Elements, Optional<Bounds>>, Node> dispatcher;
+    private Dispatcher<Elements, Class<? extends Elements>,
+            Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node> dispatcher;
 
     protected CompilerContext ctx;
 
     public AbstractConstraintCompiler(CompilerContext ctx) {
         this.ctx = ctx;
-        this.dispatcher = new Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType,
-                ? extends Elements, Optional<Bounds>>, Node>()
+        this.dispatcher = new Dispatcher<Elements, Class<? extends Elements>,
+                Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node>()
                 .withComparator((t, c) -> c.isInstance(t))
                 .withException(e -> new CompilerException("Invalid constraint %s for %s type",
                         e.getClass().getSimpleName(), getTypeName().getName()));
@@ -98,64 +99,68 @@ public abstract class AbstractConstraintCompiler {
 
     protected abstract TypeName getTypeName();
 
-    public Dispatcher<Elements, Class<? extends Elements>, Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>,
-            Node> getDispatcher() {
+    public Dispatcher<Elements, Class<? extends Elements>,
+            Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node> getDispatcher() {
         return dispatcher;
     }
 
     protected <T extends Elements> Node dispatchToCompiler(Class<T> clazz,
-            TriFunction<CompiledType, T, Optional<Bounds>, Node> function,
-            Optional<Tuple3<CompiledType, ? extends Elements, Optional<Bounds>>> maybeArgs) {
+            QuadFunction<CompiledType, T, Optional<Bounds>, Optional<Parameters>, Node> function,
+            Optional<Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>> maybeArgs) {
         var args = maybeArgs.orElseThrow(
                 () -> new IllegalCompilerStateException("Arguments in dispatchToCompiler may not be null"));
 
-        return function.apply(args.get_1(), clazz.cast(args.get_2()), args.get_3());
+        return function.apply(args.get_1(), clazz.cast(args.get_2()), args.get_3(), args.get_4());
     }
 
     protected <T extends Elements> void addConstraintHandler(Class<T> clazz,
-            TriFunction<CompiledType, T, Optional<Bounds>, Node> function) {
+            QuadFunction<CompiledType, T, Optional<Bounds>, Optional<Parameters>, Node> function) {
         getDispatcher().withCase(clazz, a -> dispatchToCompiler(clazz, function, a));
     }
 
     public ConstraintDefinition compileConstraint(CompiledType baseType, SubtypeConstraint subtypeConstraint,
-            Optional<Bounds> bounds) {
+            Optional<Bounds> bounds, Optional<Parameters> maybeParameters) {
         var setSpecs = subtypeConstraint.getElementSetSpecs();
         var rootElements = setSpecs.getRootElements();
-        Node root = dispatcher.execute(rootElements, Tuple3.of(baseType, rootElements, bounds));
+        Node root = dispatcher.execute(rootElements, Tuple4.of(baseType, rootElements, bounds, maybeParameters));
         Node extension = null;
 
         if (setSpecs.hasExtensionElements()) {
             var extensionElements = setSpecs.getExtensionElements();
-            extension = dispatcher.execute(extensionElements, Tuple3.of(baseType, extensionElements, bounds));
+            extension = dispatcher.execute(extensionElements,
+                    Tuple4.of(baseType, extensionElements, bounds, maybeParameters));
         }
 
         return new ConstraintDefinition(root, extension).extensible(setSpecs.hasExtensionMarker());
     }
 
     protected ConstraintDefinition compileConstraint(CompiledType baseType, SizeConstraint sizeConstraint,
-            Optional<Bounds> bounds) {
-        var node = dispatcher.execute(sizeConstraint, Tuple3.of(baseType, sizeConstraint, bounds));
+            Optional<Bounds> bounds, Optional<Parameters> maybeParameters) {
+        var node = dispatcher.execute(sizeConstraint, Tuple4.of(baseType, sizeConstraint, bounds, maybeParameters));
 
         return new ConstraintDefinition(node);
     }
 
     private ConstraintDefinition compileConstraint(CompiledType baseType,
-            SimpleTableConstraint simpleTableConstraint, Optional<Bounds> bounds) {
+            SimpleTableConstraint simpleTableConstraint, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
         var setSpec = simpleTableConstraint.getObjectSetSpec();
         var rootElements = setSpec.getRootElements();
-        Node root = dispatcher.execute(rootElements, Tuple3.of(baseType, rootElements, bounds));
+        var root = dispatcher.execute(rootElements, Tuple4.of(baseType, rootElements, bounds, maybeParameters));
         Node extension = null;
 
         if (setSpec.hasExtensionElements()) {
             var extensionElements = setSpec.getExtensionElements();
 
-            extension = dispatcher.execute(extensionElements, Tuple3.of(baseType, extensionElements, bounds));
+            extension = dispatcher.execute(extensionElements,
+                    Tuple4.of(baseType, extensionElements, bounds, maybeParameters));
         }
 
         return new ConstraintDefinition(root, extension).extensible(setSpec.hasExtensionMarker());
     }
 
-    Optional<ConstraintDefinition> compileComponentConstraints(Type node, CompiledType baseType) {
+    Optional<ConstraintDefinition> compileComponentConstraints(Type node, CompiledType baseType,
+            Optional<Parameters> maybeParameters) {
         LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
         Optional<List<Constraint>> constraint = Optional.ofNullable(node.getConstraints());
         ConstraintDefinition definition = null;
@@ -183,7 +188,7 @@ public abstract class AbstractConstraintCompiler {
 
         constraint.ifPresent(c -> {
             Optional<Bounds> bounds = getBounds(Optional.ofNullable(definitions.peek()));
-            definitions.addLast(compileComponentConstraints(baseType, c, bounds));
+            definitions.addLast(compileComponentConstraints(baseType, c, bounds, maybeParameters));
         });
 
         if (definitions.size() == 1) {
@@ -265,19 +270,19 @@ public abstract class AbstractConstraintCompiler {
     }
 
     ConstraintDefinition compileComponentConstraints(CompiledType baseType, List<Constraint> constraints,
-            Optional<Bounds> bounds) {
+            Optional<Bounds> bounds, Optional<Parameters> maybeParameters) {
         ConstraintDefinition constraintDef = null;
 
-        for (Constraint constraint : constraints) {
+        for (var constraint : constraints) {
             if (constraint instanceof SubtypeConstraint) {
-                constraintDef = getConstraintDefinition(baseType, bounds, constraintDef, (SubtypeConstraint) constraint,
-                        this::compileConstraint);
+                constraintDef = getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef,
+                        (SubtypeConstraint) constraint, this::compileConstraint);
             } else if (constraint instanceof SizeConstraint) {
-                constraintDef = getConstraintDefinition(baseType, bounds, constraintDef, (SizeConstraint) constraint,
-                        this::compileConstraint);
+                constraintDef = getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef,
+                        (SizeConstraint) constraint, this::compileConstraint);
             } else if (constraint instanceof SimpleTableConstraint) {
-                constraintDef = getConstraintDefinition(baseType, bounds, constraintDef, (SimpleTableConstraint) constraint,
-                        this::compileConstraint);
+                constraintDef = getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef,
+                        (SimpleTableConstraint) constraint, this::compileConstraint);
             } else {
                 throw new CompilerException("Constraints of type %s not yet supported",
                         constraint.getClass().getSimpleName());
@@ -287,14 +292,18 @@ public abstract class AbstractConstraintCompiler {
         return constraintDef;
     }
 
-    private <C extends Constraint> ConstraintDefinition getConstraintDefinition(CompiledType baseType,
-            Optional<Bounds> bounds, ConstraintDefinition constraintDef, C constraint,
-            TriFunction<CompiledType, C, Optional<Bounds>, ConstraintDefinition> compile) {
+    private <C extends Constraint> ConstraintDefinition getConstraintDefinition(
+            CompiledType baseType,
+            Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters,
+            ConstraintDefinition constraintDef,
+            C constraint,
+            QuadFunction<CompiledType, C, Optional<Bounds>, Optional<Parameters>, ConstraintDefinition> compile) {
         if (constraintDef == null) {
-            constraintDef = compile.apply(baseType, constraint, bounds);
+            constraintDef = compile.apply(baseType, constraint, bounds, maybeParameters);
         } else {
             constraintDef = constraintDef.serialApplication(compile.apply(baseType, constraint,
-                    getBounds(Optional.of(constraintDef))));
+                    getBounds(Optional.of(constraintDef)), maybeParameters));
         }
 
         return constraintDef;
@@ -302,7 +311,8 @@ public abstract class AbstractConstraintCompiler {
 
     protected abstract void addConstraint(CompiledType type, Module module, ConstraintDefinition definition);
 
-    protected void addConstraintCondition(CompiledType compiledType, ConstraintDefinition definition, FunctionBuilder builder) {
+    protected void addConstraintCondition(CompiledType compiledType, ConstraintDefinition definition,
+            FunctionBuilder builder) {
         if (definition.isExtensible()) {
             builder.statements().returnValue(Boolean.TRUE);
         } else {

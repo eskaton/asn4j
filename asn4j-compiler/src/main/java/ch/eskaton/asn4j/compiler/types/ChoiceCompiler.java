@@ -67,9 +67,9 @@ public class ChoiceCompiler implements NamedCompiler<Choice, CompiledType> {
 
         compiledType.getComponents().addAll(components);
 
-        CompilerUtils.compileComponentConstraints(ctx, compiledType);
+        CompilerUtils.compileComponentConstraints(ctx, compiledType, maybeParameters);
 
-        ctx.compileConstraintAndModule(name, compiledType).ifPresent(constraintAndModule -> {
+        ctx.compileConstraintAndModule(name, compiledType, maybeParameters).ifPresent(constraintAndModule -> {
             compiledType.setConstraintDefinition(constraintAndModule.get_1());
             compiledType.setModule(constraintAndModule.get_2());
         });

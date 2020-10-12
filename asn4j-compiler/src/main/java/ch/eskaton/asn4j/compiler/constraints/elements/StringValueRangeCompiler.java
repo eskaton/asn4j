@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
@@ -51,7 +52,8 @@ public class StringValueRangeCompiler implements ElementsCompiler<RangeNode> {
     }
 
     @Override
-    public Node compile(CompiledType compiledType, RangeNode elements, Optional<Bounds> bounds) {
+    public Node compile(CompiledType compiledType, RangeNode elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
         String lower = resolveEndpoint(elements.getLower(), 1);
         String upper = resolveEndpoint(elements.getUpper(), -1);
 
