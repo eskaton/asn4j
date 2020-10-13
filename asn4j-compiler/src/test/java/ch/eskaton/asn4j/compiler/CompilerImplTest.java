@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
+import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
@@ -2438,7 +2439,7 @@ class CompilerImplTest {
     }
 
     @Test
-    void testParameterizedValueInIntegerConstraint() throws IOException, ParserException {
+    void testParameterizedValueInIntegerSingleValueConstraint() throws IOException, ParserException {
         var body = """
                    AbstractInt {INTEGER:value} ::= INTEGER (value)
 
@@ -2493,6 +2494,34 @@ class CompilerImplTest {
 
         assertEquals(0, integerRange.getLower());
         assertEquals(3, integerRange.getUpper());
+    }
+
+    @Test
+    void testParameterizedValueInStringSingleValueConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractString {VisibleString:value} ::= VisibleString (value)
+
+                   String ::= AbstractString {"test-value"}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "String");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof StringValueNode);
+
+        var stringValueNode = (StringValueNode) roots;
+        var stringSingleValues = stringValueNode.getValue();
+
+        assertEquals(1, stringSingleValues.size());
+
+        var stringSingleValue = (StringSingleValue) stringSingleValues.get(0);
+
+        assertEquals("test-value", stringSingleValue.getValue());
     }
 
     @Test
