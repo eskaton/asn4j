@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
@@ -2465,6 +2466,30 @@ class CompilerImplTest {
 
         assertEquals(7, integerRange.getLower());
         assertEquals(7, integerRange.getUpper());
+    }
+
+    @Test
+    void testParameterizedValueInBooleanSingleValueConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractBoolean {BOOLEAN:value} ::= BOOLEAN (value)
+
+                   Boolean ::= AbstractBoolean {FALSE}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Boolean");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof ValueNode);
+
+        var booleanValueNode = (ValueNode) roots;
+        var booleanValue = (Boolean) booleanValueNode.getValue();
+
+        assertEquals(false, booleanValue);
     }
 
     @Test
