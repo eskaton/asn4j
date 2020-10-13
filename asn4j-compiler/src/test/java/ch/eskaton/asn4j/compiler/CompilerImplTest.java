@@ -28,6 +28,9 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
+import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
@@ -2409,6 +2412,35 @@ class CompilerImplTest {
 
         assertEquals(0, integerRange.getLower());
         assertEquals(4, integerRange.getUpper());
+    }
+
+    @Test
+    void testParameterizedValueInPermittedAlphabetConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractString {VisibleString:upper} ::= VisibleString (FROM ("a"..upper))
+                 
+                   String ::= AbstractString {"f"}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "String");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof PermittedAlphabetNode);
+
+        var permittedAlphabetNode = (PermittedAlphabetNode) roots;
+        var stringRanges = (StringValueNode) permittedAlphabetNode.getNode();
+
+        assertEquals(1, stringRanges.getValue().size());
+
+        var stringRange = (StringRange) stringRanges.getValue().get(0);
+
+        assertEquals("a", stringRange.getLower());
+        assertEquals("f", stringRange.getUpper());
     }
 
     @Test

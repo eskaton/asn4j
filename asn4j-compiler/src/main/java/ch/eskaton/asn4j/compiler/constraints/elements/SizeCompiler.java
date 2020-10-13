@@ -79,7 +79,7 @@ public class SizeCompiler implements ElementsCompiler<SizeConstraint> {
 
             var maybeSizes = new SizeVisitor().visit(node);
 
-            if (!maybeSizes.isPresent() || maybeSizes.get().getSize().isEmpty()) {
+            if (maybeSizes.isEmpty() || maybeSizes.get().getSize().isEmpty()) {
                 throw new CompilerException(setSpecs.getPosition(),
                         "Invalid SIZE constraint. It contains no restrictions.");
             }

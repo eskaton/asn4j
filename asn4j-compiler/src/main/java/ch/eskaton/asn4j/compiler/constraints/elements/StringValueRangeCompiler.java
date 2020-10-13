@@ -28,15 +28,17 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
+import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
+import ch.eskaton.asn4j.parser.ast.values.AbstractStringValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
 
 import java.util.Optional;
@@ -54,24 +56,38 @@ public class StringValueRangeCompiler implements ElementsCompiler<RangeNode> {
     @Override
     public Node compile(CompiledType compiledType, RangeNode elements, Optional<Bounds> bounds,
             Optional<Parameters> maybeParameters) {
-        String lower = resolveEndpoint(elements.getLower(), 1);
-        String upper = resolveEndpoint(elements.getUpper(), -1);
+        var lower = resolveEndpoint(compiledType, maybeParameters, elements.getLower(), 1);
+        var upper = resolveEndpoint(compiledType, maybeParameters, elements.getUpper(), -1);
 
         return new StringValueNode(singletonList(new StringRange(lower, upper)));
     }
 
-    private String resolveEndpoint(EndpointNode endpoint, int offset) {
-        var value = CompilerUtils.resolveAmbiguousValue(endpoint.getValue(), StringValue.class).getCString();
+    private String resolveEndpoint(CompiledType compiledType, Optional<Parameters> maybeParameters,
+            EndpointNode endpoint, int offset) {
+        var type = compiledType.getType();
+        var value = ctx.getCompiledValue(type, endpoint.getValue(), maybeParameters).getValue();
 
-        if (value.length() != 1) {
-            throw new CompilerException(endpoint.getPosition(), "Invalid value in range: %s", value);
+        if (!(value instanceof AbstractStringValue)) {
+            var formattedValue = ValueFormatter.formatValue(value);
+            var formattedType = TypeFormatter.formatType(ctx, type);
+
+            throw new CompilerException(endpoint.getPosition(), "Unexpected value '%s', expected a value of type '%s'",
+                    formattedValue, formattedType);
+        }
+
+        var stringValue = ((AbstractStringValue) value).getValue();
+
+        if (stringValue.length() != 1) {
+            var formattedValue = ValueFormatter.formatValue(value);
+
+            throw new CompilerException(endpoint.getPosition(), "Invalid value in range: %s", formattedValue);
         }
 
         if (!endpoint.isInclusive()) {
-            return String.valueOf(Character.toChars(value.codePointAt(0) + offset));
+            return String.valueOf(Character.toChars(stringValue.codePointAt(0) + offset));
         }
 
-        return value;
+        return stringValue;
     }
 
 }
