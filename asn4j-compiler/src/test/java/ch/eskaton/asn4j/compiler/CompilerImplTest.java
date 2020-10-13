@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
@@ -2463,6 +2464,35 @@ class CompilerImplTest {
 
         assertEquals(7, integerRange.getLower());
         assertEquals(7, integerRange.getUpper());
+    }
+
+    @Test
+    void testParameterizedValueInSizeConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractBString {INTEGER:max} ::= BIT STRING (SIZE (0..max))
+
+                   BString ::= AbstractBString {3}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "BString");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof SizeNode);
+
+        var sizeNode = (SizeNode) roots;
+        var integerRanges = sizeNode.getSize();
+
+        assertEquals(1, integerRanges.size());
+
+        var integerRange = integerRanges.get(0);
+
+        assertEquals(0, integerRange.getLower());
+        assertEquals(3, integerRange.getUpper());
     }
 
     @Test
