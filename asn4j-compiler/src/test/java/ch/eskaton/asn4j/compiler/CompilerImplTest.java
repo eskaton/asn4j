@@ -2381,20 +2381,13 @@ class CompilerImplTest {
     @Test
     void testParameterizedValueInIntegerRangeConstraint() throws IOException, ParserException {
         var body = """
-                   AbstractSequence {INTEGER:max} ::= SEQUENCE {
-                       field INTEGER (0..max)
-                   }
+                   AbstractInt {INTEGER:max} ::= INTEGER (0..max)
 
-                   Sequence ::= AbstractSequence {4}
+                   Int ::= AbstractInt {4}
                 """;
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        var collection = (CompiledCollectionType) compiledType;
-        var compiledFieldType = testCollectionField(collection, "field", IntegerType.class);
-        var maybeConstraintDefinition = compiledFieldType.getConstraintDefinition();
+        var compiledType = getCompiledType(body, MODULE_NAME, "Int");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
 
         assertTrue(maybeConstraintDefinition.isPresent());
 
@@ -2446,20 +2439,13 @@ class CompilerImplTest {
     @Test
     void testParameterizedValueInIntegerConstraint() throws IOException, ParserException {
         var body = """
-                   AbstractSequence {INTEGER:value} ::= SEQUENCE {
-                       field INTEGER (value)
-                   }
+                   AbstractInt {INTEGER:value} ::= INTEGER (value)
 
-                   Sequence ::= AbstractSequence {7}
+                   Int ::= AbstractInt {7}
                 """;
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        var collection = (CompiledCollectionType) compiledType;
-        var compiledFieldType = testCollectionField(collection, "field", IntegerType.class);
-        var maybeConstraintDefinition = compiledFieldType.getConstraintDefinition();
+        var compiledType = getCompiledType(body, MODULE_NAME, "Int");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
 
         assertTrue(maybeConstraintDefinition.isPresent());
 
