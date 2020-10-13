@@ -51,7 +51,8 @@ import ch.eskaton.asn4j.runtime.verifiers.StringVerifier;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public abstract class AbstractStringValueCompiler<V extends AbstractStringValue & Value> extends AbstractValueCompiler<V> {
+public abstract class AbstractStringValueCompiler<V extends AbstractStringValue & Value>
+        extends AbstractValueCompiler<V> {
 
     private final TypeName typeName;
 
@@ -61,8 +62,8 @@ public abstract class AbstractStringValueCompiler<V extends AbstractStringValue 
 
     private final StringVerifier verifier;
 
-    protected AbstractStringValueCompiler(TypeName typeName, Class<? extends Type> typeClass,
-            Class<V> valueClass, StringVerifier verifier) {
+    protected AbstractStringValueCompiler(TypeName typeName, Class<? extends Type> typeClass, Class<V> valueClass,
+            StringVerifier verifier) {
         super(typeName, valueClass);
 
         this.typeName = typeName;
