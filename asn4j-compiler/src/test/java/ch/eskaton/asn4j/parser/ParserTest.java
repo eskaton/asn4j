@@ -295,7 +295,6 @@ import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.OIDNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
-import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
@@ -392,6 +391,7 @@ import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.NumericString;
+import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectDescriptor;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
@@ -6839,7 +6839,41 @@ class ParserTest {
         assertEquals("Module", ((ExternalTypeReference) result).getModule());
         assertEquals("Type", result.getType());
         assertTrue(result.getParameters().isPresent());
-        assertEquals(1, result.getParameters().get().size());
+
+        List<Node> parameters = result.getParameters().get();
+
+        assertEquals(1, parameters.size());
+        assertTrue(parameters.get(0) instanceof IntegerType);
+
+        parser = new Parser(new ByteArrayInputStream("Type {4711}".getBytes())).new ParameterizedTypeParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result instanceof SimpleDefinedType);
+
+        assertEquals("Type", result.getType());
+        assertTrue(result.getParameters().isPresent());
+
+        parameters = result.getParameters().get();
+
+        assertEquals(1, parameters.size());
+        assertTrue(parameters.get(0) instanceof IntegerValue);
+
+        parser = new Parser(new ByteArrayInputStream("Type {a}".getBytes())).new ParameterizedTypeParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result instanceof SimpleDefinedType);
+
+        assertEquals("Type", result.getType());
+        assertTrue(result.getParameters().isPresent());
+
+        parameters = result.getParameters().get();
+
+        assertEquals(1, parameters.size());
+        assertTrue(parameters.get(0) instanceof SimpleDefinedValue);
     }
 
     @Test

@@ -28,16 +28,16 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
-import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
-import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
+import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.constraints.SingleValueConstraint;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
-import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
+import java.util.Optional;
 import java.util.Set;
 
 public class EnumeratedTypeSingleValueCompiler extends SingleValueCompiler<EnumeratedValue, EnumeratedValueNode> {
@@ -47,24 +47,20 @@ public class EnumeratedTypeSingleValueCompiler extends SingleValueCompiler<Enume
     }
 
     @Override
-    protected Integer resolveValue(CompiledType baseType, SingleValueConstraint elements, Parameters parameters) {
-        var compiledEnumeratedType = (CompiledEnumeratedType) baseType;
+    protected Integer resolveValue(CompiledType compiledType, SingleValueConstraint elements, Parameters parameters) {
         var value = elements.getValue();
-        var definedValue = CompilerUtils.resolveAmbiguousValue(value, SimpleDefinedValue.class);
+        var type = compiledType.getType();
+        var compiledValue = ctx.getCompiledValue(type, value, Optional.ofNullable(parameters));
 
-        if (definedValue != null) {
-            var allItems = compiledEnumeratedType.getRoots().copy()
-                    .addAll(compiledEnumeratedType.getAdditions().getItems());
-            var enumItem = allItems.getItems().stream()
-                    .filter(t -> t.get_1().equals(definedValue.getReference())).findAny();
-
-            if (enumItem.isPresent()) {
-                return enumItem.get().get_2();
-            } else {
-                throw new CompilerException("Failed to resolve enum value: %s", definedValue.getReference());
-            }
+        if (compiledValue.getValue() instanceof EnumeratedValue enumeratedValue) {
+            return enumeratedValue.getValue();
         } else {
-            throw new CompilerException("Failed to resolve value: %s", value.getClass().getSimpleName());
+            var position = value.getPosition();
+            var formattedType = TypeFormatter.formatType(ctx, type);
+            var formattedValue = ValueFormatter.formatValue(value);
+
+            throw new CompilerException(position, "Failed to resolve value '%s' of type '%s'", formattedValue,
+                    formattedType);
         }
     }
 
