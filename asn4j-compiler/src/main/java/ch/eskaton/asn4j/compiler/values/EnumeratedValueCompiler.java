@@ -33,7 +33,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledEnumeratedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
-import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 
 import java.util.Optional;
@@ -50,8 +50,16 @@ public class EnumeratedValueCompiler extends AbstractValueCompiler<EnumeratedVal
         var compiledEnumeratedType = (CompiledEnumeratedType) compiledType;
         var position = definedValue.getPosition();
 
-        if (!(definedValue instanceof ExternalValueReference)) {
-            var reference = definedValue.getReference();
+        if (definedValue instanceof SimpleDefinedValue simpleDefinedValue) {
+            if (maybeParameters.isPresent()) {
+                var maybeValue = ctx.getValueParameter(maybeParameters.get(), simpleDefinedValue);
+
+                if (maybeValue.isPresent()) {
+                    return (EnumeratedValue) ctx.getCompiledValue(compiledType.getType(), maybeValue.get()).getValue();
+                }
+            }
+
+            var reference = simpleDefinedValue.getReference();
             var element = compiledEnumeratedType.getElementById(reference);
 
             if (element.isPresent()) {

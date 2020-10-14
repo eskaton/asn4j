@@ -5464,7 +5464,7 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public Node parse() throws ParserException {
-            return new ChoiceParser<>(typeParser, objectParser, objectSetParser, valueParser, valueSetParser,
+            return new ChoiceParser<>(typeParser, valueParser, valueSetParser, objectParser, objectSetParser,
                     definedObjectClassParser).parse();
         }
 

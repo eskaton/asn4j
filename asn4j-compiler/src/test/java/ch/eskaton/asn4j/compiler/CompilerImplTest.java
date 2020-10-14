@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
@@ -2490,6 +2491,31 @@ class CompilerImplTest {
         var booleanValue = (Boolean) booleanValueNode.getValue();
 
         assertEquals(false, booleanValue);
+    }
+
+    @Test
+    void testParameterizedValueInEnumeratedSingleValueConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractEnumerated {Enumerated:value} ::= ENUMERATED {a, b, c} (value)
+
+                   Enumerated ::= AbstractEnumerated {b}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Enumerated");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof EnumeratedValueNode);
+
+        var enumeratedValueNode = (EnumeratedValueNode) roots;
+        var values = enumeratedValueNode.getValue();
+
+        assertEquals(1, values.size());
+        assertEquals(1, values.stream().findFirst().get());
     }
 
     @Test
