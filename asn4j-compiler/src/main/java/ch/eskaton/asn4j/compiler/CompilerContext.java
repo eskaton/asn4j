@@ -53,6 +53,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.results.HasChildComponents;
 import ch.eskaton.asn4j.compiler.results.UnNamedCompiledValue;
 import ch.eskaton.asn4j.compiler.types.EnumeratedTypeCompiler;
+import ch.eskaton.asn4j.compiler.types.SelectionTypeCompiler;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.AbstractValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueCompiler;
@@ -77,7 +78,6 @@ import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
-import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
 import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
@@ -510,10 +510,10 @@ public class CompilerContext {
             return enumeratedTypeCompiler.createCompiledType(this, null, enumeratedType);
         } else if (isBuiltin(type)) {
             return new CompiledBuiltinType(type);
-        } else if (type instanceof SelectionType) {
-            var resolvedType = resolveSelectedType(type);
+        } else if (type instanceof SelectionType selectionType) {
+            var compiler = this.<SelectionType, SelectionTypeCompiler>getCompiler(SelectionType.class);
 
-            return getCompiledType(resolvedType);
+            return compiler.compile(this, null, selectionType, Optional.empty());
         }
 
         throw new IllegalCompilerStateException("The type %s is not expected", type.getClass().getSimpleName());
@@ -1267,30 +1267,6 @@ public class CompilerContext {
         }
 
         return null;
-    }
-
-    public Type resolveSelectedType(Type type) {
-        if (type instanceof SelectionType) {
-            var selectedId = ((SelectionType) type).getId();
-            var selectedType = ((SelectionType) type).getType();
-
-            if (selectedType instanceof TypeReference) {
-                var compiledType = getCompiledType(selectedType);
-                var collectionType = compiledType.getType();
-
-                if (collectionType instanceof Choice) {
-                    return ((Choice) collectionType).getRootAlternatives().stream()
-                            .filter(t -> t.getName().equals(selectedId))
-                            .findFirst()
-                            .orElseThrow(() -> new CompilerException("Selected type not found")).getType();
-                }
-
-            }
-
-            throw new CompilerException("Selected type not found");
-        }
-
-        return type;
     }
 
 }

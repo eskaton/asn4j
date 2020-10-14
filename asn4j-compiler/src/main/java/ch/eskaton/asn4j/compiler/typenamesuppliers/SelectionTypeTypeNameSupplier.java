@@ -47,8 +47,8 @@ public class SelectionTypeTypeNameSupplier implements TypeNameSupplier<Type> {
 
     @Override
     public String getName(Type type, String name) {
-        SelectionType selectionType = (SelectionType) type;
-        Type selectedType = ctx.resolveSelectedType(type);
+        var selectionType = (SelectionType) type;
+        var selectedType = ctx.getCompiledType(type).getType();
 
         if (selectedType != type) {
             return config.getTypeNameSupplier(selectedType.getClass()).getName(selectedType, name);

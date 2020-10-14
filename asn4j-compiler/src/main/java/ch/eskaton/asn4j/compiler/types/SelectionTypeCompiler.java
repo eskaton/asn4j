@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.parser.ast.types.Choice;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
@@ -53,24 +54,25 @@ public class SelectionTypeCompiler implements NamedCompiler<SelectionType, Compi
 
             if (compiledType instanceof CompiledChoiceType compiledChoiceType) {
                 var choiceType = (Choice) compiledChoiceType.getType();
-
                 var foundType = choiceType.getRootAlternatives().stream()
                         .filter(t -> t.getName().equals(selectedId))
                         .findFirst()
-                        .orElseThrow(() -> getNotFoundException(selectedType));
+                        .orElseThrow(() -> getNotFoundException(ctx, selectedType));
                 var compiler = ctx.<Type, TypeCompiler>getCompiler(Type.class);
 
                 return ctx.withNewType(() -> compiler.compile(ctx, name, foundType.getType(), Optional.empty()));
             } else {
-                throw getNotFoundException(selectedType);
+                throw getNotFoundException(ctx, selectedType);
             }
         }
 
         return ctx.createCompiledType(node, name);
     }
 
-    private CompilerException getNotFoundException(Type selectedType) {
-        return new CompilerException(selectedType.getPosition(), "Selected type not found");
+    private CompilerException getNotFoundException(CompilerContext ctx, Type selectedType) {
+        var formattedType = TypeFormatter.formatType(ctx, selectedType);
+
+        return new CompilerException(selectedType.getPosition(), "Selected type not found: %s", formattedType);
     }
 
 }
