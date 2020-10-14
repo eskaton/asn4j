@@ -48,7 +48,7 @@ public abstract class AbstractOIDOrIRIValueCompiler<V extends Value> extends Abs
         var valueClass = getValueClass();
         var resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
 
-        if (resolvedValue.getClass().isAssignableFrom(valueClass)) {
+        if (resolvedValue != null && resolvedValue.getClass().isAssignableFrom(valueClass)) {
             return resolvedValue;
         }
 
