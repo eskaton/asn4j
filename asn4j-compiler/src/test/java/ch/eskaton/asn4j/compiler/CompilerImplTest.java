@@ -28,8 +28,12 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
@@ -101,6 +105,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -2516,6 +2521,106 @@ class CompilerImplTest {
 
         assertEquals(1, values.size());
         assertEquals(1, values.stream().findFirst().get());
+    }
+
+    @Test
+    void testParameterizedValueInObjectIdentifierSingleValueConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractObjIdentifier {OBJECT IDENTIFIER:value} ::= OBJECT IDENTIFIER (value)
+
+                   ObjIdentifier ::= AbstractObjIdentifier {{1 2 1 3}}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "ObjIdentifier");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof ObjectIdentifierValueNode);
+
+        var objectIdentifierValueNode = (ObjectIdentifierValueNode) roots;
+        var values = objectIdentifierValueNode.getValue();
+
+        assertEquals(1, values.size());
+        assertEquals(Arrays.asList(1, 2, 1, 3), values.stream().findFirst().get());
+    }
+
+    @Test
+    void testParameterizedValueInRelativeOIDSingleValueConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractRelativeOID {RELATIVE-OID:value} ::= RELATIVE-OID (value)
+
+                   RelativeOID ::= AbstractRelativeOID {{2 1 3}}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "RelativeOID");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof RelativeOIDValueNode);
+
+        var relativeOIDValueNode = (RelativeOIDValueNode) roots;
+        var values = relativeOIDValueNode.getValue();
+
+        assertEquals(1, values.size());
+        assertEquals(Arrays.asList(2, 1, 3), values.stream().findFirst().get());
+    }
+
+    @Test
+    void testParameterizedValueInOIDIRISingleValueConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractOIDIRI {OID-IRI:value} ::= OID-IRI (value)
+
+                   OIDIRI ::= AbstractOIDIRI {"/ISO/a/b/a"}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "OIDIRI");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof IRIValueNode);
+
+        var iriValueNode = (IRIValueNode) roots;
+        var values = iriValueNode.getValue();
+
+        assertEquals(1, values.size());
+        assertEquals(Arrays.asList("ISO", "a", "b", "a"), values.stream().findFirst().get());
+    }
+
+    @Test
+    void testParameterizedValueInRelativeOIDIRISingleValueConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractRelativeOIDIRI {RELATIVE-OID-IRI:value} ::= RELATIVE-OID-IRI (value)
+
+                   RelativeOIDIRI ::= AbstractRelativeOIDIRI {"a/b/a"}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "RelativeOIDIRI");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof RelativeIRIValueNode);
+
+        var relativeIRIValueNode = (RelativeIRIValueNode) roots;
+        var values = relativeIRIValueNode.getValue();
+
+        assertEquals(1, values.size());
+        assertEquals(Arrays.asList( "a", "b", "a"), values.stream().findFirst().get());
     }
 
     @Test
