@@ -56,7 +56,7 @@ public class ChoiceValueCompiler extends AbstractValueCompiler<ChoiceValue> {
         var type = compiledType.getType();
         var choiceValue = (ChoiceValue) value;
         var choiceType = (Choice) type;
-        var resolvedType = ctx.resolveSelectedType(type);
+        var resolvedType = ctx.getCompiledType(type).getType();
         var valueType = choiceValue.getType();
 
         if (valueType != null) {
