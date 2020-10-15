@@ -431,7 +431,7 @@ public class Parser {
     private ParameterizedObjectSetParser parameterizedObjectSetParser = new ParameterizedObjectSetParser();
     private ParameterizedTypeOrObjectClassAssignmentParser parameterizedTypeOrObjectClassAssignmentParser = new ParameterizedTypeOrObjectClassAssignmentParser();
     private ParameterizedTypeParser parameterizedTypeParser = new ParameterizedTypeParser();
-    private ParameterizedValueAssignmentParser parameterizedValueAssignmentParser = new ParameterizedValueAssignmentParser();
+    private ParameterizedValueOrObjectAssignmentParser parameterizedValueOrObjectAssignmentParser = new ParameterizedValueOrObjectAssignmentParser();
     private ParameterizedValueParser parameterizedValueParser = new ParameterizedValueParser();
     private ParameterizedValueSetTypeAssignmentParser parameterizedValueSetTypeAssignmentParser = new ParameterizedValueSetTypeAssignmentParser();
     private PartialSpecificationParser partialSpecificationParser = new PartialSpecificationParser();
@@ -5130,7 +5130,7 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public ParameterizedAssignmentNode parse() throws ParserException {
-            return new ChoiceParser<>(parameterizedTypeOrObjectClassAssignmentParser, parameterizedValueAssignmentParser,
+            return new ChoiceParser<>(parameterizedTypeOrObjectClassAssignmentParser, parameterizedValueOrObjectAssignmentParser,
                     parameterizedValueSetTypeAssignmentParser, parameterizedObjectSetAssignmentParser).parse();
         }
 
@@ -5184,81 +5184,47 @@ public class Parser {
 
     }
 
-    // ParameterizedValueAssignment ::=
-    // valuereference ParameterList Type "::=" Value
-    // ParameterizedObjectAssignment ::=
-    // objectreference ParameterList DefinedObjectClass "::=" Object
-    protected class ParameterizedValueAssignmentParser implements
-            RuleParser<ParameterizedValueOrObjectAssignmentNode<?, ?>> {
+    // ParameterizedValueAssignment ::= valuereference ParameterList Type "::=" Value
+    // ParameterizedObjectAssignment ::= objectreference ParameterList DefinedObjectClass "::=" Object
+    protected class ParameterizedValueOrObjectAssignmentParser implements
+            RuleParser<ParameterizedValueOrObjectAssignmentNode> {
 
-        @SuppressWarnings("unchecked")
-        public ParameterizedValueOrObjectAssignmentNode<?, ?> parse() throws ParserException {
-            List<Object> rule = new SequenceParser(TokenType.IDENTIFIER, parameterListParser,
-                    new ChoiceParser<>(typeParser,usefulObjectClassReferenceParser), TokenType.ASSIGN,
-                    new ChoiceParser<>(informationFromObjectsParser, valueParser, objectDefnParser)).parse();
+        public ParameterizedValueOrObjectAssignmentNode parse() throws ParserException {
+            Set<List<Object>> rules = new AmbiguousChoiceParser<>(
+                    new SequenceParser(new SingleTokenParser(TokenType.VALUE_REFERENCE, Context.VALUE),
+                            parameterListParser, typeParser, TokenType.ASSIGN, valueParser),
+                    new SequenceParser(new SingleTokenParser(TokenType.OBJECT_REFERENCE, Context.OBJECT),
+                            parameterListParser, definedObjectClassParser, TokenType.ASSIGN, objectParser )).parse();
 
-            if (rule != null) {
-                Token token = (Token) rule.get(0);
-                List<ParameterNode> parameterNodeList = (List<ParameterNode>) rule.get(1);
-                Node typeNode = (Node) rule.get(2);
-                Node valueNode = (Node) rule.get(4);
-                Position position = token.getPosition();
-                String tokenText = token.getText();
+            Optional<List<Object>> first = rules.stream().findFirst();
 
-                if (valueNode instanceof ObjectDefnNode    || valueNode instanceof ObjectFromObjectNode) {
-                    if (typeNode instanceof TypeReference && !(typeNode instanceof UsefulType)) {
-                        return new ParameterizedObjectAssignmentNode(position, tokenText, parameterNodeList,
-                                new ObjectClassReference(typeNode.getPosition(),
-                                        ((TypeReference) typeNode).getType()),(ObjectNode) valueNode);
-                    } else if (typeNode instanceof ExternalTypeReference) {
-                        ExternalTypeReference typeReference = (ExternalTypeReference) typeNode;
+            if (first.isPresent()) {
+                Token token = (Token) first.get().get(0);
+                List<ParameterNode> parameters = (List<ParameterNode>) first.get().get(1);
+                ParameterizedValueOrObjectAssignmentNode rule =
+                        new ParameterizedValueOrObjectAssignmentNode(token.getPosition(), token.getText(),
+                                parameters);
 
-                        return new ParameterizedObjectAssignmentNode(position, tokenText, parameterNodeList,
-                                new ExternalObjectClassReference(typeReference.getPosition(),
-                                        typeReference.getModule(), typeReference.getType()), (ObjectNode) valueNode);
+                rules.stream().forEach(r -> {
+                    TokenType tokenType = ((Token) r.get(0)).getType();
+
+                    switch (tokenType) {
+                        case VALUE_REFERENCE:
+                            var parameterizedValueAssignmentNode = new ParameterizedValueAssignmentNode(rule.getPosition(),
+                                    rule.getReference(), parameters, (Type) r.get(2), (Value) r.get(4));
+                            rule.setParameterizedValueAssignmentNode(parameterizedValueAssignmentNode);
+                            break;
+                        case OBJECT_REFERENCE:
+                            var parameterizedObjectAssignmentNode = new ParameterizedObjectAssignmentNode(rule.getPosition(),
+                                    rule.getReference(), parameters, (ObjectClassReference) r.get(2), (ObjectNode) r.get(4));
+                            rule.setParameterizedObjectAssignmentNode(parameterizedObjectAssignmentNode);
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected token type: " + tokenType.toString());
                     }
-                    // TODO: error
-                } else if (typeNode instanceof ObjectClassReference) {
-                    Node definedValue = valueNode;
+                });
 
-                    if (valueNode instanceof AmbiguousValue) {
-                        definedValue = ((AmbiguousValue) valueNode).getValue(DefinedValue.class);
-                    }
-
-                    if (definedValue instanceof DefinedValue) {
-                        valueNode = ((DefinedValue) definedValue).toObjectValue();
-                    } else if (!(valueNode instanceof ObjectNode)) {
-                        return null;
-                    }
-
-                    return new ParameterizedObjectAssignmentNode(position, tokenText, parameterNodeList,
-                            (ObjectClassReference) typeNode, (ObjectNode) valueNode);
-                } else if ((typeNode instanceof TypeReference
-                        && !(typeNode instanceof UsefulType) || typeNode instanceof ExternalTypeReference)
-                        && valueNode instanceof DefinedValue
-                        || valueNode instanceof TypeFromObjects
-                        || valueNode instanceof ValueFromObject
-                        || valueNode instanceof AmbiguousValue
-                        && ((AmbiguousValue) valueNode).getValue(DefinedValue.class) != null) {
-                    if (valueNode instanceof AmbiguousValue) {
-                        valueNode = ((AmbiguousValue) valueNode).getValue(DefinedValue.class);
-                    }
-
-                    return new ParameterizedValueOrObjectAssignmentNode<>(position, tokenText, parameterNodeList,
-                            typeNode, valueNode);
-                } else if (valueNode instanceof Value) {
-                    if (valueNode instanceof AmbiguousValue) {
-                        Value collectionValue = ((AmbiguousValue) valueNode).getValue(CollectionValue.class);
-
-                        if (collectionValue != null) {
-                            valueNode = collectionValue;
-                        }
-                     }
-
-                    return new ParameterizedValueAssignmentNode(position, tokenText, parameterNodeList,
-                            (Type) typeNode, (Value) valueNode);
-                }
-
+                return rule;
             }
 
             return null;

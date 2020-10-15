@@ -33,11 +33,26 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 import java.util.List;
 
-public class ParameterizedValueAssignmentNode extends ParameterizedValueOrObjectAssignmentNode<Type, Value> {
+public class ParameterizedValueAssignmentNode extends ParameterizedAssignmentNode {
+
+    private final Type type;
+
+    private final Value value;
 
     public ParameterizedValueAssignmentNode(Position position, String reference, List<ParameterNode> parameters,
             Type type, Value value) {
-        super(position, reference, parameters, type, value);
+        super(position, reference, parameters);
+
+        this.type = type;
+        this.value = value;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public Value getValue() {
+        return value;
     }
 
 }

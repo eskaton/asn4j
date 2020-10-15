@@ -30,28 +30,33 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 
 import java.util.List;
+import java.util.Optional;
 
-public class ParameterizedValueOrObjectAssignmentNode<T extends Node, V extends Node>
-        extends ParameterizedAssignmentNode {
+public class ParameterizedValueOrObjectAssignmentNode extends ParameterizedAssignmentNode {
 
-    private T type;
+    private Optional<ParameterizedValueAssignmentNode> parameterizedValueAssignmentNode = Optional.empty();
 
-    private V value;
+    private Optional<ParameterizedObjectAssignmentNode> parameterizedObjectAssignmentNode = Optional.empty();
 
     public ParameterizedValueOrObjectAssignmentNode(Position position, String reference,
-            List<ParameterNode> parameters, T type, V value) {
+            List<ParameterNode> parameters) {
         super(position, reference, parameters);
-
-        this.type = type;
-        this.value = value;
     }
 
-    public T getType() {
-        return type;
+    public Optional<ParameterizedValueAssignmentNode> getParameterizedValueAssignmentNode() {
+        return parameterizedValueAssignmentNode;
     }
 
-    public V getValue() {
-        return value;
+    public void setParameterizedValueAssignmentNode(ParameterizedValueAssignmentNode parameterizedValueAssignmentNode) {
+        this.parameterizedValueAssignmentNode = Optional.ofNullable(parameterizedValueAssignmentNode);
+    }
+
+    public Optional<ParameterizedObjectAssignmentNode> getParameterizedObjectAssignmentNode() {
+        return parameterizedObjectAssignmentNode;
+    }
+
+    public void setParameterizedObjectAssignmentNode(ParameterizedObjectAssignmentNode parameterizedObjectAssignmentNode) {
+        this.parameterizedObjectAssignmentNode = Optional.ofNullable(parameterizedObjectAssignmentNode);
     }
 
 }
