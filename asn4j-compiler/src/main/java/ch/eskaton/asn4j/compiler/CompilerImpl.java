@@ -51,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedTypeAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedTypeOrObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
@@ -229,12 +230,10 @@ public class CompilerImpl {
             return compileValueOrObjectAssignmentNode(assignment);
         } else if (unknownAssignment instanceof ObjectSetAssignmentNode assignment) {
             return compileObjectSetAssignment(assignment);
-        } else if (unknownAssignment instanceof ObjectClassAssignmentNode assignment) {
-            return compileObjectClassAssignment(assignment);
         } else if (unknownAssignment instanceof ValueSetTypeOrObjectSetAssignmentNode assignment) {
             return compileValueSetTypeOrObjectSetAssignment(assignment);
-        } else if (unknownAssignment instanceof ParameterizedTypeAssignmentNode assignment) {
-            return compileParameterizedTypeAssignment(assignment);
+        } else if (unknownAssignment instanceof ParameterizedTypeOrObjectClassAssignmentNode assignment) {
+            return compileParameterizedTypeOrObjectClassAssignment(assignment);
         } else if (unknownAssignment instanceof ParameterizedValueAssignmentNode) {
             // ignore values, they are resolved when needed
             return null;
@@ -337,6 +336,25 @@ public class CompilerImpl {
                 getCompiler(ObjectSetAssignmentNode.class).compile(assignment);
     }
 
+    private CompilationResult compileParameterizedTypeOrObjectClassAssignment(
+            ParameterizedTypeOrObjectClassAssignmentNode assignment) {
+        if (assignment.getParameterizedObjectClassAssignment().isPresent()) {
+            try {
+                var parameterizedObjectClassAssignment = assignment.getParameterizedObjectClassAssignment().get();
+
+                return compileParameterizedObjectClassAssignment(parameterizedObjectClassAssignment);
+            } catch (ResolutionException e) {
+                // ignore
+            }
+        }
+
+        if (assignment.getParameterizedTypeAssignment().isPresent()) {
+            return compileParameterizedTypeAssignment(assignment.getParameterizedTypeAssignment().get());
+        }
+
+        throw new IllegalCompilerStateException(assignment.getPosition(), "Unhandled assignment: %s", assignment);
+    }
+
     private CompiledParameterizedType compileParameterizedTypeAssignment(ParameterizedTypeAssignmentNode assignment) {
         return compilerContext.<ParameterizedTypeAssignmentNode, ParameterizedTypeAssignmentCompiler>
                 getCompiler(ParameterizedTypeAssignmentNode.class).compile(compilerContext, assignment);
@@ -410,8 +428,10 @@ public class CompilerImpl {
     }
 
     public Optional<CompiledType> compileType(String name, Optional<String> maybeModuleName) {
-        return compile(name, maybeModuleName, getAssignmentSelector(TypeOrObjectClassAssignmentNode.class,
-                TypeOrObjectClassAssignmentNode::getTypeAssignment), this::compileTypeAssignment);
+        var assignmentSelector = getAssignmentSelector(TypeOrObjectClassAssignmentNode.class,
+                TypeOrObjectClassAssignmentNode::getTypeAssignment);
+
+        return compile(name, maybeModuleName, assignmentSelector, this::compileTypeAssignment);
     }
 
     public Optional<CompiledValue<? extends Value>> compileValue(String name, Optional<String> maybeModuleName) {
@@ -450,14 +470,16 @@ public class CompilerImpl {
     }
 
     public Optional<CompiledParameterizedType> compileParameterizedType(String name, Optional<String> maybeModuleName) {
-        var assignmentSelector = getAssignmentSelector(ParameterizedTypeAssignmentNode.class);
+        var assignmentSelector = getAssignmentSelector(ParameterizedTypeOrObjectClassAssignmentNode.class,
+                ParameterizedTypeOrObjectClassAssignmentNode::getParameterizedTypeAssignment);
 
         return compile(name, maybeModuleName, assignmentSelector, this::compileParameterizedTypeAssignment);
     }
 
     public Optional<CompiledParameterizedObjectClass> compiledParameterizedObjectClass(String name,
             Optional<String> maybeModuleName) {
-        var assignmentSelector = getAssignmentSelector(ParameterizedObjectClassAssignmentNode.class);
+        var assignmentSelector = getAssignmentSelector(ParameterizedTypeOrObjectClassAssignmentNode.class,
+                ParameterizedTypeOrObjectClassAssignmentNode::getParameterizedObjectClassAssignment);
 
         return compile(name, maybeModuleName, assignmentSelector, this::compileParameterizedObjectClassAssignment);
     }

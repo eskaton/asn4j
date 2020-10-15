@@ -429,7 +429,7 @@ public class Parser {
     private ParameterizedObjectParser parameterizedObjectParser = new ParameterizedObjectParser();
     private ParameterizedObjectSetAssignmentParser parameterizedObjectSetAssignmentParser = new ParameterizedObjectSetAssignmentParser();
     private ParameterizedObjectSetParser parameterizedObjectSetParser = new ParameterizedObjectSetParser();
-    private ParameterizedTypeAssignmentParser parameterizedTypeAssignmentParser = new ParameterizedTypeAssignmentParser();
+    private ParameterizedTypeOrObjectClassAssignmentParser parameterizedTypeOrObjectClassAssignmentParser = new ParameterizedTypeOrObjectClassAssignmentParser();
     private ParameterizedTypeParser parameterizedTypeParser = new ParameterizedTypeParser();
     private ParameterizedValueAssignmentParser parameterizedValueAssignmentParser = new ParameterizedValueAssignmentParser();
     private ParameterizedValueParser parameterizedValueParser = new ParameterizedValueParser();
@@ -4059,8 +4059,7 @@ public class Parser {
     }
 
     // DefinedObjectClass ::=
-    // ExternalObjectClassReference | objectclassreference |
-    // UsefulObjectClassReference
+    // ExternalObjectClassReference | objectclassreference | UsefulObjectClassReference
     protected class DefinedObjectClassParser extends ObjectRuleParser<ObjectClassReference> {
 
         @SuppressWarnings("unchecked")
@@ -5131,34 +5130,56 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public ParameterizedAssignmentNode parse() throws ParserException {
-            return new ChoiceParser<>(parameterizedTypeAssignmentParser, parameterizedValueAssignmentParser,
+            return new ChoiceParser<>(parameterizedTypeOrObjectClassAssignmentParser, parameterizedValueAssignmentParser,
                     parameterizedValueSetTypeAssignmentParser, parameterizedObjectSetAssignmentParser).parse();
         }
 
     }
 
-    // ParameterizedTypeAssignment ::=
-    // typereference ParameterList "::=" Type
-    // ParameterizedObjectClassAssignment ::=
-    // objectclassreference ParameterList "::=" ObjectClass
-    protected class ParameterizedTypeAssignmentParser extends
-            ListRuleParser<ParameterizedTypeOrObjectClassAssignmentNode<?>> {
+    // ParameterizedTypeAssignment ::= typereference ParameterList "::=" Type
+    // ParameterizedObjectClassAssignment ::= objectclassreference ParameterList "::=" ObjectClass
+    protected class ParameterizedTypeOrObjectClassAssignmentParser extends
+            ListRuleParser<ParameterizedTypeOrObjectClassAssignmentNode> {
 
         @SuppressWarnings("unchecked")
-        public ParameterizedTypeOrObjectClassAssignmentNode<?> parse() throws ParserException {
-            return super.parse(new SequenceParser(TokenType.TYPE_REFERENCE, parameterListParser, TokenType.ASSIGN,
-                    new ChoiceParser<>(typeParser, usefulObjectClassReferenceParser, objectClassDefnParser)),
-                    a -> {
-                        if (a.n3() instanceof ObjectClassDefn || a.n3() instanceof ObjectClassReference) {
-                            return new ParameterizedObjectClassAssignmentNode(a.P0(), a.t0().getText(), a.n1(), a.n3());
-                        } else if (a.n3() instanceof TypeReference && !(a.n3() instanceof UsefulType)
-                                || a.n3() instanceof ExternalTypeReference) {
-                            return new ParameterizedTypeOrObjectClassAssignmentNode<>(a.P0(), a.t0().getText(),
-                                    a.n1(), a.n3());
-                        } else {
-                            return new ParameterizedTypeAssignmentNode(a.P0(), a.t0().getText(), a.n1(), a.n3());
-                        }
-                    });
+        public ParameterizedTypeOrObjectClassAssignmentNode parse() throws ParserException {
+            Set<List<Object>> rules = new AmbiguousChoiceParser<>(
+                    new SequenceParser(TokenType.TYPE_REFERENCE, parameterListParser, TokenType.ASSIGN, typeParser),
+                    new SequenceParser(new SingleTokenParser(TokenType.OBJECT_CLASS_REFERENCE, Context.OBJECT_CLASS),
+                            parameterListParser, TokenType.ASSIGN, objectClassParser)).parse();
+
+            Optional<List<Object>> first = rules.stream().findFirst();
+
+            if (first.isPresent()) {
+                Token token = (Token) first.get().get(0);
+                List<ParameterNode> parameters = (List<ParameterNode>) first.get().get(1);
+                ParameterizedTypeOrObjectClassAssignmentNode rule =
+                        new ParameterizedTypeOrObjectClassAssignmentNode(token.getPosition(), token.getText(),
+                                parameters);
+
+                rules.stream().forEach(r -> {
+                    TokenType tokenType = ((Token) r.get(0)).getType();
+
+                    switch (tokenType) {
+                        case TYPE_REFERENCE:
+                            var parameterizedTypeAssignmentNode = new ParameterizedTypeAssignmentNode(rule.getPosition(),
+                                    rule.getReference(), parameters, (Type) r.get(3));
+                            rule.setParameterizedTypeAssignment(parameterizedTypeAssignmentNode);
+                            break;
+                        case OBJECT_CLASS_REFERENCE:
+                            var parameterizedObjectClassAssignmentNode = new ParameterizedObjectClassAssignmentNode(rule.getPosition(),
+                                    rule.getReference(), parameters, (ObjectClassNode) r.get(3));
+                            rule.setParameterizedObjectClassAssignment(parameterizedObjectClassAssignmentNode);
+                            break;
+                        default:
+                            throw new IllegalStateException("Unexpected token type: " + tokenType.toString());
+                    }
+                });
+
+                return rule;
+            }
+
+            return null;
         }
 
     }

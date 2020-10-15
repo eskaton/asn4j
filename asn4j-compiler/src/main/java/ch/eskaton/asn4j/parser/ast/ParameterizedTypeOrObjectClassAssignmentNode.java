@@ -30,20 +30,34 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 
 import java.util.List;
+import java.util.Optional;
 
-public class ParameterizedTypeOrObjectClassAssignmentNode<T extends Node> extends ParameterizedAssignmentNode {
+public class ParameterizedTypeOrObjectClassAssignmentNode extends ParameterizedAssignmentNode {
 
-    private T type;
+    private Optional<ParameterizedTypeAssignmentNode> parameterizedTypeAssignment = Optional.empty();
+
+    private Optional<ParameterizedObjectClassAssignmentNode> parameterizedObjectClassAssignment = Optional.empty();
 
     public ParameterizedTypeOrObjectClassAssignmentNode(Position position, String reference,
-            List<ParameterNode> parameters, T type) {
+            List<ParameterNode> parameters) {
         super(position, reference, parameters);
-
-        this.type = type;
     }
 
-    public T getType() {
-        return type;
+    public Optional<ParameterizedTypeAssignmentNode> getParameterizedTypeAssignment() {
+        return parameterizedTypeAssignment;
+    }
+
+    public void setParameterizedTypeAssignment(ParameterizedTypeAssignmentNode parameterizedTypeAssignment) {
+        this.parameterizedTypeAssignment = Optional.ofNullable(parameterizedTypeAssignment);
+    }
+
+    public Optional<ParameterizedObjectClassAssignmentNode> getParameterizedObjectClassAssignment() {
+        return parameterizedObjectClassAssignment;
+    }
+
+    public void setParameterizedObjectClassAssignment(
+            ParameterizedObjectClassAssignmentNode parameterizedObjectClassAssignment) {
+        this.parameterizedObjectClassAssignment = Optional.ofNullable(parameterizedObjectClassAssignment);
     }
 
 }
