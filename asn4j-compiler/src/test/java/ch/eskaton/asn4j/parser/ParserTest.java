@@ -169,7 +169,6 @@ import ch.eskaton.asn4j.parser.Parser.ParameterizedObjectParser;
 import ch.eskaton.asn4j.parser.Parser.ParameterizedObjectSetAssignmentParser;
 import ch.eskaton.asn4j.parser.Parser.ParameterizedObjectSetParser;
 import ch.eskaton.asn4j.parser.Parser.ParameterizedTypeParser;
-import ch.eskaton.asn4j.parser.Parser.ParameterizedValueAssignmentParser;
 import ch.eskaton.asn4j.parser.Parser.ParameterizedValueParser;
 import ch.eskaton.asn4j.parser.Parser.ParameterizedValueSetTypeAssignmentParser;
 import ch.eskaton.asn4j.parser.Parser.PartialSpecificationParser;
@@ -6547,9 +6546,9 @@ class ParserTest {
         assertNotNull(result);
         assertTrue(result instanceof ParameterizedTypeOrObjectClassAssignmentNode);
 
-        var assignment = (ParameterizedTypeOrObjectClassAssignmentNode) result;
+        var typeOrObjectClassAssignmentNode = (ParameterizedTypeOrObjectClassAssignmentNode) result;
 
-        assertTrue(assignment.getParameterizedTypeAssignment().isPresent());
+        assertTrue(typeOrObjectClassAssignmentNode.getParameterizedTypeAssignment().isPresent());
 
         source = "valueReference {aValue} TypeReference ::= {attribute aValue}";
         parser = new Parser(new ByteArrayInputStream(source.getBytes())).new ParameterizedAssignmentParser();
@@ -6557,7 +6556,11 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ParameterizedValueAssignmentNode);
+        assertTrue(result instanceof ParameterizedValueOrObjectAssignmentNode);
+
+        var valueOrObjectAssignmentNode = (ParameterizedValueOrObjectAssignmentNode) result;
+
+        assertTrue(valueOrObjectAssignmentNode.getParameterizedValueAssignmentNode().isPresent());
 
         source = "TypeReference {aValue} INTEGER ::= {(4711 ^ aValue)}";
         parser = new Parser(new ByteArrayInputStream(source.getBytes())).new ParameterizedAssignmentParser();
@@ -6575,9 +6578,9 @@ class ParserTest {
         assertNotNull(result);
         assertTrue(result instanceof ParameterizedTypeOrObjectClassAssignmentNode);
 
-        assignment = (ParameterizedTypeOrObjectClassAssignmentNode) result;
+        typeOrObjectClassAssignmentNode = (ParameterizedTypeOrObjectClassAssignmentNode) result;
 
-        assertTrue(assignment.getParameterizedObjectClassAssignment().isPresent());
+        assertTrue(typeOrObjectClassAssignmentNode.getParameterizedObjectClassAssignment().isPresent());
 
         source = "objectReference {aValue} ABSTRACT-SYNTAX ::= object";
         parser = new Parser(new ByteArrayInputStream(source.getBytes())).new ParameterizedAssignmentParser();
@@ -6585,7 +6588,11 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ParameterizedObjectAssignmentNode);
+        assertTrue(result instanceof ParameterizedValueOrObjectAssignmentNode);
+
+        valueOrObjectAssignmentNode = (ParameterizedValueOrObjectAssignmentNode) result;
+
+        assertTrue(valueOrObjectAssignmentNode.getParameterizedObjectAssignmentNode().isPresent());
 
         source = "ObjSetReference {aValue} ABSTRACT-SYNTAX ::= { object | { TYPE INTEGER } }";
         parser = new Parser(new ByteArrayInputStream(source.getBytes())).new ParameterizedAssignmentParser();
@@ -6615,19 +6622,22 @@ class ParserTest {
 
     @Test
     void testParameterizedValueAssignmentParser() throws IOException, ParserException {
-        ParameterizedValueAssignmentParser parser = new Parser(
-                new ByteArrayInputStream(
-                        "valueReference {aValue} TypeReference ::= {attribute aValue}"
-                                .getBytes())).new ParameterizedValueAssignmentParser();
+        var source = "valueReference {aValue} TypeReference ::= {attribute aValue}";
+        var parser = new Parser(new ByteArrayInputStream(source.getBytes())).new ParameterizedValueOrObjectAssignmentParser();
 
-        ParameterizedValueOrObjectAssignmentNode<?, ?> result = parser.parse();
+        var result = parser.parse();
 
         assertNotNull(result);
         assertEquals("valueReference", result.getReference());
-        assertTrue(result instanceof ParameterizedValueAssignmentNode);
-        assertTrue(((ParameterizedValueAssignmentNode) result).getType() instanceof TypeReference);
+        assertTrue(result instanceof ParameterizedValueOrObjectAssignmentNode);
+
+        assertTrue(result.getParameterizedValueAssignmentNode().isPresent());
+
+        var assignment = result.getParameterizedValueAssignmentNode().get();
+
+        assertTrue(assignment.getType() instanceof TypeReference);
         assertEquals(1, result.getParameters().size());
-        assertTrue(((ParameterizedValueAssignmentNode) result).getValue() instanceof CollectionValue);
+        assertTrue(assignment.getValue() instanceof Value);
     }
 
     @Test
@@ -6664,37 +6674,35 @@ class ParserTest {
     }
 
     @Test
-    void testParameterizedObjectAssignmentParser() throws IOException,
-            ParserException {
-        ParameterizedValueAssignmentParser parser = new Parser(
-                new ByteArrayInputStream(
-                        "objectReference {aValue} ABSTRACT-SYNTAX ::= object"
-                                .getBytes())).new ParameterizedValueAssignmentParser();
+    void testParameterizedObjectAssignmentParser() throws IOException, ParserException {
+        var source = "objectReference {aValue} ABSTRACT-SYNTAX ::= object";
+        var parser = new Parser(new ByteArrayInputStream(source.getBytes())).new ParameterizedValueOrObjectAssignmentParser();
 
-        ParameterizedValueOrObjectAssignmentNode<?, ?> result = parser.parse();
+        var result = parser.parse();
 
-        assertNotNull(result);
+        assertTrue(result instanceof ParameterizedValueOrObjectAssignmentNode);
         assertEquals("objectReference", result.getReference());
-        assertTrue(result instanceof ParameterizedObjectAssignmentNode);
-        assertTrue(((ParameterizedObjectAssignmentNode) result).getType() instanceof ObjectClassReference);
+        assertTrue(result.getParameterizedObjectAssignmentNode().isPresent());
         assertEquals(1, result.getParameters().size());
-        assertTrue(((ParameterizedObjectAssignmentNode) result).getValue() instanceof ObjectReference);
 
-        parser = new Parser(new ByteArrayInputStream(
-                "object{A-CLASS:class} A-CLASS ::= {ARGUMENT value.&Type}"
-                        .getBytes())).new ParameterizedValueAssignmentParser();
+        source = "object{A-CLASS:class} A-CLASS ::= {ARGUMENT value.&Type}";
+        parser = new Parser(new ByteArrayInputStream(source.getBytes())).new ParameterizedValueOrObjectAssignmentParser();
 
         result = parser.parse();
-        assertNotNull(result);
-        assertTrue(result.getValue() instanceof ObjectDefnNode);
 
-        parser = new Parser(new ByteArrayInputStream(
-                "object{A-CLASS:class} A-CLASS ::= object.&object-reference"
-                        .getBytes())).new ParameterizedValueAssignmentParser();
+        assertTrue(result instanceof ParameterizedValueOrObjectAssignmentNode);
+        assertTrue(result.getParameterizedObjectAssignmentNode().isPresent());
+        assertTrue(result.getParameterizedObjectAssignmentNode().get().getObject() instanceof ObjectDefnNode);
+
+        source = "object{A-CLASS:class} A-CLASS ::= object.&object-reference";
+        parser = new Parser(new ByteArrayInputStream(source.getBytes())).new ParameterizedValueOrObjectAssignmentParser();
 
         result = parser.parse();
-        assertNotNull(result);
-        assertTrue(result.getValue() instanceof ValueFromObject);
+
+        assertTrue(result instanceof ParameterizedValueOrObjectAssignmentNode);
+        assertTrue(result.getParameterizedObjectAssignmentNode().isPresent());
+
+        assertTrue(result.getParameterizedObjectAssignmentNode().get().getObject() instanceof ObjectFromObjectNode);
     }
 
     @Test

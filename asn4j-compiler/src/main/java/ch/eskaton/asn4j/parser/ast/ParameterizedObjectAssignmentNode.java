@@ -31,12 +31,26 @@ import ch.eskaton.asn4j.parser.Position;
 
 import java.util.List;
 
-public class ParameterizedObjectAssignmentNode extends
-        ParameterizedValueOrObjectAssignmentNode<ObjectClassReference, ObjectNode> {
+public class ParameterizedObjectAssignmentNode extends ParameterizedAssignmentNode {
+
+    private final ObjectClassReference objectClass;
+
+    private final ObjectNode object;
 
     public ParameterizedObjectAssignmentNode(Position position, String reference, List<ParameterNode> parameters,
             ObjectClassReference objectClass, ObjectNode object) {
-        super(position, reference, parameters, objectClass, object);
+        super(position, reference, parameters);
+
+        this.objectClass = objectClass;
+        this.object = object;
+    }
+
+    public ObjectClassReference getObjectClass() {
+        return objectClass;
+    }
+
+    public ObjectNode getObject() {
+        return object;
     }
 
 }
