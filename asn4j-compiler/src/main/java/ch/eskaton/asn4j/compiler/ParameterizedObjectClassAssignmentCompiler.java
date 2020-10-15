@@ -34,7 +34,7 @@ public class ParameterizedObjectClassAssignmentCompiler implements Compiler<Para
 
     public CompiledParameterizedObjectClass compile(CompilerContext ctx, ParameterizedObjectClassAssignmentNode node) {
         var typeName = node.getReference();
-        var objectClass = node.getType();
+        var objectClass = node.getObjectClass();
         var parameters = node.getParameters();
 
         System.out.println("Compiling parameterized object class " + typeName);
