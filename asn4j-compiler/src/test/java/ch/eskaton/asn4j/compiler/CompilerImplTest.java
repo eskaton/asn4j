@@ -791,6 +791,36 @@ class CompilerImplTest {
     }
 
     @Test
+    void testTypeReferencesWithConstraints() throws IOException, ParserException {
+        var body = """
+                TestInteger1 ::= INTEGER ((0..2) | (4..6) | 9)
+                TestInteger2 ::= TestInteger1 (MIN<..5)
+                TestInteger3 ::= INTEGER (TestInteger2 ^ (4 | 5 | 6))
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "TestInteger3");
+
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof IntegerRangeValueNode);
+
+        var integerRangeValueNode = (IntegerRangeValueNode) roots;
+        var integerRanges = integerRangeValueNode.getValue();
+
+        assertEquals(1, integerRanges.size());
+
+        var integerRange = integerRanges.get(0);
+
+        assertEquals(4, integerRange.getLower());
+        assertEquals(5, integerRange.getUpper());
+    }
+
+    @Test
     void testObjectSetDuplicateValue() {
         var body = """
                 TEST ::= CLASS {
