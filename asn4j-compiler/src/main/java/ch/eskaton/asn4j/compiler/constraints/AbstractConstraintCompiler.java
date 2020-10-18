@@ -122,7 +122,7 @@ public abstract class AbstractConstraintCompiler {
             Optional<Bounds> bounds, Optional<Parameters> maybeParameters) {
         var setSpecs = subtypeConstraint.getElementSetSpecs();
         var rootElements = setSpecs.getRootElements();
-        Node root = dispatcher.execute(rootElements, Tuple4.of(baseType, rootElements, bounds, maybeParameters));
+        var root = dispatcher.execute(rootElements, Tuple4.of(baseType, rootElements, bounds, maybeParameters));
         Node extension = null;
 
         if (setSpecs.hasExtensionElements()) {
