@@ -28,6 +28,7 @@ package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.Bounds;
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
@@ -36,6 +37,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.constraints.ContainedSubtype;
+import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 import java.util.ArrayDeque;
@@ -58,7 +60,7 @@ public class ContainedSubtypeCompiler implements ElementsCompiler<ContainedSubty
         var constraints = new ArrayDeque<Node>();
 
         do {
-            var compiledParentType = ctx.getCompiledType(parent);
+            var compiledParentType = getCompiledParentType(parent, maybeParameters);
 
             if (!isAssignable(compiledType, compiledParentType)) {
                 throw new CompilerException("Type %s can't be used in INCLUDES constraint of type %s",
@@ -79,8 +81,8 @@ public class ContainedSubtypeCompiler implements ElementsCompiler<ContainedSubty
         } else if (constraints.size() == 1) {
             return constraints.pop();
         } else {
-            Node node1 = constraints.pop();
-            Node node2 = constraints.pop();
+            var node1 = constraints.pop();
+            var node2 = constraints.pop();
 
             do {
                 node1 = new BinOpNode(NodeType.INTERSECTION, node1, node2);
@@ -94,6 +96,14 @@ public class ContainedSubtypeCompiler implements ElementsCompiler<ContainedSubty
 
             return node1;
         }
+    }
+
+    private CompiledType getCompiledParentType(Type type, Optional<Parameters> maybeParameters) {
+        if (type instanceof TypeReference typeReference) {
+            return CompilerUtils.compileTypeReference(ctx, typeReference, maybeParameters);
+        }
+
+        return ctx.getCompiledType(type);
     }
 
     protected boolean isAssignable(CompiledType compiledType, CompiledType compiledParentType) {

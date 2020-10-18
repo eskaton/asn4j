@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
@@ -99,6 +100,7 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -2399,6 +2401,26 @@ class CompilerImplTest {
     }
 
     @Test
+    void testParameterizedTypeInEnumeratedContainedSubtypeConstraint() throws IOException, ParserException {
+        var body = """
+                AbstractEnumeration {Type} ::= Type (INCLUDES Type)
+
+                Enumeration ::= AbstractEnumeration {ENUMERATED {a, b, c}}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Enumeration");
+
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof AllValuesNode);
+    }
+
+    @Test
     void testParameterizedValueWithSequence() throws IOException, ParserException {
         var body = """
                    AbstractSequence {INTEGER:value} ::= SEQUENCE {
@@ -2650,7 +2672,7 @@ class CompilerImplTest {
         var values = relativeIRIValueNode.getValue();
 
         assertEquals(1, values.size());
-        assertEquals(Arrays.asList( "a", "b", "a"), values.stream().findFirst().get());
+        assertEquals(Arrays.asList("a", "b", "a"), values.stream().findFirst().get());
     }
 
     @Test

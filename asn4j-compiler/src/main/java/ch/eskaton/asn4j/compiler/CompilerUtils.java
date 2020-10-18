@@ -412,6 +412,11 @@ public class CompilerUtils {
                     return ctx.getCompiledType((SimpleDefinedType) resolvedType);
                 }
 
+                if (typeReference.hasConstraint()) {
+                    resolvedType = Clone.clone(resolvedType);
+                    resolvedType.setConstraints(typeReference.getConstraints());
+                }
+
                 var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) resolvedType.getClass());
 
                 return compiler.compile(ctx, null, resolvedType, maybeParameters);
@@ -463,7 +468,7 @@ public class CompilerUtils {
      * @param outputParameters Output parameters
      * @return Updated parameters
      */
-    private static Parameters updateParameters(Parameters inputParameters, Parameters outputParameters) {
+    public static Parameters updateParameters(Parameters inputParameters, Parameters outputParameters) {
         var parameterValues = outputParameters.getDefinitionsAndValues().stream().map(definitionAndValue -> {
             var parameterValue = definitionAndValue.get_2();
 

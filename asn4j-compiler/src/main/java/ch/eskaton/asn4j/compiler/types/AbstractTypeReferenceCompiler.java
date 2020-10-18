@@ -33,32 +33,16 @@ import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 
 import java.util.Optional;
-
-import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
 
 public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         implements NamedCompiler<T, CompiledType> {
 
     @Override
     public CompiledType compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
-        if (node.getParameters().isPresent()) {
-            var typeName = node.getType();
-            var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
-            var parameters = Optional.of(CompilerUtils.createParameters(node, name, compiledParameterizedType));
-            var type = compiledParameterizedType.getType();
-            var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
-            var compiledType = compiler.compile(ctx, name, type, parameters);
-
-            checkUnusedParameters(parameters);
-
-            return compiledType;
-        }
-
-        var tags = CompilerUtils.getTagIds(ctx, node);
         var compiledType = ctx.createCompiledType(node, name);
+        var tags = CompilerUtils.getTagIds(ctx, compiledType.getType());
 
         compiledType.setTags(tags);
 
