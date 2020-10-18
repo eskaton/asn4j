@@ -396,11 +396,7 @@ public class CompilerImpl {
     private <T extends CompilationResult, A extends AssignmentNode> Optional<T> compile(String name,
             BiFunction<String, Collection<AssignmentNode>, Optional<A>> assignmentSelector, Function<A, T> compiler,
             Deque<AssignmentNode> assignments) {
-        return assignmentSelector.apply(name, assignments).map(assignment -> {
-            assignments.remove(assignment);
-
-            return compiler.apply(assignment);
-        });
+        return assignmentSelector.apply(name, assignments).map(compiler::apply);
     }
 
     private Deque<AssignmentNode> getAssignments(String moduleName) {
@@ -413,13 +409,22 @@ public class CompilerImpl {
 
     private <A extends AssignmentNode, I extends AssignmentNode> BiFunction<String, Collection<AssignmentNode>, Optional<A>> getAssignmentSelector(
             Class<I> intermediateClass, Function<I, Optional<A>> assignmentMapper) {
-        return (name, assignmentNodes) -> assignmentNodes.stream()
-                .filter(obj -> Objects.equals(name, obj.getReference()))
-                .filter(intermediateClass::isInstance)
-                .map(intermediateClass::cast)
-                .findFirst()
-                .map(assignmentMapper)
-                .flatMap(Function.identity());
+        return (name, assignmentNodes) -> {
+            var maybeIntermediateClass = assignmentNodes.stream()
+                    .filter(obj -> Objects.equals(name, obj.getReference()))
+                    .filter(intermediateClass::isInstance)
+                    .map(intermediateClass::cast)
+                    .findFirst();
+
+            var maybeAssignment = maybeIntermediateClass.map(assignmentMapper)
+                    .flatMap(Function.identity());
+
+            if (maybeAssignment.isPresent()) {
+                assignmentNodes.remove(maybeIntermediateClass.get());
+            }
+
+            return maybeAssignment;
+        };
     }
 
     private <A extends AssignmentNode> BiFunction<String, Collection<AssignmentNode>, Optional<A>> getAssignmentSelector(
