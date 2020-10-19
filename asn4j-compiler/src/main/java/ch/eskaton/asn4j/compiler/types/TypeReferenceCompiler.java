@@ -48,39 +48,23 @@ import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParame
 public class TypeReferenceCompiler extends AbstractTypeReferenceCompiler<TypeReference> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, TypeReference node,
+    public CompiledType compile(CompilerContext ctx, String name, TypeReference typeReference,
             Optional<Parameters> maybeParameters) {
-        var maybeTypeRefParams = node.getParameters();
+        var maybeTypeRefParams = typeReference.getParameters();
 
-        if (maybeParameters.isPresent()) {
-            if (maybeTypeRefParams.isPresent()) {
-                return getCompiledParameterizedType(ctx, name, node,
-                        (parameters -> updateParameters(maybeParameters.get(), parameters)));
-            }
-
-            var maybeResolvedType = ctx.getTypeParameter(maybeParameters.get(), node);
-
-            if (maybeResolvedType.isPresent()) {
-                var resolvedType = maybeResolvedType.get();
-
-                if (isAnyTypeReference(resolvedType)) {
-                    return ctx.getCompiledType((SimpleDefinedType) resolvedType);
-                }
-
-                if (node.hasConstraint()) {
-                    resolvedType = Clone.clone(resolvedType);
-                    resolvedType.setConstraints(node.getConstraints());
-                }
-
-                var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) resolvedType.getClass());
-
-                return compiler.compile(ctx, name, resolvedType, maybeParameters);
-            }
-        } else if (maybeTypeRefParams.isPresent()) {
-            return getCompiledParameterizedType(ctx, name, node, UnaryOperator.identity());
+        if (maybeTypeRefParams.isPresent()) {
+            return compileParameterizedType(ctx, name, typeReference, maybeParameters);
         }
 
-        var compiledType = ctx.createCompiledType(node, name);
+        if (maybeParameters.isPresent()) {
+            var maybeResolvedType = ctx.getTypeParameter(maybeParameters.get(), typeReference);
+
+            if (maybeResolvedType.isPresent()) {
+                return compileTypeParameter(ctx, name, typeReference, maybeResolvedType.get(), maybeParameters);
+            }
+        }
+
+        var compiledType = ctx.createCompiledType(typeReference, name);
         var tags = CompilerUtils.getTagIds(ctx, compiledType.getType());
 
         compiledType.setTags(tags);
@@ -91,6 +75,33 @@ public class TypeReferenceCompiler extends AbstractTypeReferenceCompiler<TypeRef
         });
 
         return compiledType;
+    }
+
+    private CompiledType compileTypeParameter(CompilerContext ctx, String name, TypeReference typeReference,
+            Type resolvedType, Optional<Parameters> maybeParameters) {
+        if (isAnyTypeReference(resolvedType)) {
+            return ctx.getCompiledType((SimpleDefinedType) resolvedType);
+        }
+
+        if (typeReference.hasConstraint()) {
+            resolvedType = Clone.clone(resolvedType);
+            resolvedType.setConstraints(typeReference.getConstraints());
+        }
+
+        var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) resolvedType.getClass());
+
+        return compiler.compile(ctx, name, resolvedType, maybeParameters);
+    }
+
+    private CompiledType compileParameterizedType(CompilerContext ctx, String name, TypeReference typeReference,
+            Optional<Parameters> maybeParameters) {
+        var updateParameters = UnaryOperator.<Parameters>identity();
+
+        if (maybeParameters.isPresent()) {
+            updateParameters = parameters -> updateParameters(maybeParameters.get(), parameters);
+        }
+
+        return getCompiledParameterizedType(ctx, name, typeReference, updateParameters);
     }
 
     private CompiledType getCompiledParameterizedType(CompilerContext ctx, String name, TypeReference typeReference,
