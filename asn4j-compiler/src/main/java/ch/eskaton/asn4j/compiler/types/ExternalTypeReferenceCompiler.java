@@ -37,13 +37,13 @@ import java.util.Optional;
 public class ExternalTypeReferenceCompiler extends AbstractTypeReferenceCompiler<ExternalTypeReference> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, ExternalTypeReference node,
+    public CompiledType compile(CompilerContext ctx, String name, ExternalTypeReference externalTypeReference,
             Optional<Parameters> maybeParameters) {
-        var module = ctx.getModule(node.getModule());
+        var module = ctx.getModule(externalTypeReference.getModule());
 
-        ctx.ensureSymbolIsExported(module, node.getType());
+        ctx.ensureSymbolIsExported(module, externalTypeReference.getType());
 
-        return super.compile(ctx, name, node, maybeParameters);
+        return super.compile(ctx, name, externalTypeReference, maybeParameters);
     }
 
 }

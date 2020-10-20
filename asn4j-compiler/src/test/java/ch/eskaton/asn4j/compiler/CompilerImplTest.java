@@ -100,7 +100,6 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -2418,6 +2417,29 @@ class CompilerImplTest {
         var roots = constraintDefinition.getRoots();
 
         assertTrue(roots instanceof AllValuesNode);
+    }
+
+    @Test
+    void testParameterizedExternalTypeReference() throws IOException, ParserException {
+        var body1 = """
+                String ::= OTHER-MODULE.AbstractType {VisibleString}
+                """;
+        var body2 = """
+                AbstractType {Type} ::= Type
+                """;
+
+        var module1 = module(MODULE_NAME, body1);
+        var module2 = module("OTHER-MODULE", body2);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("String");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType.getType() instanceof VisibleString);
     }
 
     @Test
