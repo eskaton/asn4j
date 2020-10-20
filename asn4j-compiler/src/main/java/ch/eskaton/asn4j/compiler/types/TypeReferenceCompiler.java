@@ -77,47 +77,4 @@ public class TypeReferenceCompiler extends AbstractTypeReferenceCompiler<TypeRef
         return compiledType;
     }
 
-    private CompiledType compileTypeParameter(CompilerContext ctx, String name, TypeReference typeReference,
-            Type resolvedType, Optional<Parameters> maybeParameters) {
-        if (isAnyTypeReference(resolvedType)) {
-            return ctx.getCompiledType((SimpleDefinedType) resolvedType);
-        }
-
-        if (typeReference.hasConstraint()) {
-            resolvedType = Clone.clone(resolvedType);
-            resolvedType.setConstraints(typeReference.getConstraints());
-        }
-
-        var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) resolvedType.getClass());
-
-        return compiler.compile(ctx, name, resolvedType, maybeParameters);
-    }
-
-    private CompiledType compileParameterizedType(CompilerContext ctx, String name, TypeReference typeReference,
-            Optional<Parameters> maybeParameters) {
-        var updateParameters = UnaryOperator.<Parameters>identity();
-
-        if (maybeParameters.isPresent()) {
-            updateParameters = parameters -> updateParameters(maybeParameters.get(), parameters);
-        }
-
-        return getCompiledParameterizedType(ctx, name, typeReference, updateParameters);
-    }
-
-    private CompiledType getCompiledParameterizedType(CompilerContext ctx, String name, TypeReference typeReference,
-            UnaryOperator<Parameters> parametersProvider) {
-        var typeName = typeReference.getType();
-        var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
-        var parameters = createParameters(typeReference, name, compiledParameterizedType);
-        var updatedParameters = parametersProvider.apply(parameters);
-        var maybeUpdatedParameters = Optional.of(updatedParameters);
-        var type = compiledParameterizedType.getType();
-        var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
-        var compiledType = compiler.compile(ctx, name, type, maybeUpdatedParameters);
-
-        checkUnusedParameters(maybeUpdatedParameters);
-
-        return compiledType;
-    }
-
 }
