@@ -111,6 +111,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.compilerConfig;
@@ -2470,6 +2471,37 @@ class CompilerImplTest {
         var collectionValue = ((CollectionValueNode) roots).getValue();
 
         assertEquals(1, collectionValue.size());
+    }
+
+    @Test
+    void testParameterizedTypeInChoiceContainedSubtypeConstraint() throws IOException, ParserException {
+        var body = """
+                AbstractChoice {Type} ::= CHOICE  {
+                    a INTEGER,
+                    b BOOLEAN
+                }  (INCLUDES Type)
+
+                Choice ::= AbstractChoice {CHOICE {a INTEGER, b BOOLEAN} (a: 2)}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Choice");
+
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof ValueNode);
+
+        var valueNode = ((ValueNode<Set>) roots).getValue();
+
+        assertEquals(1, valueNode.size());
+
+        var value = valueNode.iterator().next();
+
+        assertTrue(value instanceof ChoiceValue);
     }
 
     @Test
