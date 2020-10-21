@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
@@ -2417,6 +2418,30 @@ class CompilerImplTest {
         var roots = constraintDefinition.getRoots();
 
         assertTrue(roots instanceof AllValuesNode);
+    }
+
+    @Test
+    void testParameterizedTypeInSetOfContainedSubtypeConstraint() throws IOException, ParserException {
+        var body = """
+                AbstractSetOf {Type} ::= SET (INCLUDES Type) OF INTEGER
+
+                SetOf ::= AbstractSetOf {SET ({1} | {2} | {3}) OF INTEGER}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "SetOf");
+
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof CollectionOfValueNode);
+
+        var collectionOfValue = ((CollectionOfValueNode) roots).getValue();
+
+        assertEquals(3, collectionOfValue.size());
     }
 
     @Test
