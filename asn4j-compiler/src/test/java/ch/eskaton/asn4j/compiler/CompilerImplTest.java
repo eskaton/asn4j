@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
@@ -2442,6 +2443,33 @@ class CompilerImplTest {
         var collectionOfValue = ((CollectionOfValueNode) roots).getValue();
 
         assertEquals(3, collectionOfValue.size());
+    }
+
+    @Test
+    void testParameterizedTypeInSetContainedSubtypeConstraint() throws IOException, ParserException {
+        var body = """
+                AbstractSet {Type} ::= SET  { 
+                    a INTEGER, 
+                    b BOOLEAN 
+                }  (INCLUDES Type)
+
+                Set ::= AbstractSet {SET {a INTEGER, b BOOLEAN} ({a 1, b TRUE})}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Set");
+
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof CollectionValueNode);
+
+        var collectionValue = ((CollectionValueNode) roots).getValue();
+
+        assertEquals(1, collectionValue.size());
     }
 
     @Test
