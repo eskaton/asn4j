@@ -5276,7 +5276,7 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public ParameterNode parse() throws ParserException {
             List<Object> rule = new ChoiceParser<>(
-                    new SequenceParser(paramGovernorParser, TokenType.COLON,dummyReferenceParser),
+                    new SequenceParser(paramGovernorParser, TokenType.COLON, dummyReferenceParser),
                     new SequenceParser(dummyReferenceParser)).parse();
 
             if (rule != null) {

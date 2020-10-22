@@ -84,6 +84,7 @@ import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.HasModuleName;
 import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
+import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
@@ -94,6 +95,7 @@ import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.commons.collections.Tuple2;
@@ -282,6 +284,8 @@ public class CompilerContext {
             var parameterDefinition = parameter.get_1();
             var parameterValue = parameter.get_2();
 
+            parameterValue = handleNull(parameters, parameterDefinition, parameterValue);
+
             if (parameterValue instanceof Value value) {
                 var governor = parameterDefinition.getGovernor();
                 var expectedType = getParameterType(parameters, governor);
@@ -311,6 +315,28 @@ public class CompilerContext {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * Converts a null type to a null value if the parameter has a governor of type null. Since the token NULL is
+     * ambiguous in an ActualParameterList the parser always treats it as a type.
+     *
+     * @param parameters          A parameters object containing all parameters
+     * @param parameterDefinition The parameter definition
+     * @param parameterValue      The parameter value
+     * @return The original parameter value or a null value if the governor is a null type
+     */
+    private Node handleNull(Parameters parameters, ParameterNode parameterDefinition, Node parameterValue) {
+        if (parameterValue instanceof Null && parameterDefinition.getGovernor() != null) {
+            var governor = parameterDefinition.getGovernor();
+            var type = getParameterType(parameters, governor);
+
+            if (type instanceof Null) {
+                return new NullValue(parameterValue.getPosition());
+            }
+        }
+
+        return parameterValue;
     }
 
     protected boolean isValueParameter(Parameters parameters, ParameterNode definition,
