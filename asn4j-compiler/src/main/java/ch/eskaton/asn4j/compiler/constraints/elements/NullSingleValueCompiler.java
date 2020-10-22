@@ -45,7 +45,7 @@ public class NullSingleValueCompiler extends SingleValueCompiler<NullValue, Valu
     @Override
     protected ASN1Null.Value resolveValue(CompiledType baseType, SingleValueConstraint elements,
             Parameters parameters) {
-        var value = elements.getValue();
+        var value = super.<NullValue>resolveValue(baseType, elements, parameters);
 
         if (value instanceof NullValue) {
             return ASN1Null.Value.NULL;

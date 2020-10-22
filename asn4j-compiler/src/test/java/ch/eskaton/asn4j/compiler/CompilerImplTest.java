@@ -100,6 +100,7 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
+import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple2;
 import org.junit.jupiter.api.Test;
@@ -2780,6 +2781,55 @@ class CompilerImplTest {
 
         assertEquals(1, values.size());
         assertEquals(Arrays.asList("a", "b", "a"), values.stream().findFirst().get());
+    }
+
+    @Test
+    void testParameterizedValueInNullSingleValueConstraint() throws IOException, ParserException {
+        var body = """
+                   AbstractNull {NULL:value} ::= NULL (value)
+
+                   Null ::= AbstractNull {NULL}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Null");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof ValueNode);
+
+        var valueNode = (ValueNode) roots;
+        var value = valueNode.getValue();
+
+        assertTrue(value instanceof ASN1Null.Value);
+    }
+
+    @Test
+    void testParameterizedValueInNullSingleValueConstraintWithTypeReferenceInGovernor() throws IOException,
+            ParserException {
+        var body = """
+                   AbstractNull {Null:value} ::= NULL (value)
+
+                   Null ::= AbstractNull {NULL}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Null");
+        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraintDefinition.isPresent());
+
+        var constraintDefinition = maybeConstraintDefinition.get();
+        var roots = constraintDefinition.getRoots();
+
+        assertTrue(roots instanceof ValueNode);
+
+        var valueNode = (ValueNode) roots;
+        var value = valueNode.getValue();
+
+        assertTrue(value instanceof ASN1Null.Value);
     }
 
     @Test
