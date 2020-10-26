@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.constraints.ast.AbstractNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
@@ -102,7 +103,9 @@ import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
 import ch.eskaton.asn4j.runtime.types.TypeName;
+import ch.eskaton.asn4j.test.CompilerTestBuilder;
 import ch.eskaton.commons.collections.Tuple2;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -113,6 +116,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.compilerConfig;
@@ -569,6 +574,7 @@ class CompilerImplTest {
     @SuppressWarnings("unused")
     @ParameterizedTest(name = "[{index}] {3}")
     @MethodSource("provideInvalidTypesInConstraintsArguments")
+    @DisplayName("Test invalid types in constraints")
     void testInvalidTypesInConstraints(String body, Class<? extends Exception> expected, String message,
             String description) {
         testModule(body, expected, ".*" + message + ".*");
@@ -577,6 +583,7 @@ class CompilerImplTest {
     @SuppressWarnings("unused")
     @ParameterizedTest(name = "[{index}] {3}")
     @MethodSource("provideInvalidMultipleTypeConstraints")
+    @DisplayName("Test invalid WITH COMPONENTS constraints")
     void testInvalidMultipleTypeConstraints(String body, Class<? extends Exception> expected, String message,
             String description) {
         testModule(body, expected, ".*" + message + ".*");
@@ -584,6 +591,7 @@ class CompilerImplTest {
 
     @ParameterizedTest(name = "[{index}] {3}")
     @MethodSource("provideTagsOnComponents")
+    @DisplayName("Test tags on SEQUENCE components")
     void testTagsOnComponents(Class<? extends Type> type, String typeName, TagId tag, String description)
             throws IOException, ParserException {
         var body = """
@@ -610,6 +618,7 @@ class CompilerImplTest {
 
     @ParameterizedTest(name = "[{index}] {2}")
     @MethodSource("provideCustomTagsOnComponentsExplicit")
+    @DisplayName("Test explicit custom tags on SEQUENCE components")
     void testCustomTagsOnComponentsExplicit(String prefixedType, List<TagId> tags, String description)
             throws IOException, ParserException {
         testCustomTagsOnComponents(prefixedType, tags, false);
@@ -617,40 +626,10 @@ class CompilerImplTest {
 
     @ParameterizedTest(name = "[{index}] {2}")
     @MethodSource("provideCustomTagsOnComponentsImplicit")
+    @DisplayName("Test implicit custom tags on SEQUENCE components")
     void testCustomTagsOnComponentsImplicit(String prefixedType, List<TagId> tags, String description)
             throws IOException, ParserException {
         testCustomTagsOnComponents(prefixedType, tags, true);
-    }
-
-    private void testCustomTagsOnComponents(String prefixedType, List<TagId> tags, boolean implicit)
-            throws IOException, ParserException {
-        var body = """
-                Seq ::= SEQUENCE {
-                    component %s
-                }
-                """.formatted(prefixedType);
-
-        var module = module(MODULE_NAME, body, implicit);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq");
-
-        assertNotNull(compiledType);
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        var compiledSequence = (CompiledCollectionType) compiledType;
-
-        assertEquals(1, compiledSequence.getComponents().size());
-
-        var compiledComponent = compiledSequence.getComponents().get(0).getCompiledType();
-
-        assertTrue(compiledComponent.getTags().isPresent());
-        assertEquals(tags.size(), compiledComponent.getTags().get().size());
-        assertEquals(tags, compiledComponent.getTags().get());
     }
 
     @Test
@@ -667,6 +646,7 @@ class CompilerImplTest {
 
     @ParameterizedTest(name = "[{index}] {1}")
     @MethodSource("provideSetsWithDuplicateTags")
+    @DisplayName("Test duplicate tags in SET")
     void testDuplicateTagsInSet(String body, String description) {
         testModule(body, CompilerException.class, "Duplicate tags in SET .*:.*");
     }
@@ -1896,6 +1876,7 @@ class CompilerImplTest {
 
     @ParameterizedTest(name = "[{index}] {1}")
     @MethodSource("getObjectClassWithSyntaxForbiddenLiteralsArgument")
+    @DisplayName("Test forbidden literals in syntax of object class")
     void testObjectClassWithSyntaxForbiddenLiterals(String reservedWord, String description) {
         var body = """
                    TEST ::= CLASS {
@@ -2404,108 +2385,6 @@ class CompilerImplTest {
     }
 
     @Test
-    void testParameterizedTypeInEnumeratedContainedSubtypeConstraint() throws IOException, ParserException {
-        var body = """
-                AbstractEnumeration {Type} ::= Type (INCLUDES Type)
-
-                Enumeration ::= AbstractEnumeration {ENUMERATED {a, b, c}}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Enumeration");
-
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof AllValuesNode);
-    }
-
-    @Test
-    void testParameterizedTypeInSetOfContainedSubtypeConstraint() throws IOException, ParserException {
-        var body = """
-                AbstractSetOf {Type} ::= SET (INCLUDES Type) OF INTEGER
-
-                SetOf ::= AbstractSetOf {SET ({1} | {2} | {3}) OF INTEGER}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "SetOf");
-
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof CollectionOfValueNode);
-
-        var collectionOfValue = ((CollectionOfValueNode) roots).getValue();
-
-        assertEquals(3, collectionOfValue.size());
-    }
-
-    @Test
-    void testParameterizedTypeInSetContainedSubtypeConstraint() throws IOException, ParserException {
-        var body = """
-                AbstractSet {Type} ::= SET  { 
-                    a INTEGER, 
-                    b BOOLEAN 
-                }  (INCLUDES Type)
-
-                Set ::= AbstractSet {SET {a INTEGER, b BOOLEAN} ({a 1, b TRUE})}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Set");
-
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof CollectionValueNode);
-
-        var collectionValue = ((CollectionValueNode) roots).getValue();
-
-        assertEquals(1, collectionValue.size());
-    }
-
-    @Test
-    void testParameterizedTypeInChoiceContainedSubtypeConstraint() throws IOException, ParserException {
-        var body = """
-                AbstractChoice {Type} ::= CHOICE  {
-                    a INTEGER,
-                    b BOOLEAN
-                }  (INCLUDES Type)
-
-                Choice ::= AbstractChoice {CHOICE {a INTEGER, b BOOLEAN} (a: 2)}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Choice");
-
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof ValueNode);
-
-        var valueNode = ((ValueNode<Set>) roots).getValue();
-
-        assertEquals(1, valueNode.size());
-
-        var value = valueNode.iterator().next();
-
-        assertTrue(value instanceof ChoiceValue);
-    }
-
-    @Test
     void testParameterizedExternalTypeReference() throws IOException, ParserException {
         var body1 = """
                 String ::= OTHER-MODULE.AbstractType {VisibleString}
@@ -2545,348 +2424,6 @@ class CompilerImplTest {
         var collection = (CompiledCollectionType) compiledType;
 
         testCollectionField(collection, "field", IntegerType.class);
-    }
-
-    @Test
-    void testParameterizedValueInIntegerRangeConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractInt {INTEGER:max} ::= INTEGER (0..max)
-
-                   Int ::= AbstractInt {4}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Int");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof IntegerRangeValueNode);
-
-        var integerRangeValueNode = (IntegerRangeValueNode) roots;
-        var integerRanges = integerRangeValueNode.getValue();
-
-        assertEquals(1, integerRanges.size());
-
-        var integerRange = integerRanges.get(0);
-
-        assertEquals(0, integerRange.getLower());
-        assertEquals(4, integerRange.getUpper());
-    }
-
-    @Test
-    void testParameterizedValueInPermittedAlphabetConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractString {VisibleString:upper} ::= VisibleString (FROM ("a"..upper))
-                 
-                   String ::= AbstractString {"f"}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "String");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof PermittedAlphabetNode);
-
-        var permittedAlphabetNode = (PermittedAlphabetNode) roots;
-        var stringRanges = (StringValueNode) permittedAlphabetNode.getNode();
-
-        assertEquals(1, stringRanges.getValue().size());
-
-        var stringRange = (StringRange) stringRanges.getValue().get(0);
-
-        assertEquals("a", stringRange.getLower());
-        assertEquals("f", stringRange.getUpper());
-    }
-
-    @Test
-    void testParameterizedValueInIntegerSingleValueConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractInt {INTEGER:value} ::= INTEGER (value)
-
-                   Int ::= AbstractInt {7}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Int");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof IntegerRangeValueNode);
-
-        var integerRangeValueNode = (IntegerRangeValueNode) roots;
-        var integerRanges = integerRangeValueNode.getValue();
-
-        assertEquals(1, integerRanges.size());
-
-        var integerRange = integerRanges.get(0);
-
-        assertEquals(7, integerRange.getLower());
-        assertEquals(7, integerRange.getUpper());
-    }
-
-    @Test
-    void testParameterizedValueInBooleanSingleValueConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractBoolean {BOOLEAN:value} ::= BOOLEAN (value)
-
-                   Boolean ::= AbstractBoolean {FALSE}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Boolean");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof ValueNode);
-
-        var booleanValueNode = (ValueNode) roots;
-        var booleanValue = (Boolean) booleanValueNode.getValue();
-
-        assertEquals(false, booleanValue);
-    }
-
-    @Test
-    void testParameterizedValueInEnumeratedSingleValueConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractEnumerated {Enumerated:value} ::= ENUMERATED {a, b, c} (value)
-
-                   Enumerated ::= AbstractEnumerated {b}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Enumerated");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof EnumeratedValueNode);
-
-        var enumeratedValueNode = (EnumeratedValueNode) roots;
-        var values = enumeratedValueNode.getValue();
-
-        assertEquals(1, values.size());
-        assertEquals(1, values.stream().findFirst().get());
-    }
-
-    @Test
-    void testParameterizedValueInObjectIdentifierSingleValueConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractObjIdentifier {OBJECT IDENTIFIER:value} ::= OBJECT IDENTIFIER (value)
-
-                   ObjIdentifier ::= AbstractObjIdentifier {{1 2 1 3}}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "ObjIdentifier");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof ObjectIdentifierValueNode);
-
-        var objectIdentifierValueNode = (ObjectIdentifierValueNode) roots;
-        var values = objectIdentifierValueNode.getValue();
-
-        assertEquals(1, values.size());
-        assertEquals(Arrays.asList(1, 2, 1, 3), values.stream().findFirst().get());
-    }
-
-    @Test
-    void testParameterizedValueInRelativeOIDSingleValueConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractRelativeOID {RELATIVE-OID:value} ::= RELATIVE-OID (value)
-
-                   RelativeOID ::= AbstractRelativeOID {{2 1 3}}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "RelativeOID");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof RelativeOIDValueNode);
-
-        var relativeOIDValueNode = (RelativeOIDValueNode) roots;
-        var values = relativeOIDValueNode.getValue();
-
-        assertEquals(1, values.size());
-        assertEquals(Arrays.asList(2, 1, 3), values.stream().findFirst().get());
-    }
-
-    @Test
-    void testParameterizedValueInOIDIRISingleValueConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractOIDIRI {OID-IRI:value} ::= OID-IRI (value)
-
-                   OIDIRI ::= AbstractOIDIRI {"/ISO/a/b/a"}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "OIDIRI");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof IRIValueNode);
-
-        var iriValueNode = (IRIValueNode) roots;
-        var values = iriValueNode.getValue();
-
-        assertEquals(1, values.size());
-        assertEquals(Arrays.asList("ISO", "a", "b", "a"), values.stream().findFirst().get());
-    }
-
-    @Test
-    void testParameterizedValueInRelativeOIDIRISingleValueConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractRelativeOIDIRI {RELATIVE-OID-IRI:value} ::= RELATIVE-OID-IRI (value)
-
-                   RelativeOIDIRI ::= AbstractRelativeOIDIRI {"a/b/a"}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "RelativeOIDIRI");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof RelativeIRIValueNode);
-
-        var relativeIRIValueNode = (RelativeIRIValueNode) roots;
-        var values = relativeIRIValueNode.getValue();
-
-        assertEquals(1, values.size());
-        assertEquals(Arrays.asList("a", "b", "a"), values.stream().findFirst().get());
-    }
-
-    @Test
-    void testParameterizedValueInNullSingleValueConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractNull {NULL:value} ::= NULL (value)
-
-                   Null ::= AbstractNull {NULL}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Null");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof ValueNode);
-
-        var valueNode = (ValueNode) roots;
-        var value = valueNode.getValue();
-
-        assertTrue(value instanceof ASN1Null.Value);
-    }
-
-    @Test
-    void testParameterizedValueInNullSingleValueConstraintWithTypeReferenceInGovernor() throws IOException,
-            ParserException {
-        var body = """
-                   AbstractNull {Null:value} ::= NULL (value)
-
-                   Null ::= AbstractNull {NULL}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Null");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof ValueNode);
-
-        var valueNode = (ValueNode) roots;
-        var value = valueNode.getValue();
-
-        assertTrue(value instanceof ASN1Null.Value);
-    }
-
-    @Test
-    void testParameterizedValueInSizeConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractBString {INTEGER:max} ::= BIT STRING (SIZE (0..max))
-
-                   BString ::= AbstractBString {3}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "BString");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof SizeNode);
-
-        var sizeNode = (SizeNode) roots;
-        var integerRanges = sizeNode.getSize();
-
-        assertEquals(1, integerRanges.size());
-
-        var integerRange = integerRanges.get(0);
-
-        assertEquals(0, integerRange.getLower());
-        assertEquals(3, integerRange.getUpper());
-    }
-
-    @Test
-    void testParameterizedValueInStringSingleValueConstraint() throws IOException, ParserException {
-        var body = """
-                   AbstractString {VisibleString:value} ::= VisibleString (value)
-
-                   String ::= AbstractString {"test-value"}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "String");
-        var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-        assertTrue(maybeConstraintDefinition.isPresent());
-
-        var constraintDefinition = maybeConstraintDefinition.get();
-        var roots = constraintDefinition.getRoots();
-
-        assertTrue(roots instanceof StringValueNode);
-
-        var stringValueNode = (StringValueNode) roots;
-        var stringSingleValues = stringValueNode.getValue();
-
-        assertEquals(1, stringSingleValues.size());
-
-        var stringSingleValue = (StringSingleValue) stringSingleValues.get(0);
-
-        assertEquals("test-value", stringSingleValue.getValue());
     }
 
     @Test
@@ -3046,6 +2583,72 @@ class CompilerImplTest {
         var contentType = (CompiledCollectionOfType) collection.getContentType();
 
         assertTrue(contentType.getContentType().getType() instanceof BooleanType);
+    }
+
+    @ParameterizedTest(name = "[{index}] {4}")
+    @MethodSource("provideParameterizedValueInConstraint")
+    @DisplayName("Test value parameters in constraints")
+    <T extends AbstractNode> void testParameterizedValueInConstraint(String body, String typeName, Class<T> nodeClass,
+            Consumer<T> verifier, String description) throws IOException, ParserException {
+        testConstraint(MODULE_NAME, body, typeName, nodeClass, verifier);
+    }
+
+    @ParameterizedTest(name = "[{index}] {4}")
+    @MethodSource("provideParameterizedTypeInConstraint")
+    @DisplayName("Test type parameters in constraints")
+    <T extends AbstractNode> void testParameterizedTypeInConstraint(String body, String typeName, Class<T> nodeClass,
+            Consumer<T> verifier, String description) throws IOException, ParserException {
+        testConstraint(MODULE_NAME, body, typeName, nodeClass, verifier);
+    }
+
+    <T extends AbstractNode> void testConstraint(String moduleName, String body, String typeName, Class<T> nodeClass,
+            Consumer<T> verifier) throws IOException, ParserException {
+        // @formatter:off
+        new CompilerTestBuilder()
+                .moduleBuilder()
+                .name(moduleName)
+                .body(body)
+                .build()
+                .typeTestBuilder()
+                .typeName(typeName)
+                .constraintTestBuilder(nodeClass)
+                .verify(verifier::accept)
+                .build()
+                .build()
+                .build()
+                .run();
+        // @formatter:on
+    }
+
+    private void testCustomTagsOnComponents(String prefixedType, List<TagId> tags, boolean implicit)
+            throws IOException, ParserException {
+        var body = """
+                Seq ::= SEQUENCE {
+                    component %s
+                }
+                """.formatted(prefixedType);
+
+        var module = module(MODULE_NAME, body, implicit);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Seq");
+
+        assertNotNull(compiledType);
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledSequence = (CompiledCollectionType) compiledType;
+
+        assertEquals(1, compiledSequence.getComponents().size());
+
+        var compiledComponent = compiledSequence.getComponents().get(0).getCompiledType();
+
+        assertTrue(compiledComponent.getTags().isPresent());
+        assertEquals(tags.size(), compiledComponent.getTags().get().size());
+        assertEquals(tags, compiledComponent.getTags().get());
     }
 
     private void testChoiceField(CompiledChoiceType choice, String fieldName,
@@ -3211,6 +2814,253 @@ class CompilerImplTest {
         assertTrue(objectClass.getSyntax().isPresent());
 
         return ctx.getCompiledModule(MODULE_NAME).getObjectSets().get(setName);
+    }
+
+    private static Stream<Arguments> provideParameterizedValueInConstraint() {
+        // @formatter:off
+        return Stream.of(
+                Arguments.of("""
+                            AbstractString {VisibleString:value} ::= VisibleString (value)
+    
+                            String ::= AbstractString {"test-value"}
+                        """,
+                        "String",
+                        StringValueNode.class,
+                        (Consumer<StringValueNode>) node -> {
+                            var stringSingleValues = node.getValue();
+
+                            assertEquals(1, stringSingleValues.size());
+
+                            var stringSingleValue = (StringSingleValue) stringSingleValues.get(0);
+
+                            assertEquals("test-value", stringSingleValue.getValue());
+                        },
+                        "VisibleString single value constraint"),
+                Arguments.of("""
+                           AbstractBString {INTEGER:max} ::= BIT STRING (SIZE (0..max))
+        
+                           BString ::= AbstractBString {3}
+                        """,
+                        "BString",
+                        SizeNode.class,
+                        (Consumer<SizeNode>) node -> {
+                            var integerRanges = node.getSize();
+
+                            assertEquals(1, integerRanges.size());
+
+                            var integerRange = integerRanges.get(0);
+
+                            assertEquals(0, integerRange.getLower());
+                            assertEquals(3, integerRange.getUpper());
+                        },
+                        "BIT STRING size constraint"),
+                Arguments.of("""
+                           AbstractNull {Null:value} ::= NULL (value)
+        
+                           Null ::= AbstractNull {NULL}
+                        """,
+                        "Null",
+                        ValueNode.class,
+                        (Consumer<ValueNode>) node -> assertTrue(node.getValue() instanceof ASN1Null.Value),
+                        "NULL single value constraint with type reference in governor"),
+                Arguments.of("""
+                           AbstractNull {NULL:value} ::= NULL (value)
+        
+                           Null ::= AbstractNull {NULL}
+                        """,
+                        "Null",
+                        ValueNode.class,
+                        (Consumer<ValueNode>) node -> assertTrue(node.getValue() instanceof ASN1Null.Value),
+                        "NULL single value constraint"),
+                Arguments.of("""
+                            AbstractRelativeOIDIRI {RELATIVE-OID-IRI:value} ::= RELATIVE-OID-IRI (value)
+
+                            RelativeOIDIRI ::= AbstractRelativeOIDIRI {"a/b/a"}
+                        """,
+                        "RelativeOIDIRI",
+                        RelativeIRIValueNode.class,
+                        (Consumer<RelativeIRIValueNode>) node -> {
+                            var values = node.getValue();
+
+                            assertEquals(1, values.size());
+                            assertEquals(Arrays.asList("a", "b", "a"), values.stream().findFirst().get());
+                        },
+                        "RELATIVE-OID-IRI single value constraint"),
+                Arguments.of("""
+                            AbstractOIDIRI {OID-IRI:value} ::= OID-IRI (value)
+
+                            OIDIRI ::= AbstractOIDIRI {"/ISO/a/b/a"}
+                        """,
+                        "OIDIRI",
+                        IRIValueNode.class,
+                        (Consumer<IRIValueNode>) node -> {
+                            var values = node.getValue();
+
+                            assertEquals(1, values.size());
+                            assertEquals(Arrays.asList("ISO", "a", "b", "a"), values.stream().findFirst().get());
+                        },
+                        "OID-IRI single value constraint"),
+                Arguments.of("""
+                            AbstractRelativeOID {RELATIVE-OID:value} ::= RELATIVE-OID (value)
+
+                            RelativeOID ::= AbstractRelativeOID {{2 1 3}}
+                        """,
+                        "RelativeOID",
+                        RelativeOIDValueNode.class,
+                        (Consumer<RelativeOIDValueNode>) node -> {
+                            var values = node.getValue();
+
+                            assertEquals(1, values.size());
+                            assertEquals(Arrays.asList(2, 1, 3), values.stream().findFirst().get());
+                        },
+                        "RELATIVE-OID single value constraint"),
+                Arguments.of("""
+                            AbstractObjIdentifier {OBJECT IDENTIFIER:value} ::= OBJECT IDENTIFIER (value)
+        
+                            ObjIdentifier ::= AbstractObjIdentifier {{1 2 1 3}}
+                        """,
+                        "ObjIdentifier",
+                        ObjectIdentifierValueNode.class,
+                        (Consumer<ObjectIdentifierValueNode>) node -> {
+                            var values = node.getValue();
+
+                            assertEquals(1, values.size());
+                            assertEquals(Arrays.asList(1, 2, 1, 3), values.stream().findFirst().get());
+                        },
+                        "OBJECT IDENTIFIER single value constraint"),
+                Arguments.of("""
+                            AbstractEnumerated {Enumerated:value} ::= ENUMERATED {a, b, c} (value)
+        
+                            Enumerated ::= AbstractEnumerated {b}
+                        """,
+                        "Enumerated",
+                        EnumeratedValueNode.class,
+                        (Consumer<EnumeratedValueNode>) node -> {
+                            var values = node.getValue();
+
+                            assertEquals(1, values.size());
+                            assertEquals(1, values.stream().findFirst().get());
+                        },
+                        "ENUMERATED single value constraint"),
+                Arguments.of("""
+                            AbstractBoolean {BOOLEAN:value} ::= BOOLEAN (value)
+
+                            Boolean ::= AbstractBoolean {FALSE}
+                        """,
+                        "Boolean",
+                        ValueNode.class,
+                        (Consumer<ValueNode>) node -> assertEquals(false, node.getValue()),
+                        "BOOLEAN single value constraint"),
+                Arguments.of("""
+                            AbstractInt {INTEGER:value} ::= INTEGER (value)
+
+                            Int ::= AbstractInt {7}
+                        """,
+                        "Int",
+                        IntegerRangeValueNode.class,
+                        (Consumer<IntegerRangeValueNode>) node -> {
+                            var integerRanges = node.getValue();
+
+                            assertEquals(1, integerRanges.size());
+
+                            var integerRange = integerRanges.get(0);
+
+                            assertEquals(7, integerRange.getLower());
+                            assertEquals(7, integerRange.getUpper());
+                        },
+                        "INTEGER single value constraint"),
+                Arguments.of("""
+                            AbstractString {VisibleString:upper} ::= VisibleString (FROM ("a"..upper))
+                 
+                            String ::= AbstractString {"f"}
+                        """,
+                        "String",
+                        PermittedAlphabetNode.class,
+                        (Consumer<PermittedAlphabetNode>) node -> {
+                            var stringRanges = (StringValueNode) node.getNode();
+
+                            assertEquals(1, stringRanges.getValue().size());
+
+                            var stringRange = (StringRange) stringRanges.getValue().get(0);
+
+                            assertEquals("a", stringRange.getLower());
+                            assertEquals("f", stringRange.getUpper());
+                        },
+                        "VisibleString permitted alphabet constraint"),
+                Arguments.of("""
+                            AbstractInt {INTEGER:max} ::= INTEGER (0..max)
+
+                            Int ::= AbstractInt {4}
+                        """,
+                        "Int",
+                        IntegerRangeValueNode.class,
+                        (Consumer<IntegerRangeValueNode>) node -> {
+                            var integerRanges = node.getValue();
+
+                            assertEquals(1, integerRanges.size());
+
+                            var integerRange = integerRanges.get(0);
+
+                            assertEquals(0, integerRange.getLower());
+                            assertEquals(4, integerRange.getUpper());
+                        },
+                        "INTEGER value range constraint")
+        );
+        // @formatter:on
+    }
+
+    private static Stream<Arguments> provideParameterizedTypeInConstraint() {
+        // @formatter:off
+        return Stream.of(
+                Arguments.of("""
+                            AbstractChoice {Type} ::= CHOICE  {
+                                a INTEGER,
+                                b BOOLEAN
+                            }  (INCLUDES Type)
+            
+                            Choice ::= AbstractChoice {CHOICE {a INTEGER, b BOOLEAN} (a: 2)}
+                        """,
+                        "Choice",
+                        ValueNode.class,
+                        (Consumer<ValueNode>) node -> {
+                            var value = (Set) node.getValue();
+
+                            assertEquals(1, value.size());
+                            assertTrue(value.iterator().next() instanceof ChoiceValue);
+                        },
+                        "CHOICE contained subtype constraint"),
+                Arguments.of("""
+                            AbstractSet {Type} ::= SET  { 
+                                a INTEGER, 
+                                b BOOLEAN 
+                            }  (INCLUDES Type)
+            
+                            Set ::= AbstractSet {SET {a INTEGER, b BOOLEAN} ({a 1, b TRUE})}
+                        """,
+                        "Set",
+                        CollectionValueNode.class,
+                        (Consumer<CollectionValueNode>) node -> assertEquals(1, node.getValue().size()),
+                        "SET contained subtype constraint"),
+                Arguments.of("""
+                            AbstractSetOf {Type} ::= SET (INCLUDES Type) OF INTEGER
+            
+                            SetOf ::= AbstractSetOf {SET ({1} | {2} | {3}) OF INTEGER}
+                        """,
+                        "SetOf",
+                        CollectionOfValueNode.class,
+                        (Consumer<CollectionOfValueNode>) node -> assertEquals(3, node.getValue().size()),
+                        "SET OF contained subtype constraint"),
+                Arguments.of("""
+                            AbstractEnumeration {Type} ::= Type (INCLUDES Type)
+
+                            Enumeration ::= AbstractEnumeration {ENUMERATED {a, b, c}}
+                        """,
+                        "Enumeration",
+                        AllValuesNode.class,
+                        (Consumer<AllValuesNode>) node -> {},
+                        "ENUMERATED contained subtype constraint")
+        );
+        // @formatter:on
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {
