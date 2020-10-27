@@ -31,8 +31,10 @@ import ch.eskaton.asn4j.compiler.constraints.ast.AbstractNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
@@ -43,6 +45,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
@@ -117,7 +120,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.compilerConfig;
@@ -795,14 +797,8 @@ class CompilerImplTest {
         assertTrue(roots instanceof IntegerRangeValueNode);
 
         var integerRangeValueNode = (IntegerRangeValueNode) roots;
-        var integerRanges = integerRangeValueNode.getValue();
 
-        assertEquals(1, integerRanges.size());
-
-        var integerRange = integerRanges.get(0);
-
-        assertEquals(4, integerRange.getLower());
-        assertEquals(5, integerRange.getUpper());
+        checkIntegerRange(integerRangeValueNode.getValue(), 4, 5);
     }
 
     @Test
@@ -2606,15 +2602,15 @@ class CompilerImplTest {
         // @formatter:off
         new CompilerTestBuilder()
                 .moduleBuilder()
-                .name(moduleName)
-                .body(body)
-                .build()
+                    .name(moduleName)
+                    .body(body)
+                    .build()
                 .typeTestBuilder()
-                .typeName(typeName)
-                .constraintTestBuilder(nodeClass)
-                .verify(verifier::accept)
-                .build()
-                .build()
+                    .typeName(typeName)
+                    .constraintTestBuilder(nodeClass)
+                        .verify(verifier::accept)
+                        .build()
+                    .build()
                 .build()
                 .run();
         // @formatter:on
@@ -2816,6 +2812,23 @@ class CompilerImplTest {
         return ctx.getCompiledModule(MODULE_NAME).getObjectSets().get(setName);
     }
 
+    private static Optional<ComponentNode> getComponent(Set<ComponentNode> components, String componentName) {
+        return components.stream()
+                .filter(component -> componentName.equals(component.getName()))
+                .findAny();
+    }
+
+    private static void checkIntegerRange(List<IntegerRange> value, int lower, int upper) {
+        var integerRanges = value;
+
+        assertEquals(1, integerRanges.size());
+
+        var integerRange = integerRanges.get(0);
+
+        assertEquals(lower, integerRange.getLower());
+        assertEquals(upper, integerRange.getUpper());
+    }
+
     private static Stream<Arguments> provideParameterizedValueInConstraint() {
         // @formatter:off
         return Stream.of(
@@ -2843,16 +2856,7 @@ class CompilerImplTest {
                         """,
                         "BString",
                         SizeNode.class,
-                        (Consumer<SizeNode>) node -> {
-                            var integerRanges = node.getSize();
-
-                            assertEquals(1, integerRanges.size());
-
-                            var integerRange = integerRanges.get(0);
-
-                            assertEquals(0, integerRange.getLower());
-                            assertEquals(3, integerRange.getUpper());
-                        },
+                        (Consumer<SizeNode>) node -> checkIntegerRange(node.getSize(),0, 3),
                         "BIT STRING size constraint"),
                 Arguments.of("""
                            AbstractNull {Null:value} ::= NULL (value)
@@ -2958,16 +2962,7 @@ class CompilerImplTest {
                         """,
                         "Int",
                         IntegerRangeValueNode.class,
-                        (Consumer<IntegerRangeValueNode>) node -> {
-                            var integerRanges = node.getValue();
-
-                            assertEquals(1, integerRanges.size());
-
-                            var integerRange = integerRanges.get(0);
-
-                            assertEquals(7, integerRange.getLower());
-                            assertEquals(7, integerRange.getUpper());
-                        },
+                        (Consumer<IntegerRangeValueNode>) node -> checkIntegerRange(node.getValue(),7, 7),
                         "INTEGER single value constraint"),
                 Arguments.of("""
                             AbstractString {VisibleString:upper} ::= VisibleString (FROM ("a"..upper))
@@ -2994,19 +2989,48 @@ class CompilerImplTest {
                         """,
                         "Int",
                         IntegerRangeValueNode.class,
-                        (Consumer<IntegerRangeValueNode>) node -> {
-                            var integerRanges = node.getValue();
+                        (Consumer<IntegerRangeValueNode>) node -> checkIntegerRange(node.getValue(), 0, 4),
+                        "INTEGER value range constraint"),
+                Arguments.of("""
+                            AbstractSequence {INTEGER:int, BOOLEAN:bool} ::= SEQUENCE {
+                                a INTEGER, 
+                                b BOOLEAN
+                            } (WITH COMPONENTS {a (int), b (bool)})
 
-                            assertEquals(1, integerRanges.size());
+                            Seq ::= AbstractSequence {23, FALSE}
+                        """,
+                        "Seq",
+                        WithComponentsNode.class,
+                        (Consumer<WithComponentsNode>) node -> {
+                            var components = node.getComponents();
 
-                            var integerRange = integerRanges.get(0);
+                            assertEquals(2, components.size());
 
-                            assertEquals(0, integerRange.getLower());
-                            assertEquals(4, integerRange.getUpper());
+                            var integerRange = getComponentNode(components, "a", IntegerRangeValueNode.class);
+
+                            checkIntegerRange(integerRange.getValue(), 23, 23);
+
+                            var value = getComponentNode(components, "b", ValueNode.class);
+
+                            assertEquals(false, value.getValue());
                         },
-                        "INTEGER value range constraint")
+                        "SEQUENCE inner subtyping constraint")
         );
         // @formatter:on
+    }
+
+    private static <T extends AbstractNode> T getComponentNode(Set<ComponentNode> components, String componentName,
+            Class<T> nodeClass) {
+        var maybeComponent = getComponent(components, componentName);
+
+        assertTrue(maybeComponent.isPresent());
+
+        var component = maybeComponent.get();
+        var constraint = component.getConstraint();
+
+        assertTrue(nodeClass.isAssignableFrom(constraint.getClass()));
+
+        return nodeClass.cast(constraint);
     }
 
     private static Stream<Arguments> provideParameterizedTypeInConstraint() {
