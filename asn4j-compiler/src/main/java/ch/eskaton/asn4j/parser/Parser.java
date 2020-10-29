@@ -3349,11 +3349,11 @@ public class Parser {
                     switch (tokenType) {
                         case TYPE_REFERENCE:
                             rule.setValueSetTypeAssignment(new ValueSetTypeAssignmentNode(rule.getPosition(),
-                                    rule.getReference(), (Type) r.get(1), (SetSpecsNode) r.get(3)));
+                                    rule.getReference(), (Type) r.get(1), (ElementSetSpecsNode) r.get(3)));
                             break;
                         case OBJECT_SET_REFERENCE:
                             rule.setObjectSetAssignment(new ObjectSetAssignmentNode(rule.getPosition(),
-                                    rule.getReference(), (ObjectClassReference) r.get(1), (SetSpecsNode) r.get(3)));
+                                    rule.getReference(), (ObjectClassReference) r.get(1), (ObjectSetSpecNode) r.get(3)));
                             break;
                         default:
                             throw new IllegalStateException("Unexpected token type: " + tokenType.toString());

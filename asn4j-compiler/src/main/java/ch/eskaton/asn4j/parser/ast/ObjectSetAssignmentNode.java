@@ -33,10 +33,10 @@ public class ObjectSetAssignmentNode extends AssignmentNode {
 
     private ObjectClassReference objectClassReference;
 
-    private SetSpecsNode objectSet;
+    private ObjectSetSpecNode objectSet;
 
     public ObjectSetAssignmentNode(Position position, String reference, ObjectClassReference objectClassReference,
-            SetSpecsNode objectSet) {
+            ObjectSetSpecNode objectSet) {
         super(position, reference);
 
         this.objectClassReference = objectClassReference;
@@ -47,7 +47,7 @@ public class ObjectSetAssignmentNode extends AssignmentNode {
         return objectClassReference;
     }
 
-    public SetSpecsNode getObjectSet() {
+    public ObjectSetSpecNode getObjectSet() {
         return objectSet;
     }
 
