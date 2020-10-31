@@ -80,6 +80,7 @@ import ch.eskaton.asn4j.parser.ast.OIDNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
+import ch.eskaton.asn4j.parser.ast.ValueSetOrObjectSet;
 import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
@@ -517,6 +518,7 @@ public class Parser {
     private ValueSetOptionalitySpecParser valueSetOptionalitySpecParser = new ValueSetOptionalitySpecParser();
     private ObjectSetOptionalitySpecParser objectSetOptionalitySpecParser = new ObjectSetOptionalitySpecParser();
     private ValueSetParser valueSetParser = new ValueSetParser();
+    private ValueSetOrObjectSetParser valueSetOrObjectSetParser = new ValueSetOrObjectSetParser();
     private ValueSetTypeAssignmentParser valueSetTypeAssignmentParser = new ValueSetTypeAssignmentParser();
     private VariableTypeValueFieldSpecParser variableTypeValueFieldSpecParser = new VariableTypeValueFieldSpecParser();
     private VariableTypeValueSetFieldSpecParser variableTypeValueSetFieldSpecParser = new VariableTypeValueSetFieldSpecParser();
@@ -5451,8 +5453,34 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public Node parse() throws ParserException {
-            return new ChoiceParser<>(typeParser, valueParser, valueSetParser, objectParser, objectSetParser,
+            return new ChoiceParser<>(typeParser, valueParser, valueSetOrObjectSetParser, objectParser,
                     definedObjectClassParser).parse();
+        }
+
+    }
+
+    //  ValueSet | ObjectSet
+    protected class ValueSetOrObjectSetParser implements RuleParser<Node> {
+
+        public Node parse() throws ParserException {
+            Set<SetSpecsNode> rules = new AmbiguousChoiceParser<>(valueSetParser, objectSetParser).parse();
+            Optional<SetSpecsNode> first = rules.stream().findFirst();
+
+            if (first.isPresent()) {
+                ValueSetOrObjectSet rule = new ValueSetOrObjectSet(first.get().getPosition());
+
+                for (SetSpecsNode node : rules) {
+                    if (node instanceof ElementSetSpecsNode elementSetSpecs) {
+                        rule.setElementSetSpecs(elementSetSpecs);
+                    } else if (node instanceof ObjectSetSpecNode objectSetSpec) {
+                        rule.setObjectSetSpec(objectSetSpec);
+                    }
+                }
+
+                return rule;
+            }
+
+            return null;
         }
 
     }

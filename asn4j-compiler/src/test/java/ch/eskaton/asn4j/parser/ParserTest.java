@@ -331,6 +331,7 @@ import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintNode;
 import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintParamNode;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ValueSetOrObjectSet;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
@@ -7037,6 +7038,34 @@ class ParserTest {
         assertTrue(((TypeReference) result).getParameters().get().get(0) instanceof ObjectClassFieldType);
         assertTrue(((ObjectClassFieldType) ((TypeReference) result)
                 .getParameters().get().get(0)).hasConstraint());
+
+        parser = new Parser(new ByteArrayInputStream("{1 | 2}".getBytes())).new ActualParameterParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result instanceof ValueSetOrObjectSet);
+        assertTrue(((ValueSetOrObjectSet) result).getElementSetSpecs().isPresent());
+        assertTrue(((ValueSetOrObjectSet) result).getObjectSetSpec().isEmpty());
+
+        parser = new Parser(new ByteArrayInputStream("{{&id 1} | {&id 2}}".getBytes())).new ActualParameterParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result instanceof ValueSetOrObjectSet);
+        assertTrue(((ValueSetOrObjectSet) result).getElementSetSpecs().isEmpty());
+        assertTrue(((ValueSetOrObjectSet) result).getObjectSetSpec().isPresent());
+
+        parser = new Parser(new ByteArrayInputStream("{Reference}".getBytes())).new ActualParameterParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+
+        assertTrue(result instanceof ValueSetOrObjectSet);
+        assertTrue(((ValueSetOrObjectSet) result).getElementSetSpecs().isPresent());
+        assertTrue(((ValueSetOrObjectSet) result).getObjectSetSpec().isPresent());
     }
 
     private <T extends Value> void testAmbiguousValue(Object value, Class<T> valueClass) {
