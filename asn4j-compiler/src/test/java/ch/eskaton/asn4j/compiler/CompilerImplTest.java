@@ -883,6 +883,35 @@ class CompilerImplTest {
     }
 
     @Test
+    void testObjectSetWithObjectSetReference() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &id INTEGER UNIQUE
+                }
+
+                TestSet1 TEST ::= {
+                    {&id 1234}
+                }
+                
+                TestSet2 TEST ::= {
+                    TestSet1 | {&id 5678}
+                }
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet2");
+
+        assertNotNull(objectSet);
+        assertEquals(2, objectSet.getValues().size());
+    }
+
+    @Test
     void testObjects() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {

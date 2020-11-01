@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
+import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
@@ -144,21 +145,25 @@ public class ObjectSetCompiler implements Compiler<ObjectSetSpecNode> {
         if (elements instanceof ElementSet) {
             return compile(objectClass, (ElementSet) elements);
         } else if (elements instanceof ObjectSetElements) {
-            return Sets.<Map<String, Object>>builder().add(compile(objectClass, (ObjectSetElements) elements)).build();
+            return Sets.<Map<String, Object>>builder()
+                    .addAll(compile(objectClass, (ObjectSetElements) elements))
+                    .build();
         } else {
             throw new CompilerException(elements.getPosition(), "Unsupported elements: %s",
                     elements.getClass().getSimpleName());
         }
     }
 
-    private Map<String, Object> compile(CompiledObjectClass objectClass, ObjectSetElements elements) {
+    private Set<Map<String, Object>> compile(CompiledObjectClass objectClass, ObjectSetElements elements) {
         var element = elements.getElement();
 
         if (element instanceof ObjectDefnNode objectDefn) {
-            return ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class)
-                    .compile(objectClass, objectDefn);
+            return Set.of(ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class)
+                    .compile(objectClass, objectDefn));
         } else if (element instanceof ObjectReference objectReference) {
-            return ctx.getCompiledObject(objectReference).getObjectDefinition();
+            return Set.of(ctx.getCompiledObject(objectReference).getObjectDefinition());
+        } else if (element instanceof ObjectSetReference objectSetReference) {
+            return ctx.getCompiledObjectSet(objectSetReference).getValues();
         } else {
             throw new CompilerException(elements.getPosition(), "Unsupported element: %s",
                     element.getClass().getSimpleName());
