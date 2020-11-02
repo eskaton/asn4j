@@ -25,31 +25,44 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.objects;
+package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.NamedCompiler;
+import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.Parameters;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
-import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
+import ch.eskaton.asn4j.compiler.constraints.Bounds;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
+import ch.eskaton.asn4j.compiler.constraints.ast.ObjectSetNode;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
+import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
+import ch.eskaton.asn4j.parser.ast.constraints.Elements;
+import ch.eskaton.commons.collections.Tuple4;
+import ch.eskaton.commons.utils.Dispatcher;
 
 import java.util.Optional;
 
-public abstract class AbstractObjectReferenceCompiler<T extends ObjectClassReference>
-        implements NamedCompiler<T, CompiledObjectClass> {
+public class ObjectSetElementsCompiler implements ElementsCompiler<ObjectSetElements> {
 
-    @Override
-    public CompiledObjectClass compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
-        var referencedObjectClass = getReferencedObjectClass(ctx, node);
-        var compiledObjectClass = ctx.createCompiledObjectClass(name);
+    private CompilerContext ctx;
 
-        referencedObjectClass.getFields().forEach(compiledObjectClass::addField);
-
-        compiledObjectClass.setSyntax(referencedObjectClass.getSyntax().orElse(null));
-
-        return compiledObjectClass;
+    public ObjectSetElementsCompiler(CompilerContext ctx, Dispatcher<Elements, Class<? extends Elements>,
+            Tuple4<CompiledType, ? extends Elements, Optional<Bounds>, Optional<Parameters>>, Node> dispatcher) {
+        this.ctx = ctx;
     }
 
-    protected abstract CompiledObjectClass getReferencedObjectClass(CompilerContext ctx, T node);
+    @Override
+    public Node compile(CompiledType baseType, ObjectSetElements elements, Optional<Bounds> bounds,
+            Optional<Parameters> maybeParameters) {
+        var element = elements.getElement();
+
+        if (element instanceof ObjectSetReference objectSetReference) {
+            var compiledObjectSet = ctx.getCompiledObjectSet(objectSetReference, maybeParameters);
+
+            return new ObjectSetNode(compiledObjectSet.getValues());
+        }
+
+        throw new IllegalCompilerStateException(elements.getPosition(), "Unsupported element type: %s", elements);
+    }
 
 }
