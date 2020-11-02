@@ -36,6 +36,7 @@ import ch.eskaton.asn4j.compiler.defaults.DefaultsCompiler;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
+import ch.eskaton.asn4j.compiler.objects.ObjectClassNodeCompiler;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
@@ -76,6 +77,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ValueSetOrObjectSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
@@ -350,6 +352,86 @@ public class CompilerContext {
                 !value.isBlank() &&
                 value.toLowerCase().equals(value) &&
                 definition.getReference().getName().equals(value);
+    }
+
+    private Optional<ObjectClassNode> getObjectClassParameter(Parameters parameters, String reference) {
+        var maybeParameter = parameters.getDefinitionsAndValues().stream().
+                filter(tuple -> isObjectClassParameter(tuple.get_1(), reference))
+                .findAny();
+
+        if (maybeParameter.isPresent()) {
+            var parameter = maybeParameter.get();
+            var node = parameter.get_2();
+
+            if (node instanceof ObjectClassNode objectClassNode) {
+                parameters.markAsUsed(parameter.get_1());
+
+                return Optional.of(objectClassNode);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean isObjectClassParameter(ParameterNode definition, String reference) {
+        var paramGovernor = definition.getGovernor();
+
+        return paramGovernor != null &&
+                reference.toUpperCase().equals(reference) &&
+                definition.getReference().getName().equals(reference);
+    }
+
+    protected boolean isObjectSetParameter(Parameters parameters, ParameterNode definition,
+            ObjectSetReference objectSetReference) {
+        var reference = objectSetReference.getReference();
+        var paramGovernor = definition.getGovernor();
+
+        if (reference.equals(definition.getReference().getName())) {
+            var objectClass = getParameterObjectClass(parameters, paramGovernor);
+
+            return objectClass != null && definition.getReference().getName().equals(reference);
+        }
+
+        return false;
+    }
+
+    private CompiledObjectClass getParameterObjectClass(Parameters parameters, ParamGovernorNode paramGovernor) {
+        Node objectClass = null;
+
+        if (paramGovernor instanceof Governor governor) {
+            objectClass = governor.getType();
+        } else if (paramGovernor instanceof DummyGovernor dummyGovernor) {
+            var reference = dummyGovernor.getReference();
+            var objectClassReference = reference.getName();
+
+            if (objectClassReference.equals(objectClassReference.toUpperCase())) {
+                var resolvedObjectClass = getObjectClassParameter(parameters, objectClassReference);
+
+                if (resolvedObjectClass.isPresent()) {
+                    objectClass = resolvedObjectClass.get();
+                } else {
+                    try {
+                        return getCompiledObjectClass(objectClassReference);
+                    } catch (CompilerException e) {
+                        throw new CompilerException(dummyGovernor.getPosition(),
+                                "The Governor references the object class %s which can't be resolved",
+                                objectClassReference);
+                    }
+                }
+            } else {
+                throw new CompilerException(dummyGovernor.getPosition(),
+                        "The Governor '%s' is not a valid objectclassreference", objectClassReference);
+            }
+        } else if (paramGovernor != null) {
+            throw new IllegalCompilerStateException(paramGovernor.getPosition(), "Unexpected governor type %s",
+                    paramGovernor.getClass().getSimpleName());
+        }
+
+        if (objectClass instanceof ObjectClassNode) {
+            return new ObjectClassNodeCompiler().compile(this, null, (ObjectClassNode) objectClass, Optional.empty());
+        }
+
+        return null;
     }
 
     private Type getParameterType(Parameters parameters, ParamGovernorNode paramGovernor) {
@@ -684,6 +766,46 @@ public class CompilerContext {
         }
 
         return getCompiledObjectSet(maybeModuleName.get(), reference);
+    }
+
+
+    public CompiledObjectSet getCompiledObjectSet(ObjectSetReference objectSetReference,
+            Optional<Parameters> maybeParameters) {
+        var maybeModuleName = CompilerUtils.toExternalObjectSetReference(objectSetReference)
+                .map(ExternalObjectSetReference::getModule);
+
+        if (maybeModuleName.isPresent() || maybeParameters.isEmpty()) {
+            return getCompiledObjectSet(objectSetReference);
+        }
+
+        if (maybeParameters.isPresent()) {
+            var parameters = maybeParameters.get();
+            var maybeParameter = parameters.getDefinitionsAndValues().stream().
+                    filter(tuple -> isObjectSetParameter(parameters, tuple.get_1(), objectSetReference))
+                    .findAny();
+
+            if (maybeParameter.isPresent()) {
+                var node = maybeParameter.get().get_2();
+
+                if (!(node instanceof ValueSetOrObjectSet maybeObjectSet) ||
+                        maybeObjectSet.getObjectSetSpec().isEmpty()) {
+                    throw new CompilerException(node.getPosition(), "Expected an object set but found: %s", node);
+                }
+
+                var valueSetOrObjectSet = (ValueSetOrObjectSet) node;
+                var elementSetSpecs = valueSetOrObjectSet.getObjectSetSpec().get();
+                var parameter = maybeParameter.get().get_1();
+                var compiledObjectClass = getParameterObjectClass(parameters, parameter.getGovernor());
+
+                parameters.markAsUsed(parameter);
+
+                return new ObjectSetCompiler(this).getCompiledObjectSet(this, null, compiledObjectClass,
+                        elementSetSpecs.getRootElements());
+            }
+        }
+
+        throw new CompilerException(objectSetReference.getPosition(), "Failed to resolve object set reference: %s",
+                objectSetReference);
     }
 
     public CompiledObjectSet getCompiledObjectSet(String reference) {

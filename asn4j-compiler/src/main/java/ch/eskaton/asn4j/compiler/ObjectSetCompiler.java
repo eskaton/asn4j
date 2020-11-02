@@ -57,8 +57,15 @@ public class ObjectSetCompiler implements Compiler<ObjectSetSpecNode> {
 
     public CompiledObjectSet compile(CompilerContext ctx, String objectSetName, CompiledObjectClass objectClass,
             ObjectSetSpecNode objectSet, Optional<Parameters> maybeParameters) {
+        var elementSet = objectSet.getRootElements();
+
+        return getCompiledObjectSet(ctx, objectSetName, objectClass, elementSet);
+    }
+
+    public CompiledObjectSet getCompiledObjectSet(CompilerContext ctx, String objectSetName,
+            CompiledObjectClass objectClass, ElementSet elementSet) {
         var compiledObjectSet = ctx.createCompiledObjectSet(objectSetName, objectClass);
-        var values = compile(objectClass, objectSet.getRootElements());
+        var values = compile(objectClass, elementSet);
 
         objectClass.getFields().stream()
                 .filter(CompiledFixedTypeValueField.class::isInstance)

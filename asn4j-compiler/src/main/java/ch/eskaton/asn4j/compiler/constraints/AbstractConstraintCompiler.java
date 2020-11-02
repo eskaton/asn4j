@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.NodeType;
 import ch.eskaton.asn4j.compiler.constraints.ast.OpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.constraints.elements.ElementSetCompiler;
+import ch.eskaton.asn4j.compiler.constraints.elements.ObjectSetElementsCompiler;
 import ch.eskaton.asn4j.compiler.il.BinaryBooleanExpression;
 import ch.eskaton.asn4j.compiler.il.BinaryOperator;
 import ch.eskaton.asn4j.compiler.il.BooleanExpression;
@@ -51,7 +52,9 @@ import ch.eskaton.asn4j.compiler.il.builder.FunctionBuilder;
 import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
+import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
+import ch.eskaton.asn4j.parser.ast.constraints.ComponentRelationConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
@@ -95,6 +98,7 @@ public abstract class AbstractConstraintCompiler {
                         e.getClass().getSimpleName(), getTypeName().getName()));
 
         addConstraintHandler(ElementSet.class, new ElementSetCompiler(dispatcher)::compile);
+        addConstraintHandler(ObjectSetElements.class, new ObjectSetElementsCompiler(ctx, dispatcher)::compile);
     }
 
     protected abstract TypeName getTypeName();
@@ -281,8 +285,11 @@ public abstract class AbstractConstraintCompiler {
                 constraintDef = getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef,
                         (SizeConstraint) constraint, this::compileConstraint);
             } else if (constraint instanceof SimpleTableConstraint) {
-                constraintDef = getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef,
+                // TODO implement constraint
+                getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef,
                         (SimpleTableConstraint) constraint, this::compileConstraint);
+            } else if (constraint instanceof ComponentRelationConstraint) {
+                // TODO implement constraint
             } else {
                 throw new CompilerException("Constraints of type %s not yet supported",
                         constraint.getClass().getSimpleName());

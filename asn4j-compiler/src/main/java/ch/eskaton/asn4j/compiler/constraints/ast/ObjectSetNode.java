@@ -25,31 +25,44 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler.objects;
+package ch.eskaton.asn4j.compiler.constraints.ast;
 
-import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.NamedCompiler;
-import ch.eskaton.asn4j.compiler.Parameters;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
-import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
-import java.util.Optional;
+public class ObjectSetNode extends AbstractNode {
 
-public abstract class AbstractObjectReferenceCompiler<T extends ObjectClassReference>
-        implements NamedCompiler<T, CompiledObjectClass> {
+    private Set<Map<String, Object>> values;
 
-    @Override
-    public CompiledObjectClass compile(CompilerContext ctx, String name, T node, Optional<Parameters> maybeParameters) {
-        var referencedObjectClass = getReferencedObjectClass(ctx, node);
-        var compiledObjectClass = ctx.createCompiledObjectClass(name);
+    public ObjectSetNode(Set<Map<String, Object>> values) {
+        super(NodeType.OBJECT_SET);
 
-        referencedObjectClass.getFields().forEach(compiledObjectClass::addField);
-
-        compiledObjectClass.setSyntax(referencedObjectClass.getSyntax().orElse(null));
-
-        return compiledObjectClass;
+        this.values = values;
     }
 
-    protected abstract CompiledObjectClass getReferencedObjectClass(CompilerContext ctx, T node);
+    public Set<Map<String, Object>> getValues() {
+        return values;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ObjectSetNode that = (ObjectSetNode) o;
+
+        return Objects.equals(values, that.values);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(values);
+    }
 
 }

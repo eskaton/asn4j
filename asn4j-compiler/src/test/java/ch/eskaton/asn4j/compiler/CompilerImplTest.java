@@ -2610,6 +2610,29 @@ class CompilerImplTest {
         assertTrue(contentType.getContentType().getType() instanceof BooleanType);
     }
 
+    @Test
+    void testParameterizedObjectSetInConstraint() throws IOException, ParserException {
+        var body = """
+                    AbstractSeq{OBJ-CLASS:ObjectSetParam} ::= SEQUENCE {
+                      field OBJ-CLASS.&id({ObjectSetParam})
+                    }
+                    
+                    ObjectSet OBJ-CLASS ::= {
+                        {&id 123}
+                    }
+                    
+                    OBJ-CLASS ::= CLASS {
+                        &id INTEGER UNIQUE
+                    }
+
+                    Seq ::= AbstractSeq{{ObjectSet}}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+    }
+
     @ParameterizedTest(name = "[{index}] {4}")
     @MethodSource("provideParameterizedValueInConstraint")
     @DisplayName("Test value parameters in constraints")
