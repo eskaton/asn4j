@@ -37,19 +37,20 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
-import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
-import ch.eskaton.asn4j.parser.ast.Group;
+import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.RequiredToken;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.DefinedSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
+import ch.eskaton.asn4j.parser.ast.Group;
 import ch.eskaton.asn4j.parser.ast.LiteralNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.collections.Tuple2;
@@ -286,8 +287,14 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 var fieldValue = (Value) objectFields.get(fieldName);
                 var fieldType = ((CompiledType) objectFields.get(variableTypeValueField.getReference())).getType();
 
+                if (fieldValue instanceof SimpleDefinedValue simpleDefinedValue) {
+                    fieldValue = ctx.getCompiledValue(simpleDefinedValue).getValue();
+                }
+
                 try {
                     ctx.getValue(fieldType, fieldValue);
+
+                    objectFields.put(fieldName, fieldValue);
                 } catch (ValueResolutionException e) {
                     throw new CompilerException(objectDefinition.getPosition(),
                             "The value for %s in the object definition for %s must be of the type %s but found the value %s",

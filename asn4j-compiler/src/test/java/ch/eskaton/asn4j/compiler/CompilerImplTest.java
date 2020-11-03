@@ -948,6 +948,74 @@ class CompilerImplTest {
     }
 
     @Test
+    void testObjectWithReferenceInFixedTypeValueField() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &intField INTEGER
+                }
+
+                intValue INTEGER ::= 47
+
+                testObject TEST ::= {
+                    &intField intValue
+                }
+
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("testObject");
+
+        assertNotNull(object);
+        assertTrue(object.getObjectDefinition().containsKey("intField"));
+
+        var value = object.getObjectDefinition().get("intField");
+
+        assertTrue(value instanceof IntegerValue);
+        assertEquals(47, ((IntegerValue) value).getValue().longValue());
+    }
+
+    @Test
+    void testObjectWithReferenceInVariableTypeValueField() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &field &Type,
+                    &Type
+                }
+
+                intValue INTEGER ::= 47
+
+                testObject TEST ::= {
+                    &field intValue,
+                    &Type  INTEGER
+                }
+
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("testObject");
+
+        assertNotNull(object);
+        assertTrue(object.getObjectDefinition().containsKey("field"));
+
+        var value = object.getObjectDefinition().get("field");
+
+        assertTrue(value instanceof IntegerValue);
+        assertEquals(47, ((IntegerValue) value).getValue().longValue());
+    }
+
+    @Test
     void testNestedFields() throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
