@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
@@ -43,13 +44,16 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.RequiredToken;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.DefinedSyntaxNode;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectReferenceNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
 import ch.eskaton.asn4j.parser.ast.Group;
 import ch.eskaton.asn4j.parser.ast.LiteralNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
+import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.utils.ToString;
@@ -270,12 +274,40 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 var value = (Value) setting;
 
                 return Tuple2.of(reference, value);
+            } else if (field instanceof CompiledObjectField) {
+                Map<String, Object> object;
+
+                if (setting instanceof SimpleDefinedValue simpleDefinedValue) {
+                    object = ctx.getCompiledObject(toObjectReference(simpleDefinedValue)).getObjectDefinition();
+                } else if (setting instanceof ObjectDefnNode) {
+                    var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
+
+                    object = compiler.compile(((CompiledObjectField) field).getObjectClass(), (ObjectDefnNode) setting);
+                } else {
+                    throw new IllegalCompilerStateException(setting.getPosition(), "Unsupported setting %s",
+                            setting.getClass().getSimpleName());
+                }
+
+                return Tuple2.of(reference, object);
             } else {
                 throw new IllegalCompilerStateException("Unsupported field of type %s",
                         field.getClass().getSimpleName());
             }
         } else {
             throw new CompilerException(fieldName.getPosition(), "Invalid reference %s", reference);
+        }
+    }
+
+    private ObjectReference toObjectReference(SimpleDefinedValue simpleDefinedValue) {
+        var position = simpleDefinedValue.getPosition();
+        var ref = simpleDefinedValue.getReference();
+
+        if (simpleDefinedValue instanceof ExternalValueReference externalValueReference) {
+            var module = externalValueReference.getModule();
+
+            return new ExternalObjectReferenceNode(position, module, ref);
+        } else {
+            return new ObjectReference(position, ref);
         }
     }
 
