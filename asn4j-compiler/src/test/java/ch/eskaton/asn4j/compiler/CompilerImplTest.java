@@ -117,6 +117,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -1013,6 +1014,86 @@ class CompilerImplTest {
 
         assertTrue(value instanceof IntegerValue);
         assertEquals(47, ((IntegerValue) value).getValue().longValue());
+    }
+
+    @Test
+    void testObjectWithObjectField() throws IOException, ParserException {
+        var body = """
+                TEST1 ::= CLASS {
+                    &field1 INTEGER
+                }
+                
+                TEST2 ::= CLASS {
+                    &field2 TEST1
+                }
+
+                object2 TEST2 ::= {
+                    &field2 {&field1 47}
+                }
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var object2 = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object2");
+
+        assertNotNull(object2);
+        assertTrue(object2.getObjectDefinition().containsKey("field2"));
+
+        var object1 = object2.getObjectDefinition().get("field2");
+
+        assertTrue(object1 instanceof Map);
+        assertTrue(((Map) object1).containsKey("field1"));
+
+        var value = ((Map) object1).get("field1");
+
+        assertTrue(value instanceof IntegerValue);
+        assertEquals(47, ((IntegerValue)value).getValue().longValue());
+    }
+
+    @Test
+    void testObjectWithReferenceInObjectField() throws IOException, ParserException {
+        var body = """
+                TEST1 ::= CLASS {
+                    &field1 INTEGER
+                }
+                
+                TEST2 ::= CLASS {
+                    &field2 TEST1
+                }
+
+                object1 TEST1 ::= {&field1 47}
+
+                object2 TEST2 ::= {
+                    &field2 object1
+                }
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var object2 = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object2");
+
+        assertNotNull(object2);
+        assertTrue(object2.getObjectDefinition().containsKey("field2"));
+
+        var object1 = object2.getObjectDefinition().get("field2");
+
+        assertTrue(object1 instanceof Map);
+        assertTrue(((Map) object1).containsKey("field1"));
+
+        var value = ((Map) object1).get("field1");
+
+        assertTrue(value instanceof IntegerValue);
+        assertEquals(47, ((IntegerValue)value).getValue().longValue());
     }
 
     @Test
