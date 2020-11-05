@@ -51,6 +51,7 @@ import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.StringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.ValueFromObject;
 import ch.eskaton.commons.ImmutableReference;
 import ch.eskaton.commons.Reference;
 import ch.eskaton.commons.utils.Dispatcher;
@@ -88,6 +89,7 @@ public class ValueFormatter {
         addCase(StringValue.class, new StringValueFormatter()::format);
         addCase(Tuple.class, new TupleFormatter()::format);
         addCase(NamedValue.class, new NamedValueFormatter()::format);
+        addCase(ValueFromObject.class, new ValueFromObjectFormatter()::format);
     }
 
     private ValueFormatter() {
