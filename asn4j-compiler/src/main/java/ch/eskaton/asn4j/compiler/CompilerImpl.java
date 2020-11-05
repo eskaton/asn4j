@@ -309,7 +309,7 @@ public class CompilerImpl {
 
         var valueSet = assignment.getValueSet();
 
-        type.setConstraints(List.of(new SubtypeConstraint(valueSet.getPosition(), (ElementSetSpecsNode) valueSet)));
+        type.setConstraints(List.of(new SubtypeConstraint(valueSet.getPosition(), valueSet)));
 
         var typeAssignment = new TypeAssignmentNode(assignment.getPosition(), assignment.getReference(), type);
 
