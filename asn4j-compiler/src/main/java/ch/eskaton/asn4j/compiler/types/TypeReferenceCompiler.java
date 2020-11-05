@@ -27,23 +27,13 @@
 
 package ch.eskaton.asn4j.compiler.types;
 
-import ch.eskaton.asn4j.compiler.Clone;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
-import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
-import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 import java.util.Optional;
-import java.util.function.UnaryOperator;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.createParameters;
-import static ch.eskaton.asn4j.compiler.CompilerUtils.isAnyTypeReference;
-import static ch.eskaton.asn4j.compiler.CompilerUtils.updateParameters;
-import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
 
 public class TypeReferenceCompiler extends AbstractTypeReferenceCompiler<TypeReference> {
 

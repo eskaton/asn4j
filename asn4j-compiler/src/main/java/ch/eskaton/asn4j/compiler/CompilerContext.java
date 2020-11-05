@@ -778,31 +778,30 @@ public class CompilerContext {
             return getCompiledObjectSet(objectSetReference);
         }
 
-        if (maybeParameters.isPresent()) {
-            var parameters = maybeParameters.get();
-            var maybeParameter = parameters.getDefinitionsAndValues().stream().
-                    filter(tuple -> isObjectSetParameter(parameters, tuple.get_1(), objectSetReference))
-                    .findAny();
+        var parameters = maybeParameters.get();
+        var maybeParameter = parameters.getDefinitionsAndValues().stream().
+                filter(tuple -> isObjectSetParameter(parameters, tuple.get_1(), objectSetReference))
+                .findAny();
 
-            if (maybeParameter.isPresent()) {
-                var node = maybeParameter.get().get_2();
+        if (maybeParameter.isPresent()) {
+            var node = maybeParameter.get().get_2();
 
-                if (!(node instanceof ValueSetOrObjectSet maybeObjectSet) ||
-                        maybeObjectSet.getObjectSetSpec().isEmpty()) {
-                    throw new CompilerException(node.getPosition(), "Expected an object set but found: %s", node);
-                }
-
-                var valueSetOrObjectSet = (ValueSetOrObjectSet) node;
-                var elementSetSpecs = valueSetOrObjectSet.getObjectSetSpec().get();
-                var parameter = maybeParameter.get().get_1();
-                var compiledObjectClass = getParameterObjectClass(parameters, parameter.getGovernor());
-
-                parameters.markAsUsed(parameter);
-
-                return new ObjectSetCompiler(this).getCompiledObjectSet(this, null, compiledObjectClass,
-                        elementSetSpecs.getRootElements());
+            if (!(node instanceof ValueSetOrObjectSet maybeObjectSet) ||
+                    maybeObjectSet.getObjectSetSpec().isEmpty()) {
+                throw new CompilerException(node.getPosition(), "Expected an object set but found: %s", node);
             }
+
+            var valueSetOrObjectSet = (ValueSetOrObjectSet) node;
+            var elementSetSpecs = valueSetOrObjectSet.getObjectSetSpec().get();
+            var parameter = maybeParameter.get().get_1();
+            var compiledObjectClass = getParameterObjectClass(parameters, parameter.getGovernor());
+
+            parameters.markAsUsed(parameter);
+
+            return new ObjectSetCompiler(this).getCompiledObjectSet(this, null, compiledObjectClass,
+                    elementSetSpecs.getRootElements());
         }
+
 
         throw new CompilerException(objectSetReference.getPosition(), "Failed to resolve object set reference: %s",
                 objectSetReference);

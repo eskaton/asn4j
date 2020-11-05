@@ -39,7 +39,6 @@ import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.EndpointNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.values.AbstractStringValue;
-import ch.eskaton.asn4j.parser.ast.values.StringValue;
 
 import java.util.Optional;
 
