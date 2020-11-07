@@ -59,6 +59,8 @@ public class BitStringValueCompiler extends AbstractValueCompiler<BitStringValue
     @Override
     public BitStringValue doCompile(CompilerContext ctx, CompiledType compiledType, Value value,
             Optional<Parameters> maybeParameters) {
+        value = resolveValueFromObject(ctx, value);
+
         if (value instanceof AbstractBaseXStringValue) {
             return ((AbstractBaseXStringValue) value).toBitString();
         } else if (value instanceof EmptyValue) {

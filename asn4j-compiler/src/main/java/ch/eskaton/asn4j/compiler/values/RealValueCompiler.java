@@ -52,6 +52,8 @@ public class RealValueCompiler extends AbstractValueCompiler<RealValue> {
     @Override
     public RealValue doCompile(CompilerContext ctx, CompiledType compiledType, Value value,
             Optional<Parameters> maybeParameters) {
+        value = resolveValueFromObject(ctx, value);
+
         if (value instanceof RealValue) {
             return (RealValue) value;
         } else if (value instanceof IntegerValue integerValue) {

@@ -95,12 +95,33 @@ import ch.eskaton.asn4j.parser.ast.types.UTF8String;
 import ch.eskaton.asn4j.parser.ast.types.UniversalString;
 import ch.eskaton.asn4j.parser.ast.types.VideotexString;
 import ch.eskaton.asn4j.parser.ast.types.VisibleString;
+import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
+import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
 import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
 import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
+import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
 import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
+import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
+import ch.eskaton.asn4j.parser.ast.values.GeneralStringValue;
+import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
+import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
+import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
+import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
+import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
+import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
+import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
+import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
+import ch.eskaton.asn4j.parser.ast.values.RealValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
+import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
+import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
+import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
+import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
+import ch.eskaton.asn4j.parser.ast.values.UniversalStringValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
 import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
@@ -121,6 +142,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.compilerConfig;
@@ -156,6 +178,7 @@ import static ch.eskaton.asn4j.runtime.types.TypeName.UTF8_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.VIDEOTEX_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.VISIBLE_STRING;
 import static ch.eskaton.asn4j.test.TestUtils.module;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -893,7 +916,7 @@ class CompilerImplTest {
                 TestSet1 TEST ::= {
                     {&id 1234}
                 }
-                
+                                
                 TestSet2 TEST ::= {
                     TestSet1 | {&id 5678}
                 }
@@ -1022,7 +1045,7 @@ class CompilerImplTest {
                 TEST1 ::= CLASS {
                     &field1 INTEGER
                 }
-                
+                                
                 TEST2 ::= CLASS {
                     &field2 TEST1
                 }
@@ -1052,7 +1075,7 @@ class CompilerImplTest {
         var value = ((Map) object1).get("field1");
 
         assertTrue(value instanceof IntegerValue);
-        assertEquals(47, ((IntegerValue)value).getValue().longValue());
+        assertEquals(47, ((IntegerValue) value).getValue().longValue());
     }
 
     @Test
@@ -1061,7 +1084,7 @@ class CompilerImplTest {
                 TEST1 ::= CLASS {
                     &field1 INTEGER
                 }
-                
+                                
                 TEST2 ::= CLASS {
                     &field2 TEST1
                 }
@@ -1093,7 +1116,72 @@ class CompilerImplTest {
         var value = ((Map) object1).get("field1");
 
         assertTrue(value instanceof IntegerValue);
-        assertEquals(47, ((IntegerValue)value).getValue().longValue());
+        assertEquals(47, ((IntegerValue) value).getValue().longValue());
+    }
+
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("provideValueFromObject")
+    @DisplayName("Test value from object")
+    <V extends Value> void testValueFromObject(String typeName, String valueString, Class<V> valueClass,
+            Consumer<V> valueTester) throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &field %s
+                }
+                              
+                object TEST ::= {&field %s}
+
+                value %s ::= object.&field
+                """.formatted(typeName, valueString, typeName);
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledValue = ctx.getCompiledModule(MODULE_NAME).getValues().get("value");
+
+        assertNotNull(compiledValue);
+
+        var value = compiledValue.getValue();
+
+        assertNotNull(value);
+        assertTrue(valueClass.isInstance(value));
+
+        valueTester.accept(valueClass.cast(value));
+    }
+
+    @Test
+    void testValueFromObjectWithNestedObjects() throws IOException, ParserException {
+        var body = """
+                TEST1 ::= CLASS {
+                    &field1 TEST2
+                }
+
+                TEST2 ::= CLASS {
+                    &field2 BOOLEAN
+                }
+                              
+                object TEST1 ::= {&field1 {&field2 TRUE}}
+
+                value BOOLEAN ::= object.&field1.&field2
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledValue = ctx.getCompiledModule(MODULE_NAME).getValues().get("value");
+
+        assertNotNull(compiledValue);
+        assertNotNull(compiledValue.getValue());
+        assertTrue(compiledValue.getValue() instanceof BooleanValue);
+        assertEquals(true, ((BooleanValue) compiledValue.getValue()).getValue());
     }
 
     @Test
@@ -3456,7 +3544,6 @@ class CompilerImplTest {
                 .formatted(type);
     }
 
-
     private static Stream<Arguments> provideTagsOnComponents() {
         return Stream.of(
                 getTagsOnComponentsArguments(BooleanType.class, BOOLEAN, 1),
@@ -3599,6 +3686,87 @@ class CompilerImplTest {
 
     private static Arguments getObjectClassWithSyntaxForbiddenLiteralsArgument(String reservedWord) {
         return Arguments.of(reservedWord, "Test that '%s' is forbidden in DefinedSyntax".formatted(reservedWord));
+    }
+
+    private static Stream<Arguments> provideValueFromObject() {
+        return Stream.of(
+                getValueFromObjectArguments(BOOLEAN, "TRUE", BooleanValue.class,
+                        value -> assertEquals(true, value.getValue())),
+                getValueFromObjectArguments(INTEGER, "23", IntegerValue.class,
+                        value -> assertEquals(23, value.getValue().longValue())),
+                getValueFromObjectArguments(BIT_STRING, "'1011'B", BitStringValue.class,
+                        value -> assertArrayEquals(new byte[] { 0x0b }, value.getByteValue())),
+                getValueFromObjectArguments(OCTET_STRING, "'0A'H", OctetStringValue.class,
+                        value -> assertArrayEquals(new byte[] { 0x0a }, value.getByteValue())),
+                getValueFromObjectArguments(NULL, "NULL", NullValue.class, value -> {}),
+                getValueFromObjectArguments(OBJECT_IDENTIFIER, "{1 2 3 27}", ObjectIdentifierValue.class,
+                        value -> assertEquals(Arrays.asList(1, 2, 3, 27), value.getComponents().stream()
+                                .map(c -> c.getId()).collect(Collectors.toList()))),
+                getValueFromObjectArguments(REAL, "1.2e5", RealValue.class,
+                        value -> assertEquals(120000, value.getValue().longValue())),
+                getValueFromObjectArguments("ENUMERATED {a, b, c}", "c", EnumeratedValue.class,
+                        value -> assertEquals(2, value.getValue())),
+                getValueFromObjectArguments(UTF8_STRING, "\"äöü\"", UTF8StringValue.class,
+                        value -> assertEquals("äöü", value.getValue())),
+                getValueFromObjectArguments(RELATIVE_OID, "{2 3 27}", RelativeOIDValue.class,
+                        value -> assertEquals(Arrays.asList(2, 3, 27), value.getComponents().stream()
+                                .map(c -> c.getId()).collect(Collectors.toList()))),
+                getValueFromObjectArguments("SEQUENCE {a BOOLEAN}", "{a TRUE}", CollectionValue.class,
+                        value -> assertTrue(value.getValues().stream()
+                                .filter(nv -> nv.getName().equals("a"))
+                                .findAny()
+                                .isPresent())),
+                getValueFromObjectArguments("SEQUENCE OF BOOLEAN", "{TRUE}", CollectionOfValue.class,
+                        value -> assertEquals(1, value.getSize())),
+                getValueFromObjectArguments("SET {a BOOLEAN}", "{a TRUE}", CollectionValue.class,
+                        value -> assertTrue(value.getValues().stream()
+                                .filter(nv -> nv.getName().equals("a"))
+                                .findAny()
+                                .isPresent())),
+                getValueFromObjectArguments("SET OF BOOLEAN", "{TRUE}", CollectionOfValue.class,
+                        value -> assertEquals(1, value.getSize())),
+                getValueFromObjectArguments(NUMERIC_STRING, "\"123\"", NumericStringValue.class,
+                        value -> assertEquals("123", value.getValue())),
+                getValueFromObjectArguments(PRINTABLE_STRING, "\"abc\"", PrintableStringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(TELETEX_STRING, "\"abc\"", TeletexStringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(T61_STRING, "\"abc\"", TeletexStringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(VIDEOTEX_STRING, "\"abc\"", VideotexStringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(IA5_STRING, "\"abc\"", IA5StringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(UTC_TIME, "\"8201021200Z\"", UTCTimeValue.class,
+                        value -> assertEquals("8201021200Z", value.getValue())),
+                getValueFromObjectArguments(GENERALIZED_TIME, "\"19851106210627.3Z\"", GeneralizedTimeValue.class,
+                        value -> assertEquals("19851106210627.3Z", value.getValue())),
+                getValueFromObjectArguments(GRAPHIC_STRING, "\"abc\"", GraphicStringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(VISIBLE_STRING, "\"abc\"", VisibleStringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(ISO646_STRING, "\"abc\"", VisibleStringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(GENERAL_STRING, "\"abc\"", GeneralStringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(UNIVERSAL_STRING, "\"abc\"", UniversalStringValue.class,
+                        value -> assertEquals("abc", value.getValue())),
+                getValueFromObjectArguments(BMP_STRING, "\"äöü\"", BMPStringValue.class,
+                        value -> assertEquals("äöü", value.getValue())),
+                getValueFromObjectArguments(OID_IRI, "\"/iso/a/b/c\"", IRIValue.class,
+                        value -> assertEquals(Arrays.asList("iso", "a", "b", "c"), value.getArcIdentifierTexts())),
+                getValueFromObjectArguments(RELATIVE_OID_IRI, "\"a/b/c\"", RelativeIRIValue.class,
+                        value -> assertEquals(Arrays.asList("a", "b", "c"), value.getArcIdentifierTexts())));
+    }
+
+    private static <V extends Value> Arguments getValueFromObjectArguments(TypeName typeName, String value,
+            Class<V> valueClass, Consumer<V> valueTest) {
+        return Arguments.of(typeName.toString(), value, valueClass, valueTest);
+    }
+
+    private static <V extends Value> Arguments getValueFromObjectArguments(String typeName, String value,
+            Class<V> valueClass, Consumer<V> valueTest) {
+        return Arguments.of(typeName, value, valueClass, valueTest);
     }
 
 }

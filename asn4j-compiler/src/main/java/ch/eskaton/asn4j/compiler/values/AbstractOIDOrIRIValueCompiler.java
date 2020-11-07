@@ -46,6 +46,9 @@ public abstract class AbstractOIDOrIRIValueCompiler<V extends Value> extends Abs
     public V doCompile(CompilerContext ctx, CompiledType compiledType, Value value,
             Optional<Parameters> maybeParameters) {
         var valueClass = getValueClass();
+
+        value = resolveValueFromObject(ctx, value);
+
         var resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
 
         if (resolvedValue != null && resolvedValue.getClass().isAssignableFrom(valueClass)) {

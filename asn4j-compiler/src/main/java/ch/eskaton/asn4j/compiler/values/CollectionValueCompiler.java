@@ -61,6 +61,9 @@ public class CollectionValueCompiler extends AbstractValueCompiler<CollectionVal
     public CollectionValue doCompile(CompilerContext ctx, CompiledType compiledType, Value value,
             Optional<Parameters> maybeParameters) {
         var typeName = getTypeName().getName();
+
+        value = resolveValueFromObject(ctx, value);
+
         var maybeCollectionValue = getCollectionValue(value);
 
         if (maybeCollectionValue.isPresent()) {
