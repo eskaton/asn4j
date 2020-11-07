@@ -60,6 +60,8 @@ public class CollectionOfValueCompiler extends AbstractValueCompiler<CollectionO
         var elementType = ((CollectionOfType) baseType).getType();
         CollectionOfValue collectionOfValue = null;
 
+        value = resolveValueFromObject(ctx, value);
+
         if (value instanceof EmptyValue) {
             return new CollectionOfValue(value.getPosition(), Collections.emptyList());
         } else if (value instanceof AmbiguousValue) {

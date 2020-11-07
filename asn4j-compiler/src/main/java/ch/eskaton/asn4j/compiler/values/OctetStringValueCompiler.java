@@ -51,6 +51,8 @@ public class OctetStringValueCompiler extends AbstractValueCompiler<OctetStringV
         var compiledBaseType = ctx.getCompiledBaseType(compiledType);
         var type = compiledBaseType.getType();
 
+        value = resolveValueFromObject(ctx, value);
+
         if (OctetString.class.isAssignableFrom(type.getClass()) &&
                 OctetStringValue.class.isAssignableFrom(value.getClass())) {
             return (OctetStringValue) value;

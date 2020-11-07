@@ -78,6 +78,8 @@ public abstract class AbstractStringValueCompiler<V extends AbstractStringValue 
         var valuePosition = value.getPosition();
         var verifiedCompiledBaseType = verifyType(ctx, compiledType.getType(), valuePosition);
 
+        value = resolveValueFromObject(ctx, value);
+
         if (typeClass.isAssignableFrom(verifiedCompiledBaseType.getClass()) &&
                 valueClass.isAssignableFrom(value.getClass())) {
             return (V) value;
