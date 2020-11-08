@@ -178,7 +178,7 @@ public abstract class AbstractValueCompiler<V extends Value> implements Compiler
             }
         }
 
-        if (!(value instanceof Value)) {
+        if (!(resolvedValue instanceof Value)) {
             var formattedValue = ValueFormatter.formatValue(valueFromObject);
 
             throw new CompilerException(valueFromObject.getPosition(), "%s doesn't refer to a value", formattedValue);
