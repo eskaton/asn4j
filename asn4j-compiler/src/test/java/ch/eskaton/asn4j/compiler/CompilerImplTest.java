@@ -2176,15 +2176,14 @@ class CompilerImplTest {
         assertEquals(1, objectSet.getValues().size());
 
         var object = objectSet.getValues().stream().findFirst().get();
-        var field1 = (Tuple2<String, Object>) object.get("fixedTypeValueField1");
+        var value1 = object.get("fixedTypeValueField1");
 
-        assertNotNull(field1);
-        assertTrue(field1.get_2() instanceof BooleanValue);
+        assertTrue(value1 instanceof BooleanValue);
 
-        var field2 = (Tuple2<String, Object>) object.get("fixedTypeValueField2");
+        var value2 = object.get("fixedTypeValueField2");
 
-        assertNotNull(field2);
-        assertTrue(field2.get_2() instanceof IntegerValue);
+        assertNotNull(value2);
+        assertTrue(value2 instanceof IntegerValue);
     }
 
     @Test
@@ -2211,15 +2210,13 @@ class CompilerImplTest {
         assertEquals(1, objectSet.getValues().size());
 
         var object = objectSet.getValues().stream().findFirst().get();
-        var field1 = (Tuple2<String, Object>) object.get("fixedTypeValueField1");
+        var value1 = object.get("fixedTypeValueField1");
 
-        assertNotNull(field1);
-        assertTrue(field1.get_2() instanceof BooleanValue);
+        assertTrue(value1 instanceof BooleanValue);
 
-        var field2 = (Tuple2<String, Object>) object.get("fixedTypeValueField2");
+        var value2 = object.get("fixedTypeValueField2");
 
-        assertNotNull(field2);
-        assertTrue(field2.get_2() instanceof IntegerValue);
+        assertTrue(value2 instanceof IntegerValue);
     }
 
     @Test
@@ -2306,15 +2303,13 @@ class CompilerImplTest {
         assertEquals(1, objectSet.getValues().size());
 
         var object = objectSet.getValues().stream().findFirst().get();
-        var field1 = (Tuple2<String, Object>) object.get("fixedTypeValueField1");
+        var value1 = object.get("fixedTypeValueField1");
 
-        assertNull(field1);
+        assertNull(value1);
 
-        var field2 = (Tuple2<String, Object>) object.get("fixedTypeValueField2");
+        var value2 =  object.get("fixedTypeValueField2");
 
-        assertNotNull(field2);
-
-        assertTrue(field2.get_2() instanceof IntegerValue);
+        assertTrue(value2 instanceof IntegerValue);
     }
 
     @Test

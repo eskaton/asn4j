@@ -212,7 +212,9 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                     objectClass.getName(), fieldNameNode);
         }
 
-        values.put(fieldName, compile(objectClass, element, fieldNameNode));
+        var value = compile(objectClass, element, fieldNameNode);
+
+        values.put(value.get_1(), value.get_2());
     }
 
     private Map<String, Object> compileDefaultSyntax(CompiledObjectClass objectClass, DefaultSyntaxNode syntaxNode) {
