@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.objects;
 import ch.eskaton.asn4j.compiler.Compiler;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.Formatter;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
@@ -52,7 +53,7 @@ import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
-import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.Setting;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -170,9 +171,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
 
         if (token instanceof LiteralNode literalNodeSpec) {
             if (!(element instanceof LiteralNode literalNode)) {
-                var formattedElement = element instanceof Value ?
-                        ValueFormatter.formatValue(element) :
-                        element.toString();
+                var formattedElement = Formatter.format(ctx, element);
 
                 throw new CompilerException(element.getPosition(), "Expected literal '%s' but found '%s'",
                         literalNodeSpec.getText(), formattedElement);
@@ -191,7 +190,13 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 state = state.accepted(true);
             }
         } else if (token instanceof PrimitiveFieldNameNode fieldNameNode) {
-            compilePrimitiveFieldName(objectClass, values, element, fieldNameNode);
+            if (!(element instanceof Setting)) {
+                var formattedElement = Formatter.format(ctx, element);
+
+                throw new CompilerException(element.getPosition(), "Expected setting but found '%s'", formattedElement);
+            }
+
+            compilePrimitiveFieldName(objectClass, values, (Setting) element, fieldNameNode);
 
             state = state.hasField(true);
         }
@@ -200,7 +205,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
     }
 
     private void compilePrimitiveFieldName(CompiledObjectClass objectClass, HashMap<String, Object> values,
-            Node element, PrimitiveFieldNameNode fieldNameNode) {
+            Setting setting, PrimitiveFieldNameNode fieldNameNode) {
         var fieldName = fieldNameNode.getReference();
         var maybeField = objectClass.getField(fieldName);
 
@@ -212,7 +217,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                     objectClass.getName(), fieldNameNode);
         }
 
-        var value = compile(objectClass, element, fieldNameNode);
+        var value = compile(objectClass, setting, fieldNameNode);
 
         values.put(value.get_1(), value.get_2());
     }
@@ -251,10 +256,10 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         var fieldName = fieldSettingNode.getFieldName();
         var setting = fieldSettingNode.getSetting();
 
-        return compile(objectClass, setting, fieldName);
+        return compile(objectClass, (Setting) setting, fieldName);
     }
 
-    private Tuple2<String, Object> compile(CompiledObjectClass objectClass, Node setting,
+    private Tuple2<String, Object> compile(CompiledObjectClass objectClass, Setting setting,
             PrimitiveFieldNameNode fieldName) {
         var reference = fieldName.getReference();
         var maybeField = objectClass.getField(reference);
@@ -263,30 +268,50 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
             var field = maybeField.get();
 
             if (field instanceof CompiledFixedTypeValueField) {
+                if (setting.getValue().isEmpty()) {
+                    var formattedNode = Formatter.format(ctx, setting);
+
+                    throw new CompilerException(setting.getPosition(), "Invalid value: %s", formattedNode);
+                }
+
                 var compiledField = (CompiledFixedTypeValueField) field;
                 var type = compiledField.getCompiledType().getType();
-                var value = (Value) setting;
+                var value = setting.getValue().get();
 
                 return Tuple2.of(reference, ctx.getValue(type, value));
             } else if (field instanceof CompiledTypeField) {
-                var type = (Type) setting;
+                if (setting.getType().isEmpty()) {
+                    var formattedNode = Formatter.format(ctx, setting);
+
+                    throw new CompilerException(setting.getPosition(), "Invalid type: %s", formattedNode);
+                }
+
+                var type = setting.getType().get();
 
                 return Tuple2.of(reference, ctx.getCompiledType(type));
             } else if (field instanceof CompiledVariableTypeValueField) {
-                var value = (Value) setting;
+                if (setting.getValue().isEmpty()) {
+                    var formattedNode = Formatter.format(ctx, setting);
+
+                    throw new CompilerException(setting.getPosition(), "Invalid value: %s", formattedNode);
+                }
+
+                var value = setting.getValue().get();
 
                 return Tuple2.of(reference, value);
             } else if (field instanceof CompiledObjectField) {
                 Map<String, Object> object;
 
-                if (setting instanceof SimpleDefinedValue simpleDefinedValue) {
+                if (setting.getValue().isPresent() &&
+                        setting.getValue().get() instanceof SimpleDefinedValue simpleDefinedValue) {
                     object = ctx.getCompiledObject(toObjectReference(simpleDefinedValue)).getObjectDefinition();
-                } else if (setting instanceof ObjectDefnNode) {
+                } else if (setting.getObject().isPresent() &&
+                        setting.getObject().get() instanceof ObjectDefnNode objectDefnNode) {
                     var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
 
-                    object = compiler.compile(((CompiledObjectField) field).getObjectClass(), (ObjectDefnNode) setting);
+                    object = compiler.compile(((CompiledObjectField) field).getObjectClass(), objectDefnNode);
                 } else {
-                    throw new IllegalCompilerStateException(setting.getPosition(), "Unsupported setting %s",
+                    throw new IllegalCompilerStateException(setting.getPosition(), "Unsupported setting: %s",
                             setting.getClass().getSimpleName());
                 }
 
