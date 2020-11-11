@@ -320,6 +320,7 @@ import ch.eskaton.asn4j.parser.ast.Quadruple;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
+import ch.eskaton.asn4j.parser.ast.Setting;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.TokenOrGroup;
 import ch.eskaton.asn4j.parser.ast.Tuple;
@@ -5833,7 +5834,11 @@ class ParserTest {
 
         assertNotNull(result);
         assertEquals("value-field", result.getFieldName().getReference());
-        assertTrue(result.getSetting() instanceof IntegerValue);
+
+        Setting setting = result.getSetting();
+
+        assertTrue(setting.getValue().isPresent());
+        assertTrue(setting.getValue().get() instanceof IntegerValue);
     }
 
     @Test
@@ -5869,7 +5874,12 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof VisibleString);
+        assertTrue(result instanceof Setting);
+
+        Setting setting = (Setting) result;
+
+        assertTrue(setting.getType().isPresent());
+        assertTrue(setting.getType().get() instanceof VisibleString);
     }
 
     @Test
@@ -5881,7 +5891,12 @@ class ParserTest {
         Node result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof IntegerType);
+        assertTrue(result instanceof Setting);
+
+        Setting setting = (Setting) result;
+
+        assertTrue(setting.getType().isPresent());
+        assertTrue(setting.getType().get() instanceof IntegerType);
 
         // Value
         parser = new Parser(new ByteArrayInputStream("12.5".getBytes())).new SettingParser();
@@ -5889,7 +5904,12 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof RealValue);
+        assertTrue(result instanceof Setting);
+
+        setting = (Setting) result;
+
+        assertTrue(setting.getValue().isPresent());
+        assertTrue(setting.getValue().get() instanceof RealValue);
 
         // ValueSet
         parser = new Parser(new ByteArrayInputStream(
@@ -5898,7 +5918,11 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ElementSetSpecsNode);
+        assertTrue(result instanceof Setting);
+
+        setting = (Setting) result;
+
+        assertTrue(setting.getValueSet().isPresent());
 
         // Object
         parser = new Parser(new ByteArrayInputStream(
@@ -5907,7 +5931,11 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectDefnNode);
+        assertTrue(result instanceof Setting);
+
+        setting = (Setting) result;
+
+        assertTrue(setting.getObject().isPresent());
 
         // ObjectSet
         parser = new Parser(new ByteArrayInputStream(
@@ -5916,7 +5944,11 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ObjectSetSpecNode);
+        assertTrue(result instanceof Setting);
+
+        setting = (Setting) result;
+
+        assertTrue(setting.getObjectSet().isPresent());
     }
 
     @Test

@@ -28,26 +28,65 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 
-public class FieldSettingNode extends AbstractNode {
+import java.util.Optional;
 
-    private PrimitiveFieldNameNode fieldName;
+public class Setting extends AbstractNode {
 
-    private Setting setting;
+    private Optional<Type> type = Optional.empty();
 
-    public FieldSettingNode(Position position, PrimitiveFieldNameNode fieldName, Setting setting) {
+    private Optional<ElementSetSpecsNode> valueSet = Optional.empty();
+
+    private Optional<ObjectSetSpecNode> objectSet = Optional.empty();
+
+    private Optional<Value> value = Optional.empty();
+
+    private Optional<ObjectNode> object = Optional.empty();
+
+    public Setting(Position position) {
         super(position);
-
-        this.fieldName = fieldName;
-        this.setting = setting;
     }
 
-    public PrimitiveFieldNameNode getFieldName() {
-        return fieldName;
+    public void setType(Type type) {
+        this.type = Optional.ofNullable(type);
     }
 
-    public Setting getSetting() {
-        return setting;
+    public Optional<Type> getType() {
+        return type;
+    }
+
+    public void setValueSet(ElementSetSpecsNode valueSet) {
+        this.valueSet = Optional.ofNullable(valueSet);
+    }
+
+    public Optional<ElementSetSpecsNode> getValueSet() {
+        return valueSet;
+    }
+
+    public void setObjectSet(ObjectSetSpecNode objectSet) {
+        this.objectSet = Optional.ofNullable(objectSet);
+    }
+
+    public Optional<ObjectSetSpecNode> getObjectSet() {
+        return objectSet;
+    }
+
+    public void setValue(Value value) {
+        this.value = Optional.ofNullable(value);
+    }
+
+    public Optional<Value> getValue() {
+        return value;
+    }
+
+    public void setObject(ObjectNode object) {
+        this.object = Optional.ofNullable(object);
+    }
+
+    public Optional<ObjectNode> getObject() {
+        return object;
     }
 
 }

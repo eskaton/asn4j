@@ -80,6 +80,7 @@ import ch.eskaton.asn4j.parser.ast.OIDNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
+import ch.eskaton.asn4j.parser.ast.Setting;
 import ch.eskaton.asn4j.parser.ast.ValueSetOrObjectSet;
 import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
@@ -4713,13 +4714,13 @@ public class Parser {
 
         public FieldSettingNode parse() throws ParserException {
             List<Object> rule = new ChoiceParser<>(
-                    new SequenceParser(valuePrimitiveFieldNameParser, valueSettingParser),
-                    new SequenceParser(typePrimitiveFieldNameParser, typeSettingParser)).parse();
+                    new SequenceParser(valuePrimitiveFieldNameParser, settingParser),
+                    new SequenceParser(typePrimitiveFieldNameParser, settingParser)).parse();
 
             if (rule != null) {
                 PrimitiveFieldNameNode fieldName = (PrimitiveFieldNameNode) rule.get(0);
 
-                return new FieldSettingNode(fieldName.getPosition(), fieldName, (Node) rule.get(1));
+                return new FieldSettingNode(fieldName.getPosition(), fieldName, (Setting) rule.get(1));
             }
 
             return null;
@@ -4753,7 +4754,33 @@ public class Parser {
     protected class SettingParser implements RuleParser<Node> {
 
         public Node parse() throws ParserException {
-            return new ChoiceParser<>(typeSettingParser, valueSettingParser).parse();
+            Set<Node> rules = new AmbiguousChoiceParser<>(typeSettingParser, valueSettingParser).parse();
+
+            Optional<Node> maybeFirst = rules.stream().findFirst();
+
+            if (maybeFirst.isPresent()) {
+                Node first = maybeFirst.get();
+
+                Setting setting = new Setting(first.getPosition());
+
+                rules.stream().forEach(rule -> {
+                    if (rule instanceof Type type) {
+                        setting.setType(type);
+                    } else if (rule instanceof ElementSetSpecsNode valueSet) {
+                        setting.setValueSet(valueSet);
+                    } else if (rule instanceof ObjectSetSpecNode objectSet) {
+                        setting.setObjectSet(objectSet);
+                    } else if (rule instanceof Value value) {
+                        setting.setValue(value);
+                    } else if (rule instanceof ObjectNode object) {
+                        setting.setObject(object);
+                    }
+                });
+
+                return setting;
+            }
+
+            return null;
         }
 
     }

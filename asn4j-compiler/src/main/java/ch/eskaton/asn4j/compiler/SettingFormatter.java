@@ -25,29 +25,29 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.Setting;
 
-public class FieldSettingNode extends AbstractNode {
+public class SettingFormatter {
 
-    private PrimitiveFieldNameNode fieldName;
+    public static String format(CompilerContext ctx, Setting setting) {
+        Node node;
 
-    private Setting setting;
+        if (setting.getValue().isPresent()) {
+            node = setting.getValue().get();
+        } else if (setting.getObject().isPresent()) {
+            node = setting.getObject().get();
+        } else if (setting.getValueSet().isPresent()) {
+            node = setting.getValueSet().get();
+        } else if (setting.getObjectSet().isPresent()) {
+            node = setting.getObjectSet().get();
+        } else {
+            node = setting.getType().get();
+        }
 
-    public FieldSettingNode(Position position, PrimitiveFieldNameNode fieldName, Setting setting) {
-        super(position);
-
-        this.fieldName = fieldName;
-        this.setting = setting;
-    }
-
-    public PrimitiveFieldNameNode getFieldName() {
-        return fieldName;
-    }
-
-    public Setting getSetting() {
-        return setting;
+        return Formatter.format(ctx, node);
     }
 
 }

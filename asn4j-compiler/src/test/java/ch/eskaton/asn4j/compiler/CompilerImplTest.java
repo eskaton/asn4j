@@ -1119,6 +1119,33 @@ class CompilerImplTest {
         assertEquals(47, ((IntegerValue) value).getValue().longValue());
     }
 
+    @Test
+    void testObjectWithSequenceOf() throws IOException, ParserException {
+        var body = """
+                TEST ::= CLASS {
+                    &field SEQUENCE OF VisibleString
+                } WITH SYNTAX {
+                    FIELD &field
+                }
+                
+                object TEST ::= {
+                    FIELD {"value"}
+                }
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object");
+
+        assertNotNull(object);
+        assertTrue(object.getObjectDefinition().containsKey("field"));
+    }
+
     @ParameterizedTest(name = "[{index}] {0}")
     @MethodSource("provideValueFromObject")
     @DisplayName("Test value from object")
