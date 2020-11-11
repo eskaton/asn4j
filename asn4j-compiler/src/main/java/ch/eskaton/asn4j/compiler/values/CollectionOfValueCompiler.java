@@ -92,10 +92,8 @@ public class CollectionOfValueCompiler extends AbstractValueCompiler<CollectionO
         }
 
         if (collectionOfValue != null) {
-            var valueClass = ctx.getValueType(elementType);
-
             var values = collectionOfValue.getValues().stream()
-                    .map(v -> resolveElement(ctx, elementType, valueClass, v))
+                    .map(v -> resolveElement(ctx, elementType, v))
                     .collect(Collectors.toList());
 
             collectionOfValue.getValues().clear();
@@ -107,23 +105,7 @@ public class CollectionOfValueCompiler extends AbstractValueCompiler<CollectionO
         throw invalidValueError(value);
     }
 
-    private Value resolveElement(CompilerContext ctx, Type elementType, Class<? extends Value> valueClass,
-            Value value) {
-        if (value instanceof AmbiguousValue) {
-            var resolvedValue = CompilerUtils.resolveAmbiguousValue(value, valueClass);
-
-            if (resolvedValue != null) {
-                value = resolvedValue;
-            } else {
-                var formattedValue = ValueFormatter.formatValue(value);
-                var formattedType = TypeFormatter.formatType(ctx, elementType);
-
-                throw new ValueResolutionException(value.getPosition(),
-                        "Failed to resolve a value in a %s to type %s: %s",
-                        getTypeName().getName(), formattedType, formattedValue);
-            }
-        }
-
+    private Value resolveElement(CompilerContext ctx, Type elementType, Value value) {
         return ctx.getCompiledValue(elementType, value).getValue();
     }
 
