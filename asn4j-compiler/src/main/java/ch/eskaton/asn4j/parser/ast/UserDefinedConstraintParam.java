@@ -28,23 +28,30 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.constraints.AbstractConstraint;
 
-import java.util.ArrayList;
-import java.util.List;
+public class UserDefinedConstraintParam extends AbstractNode {
 
-public class UserDefinedConstraintNode extends AbstractConstraint {
+    private Governor governor;
 
-    private List<UserDefinedConstraintParamNode> params;
+    private Node value;
 
-    public UserDefinedConstraintNode(Position position, List<UserDefinedConstraintParamNode> params) {
+    public UserDefinedConstraintParam(Position position, Governor governor, Node value) {
         super(position);
 
-        this.params = params != null ? params : new ArrayList<>();
+        this.governor = governor;
+        this.value = value;
     }
 
-    public List<UserDefinedConstraintParamNode> getParams() {
-        return params;
+    public UserDefinedConstraintParam(Position position, Node value) {
+        this(position, null, value);
+    }
+
+    public Governor getGovernor() {
+        return governor;
+    }
+
+    public Node getValue() {
+        return value;
     }
 
 }

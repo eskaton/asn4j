@@ -121,8 +121,8 @@ import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeIdentifierObjectClassReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.UpperEndpointNode;
-import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintNode;
-import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintParamNode;
+import ch.eskaton.asn4j.parser.ast.UserDefinedConstraint;
+import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintParam;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeAssignmentNode;
@@ -4977,15 +4977,15 @@ public class Parser {
 
     // UserDefinedConstraint ::= CONSTRAINED BY "{"
     // UserDefinedConstraintParameter "," * "}"
-    protected class UserDefinedConstraintParser extends ListRuleParser<UserDefinedConstraintNode> {
+    protected class UserDefinedConstraintParser extends ListRuleParser<UserDefinedConstraint> {
 
         @SuppressWarnings("unchecked")
-        public UserDefinedConstraintNode parse() throws ParserException {
+        public UserDefinedConstraint parse() throws ParserException {
             return super.parse(new SequenceParser(
                     new boolean[] { true, true, true, false, true },
                     TokenType.CONSTRAINED_KW, TokenType.BY_KW, TokenType.L_BRACE,
                     new CommaSeparatedRuleParser<>(userDefinedConstraintParameterParser), TokenType.R_BRACE),
-                    a -> new UserDefinedConstraintNode(a.P(), a.n3()));
+                    a -> new UserDefinedConstraint(a.P(), a.n3()));
         }
 
     }
@@ -4996,10 +4996,10 @@ public class Parser {
     // | DefinedObjectSet
     // | Type
     // | DefinedObjectClass
-    protected class UserDefinedConstraintParameterParser implements RuleParser<UserDefinedConstraintParamNode> {
+    protected class UserDefinedConstraintParameterParser implements RuleParser<UserDefinedConstraintParam> {
 
         @SuppressWarnings("unchecked")
-        public UserDefinedConstraintParamNode parse() throws ParserException {
+        public UserDefinedConstraintParam parse() throws ParserException {
             Object rule = new ChoiceParser<>(new SequenceParser(governorParser, TokenType.COLON,
                     new ChoiceParser<>(valueParser, objectParser)), typeParser, usefulObjectClassReferenceParser).parse();
 
@@ -5007,12 +5007,12 @@ public class Parser {
                 if (rule instanceof List) {
                     List<Object> ruleList = (List<Object>) rule;
 
-                    return new UserDefinedConstraintParamNode(getPosition(ruleList), (Governor) ruleList.get(0),
+                    return new UserDefinedConstraintParam(getPosition(ruleList), (Governor) ruleList.get(0),
                             (Node) ruleList.get(2));
                 } else {
                     Node node = (Node) rule;
 
-                    return new UserDefinedConstraintParamNode(node.getPosition(), node);
+                    return new UserDefinedConstraintParam(node.getPosition(), node);
                 }
             }
 

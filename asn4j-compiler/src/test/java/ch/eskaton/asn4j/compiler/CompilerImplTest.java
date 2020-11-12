@@ -47,6 +47,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
+import ch.eskaton.asn4j.compiler.results.CompiledBitStringType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
@@ -2890,6 +2891,20 @@ class CompilerImplTest {
         var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
 
         assertTrue(compiledType instanceof CompiledCollectionType);
+    }
+
+    @Test
+    void testUserDefinedConstraintWithType() throws IOException, ParserException {
+        var body = """
+                AbstractBitString{Type} ::= BIT STRING
+                    (CONSTRAINED BY {-- comment1 -- Type -- comment2 --})
+
+                BitString ::= AbstractBitString{BOOLEAN}
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "BitString");
+
+        assertTrue(compiledType instanceof CompiledBitStringType);
     }
 
     @ParameterizedTest(name = "[{index}] {4}")

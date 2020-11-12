@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler.constraints;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
@@ -54,14 +55,17 @@ import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
+import ch.eskaton.asn4j.parser.ast.UserDefinedConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ComponentRelationConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
+import ch.eskaton.asn4j.parser.ast.constraints.ContentsConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.commons.collections.Tuple4;
 import ch.eskaton.commons.functional.QuadFunction;
@@ -145,9 +149,8 @@ public abstract class AbstractConstraintCompiler {
         return new ConstraintDefinition(node);
     }
 
-    private ConstraintDefinition compileConstraint(CompiledType baseType,
-            SimpleTableConstraint simpleTableConstraint, Optional<Bounds> bounds,
-            Optional<Parameters> maybeParameters) {
+    private ConstraintDefinition compileConstraint(CompiledType baseType, SimpleTableConstraint simpleTableConstraint,
+            Optional<Bounds> bounds, Optional<Parameters> maybeParameters) {
         var setSpec = simpleTableConstraint.getObjectSetSpec();
         var rootElements = setSpec.getRootElements();
         var root = dispatcher.execute(rootElements, Tuple4.of(baseType, rootElements, bounds, maybeParameters));
@@ -161,6 +164,33 @@ public abstract class AbstractConstraintCompiler {
         }
 
         return new ConstraintDefinition(root, extension).extensible(setSpec.hasExtensionMarker());
+    }
+
+    private ConstraintDefinition compileConstraint(CompiledType baseType, UserDefinedConstraint userDefinedConstraint,
+            Optional<Bounds> bounds, Optional<Parameters> maybeParameters) {
+        var params = userDefinedConstraint.getParams();
+
+        for (var param : params) {
+            var governor = param.getGovernor();
+            var value = param.getValue();
+
+            if (governor == null) {
+                if (value instanceof Type type) {
+                    if (CompilerUtils.isTypeReference(type) && maybeParameters.isPresent() &&
+                            !CompilerUtils.isExternalTypeReference(type)) {
+                        var typeReference = (TypeReference) type;
+                        var parameters = maybeParameters.get();
+                        var maybeParameter = parameters.getDefinition(typeReference.getType());
+
+                        if (maybeParameter.isPresent()) {
+                            parameters.markAsUsed(maybeParameter.get());
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     Optional<ConstraintDefinition> compileComponentConstraints(Type node, CompiledType baseType,
@@ -278,18 +308,24 @@ public abstract class AbstractConstraintCompiler {
         ConstraintDefinition constraintDef = null;
 
         for (var constraint : constraints) {
-            if (constraint instanceof SubtypeConstraint) {
+            if (constraint instanceof SubtypeConstraint subtypeConstraint) {
                 constraintDef = getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef,
-                        (SubtypeConstraint) constraint, this::compileConstraint);
-            } else if (constraint instanceof SizeConstraint) {
+                        subtypeConstraint, this::compileConstraint);
+            } else if (constraint instanceof SizeConstraint sizeConstraint) {
                 constraintDef = getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef,
-                        (SizeConstraint) constraint, this::compileConstraint);
-            } else if (constraint instanceof SimpleTableConstraint) {
+                        sizeConstraint, this::compileConstraint);
+            } else if (constraint instanceof SimpleTableConstraint simpleTableConstraint) {
                 // TODO implement constraint
                 getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef,
-                        (SimpleTableConstraint) constraint, this::compileConstraint);
+                        simpleTableConstraint, this::compileConstraint);
             } else if (constraint instanceof ComponentRelationConstraint) {
                 // TODO implement constraint
+            } else if (constraint instanceof ContentsConstraint) {
+                // TODO implement constraint
+            } else if (constraint instanceof UserDefinedConstraint userDefinedConstraint) {
+                // TODO implement constraint
+                getConstraintDefinition(baseType, bounds, maybeParameters, constraintDef, userDefinedConstraint,
+                        this::compileConstraint);
             } else {
                 throw new CompilerException("Constraints of type %s not yet supported",
                         constraint.getClass().getSimpleName());
