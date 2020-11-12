@@ -258,7 +258,6 @@ import ch.eskaton.asn4j.parser.ast.DefaultValueSpecNode;
 import ch.eskaton.asn4j.parser.ast.DefinedSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.DefinitiveIdentificationNode;
 import ch.eskaton.asn4j.parser.ast.DummyGovernor;
-import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.EncodingControlSectionNode;
 import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
 import ch.eskaton.asn4j.parser.ast.EnumerationItemNode;
@@ -303,15 +302,12 @@ import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
-import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalitySpecNode;
 import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
-import ch.eskaton.asn4j.parser.ast.ParameterizedObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedTypeOrObjectClassAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ParameterizedValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
@@ -328,8 +324,8 @@ import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.TypeIdentifierObjectClassReferenceNode;
 import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.UpperEndpointNode;
-import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintNode;
-import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintParamNode;
+import ch.eskaton.asn4j.parser.ast.UserDefinedConstraint;
+import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintParam;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetOrObjectSet;
@@ -4006,7 +4002,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof UserDefinedConstraintNode);
+        assertTrue(result instanceof UserDefinedConstraint);
     }
 
     @Test
@@ -6309,7 +6305,7 @@ class ParserTest {
         Constraint result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof UserDefinedConstraintNode);
+        assertTrue(result instanceof UserDefinedConstraint);
 
         parser = new Parser(new ByteArrayInputStream("{ErrorSet}".getBytes())).new GeneralConstraintParser();
 
@@ -6339,7 +6335,7 @@ class ParserTest {
         UserDefinedConstraintParser parser = new Parser(
                 new ByteArrayInputStream("CONSTRAINED BY {}".getBytes())).new UserDefinedConstraintParser();
 
-        UserDefinedConstraintNode result = parser.parse();
+        UserDefinedConstraint result = parser.parse();
 
         assertNotNull(result);
         assertEquals(0, result.getParams().size());
@@ -6368,7 +6364,7 @@ class ParserTest {
         UserDefinedConstraintParameterParser parser = new Parser(
                 new ByteArrayInputStream("INTEGER: 4711".getBytes())).new UserDefinedConstraintParameterParser();
 
-        UserDefinedConstraintParamNode result = parser.parse();
+        UserDefinedConstraintParam result = parser.parse();
 
         assertNotNull(result);
         assertNotNull(result.getGovernor());
