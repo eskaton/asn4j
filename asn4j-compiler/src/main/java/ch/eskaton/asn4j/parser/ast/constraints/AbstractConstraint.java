@@ -29,8 +29,9 @@ package ch.eskaton.asn4j.parser.ast.constraints;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.ExceptionIdentificationNode;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public abstract class AbstractConstraint extends Constraint {
+public abstract class AbstractConstraint extends Elements implements Constraint {
 
     private ExceptionIdentificationNode exceptionSpec;
 
@@ -44,6 +45,11 @@ public abstract class AbstractConstraint extends Constraint {
 
     public ExceptionIdentificationNode getExceptionSpec() {
         return exceptionSpec;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
     }
 
 }
