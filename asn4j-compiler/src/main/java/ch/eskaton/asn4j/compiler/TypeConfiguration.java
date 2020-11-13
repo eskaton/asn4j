@@ -389,7 +389,8 @@ public class TypeConfiguration {
                 new SelectionTypeTypeNameSupplier(ctx, this)));
         types.add(new TypeDefinition<>(Type.class, new TypeCompiler()));
         types.add(new TypeDefinition<>(NamedType.class, new NamedTypeCompiler()));
-        types.add(new TypeDefinition<>(InstanceOfType.class, new InstanceOfTypeCompiler()));
+        types.add(new TypeDefinition<>(InstanceOfType.class, new InstanceOfTypeCompiler(), CollectionValue.class,
+                ASN1Sequence.class, new DefaultTypeNameSupplier(this)));
         types.add(new TypeDefinition<>(TypeReference.class, new TypeReferenceCompiler(),
                 new TypeReferenceTypeNameSupplier()));
         types.add(new TypeDefinition<>(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),

@@ -73,6 +73,15 @@ public class TypeDefinition<T extends Node, V extends Value, R, S extends Abstra
         this.constraintCompiler = constraintCompiler;
     }
 
+    public TypeDefinition(Class<T> typeClass, C compiler, Class<V> valueClass, Class<R> runtimeTypeClass,
+            TypeNameSupplier<? extends Type> typeNameSupplier) {
+        this(typeClass, compiler);
+
+        this.valueClass = valueClass;
+        this.runtimeTypeClass = runtimeTypeClass;
+        this.typeNameSupplier = typeNameSupplier;
+    }
+
     public TypeDefinition(Class<T> typeClass, C compiler, TypeNameSupplier<? extends Type> typeNameSupplier) {
         this(typeClass, compiler);
 
