@@ -38,6 +38,9 @@ public class IntegerValue extends AbstractValue {
 
     private BigInteger value;
 
+    public IntegerValue() {
+    }
+
     public IntegerValue(BigInteger value) {
         this(NO_POSITION, value);
     }

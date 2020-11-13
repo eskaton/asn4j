@@ -42,6 +42,9 @@ public class ElementSet extends Elements {
 
     private List<Elements> operands;
 
+    public ElementSet() {
+    }
+
     public ElementSet(Position position, OpType operation, Elements... operands) {
         this(position, operation, Arrays.asList(operands));
     }

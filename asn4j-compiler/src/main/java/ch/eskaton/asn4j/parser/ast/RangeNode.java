@@ -40,6 +40,9 @@ public class RangeNode extends AbstractConstraint {
 
     private EndpointNode upper;
 
+    public RangeNode() {
+    }
+
     public RangeNode(EndpointNode lower, EndpointNode upper) {
         this(NO_POSITION, lower, upper);
     }

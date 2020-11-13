@@ -47,6 +47,9 @@ public class EndpointNode extends AbstractNode {
 
     private boolean inclusive;
 
+    public EndpointNode() {
+    }
+
     public EndpointNode(Position position, Value value, boolean inclusive) {
         super(position);
 

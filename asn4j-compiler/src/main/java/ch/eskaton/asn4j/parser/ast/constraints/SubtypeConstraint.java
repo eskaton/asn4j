@@ -34,6 +34,9 @@ public class SubtypeConstraint extends AbstractConstraint {
 
     private ElementSetSpecsNode elementSetSpecs;
 
+    protected SubtypeConstraint() {
+    }
+
     public SubtypeConstraint(Position position, ElementSetSpecsNode elementSetSpecs) {
         super(position);
 

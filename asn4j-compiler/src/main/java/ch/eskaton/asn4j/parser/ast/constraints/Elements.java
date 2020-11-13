@@ -32,6 +32,9 @@ import ch.eskaton.asn4j.parser.ast.AbstractNode;
 
 public abstract class Elements extends AbstractNode {
 
+    public Elements() {
+    }
+
     protected Elements(Position position) {
         super(position);
     }

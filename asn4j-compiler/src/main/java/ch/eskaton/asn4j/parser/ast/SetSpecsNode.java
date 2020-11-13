@@ -38,6 +38,9 @@ public abstract class SetSpecsNode extends AbstractNode {
 
     private boolean extensionMarker;
 
+    public SetSpecsNode() {
+    }
+
     protected SetSpecsNode(Position position, boolean extensionMarker) {
         this(position, null, extensionMarker, null);
     }
