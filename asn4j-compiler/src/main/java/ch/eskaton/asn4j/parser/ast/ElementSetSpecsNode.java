@@ -32,6 +32,9 @@ import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 
 public class ElementSetSpecsNode extends SetSpecsNode {
 
+    public ElementSetSpecsNode() {
+    }
+
     public ElementSetSpecsNode(Position position, ElementSet rootElements, boolean extensionMarker,
             ElementSet additionalElements) {
         super(position, rootElements, extensionMarker, additionalElements);

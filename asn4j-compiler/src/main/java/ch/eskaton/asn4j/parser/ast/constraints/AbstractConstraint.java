@@ -35,6 +35,9 @@ public abstract class AbstractConstraint extends Elements implements Constraint 
 
     private ExceptionIdentificationNode exceptionSpec;
 
+    public AbstractConstraint() {
+    }
+
     protected AbstractConstraint(Position position) {
         super(position);
     }

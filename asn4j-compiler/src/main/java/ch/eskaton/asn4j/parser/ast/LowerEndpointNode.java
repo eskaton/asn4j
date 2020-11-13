@@ -32,6 +32,9 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 
 public class LowerEndpointNode extends EndpointNode {
 
+    public LowerEndpointNode() {
+    }
+
     public LowerEndpointNode(Position position, Value value, boolean inclusive) {
         super(position, value, inclusive);
     }
