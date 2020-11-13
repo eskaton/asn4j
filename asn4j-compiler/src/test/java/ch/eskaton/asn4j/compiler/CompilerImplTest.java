@@ -1128,7 +1128,7 @@ class CompilerImplTest {
                 } WITH SYNTAX {
                     FIELD &field
                 }
-                
+                                
                 object TEST ::= {
                     FIELD {"value"}
                 }
@@ -2181,7 +2181,45 @@ class CompilerImplTest {
     }
 
     @Test
-    void testObjectWithSyntax() throws IOException, ParserException {
+    void testObjectWithSyntaxPrimitiveFieldNameFirst() throws IOException, ParserException {
+        var body = """
+                     TEST ::= CLASS {
+                       &id    INTEGER UNIQUE,
+                       &Type 
+                     } WITH SYNTAX {
+                       &Type IDENTIFIED BY &id
+                     }
+                    
+                    compiledObject TEST ::= {
+                       BOOLEAN IDENTIFIED BY 1 
+                    }
+                """;
+
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var compiledObject = ctx.getCompiledModule(MODULE_NAME).getObjects().get("compiledObject");
+
+        assertNotNull(compiledObject);
+
+        var object = compiledObject.getObjectDefinition();
+
+        var value1 = object.get("id");
+
+        assertTrue(value1 instanceof IntegerValue);
+
+        var value2 = object.get("Type");
+
+        assertTrue(value2 instanceof CompiledType);
+        assertTrue(((CompiledType) value2).getType() instanceof BooleanType);
+    }
+
+    @Test
+    void testObjectWithSyntaxPrimitiveFieldNameLast() throws IOException, ParserException {
         var body = """
                    TEST ::= CLASS {
                        &fixedTypeValueField1 BOOLEAN,
@@ -2335,7 +2373,7 @@ class CompilerImplTest {
 
         assertNull(value1);
 
-        var value2 =  object.get("fixedTypeValueField2");
+        var value2 = object.get("fixedTypeValueField2");
 
         assertTrue(value2 instanceof IntegerValue);
     }

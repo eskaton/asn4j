@@ -198,7 +198,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
 
             compilePrimitiveFieldName(objectClass, values, (Setting) element, fieldNameNode);
 
-            state = state.hasField(true);
+            state = state.hasField(true).accepted(true);
         }
 
         return state;
