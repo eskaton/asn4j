@@ -207,6 +207,11 @@ public class CompilerUtils {
         var tags = new LinkedList<TagId>();
         var explicit = true;
 
+        if (typeTags.size() != taggingModes.size()) {
+            throw new IllegalCompilerStateException(type.getPosition(), "#typeTags %d != #taggingModes %d",
+                    typeTags.size(), taggingModes.size());
+        }
+
         for (var i = 0; i < typeTags.size(); i++) {
             var tag = typeTags.get(i);
 
