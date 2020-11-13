@@ -112,6 +112,7 @@ public class ObjectClassFieldTypeCompiler implements NamedCompiler<ObjectClassFi
         var newType = Clone.clone(field.getCompiledType().getType());
 
         newType.setTags(type.getTags());
+        newType.setTaggingModes(type.getTaggingModes());
 
         if (additionalConstraints != null) {
             var constraints = newType.getConstraints();
