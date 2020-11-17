@@ -79,6 +79,22 @@ public class CompiledEnumeratedType extends CompiledType {
     }
 
     @Override
+    public CompiledEnumeratedType copy() {
+        var compiledType = new CompiledEnumeratedType(getType(), getName());
+
+        copyAttributes(compiledType);
+
+        return compiledType;
+    }
+
+    protected void copyAttributes(CompiledEnumeratedType compiledType) {
+        super.copyAttributes(compiledType);
+
+        compiledType.roots = roots;
+        compiledType.additions = additions;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

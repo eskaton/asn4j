@@ -430,7 +430,20 @@ public class CompilerUtils {
             return getCompiledParameterizedType(ctx, typeReference, UnaryOperator.identity());
         }
 
-        return ctx.getCompiledType(referencedTypeName);
+        var compiledType = ctx.getCompiledType(referencedTypeName);
+
+        return updateTags(ctx, typeReference, compiledType);
+    }
+
+    private static CompiledType updateTags(CompilerContext ctx, TypeReference typeReference, CompiledType compiledType) {
+        if (!typeReference.getTags().isEmpty()) {
+            compiledType = compiledType.copy();
+
+            var tagIds = getTagIds(ctx, typeReference);
+
+            compiledType.setTags(tagIds);
+        }
+        return compiledType;
     }
 
     private static CompiledType getCompiledParameterizedType(CompilerContext ctx, TypeReference typeReference,

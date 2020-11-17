@@ -39,6 +39,15 @@ public class AnonymousCompiledCollectionOfType extends CompiledCollectionOfType 
     }
 
     @Override
+    public CompiledCollectionOfType copy() {
+        var compiledType = new AnonymousCompiledCollectionOfType(getType(), getContentType());
+
+        copyAttributes(compiledType);
+
+        return compiledType;
+    }
+
+    @Override
     public String getName() {
         throw new IllegalCompilerStateException("An anonymous compiled type doesn't have a name: %s", getType());
     }

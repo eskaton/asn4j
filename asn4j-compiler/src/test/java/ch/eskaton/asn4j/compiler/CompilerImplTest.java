@@ -671,6 +671,31 @@ class CompilerImplTest {
                 ".*isn't optional and therefore can't have a presence constraint of ABSENT.*");
     }
 
+    @Test
+    void testDuplicateTypeWithTagsInSet() throws IOException, ParserException {
+        var body = """
+                String ::= VisibleString
+ 
+                Set ::= SET {
+                    field-a  [0] String,
+                    field-b  [1] String
+                }
+                """;
+
+        var compiledCollectionType = getCompiledCollectionType(body, MODULE_NAME, "Set");
+        var field = testCollectionField(compiledCollectionType, "field-a", VisibleString.class);
+        var maybeTags = field.getTags();
+
+        assertTrue(maybeTags.isPresent());
+        assertEquals(2, maybeTags.get().size());
+
+        field = testCollectionField(compiledCollectionType, "field-b", VisibleString.class);
+        maybeTags = field.getTags();
+
+        assertTrue(maybeTags.isPresent());
+        assertEquals(2, maybeTags.get().size());
+    }
+
     @ParameterizedTest(name = "[{index}] {1}")
     @MethodSource("provideSetsWithDuplicateTags")
     @DisplayName("Test duplicate tags in SET")

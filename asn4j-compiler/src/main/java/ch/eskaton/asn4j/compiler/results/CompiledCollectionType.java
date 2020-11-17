@@ -59,6 +59,21 @@ public class CompiledCollectionType extends CompiledType implements HasComponent
     }
 
     @Override
+    public CompiledCollectionType copy() {
+        var compiledType = new CompiledCollectionType(getType(), getName());
+
+        copyAttributes(compiledType);
+
+        return compiledType;
+    }
+
+    protected void copyAttributes(CompiledCollectionType compiledType) {
+        super.copyAttributes(compiledType);
+
+        compiledType.components = components;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
