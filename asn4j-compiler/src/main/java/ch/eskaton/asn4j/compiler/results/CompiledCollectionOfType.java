@@ -67,6 +67,22 @@ public class CompiledCollectionOfType extends CompiledType implements HasChildCo
     }
 
     @Override
+    public CompiledCollectionOfType copy() {
+        var compiledType = new CompiledCollectionOfType(getType(), getName());
+
+        copyAttributes(compiledType);
+
+        return compiledType;
+    }
+
+    protected void copyAttributes(CompiledCollectionOfType compiledType) {
+        super.copyAttributes(compiledType);
+
+        compiledType.contentType = contentType;
+        compiledType.contentTypeName = contentTypeName;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

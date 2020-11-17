@@ -37,6 +37,15 @@ public class CompiledBuiltinType extends CompiledType {
     }
 
     @Override
+    public CompiledBuiltinType copy() {
+        var compiledType = new CompiledBuiltinType(getType());
+
+        copyAttributes(compiledType);
+
+        return compiledType;
+    }
+
+    @Override
     public String getName() {
         throw new IllegalCompilerStateException("A compiled builtin type doesn't have a name: %s", getType());
     }

@@ -116,6 +116,23 @@ public class CompiledType implements CompilationResult {
         this.subtype = subtype;
     }
 
+    public CompiledType copy() {
+        var compiledType = new CompiledType(type, name);
+
+        copyAttributes(compiledType);
+
+        return compiledType;
+    }
+
+    protected void copyAttributes(CompiledType compiledType) {
+        compiledType.constraintDefinition = constraintDefinition;
+        compiledType.tags = tags;
+        compiledType.module = module;
+        compiledType.moduleName = moduleName;
+        compiledType.parent = parent;
+        compiledType.subtype = subtype;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

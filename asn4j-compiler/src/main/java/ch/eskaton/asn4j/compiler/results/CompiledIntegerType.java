@@ -52,6 +52,21 @@ public class CompiledIntegerType extends CompiledType {
     }
 
     @Override
+    public CompiledIntegerType copy() {
+        var compiledType = new CompiledIntegerType(getType(), getName());
+
+        copyAttributes(compiledType);
+
+        return compiledType;
+    }
+
+    protected void copyAttributes(CompiledIntegerType compiledType) {
+        super.copyAttributes(compiledType);
+
+        compiledType.namedNumbers = namedNumbers;
+    }
+
+    @Override
     public String toString() {
         return ToString.get(this);
     }

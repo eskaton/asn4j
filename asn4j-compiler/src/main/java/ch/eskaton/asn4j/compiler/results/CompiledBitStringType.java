@@ -52,6 +52,21 @@ public class CompiledBitStringType extends CompiledType {
     }
 
     @Override
+    public CompiledBitStringType copy() {
+        var compiledType = new CompiledBitStringType(getType(), getName());
+
+        copyAttributes(compiledType);
+
+        return compiledType;
+    }
+
+    protected void copyAttributes(CompiledBitStringType compiledType) {
+        super.copyAttributes(compiledType);
+
+        compiledType.namedBits = namedBits;
+    }
+
+    @Override
     public String toString() {
         return ToString.get(this);
     }

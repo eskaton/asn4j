@@ -59,6 +59,17 @@ public class CompiledChoiceType extends CompiledType implements HasComponents<Co
     }
 
     @Override
+    public CompiledChoiceType copy() {
+        var compiledType = new CompiledChoiceType(getType(), getName());
+
+        copyAttributes(compiledType);
+
+        compiledType.components = components;
+
+        return compiledType;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
