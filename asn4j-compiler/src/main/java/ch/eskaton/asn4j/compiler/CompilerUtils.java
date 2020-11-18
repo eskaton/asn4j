@@ -231,9 +231,8 @@ public class CompilerUtils {
             if (explicit) {
                 tags.addAll(getTagIdsOfBuiltinType(ctx, type));
             }
-        } else if (type instanceof SimpleDefinedType) {
-            var compiledType = ctx.getCompiledType(type);
-            var maybeCompiledTags = compiledType.getTags();
+        } else if (type instanceof SimpleDefinedType simpleDefinedType) {
+            var maybeCompiledTags = getTagsOfTypeReference(ctx, simpleDefinedType);
 
             addTags(tags, maybeCompiledTags, explicit);
         } else if (type instanceof NamedType namedType) {
@@ -262,6 +261,23 @@ public class CompilerUtils {
         }
 
         return tags;
+    }
+
+    private static Optional<List<TagId>> getTagsOfTypeReference(CompilerContext ctx,
+            SimpleDefinedType simpleDefinedType) {
+        var maybeParameters = simpleDefinedType.getParameters();
+
+        if (maybeParameters.isPresent()) {
+            var typeName = simpleDefinedType.getType();
+            var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
+            var parameterizedType = compiledParameterizedType.getType();
+
+            return Optional.ofNullable(getTagIds(ctx, parameterizedType));
+        } else {
+            var compiledType = ctx.getCompiledType(simpleDefinedType);
+
+            return compiledType.getTags();
+        }
     }
 
     private static void addTags(LinkedList<TagId> tags, Optional<List<TagId>> maybeCompiledTags, boolean explicit) {
@@ -357,7 +373,7 @@ public class CompilerUtils {
             var compiledComponent = component.getCompiledType();
             var componentType = compiledComponent.getType();
 
-            if (componentType.getConstraints() != null) {
+            if (componentType.getConstraints() != null && compiledComponent.getConstraintDefinition().isEmpty()) {
                 var constraintDef = ctx.compileConstraint(componentName, compiledComponent, maybeParameters);
 
                 compiledComponent.setConstraintDefinition(constraintDef.orElse(null));
@@ -404,8 +420,10 @@ public class CompilerUtils {
 
         if (maybeParameters.isPresent()) {
             if (maybeTypeRefParams.isPresent()) {
-                return getCompiledParameterizedType(ctx, typeReference,
+                var compiledType = getCompiledParameterizedType(ctx, typeReference,
                         (parameters -> updateParameters(maybeParameters.get(), parameters)));
+
+                return updateTags(ctx, typeReference, compiledType);
             }
 
             var maybeResolvedType = ctx.getTypeParameter(maybeParameters.get(), typeReference);
@@ -414,7 +432,9 @@ public class CompilerUtils {
                 var resolvedType = maybeResolvedType.get();
 
                 if (isAnyTypeReference(resolvedType)) {
-                    return ctx.getCompiledType((SimpleDefinedType) resolvedType);
+                    var compiledType = ctx.getCompiledType((SimpleDefinedType) resolvedType);
+
+                    return updateTags(ctx, typeReference, compiledType);
                 }
 
                 if (typeReference.hasConstraint()) {
@@ -423,11 +443,14 @@ public class CompilerUtils {
                 }
 
                 var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) resolvedType.getClass());
+                var compiledType = compiler.compile(ctx, null, resolvedType, maybeParameters);
 
-                return compiler.compile(ctx, null, resolvedType, maybeParameters);
+                return updateTags(ctx, typeReference, compiledType);
             }
         } else if (maybeTypeRefParams.isPresent()) {
-            return getCompiledParameterizedType(ctx, typeReference, UnaryOperator.identity());
+            var compiledType = getCompiledParameterizedType(ctx, typeReference, UnaryOperator.identity());
+
+            return updateTags(ctx, typeReference, compiledType);
         }
 
         var compiledType = ctx.getCompiledType(referencedTypeName);
@@ -443,6 +466,7 @@ public class CompilerUtils {
 
             compiledType.setTags(tagIds);
         }
+
         return compiledType;
     }
 
@@ -455,7 +479,7 @@ public class CompilerUtils {
         var maybeUpdatedParameters = Optional.of(updatedParameters);
         var type = compiledParameterizedType.getType();
         var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
-        var compiledType = compiler.compile(ctx, null, type, maybeUpdatedParameters);
+        var compiledType = compiler.compile(ctx, ctx.getTypeName(type), type, maybeUpdatedParameters);
 
         checkUnusedParameters(maybeUpdatedParameters);
 

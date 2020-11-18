@@ -696,6 +696,31 @@ class CompilerImplTest {
         assertEquals(2, maybeTags.get().size());
     }
 
+    @Test
+    void testDuplicateParameterizedTypeWithTagsInSet() throws IOException, ParserException {
+        var body = """
+                String{INTEGER:length} ::= VisibleString (SIZE(1..length))
+ 
+                Set ::= SET {
+                    field-a  [0] String{10},
+                    field-b  [1] String{15}
+                }
+                """;
+
+        var compiledCollectionType = getCompiledCollectionType(body, MODULE_NAME, "Set");
+        var field = testCollectionField(compiledCollectionType, "field-a", VisibleString.class);
+        var maybeTags = field.getTags();
+
+        assertTrue(maybeTags.isPresent());
+        assertEquals(2, maybeTags.get().size());
+
+        field = testCollectionField(compiledCollectionType, "field-b", VisibleString.class);
+        maybeTags = field.getTags();
+
+        assertTrue(maybeTags.isPresent());
+        assertEquals(2, maybeTags.get().size());
+    }
+
     @ParameterizedTest(name = "[{index}] {1}")
     @MethodSource("provideSetsWithDuplicateTags")
     @DisplayName("Test duplicate tags in SET")
