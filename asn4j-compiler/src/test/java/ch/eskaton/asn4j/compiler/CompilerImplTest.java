@@ -131,7 +131,9 @@ import ch.eskaton.asn4j.runtime.types.TypeName;
 import ch.eskaton.asn4j.test.CompilerTestBuilder;
 import ch.eskaton.commons.collections.Tuple2;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -675,7 +677,7 @@ class CompilerImplTest {
     void testDuplicateTypeWithTagsInSet() throws IOException, ParserException {
         var body = """
                 String ::= VisibleString
- 
+                 
                 Set ::= SET {
                     field-a  [0] String,
                     field-b  [1] String
@@ -700,7 +702,7 @@ class CompilerImplTest {
     void testDuplicateParameterizedTypeWithTagsInSet() throws IOException, ParserException {
         var body = """
                 String{INTEGER:length} ::= VisibleString (SIZE(1..length))
- 
+                 
                 Set ::= SET {
                     field-a  [0] String{10},
                     field-b  [1] String{15}
@@ -876,325 +878,537 @@ class CompilerImplTest {
         checkIntegerRange(integerRangeValueNode.getValue(), 4, 5);
     }
 
-    @Test
-    void testObjectSetDuplicateValue() {
-        var body = """
-                TEST ::= CLASS {
-                    &id   INTEGER UNIQUE,
-                    &desc VisibleString
-                }
+    @Nested
+    @DisplayName("Test object set")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ObjectSet {
 
-                TestSet TEST ::= {
-                      {&id 1, &desc "Desc 1"}
-                    | {&id 2, &desc "Desc 2"}
-                    | {&id 1, &desc "Desc 3"}
-                }
-                """;
+        @Test
+        void testObjectSetDuplicateValue() {
+            var body = """
+                    TEST ::= CLASS {
+                        &id   INTEGER UNIQUE,
+                        &desc VisibleString
+                    }
 
-        testModule(body, CompilerException.class, ".*Duplicate value in object set.*");
+                    TestSet TEST ::= {
+                          {&id 1, &desc "Desc 1"}
+                        | {&id 2, &desc "Desc 2"}
+                        | {&id 1, &desc "Desc 3"}
+                    }
+                    """;
+
+            testModule(body, CompilerException.class, ".*Duplicate value in object set.*");
+        }
+
+        @Test
+        void testObjectSetMissingValue() {
+            var body = """
+                    TEST ::= CLASS {
+                        &id   INTEGER UNIQUE,
+                        &desc VisibleString
+                    }
+
+                    TestSet TEST ::= {
+                        {&id 1}
+                    }
+                    """;
+
+            testModule(body, CompilerException.class, ".*Field 'desc' is mandatory.*");
+        }
+
+        @Test
+        void testObjectSetInvalidValue() {
+            var body = """
+                    TEST ::= CLASS {
+                        &id   INTEGER UNIQUE,
+                        &desc VisibleString
+                    }
+
+                    TestSet TEST ::= {
+                        {&id "abcd"}
+                    }
+                    """;
+
+            testModule(body, CompilerException.class, ".*Invalid INTEGER value.*");
+        }
+
+        @Test
+        void testObjectSetTypeValue() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+
+                    TestSet TEST ::= {
+                        {&TypeField BOOLEAN}
+                    }
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
+
+            assertNotNull(objectSet);
+            assertEquals(1, objectSet.getValues().size());
+
+            var value = objectSet.getValues().stream().findFirst().get();
+
+            assertTrue(value.containsKey("TypeField"));
+            assertTrue(value.get("TypeField") instanceof CompiledType);
+            assertTrue(((CompiledType) value.get("TypeField")).getType() instanceof BooleanType);
+        }
+
+        @Test
+        void testObjectSetWithObjectSetReference() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &id INTEGER UNIQUE
+                    }
+
+                    TestSet1 TEST ::= {
+                        {&id 1234}
+                    }
+                                    
+                    TestSet2 TEST ::= {
+                        TestSet1 | {&id 5678}
+                    }
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet2");
+
+            assertNotNull(objectSet);
+            assertEquals(2, objectSet.getValues().size());
+        }
+
+        @Test
+        void testObjectSetWithObjectReferences() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &booleanField  BOOLEAN,
+                        &intField      INTEGER
+                    }
+
+                    testObject1 TEST ::= {
+                        &booleanField  FALSE,
+                        &intField      23
+                    }
+
+                    testObject2 TEST ::= {
+                        &booleanField  TRUE,
+                        &intField      47
+                    }
+
+                    TestSet TEST ::= {
+                        testObject1 | testObject2
+                    }
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
+
+            assertNotNull(objectSet);
+            assertEquals(2, objectSet.getValues().size());
+        }
+
     }
 
-    @Test
-    void testObjectSetMissingValue() {
-        var body = """
-                TEST ::= CLASS {
-                    &id   INTEGER UNIQUE,
-                    &desc VisibleString
-                }
-
-                TestSet TEST ::= {
-                    {&id 1}
-                }
-                """;
-
-        testModule(body, CompilerException.class, ".*Field 'desc' is mandatory.*");
-    }
-
-    @Test
-    void testObjectSetInvalidValue() {
-        var body = """
-                TEST ::= CLASS {
-                    &id   INTEGER UNIQUE,
-                    &desc VisibleString
-                }
-
-                TestSet TEST ::= {
-                    {&id "abcd"}
-                }
-                """;
-
-        testModule(body, CompilerException.class, ".*Invalid INTEGER value.*");
-    }
-
-    @Test
-    void testObjectSetTypeValue() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-
-                TestSet TEST ::= {
-                    {&TypeField BOOLEAN}
-                }
-                """;
-
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
-
-        assertNotNull(objectSet);
-        assertEquals(1, objectSet.getValues().size());
-
-        var value = objectSet.getValues().stream().findFirst().get();
-
-        assertTrue(value.containsKey("TypeField"));
-        assertTrue(value.get("TypeField") instanceof CompiledType);
-        assertTrue(((CompiledType) value.get("TypeField")).getType() instanceof BooleanType);
-    }
-
-    @Test
-    void testObjectSetWithObjectSetReference() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &id INTEGER UNIQUE
-                }
-
-                TestSet1 TEST ::= {
-                    {&id 1234}
-                }
-                                
-                TestSet2 TEST ::= {
-                    TestSet1 | {&id 5678}
-                }
-                """;
-
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet2");
-
-        assertNotNull(objectSet);
-        assertEquals(2, objectSet.getValues().size());
-    }
-
-    @Test
-    void testObjects() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &booleanField  BOOLEAN,
-                    &intField      INTEGER
-                }
-
-                testObject1 TEST ::= {
-                    &booleanField  FALSE,
-                    &intField      23
-                }
+    @Nested
+    @DisplayName("Test object")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class Object {
 
-                testObject2 TEST ::= {
-                    &booleanField  TRUE,
-                    &intField      47
-                }
+        @Test
+        void testObjectWithReferenceInFixedTypeValueField() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &intField INTEGER
+                    }
 
-                TestSet TEST ::= {
-                    testObject1 | testObject2
-                }
-                """;
+                    intValue INTEGER ::= 47
 
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+                    testObject TEST ::= {
+                        &intField intValue
+                    }
 
-        compiler.run();
+                    """;
 
-        var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
-        assertNotNull(objectSet);
-        assertEquals(2, objectSet.getValues().size());
-    }
+            compiler.run();
 
-    @Test
-    void testObjectWithReferenceInFixedTypeValueField() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &intField INTEGER
-                }
+            var ctx = compiler.getCompilerContext();
+            var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("testObject");
 
-                intValue INTEGER ::= 47
+            assertNotNull(object);
+            assertTrue(object.getObjectDefinition().containsKey("intField"));
 
-                testObject TEST ::= {
-                    &intField intValue
-                }
+            var value = object.getObjectDefinition().get("intField");
 
-                """;
+            assertTrue(value instanceof IntegerValue);
+            assertEquals(47, ((IntegerValue) value).getValue().longValue());
+        }
 
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        @Test
+        void testObjectWithReferenceInVariableTypeValueField() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &field &Type,
+                        &Type
+                    }
 
-        compiler.run();
+                    intValue INTEGER ::= 47
 
-        var ctx = compiler.getCompilerContext();
-        var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("testObject");
+                    testObject TEST ::= {
+                        &field intValue,
+                        &Type  INTEGER
+                    }
 
-        assertNotNull(object);
-        assertTrue(object.getObjectDefinition().containsKey("intField"));
+                    """;
 
-        var value = object.getObjectDefinition().get("intField");
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
-        assertTrue(value instanceof IntegerValue);
-        assertEquals(47, ((IntegerValue) value).getValue().longValue());
-    }
+            compiler.run();
 
-    @Test
-    void testObjectWithReferenceInVariableTypeValueField() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &field &Type,
-                    &Type
-                }
+            var ctx = compiler.getCompilerContext();
+            var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("testObject");
 
-                intValue INTEGER ::= 47
+            assertNotNull(object);
+            assertTrue(object.getObjectDefinition().containsKey("field"));
 
-                testObject TEST ::= {
-                    &field intValue,
-                    &Type  INTEGER
-                }
+            var value = object.getObjectDefinition().get("field");
 
-                """;
+            assertTrue(value instanceof IntegerValue);
+            assertEquals(47, ((IntegerValue) value).getValue().longValue());
+        }
 
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+        @Test
+        void testObjectWithObjectField() throws IOException, ParserException {
+            var body = """
+                    TEST1 ::= CLASS {
+                        &field1 INTEGER
+                    }
+                                    
+                    TEST2 ::= CLASS {
+                        &field2 TEST1
+                    }
 
-        compiler.run();
+                    object2 TEST2 ::= {
+                        &field2 {&field1 47}
+                    }
+                    """;
 
-        var ctx = compiler.getCompilerContext();
-        var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("testObject");
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var object2 = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object2");
+
+            assertNotNull(object2);
+            assertTrue(object2.getObjectDefinition().containsKey("field2"));
+
+            var object1 = object2.getObjectDefinition().get("field2");
+
+            assertTrue(object1 instanceof Map);
+            assertTrue(((Map) object1).containsKey("field1"));
+
+            var value = ((Map) object1).get("field1");
+
+            assertTrue(value instanceof IntegerValue);
+            assertEquals(47, ((IntegerValue) value).getValue().longValue());
+        }
 
-        assertNotNull(object);
-        assertTrue(object.getObjectDefinition().containsKey("field"));
+        @Test
+        void testObjectWithReferenceInObjectField() throws IOException, ParserException {
+            var body = """
+                    TEST1 ::= CLASS {
+                        &field1 INTEGER
+                    }
+                                    
+                    TEST2 ::= CLASS {
+                        &field2 TEST1
+                    }
 
-        var value = object.getObjectDefinition().get("field");
+                    object1 TEST1 ::= {&field1 47}
 
-        assertTrue(value instanceof IntegerValue);
-        assertEquals(47, ((IntegerValue) value).getValue().longValue());
-    }
+                    object2 TEST2 ::= {
+                        &field2 object1
+                    }
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var object2 = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object2");
+
+            assertNotNull(object2);
+            assertTrue(object2.getObjectDefinition().containsKey("field2"));
+
+            var object1 = object2.getObjectDefinition().get("field2");
+
+            assertTrue(object1 instanceof Map);
+            assertTrue(((Map) object1).containsKey("field1"));
+
+            var value = ((Map) object1).get("field1");
 
-    @Test
-    void testObjectWithObjectField() throws IOException, ParserException {
-        var body = """
-                TEST1 ::= CLASS {
-                    &field1 INTEGER
-                }
-                                
-                TEST2 ::= CLASS {
-                    &field2 TEST1
-                }
+            assertTrue(value instanceof IntegerValue);
+            assertEquals(47, ((IntegerValue) value).getValue().longValue());
+        }
 
-                object2 TEST2 ::= {
-                    &field2 {&field1 47}
-                }
-                """;
+        @Test
+        void testObjectWithSequenceOf() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &field SEQUENCE OF VisibleString
+                    } WITH SYNTAX {
+                        FIELD &field
+                    }
+                                    
+                    object TEST ::= {
+                        FIELD {"value"}
+                    }
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object");
+
+            assertNotNull(object);
+            assertTrue(object.getObjectDefinition().containsKey("field"));
+        }
+
+        @Test
+        void testObjectWithSyntaxPrimitiveFieldNameFirst() throws IOException, ParserException {
+            var body = """
+                         TEST ::= CLASS {
+                           &id    INTEGER UNIQUE,
+                           &Type 
+                         } WITH SYNTAX {
+                           &Type IDENTIFIED BY &id
+                         }
+                        
+                        compiledObject TEST ::= {
+                           BOOLEAN IDENTIFIED BY 1 
+                        }
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var compiledObject = ctx.getCompiledModule(MODULE_NAME).getObjects().get("compiledObject");
+
+            assertNotNull(compiledObject);
+
+            var object = compiledObject.getObjectDefinition();
+
+            var value1 = object.get("id");
+
+            assertTrue(value1 instanceof IntegerValue);
+
+            var value2 = object.get("Type");
+
+            assertTrue(value2 instanceof CompiledType);
+            assertTrue(((CompiledType) value2).getType() instanceof BooleanType);
+        }
+
+        @Test
+        void testObjectWithSyntaxPrimitiveFieldNameLast() throws IOException, ParserException {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN,
+                           &fixedTypeValueField2 INTEGER
+                       } WITH SYNTAX {
+                           FIXED TYPE VALUE-A &fixedTypeValueField1
+                           FIXED TYPE VALUE-B &fixedTypeValueField2
+                       }
+                       
+                       testObject TEST ::= {
+                           FIXED TYPE VALUE-A TRUE
+                           FIXED TYPE VALUE-B 1
+                       }
+                       
+                       TestSet TEST ::= { testObject }
+                    """;
+
+            var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+
+            assertEquals(1, objectSet.getValues().size());
+
+            var object = objectSet.getValues().stream().findFirst().get();
+            var value1 = object.get("fixedTypeValueField1");
+
+            assertTrue(value1 instanceof BooleanValue);
+
+            var value2 = object.get("fixedTypeValueField2");
+
+            assertNotNull(value2);
+            assertTrue(value2 instanceof IntegerValue);
+        }
+
+        @Test
+        void testObjectWithSyntaxOptionalPresent() throws IOException, ParserException {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                           &fixedTypeValueField2 INTEGER
+                       } WITH SYNTAX {
+                           [VALUE-A FIELD &fixedTypeValueField1]
+                           VALUE-B FIELD &fixedTypeValueField2
+                       }
+                       
+                       testObject TEST ::= {
+                           VALUE-A FIELD TRUE
+                           VALUE-B FIELD 1
+                       }
+                       
+                       TestSet TEST ::= { testObject }
+                    """;
+
+            var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+
+            assertEquals(1, objectSet.getValues().size());
+
+            var object = objectSet.getValues().stream().findFirst().get();
+            var value1 = object.get("fixedTypeValueField1");
+
+            assertTrue(value1 instanceof BooleanValue);
+
+            var value2 = object.get("fixedTypeValueField2");
+
+            assertTrue(value2 instanceof IntegerValue);
+        }
+
+        @Test
+        void testObjectWithSyntaxIncompleteOptionalGroup() {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                           &fixedTypeValueField2 INTEGER
+                       } WITH SYNTAX {
+                           [VALUE-A FIELD &fixedTypeValueField1]
+                           VALUE-B FIELD &fixedTypeValueField2
+                       }
+                       
+                       testObject TEST ::= {
+                           VALUE-A TRUE
+                           VALUE-B FIELD 1
+                       }
+                       
+                       TestSet TEST ::= { testObject }
+                    """;
+
+            testModule(body, CompilerException.class, ".*Expected literal 'FIELD' but found 'TRUE'.*");
+        }
+
+        @Test
+        void testObjectWithSyntaxMandatoryOptionalGroupMissing() {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                           &fixedTypeValueField2 INTEGER OPTIONAL
+                       } WITH SYNTAX {
+                           [LITERAL [A &fixedTypeValueField1] [B &fixedTypeValueField2]]
+                       }
+                       
+                       testObject TEST ::= {
+                           LITERAL
+                       }
+                       
+                       TestSet TEST ::= { testObject }
+                    """;
+
+            testModule(body, CompilerException.class, ".*There must be at least one field in an optional group.*");
+        }
+
+        @Test
+        void testObjectWithSyntaxMandatoryOptionalGroupMissingRecursively() {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                           &fixedTypeValueField2 INTEGER OPTIONAL
+                       } WITH SYNTAX {
+                           [LITERAL [LITERAL [A &fixedTypeValueField1] [B &fixedTypeValueField2]]]
+                       }
+                       
+                       testObject TEST ::= {
+                           LITERAL LITERAL
+                       }
+                       
+                       TestSet TEST ::= { testObject }
+                    """;
+
+            testModule(body, CompilerException.class, ".*There must be at least one field in an optional group.*");
+        }
+
+        @Test
+        void testObjectWithSyntaxMandatoryOptionalGroupPresent() throws IOException, ParserException {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                           &fixedTypeValueField2 INTEGER OPTIONAL
+                       } WITH SYNTAX {
+                           [LITERAL [A &fixedTypeValueField1] [B &fixedTypeValueField2]]
+                       }
+                       
+                       testObject TEST ::= {
+                           LITERAL B 12
+                       }
+                       
+                       TestSet TEST ::= { testObject }
+                    """;
+
+            var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+
+            assertEquals(1, objectSet.getValues().size());
+
+            var object = objectSet.getValues().stream().findFirst().get();
+            var value1 = object.get("fixedTypeValueField1");
+
+            assertNull(value1);
+
+            var value2 = object.get("fixedTypeValueField2");
+
+            assertTrue(value2 instanceof IntegerValue);
+        }
 
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var object2 = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object2");
-
-        assertNotNull(object2);
-        assertTrue(object2.getObjectDefinition().containsKey("field2"));
-
-        var object1 = object2.getObjectDefinition().get("field2");
-
-        assertTrue(object1 instanceof Map);
-        assertTrue(((Map) object1).containsKey("field1"));
-
-        var value = ((Map) object1).get("field1");
-
-        assertTrue(value instanceof IntegerValue);
-        assertEquals(47, ((IntegerValue) value).getValue().longValue());
-    }
-
-    @Test
-    void testObjectWithReferenceInObjectField() throws IOException, ParserException {
-        var body = """
-                TEST1 ::= CLASS {
-                    &field1 INTEGER
-                }
-                                
-                TEST2 ::= CLASS {
-                    &field2 TEST1
-                }
-
-                object1 TEST1 ::= {&field1 47}
-
-                object2 TEST2 ::= {
-                    &field2 object1
-                }
-                """;
-
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var object2 = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object2");
-
-        assertNotNull(object2);
-        assertTrue(object2.getObjectDefinition().containsKey("field2"));
-
-        var object1 = object2.getObjectDefinition().get("field2");
-
-        assertTrue(object1 instanceof Map);
-        assertTrue(((Map) object1).containsKey("field1"));
-
-        var value = ((Map) object1).get("field1");
-
-        assertTrue(value instanceof IntegerValue);
-        assertEquals(47, ((IntegerValue) value).getValue().longValue());
-    }
-
-    @Test
-    void testObjectWithSequenceOf() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &field SEQUENCE OF VisibleString
-                } WITH SYNTAX {
-                    FIELD &field
-                }
-                                
-                object TEST ::= {
-                    FIELD {"value"}
-                }
-                """;
-
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object");
-
-        assertNotNull(object);
-        assertTrue(object.getObjectDefinition().containsKey("field"));
     }
 
     @ParameterizedTest(name = "[{index}] {0}")
@@ -1318,392 +1532,406 @@ class CompilerImplTest {
                 ".*Default value on field test in object class TEST not allowed because it's unique.*");
     }
 
-    @Test
-    void testTypeField() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
+    @Nested
+    @DisplayName("Test type fields")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class TypeField {
 
-                TestSequence ::= SEQUENCE {
-                    typeField TEST.&TypeField
-                }
-                """;
+        @Test
+        void testTypeField() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "TestSequence");
+                    TestSequence ::= SEQUENCE {
+                        typeField TEST.&TypeField
+                    }
+                    """;
 
-        assertTrue(compiledType instanceof CompiledCollectionType);
+            var compiledType = getCompiledType(body, MODULE_NAME, "TestSequence");
 
-        var compiledSequence = (CompiledCollectionType) compiledType;
+            assertTrue(compiledType instanceof CompiledCollectionType);
 
-        assertEquals(1, compiledSequence.getComponents().size());
+            var compiledSequence = (CompiledCollectionType) compiledType;
 
-        var compiledComponent = compiledSequence.getComponents().get(0).getCompiledType();
+            assertEquals(1, compiledSequence.getComponents().size());
 
-        assertTrue(compiledComponent.getType() instanceof OpenType);
+            var compiledComponent = compiledSequence.getComponents().get(0).getCompiledType();
+
+            assertTrue(compiledComponent.getType() instanceof OpenType);
+        }
+
+        @Test
+        void testTypeFieldInvalidOptionalInSequence() {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+                                    
+                    TestSequence ::= SEQUENCE {
+                       typeField TEST.&TypeField OPTIONAL,
+                       intField  INTEGER
+                    }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*'TestSequence' contains the optional open type 'typeField' which is ambiguous.*");
+        }
+
+        @Test
+        void testTypeFieldValidOptionalInSequence() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+                                    
+                    TestSequence ::= SEQUENCE {
+                       intField  INTEGER,
+                       typeField TEST.&TypeField OPTIONAL
+                    }
+                    """;
+
+            testCompiledCollection(body, "TestSequence");
+        }
+
+        @Test
+        void testTypeFieldInvalidInSet() {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+                                    
+                    TestSet ::= SET {
+                       intField  INTEGER,
+                       typeField TEST.&TypeField
+                    }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*'TestSet' contains the open type 'typeField' which is ambiguous.*");
+
+            body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+                                    
+                    TestSet ::= SET {
+                       typeField TEST.&TypeField,
+                       intField  INTEGER
+                    }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*'TestSet' contains the open type 'typeField' which is ambiguous.*");
+        }
+
+        @Test
+        void testTypeFieldValidInSet() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+                                    
+                    TestSet ::= SET {
+                       typeField TEST.&TypeField
+                    }
+                    """;
+
+            testCompiledCollection(body, "TestSet");
+        }
+
+        @Test
+        void testTypeFieldTaggedValidInSet() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+                                    
+                    TestSet ::= SET {
+                       intField        INTEGER,
+                       typeField1 [23] TEST.&TypeField,
+                       typeField2 [24] TEST.&TypeField
+                    }
+                    """;
+
+            testCompiledCollection(body, "TestSet");
+        }
+
+        @Test
+        void testTypeFieldValidInChoice() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+
+                    TestChoice ::= CHOICE {
+                       typeField TEST.&TypeField
+                    }
+                    """;
+
+            testCompiledChoice(body);
+        }
+
+        @Test
+        void testTypeFieldTaggedValidInChoice() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+
+                    TestChoice ::= CHOICE {
+                       typeField1 [23] TEST.&TypeField,
+                       typeField2 [24] TEST.&TypeField
+                    }
+                    """;
+
+            testCompiledChoice(body);
+        }
+
+        @Test
+        void testTypeFieldInvalidInChoice() {
+            var body = """
+                    TEST ::= CLASS {
+                        &TypeField
+                    }
+
+                    TestChoice ::= CHOICE {
+                       intField  INTEGER,
+                       typeField TEST.&TypeField
+                    }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*'TestChoice' contains the open type 'typeField' which is ambiguous.*");
+        }
+
     }
 
-    @Test
-    void testTypeFieldInvalidOptionalInSequence() {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-                                
-                TestSequence ::= SEQUENCE {
-                   typeField TEST.&TypeField OPTIONAL,
-                   intField  INTEGER
-                }
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*'TestSequence' contains the optional open type 'typeField' which is ambiguous.*");
-    }
-
-    @Test
-    void testTypeFieldValidOptionalInSequence() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-                                
-                TestSequence ::= SEQUENCE {
-                   intField  INTEGER,
-                   typeField TEST.&TypeField OPTIONAL
-                }
-                """;
-
-        testCompiledCollection(body, "TestSequence");
-    }
-
-    @Test
-    void testTypeFieldInvalidInSet() {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-                                
-                TestSet ::= SET {
-                   intField  INTEGER,
-                   typeField TEST.&TypeField
-                }
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*'TestSet' contains the open type 'typeField' which is ambiguous.*");
-
-        body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-                                
-                TestSet ::= SET {
-                   typeField TEST.&TypeField,
-                   intField  INTEGER
-                }
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*'TestSet' contains the open type 'typeField' which is ambiguous.*");
-    }
-
-    @Test
-    void testTypeFieldValidInSet() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-                                
-                TestSet ::= SET {
-                   typeField TEST.&TypeField
-                }
-                """;
-
-        testCompiledCollection(body, "TestSet");
-    }
-
-    @Test
-    void testTypeFieldTaggedValidInSet() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-                                
-                TestSet ::= SET {
-                   intField        INTEGER,
-                   typeField1 [23] TEST.&TypeField,
-                   typeField2 [24] TEST.&TypeField
-                }
-                """;
-
-        testCompiledCollection(body, "TestSet");
-    }
-
-    @Test
-    void testTypeFieldValidInChoice() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-
-                TestChoice ::= CHOICE {
-                   typeField TEST.&TypeField
-                }
-                """;
-
-        testCompiledChoice(body);
-    }
-
-    @Test
-    void testTypeFieldTaggedValidInChoice() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-
-                TestChoice ::= CHOICE {
-                   typeField1 [23] TEST.&TypeField,
-                   typeField2 [24] TEST.&TypeField
-                }
-                """;
-
-        testCompiledChoice(body);
-    }
-
-    @Test
-    void testTypeFieldInvalidInChoice() {
-        var body = """
-                TEST ::= CLASS {
-                    &TypeField
-                }
-
-                TestChoice ::= CHOICE {
-                   intField  INTEGER,
-                   typeField TEST.&TypeField
-                }
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*'TestChoice' contains the open type 'typeField' which is ambiguous.*");
-    }
-
-    @Test
-    void testVariableTypeValueField() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &variableTypeValueField &TypeField,
-                    &TypeField
-                }
-                """;
-
-        var variableTypeValueField =
-                getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
-
-        assertEquals("TypeField", variableTypeValueField.getReference());
-        assertFalse(variableTypeValueField.isOptional());
-    }
-
-    @Test
-    void testVariableTypeValueFieldIsOptional() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &variableTypeValueField &TypeField OPTIONAL,
-                    &TypeField
-                }
-                """;
-
-        var variableTypeValueField =
-                getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
-
-        assertEquals("TypeField", variableTypeValueField.getReference());
-        assertTrue(variableTypeValueField.isOptional());
-    }
-
-    @Test
-    void testVariableTypeValueFieldHasDefault() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &variableTypeValueField &TypeField DEFAULT TRUE,
-                    &TypeField DEFAULT BOOLEAN
-                }
-                """;
-
-        var variableTypeValueField =
-                getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
-
-        assertEquals("TypeField", variableTypeValueField.getReference());
-
-        var defaultValue = variableTypeValueField.getDefaultValue();
-
-        assertTrue(defaultValue.isPresent());
-        assertTrue(defaultValue.get() instanceof BooleanValue);
-    }
-
-    @Test
-    void testVariableTypeValueFieldHasDisallowedDefault() {
-        var body = """
-                TEST ::= CLASS {
-                    &variableTypeValueField &TypeField DEFAULT TRUE,
-                    &TypeField
-                }
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*'variableTypeValueField' in object class 'TEST' defines a default value, but the referenced type field 'TypeField' has no default.*");
-    }
-
-    @Test
-    void testVariableTypeValueFieldHasInvalidDefault() {
-        var body = """
-                TEST ::= CLASS {
-                    &variableTypeValueField &TypeField DEFAULT 4711,
-                    &TypeField DEFAULT VisibleString
-                }
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*'variableTypeValueField' in object class 'TEST' expects a default value of type VisibleString but found '4711'.*");
-    }
-
-    @Test
-    void testVariableTypeValueFieldInvalidReference() {
-        var body = """
-                TEST ::= CLASS {
-                    &variableTypeValueField &InvalidTypeField,
-                    &TypeField
-                }
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*'variableTypeValueField' in object class 'TEST' refers to the inexistent field 'InvalidTypeField'.*");
-    }
-
-    @Test
-    void testObjectsWithVariableTypeValueField() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &variableTypeValueField &TypeField DEFAULT "abc",
-                    &TypeField DEFAULT VisibleString
-                }
-
-                testObject1 TEST ::= {
-                    &variableTypeValueField  FALSE,
-                    &TypeField          BOOLEAN
-                }
-
-                testObject2 TEST ::= {
-                    &variableTypeValueField  4711,
-                    &TypeField          INTEGER
-                }
-
-                TestSet TEST ::= {
-                    testObject1 | testObject2
-                }
-                """;
-
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
-
-        assertNotNull(objectSet);
-        assertEquals(2, objectSet.getValues().size());
-    }
-
-    @Test
-    void testObjectsWithVariableTypeValueFieldDefaults() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &variableTypeValueField &TypeField DEFAULT "abc",
-                    &TypeField DEFAULT VisibleString
-                }
-
-                TestSet TEST ::= {
-                    {}
-                }
-                """;
-
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
-
-        assertNotNull(objectSet);
-        assertEquals(1, objectSet.getValues().size());
-
-        var objectDefinition = objectSet.getValues().stream().findFirst().get();
-        var compiledType = (CompiledType) objectDefinition.get("TypeField");
-
-        assertEquals(VisibleString.class, compiledType.getType().getClass());
-
-        var value = (Value) objectDefinition.get("variableTypeValueField");
-
-        assertEquals(VisibleStringValue.class, value.getClass());
-    }
-
-    @Test
-    void testObjectsWithVariableTypeValueFieldDefaultsSequence() throws IOException, ParserException {
-        var body = """
-                Seq ::= SEQUENCE {
-                    a BOOLEAN,
-                    b INTEGER
-                }
-
-                TEST ::= CLASS {
-                    &variableTypeValueField &TypeField DEFAULT {a TRUE, b 23},
-                    &TypeField DEFAULT Seq
-                }
-
-                TestSet TEST ::= {
-                    {}
-                }
-                """;
-
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
-
-        assertNotNull(objectSet);
-        assertEquals(1, objectSet.getValues().size());
-
-        var objectDefinition = objectSet.getValues().stream().findFirst().get();
-        var compiledType = (CompiledType) objectDefinition.get("TypeField");
-
-        assertEquals(SequenceType.class, compiledType.getType().getClass());
-
-        var value = (Value) objectDefinition.get("variableTypeValueField");
-
-        assertEquals(CollectionValue.class, value.getClass());
-    }
-
-    @Test
-    void testObjectWithVariableTypeValueFieldWithInvalidType() {
-        var body = """
-                TEST ::= CLASS {
-                    &variableTypeValueField &TypeField,
-                    &TypeField
-                }
-
-                TestSet TEST ::= {
-                    { &variableTypeValueField FALSE, &TypeField INTEGER}
-                }
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*The value for variableTypeValueField in the object definition for TEST must be of the type INTEGER but found the value.*");
+    @Nested
+    @DisplayName("Test variable type value field")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class VariableTypeValueField {
+
+        @Test
+        void testVariableTypeValueField() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &variableTypeValueField &TypeField,
+                        &TypeField
+                    }
+                    """;
+
+            var variableTypeValueField =
+                    getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
+
+            assertEquals("TypeField", variableTypeValueField.getReference());
+            assertFalse(variableTypeValueField.isOptional());
+        }
+
+        @Test
+        void testVariableTypeValueFieldIsOptional() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &variableTypeValueField &TypeField OPTIONAL,
+                        &TypeField
+                    }
+                    """;
+
+            var variableTypeValueField =
+                    getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
+
+            assertEquals("TypeField", variableTypeValueField.getReference());
+            assertTrue(variableTypeValueField.isOptional());
+        }
+
+        @Test
+        void testVariableTypeValueFieldHasDefault() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &variableTypeValueField &TypeField DEFAULT TRUE,
+                        &TypeField DEFAULT BOOLEAN
+                    }
+                    """;
+
+            var variableTypeValueField =
+                    getCompiledVariableTypeValueField(body, "TEST", "variableTypeValueField");
+
+            assertEquals("TypeField", variableTypeValueField.getReference());
+
+            var defaultValue = variableTypeValueField.getDefaultValue();
+
+            assertTrue(defaultValue.isPresent());
+            assertTrue(defaultValue.get() instanceof BooleanValue);
+        }
+
+        @Test
+        void testVariableTypeValueFieldHasDisallowedDefault() {
+            var body = """
+                    TEST ::= CLASS {
+                        &variableTypeValueField &TypeField DEFAULT TRUE,
+                        &TypeField
+                    }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*'variableTypeValueField' in object class 'TEST' defines a default value, but the referenced type field 'TypeField' has no default.*");
+        }
+
+        @Test
+        void testVariableTypeValueFieldHasInvalidDefault() {
+            var body = """
+                    TEST ::= CLASS {
+                        &variableTypeValueField &TypeField DEFAULT 4711,
+                        &TypeField DEFAULT VisibleString
+                    }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*'variableTypeValueField' in object class 'TEST' expects a default value of type VisibleString but found '4711'.*");
+        }
+
+        @Test
+        void testVariableTypeValueFieldInvalidReference() {
+            var body = """
+                    TEST ::= CLASS {
+                        &variableTypeValueField &InvalidTypeField,
+                        &TypeField
+                    }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*'variableTypeValueField' in object class 'TEST' refers to the inexistent field 'InvalidTypeField'.*");
+        }
+
+        @Test
+        void testObjectsWithVariableTypeValueField() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &variableTypeValueField &TypeField DEFAULT "abc",
+                        &TypeField DEFAULT VisibleString
+                    }
+
+                    testObject1 TEST ::= {
+                        &variableTypeValueField  FALSE,
+                        &TypeField          BOOLEAN
+                    }
+
+                    testObject2 TEST ::= {
+                        &variableTypeValueField  4711,
+                        &TypeField          INTEGER
+                    }
+
+                    TestSet TEST ::= {
+                        testObject1 | testObject2
+                    }
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
+
+            assertNotNull(objectSet);
+            assertEquals(2, objectSet.getValues().size());
+        }
+
+        @Test
+        void testObjectsWithVariableTypeValueFieldDefaults() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &variableTypeValueField &TypeField DEFAULT "abc",
+                        &TypeField DEFAULT VisibleString
+                    }
+
+                    TestSet TEST ::= {
+                        {}
+                    }
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
+
+            assertNotNull(objectSet);
+            assertEquals(1, objectSet.getValues().size());
+
+            var objectDefinition = objectSet.getValues().stream().findFirst().get();
+            var compiledType = (CompiledType) objectDefinition.get("TypeField");
+
+            assertEquals(VisibleString.class, compiledType.getType().getClass());
+
+            var value = (Value) objectDefinition.get("variableTypeValueField");
+
+            assertEquals(VisibleStringValue.class, value.getClass());
+        }
+
+        @Test
+        void testObjectsWithVariableTypeValueFieldDefaultsSequence() throws IOException, ParserException {
+            var body = """
+                    Seq ::= SEQUENCE {
+                        a BOOLEAN,
+                        b INTEGER
+                    }
+
+                    TEST ::= CLASS {
+                        &variableTypeValueField &TypeField DEFAULT {a TRUE, b 23},
+                        &TypeField DEFAULT Seq
+                    }
+
+                    TestSet TEST ::= {
+                        {}
+                    }
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var objectSet = ctx.getCompiledModule(MODULE_NAME).getObjectSets().get("TestSet");
+
+            assertNotNull(objectSet);
+            assertEquals(1, objectSet.getValues().size());
+
+            var objectDefinition = objectSet.getValues().stream().findFirst().get();
+            var compiledType = (CompiledType) objectDefinition.get("TypeField");
+
+            assertEquals(SequenceType.class, compiledType.getType().getClass());
+
+            var value = (Value) objectDefinition.get("variableTypeValueField");
+
+            assertEquals(CollectionValue.class, value.getClass());
+        }
+
+        @Test
+        void testObjectWithVariableTypeValueFieldWithInvalidType() {
+            var body = """
+                    TEST ::= CLASS {
+                        &variableTypeValueField &TypeField,
+                        &TypeField
+                    }
+
+                    TestSet TEST ::= {
+                        { &variableTypeValueField FALSE, &TypeField INTEGER}
+                    }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*The value for variableTypeValueField in the object definition for TEST must be of the type INTEGER but found the value.*");
+        }
+
     }
 
     @Test
@@ -1722,306 +1950,149 @@ class CompilerImplTest {
         assertTrue(fixedTypeValueSetField.getCompiledType().getType() instanceof IntegerType);
     }
 
-    @Test
-    void testVariableTypeValueSetField() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &VariableTypeValueSetField &TypeField,
-                    &TypeField
-                }
-                """;
+    @Nested
+    @DisplayName("Test variable type value set")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class VariableTypeValueSetField {
 
-        var variableTypeValueSetField =
-                getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
+        @Test
+        void testVariableTypeValueSetField() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &VariableTypeValueSetField &TypeField,
+                        &TypeField
+                    }
+                    """;
 
-        assertEquals("TypeField", variableTypeValueSetField.getReference());
-        assertFalse(variableTypeValueSetField.isOptional());
+            var variableTypeValueSetField =
+                    getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
+
+            assertEquals("TypeField", variableTypeValueSetField.getReference());
+            assertFalse(variableTypeValueSetField.isOptional());
+        }
+
+        @Test
+        void testVariableTypeValueSetFieldIsOptional() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &VariableTypeValueSetField &TypeField OPTIONAL,
+                        &TypeField
+                    }
+                    """;
+
+            var variableTypeValueSetField =
+                    getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
+
+            assertEquals("TypeField", variableTypeValueSetField.getReference());
+            assertTrue(variableTypeValueSetField.isOptional());
+        }
+
     }
 
-    @Test
-    void testVariableTypeValueSetFieldIsOptional() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &VariableTypeValueSetField &TypeField OPTIONAL,
-                    &TypeField
-                }
-                """;
+    @Nested
+    @DisplayName("Test object field")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ObjectField {
 
-        var variableTypeValueSetField =
-                getCompiledVariableTypeValueSetField(body, "TEST", "VariableTypeValueSetField");
+        @Test
+        void testObjectField() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &objectField TEST2
+                    }
+                                    
+                    TEST2 ::= CLASS {
+                        &TypeField
+                    }
+                    """;
 
-        assertEquals("TypeField", variableTypeValueSetField.getReference());
-        assertTrue(variableTypeValueSetField.isOptional());
+            var objectField = getCompiledObjectField(body, "TEST", "objectField");
+
+            assertNotNull(objectField.getObjectClass());
+
+            var referencedObjectClass = objectField.getObjectClass();
+
+            assertEquals("TEST2", referencedObjectClass.getName());
+        }
+
+        @Test
+        void testObjectFieldRecursion() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &objectField TEST OPTIONAL
+                    }
+                    """;
+
+            var objectField = getCompiledObjectField(body, "TEST", "objectField");
+
+            assertNotNull(objectField.getObjectClass());
+
+            var referencedObjectClass = objectField.getObjectClass();
+
+            assertEquals("TEST", referencedObjectClass.getName());
+        }
+
+        @Test
+        void testObjectFieldInvalidRecursion() {
+            var body = """
+                    TEST ::= CLASS {
+                        &objectField TEST
+                    }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*The object field 'objectField' that refers to its defining object class 'TEST' must be marked as OPTIONAL.*");
+        }
     }
 
-    @Test
-    void testObjectField() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &objectField TEST2
-                }
-                                
-                TEST2 ::= CLASS {
-                    &TypeField
-                }
-                """;
+    @Nested
+    @DisplayName("Test object set field")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ObjectSetField {
 
-        var objectField = getCompiledObjectField(body, "TEST", "objectField");
+        @Test
+        void testObjectSetField() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &ObjectSetField TEST2
+                    }
 
-        assertNotNull(objectField.getObjectClass());
+                    TEST2 ::= CLASS {
+                        &fixedTypeValueField INTEGER
+                    }
+                    """;
 
-        var referencedObjectClass = objectField.getObjectClass();
+            var objectSetField = getCompiledObjectSetField(body, "TEST", "ObjectSetField");
 
-        assertEquals("TEST2", referencedObjectClass.getName());
-    }
+            assertNotNull(objectSetField.getObjectClass());
 
-    @Test
-    void testObjectFieldRecursion() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &objectField TEST OPTIONAL
-                }
-                """;
+            var referencedObjectClass = objectSetField.getObjectClass();
 
-        var objectField = getCompiledObjectField(body, "TEST", "objectField");
+            assertEquals("TEST2", referencedObjectClass.getName());
+        }
 
-        assertNotNull(objectField.getObjectClass());
+        @Test
+        void testObjectSetFieldIsOptional() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &ObjectSetField TEST2 OPTIONAL
+                    }
+                                    
+                    TEST2 ::= CLASS {
+                        &fixedTypeValueField INTEGER
+                    }
+                    """;
 
-        var referencedObjectClass = objectField.getObjectClass();
+            var objectSetField = getCompiledObjectSetField(body, "TEST", "ObjectSetField");
 
-        assertEquals("TEST", referencedObjectClass.getName());
-    }
+            assertNotNull(objectSetField.getObjectClass());
 
-    @Test
-    void testObjectFieldInvalidRecursion() {
-        var body = """
-                TEST ::= CLASS {
-                    &objectField TEST
-                }
-                """;
+            var referencedObjectClass = objectSetField.getObjectClass();
 
-        testModule(body, CompilerException.class,
-                ".*The object field 'objectField' that refers to its defining object class 'TEST' must be marked as OPTIONAL.*");
-    }
+            assertEquals("TEST2", referencedObjectClass.getName());
+            assertTrue(objectSetField.isOptional());
+        }
 
-    @Test
-    void testObjectClassReference() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &fixedTypeValueField INTEGER
-                }
-
-                TEST2 ::= TEST
-                """;
-
-        var compiledObjectClass = getCompiledObjectClass(body, "TEST2");
-
-        assertNotNull(compiledObjectClass);
-        assertEquals(1, compiledObjectClass.getFields().size());
-
-        var maybeField = compiledObjectClass.getField("fixedTypeValueField");
-
-        assertTrue(maybeField.isPresent());
-
-        var field = maybeField.get();
-
-        assertTrue(field instanceof CompiledFixedTypeValueField);
-
-        var fixedTypeValueField = (CompiledFixedTypeValueField) field;
-
-        assertTrue(fixedTypeValueField.getCompiledType().getType() instanceof IntegerType);
-    }
-
-    @Test
-    void testObjectClassExternalReference() throws IOException, ParserException {
-        var body1 = """
-                TEST2 ::= OTHER-MODULE.TEST
-                """;
-        var body2 = """
-                TEST ::= CLASS {
-                    &fixedTypeValueField INTEGER
-                }
-                """;
-
-        var module1 = module(MODULE_NAME, body1);
-        var module2 = module("OTHER-MODULE", body2);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledObjectClass = ctx.getCompiledModule(MODULE_NAME).getObjectClasses().get("TEST2");
-
-        assertNotNull(compiledObjectClass);
-        assertEquals(1, compiledObjectClass.getFields().size());
-
-        var maybeField = compiledObjectClass.getField("fixedTypeValueField");
-
-        assertTrue(maybeField.isPresent());
-
-        var field = maybeField.get();
-
-        assertTrue(field instanceof CompiledFixedTypeValueField);
-
-        var fixedTypeValueField = (CompiledFixedTypeValueField) field;
-
-        assertTrue(fixedTypeValueField.getCompiledType().getType() instanceof IntegerType);
-    }
-
-    @Test
-    void testObjectClassWithObjectClassFieldType() throws IOException, ParserException {
-        var body = """
-                TEST1 ::= CLASS {
-                    &fixedTypeValueField INTEGER
-                }
-
-                TEST2 ::= CLASS {
-                    &fixedTypeValueField TEST1.&fixedTypeValueField
-                }
-                """;
-
-
-        var objectClass = getCompiledObjectClass(body, "TEST2");
-
-        assertEquals(1, objectClass.getFields().size());
-
-        var maybeField = objectClass.getField("fixedTypeValueField");
-
-        assertTrue(maybeField.isPresent());
-
-        var field = maybeField.get();
-
-        assertTrue(field instanceof CompiledFixedTypeValueField);
-
-        var fixedTypeValueField = (CompiledFixedTypeValueField) field;
-
-        assertTrue(fixedTypeValueField.getCompiledType().getType() instanceof IntegerType);
-    }
-
-    @Test
-    void testObjectSetField() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &ObjectSetField TEST2
-                }
-
-                TEST2 ::= CLASS {
-                    &fixedTypeValueField INTEGER
-                }
-                """;
-
-        var objectSetField = getCompiledObjectSetField(body, "TEST", "ObjectSetField");
-
-        assertNotNull(objectSetField.getObjectClass());
-
-        var referencedObjectClass = objectSetField.getObjectClass();
-
-        assertEquals("TEST2", referencedObjectClass.getName());
-    }
-
-    @Test
-    void testObjectSetFieldIsOptional() throws IOException, ParserException {
-        var body = """
-                TEST ::= CLASS {
-                    &ObjectSetField TEST2 OPTIONAL
-                }
-                                
-                TEST2 ::= CLASS {
-                    &fixedTypeValueField INTEGER
-                }
-                """;
-
-        var objectSetField = getCompiledObjectSetField(body, "TEST", "ObjectSetField");
-
-        assertNotNull(objectSetField.getObjectClass());
-
-        var referencedObjectClass = objectSetField.getObjectClass();
-
-        assertEquals("TEST2", referencedObjectClass.getName());
-        assertTrue(objectSetField.isOptional());
-    }
-
-    @Test
-    void testObjectClassTypeIdentifier() throws IOException, ParserException {
-        var body = """
-                   TEST ::= TYPE-IDENTIFIER
-                """;
-
-        var objectClass = getCompiledObjectClass(body, "TEST");
-
-        assertEquals(2, objectClass.getFields().size());
-
-        var maybeField1 = objectClass.getField("id");
-
-        assertTrue(maybeField1.isPresent());
-
-        var field1 = maybeField1.get();
-
-        assertTrue(field1 instanceof CompiledFixedTypeValueField);
-
-        var compiledFixedTypeValueField = (CompiledFixedTypeValueField) field1;
-
-        assertTrue(compiledFixedTypeValueField.isUnique());
-        assertTrue(compiledFixedTypeValueField.getCompiledType().getType() instanceof ObjectIdentifier);
-
-        var maybeField2 = objectClass.getField("Type");
-
-        assertTrue(maybeField2.isPresent());
-
-        var field2 = maybeField2.get();
-
-        assertTrue(field2 instanceof CompiledTypeField);
-
-        assertTrue(objectClass.getSyntax().isPresent());
-    }
-
-    @Test
-    void testObjectClassAbstractSyntax() throws IOException, ParserException {
-        var body = """
-                   TEST ::= ABSTRACT-SYNTAX
-                """;
-
-        var objectClass = getCompiledObjectClass(body, "TEST");
-
-        assertEquals(3, objectClass.getFields().size());
-
-        var maybeField1 = objectClass.getField("id");
-
-        assertTrue(maybeField1.isPresent());
-
-        var field1 = maybeField1.get();
-
-        assertTrue(field1 instanceof CompiledFixedTypeValueField);
-
-        var compiledFixedTypeValueField1 = (CompiledFixedTypeValueField) field1;
-
-        assertTrue(compiledFixedTypeValueField1.isUnique());
-        assertTrue(compiledFixedTypeValueField1.getCompiledType().getType() instanceof ObjectIdentifier);
-
-        var maybeField2 = objectClass.getField("Type");
-
-        assertTrue(maybeField2.isPresent());
-
-        var field2 = maybeField2.get();
-
-        assertTrue(field2 instanceof CompiledTypeField);
-
-        var maybeField3 = objectClass.getField("property");
-
-        assertTrue(maybeField3.isPresent());
-
-        var field3 = maybeField3.get();
-
-        assertTrue(field3 instanceof CompiledFixedTypeValueField);
-
-        var compiledFixedTypeValueField3 = (CompiledFixedTypeValueField) field3;
-
-        assertFalse(compiledFixedTypeValueField3.isUnique());
-        assertTrue(compiledFixedTypeValueField3.getCompiledType().getType() instanceof BitString);
-        assertNotNull(compiledFixedTypeValueField3.getDefaultValue());
-
-        assertTrue(objectClass.getSyntax().isPresent());
     }
 
     @Test
@@ -2070,362 +2141,384 @@ class CompilerImplTest {
         assertEquals(8, tag.getTag());
     }
 
-    @Test
-    void testObjectClassWithSyntax() throws IOException, ParserException {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField BOOLEAN
-                   } WITH SYNTAX {
-                       FIXED TYPE VALUE &fixedTypeValueField
-                   }
-                """;
+    @Nested
+    @DisplayName("Test object class")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ObjectClass {
 
-        var objectClass = getCompiledObjectClass(body, "TEST");
+        @Test
+        void testObjectClassTypeIdentifier() throws IOException, ParserException {
+            var body = """
+                       TEST ::= TYPE-IDENTIFIER
+                    """;
 
-        assertTrue(objectClass.getSyntax().isPresent());
-    }
+            var objectClass = getCompiledObjectClass(body, "TEST");
 
-    @Test
-    void testObjectClassWithSyntaxInvalidField() {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField BOOLEAN
-                   } WITH SYNTAX {
-                       FIXED TYPE VALUE &nonExistentField
-                   }
-                """;
+            assertEquals(2, objectClass.getFields().size());
 
-        testModule(body, CompilerException.class,
-                ".*Syntax of object class 'TEST' references the undefined field 'nonExistentField'.*");
-    }
+            var maybeField1 = objectClass.getField("id");
 
-    @Test
-    void testObjectClassWithSyntaxInvalidOptionalField() {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField BOOLEAN
-                   } WITH SYNTAX {
-                       [FIXED TYPE VALUE &fixedTypeValueField]
-                   }
-                """;
+            assertTrue(maybeField1.isPresent());
 
-        testModule(body, CompilerException.class,
-                ".*'fixedTypeValueField' in object class 'TEST' is defined in an optional group but refers to a mandatory field.*");
-    }
+            var field1 = maybeField1.get();
 
-    @Test
-    void testObjectClassWithSyntaxOptionalField() throws IOException, ParserException {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField BOOLEAN OPTIONAL
-                   } WITH SYNTAX {
-                       [FIXED TYPE VALUE &fixedTypeValueField]
-                   }
-                """;
+            assertTrue(field1 instanceof CompiledFixedTypeValueField);
 
-        var objectClass = getCompiledObjectClass(body, "TEST");
+            var compiledFixedTypeValueField = (CompiledFixedTypeValueField) field1;
 
-        assertTrue(objectClass.getSyntax().isPresent());
-    }
+            assertTrue(compiledFixedTypeValueField.isUnique());
+            assertTrue(compiledFixedTypeValueField.getCompiledType().getType() instanceof ObjectIdentifier);
 
-    @Test
-    void testObjectClassWithSyntaxDefaultField() throws IOException, ParserException {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField BOOLEAN DEFAULT TRUE
-                   } WITH SYNTAX {
-                       [FIXED TYPE VALUE &fixedTypeValueField]
-                   }
-                """;
+            var maybeField2 = objectClass.getField("Type");
 
-        var objectClass = getCompiledObjectClass(body, "TEST");
+            assertTrue(maybeField2.isPresent());
 
-        assertTrue(objectClass.getSyntax().isPresent());
-    }
+            var field2 = maybeField2.get();
 
-    @Test
-    void testObjectClassWithSyntaxInvalidLiteralAfterOptionalGroup() {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
-                       &fixedTypeValueField2 BOOLEAN OPTIONAL
-                   } WITH SYNTAX {
-                       [FIXED TYPE VALUE &fixedTypeValueField1]
-                       [FIXED TYPE VALUE &fixedTypeValueField2]
-                   }
-                """;
+            assertTrue(field2 instanceof CompiledTypeField);
 
-        testModule(body, CompilerException.class,
-                ".*Literal 'FIXED' in object class 'TEST' is illegal at this position because it's also used as the first literal of a preceding optional group.*");
+            assertTrue(objectClass.getSyntax().isPresent());
+        }
 
-        body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
-                       &fixedTypeValueField2 BOOLEAN OPTIONAL
-                   } WITH SYNTAX {
-                       [FIXED TYPE VALUE &fixedTypeValueField1]
-                       FIXED TYPE VALUE &fixedTypeValueField2
-                   }
-                """;
+        @Test
+        void testObjectClassAbstractSyntax() throws IOException, ParserException {
+            var body = """
+                       TEST ::= ABSTRACT-SYNTAX
+                    """;
 
-        testModule(body, CompilerException.class,
-                ".*Literal 'FIXED' in object class 'TEST' is illegal at this position because it's also used as the first literal of a preceding optional group.*");
+            var objectClass = getCompiledObjectClass(body, "TEST");
 
-        body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
-                       &fixedTypeValueField2 BOOLEAN OPTIONAL
-                   } WITH SYNTAX {
-                       [FIXED [TYPE [VALUE &fixedTypeValueField1] [VALUE &fixedTypeValueField2]]]
-                   }
-                """;
+            assertEquals(3, objectClass.getFields().size());
 
-        testModule(body, CompilerException.class,
-                ".*Literal 'VALUE' in object class 'TEST' is illegal at this position because it's also used as the first literal of a preceding optional group.*");
-    }
+            var maybeField1 = objectClass.getField("id");
 
-    @Test
-    void testObjectClassWithSyntaxDuplicateField() {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField BOOLEAN
-                   } WITH SYNTAX {
-                       FIELD &fixedTypeValueField
-                       FIELD &fixedTypeValueField 
-                   }
-                """;
+            assertTrue(maybeField1.isPresent());
 
-        testModule(body, CompilerException.class,
-                ".*Field 'fixedTypeValueField' already used in the syntax definition of object class 'TEST'.*");
-    }
+            var field1 = maybeField1.get();
 
-    @Test
-    void testObjectClassWithSyntaxMissingMandatoryField() {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN,
-                       &fixedTypeValueField2 BOOLEAN
-                   } WITH SYNTAX {
-                       FIELD &fixedTypeValueField1
-                   }
-                """;
+            assertTrue(field1 instanceof CompiledFixedTypeValueField);
 
-        testModule(body, CompilerException.class,
-                ".*Not all mandatory fields are defined in the syntax for object class 'TEST': fixedTypeValueField2.*");
-    }
+            var compiledFixedTypeValueField1 = (CompiledFixedTypeValueField) field1;
 
-    @ParameterizedTest(name = "[{index}] {1}")
-    @MethodSource("getObjectClassWithSyntaxForbiddenLiteralsArgument")
-    @DisplayName("Test forbidden literals in syntax of object class")
-    void testObjectClassWithSyntaxForbiddenLiterals(String reservedWord, String description) {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField BOOLEAN
-                   } WITH SYNTAX {
-                       %s &fixedTypeValueField
-                   }
-                """.formatted(reservedWord);
+            assertTrue(compiledFixedTypeValueField1.isUnique());
+            assertTrue(compiledFixedTypeValueField1.getCompiledType().getType() instanceof ObjectIdentifier);
 
-        testModule(body, CompilerException.class,
-                ".*Literal '%s' in object class 'TEST' is a reserved word and may not be used.*".formatted(reservedWord));
-    }
+            var maybeField2 = objectClass.getField("Type");
 
-    @Test
-    void testObjectWithSyntaxPrimitiveFieldNameFirst() throws IOException, ParserException {
-        var body = """
-                     TEST ::= CLASS {
-                       &id    INTEGER UNIQUE,
-                       &Type 
-                     } WITH SYNTAX {
-                       &Type IDENTIFIED BY &id
-                     }
-                    
-                    compiledObject TEST ::= {
-                       BOOLEAN IDENTIFIED BY 1 
+            assertTrue(maybeField2.isPresent());
+
+            var field2 = maybeField2.get();
+
+            assertTrue(field2 instanceof CompiledTypeField);
+
+            var maybeField3 = objectClass.getField("property");
+
+            assertTrue(maybeField3.isPresent());
+
+            var field3 = maybeField3.get();
+
+            assertTrue(field3 instanceof CompiledFixedTypeValueField);
+
+            var compiledFixedTypeValueField3 = (CompiledFixedTypeValueField) field3;
+
+            assertFalse(compiledFixedTypeValueField3.isUnique());
+            assertTrue(compiledFixedTypeValueField3.getCompiledType().getType() instanceof BitString);
+            assertNotNull(compiledFixedTypeValueField3.getDefaultValue());
+
+            assertTrue(objectClass.getSyntax().isPresent());
+        }
+
+        @Test
+        void testObjectClassReference() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &fixedTypeValueField INTEGER
                     }
-                """;
 
-        var module = module(MODULE_NAME, body);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+                    TEST2 ::= TEST
+                    """;
 
-        compiler.run();
+            var compiledObjectClass = getCompiledObjectClass(body, "TEST2");
 
-        var ctx = compiler.getCompilerContext();
-        var compiledObject = ctx.getCompiledModule(MODULE_NAME).getObjects().get("compiledObject");
+            assertNotNull(compiledObjectClass);
+            assertEquals(1, compiledObjectClass.getFields().size());
 
-        assertNotNull(compiledObject);
+            var maybeField = compiledObjectClass.getField("fixedTypeValueField");
 
-        var object = compiledObject.getObjectDefinition();
+            assertTrue(maybeField.isPresent());
 
-        var value1 = object.get("id");
+            var field = maybeField.get();
 
-        assertTrue(value1 instanceof IntegerValue);
+            assertTrue(field instanceof CompiledFixedTypeValueField);
 
-        var value2 = object.get("Type");
+            var fixedTypeValueField = (CompiledFixedTypeValueField) field;
 
-        assertTrue(value2 instanceof CompiledType);
-        assertTrue(((CompiledType) value2).getType() instanceof BooleanType);
-    }
+            assertTrue(fixedTypeValueField.getCompiledType().getType() instanceof IntegerType);
+        }
 
-    @Test
-    void testObjectWithSyntaxPrimitiveFieldNameLast() throws IOException, ParserException {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN,
-                       &fixedTypeValueField2 INTEGER
-                   } WITH SYNTAX {
-                       FIXED TYPE VALUE-A &fixedTypeValueField1
-                       FIXED TYPE VALUE-B &fixedTypeValueField2
-                   }
-                   
-                   testObject TEST ::= {
-                       FIXED TYPE VALUE-A TRUE
-                       FIXED TYPE VALUE-B 1
-                   }
-                   
-                   TestSet TEST ::= { testObject }
-                """;
+        @Test
+        void testObjectClassExternalReference() throws IOException, ParserException {
+            var body1 = """
+                    TEST2 ::= OTHER-MODULE.TEST
+                    """;
+            var body2 = """
+                    TEST ::= CLASS {
+                        &fixedTypeValueField INTEGER
+                    }
+                    """;
 
-        var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+            var module1 = module(MODULE_NAME, body1);
+            var module2 = module("OTHER-MODULE", body2);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
-        assertEquals(1, objectSet.getValues().size());
+            compiler.run();
 
-        var object = objectSet.getValues().stream().findFirst().get();
-        var value1 = object.get("fixedTypeValueField1");
+            var ctx = compiler.getCompilerContext();
+            var compiledObjectClass = ctx.getCompiledModule(MODULE_NAME).getObjectClasses().get("TEST2");
 
-        assertTrue(value1 instanceof BooleanValue);
+            assertNotNull(compiledObjectClass);
+            assertEquals(1, compiledObjectClass.getFields().size());
 
-        var value2 = object.get("fixedTypeValueField2");
+            var maybeField = compiledObjectClass.getField("fixedTypeValueField");
 
-        assertNotNull(value2);
-        assertTrue(value2 instanceof IntegerValue);
-    }
+            assertTrue(maybeField.isPresent());
 
-    @Test
-    void testObjectWithSyntaxOptionalPresent() throws IOException, ParserException {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
-                       &fixedTypeValueField2 INTEGER
-                   } WITH SYNTAX {
-                       [VALUE-A FIELD &fixedTypeValueField1]
-                       VALUE-B FIELD &fixedTypeValueField2
-                   }
-                   
-                   testObject TEST ::= {
-                       VALUE-A FIELD TRUE
-                       VALUE-B FIELD 1
-                   }
-                   
-                   TestSet TEST ::= { testObject }
-                """;
+            var field = maybeField.get();
 
-        var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+            assertTrue(field instanceof CompiledFixedTypeValueField);
 
-        assertEquals(1, objectSet.getValues().size());
+            var fixedTypeValueField = (CompiledFixedTypeValueField) field;
 
-        var object = objectSet.getValues().stream().findFirst().get();
-        var value1 = object.get("fixedTypeValueField1");
+            assertTrue(fixedTypeValueField.getCompiledType().getType() instanceof IntegerType);
+        }
 
-        assertTrue(value1 instanceof BooleanValue);
+        @Test
+        void testObjectClassWithObjectClassFieldType() throws IOException, ParserException {
+            var body = """
+                    TEST1 ::= CLASS {
+                        &fixedTypeValueField INTEGER
+                    }
 
-        var value2 = object.get("fixedTypeValueField2");
+                    TEST2 ::= CLASS {
+                        &fixedTypeValueField TEST1.&fixedTypeValueField
+                    }
+                    """;
 
-        assertTrue(value2 instanceof IntegerValue);
-    }
 
-    @Test
-    void testObjectWithSyntaxIncompleteOptionalGroup() {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
-                       &fixedTypeValueField2 INTEGER
-                   } WITH SYNTAX {
-                       [VALUE-A FIELD &fixedTypeValueField1]
-                       VALUE-B FIELD &fixedTypeValueField2
-                   }
-                   
-                   testObject TEST ::= {
-                       VALUE-A TRUE
-                       VALUE-B FIELD 1
-                   }
-                   
-                   TestSet TEST ::= { testObject }
-                """;
+            var objectClass = getCompiledObjectClass(body, "TEST2");
 
-        testModule(body, CompilerException.class, ".*Expected literal 'FIELD' but found 'TRUE'.*");
-    }
+            assertEquals(1, objectClass.getFields().size());
 
-    @Test
-    void testObjectWithSyntaxMandatoryOptionalGroupMissing() {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
-                       &fixedTypeValueField2 INTEGER OPTIONAL
-                   } WITH SYNTAX {
-                       [LITERAL [A &fixedTypeValueField1] [B &fixedTypeValueField2]]
-                   }
-                   
-                   testObject TEST ::= {
-                       LITERAL
-                   }
-                   
-                   TestSet TEST ::= { testObject }
-                """;
+            var maybeField = objectClass.getField("fixedTypeValueField");
 
-        testModule(body, CompilerException.class, ".*There must be at least one field in an optional group.*");
-    }
+            assertTrue(maybeField.isPresent());
 
-    @Test
-    void testObjectWithSyntaxMandatoryOptionalGroupMissingRecursively() {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
-                       &fixedTypeValueField2 INTEGER OPTIONAL
-                   } WITH SYNTAX {
-                       [LITERAL [LITERAL [A &fixedTypeValueField1] [B &fixedTypeValueField2]]]
-                   }
-                   
-                   testObject TEST ::= {
-                       LITERAL LITERAL
-                   }
-                   
-                   TestSet TEST ::= { testObject }
-                """;
+            var field = maybeField.get();
 
-        testModule(body, CompilerException.class, ".*There must be at least one field in an optional group.*");
-    }
+            assertTrue(field instanceof CompiledFixedTypeValueField);
 
-    @Test
-    void testObjectWithSyntaxMandatoryOptionalGroupPresent() throws IOException, ParserException {
-        var body = """
-                   TEST ::= CLASS {
-                       &fixedTypeValueField1 BOOLEAN OPTIONAL,
-                       &fixedTypeValueField2 INTEGER OPTIONAL
-                   } WITH SYNTAX {
-                       [LITERAL [A &fixedTypeValueField1] [B &fixedTypeValueField2]]
-                   }
-                   
-                   testObject TEST ::= {
-                       LITERAL B 12
-                   }
-                   
-                   TestSet TEST ::= { testObject }
-                """;
+            var fixedTypeValueField = (CompiledFixedTypeValueField) field;
 
-        var objectSet = getCompiledObjectSet(body, "TEST", "TestSet");
+            assertTrue(fixedTypeValueField.getCompiledType().getType() instanceof IntegerType);
+        }
 
-        assertEquals(1, objectSet.getValues().size());
+        @Test
+        void testObjectClassWithSyntax() throws IOException, ParserException {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField BOOLEAN
+                       } WITH SYNTAX {
+                           FIXED TYPE VALUE &fixedTypeValueField
+                       }
+                    """;
 
-        var object = objectSet.getValues().stream().findFirst().get();
-        var value1 = object.get("fixedTypeValueField1");
+            var objectClass = getCompiledObjectClass(body, "TEST");
 
-        assertNull(value1);
+            assertTrue(objectClass.getSyntax().isPresent());
+        }
 
-        var value2 = object.get("fixedTypeValueField2");
+        @Test
+        void testObjectClassWithSyntaxInvalidField() {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField BOOLEAN
+                       } WITH SYNTAX {
+                           FIXED TYPE VALUE &nonExistentField
+                       }
+                    """;
 
-        assertTrue(value2 instanceof IntegerValue);
+            testModule(body, CompilerException.class,
+                    ".*Syntax of object class 'TEST' references the undefined field 'nonExistentField'.*");
+        }
+
+        @Test
+        void testObjectClassWithSyntaxInvalidOptionalField() {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField BOOLEAN
+                       } WITH SYNTAX {
+                           [FIXED TYPE VALUE &fixedTypeValueField]
+                       }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*'fixedTypeValueField' in object class 'TEST' is defined in an optional group but refers to a mandatory field.*");
+        }
+
+        @Test
+        void testObjectClassWithSyntaxOptionalField() throws IOException, ParserException {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField BOOLEAN OPTIONAL
+                       } WITH SYNTAX {
+                           [FIXED TYPE VALUE &fixedTypeValueField]
+                       }
+                    """;
+
+            var objectClass = getCompiledObjectClass(body, "TEST");
+
+            assertTrue(objectClass.getSyntax().isPresent());
+        }
+
+        @Test
+        void testObjectClassWithSyntaxDefaultField() throws IOException, ParserException {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField BOOLEAN DEFAULT TRUE
+                       } WITH SYNTAX {
+                           [FIXED TYPE VALUE &fixedTypeValueField]
+                       }
+                    """;
+
+            var objectClass = getCompiledObjectClass(body, "TEST");
+
+            assertTrue(objectClass.getSyntax().isPresent());
+        }
+
+        @Test
+        void testObjectClassWithSyntaxInvalidLiteralAfterOptionalGroup() {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                           &fixedTypeValueField2 BOOLEAN OPTIONAL
+                       } WITH SYNTAX {
+                           [FIXED TYPE VALUE &fixedTypeValueField1]
+                           [FIXED TYPE VALUE &fixedTypeValueField2]
+                       }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*Literal 'FIXED' in object class 'TEST' is illegal at this position because it's also used as the first literal of a preceding optional group.*");
+
+            body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                           &fixedTypeValueField2 BOOLEAN OPTIONAL
+                       } WITH SYNTAX {
+                           [FIXED TYPE VALUE &fixedTypeValueField1]
+                           FIXED TYPE VALUE &fixedTypeValueField2
+                       }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*Literal 'FIXED' in object class 'TEST' is illegal at this position because it's also used as the first literal of a preceding optional group.*");
+
+            body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN OPTIONAL,
+                           &fixedTypeValueField2 BOOLEAN OPTIONAL
+                       } WITH SYNTAX {
+                           [FIXED [TYPE [VALUE &fixedTypeValueField1] [VALUE &fixedTypeValueField2]]]
+                       }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*Literal 'VALUE' in object class 'TEST' is illegal at this position because it's also used as the first literal of a preceding optional group.*");
+        }
+
+        @Test
+        void testObjectClassWithSyntaxDuplicateField() {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField BOOLEAN
+                       } WITH SYNTAX {
+                           FIELD &fixedTypeValueField
+                           FIELD &fixedTypeValueField 
+                       }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*Field 'fixedTypeValueField' already used in the syntax definition of object class 'TEST'.*");
+        }
+
+        @Test
+        void testObjectClassWithSyntaxMissingMandatoryField() {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField1 BOOLEAN,
+                           &fixedTypeValueField2 BOOLEAN
+                       } WITH SYNTAX {
+                           FIELD &fixedTypeValueField1
+                       }
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*Not all mandatory fields are defined in the syntax for object class 'TEST': fixedTypeValueField2.*");
+        }
+
+        @ParameterizedTest(name = "[{index}] {1}")
+        @MethodSource("getObjectClassWithSyntaxForbiddenLiteralsArgument")
+        @DisplayName("Test forbidden literals in syntax of object class")
+        void testObjectClassWithSyntaxForbiddenLiterals(String reservedWord, String description) {
+            var body = """
+                       TEST ::= CLASS {
+                           &fixedTypeValueField BOOLEAN
+                       } WITH SYNTAX {
+                           %s &fixedTypeValueField
+                       }
+                    """.formatted(reservedWord);
+
+            testModule(body, CompilerException.class,
+                    ".*Literal '%s' in object class 'TEST' is a reserved word and may not be used.*".formatted(reservedWord));
+        }
+
+        Stream<Arguments> getObjectClassWithSyntaxForbiddenLiteralsArgument() {
+            return Stream.of(
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("BIT"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("BOOLEAN"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("CHARACTER"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("CHOICE"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("DATE"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("DATE-TIME"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("DURATION"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("EMBEDDED"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("END"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("ENUMERATED"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("EXTERNAL"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("FALSE"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("INSTANCE"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("INTEGER"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("INTERSECTION"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("MINUS-INFINITY"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("NULL"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("OBJECT"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("OCTET"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("PLUS-INFINITY"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("RELATIVE-OID"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("SEQUENCE"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("SET"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("TIME"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("TIME-OF-DAY"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("TRUE"),
+                    getObjectClassWithSyntaxForbiddenLiteralsArgument("UNION")
+            );
+        }
+
+        Arguments getObjectClassWithSyntaxForbiddenLiteralsArgument(String reservedWord) {
+            return Arguments.of(reservedWord, "Test that '%s' is forbidden in DefinedSyntax".formatted(reservedWord));
+        }
+
     }
 
     @Test
@@ -2441,574 +2534,840 @@ class CompilerImplTest {
         assertEquals(0, objectSet.getValues().size());
     }
 
-    @Test
-    void testParameterizedTypeWithSequence() throws IOException, ParserException {
-        var body = """
-                   AbstractSeq {Type} ::= SEQUENCE {
-                       field Type
-                   }
-                   
-                   Seq ::= AbstractSeq {BOOLEAN}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        testCollectionField((CompiledCollectionType) compiledType, "field", BooleanType.class);
-    }
-
-    @Test
-    void testParameterizedTypeWithSequenceComponentsOf() throws IOException, ParserException {
-        var body = """
-                   TestSequence ::= SEQUENCE {
-                       field2 INTEGER,
-                       field3 VisibleString
-                   }
-                   
-                   AbstractSeq {Type, SequenceType} ::= SEQUENCE {
-                       field1 Type,
-                       COMPONENTS OF SequenceType
-                   }
-                   
-                   Seq ::= AbstractSeq {BOOLEAN, TestSequence}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
-        testCollectionField((CompiledCollectionType) compiledType, "field2", IntegerType.class);
-        testCollectionField((CompiledCollectionType) compiledType, "field3", VisibleString.class);
-    }
-
-    @Test
-    void testParameterizedTypeWithSequenceComponentsOfInline() throws IOException, ParserException {
-        var body = """
-                AbstractSeq {Type} ::= SEQUENCE { 
-                    COMPONENTS OF SEQUENCE {field1 INTEGER, field2 Type} 
-                }
-                                
-                Seq ::= AbstractSeq {BOOLEAN}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        testCollectionField((CompiledCollectionType) compiledType, "field1", IntegerType.class);
-        testCollectionField((CompiledCollectionType) compiledType, "field2", BooleanType.class);
-    }
-
-    @Test
-    void testParameterizedTypeWithSequenceNested() throws IOException, ParserException {
-        var body = """
-                   AbstractSeq {Type1, Type2} ::= SEQUENCE {
-                       field1 Type1,
-                       field2 SEQUENCE {
-                                  field3 Type2
-                              }
-                   }
-                   
-                   Seq ::= AbstractSeq {BOOLEAN, INTEGER}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        var collection = (CompiledCollectionType) compiledType;
-
-        testCollectionField(collection, "field1", BooleanType.class);
-
-        var field2 = testCollectionField(collection, "field2", SequenceType.class);
-
-        testCollectionField((CompiledCollectionType) field2, "field3", IntegerType.class);
-    }
-
-    @Test
-    void testParameterizedTypeWithSequenceUnusedParameters() {
-        var body = """
-                   AbstractSeq {Type1, Type2, Type3} ::= SEQUENCE {
-                       field Type2
-                   }
-                   
-                   Seq ::= AbstractSeq {INTEGER, BOOLEAN, VisibleString}
-                """;
-
-        testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSeq': Type1, Type3.*");
-    }
-
-    @Test
-    void testParameterizedTypeWithSequenceParameterCount() {
-        var body = """
-                   AbstractSeq {Type1, Type2, Type3} ::= SEQUENCE {
-                       field Type2
-                   }
-                   
-                   Seq ::= AbstractSeq {INTEGER}
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*'Seq' passes 1 parameters but 'AbstractSeq' expects: Type1, Type2, Type3.*");
-    }
-
-    @Test
-    void testParameterizedTypeWithSetComponentsOf() throws IOException, ParserException {
-        var body = """
-                   TestSet ::= SET {
-                       field2 INTEGER,
-                       field3 VisibleString
-                   }
-                   
-                   AbstractSet {Type, SetType} ::= SET {
-                       field1 Type,
-                       COMPONENTS OF SetType
-                   }
-                   
-                   Set ::= AbstractSet {BOOLEAN, TestSet}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Set");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
-        testCollectionField((CompiledCollectionType) compiledType, "field2", IntegerType.class);
-        testCollectionField((CompiledCollectionType) compiledType, "field3", VisibleString.class);
-    }
-
-    @Test
-    void testParameterizedTypeWithSetComponentsOfExternalTypeReference() throws IOException, ParserException {
-        var body1 = """              
-                Set1 ::= SET {
-                    COMPONENTS OF OTHER-MODULE.Set2
-                }
-                """;
-        var body2 = """
-                EXPORTS Set2;
-                                
-                Set2 ::= SET {
-                    field1 INTEGER,
-                    field2 BOOLEAN
-                }     
-                """;
-
-        var module1 = module(MODULE_NAME, body1);
-        var module2 = module("OTHER-MODULE", body2);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Set1");
-
-        assertNotNull(compiledType);
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        testCollectionField((CompiledCollectionType) compiledType, "field1", IntegerType.class);
-        testCollectionField((CompiledCollectionType) compiledType, "field2", BooleanType.class);
-    }
-
-    @Test
-    void testParameterizedTypeWithSetComponentsOfImportedType() throws IOException, ParserException {
-        var body1 = """
-                IMPORTS Set2 FROM OTHER-MODULE;
-                                
-                Set1 ::= SET {
-                    COMPONENTS OF Set2
-                }
-                """;
-        var body2 = """
-                EXPORTS Set2;
-                                
-                Set2 ::= SET {
-                    field1 INTEGER,
-                    field2 BOOLEAN
-                }    
-                """;
-
-        var module1 = module(MODULE_NAME, body1);
-        var module2 = module("OTHER-MODULE", body2);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Set1");
-
-        assertNotNull(compiledType);
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        testCollectionField((CompiledCollectionType) compiledType, "field1", IntegerType.class);
-        testCollectionField((CompiledCollectionType) compiledType, "field2", BooleanType.class);
-    }
-
-    @Test
-    void testParameterizedTypeWithSetComponentsOfDuplicateTags() {
-        var body = """
-                   TestSet ::= SET {
-                       field2 INTEGER,
-                       field3 VisibleString
-                   }
-                   
-                   AbstractSet {Type, SetType} ::= SET {
-                       field1 Type,
-                       COMPONENTS OF SetType
-                   }
-                   
-                   Set ::= AbstractSet {INTEGER, TestSet}
-                """;
-
-        testModule(body, CompilerException.class, ".*Duplicate tags in SET 'Set': field1 and field2.*");
-    }
-
-    @Test
-    void testParameterizedTypeWithChoice() throws IOException, ParserException {
-        var body = """
-                   AbstractChoice {Type} ::= CHOICE {
-                       field1 Type,
-                       field2 INTEGER
-                   }
-                   
-                   Choice ::= AbstractChoice {BOOLEAN}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Choice");
-
-        assertTrue(compiledType instanceof CompiledChoiceType);
-
-        testChoiceField((CompiledChoiceType) compiledType, "field1", BooleanType.class);
-        testChoiceField((CompiledChoiceType) compiledType, "field2", IntegerType.class);
-    }
-
-    @Test
-    void testParameterizedTypeWithChoiceDuplicateTags() {
-        var body = """
-                   AbstractChoice {Type} ::= CHOICE {
-                       field1 Type,
-                       field2 INTEGER
-                   }
-                   
-                   Choice ::= AbstractChoice {INTEGER}
-                """;
-
-        testModule(body, CompilerException.class, ".*Duplicate tags in CHOICE 'Choice': field1 and field2.*");
-    }
-
-    @Test
-    void testParameterizedTypeWithChoiceUnusedParameters() {
-        var body = """
-                   AbstractChoice {Type1, Type2, Type3} ::= CHOICE {
-                       field Type2
-                   }
-                   
-                   Choice ::= AbstractChoice {INTEGER, BOOLEAN, VisibleString}
-                """;
-
-        testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractChoice': Type1, Type3.*");
-    }
-
-    @Test
-    void testParameterizedTypeWithSequenceOf() throws IOException, ParserException {
-        var body = """
-                   AbstractSequenceOf {Type} ::= SEQUENCE OF Type
-                   
-                   SequenceOf ::= AbstractSequenceOf {BOOLEAN}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "SequenceOf");
-
-        assertTrue(compiledType instanceof CompiledCollectionOfType);
-
-        var collectionOf = (CompiledCollectionOfType) compiledType;
-
-        assertTrue(collectionOf.getContentType().getType() instanceof BooleanType);
-    }
-
-    @Test
-    void testParameterizedTypeWithSequenceOfUnusedParameters() {
-        var body = """
-                   AbstractSequenceOf {Type1, Type2, Type3} ::= SEQUENCE OF Type2
-                   
-                   SequenceOf ::= AbstractSequenceOf {INTEGER, BOOLEAN, VisibleString}
-                """;
-
-        testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSequenceOf': Type1, Type3.*");
-    }
-
-    @Test
-    void testParameterizedTypeWithSetOf() throws IOException, ParserException {
-        var body = """
-                   AbstractSetOf {Type} ::= SET OF Type
-                   
-                   SetOf ::= AbstractSetOf {BOOLEAN}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "SetOf");
-
-        assertTrue(compiledType instanceof CompiledCollectionOfType);
-
-        var collectionOf = (CompiledCollectionOfType) compiledType;
-
-        assertTrue(collectionOf.getContentType().getType() instanceof BooleanType);
-    }
-
-    @Test
-    void testParameterizedExternalTypeReference() throws IOException, ParserException {
-        var body1 = """
-                String ::= OTHER-MODULE.AbstractType {VisibleString}
-                """;
-        var body2 = """
-                AbstractType {Type} ::= Type
-                """;
-
-        var module1 = module(MODULE_NAME, body1);
-        var module2 = module("OTHER-MODULE", body2);
-        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
-        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
-
-        compiler.run();
-
-        var ctx = compiler.getCompilerContext();
-        var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("String");
-
-        assertNotNull(compiledType);
-        assertTrue(compiledType.getType() instanceof VisibleString);
-    }
-
-    @Test
-    void testParameterizedValueWithSequence() throws IOException, ParserException {
-        var body = """
-                   AbstractSequence {INTEGER:value} ::= SEQUENCE {
-                       field INTEGER DEFAULT value
-                   }
-                   
-                   Sequence ::= AbstractSequence {23}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        var collection = (CompiledCollectionType) compiledType;
-
-        testCollectionField(collection, "field", IntegerType.class);
-    }
-
-    @Test
-    void testParameterizedValueWithTypeReferenceWithSequence() throws IOException, ParserException {
-        var body = """
-                   Integer ::= INTEGER
-                   
-                   AbstractSequence {Integer:value} ::= SEQUENCE {
-                       field INTEGER DEFAULT value
-                   }
-                   
-                   Sequence ::= AbstractSequence {23}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        var collection = (CompiledCollectionType) compiledType;
-
-        testCollectionField(collection, "field", IntegerType.class);
-    }
-
-    @Test
-    void testParameterizedValueWithSequenceUnresolvableTypeReference() {
-        var body = """
-                   AbstractSequence {Integer:value} ::= SEQUENCE {
-                       field INTEGER DEFAULT value
-                   }
-                   
-                   Sequence ::= AbstractSequence {TRUE}
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*The Governor references the type Integer which can't be resolved.*");
-    }
-
-    @Test
-    void testParameterizedValueWithSequenceInvalidTypeReference() {
-        var body = """
-                   AbstractSequence {integer:value} ::= SEQUENCE {
-                       field INTEGER DEFAULT value
-                   }
-                   
-                   Sequence ::= AbstractSequence {23}
-                """;
-
-        testModule(body, CompilerException.class,
-                ".*The Governor 'integer' is not a valid typereference.*");
-    }
-
-    @Test
-    void testParameterizedValueWithSequenceWrongValueType() {
-        var body = """
-                   AbstractSequence {INTEGER:value} ::= SEQUENCE {
-                       field INTEGER DEFAULT value
-                   }
-                   
-                   Sequence ::= AbstractSequence {TRUE}
-                """;
-
-        testModule(body, CompilerException.class, ".*Expected a value of type INTEGER but found: TRUE.*");
-    }
-
-    @Test
-    void testParameterizedTypeAndValueWithSequence() throws IOException, ParserException {
-        var body = """
-                   AbstractSequence {Type, Type:value} ::= SEQUENCE {
-                       field Type DEFAULT value
-                   }
-                   
-                   Sequence ::= AbstractSequence {INTEGER, 23}
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        var collection = (CompiledCollectionType) compiledType;
-
-        testCollectionField(collection, "field", IntegerType.class);
-    }
-
-    @Test
-    void testParameterizedTypeWithInheritedParameter() throws IOException, ParserException {
-        var body = """
-                    Set ::= AbstractSet2 {BOOLEAN}
-                                
-                    AbstractSet1 {Type1} ::= SET {
-                        field Type1
+    @Nested
+    @DisplayName("Test parameterized types")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ParameterizedTypes {
+
+        @Test
+        void testParameterizedTypeWithSequence() throws IOException, ParserException {
+            var body = """
+                       AbstractSeq {Type} ::= SEQUENCE {
+                           field Type
+                       }
+                       
+                       Seq ::= AbstractSeq {BOOLEAN}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            testCollectionField((CompiledCollectionType) compiledType, "field", BooleanType.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithSequenceComponentsOf() throws IOException, ParserException {
+            var body = """
+                       TestSequence ::= SEQUENCE {
+                           field2 INTEGER,
+                           field3 VisibleString
+                       }
+                       
+                       AbstractSeq {Type, SequenceType} ::= SEQUENCE {
+                           field1 Type,
+                           COMPONENTS OF SequenceType
+                       }
+                       
+                       Seq ::= AbstractSeq {BOOLEAN, TestSequence}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
+            testCollectionField((CompiledCollectionType) compiledType, "field2", IntegerType.class);
+            testCollectionField((CompiledCollectionType) compiledType, "field3", VisibleString.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithSequenceComponentsOfInline() throws IOException, ParserException {
+            var body = """
+                    AbstractSeq {Type} ::= SEQUENCE { 
+                        COMPONENTS OF SEQUENCE {field1 INTEGER, field2 Type} 
                     }
-                                
-                    AbstractSet2 {Type2} ::= SET {
-                        COMPONENTS OF AbstractSet1 {Type2}
+                                    
+                    Seq ::= AbstractSeq {BOOLEAN}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            testCollectionField((CompiledCollectionType) compiledType, "field1", IntegerType.class);
+            testCollectionField((CompiledCollectionType) compiledType, "field2", BooleanType.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithSequenceNested() throws IOException, ParserException {
+            var body = """
+                       AbstractSeq {Type1, Type2} ::= SEQUENCE {
+                           field1 Type1,
+                           field2 SEQUENCE {
+                                      field3 Type2
+                                  }
+                       }
+                       
+                       Seq ::= AbstractSeq {BOOLEAN, INTEGER}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            var collection = (CompiledCollectionType) compiledType;
+
+            testCollectionField(collection, "field1", BooleanType.class);
+
+            var field2 = testCollectionField(collection, "field2", SequenceType.class);
+
+            testCollectionField((CompiledCollectionType) field2, "field3", IntegerType.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithSequenceUnusedParameters() {
+            var body = """
+                       AbstractSeq {Type1, Type2, Type3} ::= SEQUENCE {
+                           field Type2
+                       }
+                       
+                       Seq ::= AbstractSeq {INTEGER, BOOLEAN, VisibleString}
+                    """;
+
+            testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSeq': Type1, Type3.*");
+        }
+
+        @Test
+        void testParameterizedTypeWithSequenceParameterCount() {
+            var body = """
+                       AbstractSeq {Type1, Type2, Type3} ::= SEQUENCE {
+                           field Type2
+                       }
+                       
+                       Seq ::= AbstractSeq {INTEGER}
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*'Seq' passes 1 parameters but 'AbstractSeq' expects: Type1, Type2, Type3.*");
+        }
+
+        @Test
+        void testParameterizedTypeWithSetComponentsOf() throws IOException, ParserException {
+            var body = """
+                       TestSet ::= SET {
+                           field2 INTEGER,
+                           field3 VisibleString
+                       }
+                       
+                       AbstractSet {Type, SetType} ::= SET {
+                           field1 Type,
+                           COMPONENTS OF SetType
+                       }
+                       
+                       Set ::= AbstractSet {BOOLEAN, TestSet}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Set");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            testCollectionField((CompiledCollectionType) compiledType, "field1", BooleanType.class);
+            testCollectionField((CompiledCollectionType) compiledType, "field2", IntegerType.class);
+            testCollectionField((CompiledCollectionType) compiledType, "field3", VisibleString.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithSetComponentsOfExternalTypeReference() throws IOException, ParserException {
+            var body1 = """              
+                    Set1 ::= SET {
+                        COMPONENTS OF OTHER-MODULE.Set2
                     }
-                """;
+                    """;
+            var body2 = """
+                    EXPORTS Set2;
+                                    
+                    Set2 ::= SET {
+                        field1 INTEGER,
+                        field2 BOOLEAN
+                    }     
+                    """;
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "Set");
+            var module1 = module(MODULE_NAME, body1);
+            var module2 = module("OTHER-MODULE", body2);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
 
-        assertTrue(compiledType instanceof CompiledCollectionType);
+            compiler.run();
 
-        var collection = (CompiledCollectionType) compiledType;
+            var ctx = compiler.getCompilerContext();
+            var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Set1");
 
-        testCollectionField(collection, "field", BooleanType.class);
+            assertNotNull(compiledType);
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            testCollectionField((CompiledCollectionType) compiledType, "field1", IntegerType.class);
+            testCollectionField((CompiledCollectionType) compiledType, "field2", BooleanType.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithSetComponentsOfImportedType() throws IOException, ParserException {
+            var body1 = """
+                    IMPORTS Set2 FROM OTHER-MODULE;
+                                    
+                    Set1 ::= SET {
+                        COMPONENTS OF Set2
+                    }
+                    """;
+            var body2 = """
+                    EXPORTS Set2;
+                                    
+                    Set2 ::= SET {
+                        field1 INTEGER,
+                        field2 BOOLEAN
+                    }    
+                    """;
+
+            var module1 = module(MODULE_NAME, body1);
+            var module2 = module("OTHER-MODULE", body2);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("Set1");
+
+            assertNotNull(compiledType);
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            testCollectionField((CompiledCollectionType) compiledType, "field1", IntegerType.class);
+            testCollectionField((CompiledCollectionType) compiledType, "field2", BooleanType.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithSetComponentsOfDuplicateTags() {
+            var body = """
+                       TestSet ::= SET {
+                           field2 INTEGER,
+                           field3 VisibleString
+                       }
+                       
+                       AbstractSet {Type, SetType} ::= SET {
+                           field1 Type,
+                           COMPONENTS OF SetType
+                       }
+                       
+                       Set ::= AbstractSet {INTEGER, TestSet}
+                    """;
+
+            testModule(body, CompilerException.class, ".*Duplicate tags in SET 'Set': field1 and field2.*");
+        }
+
+        @Test
+        void testParameterizedTypeWithChoice() throws IOException, ParserException {
+            var body = """
+                       AbstractChoice {Type} ::= CHOICE {
+                           field1 Type,
+                           field2 INTEGER
+                       }
+                       
+                       Choice ::= AbstractChoice {BOOLEAN}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Choice");
+
+            assertTrue(compiledType instanceof CompiledChoiceType);
+
+            testChoiceField((CompiledChoiceType) compiledType, "field1", BooleanType.class);
+            testChoiceField((CompiledChoiceType) compiledType, "field2", IntegerType.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithChoiceDuplicateTags() {
+            var body = """
+                       AbstractChoice {Type} ::= CHOICE {
+                           field1 Type,
+                           field2 INTEGER
+                       }
+                       
+                       Choice ::= AbstractChoice {INTEGER}
+                    """;
+
+            testModule(body, CompilerException.class, ".*Duplicate tags in CHOICE 'Choice': field1 and field2.*");
+        }
+
+        @Test
+        void testParameterizedTypeWithChoiceUnusedParameters() {
+            var body = """
+                       AbstractChoice {Type1, Type2, Type3} ::= CHOICE {
+                           field Type2
+                       }
+                       
+                       Choice ::= AbstractChoice {INTEGER, BOOLEAN, VisibleString}
+                    """;
+
+            testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractChoice': Type1, Type3.*");
+        }
+
+        @Test
+        void testParameterizedTypeWithSequenceOf() throws IOException, ParserException {
+            var body = """
+                       AbstractSequenceOf {Type} ::= SEQUENCE OF Type
+                       
+                       SequenceOf ::= AbstractSequenceOf {BOOLEAN}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "SequenceOf");
+
+            assertTrue(compiledType instanceof CompiledCollectionOfType);
+
+            var collectionOf = (CompiledCollectionOfType) compiledType;
+
+            assertTrue(collectionOf.getContentType().getType() instanceof BooleanType);
+        }
+
+        @Test
+        void testParameterizedTypeWithSequenceOfUnusedParameters() {
+            var body = """
+                       AbstractSequenceOf {Type1, Type2, Type3} ::= SEQUENCE OF Type2
+                       
+                       SequenceOf ::= AbstractSequenceOf {INTEGER, BOOLEAN, VisibleString}
+                    """;
+
+            testModule(body, CompilerException.class, ".*Unused parameters in type 'AbstractSequenceOf': Type1, Type3.*");
+        }
+
+        @Test
+        void testParameterizedTypeWithSetOf() throws IOException, ParserException {
+            var body = """
+                       AbstractSetOf {Type} ::= SET OF Type
+                       
+                       SetOf ::= AbstractSetOf {BOOLEAN}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "SetOf");
+
+            assertTrue(compiledType instanceof CompiledCollectionOfType);
+
+            var collectionOf = (CompiledCollectionOfType) compiledType;
+
+            assertTrue(collectionOf.getContentType().getType() instanceof BooleanType);
+        }
+
+
+        @Test
+        void testParameterizedExternalTypeReference() throws IOException, ParserException {
+            var body1 = """
+                    String ::= OTHER-MODULE.AbstractType {VisibleString}
+                    """;
+            var body2 = """
+                    AbstractType {Type} ::= Type
+                    """;
+
+            var module1 = module(MODULE_NAME, body1);
+            var module2 = module("OTHER-MODULE", body2);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module1), Tuple2.of("OTHER-MODULE", module2));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var compiledType = ctx.getCompiledModule(MODULE_NAME).getTypes().get("String");
+
+            assertNotNull(compiledType);
+            assertTrue(compiledType.getType() instanceof VisibleString);
+        }
+
+        @Test
+        void testParameterizedTypeAndValueWithSequence() throws IOException, ParserException {
+            var body = """
+                       AbstractSequence {Type, Type:value} ::= SEQUENCE {
+                           field Type DEFAULT value
+                       }
+                       
+                       Sequence ::= AbstractSequence {INTEGER, 23}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            var collection = (CompiledCollectionType) compiledType;
+
+            testCollectionField(collection, "field", IntegerType.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithInheritedParameter() throws IOException, ParserException {
+            var body = """
+                        Set ::= AbstractSet2 {BOOLEAN}
+                                    
+                        AbstractSet1 {Type1} ::= SET {
+                            field Type1
+                        }
+                                    
+                        AbstractSet2 {Type2} ::= SET {
+                            COMPONENTS OF AbstractSet1 {Type2}
+                        }
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Set");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            var collection = (CompiledCollectionType) compiledType;
+
+            testCollectionField(collection, "field", BooleanType.class);
+        }
+
+        @Test
+        void testParameterizedTypeWithInheritedParameterInSet() throws IOException, ParserException {
+            var body = """
+                        Set ::= AbstractSet2 {BOOLEAN}
+                                    
+                        AbstractSet1 {Type1} ::= SET {
+                            field2 Type1
+                        }
+                                    
+                        AbstractSet2 {Type2} ::= SET {
+                            field1 AbstractSet1 {Type2}
+                        }
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Set");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            var set = (CompiledCollectionType) compiledType;
+
+            assertEquals(1, set.getComponents().size());
+            assertTrue(set.getComponents().get(0) instanceof CompiledCollectionComponent);
+
+            var field1 = set.getComponents().get(0).getCompiledType();
+
+            assertEquals(1, ((CompiledCollectionType) field1).getComponents().size());
+
+            var field2 = ((CompiledCollectionType) field1).getComponents().get(0);
+
+            assertTrue(field2.getCompiledType().getType() instanceof BooleanType);
+        }
+
+        @Test
+        void testParameterizedTypeWithInheritedParameterInSetOf() throws IOException, ParserException {
+            var body = """
+                        SetOf ::= AbstractSetOf2 {BOOLEAN}
+                                    
+                        AbstractSetOf1 {Type1} ::= SET OF Type1
+                                    
+                        AbstractSetOf2 {Type2} ::= SET OF AbstractSetOf1 {Type2}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "SetOf");
+
+            assertTrue(compiledType instanceof CompiledCollectionOfType);
+
+            var collection = (CompiledCollectionOfType) compiledType;
+
+            assertTrue(collection.getContentType() instanceof CompiledCollectionOfType);
+
+            var contentType = (CompiledCollectionOfType) collection.getContentType();
+
+            assertTrue(contentType.getContentType().getType() instanceof BooleanType);
+        }
+
+        @Test
+        void testParameterizedObjectSetInConstraint() throws IOException, ParserException {
+            var body = """
+                        AbstractSeq{OBJ-CLASS:ObjectSetParam} ::= SEQUENCE {
+                          field OBJ-CLASS.&id({ObjectSetParam})
+                        }
+                        
+                        ObjectSet OBJ-CLASS ::= {
+                            {&id 123}
+                        }
+                        
+                        OBJ-CLASS ::= CLASS {
+                            &id INTEGER UNIQUE
+                        }
+
+                        Seq ::= AbstractSeq{{ObjectSet}}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+        }
+
+        @Test
+        void testUserDefinedConstraintWithType() throws IOException, ParserException {
+            var body = """
+                    AbstractBitString{Type} ::= BIT STRING
+                        (CONSTRAINED BY {-- comment1 -- Type -- comment2 --})
+
+                    BitString ::= AbstractBitString{BOOLEAN}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "BitString");
+
+            assertTrue(compiledType instanceof CompiledBitStringType);
+        }
+
     }
 
-    @Test
-    void testParameterizedTypeWithInheritedParameterInSet() throws IOException, ParserException {
-        var body = """
-                    Set ::= AbstractSet2 {BOOLEAN}
-                                
-                    AbstractSet1 {Type1} ::= SET {
-                        field2 Type1
-                    }
-                                
-                    AbstractSet2 {Type2} ::= SET {
-                        field1 AbstractSet1 {Type2}
-                    }
-                """;
+    @Nested
+    @DisplayName("Test type parameters")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class TypeParameters {
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "Set");
+        @ParameterizedTest(name = "[{index}] {4}")
+        @MethodSource("provideParameterizedTypeInConstraint")
+        @DisplayName("Test type parameters in constraints")
+        <T extends AbstractNode> void testParameterizedTypeInConstraint(String body, String typeName, Class<T> nodeClass,
+                Consumer<T> verifier, String description) throws IOException, ParserException {
+            testConstraint(MODULE_NAME, body, typeName, nodeClass, verifier);
+        }
 
-        assertTrue(compiledType instanceof CompiledCollectionType);
+        Stream<Arguments> provideParameterizedTypeInConstraint() {
+            // @formatter:off
+            return Stream.of(
+                    Arguments.of("""
+                                AbstractChoice {Type} ::= CHOICE  {
+                                    a INTEGER,
+                                    b BOOLEAN
+                                }  (INCLUDES Type)
+                
+                                Choice ::= AbstractChoice {CHOICE {a INTEGER, b BOOLEAN} (a: 2)}
+                            """,
+                            "Choice",
+                            ValueNode.class,
+                            (Consumer<ValueNode>) node -> {
+                                var value = (Set) node.getValue();
 
-        var set = (CompiledCollectionType) compiledType;
+                                assertEquals(1, value.size());
+                                assertTrue(value.iterator().next() instanceof ChoiceValue);
+                            },
+                            "CHOICE contained subtype constraint"),
+                    Arguments.of("""
+                                AbstractSet {Type} ::= SET  { 
+                                    a INTEGER, 
+                                    b BOOLEAN 
+                                }  (INCLUDES Type)
+                
+                                Set ::= AbstractSet {SET {a INTEGER, b BOOLEAN} ({a 1, b TRUE})}
+                            """,
+                            "Set",
+                            CollectionValueNode.class,
+                            (Consumer<CollectionValueNode>) node -> assertEquals(1, node.getValue().size()),
+                            "SET contained subtype constraint"),
+                    Arguments.of("""
+                                AbstractSetOf {Type} ::= SET (INCLUDES Type) OF INTEGER
+                
+                                SetOf ::= AbstractSetOf {SET ({1} | {2} | {3}) OF INTEGER}
+                            """,
+                            "SetOf",
+                            CollectionOfValueNode.class,
+                            (Consumer<CollectionOfValueNode>) node -> assertEquals(3, node.getValue().size()),
+                            "SET OF contained subtype constraint"),
+                    Arguments.of("""
+                                AbstractEnumeration {Type} ::= Type (INCLUDES Type)
+    
+                                Enumeration ::= AbstractEnumeration {ENUMERATED {a, b, c}}
+                            """,
+                            "Enumeration",
+                            AllValuesNode.class,
+                            (Consumer<AllValuesNode>) node -> {},
+                            "ENUMERATED contained subtype constraint")
+            );
+            // @formatter:on
+        }
 
-        assertEquals(1, set.getComponents().size());
-        assertTrue(set.getComponents().get(0) instanceof CompiledCollectionComponent);
-
-        var field1 = set.getComponents().get(0).getCompiledType();
-
-        assertEquals(1, ((CompiledCollectionType) field1).getComponents().size());
-
-        var field2 = ((CompiledCollectionType) field1).getComponents().get(0);
-
-        assertTrue(field2.getCompiledType().getType() instanceof BooleanType);
     }
 
-    @Test
-    void testParameterizedTypeWithInheritedParameterInSetOf() throws IOException, ParserException {
-        var body = """
-                    SetOf ::= AbstractSetOf2 {BOOLEAN}
-                                
-                    AbstractSetOf1 {Type1} ::= SET OF Type1
-                                
-                    AbstractSetOf2 {Type2} ::= SET OF AbstractSetOf1 {Type2}
-                """;
+    @Nested
+    @DisplayName("Test value parameters")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ValueParameters {
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "SetOf");
+        @Test
+        void testParameterizedValueWithSequence() throws IOException, ParserException {
+            var body = """
+                       AbstractSequence {INTEGER:value} ::= SEQUENCE {
+                           field INTEGER DEFAULT value
+                       }
+                       
+                       Sequence ::= AbstractSequence {23}
+                    """;
 
-        assertTrue(compiledType instanceof CompiledCollectionOfType);
+            var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
 
-        var collection = (CompiledCollectionOfType) compiledType;
+            assertTrue(compiledType instanceof CompiledCollectionType);
 
-        assertTrue(collection.getContentType() instanceof CompiledCollectionOfType);
+            var collection = (CompiledCollectionType) compiledType;
 
-        var contentType = (CompiledCollectionOfType) collection.getContentType();
+            testCollectionField(collection, "field", IntegerType.class);
+        }
 
-        assertTrue(contentType.getContentType().getType() instanceof BooleanType);
-    }
+        @Test
+        void testParameterizedValueWithTypeReferenceWithSequence() throws IOException, ParserException {
+            var body = """
+                       Integer ::= INTEGER
+                       
+                       AbstractSequence {Integer:value} ::= SEQUENCE {
+                           field INTEGER DEFAULT value
+                       }
+                       
+                       Sequence ::= AbstractSequence {23}
+                    """;
 
-    @Test
-    void testParameterizedObjectSetInConstraint() throws IOException, ParserException {
-        var body = """
-                    AbstractSeq{OBJ-CLASS:ObjectSetParam} ::= SEQUENCE {
-                      field OBJ-CLASS.&id({ObjectSetParam})
-                    }
-                    
-                    ObjectSet OBJ-CLASS ::= {
-                        {&id 123}
-                    }
-                    
-                    OBJ-CLASS ::= CLASS {
-                        &id INTEGER UNIQUE
-                    }
+            var compiledType = getCompiledType(body, MODULE_NAME, "Sequence");
 
-                    Seq ::= AbstractSeq{{ObjectSet}}
-                """;
+            assertTrue(compiledType instanceof CompiledCollectionType);
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+            var collection = (CompiledCollectionType) compiledType;
 
-        assertTrue(compiledType instanceof CompiledCollectionType);
-    }
+            testCollectionField(collection, "field", IntegerType.class);
+        }
 
-    @Test
-    void testUserDefinedConstraintWithType() throws IOException, ParserException {
-        var body = """
-                AbstractBitString{Type} ::= BIT STRING
-                    (CONSTRAINED BY {-- comment1 -- Type -- comment2 --})
+        @Test
+        void testParameterizedValueWithSequenceUnresolvableTypeReference() {
+            var body = """
+                       AbstractSequence {Integer:value} ::= SEQUENCE {
+                           field INTEGER DEFAULT value
+                       }
+                       
+                       Sequence ::= AbstractSequence {TRUE}
+                    """;
 
-                BitString ::= AbstractBitString{BOOLEAN}
-                """;
+            testModule(body, CompilerException.class,
+                    ".*The Governor references the type Integer which can't be resolved.*");
+        }
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "BitString");
+        @Test
+        void testParameterizedValueWithSequenceInvalidTypeReference() {
+            var body = """
+                       AbstractSequence {integer:value} ::= SEQUENCE {
+                           field INTEGER DEFAULT value
+                       }
+                       
+                       Sequence ::= AbstractSequence {23}
+                    """;
 
-        assertTrue(compiledType instanceof CompiledBitStringType);
-    }
+            testModule(body, CompilerException.class,
+                    ".*The Governor 'integer' is not a valid typereference.*");
+        }
 
-    @ParameterizedTest(name = "[{index}] {4}")
-    @MethodSource("provideParameterizedValueInConstraint")
-    @DisplayName("Test value parameters in constraints")
-    <T extends AbstractNode> void testParameterizedValueInConstraint(String body, String typeName, Class<T> nodeClass,
-            Consumer<T> verifier, String description) throws IOException, ParserException {
-        testConstraint(MODULE_NAME, body, typeName, nodeClass, verifier);
-    }
+        @Test
+        void testParameterizedValueWithSequenceWrongValueType() {
+            var body = """
+                       AbstractSequence {INTEGER:value} ::= SEQUENCE {
+                           field INTEGER DEFAULT value
+                       }
+                       
+                       Sequence ::= AbstractSequence {TRUE}
+                    """;
 
-    @ParameterizedTest(name = "[{index}] {4}")
-    @MethodSource("provideParameterizedTypeInConstraint")
-    @DisplayName("Test type parameters in constraints")
-    <T extends AbstractNode> void testParameterizedTypeInConstraint(String body, String typeName, Class<T> nodeClass,
-            Consumer<T> verifier, String description) throws IOException, ParserException {
-        testConstraint(MODULE_NAME, body, typeName, nodeClass, verifier);
+            testModule(body, CompilerException.class, ".*Expected a value of type INTEGER but found: TRUE.*");
+        }
+
+        @ParameterizedTest(name = "[{index}] {4}")
+        @MethodSource("provideParameterizedValueInConstraint")
+        @DisplayName("Test value parameters in constraints")
+        <T extends AbstractNode> void testParameterizedValueInConstraint(String body, String typeName, Class<T> nodeClass,
+                Consumer<T> verifier, String description) throws IOException, ParserException {
+            testConstraint(MODULE_NAME, body, typeName, nodeClass, verifier);
+        }
+
+        Stream<Arguments> provideParameterizedValueInConstraint() {
+            // @formatter:off
+            return Stream.of(
+                    Arguments.of("""
+                                AbstractString {VisibleString:value} ::= VisibleString (value)
+        
+                                String ::= AbstractString {"test-value"}
+                            """,
+                            "String",
+                            StringValueNode.class,
+                            (Consumer<StringValueNode>) node -> {
+                                var stringSingleValues = node.getValue();
+
+                                assertEquals(1, stringSingleValues.size());
+
+                                var stringSingleValue = (StringSingleValue) stringSingleValues.get(0);
+
+                                assertEquals("test-value", stringSingleValue.getValue());
+                            },
+                            "VisibleString single value constraint"),
+                    Arguments.of("""
+                               AbstractBString {INTEGER:max} ::= BIT STRING (SIZE (0..max))
+            
+                               BString ::= AbstractBString {3}
+                            """,
+                            "BString",
+                            SizeNode.class,
+                            (Consumer<SizeNode>) node -> checkIntegerRange(node.getSize(),0, 3),
+                            "BIT STRING size constraint"),
+                    Arguments.of("""
+                               AbstractNull {Null:value} ::= NULL (value)
+            
+                               Null ::= AbstractNull {NULL}
+                            """,
+                            "Null",
+                            ValueNode.class,
+                            (Consumer<ValueNode>) node -> assertTrue(node.getValue() instanceof ASN1Null.Value),
+                            "NULL single value constraint with type reference in governor"),
+                    Arguments.of("""
+                               AbstractNull {NULL:value} ::= NULL (value)
+            
+                               Null ::= AbstractNull {NULL}
+                            """,
+                            "Null",
+                            ValueNode.class,
+                            (Consumer<ValueNode>) node -> assertTrue(node.getValue() instanceof ASN1Null.Value),
+                            "NULL single value constraint"),
+                    Arguments.of("""
+                                AbstractRelativeOIDIRI {RELATIVE-OID-IRI:value} ::= RELATIVE-OID-IRI (value)
+    
+                                RelativeOIDIRI ::= AbstractRelativeOIDIRI {"a/b/a"}
+                            """,
+                            "RelativeOIDIRI",
+                            RelativeIRIValueNode.class,
+                            (Consumer<RelativeIRIValueNode>) node -> {
+                                var values = node.getValue();
+
+                                assertEquals(1, values.size());
+                                assertEquals(Arrays.asList("a", "b", "a"), values.stream().findFirst().get());
+                            },
+                            "RELATIVE-OID-IRI single value constraint"),
+                    Arguments.of("""
+                                AbstractOIDIRI {OID-IRI:value} ::= OID-IRI (value)
+    
+                                OIDIRI ::= AbstractOIDIRI {"/ISO/a/b/a"}
+                            """,
+                            "OIDIRI",
+                            IRIValueNode.class,
+                            (Consumer<IRIValueNode>) node -> {
+                                var values = node.getValue();
+
+                                assertEquals(1, values.size());
+                                assertEquals(Arrays.asList("ISO", "a", "b", "a"), values.stream().findFirst().get());
+                            },
+                            "OID-IRI single value constraint"),
+                    Arguments.of("""
+                                AbstractRelativeOID {RELATIVE-OID:value} ::= RELATIVE-OID (value)
+    
+                                RelativeOID ::= AbstractRelativeOID {{2 1 3}}
+                            """,
+                            "RelativeOID",
+                            RelativeOIDValueNode.class,
+                            (Consumer<RelativeOIDValueNode>) node -> {
+                                var values = node.getValue();
+
+                                assertEquals(1, values.size());
+                                assertEquals(Arrays.asList(2, 1, 3), values.stream().findFirst().get());
+                            },
+                            "RELATIVE-OID single value constraint"),
+                    Arguments.of("""
+                                AbstractObjIdentifier {OBJECT IDENTIFIER:value} ::= OBJECT IDENTIFIER (value)
+            
+                                ObjIdentifier ::= AbstractObjIdentifier {{1 2 1 3}}
+                            """,
+                            "ObjIdentifier",
+                            ObjectIdentifierValueNode.class,
+                            (Consumer<ObjectIdentifierValueNode>) node -> {
+                                var values = node.getValue();
+
+                                assertEquals(1, values.size());
+                                assertEquals(Arrays.asList(1, 2, 1, 3), values.stream().findFirst().get());
+                            },
+                            "OBJECT IDENTIFIER single value constraint"),
+                    Arguments.of("""
+                                AbstractEnumerated {Enumerated:value} ::= ENUMERATED {a, b, c} (value)
+            
+                                Enumerated ::= AbstractEnumerated {b}
+                            """,
+                            "Enumerated",
+                            EnumeratedValueNode.class,
+                            (Consumer<EnumeratedValueNode>) node -> {
+                                var values = node.getValue();
+
+                                assertEquals(1, values.size());
+                                assertEquals(1, values.stream().findFirst().get());
+                            },
+                            "ENUMERATED single value constraint"),
+                    Arguments.of("""
+                                AbstractBoolean {BOOLEAN:value} ::= BOOLEAN (value)
+    
+                                Boolean ::= AbstractBoolean {FALSE}
+                            """,
+                            "Boolean",
+                            ValueNode.class,
+                            (Consumer<ValueNode>) node -> assertEquals(false, node.getValue()),
+                            "BOOLEAN single value constraint"),
+                    Arguments.of("""
+                                AbstractInt {INTEGER:value} ::= INTEGER (value)
+    
+                                Int ::= AbstractInt {7}
+                            """,
+                            "Int",
+                            IntegerRangeValueNode.class,
+                            (Consumer<IntegerRangeValueNode>) node -> checkIntegerRange(node.getValue(),7, 7),
+                            "INTEGER single value constraint"),
+                    Arguments.of("""
+                                AbstractString {VisibleString:upper} ::= VisibleString (FROM ("a"..upper))
+                     
+                                String ::= AbstractString {"f"}
+                            """,
+                            "String",
+                            PermittedAlphabetNode.class,
+                            (Consumer<PermittedAlphabetNode>) node -> {
+                                var stringRanges = (StringValueNode) node.getNode();
+
+                                assertEquals(1, stringRanges.getValue().size());
+
+                                var stringRange = (StringRange) stringRanges.getValue().get(0);
+
+                                assertEquals("a", stringRange.getLower());
+                                assertEquals("f", stringRange.getUpper());
+                            },
+                            "VisibleString permitted alphabet constraint"),
+                    Arguments.of("""
+                                AbstractInt {INTEGER:max} ::= INTEGER (0..max)
+    
+                                Int ::= AbstractInt {4}
+                            """,
+                            "Int",
+                            IntegerRangeValueNode.class,
+                            (Consumer<IntegerRangeValueNode>) node -> checkIntegerRange(node.getValue(), 0, 4),
+                            "INTEGER value range constraint"),
+                    Arguments.of("""
+                                AbstractSequence {INTEGER:int, BOOLEAN:bool} ::= SEQUENCE {
+                                    a INTEGER, 
+                                    b BOOLEAN
+                                } (WITH COMPONENTS {a (int), b (bool)})
+    
+                                Seq ::= AbstractSequence {23, FALSE}
+                            """,
+                            "Seq",
+                            WithComponentsNode.class,
+                            (Consumer<WithComponentsNode>) node -> {
+                                var components = node.getComponents();
+
+                                assertEquals(2, components.size());
+
+                                var integerRange = getComponentNode(components, "a", IntegerRangeValueNode.class);
+
+                                checkIntegerRange(integerRange.getValue(), 23, 23);
+
+                                var value = getComponentNode(components, "b", ValueNode.class);
+
+                                assertEquals(false, value.getValue());
+                            },
+                            "SEQUENCE inner subtyping constraint")
+            );
+            // @formatter:on
+        }
+
     }
 
     <T extends AbstractNode> void testConstraint(String moduleName, String body, String typeName, Class<T> nodeClass,
@@ -3243,196 +3602,6 @@ class CompilerImplTest {
         assertEquals(upper, integerRange.getUpper());
     }
 
-    private static Stream<Arguments> provideParameterizedValueInConstraint() {
-        // @formatter:off
-        return Stream.of(
-                Arguments.of("""
-                            AbstractString {VisibleString:value} ::= VisibleString (value)
-    
-                            String ::= AbstractString {"test-value"}
-                        """,
-                        "String",
-                        StringValueNode.class,
-                        (Consumer<StringValueNode>) node -> {
-                            var stringSingleValues = node.getValue();
-
-                            assertEquals(1, stringSingleValues.size());
-
-                            var stringSingleValue = (StringSingleValue) stringSingleValues.get(0);
-
-                            assertEquals("test-value", stringSingleValue.getValue());
-                        },
-                        "VisibleString single value constraint"),
-                Arguments.of("""
-                           AbstractBString {INTEGER:max} ::= BIT STRING (SIZE (0..max))
-        
-                           BString ::= AbstractBString {3}
-                        """,
-                        "BString",
-                        SizeNode.class,
-                        (Consumer<SizeNode>) node -> checkIntegerRange(node.getSize(),0, 3),
-                        "BIT STRING size constraint"),
-                Arguments.of("""
-                           AbstractNull {Null:value} ::= NULL (value)
-        
-                           Null ::= AbstractNull {NULL}
-                        """,
-                        "Null",
-                        ValueNode.class,
-                        (Consumer<ValueNode>) node -> assertTrue(node.getValue() instanceof ASN1Null.Value),
-                        "NULL single value constraint with type reference in governor"),
-                Arguments.of("""
-                           AbstractNull {NULL:value} ::= NULL (value)
-        
-                           Null ::= AbstractNull {NULL}
-                        """,
-                        "Null",
-                        ValueNode.class,
-                        (Consumer<ValueNode>) node -> assertTrue(node.getValue() instanceof ASN1Null.Value),
-                        "NULL single value constraint"),
-                Arguments.of("""
-                            AbstractRelativeOIDIRI {RELATIVE-OID-IRI:value} ::= RELATIVE-OID-IRI (value)
-
-                            RelativeOIDIRI ::= AbstractRelativeOIDIRI {"a/b/a"}
-                        """,
-                        "RelativeOIDIRI",
-                        RelativeIRIValueNode.class,
-                        (Consumer<RelativeIRIValueNode>) node -> {
-                            var values = node.getValue();
-
-                            assertEquals(1, values.size());
-                            assertEquals(Arrays.asList("a", "b", "a"), values.stream().findFirst().get());
-                        },
-                        "RELATIVE-OID-IRI single value constraint"),
-                Arguments.of("""
-                            AbstractOIDIRI {OID-IRI:value} ::= OID-IRI (value)
-
-                            OIDIRI ::= AbstractOIDIRI {"/ISO/a/b/a"}
-                        """,
-                        "OIDIRI",
-                        IRIValueNode.class,
-                        (Consumer<IRIValueNode>) node -> {
-                            var values = node.getValue();
-
-                            assertEquals(1, values.size());
-                            assertEquals(Arrays.asList("ISO", "a", "b", "a"), values.stream().findFirst().get());
-                        },
-                        "OID-IRI single value constraint"),
-                Arguments.of("""
-                            AbstractRelativeOID {RELATIVE-OID:value} ::= RELATIVE-OID (value)
-
-                            RelativeOID ::= AbstractRelativeOID {{2 1 3}}
-                        """,
-                        "RelativeOID",
-                        RelativeOIDValueNode.class,
-                        (Consumer<RelativeOIDValueNode>) node -> {
-                            var values = node.getValue();
-
-                            assertEquals(1, values.size());
-                            assertEquals(Arrays.asList(2, 1, 3), values.stream().findFirst().get());
-                        },
-                        "RELATIVE-OID single value constraint"),
-                Arguments.of("""
-                            AbstractObjIdentifier {OBJECT IDENTIFIER:value} ::= OBJECT IDENTIFIER (value)
-        
-                            ObjIdentifier ::= AbstractObjIdentifier {{1 2 1 3}}
-                        """,
-                        "ObjIdentifier",
-                        ObjectIdentifierValueNode.class,
-                        (Consumer<ObjectIdentifierValueNode>) node -> {
-                            var values = node.getValue();
-
-                            assertEquals(1, values.size());
-                            assertEquals(Arrays.asList(1, 2, 1, 3), values.stream().findFirst().get());
-                        },
-                        "OBJECT IDENTIFIER single value constraint"),
-                Arguments.of("""
-                            AbstractEnumerated {Enumerated:value} ::= ENUMERATED {a, b, c} (value)
-        
-                            Enumerated ::= AbstractEnumerated {b}
-                        """,
-                        "Enumerated",
-                        EnumeratedValueNode.class,
-                        (Consumer<EnumeratedValueNode>) node -> {
-                            var values = node.getValue();
-
-                            assertEquals(1, values.size());
-                            assertEquals(1, values.stream().findFirst().get());
-                        },
-                        "ENUMERATED single value constraint"),
-                Arguments.of("""
-                            AbstractBoolean {BOOLEAN:value} ::= BOOLEAN (value)
-
-                            Boolean ::= AbstractBoolean {FALSE}
-                        """,
-                        "Boolean",
-                        ValueNode.class,
-                        (Consumer<ValueNode>) node -> assertEquals(false, node.getValue()),
-                        "BOOLEAN single value constraint"),
-                Arguments.of("""
-                            AbstractInt {INTEGER:value} ::= INTEGER (value)
-
-                            Int ::= AbstractInt {7}
-                        """,
-                        "Int",
-                        IntegerRangeValueNode.class,
-                        (Consumer<IntegerRangeValueNode>) node -> checkIntegerRange(node.getValue(),7, 7),
-                        "INTEGER single value constraint"),
-                Arguments.of("""
-                            AbstractString {VisibleString:upper} ::= VisibleString (FROM ("a"..upper))
-                 
-                            String ::= AbstractString {"f"}
-                        """,
-                        "String",
-                        PermittedAlphabetNode.class,
-                        (Consumer<PermittedAlphabetNode>) node -> {
-                            var stringRanges = (StringValueNode) node.getNode();
-
-                            assertEquals(1, stringRanges.getValue().size());
-
-                            var stringRange = (StringRange) stringRanges.getValue().get(0);
-
-                            assertEquals("a", stringRange.getLower());
-                            assertEquals("f", stringRange.getUpper());
-                        },
-                        "VisibleString permitted alphabet constraint"),
-                Arguments.of("""
-                            AbstractInt {INTEGER:max} ::= INTEGER (0..max)
-
-                            Int ::= AbstractInt {4}
-                        """,
-                        "Int",
-                        IntegerRangeValueNode.class,
-                        (Consumer<IntegerRangeValueNode>) node -> checkIntegerRange(node.getValue(), 0, 4),
-                        "INTEGER value range constraint"),
-                Arguments.of("""
-                            AbstractSequence {INTEGER:int, BOOLEAN:bool} ::= SEQUENCE {
-                                a INTEGER, 
-                                b BOOLEAN
-                            } (WITH COMPONENTS {a (int), b (bool)})
-
-                            Seq ::= AbstractSequence {23, FALSE}
-                        """,
-                        "Seq",
-                        WithComponentsNode.class,
-                        (Consumer<WithComponentsNode>) node -> {
-                            var components = node.getComponents();
-
-                            assertEquals(2, components.size());
-
-                            var integerRange = getComponentNode(components, "a", IntegerRangeValueNode.class);
-
-                            checkIntegerRange(integerRange.getValue(), 23, 23);
-
-                            var value = getComponentNode(components, "b", ValueNode.class);
-
-                            assertEquals(false, value.getValue());
-                        },
-                        "SEQUENCE inner subtyping constraint")
-        );
-        // @formatter:on
-    }
-
     private static <T extends AbstractNode> T getComponentNode(Set<ComponentNode> components, String componentName,
             Class<T> nodeClass) {
         var maybeComponent = getComponent(components, componentName);
@@ -3445,60 +3614,6 @@ class CompilerImplTest {
         assertTrue(nodeClass.isAssignableFrom(constraint.getClass()));
 
         return nodeClass.cast(constraint);
-    }
-
-    private static Stream<Arguments> provideParameterizedTypeInConstraint() {
-        // @formatter:off
-        return Stream.of(
-                Arguments.of("""
-                            AbstractChoice {Type} ::= CHOICE  {
-                                a INTEGER,
-                                b BOOLEAN
-                            }  (INCLUDES Type)
-            
-                            Choice ::= AbstractChoice {CHOICE {a INTEGER, b BOOLEAN} (a: 2)}
-                        """,
-                        "Choice",
-                        ValueNode.class,
-                        (Consumer<ValueNode>) node -> {
-                            var value = (Set) node.getValue();
-
-                            assertEquals(1, value.size());
-                            assertTrue(value.iterator().next() instanceof ChoiceValue);
-                        },
-                        "CHOICE contained subtype constraint"),
-                Arguments.of("""
-                            AbstractSet {Type} ::= SET  { 
-                                a INTEGER, 
-                                b BOOLEAN 
-                            }  (INCLUDES Type)
-            
-                            Set ::= AbstractSet {SET {a INTEGER, b BOOLEAN} ({a 1, b TRUE})}
-                        """,
-                        "Set",
-                        CollectionValueNode.class,
-                        (Consumer<CollectionValueNode>) node -> assertEquals(1, node.getValue().size()),
-                        "SET contained subtype constraint"),
-                Arguments.of("""
-                            AbstractSetOf {Type} ::= SET (INCLUDES Type) OF INTEGER
-            
-                            SetOf ::= AbstractSetOf {SET ({1} | {2} | {3}) OF INTEGER}
-                        """,
-                        "SetOf",
-                        CollectionOfValueNode.class,
-                        (Consumer<CollectionOfValueNode>) node -> assertEquals(3, node.getValue().size()),
-                        "SET OF contained subtype constraint"),
-                Arguments.of("""
-                            AbstractEnumeration {Type} ::= Type (INCLUDES Type)
-
-                            Enumeration ::= AbstractEnumeration {ENUMERATED {a, b, c}}
-                        """,
-                        "Enumeration",
-                        AllValuesNode.class,
-                        (Consumer<AllValuesNode>) node -> {},
-                        "ENUMERATED contained subtype constraint")
-        );
-        // @formatter:on
     }
 
     private static Stream<Arguments> provideInvalidTypesInConstraintsArguments() {
@@ -3777,42 +3892,6 @@ class CompilerImplTest {
                 "Test custom tag '%s' on component".formatted(prefixedType));
     }
 
-    private static Stream<Arguments> getObjectClassWithSyntaxForbiddenLiteralsArgument() {
-        return Stream.of(
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("BIT"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("BOOLEAN"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("CHARACTER"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("CHOICE"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("DATE"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("DATE-TIME"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("DURATION"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("EMBEDDED"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("END"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("ENUMERATED"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("EXTERNAL"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("FALSE"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("INSTANCE"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("INTEGER"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("INTERSECTION"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("MINUS-INFINITY"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("NULL"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("OBJECT"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("OCTET"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("PLUS-INFINITY"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("RELATIVE-OID"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("SEQUENCE"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("SET"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("TIME"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("TIME-OF-DAY"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("TRUE"),
-                getObjectClassWithSyntaxForbiddenLiteralsArgument("UNION")
-        );
-    }
-
-    private static Arguments getObjectClassWithSyntaxForbiddenLiteralsArgument(String reservedWord) {
-        return Arguments.of(reservedWord, "Test that '%s' is forbidden in DefinedSyntax".formatted(reservedWord));
-    }
-
     private static Stream<Arguments> provideValueFromObject() {
         return Stream.of(
                 getValueFromObjectArguments(BOOLEAN, "TRUE", BooleanValue.class,
@@ -3823,7 +3902,8 @@ class CompilerImplTest {
                         value -> assertArrayEquals(new byte[] { 0x0b }, value.getByteValue())),
                 getValueFromObjectArguments(OCTET_STRING, "'0A'H", OctetStringValue.class,
                         value -> assertArrayEquals(new byte[] { 0x0a }, value.getByteValue())),
-                getValueFromObjectArguments(NULL, "NULL", NullValue.class, value -> {}),
+                getValueFromObjectArguments(NULL, "NULL", NullValue.class, value -> {
+                }),
                 getValueFromObjectArguments(OBJECT_IDENTIFIER, "{1 2 3 27}", ObjectIdentifierValue.class,
                         value -> assertEquals(Arrays.asList(1, 2, 3, 27), value.getComponents().stream()
                                 .map(c -> c.getId()).collect(Collectors.toList()))),
