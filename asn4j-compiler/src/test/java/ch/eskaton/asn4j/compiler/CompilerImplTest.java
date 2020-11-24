@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.constraints.ast.AbstractNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
@@ -36,6 +37,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
 import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
+import ch.eskaton.asn4j.compiler.constraints.ast.Node;
 import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
@@ -616,6 +618,80 @@ class CompilerImplTest {
     void testInvalidMultipleTypeConstraints(String body, Class<? extends Exception> expected, String message,
             String description) {
         testModule(body, expected, ".*" + message + ".*");
+    }
+
+    @Test
+    void testMultipleTypeConstraintOnSetReference() throws IOException, ParserException {
+        var body = """
+                 Set ::= SET {
+                   field1 VisibleString(SIZE (1..9)),
+                   field2 PrintableString
+                 }
+
+                 SetReference ::= Set (WITH COMPONENTS {field1 (SIZE(3..7)), field2 (SIZE(2..6))})
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "SetReference");
+
+        assertNotNull(compiledType);
+
+        var maybeConstraint = compiledType.getConstraintDefinition();
+
+        assertTrue(maybeConstraint.isPresent());
+
+        /* The following constraint is expected at the moment:
+        * (field1 SIZE(1..9)) && ((field1 SIZE(1..9) && SIZE(3..7)) && (field2 SIZE(2..6)))
+        *
+        * This shall be optimised in the future.
+        * */
+
+        var constraint = maybeConstraint.get();
+        var roots = constraint.getRoots();
+
+        assertTrue(roots instanceof BinOpNode);
+
+        var node = (BinOpNode) roots;
+        var leftNode = node.getLeft();
+
+        assertTrue(leftNode instanceof WithComponentsNode);
+
+        var leftComponentsNode = (WithComponentsNode) leftNode;
+
+        assertEquals(1, leftComponentsNode.getComponents().size());
+
+        var maybeField1 = leftComponentsNode.getComponents().stream()
+                .filter(c -> c.getName().equals("field1")).findFirst();
+
+        assertTrue(maybeField1.isPresent());
+
+        checkSizeConstraint(maybeField1.get().getConstraint(), 1, 9);
+
+        var rightNode = node.getRight();
+
+        assertTrue(rightNode instanceof WithComponentsNode);
+
+        var rightComponentsNode = (WithComponentsNode) rightNode;
+
+        assertEquals(2, rightComponentsNode.getComponents().size());
+
+        maybeField1 = rightComponentsNode.getComponents().stream()
+                .filter(c -> c.getName().equals("field1")).findFirst();
+
+        assertTrue(maybeField1.isPresent());
+
+        var binOpNode = maybeField1.get().getConstraint();
+
+        assertTrue(binOpNode instanceof BinOpNode);
+
+        checkSizeConstraint(((BinOpNode) binOpNode).getLeft(), 1, 9);
+        checkSizeConstraint(((BinOpNode) binOpNode).getRight(), 3, 7);
+
+        var maybeField2 = rightComponentsNode.getComponents().stream()
+                .filter(c -> c.getName().equals("field2")).findFirst();
+
+        assertTrue(maybeField2.isPresent());
+
+        checkSizeConstraint(maybeField2.get().getConstraint(), 2, 6);
     }
 
     @ParameterizedTest(name = "[{index}] {3}")
@@ -3601,6 +3677,13 @@ class CompilerImplTest {
         assertEquals(lower, integerRange.getLower());
         assertEquals(upper, integerRange.getUpper());
     }
+
+    private static  void checkSizeConstraint(Node node, int lower, int upper) {
+        assertTrue(node instanceof SizeNode);
+
+        checkIntegerRange(((SizeNode) node).getSize(), lower, upper);
+    }
+
 
     private static <T extends AbstractNode> T getComponentNode(Set<ComponentNode> components, String componentName,
             Class<T> nodeClass) {
