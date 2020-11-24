@@ -64,6 +64,7 @@ import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.constraints.PresenceConstraint.PresenceType;
 import ch.eskaton.asn4j.parser.ast.constraints.SizeConstraint;
 import ch.eskaton.asn4j.parser.ast.constraints.SubtypeConstraint;
+import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.runtime.types.TypeName;
@@ -193,37 +194,10 @@ public abstract class AbstractConstraintCompiler {
         return null;
     }
 
-    Optional<ConstraintDefinition> compileComponentConstraints(Type node, CompiledType baseType,
+    Optional<ConstraintDefinition> compileConstraints(Type type, CompiledType baseType,
             Optional<Parameters> maybeParameters) {
-        LinkedList<ConstraintDefinition> definitions = new LinkedList<>();
-        Optional<List<Constraint>> constraint = Optional.ofNullable(node.getConstraints());
+        var definitions = getConstraintDefinitions(type, baseType, maybeParameters);
         ConstraintDefinition definition = null;
-        CompiledType compiledType;
-
-        do {
-            if (node.equals(baseType.getType())) {
-                compiledType = baseType;
-            } else {
-                compiledType = ctx.getCompiledType(node);
-            }
-
-            if (compiledType instanceof HasComponents) {
-                compileComponentConstraints(compiledType).ifPresent(definitions::addLast);
-            }
-
-            var maybeConstraintDefinition = compiledType.getConstraintDefinition();
-
-            if (maybeConstraintDefinition.isPresent()) {
-                definitions.addLast(maybeConstraintDefinition.get());
-            }
-
-            node = compiledType.getType();
-        } while (!compiledType.equals(baseType));
-
-        constraint.ifPresent(c -> {
-            Optional<Bounds> bounds = getBounds(Optional.ofNullable(definitions.peek()));
-            definitions.addLast(compileComponentConstraints(baseType, c, bounds, maybeParameters));
-        });
 
         if (definitions.size() == 1) {
             definition = definitions.pop();
@@ -249,6 +223,34 @@ public abstract class AbstractConstraintCompiler {
         }
 
         return Optional.ofNullable(definition);
+    }
+
+    private LinkedList<ConstraintDefinition> getConstraintDefinitions(Type type, CompiledType baseType,
+            Optional<Parameters> maybeParameters) {
+        var definitions = new LinkedList<ConstraintDefinition>();
+        var maybeConstraint = Optional.ofNullable(type.getConstraints());
+
+        if (CompilerUtils.isAnyTypeReference(type) && !CompilerUtils.isUsefulType(type)) {
+            // if we're compiling a reference get the constraints of the referred type
+            var compiledType = ctx.getCompiledType((SimpleDefinedType) type);
+            var maybeConstraintDefinition = compiledType.getConstraintDefinition();
+
+            if (maybeConstraintDefinition.isPresent()) {
+                definitions.addLast(maybeConstraintDefinition.get());
+            }
+        } else if (type.equals(baseType.getType()) && baseType instanceof HasComponents) {
+            // if we're compiling a base type also compile constraints on components if it has any
+            compileComponentConstraints(baseType).ifPresent(definitions::addLast);
+        }
+
+        // add the constraints on the type itself
+        maybeConstraint.ifPresent(constraint -> {
+            var bounds = getBounds(Optional.ofNullable(definitions.peek()));
+
+            definitions.addLast(compileConstraints(baseType, constraint, bounds, maybeParameters));
+        });
+
+        return definitions;
     }
 
     protected Optional<ConstraintDefinition> compileComponentConstraints(CompiledType compiledType) {
@@ -303,7 +305,7 @@ public abstract class AbstractConstraintCompiler {
         return Optional.empty();
     }
 
-    ConstraintDefinition compileComponentConstraints(CompiledType baseType, List<Constraint> constraints,
+    ConstraintDefinition compileConstraints(CompiledType baseType, List<Constraint> constraints,
             Optional<Bounds> bounds, Optional<Parameters> maybeParameters) {
         ConstraintDefinition constraintDef = null;
 

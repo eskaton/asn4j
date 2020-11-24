@@ -246,7 +246,8 @@ public class WithComponentsExpressionBuilder extends InnerTypeExpressionBuilder 
             ComponentNode componentNode) {
         return Optional.ofNullable(componentNode.getPresenceType())
                 .map(presenceType -> {
-                    var componentType = getComponentType((CompiledCollectionType) compiledType, componentNode);
+                    var compiledBaseType = ctx.getCompiledBaseType(compiledType);
+                    var componentType = getComponentType((CompiledCollectionType) compiledBaseType, componentNode);
 
                     return componentType.map(c ->
                             buildPresenceExpression(c.getName(), isComponentOptional(c), presenceType))

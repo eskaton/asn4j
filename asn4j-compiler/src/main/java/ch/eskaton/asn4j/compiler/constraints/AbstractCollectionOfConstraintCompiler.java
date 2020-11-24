@@ -104,9 +104,9 @@ public abstract class AbstractCollectionOfConstraintCompiler extends AbstractCon
     }
 
     @Override
-    Optional<ConstraintDefinition> compileComponentConstraints(Type node, CompiledType compiledBaseType,
+    Optional<ConstraintDefinition> compileConstraints(Type type, CompiledType compiledBaseType,
             Optional<Parameters> maybeParameters) {
-        var maybeConstraintDefinition = super.compileComponentConstraints(node, compiledBaseType, maybeParameters);
+        var maybeConstraintDefinition = super.compileConstraints(type, compiledBaseType, maybeParameters);
         var collectionOfType = (CollectionOfType) compiledBaseType.getType();
 
         if (collectionOfType.hasElementConstraint()) {

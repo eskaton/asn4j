@@ -99,7 +99,7 @@ public class ConstraintCompiler {
             Optional<Parameters> maybeParameters) {
         var compilerAndType = getCompilerAndType(compiledType);
 
-        return compilerAndType.get_1().compileComponentConstraints(compiledType.getType(), compilerAndType.get_2(),
+        return compilerAndType.get_1().compileConstraints(compiledType.getType(), compilerAndType.get_2(),
                 maybeParameters);
     }
 
@@ -111,7 +111,7 @@ public class ConstraintCompiler {
             Optional<Parameters> maybeParameters) {
         var compilerAndType = getCompilerAndType(ctx.getCompiledBaseType(type));
 
-        return compilerAndType.get_1().compileComponentConstraints(compilerAndType.get_2(), singletonList(constraint),
+        return compilerAndType.get_1().compileConstraints(compilerAndType.get_2(), singletonList(constraint),
                 Optional.empty(), maybeParameters);
     }
 
@@ -119,7 +119,7 @@ public class ConstraintCompiler {
             Optional<Parameters> maybeParameters) {
         var compilerAndType = getCompilerAndType(compiledType);
 
-        return compilerAndType.get_1().compileComponentConstraints(compilerAndType.get_2(), singletonList(constraint),
+        return compilerAndType.get_1().compileConstraints(compilerAndType.get_2(), singletonList(constraint),
                 Optional.empty(), maybeParameters);
     }
 
