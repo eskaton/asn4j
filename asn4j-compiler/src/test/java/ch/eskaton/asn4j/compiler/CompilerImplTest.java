@@ -620,6 +620,15 @@ class CompilerImplTest {
         testModule(body, expected, ".*" + message + ".*");
     }
 
+    @ParameterizedTest(name = "[{index}] {0}")
+    @MethodSource("provideSingleTypeConstraint")
+    @DisplayName("Test WITH COMPONENT constraints")
+    void testSingleTypeConstraint(String typeName, String valueString) throws IOException, ParserException {
+        var body = "SeqOf ::= SEQUENCE OF %s(%s)".formatted(typeName, valueString);
+
+        getCompiledType(body, MODULE_NAME, "SeqOf");
+    }
+
     @Test
     void testMultipleTypeConstraintOnSetReference() throws IOException, ParserException {
         var body = """
@@ -640,10 +649,10 @@ class CompilerImplTest {
         assertTrue(maybeConstraint.isPresent());
 
         /* The following constraint is expected at the moment:
-        * (field1 SIZE(1..9)) && ((field1 SIZE(1..9) && SIZE(3..7)) && (field2 SIZE(2..6)))
-        *
-        * This shall be optimised in the future.
-        * */
+         * (field1 SIZE(1..9)) && ((field1 SIZE(1..9) && SIZE(3..7)) && (field2 SIZE(2..6)))
+         *
+         * This shall be optimised in the future.
+         */
 
         var constraint = maybeConstraint.get();
         var roots = constraint.getRoots();
@@ -3678,7 +3687,7 @@ class CompilerImplTest {
         assertEquals(upper, integerRange.getUpper());
     }
 
-    private static  void checkSizeConstraint(Node node, int lower, int upper) {
+    private static void checkSizeConstraint(Node node, int lower, int upper) {
         assertTrue(node instanceof SizeNode);
 
         checkIntegerRange(((SizeNode) node).getSize(), lower, upper);
@@ -4055,6 +4064,45 @@ class CompilerImplTest {
     private static <V extends Value> Arguments getValueFromObjectArguments(String typeName, String value,
             Class<V> valueClass, Consumer<V> valueTest) {
         return Arguments.of(typeName, value, valueClass, valueTest);
+    }
+
+    private static Stream<Arguments> provideSingleTypeConstraint() {
+        return Stream.of(
+                getSingleTypeConstraintArguments(BOOLEAN, "TRUE"),
+                getSingleTypeConstraintArguments(INTEGER, "23"),
+                getSingleTypeConstraintArguments(BIT_STRING, "'1011'B"),
+                getSingleTypeConstraintArguments(OCTET_STRING, "'0A'H"),
+                getSingleTypeConstraintArguments(NULL, "NULL"),
+                getSingleTypeConstraintArguments(OBJECT_IDENTIFIER, "{1 2 3 27}"),
+                getSingleTypeConstraintArguments("ENUMERATED {a, b, c}", "c"),
+                getSingleTypeConstraintArguments(UTF8_STRING, "\"äöü\""),
+                getSingleTypeConstraintArguments(RELATIVE_OID, "{2 3 27}"),
+                getSingleTypeConstraintArguments("SEQUENCE {a BOOLEAN}", "{a TRUE}"),
+                getSingleTypeConstraintArguments("SEQUENCE OF BOOLEAN", "TRUE"),
+                getSingleTypeConstraintArguments("SET {a BOOLEAN}", "{a TRUE}"),
+                getSingleTypeConstraintArguments("SET OF BOOLEAN", "TRUE"),
+                getSingleTypeConstraintArguments(NUMERIC_STRING, "\"123\""),
+                getSingleTypeConstraintArguments(PRINTABLE_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(TELETEX_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(T61_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(VIDEOTEX_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(IA5_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(GRAPHIC_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(VISIBLE_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(ISO646_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(GENERAL_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(UNIVERSAL_STRING, "\"abc\""),
+                getSingleTypeConstraintArguments(BMP_STRING, "\"äöü\""),
+                getSingleTypeConstraintArguments(OID_IRI, "\"/iso/a/b/c\""),
+                getSingleTypeConstraintArguments(RELATIVE_OID_IRI, "\"a/b/c\""));
+    }
+
+    private static Arguments getSingleTypeConstraintArguments(TypeName typeName, String value) {
+        return Arguments.of(typeName.toString(), value);
+    }
+
+    private static Arguments getSingleTypeConstraintArguments(String typeName, String value) {
+        return Arguments.of(typeName, value);
     }
 
 }
