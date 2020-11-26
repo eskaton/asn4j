@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.objects.ObjectDefnCompiler;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
+import ch.eskaton.asn4j.parser.ast.ObjectReference;
 
 public class ObjectAssignmentCompiler implements Compiler<ObjectAssignmentNode> {
 
@@ -47,6 +48,10 @@ public class ObjectAssignmentCompiler implements Compiler<ObjectAssignmentNode> 
             var objectDefinition = compiler.compile(objectClass, objectDefnNode);
 
             return ctx.createCompiledObject(objectName, objectDefinition);
+        } else if (object instanceof ObjectReference objectReference) {
+            var compiledObject = ctx.getCompiledObject(objectReference);
+
+            return ctx.createCompiledObject(objectName, compiledObject.getObjectDefinition());
         } else {
             throw new IllegalCompilerStateException("Node type %s not yet supported", object.getClass().getSimpleName());
         }

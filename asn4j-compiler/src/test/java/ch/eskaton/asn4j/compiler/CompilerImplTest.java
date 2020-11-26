@@ -56,6 +56,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
+import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
@@ -1492,6 +1493,26 @@ class CompilerImplTest {
             var value2 = object.get("fixedTypeValueField2");
 
             assertTrue(value2 instanceof IntegerValue);
+        }
+
+        @Test
+        void testObjectReference() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &id   INTEGER
+                    }
+                    
+                    object TEST ::= {&id 123}
+                    
+                    objectRef TEST ::= object
+                """;
+
+            var compiledObject = getCompiledObject(body, "objectRef");
+            var value = compiledObject.getObjectDefinition().get("id");
+
+            assert(value instanceof IntegerValue);
+
+            assertEquals(123, ((IntegerValue)value).getValue().longValue());
         }
 
     }
@@ -3652,6 +3673,22 @@ class CompilerImplTest {
         assertTrue(field.isPresent());
 
         return field;
+    }
+
+    private CompiledObject getCompiledObject(String body, String objectName)
+            throws IOException, ParserException {
+        var module = module(MODULE_NAME, body);
+        var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+        var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+        compiler.run();
+
+        var ctx = compiler.getCompilerContext();
+        var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get(objectName);
+
+        assertNotNull(object);
+
+        return object;
     }
 
     private CompiledObjectSet getCompiledObjectSet(String body, String objectClassName, String setName)
