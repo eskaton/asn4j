@@ -28,7 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.ExternalObjectReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 
 import java.util.Objects;
@@ -53,7 +53,7 @@ public class ExternalValueReference extends SimpleDefinedValue {
 
     @Override
     public ObjectNode toObjectValue() {
-        return new ExternalObjectReferenceNode(getPosition(), getReference(), module)
+        return new ExternalObjectReference(getPosition(), getReference(), module)
                 .parameters(getParameters().orElse(null));
     }
 

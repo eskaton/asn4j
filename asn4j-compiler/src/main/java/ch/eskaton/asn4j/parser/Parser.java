@@ -55,7 +55,7 @@ import ch.eskaton.asn4j.parser.ast.ExportsNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectClassReference;
-import ch.eskaton.asn4j.parser.ast.ExternalObjectReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.FieldNameNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
@@ -4631,7 +4631,7 @@ public class Parser {
                     new SingleTokenParser(TokenType.IDENTIFIER)).parse();
 
             if (rule != null) {
-                if (rule instanceof ExternalObjectReferenceNode) {
+                if (rule instanceof ExternalObjectReference) {
                     return (ObjectReference) rule;
                 } else {
                     Token token = (Token) rule;
@@ -4646,12 +4646,12 @@ public class Parser {
     }
 
     // ExternalObjectReference ::= modulereference "." objectreference
-    protected class ExternalObjectReferenceParser extends ListRuleParser<ExternalObjectReferenceNode> {
+    protected class ExternalObjectReferenceParser extends ListRuleParser<ExternalObjectReference> {
 
-        public ExternalObjectReferenceNode parse() throws ParserException {
+        public ExternalObjectReference parse() throws ParserException {
             return super.parse(new SequenceParser(TokenType.TYPE_REFERENCE, TokenType.DOT,
                     new SingleTokenParser(TokenType.IDENTIFIER)),
-                    a -> new ExternalObjectReferenceNode(a.P(), a.s0(), a.s2())
+                    a -> new ExternalObjectReference(a.P(), a.s0(), a.s2())
             );
         }
 

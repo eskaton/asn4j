@@ -3284,6 +3284,26 @@ class CompilerImplTest {
             testConstraint(MODULE_NAME, body, typeName, nodeClass, verifier);
         }
 
+        @Test
+        void testParameterizedValueWithObjectWithDefaultSyntax() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &id INTEGER
+                    }
+                    
+                    object{INTEGER:value} TEST ::= {&id value}
+                    
+                    objectRef TEST ::= object{456}
+                """;
+
+            var compiledObject = getCompiledObject(body, "objectRef");
+            var value = compiledObject.getObjectDefinition().get("id");
+
+            assert(value instanceof IntegerValue);
+
+            assertEquals(456, ((IntegerValue)value).getValue().longValue());
+        }
+
         Stream<Arguments> provideParameterizedValueInConstraint() {
             // @formatter:off
             return Stream.of(

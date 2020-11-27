@@ -57,7 +57,7 @@ public class ObjectFieldSpecNodeCompiler implements NamedCompiler<ObjectFieldSpe
 
             if (object instanceof ObjectDefnNode objectDefnNode) {
                 var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
-                var objectDefinition = compiler.compile(objectClass, objectDefnNode);
+                var objectDefinition = compiler.compile(objectClass, objectDefnNode, maybeParameters);
 
                 compiledField.setDefaultValue(objectDefinition);
             } else {

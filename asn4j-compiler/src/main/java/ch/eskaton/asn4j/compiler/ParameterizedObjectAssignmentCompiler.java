@@ -25,32 +25,22 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.types;
+package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.AbstractNode;
-import ch.eskaton.asn4j.parser.ast.FieldNameNode;
-import ch.eskaton.asn4j.parser.ast.ReferencedObjects;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObject;
+import ch.eskaton.asn4j.parser.ast.ParameterizedObjectAssignmentNode;
 
-public abstract class InformationFromObjects extends AbstractNode {
+public class ParameterizedObjectAssignmentCompiler implements Compiler<ParameterizedObjectAssignmentNode> {
 
-    private ReferencedObjects reference;
+    public CompiledParameterizedObject compile(CompilerContext ctx, ParameterizedObjectAssignmentNode node) {
+        var typeName = node.getReference();
+        var objectClass = node.getObjectClass();
+        var object = node.getObject();
+        var parameters = node.getParameters();
 
-    private FieldNameNode field;
+        System.out.println("Compiling parameterized object " + typeName);
 
-    protected InformationFromObjects(Position position, ReferencedObjects reference, FieldNameNode field) {
-        super(position);
-
-        this.reference = reference;
-        this.field = field;
-    }
-
-    public ReferencedObjects getReference() {
-        return reference;
-    }
-
-    public FieldNameNode getField() {
-        return field;
+        return ctx.createCompiledParameterizedObject(typeName, objectClass, object, parameters);
     }
 
 }

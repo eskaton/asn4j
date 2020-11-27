@@ -53,6 +53,8 @@ public class CompiledModule implements CompilationResult {
 
     private HashMap<String, CompiledParameterizedObjectClass> parameterizedObjectClass = new HashMap<>();
 
+    private HashMap<String, CompiledParameterizedObject> parameterizedObject = new HashMap<>();
+
     private HashMap<String, CompiledParameterizedObjectSet> parameterizedObjectSet = new HashMap<>();
 
     private HashMap<String, CompiledParameterizedValueSetType> parameterizedValueSetType = new HashMap<>();
@@ -119,6 +121,14 @@ public class CompiledModule implements CompilationResult {
 
     public Map<String, CompiledParameterizedObjectClass> getParameterizedObjectClass() {
         return Collections.unmodifiableMap(parameterizedObjectClass);
+    }
+
+    public void addParameterizedObject(String name, CompiledParameterizedObject compiledParameterizedObject) {
+        parameterizedObject.put(name, compiledParameterizedObject);
+    }
+
+    public Map<String, CompiledParameterizedObject> getParameterizedObject() {
+        return Collections.unmodifiableMap(parameterizedObject);
     }
 
     public void addParameterizedObjectSet(String name, CompiledParameterizedObjectSet compiledParameterizedObjectSet) {

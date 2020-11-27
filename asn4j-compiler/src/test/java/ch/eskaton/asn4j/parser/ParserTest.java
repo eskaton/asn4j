@@ -267,7 +267,7 @@ import ch.eskaton.asn4j.parser.ast.ExportsNode.Mode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAdditionAlternativeNode;
 import ch.eskaton.asn4j.parser.ast.ExtensionAndExceptionNode;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectClassReference;
-import ch.eskaton.asn4j.parser.ast.ExternalObjectReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.FieldNameNode;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
@@ -4866,9 +4866,9 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ExternalObjectReferenceNode);
+        assertTrue(result instanceof ExternalObjectReference);
         assertEquals("Module",
-                ((ExternalObjectReferenceNode) result).getModule());
+                ((ExternalObjectReference) result).getModule());
         assertEquals("object", result.getReference());
     }
 
@@ -4914,7 +4914,7 @@ class ParserTest {
         ExternalObjectReferenceParser parser = new Parser(
                 new ByteArrayInputStream("Module.object".getBytes())).new ExternalObjectReferenceParser();
 
-        ExternalObjectReferenceNode result = parser.parse();
+        ExternalObjectReference result = parser.parse();
 
         assertNotNull(result);
         assertEquals("Module", result.getModule());
@@ -5755,7 +5755,7 @@ class ParserTest {
         Node result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ExternalObjectReferenceNode);
+        assertTrue(result instanceof ExternalObjectReference);
 
         parser = new Parser(new ByteArrayInputStream(
                 "{ A-STRING VisibleString }".getBytes())).new ObjectParser();
