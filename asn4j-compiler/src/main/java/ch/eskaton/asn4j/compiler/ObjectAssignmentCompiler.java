@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.ParameterUsageVerifier.Kind;
 import ch.eskaton.asn4j.compiler.objects.ObjectDefnCompiler;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
@@ -103,7 +104,7 @@ public class ObjectAssignmentCompiler implements Compiler<ObjectAssignmentNode> 
         var object = compiledParameterizedObject.getObject();
         var compiledObject = compile(ctx, name, objectClass, object, maybeUpdatedParameters);
 
-        checkUnusedParameters(maybeUpdatedParameters);
+        checkUnusedParameters(Kind.OBJECT, maybeUpdatedParameters);
 
         return compiledObject;
     }

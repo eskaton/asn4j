@@ -35,10 +35,19 @@ import java.util.stream.Collectors;
 
 public class ParameterUsageVerifier {
 
+    public enum Kind {
+        TYPE, OBJECT;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
+    }
+
     private ParameterUsageVerifier() {
     }
 
-    public static void checkUnusedParameters(Optional<Parameters> maybeParameters) {
+    public static void checkUnusedParameters(Kind kind, Optional<Parameters> maybeParameters) {
         if (maybeParameters.isEmpty()) {
             return;
         }
@@ -57,7 +66,7 @@ public class ParameterUsageVerifier {
                 .map(ReferenceNode::getName)
                 .collect(Collectors.joining(", "));
 
-        throw new CompilerException(position, "Unused parameters in type '%s': %s", parameterizedName,
+        throw new CompilerException(position, "Unused parameters in %s '%s': %s", kind, parameterizedName,
                 parameterNames);
     }
 

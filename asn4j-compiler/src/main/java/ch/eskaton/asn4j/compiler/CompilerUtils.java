@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.ParameterUsageVerifier.Kind;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledParameterizedResult;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
@@ -491,7 +492,7 @@ public class CompilerUtils {
         var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
         var compiledType = compiler.compile(ctx, ctx.getTypeName(type), type, maybeUpdatedParameters);
 
-        checkUnusedParameters(maybeUpdatedParameters);
+        checkUnusedParameters(Kind.TYPE, maybeUpdatedParameters);
 
         return compiledType;
     }

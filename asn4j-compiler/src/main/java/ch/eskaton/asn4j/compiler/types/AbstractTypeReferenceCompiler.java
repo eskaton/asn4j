@@ -31,6 +31,7 @@ import ch.eskaton.asn4j.compiler.Clone;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
+import ch.eskaton.asn4j.compiler.ParameterUsageVerifier.Kind;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
@@ -120,7 +121,7 @@ public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         var compiler = ctx.<Type, NamedCompiler<Type, CompiledType>>getCompiler((Class<Type>) type.getClass());
         var compiledType = compiler.compile(ctx, name, type, maybeUpdatedParameters);
 
-        checkUnusedParameters(maybeUpdatedParameters);
+        checkUnusedParameters(Kind.TYPE, maybeUpdatedParameters);
 
         return compiledType;
     }

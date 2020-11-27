@@ -1498,21 +1498,21 @@ class CompilerImplTest {
         @Test
         void testObjectReference() throws IOException, ParserException {
             var body = """
-                    TEST ::= CLASS {
-                        &id   INTEGER
-                    }
-                    
-                    object TEST ::= {&id 123}
-                    
-                    objectRef TEST ::= object
-                """;
+                        TEST ::= CLASS {
+                            &id   INTEGER
+                        }
+                        
+                        object TEST ::= {&id 123}
+                        
+                        objectRef TEST ::= object
+                    """;
 
             var compiledObject = getCompiledObject(body, "objectRef");
             var value = compiledObject.getObjectDefinition().get("id");
 
-            assert(value instanceof IntegerValue);
+            assert (value instanceof IntegerValue);
 
-            assertEquals(123, ((IntegerValue)value).getValue().longValue());
+            assertEquals(123, ((IntegerValue) value).getValue().longValue());
         }
 
     }
@@ -3287,43 +3287,58 @@ class CompilerImplTest {
         @Test
         void testParameterizedValueWithObjectWithDefaultSyntax() throws IOException, ParserException {
             var body = """
-                    TEST ::= CLASS {
-                        &id INTEGER
-                    }
-                    
-                    object{INTEGER:value} TEST ::= {&id value}
-                    
-                    objectRef TEST ::= object{456}
-                """;
+                        TEST ::= CLASS {
+                            &id INTEGER
+                        }
+                        
+                        object{INTEGER:value} TEST ::= {&id value}
+                        
+                        objectRef TEST ::= object{456}
+                    """;
 
             var compiledObject = getCompiledObject(body, "objectRef");
             var value = compiledObject.getObjectDefinition().get("id");
 
-            assert(value instanceof IntegerValue);
+            assert (value instanceof IntegerValue);
 
-            assertEquals(456, ((IntegerValue)value).getValue().longValue());
+            assertEquals(456, ((IntegerValue) value).getValue().longValue());
         }
 
         @Test
         void testParameterizedValueWithObjectWithDefinedSyntax() throws IOException, ParserException {
             var body = """
-                    TEST ::= CLASS {
-                        &id INTEGER
-                    }  WITH SYNTAX {
-                        ID &id
-                    }
-                    
-                    object{INTEGER:value} TEST ::= {ID value}
-                    
-                    objectRef TEST ::= object{456}
-                """;
+                        TEST ::= CLASS {
+                            &id INTEGER
+                        }  WITH SYNTAX {
+                            ID &id
+                        }
+                        
+                        object{INTEGER:value} TEST ::= {ID value}
+                        
+                        objectRef TEST ::= object{456}
+                    """;
 
             var compiledObject = getCompiledObject(body, "objectRef");
             var value = compiledObject.getObjectDefinition().get("id");
 
-            assert(value instanceof IntegerValue);
+            assert (value instanceof IntegerValue);
 
-            assertEquals(456, ((IntegerValue)value).getValue().longValue());
+            assertEquals(456, ((IntegerValue) value).getValue().longValue());
+        }
+
+        @Test
+        void testParameterizedValueWithObjectUnusedParameter() {
+            var body = """
+                        TEST ::= CLASS {
+                            &id INTEGER
+                        }
+                        
+                        object{INTEGER:value} TEST ::= {&id 123}
+                        
+                        objectRef TEST ::= object{456}
+                    """;
+
+            testModule(body, CompilerException.class, ".*Unused parameters in object 'object': value.*");
         }
 
         Stream<Arguments> provideParameterizedValueInConstraint() {
