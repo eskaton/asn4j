@@ -29,6 +29,7 @@ package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
+import ch.eskaton.asn4j.parser.ast.HasPosition;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public abstract class AbstractType implements Type {
+public abstract class AbstractType implements Type, HasPosition {
 
     private Position position;
 

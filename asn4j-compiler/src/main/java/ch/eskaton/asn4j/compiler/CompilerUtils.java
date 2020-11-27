@@ -28,20 +28,21 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
+import ch.eskaton.asn4j.compiler.results.AbstractCompiledParameterizedResult;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledComponent;
-import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObject;
-import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReference;
+import ch.eskaton.asn4j.parser.ast.HasPosition;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
@@ -481,9 +482,9 @@ public class CompilerUtils {
 
     private static CompiledType getCompiledParameterizedType(CompilerContext ctx, TypeReference typeReference,
             UnaryOperator<Parameters> parametersProvider) {
-        var typeName = typeReference.getType();
-        var compiledParameterizedType = ctx.getCompiledParameterizedType(typeName);
-        var parameters = createParameters(typeReference, typeName, compiledParameterizedType);
+        var reference = typeReference.getType();
+        var compiledParameterizedType = ctx.getCompiledParameterizedType(reference);
+        var parameters = createParameters(typeReference, reference, compiledParameterizedType);
         var updatedParameters = parametersProvider.apply(parameters);
         var maybeUpdatedParameters = Optional.of(updatedParameters);
         var type = compiledParameterizedType.getType();
@@ -542,21 +543,21 @@ public class CompilerUtils {
     }
 
     /**
-     * Matches the parameter definitions to the actual parameters of the typereference and wraps them in a
+     * Matches the parameter definitions to the actual parameters of the reference and wraps them in a
      * parameters object.
      *
-     * @param simpleDefinedType         A type reference
-     * @param typeName                  Name of the type that is being compiled
-     * @param compiledParameterizedType The compiled parameterized type
+     * @param node                A reference
+     * @param name                Name of the object that is being compiled
+     * @param parameterizedResult The compiled parameterized result
      * @return A parameters object
      */
-    public static Parameters createParameters(SimpleDefinedType simpleDefinedType, String typeName,
-            CompiledParameterizedType compiledParameterizedType) {
-        var parameterizedTypeName = compiledParameterizedType.getName();
-        var maybeParameterValues = simpleDefinedType.getParameters();
+    public static <T extends HasPosition & ParameterizedNode> Parameters createParameters(T node, String name,
+            AbstractCompiledParameterizedResult parameterizedResult) {
+        var maybeParameterValues = node.getParameters();
+        var parameterizedTypeName = parameterizedResult.getName();
+        var parameterDefinitions = parameterizedResult.getParameters();
         var parameterValues = maybeParameterValues.orElse(List.of());
         var parameterValuesCount = parameterValues.size();
-        var parameterDefinitions = compiledParameterizedType.getParameters();
         var parameterDefinitionsCount = parameterDefinitions.size();
 
         if (parameterValuesCount != parameterDefinitionsCount) {
@@ -565,41 +566,9 @@ public class CompilerUtils {
                     .map(ReferenceNode::getName)
                     .collect(Collectors.joining(", "));
 
-            throw new CompilerException(simpleDefinedType.getPosition(),
+            throw new CompilerException(node.getPosition(),
                     "'%s' passes %d parameters but '%s' expects: %s",
-                    typeName, parameterValuesCount, parameterizedTypeName, parameterNames);
-        }
-
-        return new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues);
-    }
-
-    /**
-     * Matches the parameter definitions to the actual parameters of the objectreference and wraps them in a
-     * parameters object.
-     *
-     * @param objectReference             An object reference
-     * @param objectName                  Name of the object that is being compiled
-     * @param compiledParameterizedObject The compiled parameterized object
-     * @return A parameters object
-     */
-    public static Parameters createParameters(ObjectReference objectReference, String objectName,
-            CompiledParameterizedObject compiledParameterizedObject) {
-        var parameterizedTypeName = compiledParameterizedObject.getName();
-        var maybeParameterValues = objectReference.getParameters();
-        var parameterValues = maybeParameterValues.orElse(List.of());
-        var parameterValuesCount = parameterValues.size();
-        var parameterDefinitions = compiledParameterizedObject.getParameters();
-        var parameterDefinitionsCount = parameterDefinitions.size();
-
-        if (parameterValuesCount != parameterDefinitionsCount) {
-            var parameterNames = parameterDefinitions.stream()
-                    .map(ParameterNode::getReference)
-                    .map(ReferenceNode::getName)
-                    .collect(Collectors.joining(", "));
-
-            throw new CompilerException(objectReference.getPosition(),
-                    "'%s' passes %d parameters but '%s' expects: %s",
-                    objectName, parameterValuesCount, parameterizedTypeName, parameterNames);
+                    name, parameterValuesCount, parameterizedTypeName, parameterNames);
         }
 
         return new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues);
