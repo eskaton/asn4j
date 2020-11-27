@@ -3304,6 +3304,28 @@ class CompilerImplTest {
             assertEquals(456, ((IntegerValue)value).getValue().longValue());
         }
 
+        @Test
+        void testParameterizedValueWithObjectWithDefinedSyntax() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS {
+                        &id INTEGER
+                    }  WITH SYNTAX {
+                        ID &id
+                    }
+                    
+                    object{INTEGER:value} TEST ::= {ID value}
+                    
+                    objectRef TEST ::= object{456}
+                """;
+
+            var compiledObject = getCompiledObject(body, "objectRef");
+            var value = compiledObject.getObjectDefinition().get("id");
+
+            assert(value instanceof IntegerValue);
+
+            assertEquals(456, ((IntegerValue)value).getValue().longValue());
+        }
+
         Stream<Arguments> provideParameterizedValueInConstraint() {
             // @formatter:off
             return Stream.of(
