@@ -45,6 +45,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledModule;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObject;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
@@ -71,6 +72,7 @@ import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
+import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
@@ -180,6 +182,11 @@ public class CompilerContext {
     private void addParameterizedObjectClass(String name,
             CompiledParameterizedObjectClass compiledParameterizedObjectClass) {
         getCurrentCompiledModule().addParameterizedObjectClass(name, compiledParameterizedObjectClass);
+    }
+
+    private void addParameterizedObject(String name,
+            CompiledParameterizedObject compiledParameterizedObject) {
+        getCurrentCompiledModule().addParameterizedObject(name, compiledParameterizedObject);
     }
 
     private void addParameterizedObjectSet(String name,
@@ -799,7 +806,7 @@ public class CompilerContext {
             parameters.markAsUsed(parameter);
 
             return new ObjectSetCompiler(this).getCompiledObjectSet(this, null, compiledObjectClass,
-                    elementSetSpecs.getRootElements());
+                    elementSetSpecs.getRootElements(), Optional.empty());
         }
 
 
@@ -869,6 +876,33 @@ public class CompilerContext {
         return getCompilationResult(reference, Optional.of(moduleName), "ParameterizedObjectClass",
                 () -> getParameterizedObjectClassesOfModule(moduleName), compiler::compiledParameterizedObjectClass,
                 this::getParameterizedObjectClassesOfModule);
+    }
+
+    /**
+     * Looks up the compiled parameterized object for the given parameterized object reference. The compiled
+     * parameterized object may be compiled if it isn't already.
+     *
+     * @param reference a parameterized object reference
+     * @return a compiled parameterized object
+     */
+    public CompiledParameterizedObject getCompiledParameterizedObject(String reference) {
+        return getCompilationResult(reference, Optional.empty(), "ParameterizedObject",
+                this::getParameterizedObjectsOfCurrentModule, compiler::compiledParameterizedObject,
+                this::getParameterizedObjectsOfModule);
+    }
+
+    /**
+     * Looks up the compiled parameterized object for the given module name and parameterized object reference.
+     * The compiled parameterized object may be compiled if it isn't already.
+     *
+     * @param moduleName a module name
+     * @param reference  a parameterized object reference
+     * @return a compiled parameterized object
+     */
+    public CompiledParameterizedObject getCompiledParameterizedObject(String moduleName, String reference) {
+        return getCompilationResult(reference, Optional.of(moduleName), "ParameterizedObject",
+                () -> getParameterizedObjectsOfModule(moduleName), compiler::compiledParameterizedObject,
+                this::getParameterizedObjectsOfModule);
     }
 
     /**
@@ -1123,6 +1157,16 @@ public class CompilerContext {
                 .orElseGet(Map::of);
     }
 
+    private Map<String, CompiledParameterizedObject> getParameterizedObjectsOfCurrentModule() {
+        return getParameterizedObjectsOfModule(getCurrentModuleName());
+    }
+
+    private Map<String, CompiledParameterizedObject> getParameterizedObjectsOfModule(String moduleName) {
+        return Optional.ofNullable(definedModules.get(moduleName))
+                .map(CompiledModule::getParameterizedObject)
+                .orElseGet(Map::of);
+    }
+
     private Map<String, CompiledParameterizedObjectSet> getParameterizedObjectSetsOfCurrentModule() {
         return getParameterizedObjectSetsOfModule(getCurrentModuleName());
     }
@@ -1336,6 +1380,16 @@ public class CompilerContext {
         addParameterizedObjectClass(name, compiledParameterizedObjectClass);
 
         return compiledParameterizedObjectClass;
+    }
+
+    public CompiledParameterizedObject createCompiledParameterizedObject(String name, ObjectClassNode objectClass,
+            ObjectNode objectDefinition, List<ParameterNode> parameters) {
+        var compiledParameterizedObject = new CompiledParameterizedObject(name, objectClass, objectDefinition,
+                parameters);
+
+        addParameterizedObject(name, compiledParameterizedObject);
+
+        return compiledParameterizedObject;
     }
 
     public CompiledParameterizedObjectSet createCompiledParameterizedObjectSet(String name, ObjectClassNode objectClass,

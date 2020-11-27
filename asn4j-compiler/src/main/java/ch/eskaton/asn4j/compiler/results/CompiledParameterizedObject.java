@@ -25,32 +25,66 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.parser.ast.types;
+package ch.eskaton.asn4j.compiler.results;
 
-import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.parser.ast.AbstractNode;
-import ch.eskaton.asn4j.parser.ast.FieldNameNode;
-import ch.eskaton.asn4j.parser.ast.ReferencedObjects;
+import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+import ch.eskaton.asn4j.parser.ast.ObjectNode;
+import ch.eskaton.asn4j.parser.ast.ParameterNode;
+import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public abstract class InformationFromObjects extends AbstractNode {
+import java.util.List;
+import java.util.Objects;
 
-    private ReferencedObjects reference;
+public class CompiledParameterizedObject extends AbstractCompiledParameterizedResult {
 
-    private FieldNameNode field;
+    private final ObjectClassNode objectClass;
 
-    protected InformationFromObjects(Position position, ReferencedObjects reference, FieldNameNode field) {
-        super(position);
+    private final ObjectNode object;
 
-        this.reference = reference;
-        this.field = field;
+    public CompiledParameterizedObject(String name, ObjectClassNode objectClass, ObjectNode object,
+            List<ParameterNode> parameters) {
+        super(name, parameters);
+
+        this.objectClass = objectClass;
+        this.object = object;
     }
 
-    public ReferencedObjects getReference() {
-        return reference;
+    public ObjectClassNode getObjectClass() {
+        return objectClass;
     }
 
-    public FieldNameNode getField() {
-        return field;
+    public ObjectNode getObject() {
+        return object;
+    }
+
+    @Override
+    public String toString() {
+        return ToString.get(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        CompiledParameterizedObject that = (CompiledParameterizedObject) o;
+
+        return Objects.equals(objectClass, that.objectClass) &&
+                Objects.equals(object, that.object);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), objectClass, object);
     }
 
 }

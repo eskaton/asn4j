@@ -59,13 +59,13 @@ public class ObjectSetCompiler implements Compiler<ObjectSetSpecNode> {
             ObjectSetSpecNode objectSet, Optional<Parameters> maybeParameters) {
         var elementSet = objectSet.getRootElements();
 
-        return getCompiledObjectSet(ctx, objectSetName, objectClass, elementSet);
+        return getCompiledObjectSet(ctx, objectSetName, objectClass, elementSet, maybeParameters);
     }
 
     public CompiledObjectSet getCompiledObjectSet(CompilerContext ctx, String objectSetName,
-            CompiledObjectClass objectClass, ElementSet elementSet) {
+            CompiledObjectClass objectClass, ElementSet elementSet, Optional<Parameters> maybeParameters) {
         var compiledObjectSet = ctx.createCompiledObjectSet(objectSetName, objectClass);
-        var values = compile(objectClass, elementSet);
+        var values = compile(objectClass, elementSet, maybeParameters);
 
         objectClass.getFields().stream()
                 .filter(CompiledFixedTypeValueField.class::isInstance)
@@ -97,7 +97,8 @@ public class ObjectSetCompiler implements Compiler<ObjectSetSpecNode> {
         return compiledObjectSet;
     }
 
-    private Set<Map<String, Object>> compile(CompiledObjectClass objectClass, ElementSet elementSet) {
+    private Set<Map<String, Object>> compile(CompiledObjectClass objectClass, ElementSet elementSet,
+            Optional<Parameters> maybeParameters) {
         if (elementSet == null) {
             return Set.of();
         }
@@ -111,49 +112,53 @@ public class ObjectSetCompiler implements Compiler<ObjectSetSpecNode> {
                 if (operands.size() == 1) {
                     return Set.of();
                 } else {
-                    return exclusion(objectClass, operands);
+                    return exclusion(objectClass, operands, maybeParameters);
                 }
             case UNION:
-                return union(objectClass, operands);
+                return union(objectClass, operands, maybeParameters);
             case INTERSECTION:
-                return intersection(objectClass, operands);
+                return intersection(objectClass, operands, maybeParameters);
             default:
                 throw new CompilerException(elementSet.getPosition(), "Unimplemented operation: %s",
                         elementSet.getOperation());
         }
     }
 
-    private Set<Map<String, Object>> exclusion(CompiledObjectClass objectClass, List<Elements> operands) {
-        var op1 = compile(objectClass, operands.get(0));
-        var op2 = compile(objectClass, operands.get(1));
+    private Set<Map<String, Object>> exclusion(CompiledObjectClass objectClass, List<Elements> operands,
+            Optional<Parameters> maybeParameters) {
+        var op1 = compile(objectClass, operands.get(0), maybeParameters);
+        var op2 = compile(objectClass, operands.get(1), maybeParameters);
 
         op1.removeAll(op2);
 
         return op1;
     }
 
-    private Set<Map<String, Object>> intersection(CompiledObjectClass objectClass, List<Elements> operands) {
-        return operands.stream().map(op -> compile(objectClass, op)).reduce((op1, op2) -> {
+    private Set<Map<String, Object>> intersection(CompiledObjectClass objectClass, List<Elements> operands,
+            Optional<Parameters> maybeParameters) {
+        return operands.stream().map(op -> compile(objectClass, op, maybeParameters)).reduce((op1, op2) -> {
             op1.retainAll(op2);
 
             return op1;
         }).orElse(new HashSet<>());
     }
 
-    private Set<Map<String, Object>> union(CompiledObjectClass objectClass, List<Elements> operands) {
-        return operands.stream().map(op -> compile(objectClass, op)).reduce((op1, op2) -> {
+    private Set<Map<String, Object>> union(CompiledObjectClass objectClass, List<Elements> operands,
+            Optional<Parameters> maybeParameters) {
+        return operands.stream().map(op -> compile(objectClass, op, maybeParameters)).reduce((op1, op2) -> {
             op1.addAll(op2);
 
             return op1;
         }).orElse(new HashSet<>());
     }
 
-    private Set<Map<String, Object>> compile(CompiledObjectClass objectClass, Elements elements) {
+    private Set<Map<String, Object>> compile(CompiledObjectClass objectClass, Elements elements,
+            Optional<Parameters> maybeParameters) {
         if (elements instanceof ElementSet) {
-            return compile(objectClass, (ElementSet) elements);
+            return compile(objectClass, (ElementSet) elements, maybeParameters);
         } else if (elements instanceof ObjectSetElements) {
             return Sets.<Map<String, Object>>builder()
-                    .addAll(compile(objectClass, (ObjectSetElements) elements))
+                    .addAll(compile(objectClass, (ObjectSetElements) elements, maybeParameters))
                     .build();
         } else {
             throw new CompilerException(elements.getPosition(), "Unsupported elements: %s",
@@ -161,12 +166,13 @@ public class ObjectSetCompiler implements Compiler<ObjectSetSpecNode> {
         }
     }
 
-    private Set<Map<String, Object>> compile(CompiledObjectClass objectClass, ObjectSetElements elements) {
+    private Set<Map<String, Object>> compile(CompiledObjectClass objectClass, ObjectSetElements elements,
+            Optional<Parameters> maybeParameters) {
         var element = elements.getElement();
 
         if (element instanceof ObjectDefnNode objectDefn) {
             return Set.of(ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class)
-                    .compile(objectClass, objectDefn));
+                    .compile(objectClass, objectDefn, maybeParameters));
         } else if (element instanceof ObjectReference objectReference) {
             return Set.of(ctx.getCompiledObject(objectReference).getObjectDefinition());
         } else if (element instanceof ObjectSetReference objectSetReference) {

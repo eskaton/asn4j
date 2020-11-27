@@ -30,13 +30,16 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledComponent;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObject;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
+import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
@@ -407,6 +410,12 @@ public class CompilerUtils {
                 Optional.empty();
     }
 
+    public static Optional<ExternalObjectReference> toExternalObjectReference(ObjectReference objectReference) {
+        return objectReference instanceof ExternalObjectReference externalObjectReference ?
+                Optional.of(externalObjectReference) :
+                Optional.empty();
+    }
+
     public static Optional<ExternalObjectSetReference> toExternalObjectSetReference(ObjectSetReference objectSetReference) {
         return objectSetReference instanceof ExternalObjectSetReference externalObjectSetReference ?
                 Optional.of(externalObjectSetReference) :
@@ -559,6 +568,38 @@ public class CompilerUtils {
             throw new CompilerException(simpleDefinedType.getPosition(),
                     "'%s' passes %d parameters but '%s' expects: %s",
                     typeName, parameterValuesCount, parameterizedTypeName, parameterNames);
+        }
+
+        return new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues);
+    }
+
+    /**
+     * Matches the parameter definitions to the actual parameters of the objectreference and wraps them in a
+     * parameters object.
+     *
+     * @param objectReference             An object reference
+     * @param objectName                  Name of the object that is being compiled
+     * @param compiledParameterizedObject The compiled parameterized object
+     * @return A parameters object
+     */
+    public static Parameters createParameters(ObjectReference objectReference, String objectName,
+            CompiledParameterizedObject compiledParameterizedObject) {
+        var parameterizedTypeName = compiledParameterizedObject.getName();
+        var maybeParameterValues = objectReference.getParameters();
+        var parameterValues = maybeParameterValues.orElse(List.of());
+        var parameterValuesCount = parameterValues.size();
+        var parameterDefinitions = compiledParameterizedObject.getParameters();
+        var parameterDefinitionsCount = parameterDefinitions.size();
+
+        if (parameterValuesCount != parameterDefinitionsCount) {
+            var parameterNames = parameterDefinitions.stream()
+                    .map(ParameterNode::getReference)
+                    .map(ReferenceNode::getName)
+                    .collect(Collectors.joining(", "));
+
+            throw new CompilerException(objectReference.getPosition(),
+                    "'%s' passes %d parameters but '%s' expects: %s",
+                    objectName, parameterValuesCount, parameterizedTypeName, parameterNames);
         }
 
         return new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues);

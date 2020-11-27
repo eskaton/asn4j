@@ -167,6 +167,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeFieldSpecNode;
@@ -419,6 +420,7 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(ObjectAssignmentNode.class, new ObjectAssignmentCompiler()));
         types.add(new TypeDefinition<>(ObjectSetAssignmentNode.class, new ObjectSetAssignmentCompiler(ctx)));
         types.add(new TypeDefinition<>(ParameterizedTypeAssignmentNode.class, new ParameterizedTypeAssignmentCompiler()));
+        types.add(new TypeDefinition<>(ParameterizedObjectAssignmentNode.class, new ParameterizedObjectAssignmentCompiler()));
     }
 
     public <T extends Node, C extends Compiler<T>> C getCompiler(Class<T> typeClass) {

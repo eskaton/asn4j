@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
+import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObject;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectSet;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
@@ -43,7 +44,6 @@ import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
@@ -53,6 +53,7 @@ import ch.eskaton.asn4j.parser.ast.ParameterizedObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedTypeOrObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueAssignmentNode;
+import ch.eskaton.asn4j.parser.ast.ParameterizedValueOrObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.TypeOrObjectClassAssignmentNode;
@@ -360,6 +361,12 @@ public class CompilerImpl {
                 getCompiler(ParameterizedTypeAssignmentNode.class).compile(compilerContext, assignment);
     }
 
+    private CompiledParameterizedObject compileParameterizedObjectAssignment(
+            ParameterizedObjectAssignmentNode assignment) {
+        return compilerContext.<ParameterizedObjectAssignmentNode, ParameterizedObjectAssignmentCompiler>
+                getCompiler(ParameterizedObjectAssignmentNode.class).compile(compilerContext, assignment);
+    }
+
     private CompiledParameterizedObjectSet compileParameterizedObjectSetAssignment(
             ParameterizedObjectSetAssignmentNode assignment) {
         return compilerContext.<ParameterizedObjectSetAssignmentNode, ParameterizedObjectSetAssignmentCompiler>
@@ -487,6 +494,14 @@ public class CompilerImpl {
                 ParameterizedTypeOrObjectClassAssignmentNode::getParameterizedObjectClassAssignment);
 
         return compile(name, maybeModuleName, assignmentSelector, this::compileParameterizedObjectClassAssignment);
+    }
+
+    public Optional<CompiledParameterizedObject> compiledParameterizedObject(String name,
+            Optional<String> maybeModuleName) {
+        var assignmentSelector = getAssignmentSelector(ParameterizedValueOrObjectAssignmentNode.class,
+                ParameterizedValueOrObjectAssignmentNode::getParameterizedObjectAssignmentNode);
+
+        return compile(name, maybeModuleName, assignmentSelector, this::compileParameterizedObjectAssignment);
     }
 
     public Optional<CompiledParameterizedObjectSet> compiledParameterizedObjectSet(String name,

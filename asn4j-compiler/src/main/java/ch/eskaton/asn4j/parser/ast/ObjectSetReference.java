@@ -32,7 +32,7 @@ import ch.eskaton.asn4j.parser.Position;
 import java.util.List;
 import java.util.Optional;
 
-public class ObjectSetReference extends ReferencedObjectsNode implements ParameterizedNode {
+public class ObjectSetReference extends ReferencedObjects implements ParameterizedNode {
 
     private String reference;
 

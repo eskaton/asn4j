@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.parser.ast.types;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.EncodingPrefixNode;
 import ch.eskaton.asn4j.parser.ast.FieldNameNode;
-import ch.eskaton.asn4j.parser.ast.ReferencedObjectsNode;
+import ch.eskaton.asn4j.parser.ast.ReferencedObjects;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.values.Tag;
 import ch.eskaton.asn4j.runtime.TaggingMode;
@@ -51,7 +51,7 @@ public class TypeFromObjects extends InformationFromObjects implements Type {
 
     private EncodingPrefixNode encodingPrefix;
 
-    public TypeFromObjects(Position position, ReferencedObjectsNode reference, FieldNameNode field) {
+    public TypeFromObjects(Position position, ReferencedObjects reference, FieldNameNode field) {
         super(position, reference, field);
     }
 

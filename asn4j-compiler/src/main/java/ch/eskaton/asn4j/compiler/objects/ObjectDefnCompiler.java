@@ -32,6 +32,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.Formatter;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
@@ -45,7 +46,7 @@ import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.RequiredToken;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
 import ch.eskaton.asn4j.parser.ast.DefinedSyntaxNode;
-import ch.eskaton.asn4j.parser.ast.ExternalObjectReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.FieldSettingNode;
 import ch.eskaton.asn4j.parser.ast.Group;
 import ch.eskaton.asn4j.parser.ast.LiteralNode;
@@ -54,6 +55,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.Setting;
+import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
@@ -64,6 +66,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
@@ -74,14 +77,15 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         this.ctx = ctx;
     }
 
-    public Map<String, Object> compile(CompiledObjectClass objectClass, ObjectDefnNode objectDefinition) {
+    public Map<String, Object> compile(CompiledObjectClass objectClass, ObjectDefnNode objectDefinition,
+            Optional<Parameters> maybeParameters) {
         var syntax = objectDefinition.getSyntax();
         Map<String, Object> compiledObject;
 
         if (syntax instanceof DefaultSyntaxNode) {
-            compiledObject = compileDefaultSyntax(objectClass, (DefaultSyntaxNode) syntax);
+            compiledObject = compileDefaultSyntax(objectClass, (DefaultSyntaxNode) syntax, maybeParameters);
         } else if (syntax instanceof DefinedSyntaxNode) {
-            compiledObject = compileDefinedSyntax(objectClass, (DefinedSyntaxNode) syntax);
+            compiledObject = compileDefinedSyntax(objectClass, (DefinedSyntaxNode) syntax, maybeParameters);
         } else {
             throw new CompilerException(syntax.getPosition(), "Unsupported syntax: %s",
                     syntax.getClass().getSimpleName());
@@ -92,7 +96,8 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         return compiledObject;
     }
 
-    private Map<String, Object> compileDefinedSyntax(CompiledObjectClass objectClass, DefinedSyntaxNode syntax) {
+    private Map<String, Object> compileDefinedSyntax(CompiledObjectClass objectClass, DefinedSyntaxNode syntax,
+            Optional<Parameters> maybeParameters) {
         var maybeSyntaxSpec = objectClass.getSyntax();
 
         if (maybeSyntaxSpec.isEmpty()) {
@@ -106,7 +111,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         var definedSyntax = new LinkedList<>(syntax.getNodes());
         var values = new HashMap<String, Object>();
 
-        compile(objectClass, syntaxSpec, definedSyntax, values, new GroupState(false, false, false));
+        compile(objectClass, syntaxSpec, definedSyntax, values, maybeParameters, new GroupState(false, false, false));
 
         if (!definedSyntax.isEmpty()) {
             var node = definedSyntax.peek();
@@ -120,7 +125,8 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
     }
 
     private GroupState compile(CompiledObjectClass objectClass, List<? extends Object> syntaxSpec,
-            LinkedList<Node> definedSyntax, HashMap<String, Object> values, GroupState state) {
+            LinkedList<Node> definedSyntax, HashMap<String, Object> values, Optional<Parameters> maybeParameters,
+            GroupState state) {
         if (definedSyntax.isEmpty()) {
             return state;
         }
@@ -131,12 +137,13 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
 
         for (var spec : syntaxSpec) {
             if (spec instanceof Group) {
-                currentState = compile(objectClass, ((Group) spec).getGroup(), definedSyntax, values,
+                currentState = compile(objectClass, ((Group) spec).getGroup(), definedSyntax, values, maybeParameters,
                         currentState.optional(true));
 
                 hasField = currentState.hasField || hasField;
             } else if (spec instanceof RequiredToken requiredToken) {
-                currentState = compileRequiredToken(objectClass, definedSyntax, values, currentState, requiredToken);
+                currentState = compileRequiredToken(objectClass, definedSyntax, values, maybeParameters, currentState,
+                        requiredToken);
 
                 if (!currentState.accepted) {
                     return currentState;
@@ -161,7 +168,8 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
     }
 
     private GroupState compileRequiredToken(CompiledObjectClass objectClass, LinkedList<Node> definedSyntax,
-            HashMap<String, Object> values, GroupState state, RequiredToken requiredToken) {
+            HashMap<String, Object> values, Optional<Parameters> maybeParameters, GroupState state,
+            RequiredToken requiredToken) {
         if (definedSyntax.isEmpty()) {
             return state;
         }
@@ -196,7 +204,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 throw new CompilerException(element.getPosition(), "Expected setting but found '%s'", formattedElement);
             }
 
-            compilePrimitiveFieldName(objectClass, values, (Setting) element, fieldNameNode);
+            compilePrimitiveFieldName(objectClass, values, maybeParameters, (Setting) element, fieldNameNode);
 
             state = state.hasField(true).accepted(true);
         }
@@ -205,7 +213,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
     }
 
     private void compilePrimitiveFieldName(CompiledObjectClass objectClass, HashMap<String, Object> values,
-            Setting setting, PrimitiveFieldNameNode fieldNameNode) {
+            Optional<Parameters> maybeParameters, Setting setting, PrimitiveFieldNameNode fieldNameNode) {
         var fieldName = fieldNameNode.getReference();
         var maybeField = objectClass.getField(fieldName);
 
@@ -217,14 +225,15 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                     objectClass.getName(), fieldNameNode);
         }
 
-        var value = compile(objectClass, setting, fieldNameNode);
+        var value = compile(objectClass, maybeParameters, setting, fieldNameNode);
 
         values.put(value.get_1(), value.get_2());
     }
 
-    private Map<String, Object> compileDefaultSyntax(CompiledObjectClass objectClass, DefaultSyntaxNode syntaxNode) {
+    private Map<String, Object> compileDefaultSyntax(CompiledObjectClass objectClass, DefaultSyntaxNode syntaxNode,
+            Optional<Parameters> maybeParameters) {
         var values = syntaxNode.getFieldSetting().stream()
-                .map(setting -> compile(objectClass, setting))
+                .map(setting -> compile(objectClass, setting, maybeParameters))
                 .collect(Collectors.toMap(Tuple2::get_1, Tuple2::get_2));
 
         verifyValues(objectClass, syntaxNode.getPosition(), values);
@@ -252,14 +261,16 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         }
     }
 
-    private Tuple2<String, Object> compile(CompiledObjectClass objectClass, FieldSettingNode fieldSettingNode) {
+    private Tuple2<String, Object> compile(CompiledObjectClass objectClass, FieldSettingNode fieldSettingNode,
+            Optional<Parameters> maybeParameters) {
         var fieldName = fieldSettingNode.getFieldName();
         var setting = fieldSettingNode.getSetting();
 
-        return compile(objectClass, (Setting) setting, fieldName);
+        return compile(objectClass, maybeParameters, setting, fieldName);
     }
 
-    private Tuple2<String, Object> compile(CompiledObjectClass objectClass, Setting setting,
+    private Tuple2<String, Object> compile(CompiledObjectClass objectClass, Optional<Parameters> maybeParameters,
+            Setting setting,
             PrimitiveFieldNameNode fieldName) {
         var reference = fieldName.getReference();
         var maybeField = objectClass.getField(reference);
@@ -275,10 +286,19 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 }
 
                 var compiledField = (CompiledFixedTypeValueField) field;
-                var type = compiledField.getCompiledType().getType();
+                var compiledType = compiledField.getCompiledType();
                 var value = setting.getValue().get();
+                Value resolvedValue;
 
-                return Tuple2.of(reference, ctx.getValue(type, value));
+                if (value instanceof DefinedValue) {
+                    resolvedValue = ctx.getCompiledValue(compiledType.getType(), value, maybeParameters).getValue();
+                } else {
+                    var type = compiledType.getType();
+
+                    resolvedValue = ctx.getValue(type, value);
+                }
+
+                return Tuple2.of(reference, resolvedValue);
             } else if (field instanceof CompiledTypeField) {
                 if (setting.getType().isEmpty()) {
                     var formattedNode = Formatter.format(ctx, setting);
@@ -309,7 +329,8 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                         setting.getObject().get() instanceof ObjectDefnNode objectDefnNode) {
                     var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
 
-                    object = compiler.compile(((CompiledObjectField) field).getObjectClass(), objectDefnNode);
+                    object = compiler.compile(((CompiledObjectField) field).getObjectClass(), objectDefnNode,
+                            maybeParameters);
                 } else {
                     throw new IllegalCompilerStateException(setting.getPosition(), "Unsupported setting: %s",
                             setting.getClass().getSimpleName());
@@ -332,7 +353,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         if (simpleDefinedValue instanceof ExternalValueReference externalValueReference) {
             var module = externalValueReference.getModule();
 
-            return new ExternalObjectReferenceNode(position, module, ref);
+            return new ExternalObjectReference(position, module, ref);
         } else {
             return new ObjectReference(position, ref);
         }

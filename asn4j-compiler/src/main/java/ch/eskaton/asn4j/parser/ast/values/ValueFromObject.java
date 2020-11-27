@@ -29,12 +29,12 @@ package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.ast.FieldNameNode;
-import ch.eskaton.asn4j.parser.ast.ReferencedObjectsNode;
+import ch.eskaton.asn4j.parser.ast.ReferencedObjects;
 import ch.eskaton.asn4j.parser.ast.types.InformationFromObjects;
 
 public class ValueFromObject extends InformationFromObjects implements Value {
 
-    public ValueFromObject(Position position, ReferencedObjectsNode reference, FieldNameNode field) {
+    public ValueFromObject(Position position, ReferencedObjects reference, FieldNameNode field) {
         super(position, reference, field);
     }
 
