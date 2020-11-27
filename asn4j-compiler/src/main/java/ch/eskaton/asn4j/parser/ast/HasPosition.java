@@ -28,26 +28,9 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
-import ch.eskaton.asn4j.runtime.utils.ToString;
 
-public abstract class AbstractNode implements Node , HasPosition {
+public interface HasPosition {
 
-    private Position position;
-
-    protected AbstractNode() {
-    }
-
-    protected AbstractNode(Position position) {
-        this.position = position;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    @Override
-    public String toString() {
-        return ToString.get(this);
-    }
+    Position getPosition();
 
 }
