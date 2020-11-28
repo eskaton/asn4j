@@ -32,6 +32,9 @@ import ch.eskaton.asn4j.parser.ast.Setting;
 
 public class SettingFormatter {
 
+    private SettingFormatter() {
+    }
+
     public static String format(CompilerContext ctx, Setting setting) {
         Node node;
 

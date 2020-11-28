@@ -115,6 +115,7 @@ import ch.eskaton.asn4j.compiler.types.SetOfCompiler;
 import ch.eskaton.asn4j.compiler.types.T61StringCompiler;
 import ch.eskaton.asn4j.compiler.types.TeletexStringCompiler;
 import ch.eskaton.asn4j.compiler.types.TypeCompiler;
+import ch.eskaton.asn4j.compiler.types.TypeFromObjectsCompiler;
 import ch.eskaton.asn4j.compiler.types.TypeReferenceCompiler;
 import ch.eskaton.asn4j.compiler.types.UTCTimeCompiler;
 import ch.eskaton.asn4j.compiler.types.UTF8StringCompiler;
@@ -209,6 +210,7 @@ import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.T61String;
 import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UTF8String;
@@ -394,6 +396,8 @@ public class TypeConfiguration {
                 ASN1Sequence.class, new DefaultTypeNameSupplier(this)));
         types.add(new TypeDefinition<>(TypeReference.class, new TypeReferenceCompiler(),
                 new TypeReferenceTypeNameSupplier()));
+        types.add(new TypeDefinition<>(TypeFromObjects.class, new TypeFromObjectsCompiler(),
+                new DefaultTypeNameSupplier(this)));
         types.add(new TypeDefinition<>(ExternalTypeReference.class, new ExternalTypeReferenceCompiler(),
                 new ExternalTypeReferenceTypeNameSupplier()));
         types.add(new TypeDefinition<>(ObjectClassFieldType.class, new ObjectClassFieldTypeCompiler()));

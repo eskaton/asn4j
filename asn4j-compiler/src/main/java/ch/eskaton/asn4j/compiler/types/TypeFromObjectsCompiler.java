@@ -25,30 +25,35 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.types;
 
-import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
-import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
-import ch.eskaton.asn4j.parser.ast.Node;
-import ch.eskaton.asn4j.parser.ast.Setting;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
+import ch.eskaton.asn4j.compiler.NamedCompiler;
+import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.results.CompiledType;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
 
-public class Formatter {
+import java.util.Optional;
 
-    private Formatter() {
-    }
+public class TypeFromObjectsCompiler implements NamedCompiler<TypeFromObjects, CompiledType> {
 
-    public static String format(CompilerContext ctx, Node node) {
-        if (node instanceof Value) {
-            return ValueFormatter.formatValue(node);
-        } else if (node instanceof Type) {
-            return TypeFormatter.formatType(ctx, node);
-        } else if (node instanceof Setting setting) {
-            return SettingFormatter.format(ctx, setting);
-        }
+    @Override
+    public CompiledType compile(CompilerContext ctx, String name, TypeFromObjects node,
+            Optional<Parameters> maybeParameters) {
+        var compiledTypeFromObject = ctx.resolveTypeFromObject(node);
+        var type = compiledTypeFromObject.getType();
+        var tags = CompilerUtils.getTagIds(ctx, type);
+        var compiledType = ctx.createCompiledType(type, name);
 
-        return node.toString();
+        compiledType.setTags(tags);
+
+        ctx.compileConstraintAndModule(name, compiledType, maybeParameters).ifPresent(constraintAndModule -> {
+            compiledType.setConstraintDefinition(constraintAndModule.get_1());
+            compiledType.setModule(constraintAndModule.get_2());
+        });
+
+        return compiledType;
     }
 
 }

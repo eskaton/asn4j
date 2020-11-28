@@ -42,7 +42,6 @@ import java.util.Optional;
 
 public class TypeFromObjects extends InformationFromObjects implements Type {
 
-
     private LinkedList<Tag> tags = new LinkedList<>();
 
     private LinkedList<Optional<TaggingMode>> taggingModes = new LinkedList<>();
