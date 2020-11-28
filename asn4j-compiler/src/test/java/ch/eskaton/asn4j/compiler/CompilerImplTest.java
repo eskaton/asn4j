@@ -66,6 +66,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueSetField;
 import ch.eskaton.asn4j.parser.ParserException;
+import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.types.BMPString;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.BooleanType;
@@ -112,6 +113,7 @@ import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
 import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
 import ch.eskaton.asn4j.parser.ast.values.IRIValue;
 import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
+import ch.eskaton.asn4j.parser.ast.values.NamedValue;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
 import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
@@ -143,16 +145,19 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.compilerConfig;
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.getCompiledValue;
+import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BMP_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
@@ -184,16 +189,97 @@ import static ch.eskaton.asn4j.runtime.types.TypeName.UTF8_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.VIDEOTEX_STRING;
 import static ch.eskaton.asn4j.runtime.types.TypeName.VISIBLE_STRING;
 import static ch.eskaton.asn4j.test.TestUtils.module;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class CompilerImplTest {
 
     public static final String MODULE_NAME = "TEST-MODULE";
+
+    private static final Collection<TypeRecord> TYPE_RECORDS;
+
+    static {
+        TYPE_RECORDS = List.of(
+                new TypeRecord(BooleanType.class, BOOLEAN, 1, BooleanValue.class, "TRUE", Boolean.TRUE,
+                        (Function<BooleanValue, Boolean>) (BooleanValue v) -> v.getValue()),
+                new TypeRecord(IntegerType.class, INTEGER, 2, IntegerValue.class, "23", 23L,
+                        (Function<IntegerValue, Long>) (IntegerValue v) -> v.getValue().longValue()),
+                new TypeRecord(BitString.class, BIT_STRING, 3, BitStringValue.class, "'1011'B", new byte[] { 0x0b },
+                        (Function<BitStringValue, byte[]>) (BitStringValue v) -> v.getByteValue()),
+                new TypeRecord(OctetString.class, OCTET_STRING, 4, OctetStringValue.class, "'0A'H", new byte[] { 0x0a },
+                        (Function<OctetStringValue, byte[]>) (OctetStringValue v) -> v.getByteValue()),
+                new TypeRecord(Null.class, NULL, 5, NullValue.class, "NULL", new NullValue(NO_POSITION),
+                        Function.identity()),
+                new TypeRecord(ObjectIdentifier.class, OBJECT_IDENTIFIER, 6, ObjectIdentifierValue.class, "{1 2 3 27}",
+                        Arrays.asList(1, 2, 3, 27),
+                        (Function<ObjectIdentifierValue, List<Integer>>) (ObjectIdentifierValue v) ->
+                                v.getComponents().stream().map(OIDComponentNode::getId).collect(toList())),
+                new TypeRecord(Real.class, REAL, 9, RealValue.class, "1.2e5", 120000L,
+                        (Function<RealValue, Long>) (RealValue v) -> v.getValue().longValue()),
+                new TypeRecord(EnumeratedType.class, "ENUMERATED {a, b, c}", 10, EnumeratedValue.class, "c", 2,
+                        (Function<EnumeratedValue, Integer>) (EnumeratedValue v) -> v.getValue()),
+                new TypeRecord(UTF8String.class, UTF8_STRING, 12, UTF8StringValue.class, "\"äöü\"", "äöü",
+                        (Function<UTF8StringValue, String>) (UTF8StringValue v) -> v.getValue()),
+                new TypeRecord(RelativeOID.class, RELATIVE_OID, 13, RelativeOIDValue.class, "{2 3 27}",
+                        Arrays.asList(2, 3, 27),
+                        (Function<RelativeOIDValue, List<Integer>>) (RelativeOIDValue v) ->
+                                v.getComponents().stream().map(OIDComponentNode::getId).collect(toList())),
+                new TypeRecord(SequenceType.class, "SEQUENCE {a BOOLEAN}", 16, CollectionValue.class, "{a TRUE}",
+                        Map.of("a", new BooleanValue(NO_POSITION, true)),
+                        (Function<CollectionValue, Map<String, Value>>) (CollectionValue v) ->
+                                v.getValues().stream().collect(Collectors.toMap(NamedValue::getName, NamedValue::getValue))),
+                new TypeRecord(SequenceOfType.class, "SEQUENCE OF BOOLEAN", 16, CollectionOfValue.class, "{TRUE}",
+                        List.of(new BooleanValue(NO_POSITION, true)),
+                        (Function<CollectionOfValue, List<Value>>) (CollectionOfValue v) -> v.getValues()),
+                new TypeRecord(SetType.class, "SET {a BOOLEAN}", 17, CollectionValue.class, "{a TRUE}",
+                        Map.of("a", new BooleanValue(NO_POSITION, true)),
+                        (Function<CollectionValue, Map<String, Value>>) (CollectionValue v) ->
+                                v.getValues().stream().collect(Collectors.toMap(NamedValue::getName, NamedValue::getValue))),
+                new TypeRecord(SetOfType.class, "SET OF BOOLEAN", 17, CollectionOfValue.class, "{TRUE}",
+                        List.of(new BooleanValue(NO_POSITION, true)),
+                        (Function<CollectionOfValue, List<Value>>) (CollectionOfValue v) -> v.getValues()),
+                new TypeRecord(NumericString.class, NUMERIC_STRING, 18, NumericStringValue.class, "\"123\"", "123",
+                        (Function<NumericStringValue, String>) (NumericStringValue v) -> v.getValue()),
+                new TypeRecord(PrintableString.class, PRINTABLE_STRING, 19, PrintableStringValue.class, "\"abc\"", "abc",
+                        (Function<PrintableStringValue, String>) (PrintableStringValue v) -> v.getValue()),
+                new TypeRecord(TeletexString.class, TELETEX_STRING, 20, TeletexStringValue.class, "\"abc\"", "abc",
+                        (Function<TeletexStringValue, String>) (TeletexStringValue v) -> v.getValue()),
+                new TypeRecord(T61String.class, T61_STRING, 20, TeletexStringValue.class, "\"abc\"", "abc",
+                        (Function<TeletexStringValue, String>) (TeletexStringValue v) -> v.getValue()),
+                new TypeRecord(VideotexString.class, VIDEOTEX_STRING, 21, VideotexStringValue.class, "\"abc\"", "abc",
+                        (Function<VideotexStringValue, String>) (VideotexStringValue v) -> v.getValue()),
+                new TypeRecord(IA5String.class, IA5_STRING, 22, IA5StringValue.class, "\"abc\"", "abc",
+                        (Function<IA5StringValue, String>) (IA5StringValue v) -> v.getValue()),
+                new TypeRecord(UTCTime.class, UTC_TIME, 23, UTCTimeValue.class, "\"8201021200Z\"", "8201021200Z",
+                        (Function<UTCTimeValue, String>) (UTCTimeValue v) -> v.getValue()),
+                new TypeRecord(GeneralizedTime.class, GENERALIZED_TIME, 24, GeneralizedTimeValue.class,
+                        "\"19851106210627.3Z\"", "19851106210627.3Z",
+                        (Function<GeneralizedTimeValue, String>) (GeneralizedTimeValue v) -> v.getValue()),
+                new TypeRecord(GraphicString.class, GRAPHIC_STRING, 25, GraphicStringValue.class, "\"abc\"", "abc",
+                        (Function<GraphicStringValue, String>) (GraphicStringValue v) -> v.getValue()),
+                new TypeRecord(VisibleString.class, VISIBLE_STRING, 26, VisibleStringValue.class, "\"abc\"", "abc",
+                        (Function<VisibleStringValue, String>) (VisibleStringValue v) -> v.getValue()),
+                new TypeRecord(ISO646String.class, ISO646_STRING, 26, VisibleStringValue.class, "\"abc\"", "abc",
+                        (Function<VisibleStringValue, String>) (VisibleStringValue v) -> v.getValue()),
+                new TypeRecord(GeneralString.class, GENERAL_STRING, 27, GeneralStringValue.class, "\"abc\"", "abc",
+                        (Function<GeneralStringValue, String>) (GeneralStringValue v) -> v.getValue()),
+                new TypeRecord(UniversalString.class, UNIVERSAL_STRING, 28, UniversalStringValue.class, "\"äöü\"", "äöü",
+                        (Function<UniversalStringValue, String>) (UniversalStringValue v) -> v.getValue()),
+                new TypeRecord(BMPString.class, BMP_STRING, 30, BMPStringValue.class, "\"äöü\"", "äöü",
+                        (Function<BMPStringValue, String>) (BMPStringValue v) -> v.getValue()),
+                new TypeRecord(IRI.class, OID_IRI, 35, IRIValue.class, "\"/iso/a/b/c\"",
+                        Arrays.asList("iso", "a", "b", "c"),
+                        (Function<IRIValue, List<String>>) (IRIValue v) -> v.getArcIdentifierTexts()),
+                new TypeRecord(RelativeIRI.class, RELATIVE_OID_IRI, 36, RelativeIRIValue.class, "\"a/b/c\"",
+                        Arrays.asList("a", "b", "c"),
+                        (Function<RelativeIRIValue, List<String>>) (RelativeIRIValue v) -> v.getArcIdentifierTexts()));
+    }
 
     @Test
     void testConstraintAndModuleAbsent() throws IOException, ParserException {
@@ -1517,11 +1603,12 @@ class CompilerImplTest {
 
     }
 
-    @ParameterizedTest(name = "[{index}] {0}")
+    @ParameterizedTest(name = "[{index}] {5}")
     @MethodSource("provideValueFromObject")
     @DisplayName("Test value from object")
-    <V extends Value> void testValueFromObject(String typeName, String valueString, Class<V> valueClass,
-            Consumer<V> valueTester) throws IOException, ParserException {
+    <V extends Value, O extends java.lang.Object> void testValueFromObject(
+            String typeName, Class<V> valueClass, String valueString, O expectedValue, Function<V, O> valueAccessor,
+            String description) throws IOException, ParserException {
         var body = """
                 TEST ::= CLASS {
                     &field %s
@@ -1548,7 +1635,7 @@ class CompilerImplTest {
         assertNotNull(value);
         assertTrue(valueClass.isInstance(value));
 
-        valueTester.accept(valueClass.cast(value));
+        testValue(valueClass, valueAccessor, expectedValue, value);
     }
 
     @Test
@@ -3284,46 +3371,57 @@ class CompilerImplTest {
             testConstraint(MODULE_NAME, body, typeName, nodeClass, verifier);
         }
 
-        @Test
-        void testParameterizedValueWithObjectWithDefaultSyntax() throws IOException, ParserException {
+        @ParameterizedTest(name = "[{index}] {5}")
+        @MethodSource("provideParameterizedValueWithObject")
+        @DisplayName("Test value parameters in objects with default syntax")
+        <V extends Value, O extends java.lang.Object> void testParameterizedValueWithObjectWithDefaultSyntax(
+                String typeName, Class<V> valueClass, String valueString, O expectedValue, Function<V, O> valueAccessor,
+                String description)
+                throws IOException, ParserException {
             var body = """
                         TEST ::= CLASS {
-                            &id INTEGER
+                            &id %s
                         }
                         
-                        object{INTEGER:value} TEST ::= {&id value}
+                        object{%s:value} TEST ::= {&id value}
                         
-                        objectRef TEST ::= object{456}
-                    """;
+                        objectRef TEST ::= object{%s}
+                    """.formatted(typeName, typeName, valueString);
 
             var compiledObject = getCompiledObject(body, "objectRef");
             var value = compiledObject.getObjectDefinition().get("id");
 
-            assert (value instanceof IntegerValue);
+            assertNotNull(value);
+            assertTrue(valueClass.isInstance(value));
 
-            assertEquals(456, ((IntegerValue) value).getValue().longValue());
+            testValue(valueClass, valueAccessor, expectedValue, value);
         }
 
-        @Test
-        void testParameterizedValueWithObjectWithDefinedSyntax() throws IOException, ParserException {
+        @ParameterizedTest(name = "[{index}] {5}")
+        @MethodSource("provideParameterizedValueWithObject")
+        @DisplayName("Test value parameters in objects with defined syntax")
+        <V extends Value, O extends java.lang.Object> void testParameterizedValueWithObjectWithDefinedSyntax(
+                String typeName, Class<V> valueClass, String valueString, O expectedValue, Function<V, O> valueAccessor,
+                String description) throws IOException, ParserException {
             var body = """
                         TEST ::= CLASS {
-                            &id INTEGER
+                            &id %s
                         }  WITH SYNTAX {
                             ID &id
                         }
                         
-                        object{INTEGER:value} TEST ::= {ID value}
+                        object{%s:value} TEST ::= {ID value}
                         
-                        objectRef TEST ::= object{456}
-                    """;
+                        objectRef TEST ::= object{%s}
+                    """.formatted(typeName, typeName, valueString);
 
             var compiledObject = getCompiledObject(body, "objectRef");
             var value = compiledObject.getObjectDefinition().get("id");
 
-            assert (value instanceof IntegerValue);
+            assertNotNull(value);
+            assertTrue(valueClass.isInstance(value));
 
-            assertEquals(456, ((IntegerValue) value).getValue().longValue());
+            testValue(valueClass, valueAccessor, expectedValue, value);
         }
 
         @Test
@@ -3531,6 +3629,24 @@ class CompilerImplTest {
             // @formatter:on
         }
 
+        public Stream<Arguments> provideParameterizedValueWithObject() {
+            return TYPE_RECORDS.stream().map(t -> Arguments.of(t.typeName, t.valueClass, t.valueString, t.value,
+                    t.valueAccessor, "Test type %s with value %s".formatted(t.typeName, t.valueString)));
+        }
+
+    }
+
+    private <V extends Value, O extends java.lang.Object> void testValue(Class<V> valueClass,
+            Function<V, O> valueAccessor, O expectedValue, java.lang.Object value) {
+        if (expectedValue.getClass().isArray()) {
+            if (expectedValue.getClass().equals(byte[].class)) {
+                assertArrayEquals((byte[]) expectedValue, (byte[]) valueAccessor.apply(valueClass.cast(value)));
+            } else {
+                fail("Unsupported value type: " + expectedValue.getClass());
+            }
+        } else {
+            assertEquals(expectedValue, valueAccessor.apply(valueClass.cast(value)));
+        }
     }
 
     <T extends AbstractNode> void testConstraint(String moduleName, String body, String typeName, Class<T> nodeClass,
@@ -3971,47 +4087,8 @@ class CompilerImplTest {
     }
 
     private static Stream<Arguments> provideTagsOnComponents() {
-        return Stream.of(
-                getTagsOnComponentsArguments(BooleanType.class, BOOLEAN, 1),
-                getTagsOnComponentsArguments(IntegerType.class, INTEGER, 2),
-                getTagsOnComponentsArguments(BitString.class, BIT_STRING, 3),
-                getTagsOnComponentsArguments(OctetString.class, OCTET_STRING, 4),
-                getTagsOnComponentsArguments(Null.class, NULL, 5),
-                getTagsOnComponentsArguments(ObjectIdentifier.class, OBJECT_IDENTIFIER, 6),
-                getTagsOnComponentsArguments(Real.class, REAL, 9),
-                getTagsOnComponentsArguments(EnumeratedType.class, "ENUMERATED {a, b, c}", 10),
-                getTagsOnComponentsArguments(UTF8String.class, UTF8_STRING, 12),
-                getTagsOnComponentsArguments(RelativeOID.class, RELATIVE_OID, 13),
-                getTagsOnComponentsArguments(SequenceType.class, "SEQUENCE {a NULL}", 16),
-                getTagsOnComponentsArguments(SequenceOfType.class, "SEQUENCE OF BOOLEAN", 16),
-                getTagsOnComponentsArguments(SetType.class, "SET {a NULL}", 17),
-                getTagsOnComponentsArguments(SetOfType.class, "SET OF BOOLEAN", 17),
-                getTagsOnComponentsArguments(NumericString.class, NUMERIC_STRING, 18),
-                getTagsOnComponentsArguments(PrintableString.class, PRINTABLE_STRING, 19),
-                getTagsOnComponentsArguments(TeletexString.class, TELETEX_STRING, 20),
-                getTagsOnComponentsArguments(T61String.class, T61_STRING, 20),
-                getTagsOnComponentsArguments(VideotexString.class, VIDEOTEX_STRING, 21),
-                getTagsOnComponentsArguments(IA5String.class, IA5_STRING, 22),
-                getTagsOnComponentsArguments(UTCTime.class, UTC_TIME, 23),
-                getTagsOnComponentsArguments(GeneralizedTime.class, GENERALIZED_TIME, 24),
-                getTagsOnComponentsArguments(GraphicString.class, GRAPHIC_STRING, 25),
-                getTagsOnComponentsArguments(VisibleString.class, VISIBLE_STRING, 26),
-                getTagsOnComponentsArguments(ISO646String.class, ISO646_STRING, 26),
-                getTagsOnComponentsArguments(GeneralString.class, GENERAL_STRING, 27),
-                getTagsOnComponentsArguments(UniversalString.class, UNIVERSAL_STRING, 28),
-                getTagsOnComponentsArguments(BMPString.class, BMP_STRING, 30),
-                getTagsOnComponentsArguments(IRI.class, OID_IRI, 35),
-                getTagsOnComponentsArguments(RelativeIRI.class, RELATIVE_OID_IRI, 36)
-        );
-    }
-
-    private static Arguments getTagsOnComponentsArguments(Class<? extends Type> type, String typeName, int tag) {
-        return Arguments.of(type, typeName, new TagId(Clazz.UNIVERSAL, tag),
-                "Test tag on %s component".formatted(typeName));
-    }
-
-    private static Arguments getTagsOnComponentsArguments(Class<? extends Type> type, TypeName typeName, int tag) {
-        return getTagsOnComponentsArguments(type, typeName.toString(), tag);
+        return TYPE_RECORDS.stream().map(t -> Arguments.of(t.type, t.typeName, t.tag,
+                "Test tag on %s component".formatted(t.typeName)));
     }
 
     private static Stream<Arguments> provideCustomTagsOnComponentsExplicit() {
@@ -4079,124 +4156,37 @@ class CompilerImplTest {
     }
 
     private static Stream<Arguments> provideValueFromObject() {
-        return Stream.of(
-                getValueFromObjectArguments(BOOLEAN, "TRUE", BooleanValue.class,
-                        value -> assertEquals(true, value.getValue())),
-                getValueFromObjectArguments(INTEGER, "23", IntegerValue.class,
-                        value -> assertEquals(23, value.getValue().longValue())),
-                getValueFromObjectArguments(BIT_STRING, "'1011'B", BitStringValue.class,
-                        value -> assertArrayEquals(new byte[] { 0x0b }, value.getByteValue())),
-                getValueFromObjectArguments(OCTET_STRING, "'0A'H", OctetStringValue.class,
-                        value -> assertArrayEquals(new byte[] { 0x0a }, value.getByteValue())),
-                getValueFromObjectArguments(NULL, "NULL", NullValue.class, value -> {
-                }),
-                getValueFromObjectArguments(OBJECT_IDENTIFIER, "{1 2 3 27}", ObjectIdentifierValue.class,
-                        value -> assertEquals(Arrays.asList(1, 2, 3, 27), value.getComponents().stream()
-                                .map(c -> c.getId()).collect(Collectors.toList()))),
-                getValueFromObjectArguments(REAL, "1.2e5", RealValue.class,
-                        value -> assertEquals(120000, value.getValue().longValue())),
-                getValueFromObjectArguments("ENUMERATED {a, b, c}", "c", EnumeratedValue.class,
-                        value -> assertEquals(2, value.getValue())),
-                getValueFromObjectArguments(UTF8_STRING, "\"äöü\"", UTF8StringValue.class,
-                        value -> assertEquals("äöü", value.getValue())),
-                getValueFromObjectArguments(RELATIVE_OID, "{2 3 27}", RelativeOIDValue.class,
-                        value -> assertEquals(Arrays.asList(2, 3, 27), value.getComponents().stream()
-                                .map(c -> c.getId()).collect(Collectors.toList()))),
-                getValueFromObjectArguments("SEQUENCE {a BOOLEAN}", "{a TRUE}", CollectionValue.class,
-                        value -> assertTrue(value.getValues().stream()
-                                .filter(nv -> nv.getName().equals("a"))
-                                .findAny()
-                                .isPresent())),
-                getValueFromObjectArguments("SEQUENCE OF BOOLEAN", "{TRUE}", CollectionOfValue.class,
-                        value -> assertEquals(1, value.getSize())),
-                getValueFromObjectArguments("SET {a BOOLEAN}", "{a TRUE}", CollectionValue.class,
-                        value -> assertTrue(value.getValues().stream()
-                                .filter(nv -> nv.getName().equals("a"))
-                                .findAny()
-                                .isPresent())),
-                getValueFromObjectArguments("SET OF BOOLEAN", "{TRUE}", CollectionOfValue.class,
-                        value -> assertEquals(1, value.getSize())),
-                getValueFromObjectArguments(NUMERIC_STRING, "\"123\"", NumericStringValue.class,
-                        value -> assertEquals("123", value.getValue())),
-                getValueFromObjectArguments(PRINTABLE_STRING, "\"abc\"", PrintableStringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(TELETEX_STRING, "\"abc\"", TeletexStringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(T61_STRING, "\"abc\"", TeletexStringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(VIDEOTEX_STRING, "\"abc\"", VideotexStringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(IA5_STRING, "\"abc\"", IA5StringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(UTC_TIME, "\"8201021200Z\"", UTCTimeValue.class,
-                        value -> assertEquals("8201021200Z", value.getValue())),
-                getValueFromObjectArguments(GENERALIZED_TIME, "\"19851106210627.3Z\"", GeneralizedTimeValue.class,
-                        value -> assertEquals("19851106210627.3Z", value.getValue())),
-                getValueFromObjectArguments(GRAPHIC_STRING, "\"abc\"", GraphicStringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(VISIBLE_STRING, "\"abc\"", VisibleStringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(ISO646_STRING, "\"abc\"", VisibleStringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(GENERAL_STRING, "\"abc\"", GeneralStringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(UNIVERSAL_STRING, "\"abc\"", UniversalStringValue.class,
-                        value -> assertEquals("abc", value.getValue())),
-                getValueFromObjectArguments(BMP_STRING, "\"äöü\"", BMPStringValue.class,
-                        value -> assertEquals("äöü", value.getValue())),
-                getValueFromObjectArguments(OID_IRI, "\"/iso/a/b/c\"", IRIValue.class,
-                        value -> assertEquals(Arrays.asList("iso", "a", "b", "c"), value.getArcIdentifierTexts())),
-                getValueFromObjectArguments(RELATIVE_OID_IRI, "\"a/b/c\"", RelativeIRIValue.class,
-                        value -> assertEquals(Arrays.asList("a", "b", "c"), value.getArcIdentifierTexts())));
-    }
-
-    private static <V extends Value> Arguments getValueFromObjectArguments(TypeName typeName, String value,
-            Class<V> valueClass, Consumer<V> valueTest) {
-        return Arguments.of(typeName.toString(), value, valueClass, valueTest);
-    }
-
-    private static <V extends Value> Arguments getValueFromObjectArguments(String typeName, String value,
-            Class<V> valueClass, Consumer<V> valueTest) {
-        return Arguments.of(typeName, value, valueClass, valueTest);
+        return TYPE_RECORDS.stream().map(t -> Arguments.of(t.typeName, t.valueClass, t.valueString, t.value,
+                t.valueAccessor, "Test %s with value %s".formatted(t.typeName, t.valueString)));
     }
 
     private static Stream<Arguments> provideSingleTypeConstraint() {
-        return Stream.of(
-                getSingleTypeConstraintArguments(BOOLEAN, "TRUE"),
-                getSingleTypeConstraintArguments(INTEGER, "23"),
-                getSingleTypeConstraintArguments(BIT_STRING, "'1011'B"),
-                getSingleTypeConstraintArguments(OCTET_STRING, "'0A'H"),
-                getSingleTypeConstraintArguments(NULL, "NULL"),
-                getSingleTypeConstraintArguments(OBJECT_IDENTIFIER, "{1 2 3 27}"),
-                getSingleTypeConstraintArguments("ENUMERATED {a, b, c}", "c"),
-                getSingleTypeConstraintArguments(UTF8_STRING, "\"äöü\""),
-                getSingleTypeConstraintArguments(RELATIVE_OID, "{2 3 27}"),
-                getSingleTypeConstraintArguments("SEQUENCE {a BOOLEAN}", "{a TRUE}"),
-                getSingleTypeConstraintArguments("SEQUENCE OF BOOLEAN", "TRUE"),
-                getSingleTypeConstraintArguments("SET {a BOOLEAN}", "{a TRUE}"),
-                getSingleTypeConstraintArguments("SET OF BOOLEAN", "TRUE"),
-                getSingleTypeConstraintArguments(NUMERIC_STRING, "\"123\""),
-                getSingleTypeConstraintArguments(PRINTABLE_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(TELETEX_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(T61_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(VIDEOTEX_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(IA5_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(GRAPHIC_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(VISIBLE_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(ISO646_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(GENERAL_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(UNIVERSAL_STRING, "\"abc\""),
-                getSingleTypeConstraintArguments(BMP_STRING, "\"äöü\""),
-                getSingleTypeConstraintArguments(OID_IRI, "\"/iso/a/b/c\""),
-                getSingleTypeConstraintArguments(RELATIVE_OID_IRI, "\"a/b/c\""));
+        return TYPE_RECORDS.stream()
+                .filter(t -> !t.type.equals(Real.class))
+                .filter(t -> !t.type.equals(UTCTime.class))
+                .filter(t -> !t.type.equals(GeneralizedTime.class))
+                .map(t -> switch (t.type.getSimpleName()) {
+                    case "SequenceOfType", "SetOfType" -> Arguments.of(t.typeName, t.valueString.substring(1, t.valueString.length() - 1));
+                    default -> Arguments.of(t.typeName, t.valueString);
+                });
     }
 
-    private static Arguments getSingleTypeConstraintArguments(TypeName typeName, String value) {
-        return Arguments.of(typeName.toString(), value);
-    }
+    static record TypeRecord<V extends Value, O extends java.lang.Object>(Class<? extends Type> type, String typeName,
+                                                                          TagId tag, Class<V> valueClass,
+                                                                          String valueString, O value,
+                                                                          Function<V, O> valueAccessor) {
 
-    private static Arguments getSingleTypeConstraintArguments(String typeName, String value) {
-        return Arguments.of(typeName, value);
+        public TypeRecord(Class<? extends Type> type, TypeName typeName, int tag, Class<V> valueClass,
+                String valueString, O value, Function<V, O> valueAccessor) {
+            this(type, typeName.getName(), new TagId(Clazz.UNIVERSAL, tag), valueClass, valueString, value,
+                    valueAccessor);
+        }
+
+        public TypeRecord(Class<? extends Type> type, String typeName, int tag,
+                Class<V> valueClass, String valueString, O value, Function<V, O> valueAccessor) {
+            this(type, typeName, new TagId(Clazz.UNIVERSAL, tag), valueClass, valueString, value, valueAccessor);
+        }
+
     }
 
 }
