@@ -94,6 +94,7 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
@@ -632,6 +633,51 @@ public class CompilerContext {
         }
 
         throw new IllegalCompilerStateException("The type %s is not expected", type.getClass().getSimpleName());
+    }
+
+    public CompiledType resolveTypeFromObject(TypeFromObjects type) {
+        var referencedObjects = type.getReference();
+
+        if (!(referencedObjects instanceof ObjectReference)) {
+            var formattedType = TypeFormatter.formatType(this, type);
+
+            throw new IllegalCompilerStateException(type.getPosition(), "%s contains an invalid object reference",
+                    formattedType);
+        }
+
+        var objectReference = (ObjectReference) referencedObjects;
+        var compiledObject = getCompiledObject(objectReference);
+        var objectDefinition = compiledObject.getObjectDefinition();
+        var fieldNames = type.getField().getPrimitiveFieldNames();
+        Object resolvedType = null;
+
+        for (var fieldName : fieldNames) {
+            var fieldReference = fieldName.getReference();
+
+            if (!fieldName.isTypeFieldReference() || objectDefinition == null ||
+                    !objectDefinition.containsKey(fieldReference)) {
+                var formattedType = TypeFormatter.formatType(this, type);
+
+                throw new CompilerException(fieldName.getPosition(), "%s in %s doesn't refer to a type",
+                        fieldName.getReference(), formattedType);
+            }
+
+            resolvedType = objectDefinition.get(fieldReference);
+
+            if (resolvedType instanceof Map) {
+                objectDefinition = (Map<String, Object>) resolvedType;
+            } else {
+                objectDefinition = null;
+            }
+        }
+
+        if (!(resolvedType instanceof CompiledType)) {
+            var formattedType = TypeFormatter.formatType(this, type);
+
+            throw new CompilerException(type.getPosition(), "%s doesn't refer to a value", formattedType);
+        }
+
+        return (CompiledType) resolvedType;
     }
 
     public CompiledType getCompiledType(SimpleDefinedType simpleDefinedType) {

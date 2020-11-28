@@ -1639,6 +1639,25 @@ class CompilerImplTest {
     }
 
     @Test
+    void testTypeFromObject() throws IOException, ParserException {
+        var body = """
+                    TEST ::= CLASS {
+                      &Type
+                    }
+
+                    object TEST ::= {
+                      &Type BOOLEAN
+                    }
+
+                    Type ::= object.&Type
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Type");
+
+        assertTrue(compiledType.getType() instanceof BooleanType);
+    }
+
+    @Test
     void testValueFromObjectWithNestedObjects() throws IOException, ParserException {
         var body = """
                 TEST1 ::= CLASS {
