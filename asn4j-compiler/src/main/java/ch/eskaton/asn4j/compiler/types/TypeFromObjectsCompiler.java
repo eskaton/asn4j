@@ -43,7 +43,7 @@ public class TypeFromObjectsCompiler implements NamedCompiler<TypeFromObjects, C
             Optional<Parameters> maybeParameters) {
         var compiledTypeFromObject = ctx.resolveTypeFromObject(node);
         var type = compiledTypeFromObject.getType();
-        var tags = CompilerUtils.getTagIds(ctx, type);
+        var tags = CompilerUtils.getTagIds(ctx, node, type);
         var compiledType = ctx.createCompiledType(type, name);
 
         compiledType.setTags(tags);
