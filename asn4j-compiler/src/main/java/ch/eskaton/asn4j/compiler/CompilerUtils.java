@@ -52,6 +52,7 @@ import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
@@ -206,9 +207,24 @@ public class CompilerUtils {
         return tags.stream().map(CompilerUtils::toTagId).collect(Collectors.toList());
     }
 
+    public static List<TagId> getTagIds(CompilerContext ctx, TypeFromObjects node, Type type) {
+        var typeTags = new ArrayList<>(toTagIds(node.getTags()));
+        var taggingModes = getTaggingModes(ctx.getModule(), node);
+
+        typeTags.addAll(toTagIds(type.getTags()));
+        taggingModes.addAll(getTaggingModes(ctx.getModule(), type));
+
+        return getTagIds(ctx, type, typeTags, taggingModes);
+    }
+
     public static List<TagId> getTagIds(CompilerContext ctx, Type type) {
         var typeTags = new ArrayList<>(toTagIds(type.getTags()));
         var taggingModes = getTaggingModes(ctx.getModule(), type);
+
+        return getTagIds(ctx, type, typeTags, taggingModes);
+    }
+
+    private static LinkedList<TagId> getTagIds(CompilerContext ctx, Type type, ArrayList<TagId> typeTags, List<TaggingMode> taggingModes) {
         var tags = new LinkedList<TagId>();
         var explicit = true;
 

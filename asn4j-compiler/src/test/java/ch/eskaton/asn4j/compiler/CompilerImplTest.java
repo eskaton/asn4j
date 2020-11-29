@@ -1639,25 +1639,6 @@ class CompilerImplTest {
     }
 
     @Test
-    void testTypeFromObject() throws IOException, ParserException {
-        var body = """
-                    TEST ::= CLASS {
-                      &Type
-                    }
-
-                    object TEST ::= {
-                      &Type BOOLEAN
-                    }
-
-                    Type ::= object.&Type
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Type");
-
-        assertTrue(compiledType.getType() instanceof BooleanType);
-    }
-
-    @Test
     void testValueFromObjectWithNestedObjects() throws IOException, ParserException {
         var body = """
                 TEST1 ::= CLASS {
@@ -1730,6 +1711,50 @@ class CompilerImplTest {
                 """;
 
         testModule(body, CompilerException.class, ".*&test doesn't refer to an object class.*");
+    }
+
+    @Test
+    void testTypeFromObject() throws IOException, ParserException {
+        var body = """
+                    TEST ::= CLASS {
+                      &Type
+                    }
+
+                    object TEST ::= {
+                      &Type BOOLEAN
+                    }
+
+                    Type ::= object.&Type
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Type");
+
+        assertTrue(compiledType.getType() instanceof BooleanType);
+    }
+
+    @Test
+    void testTaggedTypeFromObject() throws IOException, ParserException {
+        var body = """
+                    TEST ::= CLASS {
+                      &Type
+                    }
+
+                    object TEST ::= {
+                      &Type BOOLEAN
+                    }
+
+                    Type ::= [17] object.&Type
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Type");
+
+        assertTrue(compiledType.getType() instanceof BooleanType);
+
+        var maybeTags = compiledType.getTags();
+
+        assertTrue(maybeTags.isPresent());
+
+        assertEquals(List.of(new TagId(Clazz.CONTEXT_SPECIFIC, 17), new TagId(Clazz.UNIVERSAL, 1)), maybeTags.get());
     }
 
     @Test
