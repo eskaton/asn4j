@@ -279,64 +279,14 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
             var field = maybeField.get();
 
             if (field instanceof CompiledFixedTypeValueField) {
-                if (setting.getValue().isEmpty()) {
-                    var formattedNode = Formatter.format(ctx, setting);
-
-                    throw new CompilerException(setting.getPosition(), "Invalid value: %s", formattedNode);
-                }
-
-                var compiledField = (CompiledFixedTypeValueField) field;
-                var compiledType = compiledField.getCompiledType();
-                var value = setting.getValue().get();
-                Value resolvedValue;
-
-                if (value instanceof DefinedValue) {
-                    resolvedValue = ctx.getCompiledValue(compiledType.getType(), value, maybeParameters).getValue();
-                } else {
-                    var type = compiledType.getType();
-
-                    resolvedValue = ctx.getValue(type, value);
-                }
-
-                return Tuple2.of(reference, resolvedValue);
+                return compileFixedTypeValueField((CompiledFixedTypeValueField) field, reference, setting,
+                        maybeParameters);
             } else if (field instanceof CompiledTypeField) {
-                if (setting.getType().isEmpty()) {
-                    var formattedNode = Formatter.format(ctx, setting);
-
-                    throw new CompilerException(setting.getPosition(), "Invalid type: %s", formattedNode);
-                }
-
-                var type = setting.getType().get();
-
-                return Tuple2.of(reference, ctx.getCompiledType(type));
+                return compileTypeField(setting, reference);
             } else if (field instanceof CompiledVariableTypeValueField) {
-                if (setting.getValue().isEmpty()) {
-                    var formattedNode = Formatter.format(ctx, setting);
-
-                    throw new CompilerException(setting.getPosition(), "Invalid value: %s", formattedNode);
-                }
-
-                var value = setting.getValue().get();
-
-                return Tuple2.of(reference, value);
+                return compileVariableTypeValueField(setting, reference);
             } else if (field instanceof CompiledObjectField) {
-                Map<String, Object> object;
-
-                if (setting.getValue().isPresent() &&
-                        setting.getValue().get() instanceof SimpleDefinedValue simpleDefinedValue) {
-                    object = ctx.getCompiledObject(toObjectReference(simpleDefinedValue)).getObjectDefinition();
-                } else if (setting.getObject().isPresent() &&
-                        setting.getObject().get() instanceof ObjectDefnNode objectDefnNode) {
-                    var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
-
-                    object = compiler.compile(((CompiledObjectField) field).getObjectClass(), objectDefnNode,
-                            maybeParameters);
-                } else {
-                    throw new IllegalCompilerStateException(setting.getPosition(), "Unsupported setting: %s",
-                            setting.getClass().getSimpleName());
-                }
-
-                return Tuple2.of(reference, object);
+                return compileObjectField((CompiledObjectField) field, reference, setting, maybeParameters);
             } else {
                 throw new IllegalCompilerStateException("Unsupported field of type %s",
                         field.getClass().getSimpleName());
@@ -344,6 +294,75 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         } else {
             throw new CompilerException(fieldName.getPosition(), "Invalid reference %s", reference);
         }
+    }
+
+    private Tuple2<String, Object> compileObjectField(CompiledObjectField field, String reference, Setting setting,
+            Optional<Parameters> maybeParameters) {
+        Map<String, Object> object;
+
+        if (setting.getValue().isPresent() &&
+                setting.getValue().get() instanceof SimpleDefinedValue simpleDefinedValue) {
+            object = ctx.getCompiledObject(toObjectReference(simpleDefinedValue)).getObjectDefinition();
+        } else if (setting.getObject().isPresent() &&
+                setting.getObject().get() instanceof ObjectDefnNode objectDefnNode) {
+            var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
+
+            object = compiler.compile(field.getObjectClass(), objectDefnNode,
+                    maybeParameters);
+        } else {
+            throw new IllegalCompilerStateException(setting.getPosition(), "Unsupported setting: %s",
+                    setting.getClass().getSimpleName());
+        }
+
+        return Tuple2.of(reference, object);
+    }
+
+    private Tuple2<String, Object> compileVariableTypeValueField(Setting setting, String reference) {
+        if (setting.getValue().isEmpty()) {
+            var formattedNode = Formatter.format(ctx, setting);
+
+            throw new CompilerException(setting.getPosition(), "Invalid value: %s", formattedNode);
+        }
+
+        var value = setting.getValue().get();
+
+        return Tuple2.of(reference, value);
+    }
+
+    private Tuple2<String, Object> compileTypeField(Setting setting, String reference) {
+        if (setting.getType().isEmpty()) {
+            var formattedNode = Formatter.format(ctx, setting);
+
+            throw new CompilerException(setting.getPosition(), "Invalid type: %s", formattedNode);
+        }
+
+        var type = setting.getType().get();
+
+        return Tuple2.of(reference, ctx.getCompiledType(type));
+    }
+
+    private Tuple2<String, Object> compileFixedTypeValueField(CompiledFixedTypeValueField field, String reference,
+            Setting setting, Optional<Parameters> maybeParameters) {
+        if (setting.getValue().isEmpty()) {
+            var formattedNode = Formatter.format(ctx, setting);
+
+            throw new CompilerException(setting.getPosition(), "Invalid value: %s", formattedNode);
+        }
+
+        var compiledField = field;
+        var compiledType = compiledField.getCompiledType();
+        var value = setting.getValue().get();
+        Value resolvedValue;
+
+        if (value instanceof DefinedValue) {
+            resolvedValue = ctx.getCompiledValue(compiledType.getType(), value, maybeParameters).getValue();
+        } else {
+            var type = compiledType.getType();
+
+            resolvedValue = ctx.getValue(type, value);
+        }
+
+        return Tuple2.of(reference, resolvedValue);
     }
 
     private ObjectReference toObjectReference(SimpleDefinedValue simpleDefinedValue) {
