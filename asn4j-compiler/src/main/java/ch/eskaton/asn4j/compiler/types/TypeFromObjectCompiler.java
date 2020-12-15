@@ -41,7 +41,7 @@ public class TypeFromObjectsCompiler implements NamedCompiler<TypeFromObjects, C
     @Override
     public CompiledType compile(CompilerContext ctx, String name, TypeFromObjects node,
             Optional<Parameters> maybeParameters) {
-        var compiledTypeFromObject = ctx.resolveTypeFromObject(node);
+        var compiledTypeFromObject = ctx.resolveTypeFromObject(node, maybeParameters);
         var type = compiledTypeFromObject.getType();
         var tags = CompilerUtils.getTagIds(ctx, node, type);
         var compiledType = ctx.createCompiledType(type, name);

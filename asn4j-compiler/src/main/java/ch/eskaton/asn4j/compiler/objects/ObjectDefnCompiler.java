@@ -39,6 +39,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
+import ch.eskaton.asn4j.compiler.types.TypeFromObjectsCompiler;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
@@ -55,6 +56,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.Setting;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -282,7 +284,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 return compileFixedTypeValueField((CompiledFixedTypeValueField) field, reference, setting,
                         maybeParameters);
             } else if (field instanceof CompiledTypeField) {
-                return compileTypeField(setting, reference);
+                return compileTypeField(setting, reference, maybeParameters);
             } else if (field instanceof CompiledVariableTypeValueField) {
                 return compileVariableTypeValueField(setting, reference);
             } else if (field instanceof CompiledObjectField) {
@@ -329,7 +331,8 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         return Tuple2.of(reference, value);
     }
 
-    private Tuple2<String, Object> compileTypeField(Setting setting, String reference) {
+    private Tuple2<String, Object> compileTypeField(Setting setting, String reference,
+            Optional<Parameters> maybeParameters) {
         if (setting.getType().isEmpty()) {
             var formattedNode = Formatter.format(ctx, setting);
 
@@ -337,6 +340,10 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         }
 
         var type = setting.getType().get();
+
+        if (type instanceof TypeFromObjects typeFromObjects) {
+            return Tuple2.of(reference, new TypeFromObjectsCompiler().compile(ctx, null, typeFromObjects, maybeParameters));
+        }
 
         return Tuple2.of(reference, ctx.getCompiledType(type));
     }

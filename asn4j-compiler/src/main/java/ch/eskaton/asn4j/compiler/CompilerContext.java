@@ -65,6 +65,7 @@ import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.DummyGovernor;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
+import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.Governor;
 import ch.eskaton.asn4j.parser.ast.ImportNode;
@@ -403,6 +404,20 @@ public class CompilerContext {
         return false;
     }
 
+    protected boolean isObjectParameter(Parameters parameters, ParameterNode definition,
+            ObjectReference objectReference) {
+        var reference = objectReference.getReference();
+        var paramGovernor = definition.getGovernor();
+
+        if (reference.equals(definition.getReference().getName())) {
+            var objectClass = getParameterObjectClass(parameters, paramGovernor);
+
+            return objectClass != null && definition.getReference().getName().equals(reference);
+        }
+
+        return false;
+    }
+
     private CompiledObjectClass getParameterObjectClass(Parameters parameters, ParamGovernorNode paramGovernor) {
         Node objectClass = null;
 
@@ -635,7 +650,7 @@ public class CompilerContext {
         throw new IllegalCompilerStateException("The type %s is not expected", type.getClass().getSimpleName());
     }
 
-    public CompiledType resolveTypeFromObject(TypeFromObjects type) {
+    public CompiledType resolveTypeFromObject(TypeFromObjects type, Optional<Parameters> maybeParameters) {
         var referencedObjects = type.getReference();
 
         if (!(referencedObjects instanceof ObjectReference)) {
@@ -646,7 +661,7 @@ public class CompilerContext {
         }
 
         var objectReference = (ObjectReference) referencedObjects;
-        var compiledObject = getCompiledObject(objectReference);
+        var compiledObject = getCompiledObject(objectReference, maybeParameters);
         var objectDefinition = compiledObject.getObjectDefinition();
         var fieldNames = type.getField().getPrimitiveFieldNames();
         Object resolvedType = null;
@@ -769,13 +784,56 @@ public class CompilerContext {
      */
     public CompiledObject getCompiledObject(ObjectReference objectReference) {
         var reference = objectReference.getReference();
+        var maybeModuleName = CompilerUtils.toExternalObjectReference(objectReference)
+                .map(ExternalObjectReference::getModule);
 
-        return getCompiledObject(reference);
+        if (maybeModuleName.isEmpty()) {
+            return getCompiledObject(reference);
+        }
+
+        return getCompiledObject(maybeModuleName.get(), reference);
+    }
+
+    public CompiledObject getCompiledObject(ObjectReference objectReference,
+            Optional<Parameters> maybeParameters) {
+        var maybeModuleName = CompilerUtils.toExternalObjectReference(objectReference)
+                .map(ExternalObjectReference::getModule);
+
+        if (maybeModuleName.isPresent() || maybeParameters.isEmpty()) {
+            return getCompiledObject(objectReference);
+        }
+
+        var parameters = maybeParameters.get();
+        var maybeParameter = parameters.getDefinitionsAndValues().stream().
+                filter(tuple -> isObjectParameter(parameters, tuple.get_1(), objectReference))
+                .findAny();
+
+        if (maybeParameter.isPresent()) {
+            var node = maybeParameter.get().get_2();
+
+            if (!(node instanceof SimpleDefinedValue)) {
+                throw new CompilerException(node.getPosition(), "Expected an object but found: %s", node);
+            }
+
+            var parameter = maybeParameter.get().get_1();
+
+            parameters.markAsUsed(parameter);
+
+            return getCompiledObject(((SimpleDefinedValue) node).getReference());
+        }
+
+        throw new CompilerException(objectReference.getPosition(), "Failed to resolve object reference: %s",
+                objectReference);
     }
 
     private CompiledObject getCompiledObject(String reference) {
         return getCompilationResult(reference, Optional.empty(), "Object", this::getObjectsOfCurrentModule,
                 compiler::compileObject, this::getObjectsOfModule);
+    }
+
+    public CompiledObject getCompiledObject(String moduleName, String reference) {
+        return getCompilationResult(reference, Optional.of(moduleName), "Object",
+                () -> getObjectsOfModule(moduleName), compiler::compileObject, this::getObjectsOfModule);
     }
 
     /**
