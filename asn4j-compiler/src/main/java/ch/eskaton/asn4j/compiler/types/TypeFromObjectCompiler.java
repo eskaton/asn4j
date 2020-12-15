@@ -32,14 +32,14 @@ import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
 import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
 
 import java.util.Optional;
 
-public class TypeFromObjectsCompiler implements NamedCompiler<TypeFromObjects, CompiledType> {
+public class TypeFromObjectCompiler implements NamedCompiler<TypeFromObject, CompiledType> {
 
     @Override
-    public CompiledType compile(CompilerContext ctx, String name, TypeFromObjects node,
+    public CompiledType compile(CompilerContext ctx, String name, TypeFromObject node,
             Optional<Parameters> maybeParameters) {
         var compiledTypeFromObject = ctx.resolveTypeFromObject(node, maybeParameters);
         var type = compiledTypeFromObject.getType();

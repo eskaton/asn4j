@@ -40,7 +40,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-public class TypeFromObjects extends InformationFromObjects implements Type {
+public class TypeFromObject extends InformationFromObjects implements Type {
 
     private LinkedList<Tag> tags = new LinkedList<>();
 
@@ -50,7 +50,7 @@ public class TypeFromObjects extends InformationFromObjects implements Type {
 
     private EncodingPrefixNode encodingPrefix;
 
-    public TypeFromObjects(Position position, ReferencedObjects reference, FieldNameNode field) {
+    public TypeFromObject(Position position, ReferencedObjects reference, FieldNameNode field) {
         super(position, reference, field);
     }
 

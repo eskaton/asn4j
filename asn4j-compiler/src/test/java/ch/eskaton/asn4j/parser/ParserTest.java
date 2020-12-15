@@ -216,7 +216,7 @@ import ch.eskaton.asn4j.parser.Parser.TypeAssignmentParser;
 import ch.eskaton.asn4j.parser.Parser.TypeConstraintParser;
 import ch.eskaton.asn4j.parser.Parser.TypeConstraintsParser;
 import ch.eskaton.asn4j.parser.Parser.TypeFieldSpecParser;
-import ch.eskaton.asn4j.parser.Parser.TypeFromObjectsParser;
+import ch.eskaton.asn4j.parser.Parser.TypeFromObjectParser;
 import ch.eskaton.asn4j.parser.Parser.TypeOptionalitySpecParser;
 import ch.eskaton.asn4j.parser.Parser.TypeParser;
 import ch.eskaton.asn4j.parser.Parser.TypeSettingParser;
@@ -402,7 +402,7 @@ import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Time;
 import ch.eskaton.asn4j.parser.ast.types.TimeOfDay;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UTF8String;
@@ -1308,7 +1308,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof TypeFromObjects);
+        assertTrue(result instanceof TypeFromObject);
     }
 
     @Test
@@ -6083,7 +6083,7 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result.getElement() instanceof TypeFromObjects);
+        assertTrue(result.getElement() instanceof TypeFromObject);
 
         parser = new Parser(new ByteArrayInputStream(
                 "ObjectSet-Reference {parameter}".getBytes())).new ObjectSetElementsParser();
@@ -6191,7 +6191,7 @@ class ParserTest {
         InformationFromObjects result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof TypeFromObjects);
+        assertTrue(result instanceof TypeFromObject);
         assertNotNull(result.getReference());
         assertNotNull(result.getField());
 
@@ -6221,12 +6221,12 @@ class ParserTest {
     }
 
     @Test
-    void testTypeFromObjectsParser() throws IOException, ParserException {
-        TypeFromObjectsParser parser = new Parser(new ByteArrayInputStream(
+    void testTypeFromObjectParser() throws IOException, ParserException {
+        TypeFromObjectParser parser = new Parser(new ByteArrayInputStream(
                 "object-reference {Object}.&Type-Reference1.&Type-Reference2"
-                        .getBytes())).new TypeFromObjectsParser();
+                        .getBytes())).new TypeFromObjectParser();
 
-        TypeFromObjects result = parser.parse();
+        TypeFromObject result = parser.parse();
 
         assertNotNull(result);
         assertNotNull(result.getReference());

@@ -39,7 +39,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
-import ch.eskaton.asn4j.compiler.types.TypeFromObjectsCompiler;
+import ch.eskaton.asn4j.compiler.types.TypeFromObjectCompiler;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
@@ -56,7 +56,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.Setting;
-import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -341,8 +341,8 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
 
         var type = setting.getType().get();
 
-        if (type instanceof TypeFromObjects typeFromObjects) {
-            return Tuple2.of(reference, new TypeFromObjectsCompiler().compile(ctx, null, typeFromObjects, maybeParameters));
+        if (type instanceof TypeFromObject typeFromObject) {
+            return Tuple2.of(reference, new TypeFromObjectCompiler().compile(ctx, null, typeFromObject, maybeParameters));
         }
 
         return Tuple2.of(reference, ctx.getCompiledType(type));
