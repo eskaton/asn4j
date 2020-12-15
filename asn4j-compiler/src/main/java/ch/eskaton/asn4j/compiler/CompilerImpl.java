@@ -238,11 +238,14 @@ public class CompilerImpl {
         } else if (unknownAssignment instanceof ParameterizedValueAssignmentNode) {
             // ignore values, they are resolved when needed
             return null;
-        } else if (unknownAssignment instanceof ParameterizedValueSetTypeAssignmentNode assignment) {
-            return compileParameterizedValueSetTypeAssignment(assignment);
         } else if (unknownAssignment instanceof ParameterizedObjectAssignmentNode) {
             // ignore objects, they are resolved when needed
             return null;
+        } else if (unknownAssignment instanceof ParameterizedValueOrObjectAssignmentNode) {
+            // ignore values and objects, they are resolved when needed
+            return null;
+        } else if (unknownAssignment instanceof ParameterizedValueSetTypeAssignmentNode assignment) {
+            return compileParameterizedValueSetTypeAssignment(assignment);
         } else if (unknownAssignment instanceof ParameterizedObjectClassAssignmentNode assignment) {
             return compileParameterizedObjectClassAssignment(assignment);
         } else if (unknownAssignment instanceof ParameterizedObjectSetAssignmentNode assignment) {

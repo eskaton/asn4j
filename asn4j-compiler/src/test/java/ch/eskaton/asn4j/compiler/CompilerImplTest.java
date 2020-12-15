@@ -3322,6 +3322,42 @@ class CompilerImplTest {
     }
 
     @Nested
+    @DisplayName("Test object parameters")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class ObjectParameters {
+
+        @Test
+        void testParameterizedObjectWithObjectReference() throws IOException, ParserException {
+            var body = """
+                    TEST1 ::= CLASS {
+                      &Type1 OPTIONAL
+                    }
+
+                    TEST2 ::= CLASS {
+                      &Type2 OPTIONAL
+                    }
+
+                    object1{TEST2:object} TEST1 ::= {
+                       &Type1 object.&Type2
+                    }
+
+                    object2 TEST2 ::= {
+                      &Type2 BOOLEAN
+                    }
+
+                    objectRef TEST1 ::= object1{object2}
+                """;
+
+            var compiledObject = getCompiledObject(body, "objectRef");
+            var compiledType = compiledObject.getObjectDefinition().get("Type1");
+
+            assertTrue(compiledType instanceof CompiledType);
+            assertTrue(((CompiledType) compiledType).getType() instanceof BooleanType);
+        }
+
+    }
+
+    @Nested
     @DisplayName("Test value parameters")
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     class ValueParameters {
