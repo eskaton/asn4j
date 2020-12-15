@@ -199,7 +199,7 @@ import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Time;
 import ch.eskaton.asn4j.parser.ast.types.TimeOfDay;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTCTime;
 import ch.eskaton.asn4j.parser.ast.types.UTF8String;
@@ -491,7 +491,7 @@ public class Parser {
     private TypeConstraintParser typeConstraintParser = new TypeConstraintParser();
     private TypeConstraintsParser typeConstraintsParser = new TypeConstraintsParser();
     private TypeFieldSpecParser typeFieldSpecParser = new TypeFieldSpecParser();
-    private TypeFromObjectsParser typeFromObjectsParser = new TypeFromObjectsParser();
+    private TypeFromObjectParser typeFromObjectParser = new TypeFromObjectParser();
     private TypeOptionalitySpecParser typeOptionalitySpecParser = new TypeOptionalitySpecParser();
     private TypeOrNamedTypeParser typeOrNamedTypeParser = new TypeOrNamedTypeParser();
     private TypeParser typeParser = new TypeParser();
@@ -3182,7 +3182,7 @@ public class Parser {
         @SuppressWarnings("unchecked")
         public Type parse() throws ParserException {
             return new ChoiceParser<>(usefulTypeParser,
-                    typeFromObjectsParser /* incl. ValueSetFromObjects */,
+                    typeFromObjectParser /* incl. ValueSetFromObjects */,
                     parameterizedTypeParser, externalTypeReferenceParser
                     /* incl. ParameterizedValueSetType */, typeReferenceParser,
                     selectionTypeParser).parse();
@@ -4917,7 +4917,7 @@ public class Parser {
 
         @SuppressWarnings("unchecked")
         public InformationFromObjects parse() throws ParserException {
-            return new ChoiceParser<>(typeFromObjectsParser, valueFromObjectParser).parse();
+            return new ChoiceParser<>(typeFromObjectParser, valueFromObjectParser).parse();
         }
 
     }
@@ -4926,16 +4926,16 @@ public class Parser {
     // TypeFromObject ::= ReferencedObjects "." FieldName
     // ObjectFromObject ::= ReferencedObjects "." FieldName
     // ObjectSetFromObjects ::= ReferencedObjects "." FieldName
-    protected class TypeFromObjectsParser extends ListRuleParser<TypeFromObjects> {
+    protected class TypeFromObjectParser extends ListRuleParser<TypeFromObject> {
 
-        public TypeFromObjects parse() throws ParserException {
+        public TypeFromObject parse() throws ParserException {
             return super.parse(new SequenceParser(referencedObjectsParser, TokenType.DOT, fieldNameParser),
                     a -> {
                         PrimitiveFieldNameNode lastField = a.<FieldNameNode>n2().getPrimitiveFieldNames()
                                 .get(a.<FieldNameNode>n2().getPrimitiveFieldNames().size() - 1);
 
                         if (!(lastField.isValueFieldReference())) {
-                            return new TypeFromObjects(a.P(), a.n0(), a.n2());
+                            return new TypeFromObject(a.P(), a.n0(), a.n2());
                         }
 
                         return null;

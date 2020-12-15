@@ -95,7 +95,7 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
@@ -650,7 +650,7 @@ public class CompilerContext {
         throw new IllegalCompilerStateException("The type %s is not expected", type.getClass().getSimpleName());
     }
 
-    public CompiledType resolveTypeFromObject(TypeFromObjects type, Optional<Parameters> maybeParameters) {
+    public CompiledType resolveTypeFromObject(TypeFromObject type, Optional<Parameters> maybeParameters) {
         var referencedObjects = type.getReference();
 
         if (!(referencedObjects instanceof ObjectReference)) {

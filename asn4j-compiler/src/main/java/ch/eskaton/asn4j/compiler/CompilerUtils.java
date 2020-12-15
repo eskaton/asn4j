@@ -52,7 +52,7 @@ import ch.eskaton.asn4j.parser.ast.types.OpenType;
 import ch.eskaton.asn4j.parser.ast.types.SelectionType;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.TypeFromObjects;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.AmbiguousValue;
@@ -207,7 +207,7 @@ public class CompilerUtils {
         return tags.stream().map(CompilerUtils::toTagId).collect(Collectors.toList());
     }
 
-    public static List<TagId> getTagIds(CompilerContext ctx, TypeFromObjects node, Type type) {
+    public static List<TagId> getTagIds(CompilerContext ctx, TypeFromObject node, Type type) {
         var typeTags = new ArrayList<>(toTagIds(node.getTags()));
         var taggingModes = getTaggingModes(ctx.getModule(), node);
 
