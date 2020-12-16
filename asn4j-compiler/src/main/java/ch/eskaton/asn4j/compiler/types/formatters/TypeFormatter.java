@@ -57,6 +57,7 @@ import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.T61String;
 import ch.eskaton.asn4j.parser.ast.types.TeletexString;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.types.UTF8String;
 import ch.eskaton.asn4j.parser.ast.types.UniversalString;
@@ -129,6 +130,7 @@ public class TypeFormatter {
         addCase(BMPString.class, new DefaultTypeFormatter<BMPString>(BMP_STRING)::format);
         addCase(TypeReference.class, new TypeReferenceFormatter()::format);
         addCase(NamedType.class, new NamedTypeFormatter()::format);
+        addCase(TypeFromObject.class, new TypeFromObjectFormatter()::format);
     }
 
     static {
@@ -162,6 +164,7 @@ public class TypeFormatter {
         addNameCase(BMPString.class, new DefaultTypeFormatter<BMPString>(BMP_STRING)::getTypeName);
         addNameCase(TypeReference.class, new TypeReferenceFormatter()::getTypeName);
         addNameCase(NamedType.class, new NamedTypeFormatter()::getTypeName);
+        addNameCase(TypeFromObject.class, new TypeFromObjectFormatter()::getTypeName);
     }
 
     private TypeFormatter() {
