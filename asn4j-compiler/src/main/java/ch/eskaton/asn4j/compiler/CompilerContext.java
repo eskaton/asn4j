@@ -38,6 +38,7 @@ import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.objects.ObjectClassNodeCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectNodeCompiler;
+import ch.eskaton.asn4j.compiler.objects.ObjectSetCompiler;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
