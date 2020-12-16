@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.values;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
@@ -39,7 +40,7 @@ import java.util.Optional;
 
 public class SimpleDefinedValue extends DefinedValue implements ParameterizedNode {
 
-    private Optional<List<Node>> parameters = Optional.empty();
+    private Optional<List<ActualParameter>> parameters = Optional.empty();
 
     protected SimpleDefinedValue() {
         super();
@@ -49,15 +50,15 @@ public class SimpleDefinedValue extends DefinedValue implements ParameterizedNod
         super(position, value);
     }
 
-    public void setParameters(List<Node> parameters) {
+    public void setParameters(List<ActualParameter> parameters) {
         this.parameters = Optional.ofNullable(parameters);
     }
 
-    public Optional<List<Node>> getParameters() {
+    public Optional<List<ActualParameter>> getParameters() {
         return parameters;
     }
 
-    public SimpleDefinedValue parameters(List<Node> parameters) {
+    public SimpleDefinedValue parameters(List<ActualParameter> parameters) {
         setParameters(parameters);
 
         return this;

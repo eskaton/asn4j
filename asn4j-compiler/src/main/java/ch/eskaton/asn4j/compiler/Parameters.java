@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.parser.ast.AbstractNode;
+import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.runtime.utils.ToString;
@@ -48,11 +49,11 @@ public class Parameters {
 
     private final List<ParameterNode> definitions;
 
-    private final List<Node> values;
+    private final List<ActualParameter> values;
 
     private final Set<ParameterNode> usedParameters = new HashSet<>();
 
-    public Parameters(String parameterizedName, List<ParameterNode> definitions, List<Node> values) {
+    public Parameters(String parameterizedName, List<ParameterNode> definitions, List<ActualParameter> values) {
         if (definitions.size() != values.size()) {
             throw new IllegalCompilerStateException(
                     "Size of parameter definitions (%d) and parameter values (%d) don't match",
@@ -72,22 +73,22 @@ public class Parameters {
         return definitions;
     }
 
-    public List<Node> getValues() {
+    public List<ActualParameter> getValues() {
         return values;
     }
 
-    public Parameters values(List<Node> values) {
+    public Parameters values(List<ActualParameter> values) {
         return new Parameters(parameterizedName, definitions, values);
     }
 
-    public List<Tuple2<ParameterNode, Node>> getDefinitionsAndValues() {
+    public List<Tuple2<ParameterNode, ActualParameter>> getDefinitionsAndValues() {
         var definitionsStream = getDefinitions().stream();
         var valuesStream = getValues().stream();
 
         return StreamsUtils.zip(definitionsStream, valuesStream).collect(Collectors.toList());
     }
 
-    public Optional<Tuple2<ParameterNode, Node>> getDefinitionAndValue(String parameterName) {
+    public Optional<Tuple2<ParameterNode, ActualParameter>> getDefinitionAndValue(String parameterName) {
         var definitionsStream = getDefinitions().stream();
         var valuesStream = getValues().stream();
 

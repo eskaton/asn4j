@@ -28,19 +28,53 @@
 package ch.eskaton.asn4j.parser.ast;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 
 import java.util.Objects;
 import java.util.Optional;
 
-public class ValueSetOrObjectSet extends AbstractNode {
+public class ActualParameter extends AbstractNode {
+
+    private Optional<Type> type = Optional.empty();
+
+    private Optional<Value> value = Optional.empty();
+
+    private Optional<ObjectNode> object = Optional.empty();
 
     private Optional<ElementSetSpecsNode> elementSetSpecs = Optional.empty();
 
     private Optional<ObjectSetSpecNode> objectSetSpec = Optional.empty();
 
-    public ValueSetOrObjectSet(Position position) {
+    private Optional<ObjectClassReference> objectClassReference = Optional.empty();
+
+    public ActualParameter(Position position) {
         super(position);
+    }
+
+    public Optional<Type> getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = Optional.ofNullable(type);
+    }
+
+    public void setValue(Value value) {
+        this.value = Optional.ofNullable(value);
+    }
+
+    public Optional<Value> getValue() {
+        return value;
+    }
+
+    public void setObject(ObjectNode object) {
+        this.object = Optional.ofNullable(object);
+    }
+
+    public Optional<ObjectNode> getObject() {
+        return object;
     }
 
     public void setElementSetSpecs(ElementSetSpecsNode elementSetSpecs) {
@@ -59,6 +93,14 @@ public class ValueSetOrObjectSet extends AbstractNode {
         return objectSetSpec;
     }
 
+    public Optional<ObjectClassReference> getObjectClassReference() {
+        return objectClassReference;
+    }
+
+    public void setObjectClassReference(ObjectClassReference objectClassReference) {
+        this.objectClassReference = Optional.ofNullable(objectClassReference);
+    }
+
     @Override
     public String toString() {
         return ToString.get(this);
@@ -74,15 +116,19 @@ public class ValueSetOrObjectSet extends AbstractNode {
             return false;
         }
 
-        ValueSetOrObjectSet that = (ValueSetOrObjectSet) o;
+        ActualParameter that = (ActualParameter) o;
 
-        return Objects.equals(elementSetSpecs, that.elementSetSpecs) &&
-                Objects.equals(objectSetSpec, that.objectSetSpec);
+        return Objects.equals(type, that.type) &&
+                Objects.equals(value, that.value) &&
+                Objects.equals(object, that.object) &&
+                Objects.equals(elementSetSpecs, that.elementSetSpecs) &&
+                Objects.equals(objectSetSpec, that.objectSetSpec) &&
+                Objects.equals(objectClassReference, that.objectClassReference);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(elementSetSpecs, objectSetSpec);
+        return Objects.hash(type, value, object, elementSetSpecs, objectSetSpec, objectClassReference);
     }
 
 }

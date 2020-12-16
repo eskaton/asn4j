@@ -36,7 +36,7 @@ public class ObjectClassReference extends ObjectClassNode implements Parameteriz
 
     private String reference;
 
-    private Optional<List<Node>> parameters = Optional.empty();
+    private Optional<List<ActualParameter>> parameters = Optional.empty();
 
     public ObjectClassReference(Position position, String reference) {
         super(position);
@@ -48,15 +48,15 @@ public class ObjectClassReference extends ObjectClassNode implements Parameteriz
         return reference;
     }
 
-    public void setParameters(List<Node> parameters) {
+    public void setParameters(List<ActualParameter> parameters) {
         this.parameters = Optional.ofNullable(parameters);
     }
 
-    public Optional<List<Node>> getParameters() {
+    public Optional<List<ActualParameter>> getParameters() {
         return parameters;
     }
 
-    public ObjectClassReference parameters(List<Node> parameters) {
+    public ObjectClassReference parameters(List<ActualParameter> parameters) {
         setParameters(parameters);
 
         return this;

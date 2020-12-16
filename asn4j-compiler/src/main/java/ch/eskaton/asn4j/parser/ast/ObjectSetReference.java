@@ -36,7 +36,7 @@ public class ObjectSetReference extends ReferencedObjects implements Parameteriz
 
     private String reference;
 
-    private Optional<List<Node>> parameters = Optional.empty();
+    private Optional<List<ActualParameter>> parameters = Optional.empty();
 
     public ObjectSetReference(Position position, String reference) {
         super(position);
@@ -44,15 +44,15 @@ public class ObjectSetReference extends ReferencedObjects implements Parameteriz
         this.reference = reference;
     }
 
-    public void setParameters(List<Node> parameters) {
+    public void setParameters(List<ActualParameter> parameters) {
         this.parameters = Optional.ofNullable(parameters);
     }
 
-    public Optional<List<Node>> getParameters() {
+    public Optional<List<ActualParameter>> getParameters() {
         return parameters;
     }
 
-    public ObjectSetReference parameters(List<Node> parameters) {
+    public ObjectSetReference parameters(List<ActualParameter> parameters) {
         setParameters(parameters);
 
         return this;

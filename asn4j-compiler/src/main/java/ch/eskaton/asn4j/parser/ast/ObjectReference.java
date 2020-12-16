@@ -36,7 +36,7 @@ public class ObjectReference extends ReferencedObjects implements ParameterizedN
 
     private String reference;
 
-    private Optional<List<Node>> parameters = Optional.empty();
+    private Optional<List<ActualParameter>> parameters = Optional.empty();
 
     public ObjectReference(Position position, String reference) {
         super(position);
@@ -44,15 +44,15 @@ public class ObjectReference extends ReferencedObjects implements ParameterizedN
         this.reference = reference;
     }
 
-    public void setParameters(List<Node> parameters) {
+    public void setParameters(List<ActualParameter> parameters) {
         this.parameters = Optional.ofNullable(parameters);
     }
 
-    public Optional<List<Node>> getParameters() {
+    public Optional<List<ActualParameter>> getParameters() {
         return parameters;
     }
 
-    public ObjectReference parameters(List<Node> parameters) {
+    public ObjectReference parameters(List<ActualParameter> parameters) {
         setParameters(parameters);
 
         return this;
