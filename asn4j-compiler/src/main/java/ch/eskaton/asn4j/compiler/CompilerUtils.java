@@ -539,9 +539,10 @@ public class CompilerUtils {
      */
     public static Parameters updateParameters(Parameters inputParameters, Parameters outputParameters) {
         var parameterValues = outputParameters.getDefinitionsAndValues().stream().map(definitionAndValue -> {
-            var parameterValue = definitionAndValue.get_2();
+            var actualParameter = definitionAndValue.get_2();
+            var maybeType = actualParameter.getType();
 
-            if (parameterValue instanceof TypeReference paramReference) {
+            if (maybeType.isPresent() && maybeType.get() instanceof TypeReference paramReference) {
                 var paramReferenceName = paramReference.getType();
                 var maybeParameter = inputParameters.getDefinitionAndValue(paramReferenceName);
 

@@ -28,6 +28,7 @@
 package ch.eskaton.asn4j.parser.ast.types;
 
 import ch.eskaton.asn4j.parser.Position;
+import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
 
@@ -41,7 +42,7 @@ public class SimpleDefinedType extends AbstractType implements ParameterizedNode
 
     private String type;
 
-    private Optional<List<Node>> parameters = Optional.empty();
+    private Optional<List<ActualParameter>> parameters = Optional.empty();
 
     public SimpleDefinedType(Position position, String moduleName, String type) {
         super(position);
@@ -59,15 +60,15 @@ public class SimpleDefinedType extends AbstractType implements ParameterizedNode
         return type;
     }
 
-    public void setParameters(List<Node> parameters) {
+    public void setParameters(List<ActualParameter> parameters) {
         this.parameters = Optional.ofNullable(parameters);
     }
 
-    public Optional<List<Node>> getParameters() {
+    public Optional<List<ActualParameter>> getParameters() {
         return parameters;
     }
 
-    public SimpleDefinedType parameters(List<Node> parameters) {
+    public SimpleDefinedType parameters(List<ActualParameter> parameters) {
         setParameters(parameters);
 
         return this;

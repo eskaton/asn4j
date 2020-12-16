@@ -37,7 +37,6 @@ import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.objects.ObjectClassNodeCompiler;
-import ch.eskaton.asn4j.compiler.objects.ObjectDefnCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectNodeCompiler;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
@@ -75,7 +74,6 @@ import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
-import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
@@ -83,7 +81,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
-import ch.eskaton.asn4j.parser.ast.ValueSetOrObjectSet;
+import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
@@ -273,11 +271,14 @@ public class CompilerContext {
         if (maybeParameter.isPresent()) {
             var parameter = maybeParameter.get();
             var node = parameter.get_2();
+            var maybeType = node.getType();
 
-            if (node instanceof Type typeNode) {
+            if (maybeType.isPresent()) {
+                var type = maybeType.get();
+
                 parameters.markAsUsed(parameter.get_1());
 
-                return Optional.of(typeNode);
+                return Optional.of(type);
             }
         }
 
@@ -300,30 +301,35 @@ public class CompilerContext {
 
             parameterValue = handleNull(parameters, parameterDefinition, parameterValue);
 
-            if (parameterValue instanceof Value value) {
-                var governor = parameterDefinition.getGovernor();
-                var expectedType = getParameterType(parameters, governor);
+            if (parameterValue instanceof ActualParameter actualParameter) {
+                var maybeValue = actualParameter.getValue();
 
-                if (expectedType == null) {
-                    var formattedValue = ValueFormatter.formatValue(value);
+                if (maybeValue.isPresent()) {
+                    var value = maybeValue.get();
+                    var governor = parameterDefinition.getGovernor();
+                    var expectedType = getParameterType(parameters, governor);
 
-                    throw new CompilerException(governor.getPosition(),
-                            "Failed to resolve resolve the type for parameter value: %s", formattedValue);
-                }
+                    if (expectedType == null) {
+                        var formattedValue = ValueFormatter.formatValue(value);
 
-                try {
-                    // verify that the value is of the expected type
-                    getValue(expectedType, value);
+                        throw new CompilerException(governor.getPosition(),
+                                "Failed to resolve resolve the type for parameter value: %s", formattedValue);
+                    }
 
-                    parameters.markAsUsed(parameterDefinition);
+                    try {
+                        // verify that the value is of the expected type
+                        getValue(expectedType, value);
 
-                    return Optional.of(value);
-                } catch (ValueResolutionException e) {
-                    var formattedType = TypeFormatter.formatType(this, expectedType);
-                    var formattedValue = ValueFormatter.formatValue(value);
+                        parameters.markAsUsed(parameterDefinition);
 
-                    throw new CompilerException(parameterValue.getPosition(),
-                            "Expected a value of type %s but found: %s", formattedType, formattedValue);
+                        return Optional.of(value);
+                    } catch (ValueResolutionException e) {
+                        var formattedType = TypeFormatter.formatType(this, expectedType);
+                        var formattedValue = ValueFormatter.formatValue(value);
+
+                        throw new CompilerException(parameterValue.getPosition(),
+                                "Expected a value of type %s but found: %s", formattedType, formattedValue);
+                    }
                 }
             }
         }
@@ -340,13 +346,21 @@ public class CompilerContext {
      * @param parameterValue      The parameter value
      * @return The original parameter value or a null value if the governor is a null type
      */
-    private Node handleNull(Parameters parameters, ParameterNode parameterDefinition, Node parameterValue) {
-        if (parameterValue instanceof Null && parameterDefinition.getGovernor() != null) {
+    private ActualParameter handleNull(Parameters parameters, ParameterNode parameterDefinition,
+            ActualParameter parameterValue) {
+        var maybeType = parameterValue.getType();
+
+        if (maybeType.isPresent() && maybeType.get() instanceof Null && parameterDefinition.getGovernor() != null) {
             var governor = parameterDefinition.getGovernor();
             var type = getParameterType(parameters, governor);
 
             if (type instanceof Null) {
-                return new NullValue(parameterValue.getPosition());
+                var position = parameterValue.getPosition();
+                var actualParameter = new ActualParameter(position);
+
+                actualParameter.setValue(new NullValue(position));
+
+                return actualParameter;
             }
         }
 
@@ -373,9 +387,12 @@ public class CompilerContext {
 
         if (maybeParameter.isPresent()) {
             var parameter = maybeParameter.get();
-            var node = parameter.get_2();
+            var actualParameter = parameter.get_2();
+            var maybeObjectClass = actualParameter.getObjectClassReference();
 
-            if (node instanceof ObjectClassNode objectClassNode) {
+            if (maybeObjectClass.isPresent()) {
+                var objectClassNode = maybeObjectClass.get();
+
                 parameters.markAsUsed(parameter.get_1());
 
                 return Optional.of(objectClassNode);
@@ -818,12 +835,15 @@ public class CompilerContext {
 
             parameters.markAsUsed(parameter);
 
-            if (node instanceof SimpleDefinedValue) {
-                return getCompiledObject(((SimpleDefinedValue) node).getReference());
-            } else if (node instanceof ObjectNode objectNode) {
-                var compiler = this.<ObjectNode, ObjectNodeCompiler>getCompiler(ObjectNode.class);
+            if (node instanceof ActualParameter actualParameter) {
+                Optional<ObjectNode> maybeObject = actualParameter.getObject();
 
-                return compiler.compile(this, null, compiledObjectClass, objectNode, maybeParameters);
+                if (maybeObject.isPresent()) {
+                    var object = maybeObject.get();
+                    var compiler = this.<ObjectNode, ObjectNodeCompiler>getCompiler(ObjectNode.class);
+
+                    return compiler.compile(this, null, compiledObjectClass, object, maybeParameters);
+                }
             }
 
             throw new CompilerException(node.getPosition(), "Expected an object but found: %s", node);
@@ -904,12 +924,12 @@ public class CompilerContext {
         if (maybeParameter.isPresent()) {
             var node = maybeParameter.get().get_2();
 
-            if (!(node instanceof ValueSetOrObjectSet maybeObjectSet) ||
+            if (!(node instanceof ActualParameter maybeObjectSet) ||
                     maybeObjectSet.getObjectSetSpec().isEmpty()) {
                 throw new CompilerException(node.getPosition(), "Expected an object set but found: %s", node);
             }
 
-            var valueSetOrObjectSet = (ValueSetOrObjectSet) node;
+            var valueSetOrObjectSet = (ActualParameter) node;
             var elementSetSpecs = valueSetOrObjectSet.getObjectSetSpec().get();
             var parameter = maybeParameter.get().get_1();
             var compiledObjectClass = getParameterObjectClass(parameters, parameter.getGovernor());

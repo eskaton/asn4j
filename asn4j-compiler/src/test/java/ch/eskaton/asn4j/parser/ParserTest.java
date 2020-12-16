@@ -328,7 +328,7 @@ import ch.eskaton.asn4j.parser.ast.UserDefinedConstraint;
 import ch.eskaton.asn4j.parser.ast.UserDefinedConstraintParam;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueOrObjectAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ValueSetOrObjectSet;
+import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ValueSetTypeOrObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.VariableTypeValueFieldSpecNode;
@@ -6870,10 +6870,15 @@ class ParserTest {
         assertEquals("Type", result.getType());
         assertTrue(result.getParameters().isPresent());
 
-        List<Node> parameters = result.getParameters().get();
+        List<ActualParameter> parameters = result.getParameters().get();
+
 
         assertEquals(1, parameters.size());
-        assertTrue(parameters.get(0) instanceof IntegerType);
+
+        var maybeType = parameters.get(0).getType();
+
+        assertTrue(maybeType.isPresent());
+        assertTrue(maybeType.get() instanceof IntegerType);
 
         parser = new Parser(new ByteArrayInputStream("Type {4711}".getBytes())).new ParameterizedTypeParser();
 
@@ -6888,7 +6893,11 @@ class ParserTest {
         parameters = result.getParameters().get();
 
         assertEquals(1, parameters.size());
-        assertTrue(parameters.get(0) instanceof IntegerValue);
+
+        var maybeValue = parameters.get(0).getValue();
+
+        assertTrue(maybeValue.isPresent());
+        assertTrue(maybeValue.get() instanceof IntegerValue);
 
         parser = new Parser(new ByteArrayInputStream("Type {a}".getBytes())).new ParameterizedTypeParser();
 
@@ -6903,7 +6912,10 @@ class ParserTest {
         parameters = result.getParameters().get();
 
         assertEquals(1, parameters.size());
-        assertTrue(parameters.get(0) instanceof SimpleDefinedValue);
+
+        maybeValue = parameters.get(0).getValue();
+
+        assertTrue(maybeValue.get() instanceof SimpleDefinedValue);
     }
 
     @Test
@@ -7045,13 +7057,19 @@ class ParserTest {
         ActualParameterParser parser = new Parser(new ByteArrayInputStream(
                 "CustomString {VisibleString}".getBytes())).new ActualParameterParser();
 
-        Node result = parser.parse();
+        ActualParameter result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof TypeReference);
-        assertNotNull(((TypeReference) result).getParameters());
-        assertTrue(((TypeReference) result).getParameters().isPresent());
-        assertEquals(1, ((TypeReference) result).getParameters().get().size());
+
+        var maybeType = result.getType();
+
+        assertTrue(maybeType.isPresent());
+        assertTrue(maybeType.get() instanceof TypeReference);
+
+        var maybeParameters = ((TypeReference) maybeType.get()).getParameters();
+
+        assertTrue(maybeParameters.isPresent());
+        assertEquals(1, maybeParameters.get().size());
 
         parser = new Parser(new ByteArrayInputStream(
                 "Object {OBJECT-CLASS.&Type({ObjectSet})}".getBytes())).new ActualParameterParser();
@@ -7059,31 +7077,40 @@ class ParserTest {
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof TypeReference);
-        assertNotNull(((TypeReference) result).getParameters());
-        assertTrue(((TypeReference) result).getParameters().isPresent());
-        assertEquals(1, ((TypeReference) result).getParameters().get().size());
-        assertTrue(((TypeReference) result).getParameters().get().get(0) instanceof ObjectClassFieldType);
-        assertTrue(((ObjectClassFieldType) ((TypeReference) result)
-                .getParameters().get().get(0)).hasConstraint());
+
+        maybeType = result.getType();
+
+        assertTrue(maybeType.isPresent());
+        assertTrue(maybeType.get() instanceof TypeReference);
+
+        maybeParameters = ((TypeReference) maybeType.get()).getParameters();
+
+        assertTrue(maybeParameters.isPresent());
+        assertEquals(1, maybeParameters.get().size());
+
+        maybeType = maybeParameters.get().get(0).getType();
+
+        assertTrue(maybeType.isPresent());
+        assertTrue(maybeType.get() instanceof ObjectClassFieldType);
+        assertTrue(maybeType.get().hasConstraint());
 
         parser = new Parser(new ByteArrayInputStream("{1 | 2}".getBytes())).new ActualParameterParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ValueSetOrObjectSet);
-        assertTrue(((ValueSetOrObjectSet) result).getElementSetSpecs().isPresent());
-        assertTrue(((ValueSetOrObjectSet) result).getObjectSetSpec().isEmpty());
+        assertTrue(result instanceof ActualParameter);
+        assertTrue(result.getElementSetSpecs().isPresent());
+        assertTrue(result.getObjectSetSpec().isEmpty());
 
         parser = new Parser(new ByteArrayInputStream("{{&id 1} | {&id 2}}".getBytes())).new ActualParameterParser();
 
         result = parser.parse();
 
         assertNotNull(result);
-        assertTrue(result instanceof ValueSetOrObjectSet);
-        assertTrue(((ValueSetOrObjectSet) result).getElementSetSpecs().isEmpty());
-        assertTrue(((ValueSetOrObjectSet) result).getObjectSetSpec().isPresent());
+        assertTrue(result instanceof ActualParameter);
+        assertTrue(result.getElementSetSpecs().isEmpty());
+        assertTrue(result.getObjectSetSpec().isPresent());
 
         parser = new Parser(new ByteArrayInputStream("{Reference}".getBytes())).new ActualParameterParser();
 
@@ -7091,9 +7118,9 @@ class ParserTest {
 
         assertNotNull(result);
 
-        assertTrue(result instanceof ValueSetOrObjectSet);
-        assertTrue(((ValueSetOrObjectSet) result).getElementSetSpecs().isPresent());
-        assertTrue(((ValueSetOrObjectSet) result).getObjectSetSpec().isPresent());
+        assertTrue(result instanceof ActualParameter);
+        assertTrue(result.getElementSetSpecs().isPresent());
+        assertTrue(result.getObjectSetSpec().isPresent());
     }
 
     private <T extends Value> void testAmbiguousValue(Object value, Class<T> valueClass) {

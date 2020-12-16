@@ -81,7 +81,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
 import ch.eskaton.asn4j.parser.ast.Setting;
-import ch.eskaton.asn4j.parser.ast.ValueSetOrObjectSet;
+import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
@@ -519,7 +519,6 @@ public class Parser {
     private ValueSetOptionalitySpecParser valueSetOptionalitySpecParser = new ValueSetOptionalitySpecParser();
     private ObjectSetOptionalitySpecParser objectSetOptionalitySpecParser = new ObjectSetOptionalitySpecParser();
     private ValueSetParser valueSetParser = new ValueSetParser();
-    private ValueSetOrObjectSetParser valueSetOrObjectSetParser = new ValueSetOrObjectSetParser();
     private ValueSetTypeAssignmentParser valueSetTypeAssignmentParser = new ValueSetTypeAssignmentParser();
     private VariableTypeValueFieldSpecParser variableTypeValueFieldSpecParser = new VariableTypeValueFieldSpecParser();
     private VariableTypeValueSetFieldSpecParser variableTypeValueSetFieldSpecParser = new VariableTypeValueSetFieldSpecParser();
@@ -5479,28 +5478,27 @@ public class Parser {
     protected class ActualParameterParser implements RuleParser<Node> {
 
         @SuppressWarnings("unchecked")
-        public Node parse() throws ParserException {
-            return new ChoiceParser<>(typeParser, valueParser, valueSetOrObjectSetParser, objectParser,
-                    definedObjectClassParser).parse();
-        }
-
-    }
-
-    //  ValueSet | ObjectSet
-    protected class ValueSetOrObjectSetParser implements RuleParser<Node> {
-
-        public Node parse() throws ParserException {
-            Set<SetSpecsNode> rules = new AmbiguousChoiceParser<>(valueSetParser, objectSetParser).parse();
-            Optional<SetSpecsNode> first = rules.stream().findFirst();
+        public ActualParameter parse() throws ParserException {
+            Set<Node> rules = new AmbiguousChoiceParser<>(typeParser, valueParser, objectParser, valueSetParser,
+                    objectSetParser, definedObjectClassParser).parse();
+            Optional<Node> first = rules.stream().findFirst();
 
             if (first.isPresent()) {
-                ValueSetOrObjectSet rule = new ValueSetOrObjectSet(first.get().getPosition());
+                ActualParameter rule = new ActualParameter(first.get().getPosition());
 
-                for (SetSpecsNode node : rules) {
-                    if (node instanceof ElementSetSpecsNode elementSetSpecs) {
+                for (Node node : rules) {
+                    if (node instanceof Type type) {
+                        rule.setType(type);
+                    } else if (node instanceof Value value) {
+                        rule.setValue(value);
+                    } else if (node instanceof ObjectNode object) {
+                        rule.setObject(object);
+                    } else if (node instanceof ElementSetSpecsNode elementSetSpecs) {
                         rule.setElementSetSpecs(elementSetSpecs);
                     } else if (node instanceof ObjectSetSpecNode objectSetSpec) {
                         rule.setObjectSetSpec(objectSetSpec);
+                    } else if (node instanceof ObjectClassReference objectClassReference) {
+                        rule.setObjectClassReference(objectClassReference);
                     }
                 }
 

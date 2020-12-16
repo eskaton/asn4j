@@ -32,8 +32,8 @@ import java.util.Optional;
 
 public interface ParameterizedNode {
 
-    void setParameters(List<Node> parameters);
+    void setParameters(List<ActualParameter> parameters);
 
-    Optional<List<Node>> getParameters();
+    Optional<List<ActualParameter>> getParameters();
 
 }
