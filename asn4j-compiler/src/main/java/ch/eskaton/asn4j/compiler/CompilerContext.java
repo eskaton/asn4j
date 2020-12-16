@@ -37,6 +37,8 @@ import ch.eskaton.asn4j.compiler.il.BooleanExpression;
 import ch.eskaton.asn4j.compiler.il.Module;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.objects.ObjectClassNodeCompiler;
+import ch.eskaton.asn4j.compiler.objects.ObjectDefnCompiler;
+import ch.eskaton.asn4j.compiler.objects.ObjectNodeCompiler;
 import ch.eskaton.asn4j.compiler.results.CompilationResult;
 import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
@@ -73,6 +75,7 @@ import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
+import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
@@ -810,16 +813,20 @@ public class CompilerContext {
 
         if (maybeParameter.isPresent()) {
             var node = maybeParameter.get().get_2();
-
-            if (!(node instanceof SimpleDefinedValue)) {
-                throw new CompilerException(node.getPosition(), "Expected an object but found: %s", node);
-            }
-
             var parameter = maybeParameter.get().get_1();
+            var compiledObjectClass = getParameterObjectClass(parameters, parameter.getGovernor());
 
             parameters.markAsUsed(parameter);
 
-            return getCompiledObject(((SimpleDefinedValue) node).getReference());
+            if (node instanceof SimpleDefinedValue) {
+                return getCompiledObject(((SimpleDefinedValue) node).getReference());
+            } else if (node instanceof ObjectNode objectNode) {
+                var compiler = this.<ObjectNode, ObjectNodeCompiler>getCompiler(ObjectNode.class);
+
+                return compiler.compile(this, null, compiledObjectClass, objectNode, maybeParameters);
+            }
+
+            throw new CompilerException(node.getPosition(), "Expected an object but found: %s", node);
         }
 
         throw new CompilerException(objectReference.getPosition(), "Failed to resolve object reference: %s",

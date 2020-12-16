@@ -27,21 +27,12 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.ParameterUsageVerifier.Kind;
-import ch.eskaton.asn4j.compiler.objects.ObjectDefnCompiler;
+import ch.eskaton.asn4j.compiler.objects.ObjectNodeCompiler;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
-import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
-import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
-import ch.eskaton.asn4j.parser.ast.ObjectReference;
 
 import java.util.Optional;
-import java.util.function.UnaryOperator;
-
-import static ch.eskaton.asn4j.compiler.CompilerUtils.updateParameters;
-import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
 
 public class ObjectAssignmentCompiler implements Compiler<ObjectAssignmentNode> {
 
@@ -52,61 +43,9 @@ public class ObjectAssignmentCompiler implements Compiler<ObjectAssignmentNode> 
 
         var objectClass = ctx.getCompiledObjectClass(node.getObjectClassReference());
         var object = node.getObject();
+        var compiler = ctx.<ObjectNode, ObjectNodeCompiler>getCompiler(ObjectNode.class);
 
-        return compile(ctx, objectName, objectClass, object, Optional.empty());
-    }
-
-    private CompiledObject compile(CompilerContext ctx, String name, CompiledObjectClass objectClass,
-            ObjectNode object, Optional<Parameters> maybeParameters) {
-        if (object instanceof ObjectDefnNode objectDefnNode) {
-            var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
-            var objectDefinition = compiler.compile(objectClass, objectDefnNode, maybeParameters);
-
-            return ctx.createCompiledObject(name, objectDefinition);
-        } else if (object instanceof ObjectReference objectReference) {
-            var maybeObjRefParameters = objectReference.getParameters();
-
-            if (maybeObjRefParameters.isPresent()) {
-                return compileParameterizedObject(ctx, name, objectClass, objectReference, maybeParameters);
-            }
-
-            var compiledObject = ctx.getCompiledObject(objectReference);
-
-            return ctx.createCompiledObject(name, compiledObject.getObjectDefinition());
-        } else {
-            throw new IllegalCompilerStateException("Node type %s not yet supported", object.getClass().getSimpleName());
-        }
-    }
-
-    protected CompiledObject compileParameterizedObject(CompilerContext ctx, String name,
-            CompiledObjectClass objectClass, ObjectReference objectReference, Optional<Parameters> maybeParameters) {
-        var updateParameters = UnaryOperator.<Parameters>identity();
-
-        if (maybeParameters.isPresent()) {
-            updateParameters = parameters -> updateParameters(maybeParameters.get(), parameters);
-        }
-
-        return getCompileParameterizedObject(ctx, name, objectClass, objectReference, updateParameters);
-    }
-
-    private CompiledObject getCompileParameterizedObject(CompilerContext ctx, String name,
-            CompiledObjectClass objectClass, ObjectReference objectReference,
-            UnaryOperator<Parameters> parametersProvider) {
-        var reference = objectReference.getReference();
-        var maybeModuleName = CompilerUtils.toExternalObjectReference(objectReference)
-                .map(ExternalObjectReference::getModule);
-        var compiledParameterizedObject = maybeModuleName
-                .map(moduleName -> ctx.getCompiledParameterizedObject(moduleName, reference))
-                .orElseGet(() -> ctx.getCompiledParameterizedObject(reference));
-        var parameters = CompilerUtils.createParameters(objectReference, name, compiledParameterizedObject);
-        var updatedParameters = parametersProvider.apply(parameters);
-        var maybeUpdatedParameters = Optional.of(updatedParameters);
-        var object = compiledParameterizedObject.getObject();
-        var compiledObject = compile(ctx, name, objectClass, object, maybeUpdatedParameters);
-
-        checkUnusedParameters(Kind.OBJECT, maybeUpdatedParameters);
-
-        return compiledObject;
+        return compiler.compile(ctx, objectName, objectClass, object, Optional.empty());
     }
 
 }
