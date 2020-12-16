@@ -70,6 +70,7 @@ import ch.eskaton.asn4j.compiler.objects.ObjectDefnCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectFieldSpecNodeCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectIdentifierCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectNodeCompiler;
+import ch.eskaton.asn4j.compiler.objects.ObjectSetCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectSetFieldSpecNodeCompiler;
 import ch.eskaton.asn4j.compiler.objects.TypeFieldSpecNodeCompiler;
 import ch.eskaton.asn4j.compiler.objects.TypeIdentifierObjectClassReferenceNodeCompiler;

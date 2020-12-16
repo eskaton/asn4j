@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.objects.ObjectSetCompiler;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;

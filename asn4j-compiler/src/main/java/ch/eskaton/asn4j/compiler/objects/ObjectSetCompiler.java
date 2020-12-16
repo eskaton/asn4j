@@ -25,8 +25,12 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.objects;
 
+import ch.eskaton.asn4j.compiler.Compiler;
+import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.Parameters;
 import ch.eskaton.asn4j.compiler.objects.ObjectDefnCompiler;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
