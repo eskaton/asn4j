@@ -69,6 +69,7 @@ import ch.eskaton.asn4j.compiler.objects.ObjectClassReferenceCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectDefnCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectFieldSpecNodeCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectIdentifierCompiler;
+import ch.eskaton.asn4j.compiler.objects.ObjectNodeCompiler;
 import ch.eskaton.asn4j.compiler.objects.ObjectSetFieldSpecNodeCompiler;
 import ch.eskaton.asn4j.compiler.objects.TypeFieldSpecNodeCompiler;
 import ch.eskaton.asn4j.compiler.objects.TypeIdentifierObjectClassReferenceNodeCompiler;
@@ -165,6 +166,7 @@ import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectFieldSpecNode;
+import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
@@ -417,6 +419,7 @@ public class TypeConfiguration {
         types.add(new TypeDefinition<>(ObjectFieldSpecNode.class, new ObjectFieldSpecNodeCompiler()));
         types.add(new TypeDefinition<>(ObjectSetFieldSpecNode.class, new ObjectSetFieldSpecNodeCompiler()));
         types.add(new TypeDefinition<>(ObjectDefnNode.class, new ObjectDefnCompiler(ctx)));
+        types.add(new TypeDefinition<>(ObjectNode.class, new ObjectNodeCompiler()));
         // assignments
         types.add(new TypeDefinition<>(TypeAssignmentNode.class, new TypeAssignmentCompiler()));
         types.add(new TypeDefinition<>(ValueAssignmentNode.class, new ValueAssignmentCompiler()));
