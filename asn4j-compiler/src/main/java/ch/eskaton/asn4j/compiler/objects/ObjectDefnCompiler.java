@@ -272,8 +272,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
     }
 
     private Tuple2<String, Object> compile(CompiledObjectClass objectClass, Optional<Parameters> maybeParameters,
-            Setting setting,
-            PrimitiveFieldNameNode fieldName) {
+            Setting setting, PrimitiveFieldNameNode fieldName) {
         var reference = fieldName.getReference();
         var maybeField = objectClass.getField(reference);
 
