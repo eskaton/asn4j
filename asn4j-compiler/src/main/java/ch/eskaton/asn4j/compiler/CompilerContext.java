@@ -64,6 +64,7 @@ import ch.eskaton.asn4j.compiler.values.ValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ParserException;
+import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.DummyGovernor;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
@@ -82,7 +83,6 @@ import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
-import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.constraints.Constraint;
 import ch.eskaton.asn4j.parser.ast.types.BitString;
 import ch.eskaton.asn4j.parser.ast.types.CollectionOfType;
@@ -266,7 +266,7 @@ public class CompilerContext {
 
     private Optional<Type> getTypeParameter(Parameters parameters, String reference) {
         var maybeParameter = parameters.getDefinitionsAndValues().stream().
-                filter(tuple -> isTypeParameter(tuple.get_1(), reference))
+                filter(tuple -> ParameterPredicates.isTypeParameter(tuple.get_1(), reference))
                 .findAny();
 
         if (maybeParameter.isPresent()) {
@@ -286,13 +286,9 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    protected boolean isTypeParameter(ParameterNode definition, String reference) {
-        return definition.getGovernor() == null && definition.getReference().getName().equals(reference);
-    }
-
     public Optional<Value> getValueParameter(Parameters parameters, SimpleDefinedValue simpleDefinedValue) {
         var maybeParameter = parameters.getDefinitionsAndValues().stream().
-                filter(tuple -> isValueParameter(parameters, tuple.get_1(), simpleDefinedValue))
+                filter(tuple -> ParameterPredicates.isValueParameter(this, parameters, tuple.get_1(), simpleDefinedValue))
                 .findAny();
 
         if (maybeParameter.isPresent()) {
@@ -368,22 +364,9 @@ public class CompilerContext {
         return parameterValue;
     }
 
-    protected boolean isValueParameter(Parameters parameters, ParameterNode definition,
-            SimpleDefinedValue simpleDefinedValue) {
-        var value = simpleDefinedValue.getReference();
-        var paramGovernor = definition.getGovernor();
-        var type = getParameterType(parameters, paramGovernor);
-
-        return paramGovernor != null &&
-                type != null &&
-                !value.isBlank() &&
-                value.toLowerCase().equals(value) &&
-                definition.getReference().getName().equals(value);
-    }
-
     private Optional<ObjectClassNode> getObjectClassParameter(Parameters parameters, String reference) {
         var maybeParameter = parameters.getDefinitionsAndValues().stream().
-                filter(tuple -> isObjectClassParameter(tuple.get_1(), reference))
+                filter(tuple -> ParameterPredicates.isObjectClassParameter(tuple.get_1(), reference))
                 .findAny();
 
         if (maybeParameter.isPresent()) {
@@ -403,43 +386,7 @@ public class CompilerContext {
         return Optional.empty();
     }
 
-    private boolean isObjectClassParameter(ParameterNode definition, String reference) {
-        var paramGovernor = definition.getGovernor();
-
-        return paramGovernor != null &&
-                reference.toUpperCase().equals(reference) &&
-                definition.getReference().getName().equals(reference);
-    }
-
-    protected boolean isObjectSetParameter(Parameters parameters, ParameterNode definition,
-            ObjectSetReference objectSetReference) {
-        var reference = objectSetReference.getReference();
-        var paramGovernor = definition.getGovernor();
-
-        if (reference.equals(definition.getReference().getName())) {
-            var objectClass = getParameterObjectClass(parameters, paramGovernor);
-
-            return objectClass != null && definition.getReference().getName().equals(reference);
-        }
-
-        return false;
-    }
-
-    protected boolean isObjectParameter(Parameters parameters, ParameterNode definition,
-            ObjectReference objectReference) {
-        var reference = objectReference.getReference();
-        var paramGovernor = definition.getGovernor();
-
-        if (reference.equals(definition.getReference().getName())) {
-            var objectClass = getParameterObjectClass(parameters, paramGovernor);
-
-            return objectClass != null && definition.getReference().getName().equals(reference);
-        }
-
-        return false;
-    }
-
-    private CompiledObjectClass getParameterObjectClass(Parameters parameters, ParamGovernorNode paramGovernor) {
+    CompiledObjectClass getParameterObjectClass(Parameters parameters, ParamGovernorNode paramGovernor) {
         Node objectClass = null;
 
         if (paramGovernor instanceof Governor governor) {
@@ -478,7 +425,7 @@ public class CompilerContext {
         return null;
     }
 
-    private Type getParameterType(Parameters parameters, ParamGovernorNode paramGovernor) {
+    Type getParameterType(Parameters parameters, ParamGovernorNode paramGovernor) {
         Node type = null;
 
         if (paramGovernor instanceof Governor governor) {
@@ -826,7 +773,7 @@ public class CompilerContext {
 
         var parameters = maybeParameters.get();
         var maybeParameter = parameters.getDefinitionsAndValues().stream().
-                filter(tuple -> isObjectParameter(parameters, tuple.get_1(), objectReference))
+                filter(tuple -> ParameterPredicates.isObjectParameter(this, parameters, tuple.get_1(), objectReference))
                 .findAny();
 
         if (maybeParameter.isPresent()) {
@@ -837,7 +784,7 @@ public class CompilerContext {
             parameters.markAsUsed(parameter);
 
             if (node instanceof ActualParameter actualParameter) {
-                Optional<ObjectNode> maybeObject = actualParameter.getObject();
+                var maybeObject = actualParameter.getObject();
 
                 if (maybeObject.isPresent()) {
                     var object = maybeObject.get();
@@ -919,7 +866,7 @@ public class CompilerContext {
 
         var parameters = maybeParameters.get();
         var maybeParameter = parameters.getDefinitionsAndValues().stream().
-                filter(tuple -> isObjectSetParameter(parameters, tuple.get_1(), objectSetReference))
+                filter(tuple -> ParameterPredicates.isObjectSetParameter(this, parameters, tuple.get_1(), objectSetReference))
                 .findAny();
 
         if (maybeParameter.isPresent()) {
