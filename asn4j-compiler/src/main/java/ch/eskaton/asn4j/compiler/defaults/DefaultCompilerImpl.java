@@ -29,7 +29,7 @@ package ch.eskaton.asn4j.compiler.defaults;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
-import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.java.JavaUtils;
 import ch.eskaton.asn4j.compiler.java.objs.JavaClass;
 import ch.eskaton.asn4j.compiler.java.objs.JavaDefinedField;

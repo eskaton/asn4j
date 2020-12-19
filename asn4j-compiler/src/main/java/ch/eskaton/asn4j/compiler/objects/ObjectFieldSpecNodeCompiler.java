@@ -31,7 +31,7 @@ import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
-import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.parser.ast.DefaultObjectSpecNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;

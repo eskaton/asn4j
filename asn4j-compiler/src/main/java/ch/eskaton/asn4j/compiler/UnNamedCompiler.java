@@ -27,6 +27,7 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.parser.ast.Node;

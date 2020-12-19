@@ -31,7 +31,8 @@ import ch.eskaton.asn4j.compiler.Compiler;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.parameters.Parameters;
+import ch.eskaton.asn4j.compiler.parameters.ParametersHelper;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
@@ -88,7 +89,7 @@ public abstract class AbstractValueCompiler<V extends Value> implements Compiler
             resolvedValue = ctx.getCompiledValue(moduleName, reference);
         } else if (definedValue instanceof SimpleDefinedValue simpleDefinedValue) {
             if (maybeParameters.isPresent()) {
-                var maybeValue = ctx.getValueParameter(maybeParameters.get(), simpleDefinedValue);
+                var maybeValue = ParametersHelper.getValueParameter(ctx, maybeParameters.get(), simpleDefinedValue);
 
                 if (maybeValue.isPresent()) {
                     resolvedValue = ctx.getCompiledValue(compiledType.getType(), maybeValue.get());

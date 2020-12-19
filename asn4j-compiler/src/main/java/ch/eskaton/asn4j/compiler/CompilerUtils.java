@@ -27,8 +27,9 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.ParameterUsageVerifier.Kind;
+import ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.Kind;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
+import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledParameterizedResult;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledComponent;
@@ -76,7 +77,7 @@ import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
-import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
+import static ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.checkUnusedParameters;
 import static ch.eskaton.asn4j.runtime.TaggingMode.EXPLICIT;
 import static ch.eskaton.asn4j.runtime.TaggingMode.IMPLICIT;
 

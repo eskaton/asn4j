@@ -27,7 +27,7 @@
 package ch.eskaton.asn4j.compiler.constraints.elements;
 
 import ch.eskaton.asn4j.compiler.CompilerContext;
-import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
 import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
 import ch.eskaton.asn4j.compiler.results.CompiledType;

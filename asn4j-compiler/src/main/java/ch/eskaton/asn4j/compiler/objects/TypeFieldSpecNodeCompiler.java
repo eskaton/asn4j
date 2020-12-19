@@ -30,7 +30,7 @@ package ch.eskaton.asn4j.compiler.objects;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
-import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.parser.ast.DefaultTypeSpecNode;
 import ch.eskaton.asn4j.parser.ast.OptionalSpecNode;

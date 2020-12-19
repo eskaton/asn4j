@@ -31,8 +31,8 @@ import ch.eskaton.asn4j.compiler.Compiler;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
-import ch.eskaton.asn4j.compiler.ParameterUsageVerifier;
-import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier;
+import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
@@ -44,7 +44,7 @@ import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 import static ch.eskaton.asn4j.compiler.CompilerUtils.updateParameters;
-import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
+import static ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.checkUnusedParameters;
 
 public class ObjectNodeCompiler implements Compiler<ObjectNode> {
 
