@@ -31,8 +31,8 @@ import ch.eskaton.asn4j.compiler.Clone;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.NamedCompiler;
-import ch.eskaton.asn4j.compiler.ParameterUsageVerifier.Kind;
-import ch.eskaton.asn4j.compiler.Parameters;
+import ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.Kind;
+import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.SimpleDefinedType;
@@ -44,7 +44,7 @@ import java.util.function.UnaryOperator;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.createParameters;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.isAnyTypeReference;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.updateParameters;
-import static ch.eskaton.asn4j.compiler.ParameterUsageVerifier.checkUnusedParameters;
+import static ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.checkUnusedParameters;
 
 public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>
         implements NamedCompiler<T, CompiledType> {

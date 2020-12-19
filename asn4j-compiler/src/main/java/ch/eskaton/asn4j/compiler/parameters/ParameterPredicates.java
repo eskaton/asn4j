@@ -25,12 +25,16 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.compiler.parameters;
 
+import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
+
+import static ch.eskaton.asn4j.compiler.parameters.ParameterGovernorHelper.getParameterObjectClass;
+import static ch.eskaton.asn4j.compiler.parameters.ParameterGovernorHelper.getParameterType;
 
 public class ParameterPredicates {
 
@@ -45,7 +49,7 @@ public class ParameterPredicates {
             SimpleDefinedValue simpleDefinedValue) {
         var value = simpleDefinedValue.getReference();
         var paramGovernor = definition.getGovernor();
-        var type = ctx.getParameterType(parameters, paramGovernor);
+        var type = getParameterType(ctx, parameters, paramGovernor);
 
         return paramGovernor != null &&
                 type != null &&
@@ -62,14 +66,14 @@ public class ParameterPredicates {
                 checkName(definition, reference);
     }
 
-    static boolean isObjectParameter(CompilerContext ctx, Parameters parameters, ParameterNode definition,
+    public static boolean isObjectParameter(CompilerContext ctx, Parameters parameters, ParameterNode definition,
             ObjectReference objectReference) {
         var reference = objectReference.getReference();
 
         return checkNameAndObjectClass(ctx, parameters, definition, reference);
     }
 
-    static boolean isObjectSetParameter(CompilerContext ctx, Parameters parameters, ParameterNode definition,
+    public static boolean isObjectSetParameter(CompilerContext ctx, Parameters parameters, ParameterNode definition,
             ObjectSetReference objectSetReference) {
         var reference = objectSetReference.getReference();
 
@@ -81,7 +85,7 @@ public class ParameterPredicates {
         var paramGovernor = definition.getGovernor();
 
         if (checkName(definition, reference)) {
-            var objectClass = ctx.getParameterObjectClass(parameters, paramGovernor);
+            var objectClass = getParameterObjectClass(ctx, parameters, paramGovernor);
 
             return objectClass != null;
         }
