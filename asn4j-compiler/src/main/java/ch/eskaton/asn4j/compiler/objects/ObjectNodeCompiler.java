@@ -29,10 +29,12 @@ package ch.eskaton.asn4j.compiler.objects;
 
 import ch.eskaton.asn4j.compiler.Compiler;
 import ch.eskaton.asn4j.compiler.CompilerContext;
+import ch.eskaton.asn4j.compiler.CompilerException;
 import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier;
 import ch.eskaton.asn4j.compiler.parameters.Parameters;
+import ch.eskaton.asn4j.compiler.parameters.ParametersHelper;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
@@ -43,8 +45,9 @@ import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.updateParameters;
 import static ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.checkUnusedParameters;
+import static ch.eskaton.asn4j.compiler.parameters.ParametersHelper.createParameters;
+import static ch.eskaton.asn4j.compiler.parameters.ParametersHelper.updateParameters;
 
 public class ObjectNodeCompiler implements Compiler<ObjectNode> {
 
@@ -54,7 +57,7 @@ public class ObjectNodeCompiler implements Compiler<ObjectNode> {
             var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
             var objectDefinition = compiler.compile(objectClass, objectDefnNode, maybeParameters);
 
-            return ctx.createCompiledObject(name, objectDefinition);
+            return ctx.createCompiledObject(name, objectClass, objectDefinition);
         } else if (object instanceof ObjectReference objectReference) {
             var maybeObjRefParameters = objectReference.getParameters();
 
@@ -64,7 +67,15 @@ public class ObjectNodeCompiler implements Compiler<ObjectNode> {
 
             var compiledObject = ctx.getCompiledObject(objectReference);
 
-            return ctx.createCompiledObject(name, compiledObject.getObjectDefinition());
+            if (!objectClass.equals(compiledObject.getObjectClass())) {
+                var formattedObjectReference = ObjectFormatter.formatObjectReference(objectReference);
+
+                throw new CompilerException(object.getPosition(),
+                        "Expected an object of class %s but %s refers to %s", objectClass.getName(),
+                        formattedObjectReference, compiledObject.getObjectClass().getName());
+            }
+
+            return ctx.createCompiledObject(name, compiledObject.getObjectClass(), compiledObject.getObjectDefinition());
         } else {
             throw new IllegalCompilerStateException("Node type %s not yet supported", object.getClass().getSimpleName());
         }
@@ -90,7 +101,7 @@ public class ObjectNodeCompiler implements Compiler<ObjectNode> {
         var compiledParameterizedObject = maybeModuleName
                 .map(moduleName -> ctx.getCompiledParameterizedObject(moduleName, reference))
                 .orElseGet(() -> ctx.getCompiledParameterizedObject(reference));
-        var parameters = CompilerUtils.createParameters(objectReference, name, compiledParameterizedObject);
+        var parameters = createParameters(objectReference, name, compiledParameterizedObject);
         var updatedParameters = parametersProvider.apply(parameters);
         var maybeUpdatedParameters = Optional.of(updatedParameters);
         var object = compiledParameterizedObject.getObject();

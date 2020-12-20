@@ -3330,24 +3330,24 @@ class CompilerImplTest {
         @DisplayName("Test the resolution of an object reference parameter in TypeFromObject")
         void testObjectReferenceParameterInTypeFromObject() throws IOException, ParserException {
             var body = """
-                    TEST1 ::= CLASS {
-                      &Type1 OPTIONAL
-                    }
+                        TEST1 ::= CLASS {
+                          &Type1 OPTIONAL
+                        }
 
-                    TEST2 ::= CLASS {
-                      &Type2 OPTIONAL
-                    }
+                        TEST2 ::= CLASS {
+                          &Type2 OPTIONAL
+                        }
 
-                    object1{TEST2:object} TEST1 ::= {
-                       &Type1 object.&Type2
-                    }
+                        object1{TEST2:object} TEST1 ::= {
+                           &Type1 object.&Type2
+                        }
 
-                    object2 TEST2 ::= {
-                      &Type2 BOOLEAN
-                    }
+                        object2 TEST2 ::= {
+                          &Type2 BOOLEAN
+                        }
 
-                    objectRef TEST1 ::= object1{object2}
-                """;
+                        objectRef TEST1 ::= object1{object2}
+                    """;
 
             var compiledObject = getCompiledObject(body, "objectRef");
             var compiledType = compiledObject.getObjectDefinition().get("Type1");
@@ -3360,26 +3360,57 @@ class CompilerImplTest {
         @DisplayName("Test the resolution of an object parameter in TypeFromObject")
         void testObjectParameterInTypeFromObject() throws IOException, ParserException {
             var body = """
-                    TEST1 ::= CLASS {
-                      &Type1 OPTIONAL
-                    }
+                        TEST1 ::= CLASS {
+                          &Type1 OPTIONAL
+                        }
 
-                    TEST2 ::= CLASS {
-                      &Type2 OPTIONAL
-                    }
+                        TEST2 ::= CLASS {
+                          &Type2 OPTIONAL
+                        }
 
-                    object1{TEST2:object} TEST1 ::= {
-                       &Type1 object.&Type2
-                    }
+                        object1{TEST2:object} TEST1 ::= {
+                           &Type1 object.&Type2
+                        }
 
-                    objectRef TEST1 ::= object1{{&Type2 BOOLEAN}}
-                """;
+                        objectRef TEST1 ::= object1{{&Type2 BOOLEAN}}
+                    """;
 
             var compiledObject = getCompiledObject(body, "objectRef");
             var compiledType = compiledObject.getObjectDefinition().get("Type1");
 
             assertTrue(compiledType instanceof CompiledType);
             assertTrue(((CompiledType) compiledType).getType() instanceof BooleanType);
+        }
+
+        @Test
+        @DisplayName("Test the resolution of an object reference parameter of wrong object class")
+        void testObjectReferenceParameterOfWrongObjectClass() {
+            var body = """
+                        TEST1 ::= CLASS {
+                          &Type1 OPTIONAL
+                        }
+
+                        TEST2 ::= CLASS {
+                          &Type2 OPTIONAL
+                        }
+
+                        object1{TEST2:object} TEST1 ::= {
+                           &Type1 object.&Type2
+                        }
+
+                        object2 TEST2 ::= {
+                          &Type2 BOOLEAN
+                        }
+
+                        object3 TEST1 ::= {
+                          &Type1 INTEGER
+                        }
+
+                        objectRef TEST1 ::= object1{object3}
+                    """;
+
+            testModule(body, CompilerException.class,
+                    ".*Expected an object of class TEST2 but object3 refers to TEST1.*");
         }
 
     }

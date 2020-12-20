@@ -36,15 +36,22 @@ public class CompiledObject implements CompilationResult {
 
     private String name;
 
+    private CompiledObjectClass objectClass;
+
     private final Map<String, Object> objectDefinition;
 
-    public CompiledObject(String name, Map<String, Object> objectDefinition) {
+    public CompiledObject(String name, CompiledObjectClass objectClass, Map<String, Object> objectDefinition) {
         this.name = name;
+        this.objectClass = objectClass;
         this.objectDefinition = objectDefinition;
     }
 
     public String getName() {
         return name;
+    }
+
+    public CompiledObjectClass getObjectClass() {
+        return objectClass;
     }
 
     public Map<String, Object> getObjectDefinition() {
@@ -69,12 +76,13 @@ public class CompiledObject implements CompilationResult {
         CompiledObject that = (CompiledObject) o;
 
         return Objects.equals(name, that.name) &&
+                Objects.equals(objectClass, that.objectClass) &&
                 Objects.equals(objectDefinition, that.objectDefinition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, objectDefinition);
+        return Objects.hash(name, objectClass, objectDefinition);
     }
 
 }

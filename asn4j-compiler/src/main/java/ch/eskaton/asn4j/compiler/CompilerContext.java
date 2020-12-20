@@ -1231,8 +1231,9 @@ public class CompilerContext {
         return compiledObjectSet;
     }
 
-    public CompiledObject createCompiledObject(String name, Map<String, Object> objectDefinition) {
-        var compiledObject = new CompiledObject(name, objectDefinition);
+    public CompiledObject createCompiledObject(String name, CompiledObjectClass objectClass,
+            Map<String, Object> objectDefinition) {
+        var compiledObject = new CompiledObject(name, objectClass, objectDefinition);
 
         addObject(name, compiledObject);
 

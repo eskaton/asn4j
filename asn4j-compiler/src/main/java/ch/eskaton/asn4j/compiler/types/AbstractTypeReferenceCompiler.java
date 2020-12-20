@@ -41,9 +41,9 @@ import ch.eskaton.asn4j.parser.ast.types.Type;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-import static ch.eskaton.asn4j.compiler.CompilerUtils.createParameters;
+import static ch.eskaton.asn4j.compiler.parameters.ParametersHelper.createParameters;
 import static ch.eskaton.asn4j.compiler.CompilerUtils.isAnyTypeReference;
-import static ch.eskaton.asn4j.compiler.CompilerUtils.updateParameters;
+import static ch.eskaton.asn4j.compiler.parameters.ParametersHelper.updateParameters;
 import static ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.checkUnusedParameters;
 
 public abstract class AbstractTypeReferenceCompiler<T extends SimpleDefinedType>

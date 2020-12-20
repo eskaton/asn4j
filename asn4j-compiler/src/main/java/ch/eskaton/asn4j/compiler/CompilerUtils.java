@@ -30,22 +30,18 @@ package ch.eskaton.asn4j.compiler;
 import ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.Kind;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
 import ch.eskaton.asn4j.compiler.parameters.Parameters;
-import ch.eskaton.asn4j.compiler.results.AbstractCompiledParameterizedResult;
+import ch.eskaton.asn4j.compiler.parameters.ParametersHelper;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReference;
-import ch.eskaton.asn4j.parser.ast.HasPosition;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectSetReference;
-import ch.eskaton.asn4j.parser.ast.ParameterNode;
-import ch.eskaton.asn4j.parser.ast.ParameterizedNode;
-import ch.eskaton.asn4j.parser.ast.ReferenceNode;
 import ch.eskaton.asn4j.parser.ast.types.ClassType;
 import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
@@ -78,6 +74,8 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import static ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.checkUnusedParameters;
+import static ch.eskaton.asn4j.compiler.parameters.ParametersHelper.createParameters;
+import static ch.eskaton.asn4j.compiler.parameters.ParametersHelper.updateParameters;
 import static ch.eskaton.asn4j.runtime.TaggingMode.EXPLICIT;
 import static ch.eskaton.asn4j.runtime.TaggingMode.IMPLICIT;
 
@@ -512,85 +510,6 @@ public class CompilerUtils {
         checkUnusedParameters(Kind.TYPE, maybeUpdatedParameters);
 
         return compiledType;
-    }
-
-    /**
-     * Substitutes references in the output parameters with the values of matching input parameters.
-     * <p/>
-     * In the following example Type1 of AbstractSet1 is the output parameter and its associated value is the reference
-     * Type2. The input parameter is Type2 of AbstractSet2 with the value BOOLEAN. The method substitutes the reference
-     * Type2 in the output with the Value BOOLEAN from the input, because the reference matches the input parameters
-     * name.
-     *
-     * <pre>
-     *  Set ::= AbstractSet2 {BOOLEAN}
-     *
-     *  AbstractSet1 {Type1} ::= SET {
-     *      field Type1
-     *  }
-     *
-     *  AbstractSet2 {Type2} ::= SET {
-     *      COMPONENTS OF AbstractSet1 {Type2}
-     *  }
-     * </pre>
-     *
-     * @param inputParameters  Input parameters
-     * @param outputParameters Output parameters
-     * @return Updated parameters
-     */
-    public static Parameters updateParameters(Parameters inputParameters, Parameters outputParameters) {
-        var parameterValues = outputParameters.getDefinitionsAndValues().stream().map(definitionAndValue -> {
-            var actualParameter = definitionAndValue.get_2();
-            var maybeType = actualParameter.getType();
-
-            if (maybeType.isPresent() && maybeType.get() instanceof TypeReference paramReference) {
-                var paramReferenceName = paramReference.getType();
-                var maybeParameter = inputParameters.getDefinitionAndValue(paramReferenceName);
-
-                if (maybeParameter.isPresent()) {
-                    var parameter = maybeParameter.get();
-
-                    definitionAndValue.set_2(parameter.get_2());
-                    inputParameters.markAsUsed(parameter.get_1());
-                }
-            }
-
-            return definitionAndValue.get_2();
-        }).collect(Collectors.toList());
-
-        return outputParameters.values(parameterValues);
-    }
-
-    /**
-     * Matches the parameter definitions to the actual parameters of the reference and wraps them in a
-     * parameters object.
-     *
-     * @param node                A reference
-     * @param name                Name of the object that is being compiled
-     * @param parameterizedResult The compiled parameterized result
-     * @return A parameters object
-     */
-    public static <T extends HasPosition & ParameterizedNode> Parameters createParameters(T node, String name,
-            AbstractCompiledParameterizedResult parameterizedResult) {
-        var maybeParameterValues = node.getParameters();
-        var parameterizedTypeName = parameterizedResult.getName();
-        var parameterDefinitions = parameterizedResult.getParameters();
-        var parameterValues = maybeParameterValues.orElse(List.of());
-        var parameterValuesCount = parameterValues.size();
-        var parameterDefinitionsCount = parameterDefinitions.size();
-
-        if (parameterValuesCount != parameterDefinitionsCount) {
-            var parameterNames = parameterDefinitions.stream()
-                    .map(ParameterNode::getReference)
-                    .map(ReferenceNode::getName)
-                    .collect(Collectors.joining(", "));
-
-            throw new CompilerException(node.getPosition(),
-                    "'%s' passes %d parameters but '%s' expects: %s",
-                    name, parameterValuesCount, parameterizedTypeName, parameterNames);
-        }
-
-        return new Parameters(parameterizedTypeName, parameterDefinitions, parameterValues);
     }
 
 }
