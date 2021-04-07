@@ -74,7 +74,26 @@ public class CompilerTestUtils {
         var exception = TestUtils.assertThrows(
                 () -> new CompilerImpl(compilerConfig(moduleName), moduleSource).run(), expected);
 
-        exception.ifPresent(e -> assertThat(rootCause(e).getMessage(), MatchesPattern.matchesPattern(message)));
+        exception.ifPresent(e -> assertException(message, e));
+    }
+
+    private static void assertException(String message, Throwable th) {
+        var matcher = MatchesPattern.matchesPattern(message);
+        var rootCause = th;
+
+        do {
+            if (matcher.matches(rootCause.getMessage())) {
+                return;
+            }
+
+            if (rootCause.getCause() != null && rootCause.getCause() != rootCause) {
+                rootCause = rootCause.getCause();
+            } else {
+                break;
+            }
+        } while (true);
+
+        assertThat(rootCause.getMessage(), matcher);
     }
 
 }
