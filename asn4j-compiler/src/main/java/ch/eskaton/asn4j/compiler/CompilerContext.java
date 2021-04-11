@@ -854,7 +854,7 @@ public class CompilerContext {
     }
 
     private <T extends CompilationResult> Optional<T> getImportedCompilationResult(String reference, String nodeName,
-            BiFunction<String, Optional<String>, Optional<T>> compiler, Function<String, Map<String, T>> resultAccessor) {
+            BiFunction<String, Optional<String>, Optional<T>> compiler, Function<String, Map<String, T>> importAccessor) {
         var maybeImport = getImport(reference);
 
         if (maybeImport.isPresent()) {
@@ -867,7 +867,7 @@ public class CompilerContext {
                 throw new CompilerException(format, getCurrentModuleName(), nodeName, reference, moduleName);
             }
 
-            var maybeResult = Optional.ofNullable(resultAccessor.apply(moduleName).get(reference));
+            var maybeResult = Optional.ofNullable(importAccessor.apply(moduleName).get(reference));
 
             if (maybeResult.isEmpty()) {
                 return compiler.apply(reference, Optional.ofNullable(moduleName));

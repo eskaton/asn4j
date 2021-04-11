@@ -69,7 +69,7 @@ public class ParameterGovernorHelper {
                         type = ctx.getCompiledType(typeReference).getType();
                     } catch (CompilerException e) {
                         throw new CompilerException(dummyGovernor.getPosition(),
-                                "The Governor references the type %s which can't be resolved", typeReference);
+                                "The Governor references the type %s which can't be resolved", e, typeReference);
                     }
                 }
             } else {
