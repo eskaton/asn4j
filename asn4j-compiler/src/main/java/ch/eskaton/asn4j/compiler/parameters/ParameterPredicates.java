@@ -49,13 +49,12 @@ public class ParameterPredicates {
             SimpleDefinedValue simpleDefinedValue) {
         var value = simpleDefinedValue.getReference();
         var paramGovernor = definition.getGovernor();
-        var type = getParameterType(ctx, parameters, paramGovernor);
 
         return paramGovernor != null &&
-                type != null &&
                 !value.isBlank() &&
                 value.toLowerCase().equals(value) &&
-                checkName(definition, value);
+                checkName(definition, value) &&
+                getParameterType(ctx, parameters, paramGovernor) != null;
     }
 
     static boolean isObjectClassParameter(ParameterNode definition, String reference) {
