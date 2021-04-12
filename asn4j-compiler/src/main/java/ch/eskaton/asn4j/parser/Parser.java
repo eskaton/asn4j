@@ -464,8 +464,6 @@ public class Parser {
     private ElementSetSpecsParser elementSetSpecsParser = new ElementSetSpecsParser();
     private ObjectSetSpecParser objectSetSpecParser = new ObjectSetSpecParser();
     private SettingParser settingParser = new SettingParser();
-    private TypeSettingParser typeSettingParser = new TypeSettingParser();
-    private ValueSettingParser valueSettingParser = new ValueSettingParser();
     private SignedNumberParser signedNumberParser = new SignedNumberParser();
     private SimpleDefinedTypeParser simpleDefinedTypeParser = new SimpleDefinedTypeParser();
     private SimpleDefinedValueParser simpleDefinedValueParser = new SimpleDefinedValueParser();
@@ -4753,7 +4751,8 @@ public class Parser {
     protected class SettingParser implements RuleParser<Node> {
 
         public Node parse() throws ParserException {
-            Set<Node> rules = new AmbiguousChoiceParser<>(typeSettingParser, valueSettingParser).parse();
+            Set<Node> rules = new AmbiguousChoiceParser<>(typeParser, valueSetParser, objectSetParser, valueParser,
+                    objectParser).parse();
 
             Optional<Node> maybeFirst = rules.stream().findFirst();
 
@@ -4780,25 +4779,6 @@ public class Parser {
             }
 
             return null;
-        }
-
-    }
-
-    // Setting ::= Type | ValueSet | ObjectSet
-    protected class TypeSettingParser implements RuleParser<Node> {
-
-        @SuppressWarnings("unchecked")
-        public Node parse() throws ParserException {
-            return new ChoiceParser<>(typeParser, valueSetParser, objectSetParser).parse();
-        }
-
-    }
-
-    // Setting ::= Value | Object
-    protected class ValueSettingParser implements RuleParser<Node> {
-
-        public Node parse() throws ParserException {
-            return new ChoiceParser<>(valueParser, objectParser).parse();
         }
 
     }

@@ -219,7 +219,6 @@ import ch.eskaton.asn4j.parser.Parser.TypeFieldSpecParser;
 import ch.eskaton.asn4j.parser.Parser.TypeFromObjectParser;
 import ch.eskaton.asn4j.parser.Parser.TypeOptionalitySpecParser;
 import ch.eskaton.asn4j.parser.Parser.TypeParser;
-import ch.eskaton.asn4j.parser.Parser.TypeSettingParser;
 import ch.eskaton.asn4j.parser.Parser.TypeWithConstraintParser;
 import ch.eskaton.asn4j.parser.Parser.UnionsParser;
 import ch.eskaton.asn4j.parser.Parser.UnrestrictedCharacterStringTypeParser;
@@ -5881,8 +5880,7 @@ class ParserTest {
     @Test
     void testSettingParser() throws IOException, ParserException {
         // Type
-        SettingParser parser = new Parser(new ByteArrayInputStream(
-                "INTEGER".getBytes())).new SettingParser();
+        SettingParser parser = new Parser(new ByteArrayInputStream("INTEGER".getBytes())).new SettingParser();
 
         Node result = parser.parse();
 
@@ -5893,6 +5891,18 @@ class ParserTest {
 
         assertTrue(setting.getType().isPresent());
         assertTrue(setting.getType().get() instanceof IntegerType);
+
+        parser = new Parser(new ByteArrayInputStream("NULL".getBytes())).new SettingParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result instanceof Setting);
+
+        setting = (Setting) result;
+
+        assertTrue(setting.getType().isPresent());
+        assertTrue(setting.getType().get() instanceof Null);
 
         // Value
         parser = new Parser(new ByteArrayInputStream("12.5".getBytes())).new SettingParser();
@@ -5906,6 +5916,18 @@ class ParserTest {
 
         assertTrue(setting.getValue().isPresent());
         assertTrue(setting.getValue().get() instanceof RealValue);
+
+        parser = new Parser(new ByteArrayInputStream("NULL".getBytes())).new SettingParser();
+
+        result = parser.parse();
+
+        assertNotNull(result);
+        assertTrue(result instanceof Setting);
+
+        setting = (Setting) result;
+
+        assertTrue(setting.getValue().isPresent());
+        assertTrue(setting.getValue().get() instanceof NullValue);
 
         // ValueSet
         parser = new Parser(new ByteArrayInputStream(
@@ -5945,28 +5967,6 @@ class ParserTest {
         setting = (Setting) result;
 
         assertTrue(setting.getObjectSet().isPresent());
-    }
-
-    @Test
-    void testTypeSettingParser() throws IOException, ParserException {
-        TypeSettingParser parser = new Parser(new ByteArrayInputStream(
-                "NULL".getBytes())).new TypeSettingParser();
-
-        Node result = parser.parse();
-
-        assertNotNull(result);
-        assertTrue(result instanceof Null);
-    }
-
-    @Test
-    void testValueSettingParser() throws IOException, ParserException {
-        Parser.ValueSettingParser parser = new Parser(new ByteArrayInputStream(
-                "NULL".getBytes())).new ValueSettingParser();
-
-        Node result = parser.parse();
-
-        assertNotNull(result);
-        assertTrue(result instanceof NullValue);
     }
 
     /**
