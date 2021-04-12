@@ -3,7 +3,7 @@ dist: bionic
 language: java
 sudo: false
 
-jdk: openjdk14
+jdk: openjdk15
 
 addons:
    sonarcloud:
