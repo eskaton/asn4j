@@ -289,8 +289,8 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
             } else if (field instanceof CompiledObjectField) {
                 return compileObjectField((CompiledObjectField) field, reference, setting, maybeParameters);
             } else {
-                throw new IllegalCompilerStateException("Unsupported field of type %s",
-                        field.getClass().getSimpleName());
+                throw new IllegalCompilerStateException(fieldName.getPosition(), "Unsupported field '%s' of type %s",
+                        reference, field.getClass().getSimpleName());
             }
         } else {
             throw new CompilerException(fieldName.getPosition(), "Invalid reference %s", reference);
