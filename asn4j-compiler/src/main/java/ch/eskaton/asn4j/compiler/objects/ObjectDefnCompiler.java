@@ -34,8 +34,10 @@ import ch.eskaton.asn4j.compiler.Formatter;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
+import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
+import ch.eskaton.asn4j.compiler.results.CompiledObjectSetField;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
 import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
@@ -54,8 +56,11 @@ import ch.eskaton.asn4j.parser.ast.LiteralNode;
 import ch.eskaton.asn4j.parser.ast.Node;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
+import ch.eskaton.asn4j.parser.ast.ObjectSetElements;
 import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.Setting;
+import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
+import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
@@ -64,11 +69,14 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.collections.Tuple2;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
@@ -288,6 +296,8 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 return compileVariableTypeValueField(setting, reference);
             } else if (field instanceof CompiledObjectField) {
                 return compileObjectField((CompiledObjectField) field, reference, setting, maybeParameters);
+            } else if (field instanceof CompiledObjectSetField) {
+                return compileObjectSetField((CompiledObjectSetField) field, reference, setting, maybeParameters);
             } else {
                 throw new IllegalCompilerStateException(fieldName.getPosition(), "Unsupported field '%s' of type %s",
                         reference, field.getClass().getSimpleName());
@@ -295,6 +305,67 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         } else {
             throw new CompilerException(fieldName.getPosition(), "Invalid reference %s", reference);
         }
+    }
+
+    private Tuple2<String, Object> compileObjectSetField(CompiledObjectSetField field, String reference,
+            Setting setting, Optional<Parameters> maybeParameters) {
+        if (setting.getObjectSet().isPresent()) {
+            var objectSet = setting.getObjectSet().get();
+            var roots = compileElement(objectSet.getRootElements(), maybeParameters);
+            var extensions = compileElement(objectSet.getExtensionElements(), maybeParameters);
+
+            roots.addAll(extensions);
+
+            return Tuple2.of(reference, roots);
+        } else {
+            throw new IllegalCompilerStateException(setting.getPosition(), "Unsupported setting: %s",
+                    setting.getClass().getSimpleName());
+        }
+    }
+
+    private Set<Object> compileElements(ElementSet elementSet, Optional<Parameters> maybeParameters) {
+        var operands = elementSet.getOperands();
+
+        switch (elementSet.getOperation()) {
+            case UNION:
+                return operands.stream().map(e -> compileElement(e, maybeParameters)).flatMap(Collection::stream).collect(Collectors.toSet());
+            case INTERSECTION:
+                var result = compileElement(operands.get(0), maybeParameters);
+
+                operands.stream().skip(1).forEach(operand -> result.removeAll(compileElement(operand, maybeParameters)));
+
+                return result;
+            default:
+                throw new IllegalCompilerStateException(elementSet.getPosition(), "Unsupported operation: %s",
+                        elementSet.getOperation());
+        }
+    }
+
+    private Set<Object> compileElement(Elements elements, Optional<Parameters> maybeParameters) {
+        if (elements == null) {
+            return Collections.emptySet();
+        }
+
+        if (elements instanceof ElementSet elementSet) {
+            return compileElements(elementSet, maybeParameters);
+        } else if (elements instanceof ObjectSetElements objectSetElements) {
+            return compileObjectSetElements(objectSetElements, maybeParameters);
+        }
+
+        throw new IllegalCompilerStateException(elements.getPosition(), "Unsupported elements: %s",
+                elements.getClass().getSimpleName());
+
+    }
+
+    private Set<Object> compileObjectSetElements(ObjectSetElements objectSetElements, Optional<Parameters> maybeParameters) {
+        var element = objectSetElements.getElement();
+
+        if (element instanceof ObjectReference objectReference) {
+            return Collections.singleton(ctx.getCompiledObject(objectReference));
+        }
+
+        throw new IllegalCompilerStateException(objectSetElements.getPosition(), "Unsupported elements: %s",
+                objectSetElements.getClass().getSimpleName());
     }
 
     private Tuple2<String, Object> compileObjectField(CompiledObjectField field, String reference, Setting setting,

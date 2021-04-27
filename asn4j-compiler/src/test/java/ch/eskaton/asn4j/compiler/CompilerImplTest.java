@@ -146,6 +146,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -1313,6 +1314,50 @@ class CompilerImplTest {
 
             assertTrue(value instanceof IntegerValue);
             assertEquals(47, ((IntegerValue) value).getValue().longValue());
+        }
+
+        @Test
+        void testObjectWithObjectSetField() throws IOException, ParserException {
+            var body = """
+                    TEST1 ::= CLASS {
+                        &ObjectSetField TEST2
+                    }
+
+                    TEST2 ::= CLASS {
+                        &fixedTypeValueField INTEGER
+                    }
+
+                    object1 TEST1 ::= {
+                        &ObjectSetField {(object2 | object3)}
+                    }
+
+                    object2 TEST2 ::= {
+                        &fixedTypeValueField 7
+                    }
+
+                    object3 TEST2 ::= {
+                        &fixedTypeValueField 12
+                    }
+
+                    """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var object = ctx.getCompiledModule(MODULE_NAME).getObjects().get("object1");
+
+            assertNotNull(object);
+
+            var objectSet = (HashSet<CompiledObject>) object.getObjectDefinition().get("ObjectSetField");
+
+            assertNotNull(objectSet);
+
+            assertTrue(objectSet.stream().filter(obj -> "object2".equals(obj.getName())).findAny().isPresent());
+            assertTrue(objectSet.stream().filter(obj -> "object3".equals(obj.getName())).findAny().isPresent());
         }
 
         @Test
