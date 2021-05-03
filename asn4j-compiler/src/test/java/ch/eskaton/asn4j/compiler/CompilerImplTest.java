@@ -3622,6 +3622,34 @@ class CompilerImplTest {
             testModule(body, CompilerException.class, ".*Unused parameters in object 'object': value.*");
         }
 
+        @Test
+        void testCompiledValueSet() throws IOException, ParserException {
+            var body = """
+                    ValueSet OBJECT IDENTIFIER ::= {value, ...}
+                    
+                    value OBJECT IDENTIFIER ::= {2 5 5}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "ValueSet");
+
+            assertTrue(compiledType.getType() instanceof ObjectIdentifier);
+            assertTrue(compiledType.getConstraintDefinition().isPresent());
+        }
+
+        @Test
+        void testCompiledTypeWithConstraint() throws IOException, ParserException {
+            var body = """
+                    Type ::= OBJECT IDENTIFIER (value)
+                    
+                    value OBJECT IDENTIFIER ::= {2 5 5}
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Type");
+
+            assertTrue(compiledType.getType() instanceof ObjectIdentifier);
+            assertTrue(compiledType.getConstraintDefinition().isPresent());
+        }
+
         Stream<Arguments> provideParameterizedValueInConstraint() {
             // @formatter:off
             return Stream.of(
