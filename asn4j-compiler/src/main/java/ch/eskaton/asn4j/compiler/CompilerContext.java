@@ -479,8 +479,17 @@ public class CompilerContext {
     public CompiledType getCompiledType(String reference) {
         Objects.requireNonNull(reference);
 
-        return getCompilationResult(reference, Optional.empty(), "Type", this::getTypesOfCurrentModule,
-                (ref, mod) -> compiler.compileType(ref, mod), this::getTypesOfModule);
+        try {
+            return getCompilationResult(reference, Optional.empty(), "Type", this::getTypesOfCurrentModule,
+                    (ref, mod) -> compiler.compileType(ref, mod), this::getTypesOfModule);
+        } catch (ResolutionException e1) {
+            try {
+            return getCompilationResult(reference, Optional.empty(), "ValueSet", this::getTypesOfCurrentModule,
+                    (ref, mod) -> compiler.compileValueSetType(ref, mod), this::getTypesOfModule);
+            } catch (ResolutionException e2) {
+                throw e1;
+            }
+        }
     }
 
     public CompiledType getCompiledType(String moduleName, String reference) {

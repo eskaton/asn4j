@@ -56,6 +56,7 @@ import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
+import ch.eskaton.asn4j.compiler.results.CompiledIntegerType;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
@@ -1641,9 +1642,31 @@ class CompilerImplTest {
             var compiledObject = getCompiledObject(body, "objectRef");
             var value = compiledObject.getObjectDefinition().get("id");
 
-            assert (value instanceof IntegerValue);
+            assertTrue(value instanceof IntegerValue);
 
             assertEquals(123, ((IntegerValue) value).getValue().longValue());
+        }
+
+        @Test
+        void testObjectWithValueSet() throws IOException, ParserException {
+            var body = """
+                    TEST ::= CLASS { 
+                        &Type
+                    } WITH SYNTAX {
+                        TYPE &Type
+                    }
+                    
+                    object TEST ::= {
+                      TYPE  ValueSet
+                    }
+
+                    ValueSet INTEGER ::= {1, ...}
+                    """;
+
+            var compiledObject = getCompiledObject(body, "object");
+            var type = compiledObject.getObjectDefinition().get("Type");
+
+            assertTrue(type instanceof CompiledIntegerType);
         }
 
     }
