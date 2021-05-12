@@ -799,7 +799,9 @@ public class Parser {
 
                 return new Object();
             } finally {
-                pushBack();
+                if (token != null) {
+                    pushBack();
+                }
             }
         }
 
