@@ -30,20 +30,26 @@ package ch.eskaton.asn4j.parser.ast;
 import ch.eskaton.asn4j.parser.Position;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DefinedSyntaxNode extends ObjectSyntaxNode {
 
-    private List<Node> nodes;
+    private String definedSyntax;
 
-    public DefinedSyntaxNode(Position position, List<Node> nodes) {
+    public DefinedSyntaxNode(Position position, String definedSyntax) {
     	super(position);
 
-    	this.nodes = nodes != null ? nodes : new ArrayList<>();
+    	this.definedSyntax = definedSyntax;
     }
 
+    public String getDefinedSyntax() {
+        return definedSyntax;
+    }
+
+    // TODO: remove
     public List<Node> getNodes() {
-    	return nodes;
+    	return Collections.emptyList();
     }
 
 }

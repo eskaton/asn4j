@@ -1006,6 +1006,24 @@ public class Lexer {
         }
     }
 
+    public String getText(int startOffset, int endOffset) {
+        is.mark();
+
+        var len = endOffset - startOffset + 1;
+        var text = new char[len];
+
+        try {
+            is.seek(startOffset);
+            is.read(text, 0, len);
+
+            return new String(text);
+        } catch (IOException e) {
+            return null;
+        } finally {
+            is.reset();
+        }
+    }
+
     public void pushBack(Token token) {
         tokens.push(token);
     }

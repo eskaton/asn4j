@@ -4734,7 +4734,17 @@ public class Parser {
         public DefinedSyntaxNode parse() throws ParserException {
             return super.parse(new SequenceParser(new boolean[] { true, false, true },
                     TokenType.L_BRACE, new RepetitionParser<>(definedSyntaxTokenParser), TokenType.R_BRACE),
-                    a -> new DefinedSyntaxNode(a.P(), a.n1()));
+                    a -> {
+                        var nodes = a.n1();
+                        var startOffset = a.t0().getOffset();
+                        var endOffset = a.t2().getOffset();
+                        var text = lexer.getText(startOffset, endOffset);
+
+                        // We have a valid defined syntax, but since it is ambiguous it must be reparsed when
+                        // when there is more context. Just save it as a string for now
+
+                        return new DefinedSyntaxNode(a.P(), text.substring(1, text.length() - 1));
+                    });
         }
 
     }

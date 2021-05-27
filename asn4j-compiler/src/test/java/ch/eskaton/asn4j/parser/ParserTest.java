@@ -5838,18 +5838,14 @@ class ParserTest {
 
     @Test
     void testDefinedSyntaxParser() throws IOException, ParserException {
-        DefinedSyntaxParser parser = new Parser(new ByteArrayInputStream(
+        var parser = new Parser(new ByteArrayInputStream(
                 "{ A-STRING VisibleString A-NUMBER INTEGER }".getBytes())).new DefinedSyntaxParser();
 
-        DefinedSyntaxNode result = parser.parse();
-        assertNotNull(result);
-        assertEquals(4, result.getNodes().size());
+        var result = parser.parse();
 
-        parser = new Parser(new ByteArrayInputStream("{ }".getBytes())).new DefinedSyntaxParser();
-
-        result = parser.parse();
         assertNotNull(result);
-        assertEquals(0, result.getNodes().size());
+
+        assertEquals(" A-STRING VisibleString A-NUMBER INTEGER ", result.getDefinedSyntax());
     }
 
     @Test
