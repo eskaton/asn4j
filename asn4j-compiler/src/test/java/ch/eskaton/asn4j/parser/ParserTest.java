@@ -5849,6 +5849,51 @@ class ParserTest {
     }
 
     @Test
+    void testDefinedSyntaxReParser() throws IOException, ParserException {
+        var parser = new Parser(new ByteArrayInputStream(
+                " A-STRING VisibleString A-NUMBER INTEGER ".getBytes())).new DefinedSyntaxReParser();
+
+        var literal = parser.parseLiteral();
+
+        assertNotNull(literal);
+        assertEquals("A-STRING", literal.getText());
+
+        var setting = parser.parseSetting();
+
+        assertNotNull(setting);
+        assertTrue(setting.getType().isPresent());
+        assertTrue(setting.getType().get() instanceof VisibleString);
+
+        literal = parser.parseLiteral();
+
+        assertNotNull(literal);
+        assertEquals("A-NUMBER", literal.getText());
+
+        setting = parser.parseSetting();
+
+        assertNotNull(setting);
+        assertTrue(setting.getType().isPresent());
+        assertTrue(setting.getType().get() instanceof IntegerType);
+
+        parser = new Parser(new ByteArrayInputStream(
+                " FIELD {\"value\"} ".getBytes())).new DefinedSyntaxReParser();
+
+        literal = parser.parseLiteral();
+
+        assertNotNull(literal);
+        assertEquals("FIELD", literal.getText());
+
+        setting = parser.parseSetting();
+
+        assertNotNull(setting);
+        assertTrue(setting.getValue().isPresent());
+
+        var value = setting.getValue().get();
+
+        testAmbiguousValue(value, CollectionOfValue.class);
+    }
+
+    @Test
     void testDefinedSyntaxTokenParser() throws IOException,
             ParserException {
         DefinedSyntaxTokenParser parser = new Parser(new ByteArrayInputStream(

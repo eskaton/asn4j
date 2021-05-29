@@ -113,7 +113,6 @@ import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.PropertyAndSettingNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
-import ch.eskaton.asn4j.parser.ast.SetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.TokenOrGroup;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
@@ -4749,6 +4748,18 @@ public class Parser {
 
     }
 
+    protected class DefinedSyntaxReParser {
+
+        public LiteralNode parseLiteral() throws ParserException {
+            return literalParser.parse();
+        }
+
+        public Setting parseSetting() throws ParserException {
+            return settingParser.parse();
+        }
+
+    }
+
     // DefinedSyntaxToken ::= Literal | Setting
     protected class DefinedSyntaxTokenParser implements RuleParser<Node> {
 
@@ -4762,7 +4773,7 @@ public class Parser {
     // Setting ::= Type | ValueSet | ObjectSet | Value | Object
     protected class SettingParser implements RuleParser<Node> {
 
-        public Node parse() throws ParserException {
+        public Setting parse() throws ParserException {
             Set<Node> rules = new AmbiguousChoiceParser<>(typeParser, valueSetParser, objectSetParser, valueParser,
                     objectParser).parse();
 
