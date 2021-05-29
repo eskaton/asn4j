@@ -5875,6 +5875,8 @@ class ParserTest {
         assertTrue(setting.getType().isPresent());
         assertTrue(setting.getType().get() instanceof IntegerType);
 
+        assertTrue(parser.isEof());
+
         parser = new Parser(new ByteArrayInputStream(
                 " FIELD {\"value\"} ".getBytes())).new DefinedSyntaxReParser();
 
@@ -5891,6 +5893,8 @@ class ParserTest {
         var value = setting.getValue().get();
 
         testAmbiguousValue(value, CollectionOfValue.class);
+
+        assertTrue(parser.isEof());
     }
 
     @Test

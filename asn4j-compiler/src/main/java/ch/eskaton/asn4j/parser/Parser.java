@@ -4758,6 +4758,10 @@ public class Parser {
             return settingParser.parse();
         }
 
+        public boolean isEof() throws ParserException {
+            return lexer.nextToken(Context.NORMAL) == null;
+        }
+
     }
 
     // DefinedSyntaxToken ::= Literal | Setting
