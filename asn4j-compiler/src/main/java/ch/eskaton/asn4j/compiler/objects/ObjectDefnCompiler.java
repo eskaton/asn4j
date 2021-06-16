@@ -34,7 +34,6 @@ import ch.eskaton.asn4j.compiler.Formatter;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.parameters.Parameters;
 import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
-import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSetField;
@@ -45,6 +44,9 @@ import ch.eskaton.asn4j.compiler.types.TypeFromObjectCompiler;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
+import ch.eskaton.asn4j.parser.Parser;
+import ch.eskaton.asn4j.parser.Parser.DefinedSyntaxReParser;
+import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.Position;
 import ch.eskaton.asn4j.parser.RequiredToken;
 import ch.eskaton.asn4j.parser.ast.DefaultSyntaxNode;
@@ -69,10 +71,11 @@ import ch.eskaton.asn4j.parser.ast.values.Value;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.collections.Tuple2;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -95,7 +98,11 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         if (syntax instanceof DefaultSyntaxNode) {
             compiledObject = compileDefaultSyntax(objectClass, (DefaultSyntaxNode) syntax, maybeParameters);
         } else if (syntax instanceof DefinedSyntaxNode) {
-            compiledObject = compileDefinedSyntax(objectClass, (DefinedSyntaxNode) syntax, maybeParameters);
+            try {
+                compiledObject = compileDefinedSyntax(objectClass, (DefinedSyntaxNode) syntax, maybeParameters);
+            } catch (ParserException e) {
+                throw new CompilerException(e);
+            }
         } else {
             throw new CompilerException(syntax.getPosition(), "Unsupported syntax: %s",
                     syntax.getClass().getSimpleName());
@@ -107,7 +114,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
     }
 
     private Map<String, Object> compileDefinedSyntax(CompiledObjectClass objectClass, DefinedSyntaxNode syntax,
-            Optional<Parameters> maybeParameters) {
+            Optional<Parameters> maybeParameters) throws ParserException {
         var maybeSyntaxSpec = objectClass.getSyntax();
 
         if (maybeSyntaxSpec.isEmpty()) {
@@ -117,16 +124,15 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         }
 
         var syntaxSpec = maybeSyntaxSpec.get();
-
-        var definedSyntax = new LinkedList<>(syntax.getNodes());
+        var parser = createParser(syntax.getDefinedSyntax());
         var values = new HashMap<String, Object>();
 
-        compile(objectClass, syntaxSpec, definedSyntax, values, maybeParameters, new GroupState(false, false, false));
+        compile(objectClass, syntaxSpec, parser, values, maybeParameters, new GroupState(false, false, false));
 
-        if (!definedSyntax.isEmpty()) {
-            var node = definedSyntax.peek();
+        if (!parser.isEof()) {
+            var token = parser.peekToken();
 
-            throw new CompilerException(node.getPosition(), "Unexpected data in defined syntax: %s", node);
+            throw new CompilerException(token.getPosition(), "Unexpected data in defined syntax: %s", token);
         }
 
         verifyValues(objectClass, syntax.getPosition(), values);
@@ -134,25 +140,32 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         return values;
     }
 
+    private DefinedSyntaxReParser createParser(String definedSyntax) {
+        try {
+            return new Parser(new ByteArrayInputStream(definedSyntax.getBytes())).new DefinedSyntaxReParser();
+        } catch (IOException e) {
+            throw new CompilerException(e);
+        }
+    }
+
     private GroupState compile(CompiledObjectClass objectClass, List<? extends Object> syntaxSpec,
-            LinkedList<Node> definedSyntax, HashMap<String, Object> values, Optional<Parameters> maybeParameters,
-            GroupState state) {
-        if (definedSyntax.isEmpty()) {
+            DefinedSyntaxReParser parser, HashMap<String, Object> values, Optional<Parameters> maybeParameters,
+            GroupState state) throws ParserException {
+        if (parser.isEof()) {
             return state;
         }
 
-        var position = definedSyntax.get(0).getPosition();
         var currentState = state.accepted(false);
         var hasField = false;
 
         for (var spec : syntaxSpec) {
             if (spec instanceof Group) {
-                currentState = compile(objectClass, ((Group) spec).getGroup(), definedSyntax, values, maybeParameters,
+                currentState = compile(objectClass, ((Group) spec).getGroup(), parser, values, maybeParameters,
                         currentState.optional(true));
 
                 hasField = currentState.hasField || hasField;
             } else if (spec instanceof RequiredToken requiredToken) {
-                currentState = compileRequiredToken(objectClass, definedSyntax, values, maybeParameters, currentState,
+                currentState = compileRequiredToken(objectClass, parser, values, maybeParameters, currentState,
                         requiredToken);
 
                 if (!currentState.accepted) {
@@ -168,7 +181,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
 
         if (currentState.optional) {
             if (!hasField) {
-                throw new CompilerException(position, "There must be at least one field in an optional group");
+                throw new CompilerException("There must be at least one field in an optional group");
             } else {
                 currentState = currentState.hasField(true);
             }
@@ -177,27 +190,28 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         return currentState;
     }
 
-    private GroupState compileRequiredToken(CompiledObjectClass objectClass, LinkedList<Node> definedSyntax,
+    private GroupState compileRequiredToken(CompiledObjectClass objectClass, DefinedSyntaxReParser parser,
             HashMap<String, Object> values, Optional<Parameters> maybeParameters, GroupState state,
-            RequiredToken requiredToken) {
-        if (definedSyntax.isEmpty()) {
+            RequiredToken requiredToken) throws ParserException {
+        if (parser.isEof()) {
             return state;
         }
 
-        var element = definedSyntax.pop();
         var token = requiredToken.getToken();
 
         if (token instanceof LiteralNode literalNodeSpec) {
-            if (!(element instanceof LiteralNode literalNode)) {
-                var formattedElement = Formatter.format(ctx, element);
+            var element = parser.parseLiteral();
 
-                throw new CompilerException(element.getPosition(), "Expected literal '%s' but found '%s'",
-                        literalNodeSpec.getText(), formattedElement);
+            if (!(element instanceof LiteralNode literalNode)) {
+                var unexpectedToken = parser.peekToken();
+
+                throw new CompilerException(unexpectedToken.getPosition(), "Expected literal '%s' but found '%s'",
+                        literalNodeSpec.getText(), unexpectedToken.getType());
             }
 
             if (!literalNodeSpec.getText().equals(literalNode.getText())) {
                 if (state.optional && !state.accepted) {
-                    definedSyntax.push(element);
+                    parser.push(element);
 
                     return state;
                 }
@@ -208,13 +222,15 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 state = state.accepted(true);
             }
         } else if (token instanceof PrimitiveFieldNameNode fieldNameNode) {
+            var element = parser.parseSetting();
+
             if (!(element instanceof Setting)) {
                 var formattedElement = Formatter.format(ctx, element);
 
                 throw new CompilerException(element.getPosition(), "Expected setting but found '%s'", formattedElement);
             }
 
-            compilePrimitiveFieldName(objectClass, values, maybeParameters, (Setting) element, fieldNameNode);
+            compilePrimitiveFieldName(objectClass, values, maybeParameters, element, fieldNameNode);
 
             state = state.hasField(true).accepted(true);
         }
@@ -328,7 +344,8 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
 
         switch (elementSet.getOperation()) {
             case UNION:
-                return operands.stream().map(e -> compileElement(e, maybeParameters)).flatMap(Collection::stream).collect(Collectors.toSet());
+                return operands.stream().map(e -> compileElement(e, maybeParameters)).flatMap(Collection::stream)
+                        .collect(Collectors.toSet());
             case INTERSECTION:
                 var result = compileElement(operands.get(0), maybeParameters);
 

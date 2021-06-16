@@ -33,6 +33,7 @@ import ch.eskaton.asn4j.parser.accessor.ListAccessor;
 import ch.eskaton.asn4j.parser.accessor.SequenceListAccessor;
 import ch.eskaton.asn4j.parser.ast.AbstractFieldSpecNode;
 import ch.eskaton.asn4j.parser.ast.AbstractSyntaxObjectClassReferenceNode;
+import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
 import ch.eskaton.asn4j.parser.ast.AtNotationNode;
 import ch.eskaton.asn4j.parser.ast.ComponentIdListNode;
@@ -80,9 +81,6 @@ import ch.eskaton.asn4j.parser.ast.OIDNode;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassDefn;
-import ch.eskaton.asn4j.parser.ast.Setting;
-import ch.eskaton.asn4j.parser.ast.ActualParameter;
-import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
@@ -113,6 +111,7 @@ import ch.eskaton.asn4j.parser.ast.PrimitiveFieldNameNode;
 import ch.eskaton.asn4j.parser.ast.PropertyAndSettingNode;
 import ch.eskaton.asn4j.parser.ast.RangeNode;
 import ch.eskaton.asn4j.parser.ast.ReferenceNode;
+import ch.eskaton.asn4j.parser.ast.Setting;
 import ch.eskaton.asn4j.parser.ast.SimpleTableConstraint;
 import ch.eskaton.asn4j.parser.ast.TokenOrGroup;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
@@ -180,6 +179,7 @@ import ch.eskaton.asn4j.parser.ast.types.IntegerType;
 import ch.eskaton.asn4j.parser.ast.types.NamedType;
 import ch.eskaton.asn4j.parser.ast.types.Null;
 import ch.eskaton.asn4j.parser.ast.types.NumericString;
+import ch.eskaton.asn4j.parser.ast.types.ObjectClassFieldType;
 import ch.eskaton.asn4j.parser.ast.types.ObjectDescriptor;
 import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
 import ch.eskaton.asn4j.parser.ast.types.OctetString;
@@ -254,6 +254,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Stack;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -4748,18 +4749,60 @@ public class Parser {
 
     }
 
-    protected class DefinedSyntaxReParser {
+    public class DefinedSyntaxReParser {
+
+        private LinkedList<LiteralNode> literals = new LinkedList<LiteralNode>();
 
         public LiteralNode parseLiteral() throws ParserException {
-            return literalParser.parse();
+            if (!literals.isEmpty()) {
+                return literals.pop();
+            }
+
+            mark();
+
+            var result =  literalParser.parse();
+
+            if (result == null) {
+                resetToMark();
+            }
+
+            return result;
         }
 
         public Setting parseSetting() throws ParserException {
             return settingParser.parse();
         }
 
+        public Token getToken() throws ParserException {
+            return lexer.nextToken(Context.NORMAL);
+        }
+
+        public Token peekToken() throws ParserException {
+            var token = lexer.nextToken(Context.NORMAL);
+
+            try {
+                return token;
+            } finally {
+                if (token != null) {
+                    lexer.pushBack(token);
+                }
+            }
+        }
+
         public boolean isEof() throws ParserException {
-            return lexer.nextToken(Context.NORMAL) == null;
+            var token = lexer.nextToken(Context.NORMAL);
+
+            try {
+                return token == null;
+            } finally {
+                if (token != null) {
+                    lexer.pushBack(token);
+                }
+            }
+        }
+
+        public void push(LiteralNode literal) {
+            literals.push(literal);
         }
 
     }
