@@ -330,36 +330,36 @@ public class Lexer {
                         pos = 0;
                         break;
                     case '(':
-                        return new Token(ctx, TokenType.L_PAREN, offset, position(line, pos));
+                        return new Token(ctx, TokenType.L_PAREN, offset, position(line, pos), "(");
                     case ')':
-                        return new Token(ctx, TokenType.R_PAREN, offset, position(line, pos));
+                        return new Token(ctx, TokenType.R_PAREN, offset, position(line, pos), ")");
                     case '{':
-                        return new Token(ctx, TokenType.L_BRACE, offset, position(line, pos));
+                        return new Token(ctx, TokenType.L_BRACE, offset, position(line, pos), "{");
                     case '}':
-                        return new Token(ctx, TokenType.R_BRACE, offset, position(line, pos));
+                        return new Token(ctx, TokenType.R_BRACE, offset, position(line, pos), "}");
                     case '[':
                         if (ctx == Context.SYNTAX) {
-                            return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
+                            return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos), "[");
                         }
 
                         if (is.read() == '[') {
                             pos++;
-                            return new Token(ctx, TokenType.L_VERSION_BRACKETS, offset, position(line, pos - 1));
+                            return new Token(ctx, TokenType.L_VERSION_BRACKETS, offset, position(line, pos - 1), "[[");
                         } else {
                             is.unread();
-                            return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos));
+                            return new Token(ctx, TokenType.L_BRACKET, offset, position(line, pos), "[");
                         }
                     case ']':
                         if (ctx == Context.SYNTAX) {
-                            return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos));
+                            return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos), "]");
                         }
 
                         if (is.read() == ']') {
                             pos++;
-                            return new Token(ctx, TokenType.R_VERSION_BRACKETS, offset, position(line, pos - 1));
+                            return new Token(ctx, TokenType.R_VERSION_BRACKETS, offset, position(line, pos - 1), "]]");
                         } else {
                             is.unread();
-                            return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos));
+                            return new Token(ctx, TokenType.R_BRACKET, offset, position(line, pos), "]");
                         }
                     case ':':
                         switch (is.read()) {
@@ -367,31 +367,31 @@ public class Lexer {
                                 switch (is.read()) {
                                     case '=':
                                         pos += 2;
-                                        return new Token(ctx, TokenType.ASSIGN, offset, position(line, pos - 2));
+                                        return new Token(ctx, TokenType.ASSIGN, offset, position(line, pos - 2), "::=");
                                     default:
                                         is.unread();
                                 } // fall through
                             default:
                                 is.unread();
                         }
-                        return new Token(ctx, TokenType.COLON, offset, position(line, pos));
+                        return new Token(ctx, TokenType.COLON, offset, position(line, pos), ":");
                     case ';':
-                        return new Token(ctx, TokenType.SEMICOLON, offset, position(line, pos));
+                        return new Token(ctx, TokenType.SEMICOLON, offset, position(line, pos), ";");
                     case ',':
-                        return new Token(ctx, TokenType.COMMA, offset, position(line, pos));
+                        return new Token(ctx, TokenType.COMMA, offset, position(line, pos), ",");
                     case '|':
-                        return new Token(ctx, TokenType.PIPE, offset, position(line, pos));
+                        return new Token(ctx, TokenType.PIPE, offset, position(line, pos), "|");
                     case '!':
-                        return new Token(ctx, TokenType.EXCLAMATION, offset, position(line, pos));
+                        return new Token(ctx, TokenType.EXCLAMATION, offset, position(line, pos), "!");
                     case '*':
-                        return new Token(ctx, TokenType.ASTERISK, offset, position(line, pos));
+                        return new Token(ctx, TokenType.ASTERISK, offset, position(line, pos), "*");
                     case '-':
                         if (is.read() == '-') {
                             pos++;
                             skipComment();
                         } else {
                             is.unread();
-                            return new Token(ctx, TokenType.MINUS, offset, position(line, pos));
+                            return new Token(ctx, TokenType.MINUS, offset, position(line, pos), "--");
                         }
                         break;
                     case '/':
@@ -400,7 +400,7 @@ public class Lexer {
                             skipMLComment();
                         } else {
                             is.unread();
-                            return new Token(ctx, TokenType.SOLIDUS, offset, position(line, pos));
+                            return new Token(ctx, TokenType.SOLIDUS, offset, position(line, pos), "/");
                         }
                         break;
                     case '&':
@@ -412,30 +412,30 @@ public class Lexer {
                                 return parseFieldReference(Context.NORMAL, TokenType.IDENTIFIER,
                                         TokenType.VALUE_FIELD_REFERENCE);
                             default:
-                                return new Token(ctx, TokenType.AMPERSAND, offset, position(line, pos));
+                                return new Token(ctx, TokenType.AMPERSAND, offset, position(line, pos), "&");
                         }
                     case '^':
-                        return new Token(ctx, TokenType.CIRCUMFLEX, offset, position(line, pos));
+                        return new Token(ctx, TokenType.CIRCUMFLEX, offset, position(line, pos), "^");
                     case '@':
-                        return new Token(ctx, TokenType.AT, offset, position(line, pos));
+                        return new Token(ctx, TokenType.AT, offset, position(line, pos), "@");
                     case '<':
-                        return new Token(ctx, TokenType.LT, offset, position(line, pos));
+                        return new Token(ctx, TokenType.LT, offset, position(line, pos), "<");
                     case '>':
-                        return new Token(ctx, TokenType.GT, offset, position(line, pos));
+                        return new Token(ctx, TokenType.GT, offset, position(line, pos), ">");
                     case '=':
-                        return new Token(ctx, TokenType.EQUALS, offset, position(line, pos));
+                        return new Token(ctx, TokenType.EQUALS, offset, position(line, pos), "=");
                     case '\'':
                         if ((token = parseNumString(ctx)) != null) {
                             return token;
                         }
 
-                        return new Token(ctx, TokenType.APOSTROPHE, offset, position(line, pos));
+                        return new Token(ctx, TokenType.APOSTROPHE, offset, position(line, pos), "'");
                     case '"':
                         if (ctx != Context.PROPERTY_SETTINGS && (token = parseCharString(ctx)) != null) {
                             return token;
                         }
 
-                        return new Token(ctx, TokenType.QUOTATION, offset, position(line, pos));
+                        return new Token(ctx, TokenType.QUOTATION, offset, position(line, pos), "\"");
                     case '.':
                         if (ctx != Context.LEVEL) {
                             if (is.read() == '.') {
@@ -445,18 +445,18 @@ public class Lexer {
                                     pos++;
                                     offset++;
                                     return new Token(ctx, TokenType.ELLIPSIS, offset - 2,
-                                            position(line, pos - 2));
+                                            position(line, pos - 2), "...");
                                 } else {
                                     is.unread();
                                     return new Token(ctx, TokenType.RANGE, offset - 1,
-                                            position(line, pos - 1));
+                                            position(line, pos - 1), "..");
                                 }
                             }
 
                             is.unread();
                         }
 
-                        return new Token(ctx, TokenType.DOT, offset, position(line, pos));
+                        return new Token(ctx, TokenType.DOT, offset, position(line, pos), ".");
 
                     default:
                         if ('0' <= c && c <= '9' && (token = parseNumber(ctx, c)) != null) {
@@ -840,7 +840,7 @@ public class Lexer {
 
                 if (kwType != null) {
                     pos = tmpPos - 1;
-                    return new Token(ctx, kwType, beginOffset, position(line, beginPos));
+                    return new Token(ctx, kwType, beginOffset, position(line, beginPos), str);
                 }
             }
 

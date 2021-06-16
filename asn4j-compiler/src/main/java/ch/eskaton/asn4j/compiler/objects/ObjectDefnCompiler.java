@@ -206,7 +206,7 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
                 var unexpectedToken = parser.peekToken();
 
                 throw new CompilerException(unexpectedToken.getPosition(), "Expected literal '%s' but found '%s'",
-                        literalNodeSpec.getText(), unexpectedToken.getType());
+                        literalNodeSpec.getText(), unexpectedToken.getText());
             }
 
             if (!literalNodeSpec.getText().equals(literalNode.getText())) {

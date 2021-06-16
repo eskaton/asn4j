@@ -41,7 +41,7 @@ public class StringToken extends Token {
     private int flags;
 
     public StringToken(Context context, TokenType type, int offset, Position position, String text, int flags) {
-        super(context, type, offset, position);
+        super(context, type, offset, position, text);
 
         this.flags = flags;
         this.text = text;

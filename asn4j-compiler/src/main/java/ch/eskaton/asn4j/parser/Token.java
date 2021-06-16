@@ -72,10 +72,6 @@ public class Token {
 
     protected Context context;
 
-    public Token(Context context, TokenType type, int offset, Position position) {
-        this(context, type, offset, position, null);
-    }
-
     public Token(Context context, TokenType type, int offset, Position position, String text) {
         this.context = context;
         this.type = type;
