@@ -30,7 +30,9 @@ package ch.eskaton.asn4j.compiler.parameters;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.parser.ast.AbstractNode;
 import ch.eskaton.asn4j.parser.ast.ActualParameter;
+import ch.eskaton.asn4j.parser.ast.DummyGovernor;
 import ch.eskaton.asn4j.parser.ast.Node;
+import ch.eskaton.asn4j.parser.ast.ParamGovernorNode;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
 import ch.eskaton.asn4j.runtime.utils.ToString;
 import ch.eskaton.commons.collections.Tuple2;
@@ -96,6 +98,27 @@ public class Parameters {
         return StreamsUtils.zip(definitionsStream, valuesStream)
                 .filter(t -> t.get_1().getReference().getName().equals(parameterName))
                 .findFirst();
+    }
+
+    public Optional<Tuple2<ParameterNode, ActualParameter>> getDefinitionAndValue(DummyGovernor governor) {
+        var definitionsStream = getDefinitions().stream();
+        var valuesStream = getValues().stream();
+
+        return StreamsUtils.zip(definitionsStream, valuesStream)
+                .filter(t -> isGovernorEquals(governor, t.get_1().getGovernor()))
+                .findFirst();
+    }
+
+    private boolean isGovernorEquals(DummyGovernor governor1, ParamGovernorNode paramGovernorNode) {
+        if (paramGovernorNode instanceof DummyGovernor dummyGovernor) {
+            var reference1 = governor1.getReference();
+            var reference2 = dummyGovernor.getReference();
+
+            return reference1.getName().equals(reference2.getName()) &&
+                    reference1.isParameterized() == reference2.isParameterized();
+        }
+
+        return false;
     }
 
     public Optional<ParameterNode> getDefinition(String parameterName) {

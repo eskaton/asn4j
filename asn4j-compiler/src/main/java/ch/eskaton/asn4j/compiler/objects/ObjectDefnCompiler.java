@@ -30,6 +30,7 @@ package ch.eskaton.asn4j.compiler.objects;
 import ch.eskaton.asn4j.compiler.Compiler;
 import ch.eskaton.asn4j.compiler.CompilerContext;
 import ch.eskaton.asn4j.compiler.CompilerException;
+import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.Formatter;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.parameters.Parameters;
@@ -64,6 +65,8 @@ import ch.eskaton.asn4j.parser.ast.Setting;
 import ch.eskaton.asn4j.parser.ast.constraints.ElementSet;
 import ch.eskaton.asn4j.parser.ast.constraints.Elements;
 import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
+import ch.eskaton.asn4j.parser.ast.types.TypeReference;
+import ch.eskaton.asn4j.parser.ast.types.UsefulType;
 import ch.eskaton.asn4j.parser.ast.values.DefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.ExternalValueReference;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
@@ -430,6 +433,10 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
 
         if (type instanceof TypeFromObject typeFromObject) {
             return Tuple2.of(reference, new TypeFromObjectCompiler().compile(ctx, null, typeFromObject, maybeParameters));
+        }
+
+        if (type instanceof TypeReference typeReference && !(type instanceof UsefulType)) {
+            return Tuple2.of(reference, CompilerUtils.compileTypeReference(ctx, typeReference, maybeParameters));
         }
 
         return Tuple2.of(reference, ctx.getCompiledType(type));

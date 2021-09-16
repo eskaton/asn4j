@@ -34,6 +34,7 @@ import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
 import ch.eskaton.asn4j.parser.ast.ActualParameter;
+import ch.eskaton.asn4j.parser.ast.DummyGovernor;
 import ch.eskaton.asn4j.parser.ast.HasPosition;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
 import ch.eskaton.asn4j.parser.ast.ParameterNode;
@@ -45,6 +46,7 @@ import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 import ch.eskaton.asn4j.parser.ast.values.NullValue;
 import ch.eskaton.asn4j.parser.ast.values.SimpleDefinedValue;
 import ch.eskaton.asn4j.parser.ast.values.Value;
+import ch.eskaton.commons.collections.Tuple2;
 
 import java.util.List;
 import java.util.Optional;
@@ -210,18 +212,21 @@ public class ParametersHelper {
      */
     public static Parameters updateParameters(Parameters inputParameters, Parameters outputParameters) {
         var parameterValues = outputParameters.getDefinitionsAndValues().stream().map(definitionAndValue -> {
+            var parameterNode = definitionAndValue.get_1();
             var actualParameter = definitionAndValue.get_2();
-            var maybeType = actualParameter.getType();
 
-            if (maybeType.isPresent() && maybeType.get() instanceof TypeReference paramReference) {
-                var paramReferenceName = paramReference.getType();
-                var maybeParameter = inputParameters.getDefinitionAndValue(paramReferenceName);
+            if (parameterNode.getGovernor() instanceof DummyGovernor governor) {
+                var maybeParameter = inputParameters.getDefinitionAndValue(governor);
 
-                if (maybeParameter.isPresent()) {
-                    var parameter = maybeParameter.get();
+                updateParameter(inputParameters, definitionAndValue, maybeParameter);
+            } else {
+                var maybeType = actualParameter.getType();
 
-                    definitionAndValue.set_2(parameter.get_2());
-                    inputParameters.markAsUsed(parameter.get_1());
+                if (maybeType.isPresent() && maybeType.get() instanceof TypeReference paramReference) {
+                    var paramReferenceName = paramReference.getType();
+                    var maybeParameter = inputParameters.getDefinitionAndValue(paramReferenceName);
+
+                    updateParameter(inputParameters, definitionAndValue, maybeParameter);
                 }
             }
 
@@ -229,6 +234,17 @@ public class ParametersHelper {
         }).collect(Collectors.toList());
 
         return outputParameters.values(parameterValues);
+    }
+
+    private static void updateParameter(Parameters inputParameters,
+            Tuple2<ParameterNode, ActualParameter> definitionAndValue,
+            Optional<Tuple2<ParameterNode, ActualParameter>> maybeParameter) {
+        if (maybeParameter.isPresent()) {
+            var parameter = maybeParameter.get();
+
+            definitionAndValue.set_2(parameter.get_2());
+            inputParameters.markAsUsed(parameter.get_1());
+        }
     }
 
     /**

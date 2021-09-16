@@ -3527,6 +3527,41 @@ class CompilerImplTest {
                     ".*Expected an object of class TEST2 but object3 refers to TEST1.*");
         }
 
+        @Test
+        @DisplayName("Test the resolution of an object reference parameter in a SEQUENCE")
+        void testObjectReferenceParameterInSequence() throws ParserException, IOException {
+            var body = """
+                    TEST ::= CLASS {
+                      &Type
+                    }
+                    
+                    Seq{TEST:seqParam} ::= SEQUENCE {
+                      type seqParam.&Type
+                    }
+                    
+                    testObject1 TEST ::= {
+                      &Type INTEGER
+                    }
+                    
+                    testObject2{TEST:objectParam} TEST ::= {
+                      &Type Seq{objectParam}
+                    }
+                    
+                    testObject3 TEST ::= testObject2{testObject1}
+                """;
+
+            var module = module(MODULE_NAME, body);
+            var moduleSource = new StringModuleSource(Tuple2.of(MODULE_NAME, module));
+            var compiler = new CompilerImpl(compilerConfig(MODULE_NAME), moduleSource);
+
+            compiler.run();
+
+            var ctx = compiler.getCompilerContext();
+            var compiledValue = ctx.getCompiledModule(MODULE_NAME).getObjects().get("testObject3");
+
+            assertNotNull(compiledValue);
+        }
+
     }
 
     @Nested
