@@ -46,6 +46,7 @@ import ch.eskaton.asn4j.parser.ast.types.SequenceType;
 import ch.eskaton.asn4j.parser.ast.types.SetOfType;
 import ch.eskaton.asn4j.parser.ast.types.SetType;
 import ch.eskaton.asn4j.parser.ast.types.Type;
+import ch.eskaton.asn4j.parser.ast.types.TypeFromObject;
 import ch.eskaton.asn4j.parser.ast.types.TypeReference;
 
 import java.util.Optional;
@@ -85,6 +86,10 @@ public class NamedTypeCompiler implements Compiler<NamedType> {
             var compiler = ctx.<ObjectClassFieldType, ObjectClassFieldTypeCompiler>getCompiler(ObjectClassFieldType.class);
 
             return compiler.compile(ctx, name, objectClassFieldType, maybeParameters);
+        } else if (type instanceof TypeFromObject typeFromObject) {
+            var compiler = ctx.<TypeFromObject, TypeFromObjectCompiler>getCompiler(TypeFromObject.class);
+
+            return compiler.compile(ctx, name, typeFromObject, maybeParameters);
         }
 
         return ctx.createCompiledType(type, ctx.getTypeName(type, name), true);

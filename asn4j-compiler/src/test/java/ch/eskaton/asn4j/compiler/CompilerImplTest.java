@@ -50,6 +50,7 @@ import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
 import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
 import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
 import ch.eskaton.asn4j.compiler.results.CompiledBitStringType;
+import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
@@ -689,6 +690,42 @@ class CompilerImplTest {
                 """;
         testModule(body, CompilerException.class,
                 ".*Expected a value of type BOOLEAN but 'int' refers to a value of type INTEGER.*");
+    }
+
+    @Test
+    void testSequenceWithTypeFromObject() throws IOException, ParserException {
+        var body = """
+                    TEST ::= CLASS {
+                      &Type
+                    }
+
+                    object TEST ::= {
+                      &Type BOOLEAN
+                    }
+
+                    Seq ::= SEQUENCE {
+                        field object.&Type
+                    }
+                """;
+
+        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+        assertTrue(compiledType instanceof CompiledCollectionType);
+
+        var compiledCollectionType = (CompiledCollectionType) compiledType;
+        var maybeField = compiledCollectionType.getComponents().stream()
+                .filter(c -> c.getName().equals("field"))
+                .findFirst();
+
+        assertTrue(maybeField.isPresent());
+
+        var field = maybeField.get();
+
+        assertTrue(field instanceof CompiledCollectionComponent);
+
+        var compiledCollectionComponent = (CompiledCollectionComponent) field;
+
+        assertTrue(compiledCollectionComponent.getCompiledType().getType() instanceof BooleanType);
     }
 
     @SuppressWarnings("unused")
