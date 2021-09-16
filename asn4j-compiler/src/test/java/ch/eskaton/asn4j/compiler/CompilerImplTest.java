@@ -589,143 +589,194 @@ class CompilerImplTest {
         assertEquals(12, value.getValue().intValue());
     }
 
-    @Test
-    void testSequenceWithChoiceWithDefault() throws IOException, ParserException {
-        var body = """
-                Seq ::= SEQUENCE {
-                    choice CHOICE {
-                        a INTEGER,
-                        b BOOLEAN
-                    } DEFAULT a: 25
-                }
-                """;
+    @Nested
+    @DisplayName("Test SEQUENCE type")
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    class Sequence {
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        var compiledCollectionType = (CompiledCollectionType) compiledType;
-        var field = compiledCollectionType.getComponents().stream()
-                .filter(c -> c.getName().equals("choice"))
-                .findFirst();
-
-        assertTrue(field.isPresent());
-
-        var defaultValue = field.get().getDefaultValue();
-
-        assertTrue(defaultValue.isPresent());
-
-        var value = defaultValue.get().getValue();
-
-        assertTrue(value instanceof ChoiceValue);
-
-        var choiceValue = (ChoiceValue) value;
-
-        assertEquals("a", choiceValue.getId());
-        assertTrue(choiceValue.getValue() instanceof IntegerValue);
-    }
-
-    @Test
-    void testSequenceWithParameterizedComponent() throws IOException, ParserException {
-        var body = """
-                Seq2{Type} ::= SEQUENCE {
-                    field2 Type
-                }
-
-                Seq1 ::= SEQUENCE {
-                    field1 Seq2{BOOLEAN}
-                }
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq1");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        var compiledCollectionType1 = (CompiledCollectionType) compiledType;
-        var maybeField1 = compiledCollectionType1.getComponents().stream()
-                .filter(c -> c.getName().equals("field1"))
-                .findFirst();
-
-        assertTrue(maybeField1.isPresent());
-
-        var field1 = maybeField1.get();
-
-        assertTrue(field1 instanceof CompiledCollectionComponent);
-
-        var compiledCollectionComponent = (CompiledCollectionComponent) field1;
-
-        assertTrue(compiledCollectionComponent.getCompiledType() instanceof CompiledCollectionType);
-
-        var compiledCollectionType2 = (CompiledCollectionType) compiledCollectionComponent.getCompiledType();
-
-        var maybeField2 = compiledCollectionType2.getComponents().stream()
-                .filter(c -> c.getName().equals("field2"))
-                .findFirst();
-
-        assertTrue(maybeField2.isPresent());
-
-        var field2 = maybeField2.get();
-
-        assertTrue(field2.getCompiledType().getType() instanceof BooleanType);
-    }
-
-    @Test
-    void testSequenceWithDefaultInvalidValue() {
-        var body = """
-                Seq ::= SEQUENCE {
-                    field BOOLEAN DEFAULT 25
-                }
-                """;
-        testModule(body, CompilerException.class, ".*Invalid BOOLEAN value: 25.*");
-    }
-
-    @Test
-    void testSequenceWithDefaultInvalidReference() {
-        var body = """
-                int INTEGER ::= 25
-                                
-                Seq ::= SEQUENCE {
-                    field BOOLEAN DEFAULT int
-                }
-                """;
-        testModule(body, CompilerException.class,
-                ".*Expected a value of type BOOLEAN but 'int' refers to a value of type INTEGER.*");
-    }
-
-    @Test
-    void testSequenceWithTypeFromObject() throws IOException, ParserException {
-        var body = """
-                    TEST ::= CLASS {
-                      &Type
-                    }
-
-                    object TEST ::= {
-                      &Type BOOLEAN
-                    }
-
+        @Test
+        void withChoiceWithDefault() throws IOException, ParserException {
+            var body = """
                     Seq ::= SEQUENCE {
-                        field object.&Type
+                        choice CHOICE {
+                            a INTEGER,
+                            b BOOLEAN
+                        } DEFAULT a: 25
                     }
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            var compiledCollectionType = (CompiledCollectionType) compiledType;
+            var field = compiledCollectionType.getComponents().stream()
+                    .filter(c -> c.getName().equals("choice"))
+                    .findFirst();
+
+            assertTrue(field.isPresent());
+
+            var defaultValue = field.get().getDefaultValue();
+
+            assertTrue(defaultValue.isPresent());
+
+            var value = defaultValue.get().getValue();
+
+            assertTrue(value instanceof ChoiceValue);
+
+            var choiceValue = (ChoiceValue) value;
+
+            assertEquals("a", choiceValue.getId());
+            assertTrue(choiceValue.getValue() instanceof IntegerValue);
+        }
+
+        @Test
+        void withParameterizedComponent() throws IOException, ParserException {
+            var body = """
+                    Seq2{Type} ::= SEQUENCE {
+                        field2 Type
+                    }
+
+                    Seq1 ::= SEQUENCE {
+                        field1 Seq2{BOOLEAN}
+                    }
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq1");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            var compiledCollectionType1 = (CompiledCollectionType) compiledType;
+            var maybeField1 = compiledCollectionType1.getComponents().stream()
+                    .filter(c -> c.getName().equals("field1"))
+                    .findFirst();
+
+            assertTrue(maybeField1.isPresent());
+
+            var field1 = maybeField1.get();
+
+            assertTrue(field1 instanceof CompiledCollectionComponent);
+
+            var compiledCollectionComponent = (CompiledCollectionComponent) field1;
+
+            assertTrue(compiledCollectionComponent.getCompiledType() instanceof CompiledCollectionType);
+
+            var compiledCollectionType2 = (CompiledCollectionType) compiledCollectionComponent.getCompiledType();
+
+            var maybeField2 = compiledCollectionType2.getComponents().stream()
+                    .filter(c -> c.getName().equals("field2"))
+                    .findFirst();
+
+            assertTrue(maybeField2.isPresent());
+
+            var field2 = maybeField2.get();
+
+            assertTrue(field2.getCompiledType().getType() instanceof BooleanType);
+        }
+
+        @Test
+        void withDefaultInvalidValue() {
+            var body = """
+                    Seq ::= SEQUENCE {
+                        field BOOLEAN DEFAULT 25
+                    }
+                    """;
+            testModule(body, CompilerException.class, ".*Invalid BOOLEAN value: 25.*");
+        }
+
+        @Test
+        void withDefaultInvalidReference() {
+            var body = """
+                    int INTEGER ::= 25
+                                    
+                    Seq ::= SEQUENCE {
+                        field BOOLEAN DEFAULT int
+                    }
+                    """;
+            testModule(body, CompilerException.class,
+                    ".*Expected a value of type BOOLEAN but 'int' refers to a value of type INTEGER.*");
+        }
+
+        @Test
+        void withTypeFromObject() throws IOException, ParserException {
+            var body = """
+                        TEST ::= CLASS {
+                          &Type
+                        }
+
+                        object TEST ::= {
+                          &Type BOOLEAN
+                        }
+
+                        Seq ::= SEQUENCE {
+                            field object.&Type
+                        }
+                    """;
+
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+
+            assertTrue(compiledType instanceof CompiledCollectionType);
+
+            var compiledCollectionType = (CompiledCollectionType) compiledType;
+            var maybeField = compiledCollectionType.getComponents().stream()
+                    .filter(c -> c.getName().equals("field"))
+                    .findFirst();
+
+            assertTrue(maybeField.isPresent());
+
+            var field = maybeField.get();
+
+            assertTrue(field instanceof CompiledCollectionComponent);
+
+            var compiledCollectionComponent = (CompiledCollectionComponent) field;
+
+            assertTrue(compiledCollectionComponent.getCompiledType().getType() instanceof BooleanType);
+        }
+
+        @Test
+        void withComponentsOfReference() throws IOException, ParserException {
+            var body = """
+                Seq1 ::= SEQUENCE {a INTEGER, b BOOLEAN}
+                Seq2 ::= SEQUENCE { 
+                    COMPONENTS OF Seq1 
+                }
                 """;
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq2");
 
-        assertTrue(compiledType instanceof CompiledCollectionType);
+            assertTrue(compiledType instanceof CompiledCollectionType);
 
-        var compiledCollectionType = (CompiledCollectionType) compiledType;
-        var maybeField = compiledCollectionType.getComponents().stream()
-                .filter(c -> c.getName().equals("field"))
-                .findFirst();
+            testCollectionField((CompiledCollectionType) compiledType, "a", IntegerType.class);
+            testCollectionField((CompiledCollectionType) compiledType, "b", BooleanType.class);
+        }
 
-        assertTrue(maybeField.isPresent());
+        @Test
+        void withComponentsOf() throws IOException, ParserException {
+            var body = """
+                Seq ::= SEQUENCE { 
+                    COMPONENTS OF SEQUENCE {a INTEGER, b BOOLEAN} 
+                }
+                """;
 
-        var field = maybeField.get();
+            var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
 
-        assertTrue(field instanceof CompiledCollectionComponent);
+            assertTrue(compiledType instanceof CompiledCollectionType);
 
-        var compiledCollectionComponent = (CompiledCollectionComponent) field;
+            testCollectionField((CompiledCollectionType) compiledType, "a", IntegerType.class);
+            testCollectionField((CompiledCollectionType) compiledType, "b", BooleanType.class);
+        }
 
-        assertTrue(compiledCollectionComponent.getCompiledType().getType() instanceof BooleanType);
+        @Test
+        void withComponentsOfInvalidType() {
+            var body = """
+                Seq ::= SEQUENCE { 
+                    COMPONENTS OF SET {a INTEGER, b BOOLEAN} 
+                }
+                """;
+
+            testModule(body, CompilerException.class, ".*Invalid type 'SET' in COMPONENTS OF 'Seq'.*");
+        }
+
     }
 
     @SuppressWarnings("unused")
@@ -989,49 +1040,7 @@ class CompilerImplTest {
         testModule(body, CompilerException.class, "Duplicate component name in SEQUENCE 'Sequence': a.*");
     }
 
-    @Test
-    void testSequenceWithComponentsOfReference() throws IOException, ParserException {
-        var body = """
-                Seq1 ::= SEQUENCE {a INTEGER, b BOOLEAN}
-                Seq2 ::= SEQUENCE { 
-                    COMPONENTS OF Seq1 
-                }
-                """;
 
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq2");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        testCollectionField((CompiledCollectionType) compiledType, "a", IntegerType.class);
-        testCollectionField((CompiledCollectionType) compiledType, "b", BooleanType.class);
-    }
-
-    @Test
-    void testSequenceWithComponentsOf() throws IOException, ParserException {
-        var body = """
-                Seq ::= SEQUENCE { 
-                    COMPONENTS OF SEQUENCE {a INTEGER, b BOOLEAN} 
-                }
-                """;
-
-        var compiledType = getCompiledType(body, MODULE_NAME, "Seq");
-
-        assertTrue(compiledType instanceof CompiledCollectionType);
-
-        testCollectionField((CompiledCollectionType) compiledType, "a", IntegerType.class);
-        testCollectionField((CompiledCollectionType) compiledType, "b", BooleanType.class);
-    }
-
-    @Test
-    void testSequenceWithComponentsOfInvalidType() {
-        var body = """
-                Seq ::= SEQUENCE { 
-                    COMPONENTS OF SET {a INTEGER, b BOOLEAN} 
-                }
-                """;
-
-        testModule(body, CompilerException.class, ".*Invalid type 'SET' in COMPONENTS OF 'Seq'.*");
-    }
 
     @Test
     void testRedefinitionOfType() {
