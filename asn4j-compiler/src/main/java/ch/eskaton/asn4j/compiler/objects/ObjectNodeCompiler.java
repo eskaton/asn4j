@@ -34,14 +34,16 @@ import ch.eskaton.asn4j.compiler.CompilerUtils;
 import ch.eskaton.asn4j.compiler.IllegalCompilerStateException;
 import ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier;
 import ch.eskaton.asn4j.compiler.parameters.Parameters;
-import ch.eskaton.asn4j.compiler.parameters.ParametersHelper;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ObjectDefnNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 import ch.eskaton.asn4j.parser.ast.ObjectReference;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
@@ -51,14 +53,20 @@ import static ch.eskaton.asn4j.compiler.parameters.ParametersHelper.updateParame
 
 public class ObjectNodeCompiler implements Compiler<ObjectNode> {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     public CompiledObject compile(CompilerContext ctx, String name, CompiledObjectClass objectClass,
             ObjectNode object, Optional<Parameters> maybeParameters) {
         if (object instanceof ObjectDefnNode objectDefnNode) {
+            LOGGER.trace("Compiling object definition node %s", objectDefnNode);
+
             var compiler = ctx.<ObjectDefnNode, ObjectDefnCompiler>getCompiler(ObjectDefnNode.class);
             var objectDefinition = compiler.compile(objectClass, objectDefnNode, maybeParameters);
 
             return ctx.createCompiledObject(name, objectClass, objectDefinition);
         } else if (object instanceof ObjectReference objectReference) {
+            LOGGER.trace("Compiling object reference %s", objectReference.getReference());
+
             var maybeObjRefParameters = objectReference.getParameters();
 
             if (maybeObjRefParameters.isPresent()) {
