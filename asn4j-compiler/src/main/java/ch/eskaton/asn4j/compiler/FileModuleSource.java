@@ -27,12 +27,15 @@
 
 package ch.eskaton.asn4j.compiler;
 
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.commons.collections.Tuple2;
 import ch.eskaton.commons.io.FileSourceInputStream;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -43,6 +46,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class FileModuleSource implements ModuleSource {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static final String ASN_1_EXTENSION = "asn1";
 
@@ -63,7 +68,7 @@ public class FileModuleSource implements ModuleSource {
                 for (Path path : directoryStream) {
                     var file = path.toFile();
 
-                    System.out.println("Adding ASN.1 source file: %s".formatted(file));
+                    LOGGER.info("Adding ASN.1 source file: %s", file);
 
                     modules.add(Tuple2.of(file.getAbsolutePath(), new FileSourceInputStream(path.toFile())));
                 }

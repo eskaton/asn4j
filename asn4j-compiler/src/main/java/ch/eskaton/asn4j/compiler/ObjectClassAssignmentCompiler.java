@@ -31,15 +31,20 @@ import ch.eskaton.asn4j.compiler.objects.ObjectClassNodeCompiler;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
 import ch.eskaton.asn4j.parser.ast.ObjectClassAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectClassNode;
+import ch.eskaton.asn4j.logging.LoggerFactory;
+import ch.eskaton.asn4j.logging.Logger;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 public class ObjectClassAssignmentCompiler implements Compiler<ObjectClassAssignmentNode> {
 
-    public CompiledObjectClass compile(CompilerContext ctx, ObjectClassAssignmentNode node) {
-        String objectClassName = node.getReference();
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-        System.out.println("Compiling object class " + objectClassName);
+    public CompiledObjectClass compile(CompilerContext ctx, ObjectClassAssignmentNode node) {
+        var objectClassName = node.getReference();
+
+        LOGGER.info("Compiling object class %s", objectClassName);
 
         ObjectClassNodeCompiler compiler = ctx.getCompiler(ObjectClassNode.class);
 

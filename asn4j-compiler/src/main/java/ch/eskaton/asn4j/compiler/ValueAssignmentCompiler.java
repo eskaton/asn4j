@@ -29,17 +29,22 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledValue;
 import ch.eskaton.asn4j.compiler.values.ValueCompiler;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.ast.ValueAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.values.Value;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 public class ValueAssignmentCompiler implements Compiler<ValueAssignmentNode> {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     public CompiledValue<Value> compile(CompilerContext ctx, ValueAssignmentNode node) {
         var valueName = node.getReference();
 
-        System.out.println("Compiling value " + valueName);
+        LOGGER.info("Compiling value %s", valueName);
 
         var value = node.getValue();
         var compiler = ctx.<Value, ValueCompiler>getCompiler(Value.class);

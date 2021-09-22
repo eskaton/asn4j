@@ -29,17 +29,22 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.types.TypeCompiler;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.ast.TypeAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.types.Type;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 public class TypeAssignmentCompiler implements Compiler<TypeAssignmentNode> {
 
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     public CompiledType compile(CompilerContext ctx, TypeAssignmentNode node) {
         var typeName = node.getReference();
 
-        System.out.println("Compiling type " + typeName);
+        LOGGER.info("Compiling type %s", typeName);
 
         var compiler = ctx.<Type, TypeCompiler>getCompiler(Type.class);
 

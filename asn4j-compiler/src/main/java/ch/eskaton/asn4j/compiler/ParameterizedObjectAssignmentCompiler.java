@@ -28,9 +28,15 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObject;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.ast.ParameterizedObjectAssignmentNode;
 
+import java.lang.invoke.MethodHandles;
+
 public class ParameterizedObjectAssignmentCompiler implements Compiler<ParameterizedObjectAssignmentNode> {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CompiledParameterizedObject compile(CompilerContext ctx, ParameterizedObjectAssignmentNode node) {
         var typeName = node.getReference();
@@ -38,7 +44,7 @@ public class ParameterizedObjectAssignmentCompiler implements Compiler<Parameter
         var object = node.getObject();
         var parameters = node.getParameters();
 
-        System.out.println("Compiling parameterized object " + typeName);
+        LOGGER.info("Compiling parameterized object %s", typeName);
 
         return ctx.createCompiledParameterizedObject(typeName, objectClass, object, parameters);
     }

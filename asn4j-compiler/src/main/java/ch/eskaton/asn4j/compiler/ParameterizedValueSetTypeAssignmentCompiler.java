@@ -28,9 +28,15 @@
 package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedValueSetType;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.ast.ParameterizedValueSetTypeAssignmentNode;
 
+import java.lang.invoke.MethodHandles;
+
 public class ParameterizedValueSetTypeAssignmentCompiler implements Compiler<ParameterizedValueSetTypeAssignmentNode> {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CompiledParameterizedValueSetType compile(CompilerContext ctx, ParameterizedValueSetTypeAssignmentNode node) {
         var typeName = node.getReference();
@@ -38,7 +44,7 @@ public class ParameterizedValueSetTypeAssignmentCompiler implements Compiler<Par
         var elementSet = node.getElementSet();
         var parameters = node.getParameters();
 
-        System.out.println("Compiling parameterized value set type " + typeName);
+        LOGGER.info("Compiling parameterized value set type %s", typeName);
 
         return ctx.createCompiledParameterizedValueSetType(typeName, type, elementSet, parameters);
     }

@@ -29,17 +29,22 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.objects.ObjectNodeCompiler;
 import ch.eskaton.asn4j.compiler.results.CompiledObject;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.ast.ObjectAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectNode;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 public class ObjectAssignmentCompiler implements Compiler<ObjectAssignmentNode> {
 
-    public CompiledObject compile(CompilerContext ctx, ObjectAssignmentNode node) {
-        String objectName = node.getReference();
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-        System.out.println("Compiling object " + objectName);
+    public CompiledObject compile(CompilerContext ctx, ObjectAssignmentNode node) {
+        var objectName = node.getReference();
+
+        LOGGER.info("Compiling object %s", objectName);
 
         var objectClass = ctx.getCompiledObjectClass(node.getObjectClassReference());
         var object = node.getObject();

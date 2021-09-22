@@ -41,6 +41,8 @@ import ch.eskaton.asn4j.compiler.results.CompiledParameterizedType;
 import ch.eskaton.asn4j.compiler.results.CompiledParameterizedValueSetType;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.CompiledValue;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.AssignmentNode;
@@ -69,6 +71,7 @@ import ch.eskaton.commons.utils.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -81,6 +84,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class CompilerImpl {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private CompilerConfig config;
 
@@ -114,8 +119,8 @@ public class CompilerImpl {
         loadAndCompileModule(config.getModule());
         generateJavaClasses();
 
-        System.out.println("Total compilation time " + String.format("%.3f",
-                (System.currentTimeMillis() - begin) / 1000.0) + "s");
+        LOGGER.info("Total compilation time %ss", String.format("%.3f",
+                (System.currentTimeMillis() - begin) / 1000.0));
     }
 
     private void generateJavaClasses() {
@@ -179,7 +184,7 @@ public class CompilerImpl {
 
             assignments.push(Tuple2.of(moduleName, assignmentsList));
 
-            System.out.println("Loaded module " + moduleName);
+            LOGGER.info("Loaded module %s", moduleName);
         } catch (ParserException e) {
             throw new ParserException("Failed to load module from source %s", e, moduleStream.get_1());
         }
@@ -189,7 +194,7 @@ public class CompilerImpl {
         for (var moduleAssignments : assignments) {
             var moduleName = moduleAssignments.get_1();
 
-            System.out.println("Compiling module " + moduleName + "...");
+            LOGGER.info("Compiling module %s...", moduleName);
 
             compilerContext.executeWithModule(moduleName, () -> {
                 compileAssignments(moduleAssignments.get_2());

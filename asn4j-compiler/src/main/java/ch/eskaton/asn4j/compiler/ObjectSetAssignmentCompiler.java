@@ -29,12 +29,17 @@ package ch.eskaton.asn4j.compiler;
 
 import ch.eskaton.asn4j.compiler.objects.ObjectSetCompiler;
 import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.ast.ObjectSetAssignmentNode;
 import ch.eskaton.asn4j.parser.ast.ObjectSetSpecNode;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignmentNode> {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private CompilerContext ctx;
 
@@ -45,7 +50,7 @@ public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignment
     public CompiledObjectSet compile(ObjectSetAssignmentNode node) {
         var objectSetName = node.getReference();
 
-        System.out.println("Compiling object set " + objectSetName);
+        LOGGER.info("Compiling object set %s", objectSetName);
 
         var objectClassReference = node.getObjectClassReference();
         var objectClass = ctx.getCompiledObjectClass(objectClassReference);
