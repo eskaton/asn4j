@@ -119,35 +119,33 @@ public class ParametersHelper {
 
             parameterValue = handleNull(ctx, parameters, parameterDefinition, parameterValue);
 
-            if (parameterValue instanceof ActualParameter actualParameter) {
-                var maybeValue = actualParameter.getValue();
+            var maybeValue = parameterValue.getValue();
 
-                if (maybeValue.isPresent()) {
-                    var value = maybeValue.get();
-                    var governor = parameterDefinition.getGovernor();
-                    var expectedType = getParameterType(ctx, parameters, governor);
+            if (maybeValue.isPresent()) {
+                var value = maybeValue.get();
+                var governor = parameterDefinition.getGovernor();
+                var expectedType = getParameterType(ctx, parameters, governor);
 
-                    if (expectedType == null) {
-                        var formattedValue = ValueFormatter.formatValue(value);
+                if (expectedType == null) {
+                    var formattedValue = ValueFormatter.formatValue(value);
 
-                        throw new CompilerException(governor.getPosition(),
-                                "Failed to resolve resolve the type for parameter value: %s", formattedValue);
-                    }
+                    throw new CompilerException(governor.getPosition(),
+                            "Failed to resolve resolve the type for parameter value: %s", formattedValue);
+                }
 
-                    try {
-                        // verify that the value is of the expected type
-                        ctx.getValue(expectedType, value);
+                try {
+                    // verify that the value is of the expected type
+                    ctx.getValue(expectedType, value);
 
-                        parameters.markAsUsed(parameterDefinition);
+                    parameters.markAsUsed(parameterDefinition);
 
-                        return Optional.of(value);
-                    } catch (ValueResolutionException e) {
-                        var formattedType = TypeFormatter.formatType(ctx, expectedType);
-                        var formattedValue = ValueFormatter.formatValue(value);
+                    return Optional.of(value);
+                } catch (ValueResolutionException e) {
+                    var formattedType = TypeFormatter.formatType(ctx, expectedType);
+                    var formattedValue = ValueFormatter.formatValue(value);
 
-                        throw new CompilerException(parameterValue.getPosition(),
-                                "Expected a value of type %s but found: %s", formattedType, formattedValue);
-                    }
+                    throw new CompilerException(parameterValue.getPosition(),
+                            "Expected a value of type %s but found: %s", formattedType, formattedValue);
                 }
             }
         }

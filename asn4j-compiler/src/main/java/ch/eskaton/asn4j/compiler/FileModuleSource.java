@@ -47,7 +47,7 @@ import java.util.List;
 
 public class FileModuleSource implements ModuleSource {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static final String ASN_1_EXTENSION = "asn1";
 

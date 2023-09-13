@@ -25,28 +25,28 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.logging;
 
-import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectSet;
-import ch.eskaton.asn4j.logging.Logger;
-import ch.eskaton.asn4j.logging.LoggerFactory;
-import ch.eskaton.asn4j.parser.ast.ParameterizedObjectSetAssignmentNode;
+import ch.eskaton.asn4j.compiler.CompilerContext;
 
-import java.lang.invoke.MethodHandles;
+public class Logger {
 
-public class ParameterizedObjectSetAssignmentCompiler implements Compiler<ParameterizedObjectSetAssignmentNode> {
+    private final Class<?> clazz;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    public Logger(Class<?> clazz) {
+        this.clazz = clazz;
+    }
 
-    public CompiledParameterizedObjectSet compile(CompilerContext ctx, ParameterizedObjectSetAssignmentNode node) {
-        var typeName = node.getReference();
-        var objectClass = node.getObjectClass();
-        var objectSet = node.getObjectSet();
-        var parameters = node.getParameters();
+    public void info(String format, Object... parameters) {
+        System.out.println(String.format(String.format("I: %s - %s", clazz.getName(), format), parameters));
+    }
 
-        LOGGER.info("Compiling parameterized object set %s", typeName);
+    public void trace(String format, Object... parameters) {
+        System.out.println(String.format(String.format("T: %s - %s", clazz.getName(), format), parameters));
+    }
 
-        return ctx.createCompiledParameterizedObjectSet(typeName, objectClass, objectSet, parameters);
+    public void trace(String format, CompilerContext ctx, Object... parameters) {
+        System.out.println(String.format(String.format("T: %s - %s - %s", ctx.getModule().getModuleId().getModuleName(), clazz.getName(), format), parameters));
     }
 
 }

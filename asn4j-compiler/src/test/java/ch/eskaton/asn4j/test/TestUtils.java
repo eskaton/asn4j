@@ -29,6 +29,9 @@ package ch.eskaton.asn4j.test;
 
 import ch.eskaton.commons.utils.CollectionUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -52,9 +55,18 @@ public class TestUtils {
             action.execute();
             fail(exception.getSimpleName() + " expected");
         } catch (Exception e) {
-            assertTrue(exception.isAssignableFrom(rootCause(e).getClass()),
-                    () -> String.format("Expected an exception of type %s but was %s",
-                            exception.getSimpleName(), rootCause(e).getClass().getSimpleName()));
+            var rootCause = rootCause(e);
+
+            assertTrue(exception.isAssignableFrom(rootCause.getClass()),
+                    () -> {
+                        var baos = new ByteArrayOutputStream();
+                        var ps = new PrintStream(baos);
+
+                        rootCause.printStackTrace(ps);
+
+                        return String.format("Expected an exception of type %s but was %s",
+                                exception.getSimpleName(), baos.toString(Charset.defaultCharset()));
+                    });
 
             return Optional.of(e);
         }

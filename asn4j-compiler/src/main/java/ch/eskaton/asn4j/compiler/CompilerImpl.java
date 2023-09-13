@@ -85,7 +85,7 @@ import java.util.stream.Collectors;
 
 public class CompilerImpl {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private CompilerConfig config;
 

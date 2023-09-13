@@ -25,28 +25,12 @@
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package ch.eskaton.asn4j.compiler;
+package ch.eskaton.asn4j.logging;
 
-import ch.eskaton.asn4j.compiler.results.CompiledParameterizedObjectSet;
-import ch.eskaton.asn4j.logging.Logger;
-import ch.eskaton.asn4j.logging.LoggerFactory;
-import ch.eskaton.asn4j.parser.ast.ParameterizedObjectSetAssignmentNode;
+public class LoggerFactory {
 
-import java.lang.invoke.MethodHandles;
-
-public class ParameterizedObjectSetAssignmentCompiler implements Compiler<ParameterizedObjectSetAssignmentNode> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    public CompiledParameterizedObjectSet compile(CompilerContext ctx, ParameterizedObjectSetAssignmentNode node) {
-        var typeName = node.getReference();
-        var objectClass = node.getObjectClass();
-        var objectSet = node.getObjectSet();
-        var parameters = node.getParameters();
-
-        LOGGER.info("Compiling parameterized object set %s", typeName);
-
-        return ctx.createCompiledParameterizedObjectSet(typeName, objectClass, objectSet, parameters);
+    public static Logger getLogger(Class<?> clazz) {
+        return new Logger(clazz);
     }
 
 }

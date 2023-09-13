@@ -45,6 +45,8 @@ import ch.eskaton.asn4j.compiler.types.TypeFromObjectCompiler;
 import ch.eskaton.asn4j.compiler.types.formatters.TypeFormatter;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.compiler.values.formatters.ValueFormatter;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.Parser;
 import ch.eskaton.asn4j.parser.Parser.DefinedSyntaxReParser;
 import ch.eskaton.asn4j.parser.ParserException;
@@ -76,6 +78,7 @@ import ch.eskaton.commons.collections.Tuple2;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,6 +89,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private CompilerContext ctx;
 
@@ -203,35 +208,27 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
         var token = requiredToken.getToken();
 
         if (token instanceof LiteralNode literalNodeSpec) {
-            var element = parser.parseLiteral();
+            var literalNode = parser.parseLiteral();
 
-            if (!(element instanceof LiteralNode literalNode)) {
-                var unexpectedToken = parser.peekToken();
+            if (literalNode == null) {
+                var errorToken = parser.getToken();
 
-                throw new CompilerException(unexpectedToken.getPosition(), "Expected literal '%s' but found '%s'",
-                        literalNodeSpec.getText(), unexpectedToken.getText());
-            }
-
-            if (!literalNodeSpec.getText().equals(literalNode.getText())) {
+                throw new CompilerException(errorToken.getPosition(), "Expected literal '%s' but found '%s'",
+                        literalNodeSpec.getText(), errorToken.getText());
+            } else if (!literalNodeSpec.getText().equals(literalNode.getText())) {
                 if (state.optional && !state.accepted) {
-                    parser.push(element);
+                    parser.push(literalNode);
 
                     return state;
                 }
 
-                throw new CompilerException(element.getPosition(), "Expected literal '%s' but found '%s'",
+                throw new CompilerException(literalNode.getPosition(), "Expected literal '%s' but found '%s'",
                         literalNodeSpec.getText(), literalNode.getText());
             } else {
                 state = state.accepted(true);
             }
         } else if (token instanceof PrimitiveFieldNameNode fieldNameNode) {
             var element = parser.parseSetting();
-
-            if (!(element instanceof Setting)) {
-                var formattedElement = Formatter.format(ctx, element);
-
-                throw new CompilerException(element.getPosition(), "Expected setting but found '%s'", formattedElement);
-            }
 
             compilePrimitiveFieldName(objectClass, values, maybeParameters, element, fieldNameNode);
 
@@ -307,15 +304,25 @@ public class ObjectDefnCompiler implements Compiler<ObjectDefnNode> {
             var field = maybeField.get();
 
             if (field instanceof CompiledFixedTypeValueField) {
+                LOGGER.trace("Compiling fixed type value field '%s'", ctx, reference);
+
                 return compileFixedTypeValueField((CompiledFixedTypeValueField) field, reference, setting,
                         maybeParameters);
             } else if (field instanceof CompiledTypeField) {
+                LOGGER.trace("Compiling type field '%s'", ctx, reference);
+
                 return compileTypeField(setting, reference, maybeParameters);
             } else if (field instanceof CompiledVariableTypeValueField) {
+                LOGGER.trace("Compiling variable type value field '%s'", ctx, reference);
+
                 return compileVariableTypeValueField(setting, reference);
             } else if (field instanceof CompiledObjectField) {
+                LOGGER.trace("Compiling object field '%s'", ctx, reference);
+
                 return compileObjectField((CompiledObjectField) field, reference, setting, maybeParameters);
             } else if (field instanceof CompiledObjectSetField) {
+                LOGGER.trace("Compiling object set field '%s'", ctx, reference);
+
                 return compileObjectSetField((CompiledObjectSetField) field, reference, setting, maybeParameters);
             } else {
                 throw new IllegalCompilerStateException(fieldName.getPosition(), "Unsupported field '%s' of type %s",

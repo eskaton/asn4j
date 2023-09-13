@@ -36,7 +36,7 @@ import java.lang.invoke.MethodHandles;
 
 public class ParameterizedValueSetTypeAssignmentCompiler implements Compiler<ParameterizedValueSetTypeAssignmentNode> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CompiledParameterizedValueSetType compile(CompilerContext ctx, ParameterizedValueSetTypeAssignmentNode node) {
         var typeName = node.getReference();

@@ -39,7 +39,7 @@ import java.util.Optional;
 
 public class ObjectClassAssignmentCompiler implements Compiler<ObjectClassAssignmentNode> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CompiledObjectClass compile(CompilerContext ctx, ObjectClassAssignmentNode node) {
         var objectClassName = node.getReference();

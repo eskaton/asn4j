@@ -39,7 +39,7 @@ import java.util.Optional;
 
 public class TypeAssignmentCompiler implements Compiler<TypeAssignmentNode> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CompiledType compile(CompilerContext ctx, TypeAssignmentNode node) {
         var typeName = node.getReference();

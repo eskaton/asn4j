@@ -39,7 +39,7 @@ import java.util.Optional;
 
 public class ValueAssignmentCompiler implements Compiler<ValueAssignmentNode> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CompiledValue<Value> compile(CompilerContext ctx, ValueAssignmentNode node) {
         var valueName = node.getReference();

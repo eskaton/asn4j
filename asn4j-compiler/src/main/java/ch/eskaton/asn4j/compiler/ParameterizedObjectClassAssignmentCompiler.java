@@ -36,7 +36,7 @@ import java.lang.invoke.MethodHandles;
 
 public class ParameterizedObjectClassAssignmentCompiler implements Compiler<ParameterizedObjectClassAssignmentNode> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public CompiledParameterizedObjectClass compile(CompilerContext ctx, ParameterizedObjectClassAssignmentNode node) {
         var typeName = node.getReference();

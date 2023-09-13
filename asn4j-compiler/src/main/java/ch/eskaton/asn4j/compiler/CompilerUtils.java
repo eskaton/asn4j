@@ -27,14 +27,15 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.Kind;
 import ch.eskaton.asn4j.compiler.java.objs.JavaAnnotation;
+import ch.eskaton.asn4j.compiler.parameters.ParameterUsageVerifier.Kind;
 import ch.eskaton.asn4j.compiler.parameters.Parameters;
-import ch.eskaton.asn4j.compiler.parameters.ParametersHelper;
 import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
 import ch.eskaton.asn4j.compiler.results.CompiledComponent;
 import ch.eskaton.asn4j.compiler.results.CompiledType;
 import ch.eskaton.asn4j.compiler.results.HasComponents;
+import ch.eskaton.asn4j.logging.Logger;
+import ch.eskaton.asn4j.logging.LoggerFactory;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectSetReference;
 import ch.eskaton.asn4j.parser.ast.ModuleNode;
@@ -63,6 +64,7 @@ import ch.eskaton.asn4j.runtime.annotations.ASN1Tags;
 import ch.eskaton.commons.MutableReference;
 import ch.eskaton.commons.utils.StringUtils;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -80,6 +82,8 @@ import static ch.eskaton.asn4j.runtime.TaggingMode.EXPLICIT;
 import static ch.eskaton.asn4j.runtime.TaggingMode.IMPLICIT;
 
 public class CompilerUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private CompilerUtils() {
     }
@@ -342,7 +346,7 @@ public class CompilerUtils {
                     .map(CompiledComponent::getCompiledType)
                     .map(CompiledType::getTags)
                     .map(tags -> tags.map(t -> t.stream().findFirst())).
-                            flatMap(Optional::stream)
+                    flatMap(Optional::stream)
                     .flatMap(Optional::stream)
                     .collect(Collectors.toSet());
         } else {
@@ -443,6 +447,12 @@ public class CompilerUtils {
             Optional<Parameters> maybeParameters) {
         var referencedTypeName = typeReference.getType();
         var maybeTypeRefParams = typeReference.getParameters();
+
+        if (typeReference.getModuleName() == null) {
+            LOGGER.trace("Compiling type reference %s.%s", ctx.getModule().getModuleId().getModuleName(), typeReference.getType());
+        } else {
+            LOGGER.trace("Compiling type reference %s.%s", typeReference.getModuleName(), typeReference.getType());
+        }
 
         if (maybeParameters.isPresent()) {
             if (maybeTypeRefParams.isPresent()) {

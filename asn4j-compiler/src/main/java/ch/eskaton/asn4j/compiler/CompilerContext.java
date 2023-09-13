@@ -66,7 +66,6 @@ import ch.eskaton.asn4j.compiler.values.AbstractValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueCompiler;
 import ch.eskaton.asn4j.compiler.values.ValueResolutionException;
 import ch.eskaton.asn4j.parser.ParserException;
-import ch.eskaton.asn4j.parser.ast.ActualParameter;
 import ch.eskaton.asn4j.parser.ast.ElementSetSpecsNode;
 import ch.eskaton.asn4j.parser.ast.ExportsNode;
 import ch.eskaton.asn4j.parser.ast.ExternalObjectReference;
@@ -484,8 +483,8 @@ public class CompilerContext {
                     (ref, mod) -> compiler.compileType(ref, mod), this::getTypesOfModule);
         } catch (ResolutionException e1) {
             try {
-            return getCompilationResult(reference, Optional.empty(), "ValueSet", this::getTypesOfCurrentModule,
-                    (ref, mod) -> compiler.compileValueSetType(ref, mod), this::getTypesOfModule);
+                return getCompilationResult(reference, Optional.empty(), "ValueSet", this::getTypesOfCurrentModule,
+                        (ref, mod) -> compiler.compileValueSetType(ref, mod), this::getTypesOfModule);
             } catch (ResolutionException e2) {
                 throw e1;
             }
@@ -589,15 +588,13 @@ public class CompilerContext {
 
             parameters.markAsUsed(parameter);
 
-            if (node instanceof ActualParameter actualParameter) {
-                var maybeObject = actualParameter.getObject();
+            var maybeObject = node.getObject();
 
-                if (maybeObject.isPresent()) {
-                    var object = maybeObject.get();
-                    var compiler = this.<ObjectNode, ObjectNodeCompiler>getCompiler(ObjectNode.class);
+            if (maybeObject.isPresent()) {
+                var object = maybeObject.get();
+                var compiler = this.<ObjectNode, ObjectNodeCompiler>getCompiler(ObjectNode.class);
 
-                    return compiler.compile(this, null, compiledObjectClass, object, maybeParameters);
-                }
+                return compiler.compile(this, null, compiledObjectClass, object, maybeParameters);
             }
 
             throw new CompilerException(node.getPosition(), "Expected an object but found: %s", node);
@@ -678,13 +675,11 @@ public class CompilerContext {
         if (maybeParameter.isPresent()) {
             var node = maybeParameter.get().get_2();
 
-            if (!(node instanceof ActualParameter maybeObjectSet) ||
-                    maybeObjectSet.getObjectSetSpec().isEmpty()) {
+            if (node.getObjectSetSpec().isEmpty()) {
                 throw new CompilerException(node.getPosition(), "Expected an object set but found: %s", node);
             }
 
-            var valueSetOrObjectSet = (ActualParameter) node;
-            var elementSetSpecs = valueSetOrObjectSet.getObjectSetSpec().get();
+            var elementSetSpecs = node.getObjectSetSpec().get();
             var parameter = maybeParameter.get().get_1();
             var compiledObjectClass = ParameterGovernorHelper.getParameterObjectClass(this, parameters, parameter.getGovernor());
 

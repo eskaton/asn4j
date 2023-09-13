@@ -39,7 +39,7 @@ import java.util.Optional;
 
 public class ObjectSetAssignmentCompiler implements Compiler<ObjectSetAssignmentNode> {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private CompilerContext ctx;
 
