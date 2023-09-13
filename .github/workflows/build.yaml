@@ -17,6 +17,7 @@ jobs:
         with:
           repository: eskaton/commons
           path: commons
+          ref: 0.4.0
       - name: Install commons
         working-directory: commons
         run: mvn -B install
