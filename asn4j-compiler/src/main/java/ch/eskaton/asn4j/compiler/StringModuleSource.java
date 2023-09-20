@@ -38,8 +38,9 @@ import java.util.stream.Collectors;
 
 public class StringModuleSource implements ModuleSource {
 
-    private List<Tuple2<String, String>> sources;
+    private final List<Tuple2<String, String>> sources;
 
+    @SafeVarargs
     public StringModuleSource(Tuple2<String, String>... sources) {
         this.sources = Arrays.asList(sources);
     }

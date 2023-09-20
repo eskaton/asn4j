@@ -27,110 +27,12 @@
 
 package ch.eskaton.asn4j.compiler;
 
-import ch.eskaton.asn4j.compiler.constraints.ast.AbstractNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.AllValuesNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.BinOpNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.CollectionOfValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.CollectionValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ComponentNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.EnumeratedValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.IRIValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRange;
-import ch.eskaton.asn4j.compiler.constraints.ast.IntegerRangeValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.Node;
-import ch.eskaton.asn4j.compiler.constraints.ast.ObjectIdentifierValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.PermittedAlphabetNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.RelativeIRIValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.RelativeOIDValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.SizeNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.StringRange;
-import ch.eskaton.asn4j.compiler.constraints.ast.StringSingleValue;
-import ch.eskaton.asn4j.compiler.constraints.ast.StringValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.ValueNode;
-import ch.eskaton.asn4j.compiler.constraints.ast.WithComponentsNode;
-import ch.eskaton.asn4j.compiler.results.AbstractCompiledField;
-import ch.eskaton.asn4j.compiler.results.CompiledBitStringType;
-import ch.eskaton.asn4j.compiler.results.CompiledBuiltinType;
-import ch.eskaton.asn4j.compiler.results.CompiledChoiceType;
-import ch.eskaton.asn4j.compiler.results.CompiledCollectionComponent;
-import ch.eskaton.asn4j.compiler.results.CompiledCollectionOfType;
-import ch.eskaton.asn4j.compiler.results.CompiledCollectionType;
-import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueField;
-import ch.eskaton.asn4j.compiler.results.CompiledFixedTypeValueSetField;
-import ch.eskaton.asn4j.compiler.results.CompiledIntegerType;
-import ch.eskaton.asn4j.compiler.results.CompiledObject;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectClass;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectField;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectSet;
-import ch.eskaton.asn4j.compiler.results.CompiledObjectSetField;
-import ch.eskaton.asn4j.compiler.results.CompiledType;
-import ch.eskaton.asn4j.compiler.results.CompiledTypeField;
-import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueField;
-import ch.eskaton.asn4j.compiler.results.CompiledVariableTypeValueSetField;
+import ch.eskaton.asn4j.compiler.constraints.ast.*;
+import ch.eskaton.asn4j.compiler.results.*;
 import ch.eskaton.asn4j.parser.ParserException;
 import ch.eskaton.asn4j.parser.ast.OIDComponentNode;
-import ch.eskaton.asn4j.parser.ast.types.BMPString;
-import ch.eskaton.asn4j.parser.ast.types.BitString;
-import ch.eskaton.asn4j.parser.ast.types.BooleanType;
-import ch.eskaton.asn4j.parser.ast.types.EnumeratedType;
-import ch.eskaton.asn4j.parser.ast.types.ExternalTypeReference;
-import ch.eskaton.asn4j.parser.ast.types.GeneralString;
-import ch.eskaton.asn4j.parser.ast.types.GeneralizedTime;
-import ch.eskaton.asn4j.parser.ast.types.GraphicString;
-import ch.eskaton.asn4j.parser.ast.types.IA5String;
-import ch.eskaton.asn4j.parser.ast.types.IRI;
-import ch.eskaton.asn4j.parser.ast.types.ISO646String;
-import ch.eskaton.asn4j.parser.ast.types.IntegerType;
-import ch.eskaton.asn4j.parser.ast.types.Null;
-import ch.eskaton.asn4j.parser.ast.types.NumericString;
-import ch.eskaton.asn4j.parser.ast.types.ObjectIdentifier;
-import ch.eskaton.asn4j.parser.ast.types.OctetString;
-import ch.eskaton.asn4j.parser.ast.types.OpenType;
-import ch.eskaton.asn4j.parser.ast.types.PrintableString;
-import ch.eskaton.asn4j.parser.ast.types.Real;
-import ch.eskaton.asn4j.parser.ast.types.RelativeIRI;
-import ch.eskaton.asn4j.parser.ast.types.RelativeOID;
-import ch.eskaton.asn4j.parser.ast.types.SequenceOfType;
-import ch.eskaton.asn4j.parser.ast.types.SequenceType;
-import ch.eskaton.asn4j.parser.ast.types.SetOfType;
-import ch.eskaton.asn4j.parser.ast.types.SetType;
-import ch.eskaton.asn4j.parser.ast.types.T61String;
-import ch.eskaton.asn4j.parser.ast.types.TeletexString;
-import ch.eskaton.asn4j.parser.ast.types.Type;
-import ch.eskaton.asn4j.parser.ast.types.UTCTime;
-import ch.eskaton.asn4j.parser.ast.types.UTF8String;
-import ch.eskaton.asn4j.parser.ast.types.UniversalString;
-import ch.eskaton.asn4j.parser.ast.types.VideotexString;
-import ch.eskaton.asn4j.parser.ast.types.VisibleString;
-import ch.eskaton.asn4j.parser.ast.values.BMPStringValue;
-import ch.eskaton.asn4j.parser.ast.values.BitStringValue;
-import ch.eskaton.asn4j.parser.ast.values.BooleanValue;
-import ch.eskaton.asn4j.parser.ast.values.ChoiceValue;
-import ch.eskaton.asn4j.parser.ast.values.CollectionOfValue;
-import ch.eskaton.asn4j.parser.ast.values.CollectionValue;
-import ch.eskaton.asn4j.parser.ast.values.EnumeratedValue;
-import ch.eskaton.asn4j.parser.ast.values.GeneralStringValue;
-import ch.eskaton.asn4j.parser.ast.values.GeneralizedTimeValue;
-import ch.eskaton.asn4j.parser.ast.values.GraphicStringValue;
-import ch.eskaton.asn4j.parser.ast.values.IA5StringValue;
-import ch.eskaton.asn4j.parser.ast.values.IRIValue;
-import ch.eskaton.asn4j.parser.ast.values.IntegerValue;
-import ch.eskaton.asn4j.parser.ast.values.NamedValue;
-import ch.eskaton.asn4j.parser.ast.values.NullValue;
-import ch.eskaton.asn4j.parser.ast.values.NumericStringValue;
-import ch.eskaton.asn4j.parser.ast.values.ObjectIdentifierValue;
-import ch.eskaton.asn4j.parser.ast.values.OctetStringValue;
-import ch.eskaton.asn4j.parser.ast.values.PrintableStringValue;
-import ch.eskaton.asn4j.parser.ast.values.RealValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeIRIValue;
-import ch.eskaton.asn4j.parser.ast.values.RelativeOIDValue;
-import ch.eskaton.asn4j.parser.ast.values.TeletexStringValue;
-import ch.eskaton.asn4j.parser.ast.values.UTCTimeValue;
-import ch.eskaton.asn4j.parser.ast.values.UTF8StringValue;
-import ch.eskaton.asn4j.parser.ast.values.UniversalStringValue;
-import ch.eskaton.asn4j.parser.ast.values.Value;
-import ch.eskaton.asn4j.parser.ast.values.VideotexStringValue;
-import ch.eskaton.asn4j.parser.ast.values.VisibleStringValue;
+import ch.eskaton.asn4j.parser.ast.types.*;
+import ch.eskaton.asn4j.parser.ast.values.*;
 import ch.eskaton.asn4j.runtime.Clazz;
 import ch.eskaton.asn4j.runtime.TagId;
 import ch.eskaton.asn4j.runtime.types.ASN1Null;
@@ -146,13 +48,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -161,62 +58,27 @@ import java.util.stream.Stream;
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.compilerConfig;
 import static ch.eskaton.asn4j.compiler.CompilerTestUtils.getCompiledValue;
 import static ch.eskaton.asn4j.parser.NoPosition.NO_POSITION;
-import static ch.eskaton.asn4j.runtime.types.TypeName.BIT_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.BMP_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.BOOLEAN;
-import static ch.eskaton.asn4j.runtime.types.TypeName.ENUMERATED;
-import static ch.eskaton.asn4j.runtime.types.TypeName.GENERALIZED_TIME;
-import static ch.eskaton.asn4j.runtime.types.TypeName.GENERAL_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.GRAPHIC_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.IA5_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.INTEGER;
-import static ch.eskaton.asn4j.runtime.types.TypeName.ISO646_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.NULL;
-import static ch.eskaton.asn4j.runtime.types.TypeName.NUMERIC_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.OBJECT_IDENTIFIER;
-import static ch.eskaton.asn4j.runtime.types.TypeName.OCTET_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.OID;
-import static ch.eskaton.asn4j.runtime.types.TypeName.OID_IRI;
-import static ch.eskaton.asn4j.runtime.types.TypeName.PRINTABLE_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.REAL;
-import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID;
-import static ch.eskaton.asn4j.runtime.types.TypeName.RELATIVE_OID_IRI;
-import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE;
-import static ch.eskaton.asn4j.runtime.types.TypeName.SEQUENCE_OF;
-import static ch.eskaton.asn4j.runtime.types.TypeName.SET_OF;
-import static ch.eskaton.asn4j.runtime.types.TypeName.T61_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.TELETEX_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.UNIVERSAL_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.UTC_TIME;
-import static ch.eskaton.asn4j.runtime.types.TypeName.UTF8_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.VIDEOTEX_STRING;
-import static ch.eskaton.asn4j.runtime.types.TypeName.VISIBLE_STRING;
+import static ch.eskaton.asn4j.runtime.types.TypeName.*;
 import static ch.eskaton.asn4j.test.TestUtils.module;
 import static java.util.stream.Collectors.toList;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 class CompilerImplTest {
 
     public static final String MODULE_NAME = "TEST-MODULE";
 
-    private static final Collection<TypeRecord> TYPE_RECORDS;
+    private static final Collection<TypeRecord<?, ?>> TYPE_RECORDS;
 
     static {
         TYPE_RECORDS = List.of(
-                new TypeRecord(BooleanType.class, BOOLEAN, 1, BooleanValue.class, "TRUE", Boolean.TRUE,
-                        (Function<BooleanValue, Boolean>) (BooleanValue v) -> v.getValue()),
+                new TypeRecord<>(BooleanType.class, BOOLEAN, 1, BooleanValue.class, "TRUE", Boolean.TRUE,
+                        (Function<BooleanValue, Boolean>) BooleanValue::getValue),
                 new TypeRecord(IntegerType.class, INTEGER, 2, IntegerValue.class, "23", 23L,
                         (Function<IntegerValue, Long>) (IntegerValue v) -> v.getValue().longValue()),
                 new TypeRecord(BitString.class, BIT_STRING, 3, BitStringValue.class, "'1011'B", new byte[] { 0x0b },
-                        (Function<BitStringValue, byte[]>) (BitStringValue v) -> v.getByteValue()),
+                        (Function<BitStringValue, byte[]>) ByteStringValue::getByteValue),
                 new TypeRecord(OctetString.class, OCTET_STRING, 4, OctetStringValue.class, "'0A'H", new byte[] { 0x0a },
-                        (Function<OctetStringValue, byte[]>) (OctetStringValue v) -> v.getByteValue()),
+                        (Function<OctetStringValue, byte[]>) ByteStringValue::getByteValue),
                 new TypeRecord(Null.class, NULL, 5, NullValue.class, "NULL", new NullValue(NO_POSITION),
                         Function.identity()),
                 new TypeRecord(ObjectIdentifier.class, OBJECT_IDENTIFIER, 6, ObjectIdentifierValue.class, "{1 2 3 27}",
@@ -226,9 +88,9 @@ class CompilerImplTest {
                 new TypeRecord(Real.class, REAL, 9, RealValue.class, "1.2e5", 120000L,
                         (Function<RealValue, Long>) (RealValue v) -> v.getValue().longValue()),
                 new TypeRecord(EnumeratedType.class, "ENUMERATED {a, b, c}", 10, EnumeratedValue.class, "c", 2,
-                        (Function<EnumeratedValue, Integer>) (EnumeratedValue v) -> v.getValue()),
+                        (Function<EnumeratedValue, Integer>) EnumeratedValue::getValue),
                 new TypeRecord(UTF8String.class, UTF8_STRING, 12, UTF8StringValue.class, "\"äöü\"", "äöü",
-                        (Function<UTF8StringValue, String>) (UTF8StringValue v) -> v.getValue()),
+                        (Function<UTF8StringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(RelativeOID.class, RELATIVE_OID, 13, RelativeOIDValue.class, "{2 3 27}",
                         Arrays.asList(2, 3, 27),
                         (Function<RelativeOIDValue, List<Integer>>) (RelativeOIDValue v) ->
@@ -239,49 +101,49 @@ class CompilerImplTest {
                                 v.getValues().stream().collect(Collectors.toMap(NamedValue::getName, NamedValue::getValue))),
                 new TypeRecord(SequenceOfType.class, "SEQUENCE OF BOOLEAN", 16, CollectionOfValue.class, "{TRUE}",
                         List.of(new BooleanValue(NO_POSITION, true)),
-                        (Function<CollectionOfValue, List<Value>>) (CollectionOfValue v) -> v.getValues()),
+                        (Function<CollectionOfValue, List<Value>>) CollectionOfValue::getValues),
                 new TypeRecord(SetType.class, "SET {a BOOLEAN}", 17, CollectionValue.class, "{a TRUE}",
                         Map.of("a", new BooleanValue(NO_POSITION, true)),
                         (Function<CollectionValue, Map<String, Value>>) (CollectionValue v) ->
                                 v.getValues().stream().collect(Collectors.toMap(NamedValue::getName, NamedValue::getValue))),
                 new TypeRecord(SetOfType.class, "SET OF BOOLEAN", 17, CollectionOfValue.class, "{TRUE}",
                         List.of(new BooleanValue(NO_POSITION, true)),
-                        (Function<CollectionOfValue, List<Value>>) (CollectionOfValue v) -> v.getValues()),
+                        (Function<CollectionOfValue, List<Value>>) CollectionOfValue::getValues),
                 new TypeRecord(NumericString.class, NUMERIC_STRING, 18, NumericStringValue.class, "\"123\"", "123",
-                        (Function<NumericStringValue, String>) (NumericStringValue v) -> v.getValue()),
+                        (Function<NumericStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(PrintableString.class, PRINTABLE_STRING, 19, PrintableStringValue.class, "\"abc\"", "abc",
-                        (Function<PrintableStringValue, String>) (PrintableStringValue v) -> v.getValue()),
+                        (Function<PrintableStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(TeletexString.class, TELETEX_STRING, 20, TeletexStringValue.class, "\"abc\"", "abc",
-                        (Function<TeletexStringValue, String>) (TeletexStringValue v) -> v.getValue()),
+                        (Function<TeletexStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(T61String.class, T61_STRING, 20, TeletexStringValue.class, "\"abc\"", "abc",
-                        (Function<TeletexStringValue, String>) (TeletexStringValue v) -> v.getValue()),
+                        (Function<TeletexStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(VideotexString.class, VIDEOTEX_STRING, 21, VideotexStringValue.class, "\"abc\"", "abc",
-                        (Function<VideotexStringValue, String>) (VideotexStringValue v) -> v.getValue()),
+                        (Function<VideotexStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(IA5String.class, IA5_STRING, 22, IA5StringValue.class, "\"abc\"", "abc",
-                        (Function<IA5StringValue, String>) (IA5StringValue v) -> v.getValue()),
+                        (Function<IA5StringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(UTCTime.class, UTC_TIME, 23, UTCTimeValue.class, "\"8201021200Z\"", "8201021200Z",
-                        (Function<UTCTimeValue, String>) (UTCTimeValue v) -> v.getValue()),
+                        (Function<UTCTimeValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(GeneralizedTime.class, GENERALIZED_TIME, 24, GeneralizedTimeValue.class,
                         "\"19851106210627.3Z\"", "19851106210627.3Z",
-                        (Function<GeneralizedTimeValue, String>) (GeneralizedTimeValue v) -> v.getValue()),
+                        (Function<GeneralizedTimeValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(GraphicString.class, GRAPHIC_STRING, 25, GraphicStringValue.class, "\"abc\"", "abc",
-                        (Function<GraphicStringValue, String>) (GraphicStringValue v) -> v.getValue()),
+                        (Function<GraphicStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(VisibleString.class, VISIBLE_STRING, 26, VisibleStringValue.class, "\"abc\"", "abc",
-                        (Function<VisibleStringValue, String>) (VisibleStringValue v) -> v.getValue()),
+                        (Function<VisibleStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(ISO646String.class, ISO646_STRING, 26, VisibleStringValue.class, "\"abc\"", "abc",
-                        (Function<VisibleStringValue, String>) (VisibleStringValue v) -> v.getValue()),
+                        (Function<VisibleStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(GeneralString.class, GENERAL_STRING, 27, GeneralStringValue.class, "\"abc\"", "abc",
-                        (Function<GeneralStringValue, String>) (GeneralStringValue v) -> v.getValue()),
+                        (Function<GeneralStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(UniversalString.class, UNIVERSAL_STRING, 28, UniversalStringValue.class, "\"äöü\"", "äöü",
-                        (Function<UniversalStringValue, String>) (UniversalStringValue v) -> v.getValue()),
+                        (Function<UniversalStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(BMPString.class, BMP_STRING, 30, BMPStringValue.class, "\"äöü\"", "äöü",
-                        (Function<BMPStringValue, String>) (BMPStringValue v) -> v.getValue()),
+                        (Function<BMPStringValue, String>) AbstractStringValue::getValue),
                 new TypeRecord(IRI.class, OID_IRI, 35, IRIValue.class, "\"/iso/a/b/c\"",
                         Arrays.asList("iso", "a", "b", "c"),
-                        (Function<IRIValue, List<String>>) (IRIValue v) -> v.getArcIdentifierTexts()),
+                        (Function<IRIValue, List<String>>) AbstractIRIValue::getArcIdentifierTexts),
                 new TypeRecord(RelativeIRI.class, RELATIVE_OID_IRI, 36, RelativeIRIValue.class, "\"a/b/c\"",
                         Arrays.asList("a", "b", "c"),
-                        (Function<RelativeIRIValue, List<String>>) (RelativeIRIValue v) -> v.getArcIdentifierTexts()));
+                        (Function<RelativeIRIValue, List<String>>) AbstractIRIValue::getArcIdentifierTexts));
     }
 
     @Test
@@ -349,12 +211,8 @@ class CompilerImplTest {
 
         var compiledType = getCompiledCollectionOfType(body, MODULE_NAME, "SeqOf");
 
-        assertTrue(compiledType instanceof CompiledCollectionOfType);
-
-        var compiledCollectionOfType = (CompiledCollectionOfType) compiledType;
-
-        assertEquals(Optional.of("a"), compiledCollectionOfType.getContentTypeName());
-        assertTrue(compiledCollectionOfType.getContentType().getType() instanceof IntegerType);
+        assertEquals(Optional.of("a"), compiledType.getContentTypeName());
+        assertTrue(compiledType.getContentType().getType() instanceof IntegerType);
     }
 
     @Test
@@ -462,12 +320,12 @@ class CompilerImplTest {
         var body1 = """
                 IMPORTS null FROM OTHER-MODULE;
                                 
-                nullRef NULL ::= null    
+                nullRef NULL ::= null
                 """;
         var body2 = """
                 EXPORTS null;
                                 
-                null NULL ::= NULL     
+                null NULL ::= NULL
                 """;
 
         var module1 = module(MODULE_NAME, body1);
@@ -487,12 +345,12 @@ class CompilerImplTest {
     @Test
     void testExternalValueReferences() throws IOException, ParserException {
         var body1 = """            
-                nullRef NULL ::= OTHER-MODULE.null    
+                nullRef NULL ::= OTHER-MODULE.null
                 """;
         var body2 = """
                 EXPORTS null;
                                 
-                null NULL ::= NULL     
+                null NULL ::= NULL
                 """;
 
         var module1 = module(MODULE_NAME, body1);
@@ -514,13 +372,13 @@ class CompilerImplTest {
         var body1 = """
                 IMPORTS Integer FROM OTHER-MODULE;
                                 
-                MyInt1 ::= OTHER-MODULE.Integer     
-                MyInt2 ::= [0] EXPLICIT OTHER-MODULE.Integer     
+                MyInt1 ::= OTHER-MODULE.Integer
+                MyInt2 ::= [0] EXPLICIT OTHER-MODULE.Integer
                 """;
         var body2 = """
                 EXPORTS Integer;
                                 
-                Integer ::= INTEGER     
+                Integer ::= INTEGER
                 """;
 
         var module1 = module(MODULE_NAME, body1);
@@ -655,15 +513,11 @@ class CompilerImplTest {
 
             var field1 = maybeField1.get();
 
-            assertTrue(field1 instanceof CompiledCollectionComponent);
+            assertTrue(field1.getCompiledType() instanceof CompiledCollectionType);
 
-            var compiledCollectionComponent = (CompiledCollectionComponent) field1;
+            var compiledCollectionType = (CompiledCollectionType) field1.getCompiledType();
 
-            assertTrue(compiledCollectionComponent.getCompiledType() instanceof CompiledCollectionType);
-
-            var compiledCollectionType2 = (CompiledCollectionType) compiledCollectionComponent.getCompiledType();
-
-            var maybeField2 = compiledCollectionType2.getComponents().stream()
+            var maybeField2 = compiledCollectionType.getComponents().stream()
                     .filter(c -> c.getName().equals("field2"))
                     .findFirst();
 
@@ -726,19 +580,15 @@ class CompilerImplTest {
 
             var field = maybeField.get();
 
-            assertTrue(field instanceof CompiledCollectionComponent);
-
-            var compiledCollectionComponent = (CompiledCollectionComponent) field;
-
-            assertTrue(compiledCollectionComponent.getCompiledType().getType() instanceof BooleanType);
+            assertTrue(field.getCompiledType().getType() instanceof BooleanType);
         }
 
         @Test
         void withComponentsOfReference() throws IOException, ParserException {
             var body = """
                 Seq1 ::= SEQUENCE {a INTEGER, b BOOLEAN}
-                Seq2 ::= SEQUENCE { 
-                    COMPONENTS OF Seq1 
+                Seq2 ::= SEQUENCE {
+                    COMPONENTS OF Seq1
                 }
                 """;
 
@@ -753,8 +603,8 @@ class CompilerImplTest {
         @Test
         void withComponentsOf() throws IOException, ParserException {
             var body = """
-                Seq ::= SEQUENCE { 
-                    COMPONENTS OF SEQUENCE {a INTEGER, b BOOLEAN} 
+                Seq ::= SEQUENCE {
+                    COMPONENTS OF SEQUENCE {a INTEGER, b BOOLEAN}
                 }
                 """;
 
@@ -769,8 +619,8 @@ class CompilerImplTest {
         @Test
         void withComponentsOfInvalidType() {
             var body = """
-                Seq ::= SEQUENCE { 
-                    COMPONENTS OF SET {a INTEGER, b BOOLEAN} 
+                Seq ::= SEQUENCE {
+                    COMPONENTS OF SET {a INTEGER, b BOOLEAN}
                 }
                 """;
 
@@ -1355,9 +1205,9 @@ class CompilerImplTest {
             var object1 = object2.getObjectDefinition().get("field2");
 
             assertTrue(object1 instanceof Map);
-            assertTrue(((Map) object1).containsKey("field1"));
+            assertTrue(((Map<?, ?>) object1).containsKey("field1"));
 
-            var value = ((Map) object1).get("field1");
+            var value = ((Map<?, ?>) object1).get("field1");
 
             assertTrue(value instanceof IntegerValue);
             assertEquals(47, ((IntegerValue) value).getValue().longValue());
@@ -1403,8 +1253,8 @@ class CompilerImplTest {
 
             assertNotNull(objectSet);
 
-            assertTrue(objectSet.stream().filter(obj -> "object2".equals(obj.getName())).findAny().isPresent());
-            assertTrue(objectSet.stream().filter(obj -> "object3".equals(obj.getName())).findAny().isPresent());
+            assertTrue(objectSet.stream().anyMatch(obj -> "object2".equals(obj.getName())));
+            assertTrue(objectSet.stream().anyMatch(obj -> "object3".equals(obj.getName())));
         }
 
         @Test
@@ -1440,9 +1290,9 @@ class CompilerImplTest {
             var object1 = object2.getObjectDefinition().get("field2");
 
             assertTrue(object1 instanceof Map);
-            assertTrue(((Map) object1).containsKey("field1"));
+            assertTrue(((Map<?, ?>) object1).containsKey("field1"));
 
-            var value = ((Map) object1).get("field1");
+            var value = ((Map<?, ?>) object1).get("field1");
 
             assertTrue(value instanceof IntegerValue);
             assertEquals(47, ((IntegerValue) value).getValue().longValue());
@@ -1480,13 +1330,13 @@ class CompilerImplTest {
             var body = """
                          TEST ::= CLASS {
                            &id    INTEGER UNIQUE,
-                           &Type 
+                           &Type
                          } WITH SYNTAX {
                            &Type IDENTIFIED BY &id
                          }
                         
                         compiledObject TEST ::= {
-                           BOOLEAN IDENTIFIED BY 1 
+                           BOOLEAN IDENTIFIED BY 1
                         }
                     """;
 
@@ -1696,7 +1546,7 @@ class CompilerImplTest {
         @Test
         void testObjectWithValueSet() throws IOException, ParserException {
             var body = """
-                    TEST ::= CLASS { 
+                    TEST ::= CLASS {
                         &Type
                     } WITH SYNTAX {
                         TYPE &Type
@@ -1720,7 +1570,7 @@ class CompilerImplTest {
     @ParameterizedTest(name = "[{index}] {5}")
     @MethodSource("provideValueFromObject")
     @DisplayName("Test value from object")
-    <V extends Value, O extends java.lang.Object> void testValueFromObject(
+    <V extends Value, O> void testValueFromObject(
             String typeName, Class<V> valueClass, String valueString, O expectedValue, Function<V, O> valueAccessor,
             String description) throws IOException, ParserException {
         var body = """
@@ -1780,7 +1630,7 @@ class CompilerImplTest {
         assertNotNull(compiledValue);
         assertNotNull(compiledValue.getValue());
         assertTrue(compiledValue.getValue() instanceof BooleanValue);
-        assertEquals(true, ((BooleanValue) compiledValue.getValue()).getValue());
+        assertTrue(((BooleanValue) compiledValue.getValue()).getValue());
     }
 
     @Test
@@ -2293,7 +2143,8 @@ class CompilerImplTest {
                 }
                 """;
 
-        Optional<AbstractCompiledField> field = getCompiledField(body, "TEST", "FixedTypeValueSetField");
+        var field = getCompiledField(body, "TEST", "FixedTypeValueSetField");
+
         assertTrue(field.get() instanceof CompiledFixedTypeValueSetField);
 
         var fixedTypeValueSetField = (CompiledFixedTypeValueSetField) field.get();
@@ -2795,7 +2646,7 @@ class CompilerImplTest {
                            &fixedTypeValueField BOOLEAN
                        } WITH SYNTAX {
                            FIELD &fixedTypeValueField
-                           FIELD &fixedTypeValueField 
+                           FIELD &fixedTypeValueField
                        }
                     """;
 
@@ -2935,8 +2786,8 @@ class CompilerImplTest {
         @Test
         void testParameterizedTypeWithSequenceComponentsOfInline() throws IOException, ParserException {
             var body = """
-                    AbstractSeq {Type} ::= SEQUENCE { 
-                        COMPONENTS OF SEQUENCE {field1 INTEGER, field2 Type} 
+                    AbstractSeq {Type} ::= SEQUENCE {
+                        COMPONENTS OF SEQUENCE {field1 INTEGER, field2 Type}
                     }
                                     
                     Seq ::= AbstractSeq {BOOLEAN}
@@ -3041,7 +2892,7 @@ class CompilerImplTest {
                     Set2 ::= SET {
                         field1 INTEGER,
                         field2 BOOLEAN
-                    }     
+                    }
                     """;
 
             var module1 = module(MODULE_NAME, body1);
@@ -3076,7 +2927,7 @@ class CompilerImplTest {
                     Set2 ::= SET {
                         field1 INTEGER,
                         field2 BOOLEAN
-                    }    
+                    }
                     """;
 
             var module1 = module(MODULE_NAME, body1);
@@ -3293,7 +3144,7 @@ class CompilerImplTest {
             var set = (CompiledCollectionType) compiledType;
 
             assertEquals(1, set.getComponents().size());
-            assertTrue(set.getComponents().get(0) instanceof CompiledCollectionComponent);
+            assertNotNull(set.getComponents().get(0));
 
             var field1 = set.getComponents().get(0).getCompiledType();
 
@@ -3393,16 +3244,16 @@ class CompilerImplTest {
                             "Choice",
                             ValueNode.class,
                             (Consumer<ValueNode>) node -> {
-                                var value = (Set) node.getValue();
+                                var value = (Set<?>) node.getValue();
 
                                 assertEquals(1, value.size());
                                 assertTrue(value.iterator().next() instanceof ChoiceValue);
                             },
                             "CHOICE contained subtype constraint"),
                     Arguments.of("""
-                                AbstractSet {Type} ::= SET  { 
-                                    a INTEGER, 
-                                    b BOOLEAN 
+                                AbstractSet {Type} ::= SET  {
+                                    a INTEGER,
+                                    b BOOLEAN
                                 }  (INCLUDES Type)
                 
                                 Set ::= AbstractSet {SET {a INTEGER, b BOOLEAN} ({a 1, b TRUE})}
@@ -3661,7 +3512,7 @@ class CompilerImplTest {
         @ParameterizedTest(name = "[{index}] {5}")
         @MethodSource("provideParameterizedValueWithObject")
         @DisplayName("Test value parameters in objects with default syntax")
-        <V extends Value, O extends java.lang.Object> void testParameterizedValueWithObjectWithDefaultSyntax(
+        <V extends Value, O> void testParameterizedValueWithObjectWithDefaultSyntax(
                 String typeName, Class<V> valueClass, String valueString, O expectedValue, Function<V, O> valueAccessor,
                 String description)
                 throws IOException, ParserException {
@@ -3687,7 +3538,7 @@ class CompilerImplTest {
         @ParameterizedTest(name = "[{index}] {5}")
         @MethodSource("provideParameterizedValueWithObject")
         @DisplayName("Test value parameters in objects with defined syntax")
-        <V extends Value, O extends java.lang.Object> void testParameterizedValueWithObjectWithDefinedSyntax(
+        <V extends Value, O> void testParameterizedValueWithObjectWithDefinedSyntax(
                 String typeName, Class<V> valueClass, String valueString, O expectedValue, Function<V, O> valueAccessor,
                 String description) throws IOException, ParserException {
             var body = """
@@ -3918,7 +3769,7 @@ class CompilerImplTest {
                             "INTEGER value range constraint"),
                     Arguments.of("""
                                 AbstractSequence {INTEGER:int, BOOLEAN:bool} ::= SEQUENCE {
-                                    a INTEGER, 
+                                    a INTEGER,
                                     b BOOLEAN
                                 } (WITH COMPONENTS {a (int), b (bool)})
     
@@ -3951,8 +3802,8 @@ class CompilerImplTest {
 
     }
 
-    private <V extends Value, O extends java.lang.Object> void testValue(Class<V> valueClass,
-            Function<V, O> valueAccessor, O expectedValue, java.lang.Object value) {
+    private <V extends Value, O> void testValue(Class<V> valueClass,
+                                                Function<V, O> valueAccessor, O expectedValue, java.lang.Object value) {
         if (expectedValue.getClass().isArray()) {
             if (expectedValue.getClass().equals(byte[].class)) {
                 assertArrayEquals((byte[]) expectedValue, (byte[]) valueAccessor.apply(valueClass.cast(value)));
@@ -3975,7 +3826,7 @@ class CompilerImplTest {
                 .typeTestBuilder()
                     .typeName(typeName)
                     .constraintTestBuilder(nodeClass)
-                        .verify(verifier::accept)
+                        .verify(verifier)
                         .build()
                     .build()
                 .build()
@@ -4201,9 +4052,7 @@ class CompilerImplTest {
                 .findAny();
     }
 
-    private static void checkIntegerRange(List<IntegerRange> value, int lower, int upper) {
-        var integerRanges = value;
-
+    private static void checkIntegerRange(List<IntegerRange> integerRanges, int lower, int upper) {
         assertEquals(1, integerRanges.size());
 
         var integerRange = integerRanges.get(0);
@@ -4486,10 +4335,13 @@ class CompilerImplTest {
                 });
     }
 
-    static record TypeRecord<V extends Value, O extends java.lang.Object>(Class<? extends Type> type, String typeName,
-                                                                          TagId tag, Class<V> valueClass,
-                                                                          String valueString, O value,
-                                                                          Function<V, O> valueAccessor) {
+    record TypeRecord<V extends Value, O>(Class<? extends Type> type,
+                                          String typeName,
+                                          TagId tag,
+                                          Class<V> valueClass,
+                                          String valueString,
+                                          O value,
+                                          Function<V, O> valueAccessor) {
 
         public TypeRecord(Class<? extends Type> type, TypeName typeName, int tag, Class<V> valueClass,
                 String valueString, O value, Function<V, O> valueAccessor) {
