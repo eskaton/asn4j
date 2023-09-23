@@ -391,9 +391,11 @@ public class CompilerContext {
      */
     public CompiledType getCompiledType(Type type) {
         if (isResolvableReference(type)) {
-            var typeName = ((TypeReference) type).getType();
+            var typeReference = (TypeReference) type;
+            var moduleName = typeReference.getModuleName();
+            var typeName = typeReference.getType();
 
-            return getCompiledType(typeName);
+            return getCompiledType(moduleName, typeName);
         } else if (type instanceof ExternalTypeReference externalTypeReference) {
             var moduleName = externalTypeReference.getModule();
             var typeName = externalTypeReference.getType();

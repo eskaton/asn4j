@@ -489,7 +489,9 @@ public class CompilerUtils {
             return updateTags(ctx, typeReference, compiledType);
         }
 
-        var compiledType = ctx.getCompiledType(referencedTypeName);
+        var compiledType = typeReference.getModuleName() != null
+                ? ctx.getCompiledType(typeReference.getModuleName(), referencedTypeName)
+                : ctx.getCompiledType(referencedTypeName);
 
         return updateTags(ctx, typeReference, compiledType);
     }
